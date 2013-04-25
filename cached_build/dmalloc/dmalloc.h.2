@@ -1,0 +1,25 @@
+/* this is dmalloc.h.2 */
+/* produced by configure, inserted into dmalloc.h */
+
+/* const is available */
+/* strdup is not a macro */
+#undef DMALLOC_STRDUP_MACRO
+
+/*
+ * the definition of DMALLOC_SIZE
+ *
+ * NOTE: some architectures have malloc, realloc, etc.
+ * using unsigned instead of unsigned long.  You may
+ * have to edit this by hand to fix any compilation
+ * warnings or errors.
+ */
+#include <sys/types.h>
+#define DMALLOC_SIZE size_t
+
+/*
+ * We use stdarg.h for the dmalloc_message and
+ * dmalloc_vmessage functions.
+ */
+#include <stdarg.h>
+#define DMALLOC_STDARG 1
+
