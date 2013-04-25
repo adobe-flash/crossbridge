@@ -1,0 +1,638 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsdoc PUBLIC "-//GNUstep//DTD gsdoc 1.0.3//EN" "http://www.gnustep.org/gsdoc-1_0_3.xml">
+<gsdoc base="ReleaseNotes">
+  <head>
+    <title>GNUstep Gui Release Notes</title>
+    <author name="Adam Fedor">
+      <email address="fedor@gnu.org"/>
+      <url url="http://www.gnustep.org/developers/whoiswho.html"/>
+    </author>
+    <version>$Revision: 34711 $</version>
+    <date>$Date: 2012-02-03 18:27:05 +0100 (Fri, 03 Feb 2012) $</date>
+    <copy>2005 Free Software Foundation, Inc.</copy>
+  </head>
+  <body>
+    <chapter>
+      <heading>Gui Release Notes</heading>
+      <p>
+        The release notes include descriptions of API changes, behavior
+	changes and other information that might help developers and users
+	migrate to using a newer version of the library.
+      </p>
+
+     <section>
+      	<heading>0.22.0</heading>
+	<p>
+	  This is a major new stable release of GUI. Note that to improve stability, some features that were in previous releases have been removed. Newer and better implementation of these features will be added back soon. These include use of ghostscript and ImageMagic to automatically translate image formats, and an implementation of copy-on-scroll in NSClipView. Also note that this version is binary incompatible with previous versions on 64-bit systems due to changes in some variables based on changes in GNUstep base to the type of NSNotFound.
+	  New features include:
+	</p>
+	<deflist>
+            <term>Support for drawing the GUI with a scale factor, for high-DPI monitors.</term>
+            <desc>
+	      <p>
+		This is enabled automatically on Windows when the system DPI setting is changed from its default of 96 in the Windows control panel. It can be enabled on X11 (or the default overridden on Windows) by setting the GSScaleFactor user default. For example, setting this to 1.5 would make everything appear 50% larger.
+	      </p>
+	      <p>
+		The scale factor is implemented in GSWindowDecorationView; we use NSView's built-in scaling support and call -[NSWindow userSpaceScaleFactor] to determine how to manipulate the bounds and frame rect of the window decoration view. NSUnscaledWindowMask is respected, if it is part of a window's style mask. Note that changing the scale factor without restarting applications is currently unsupported, and all screens currently share the same scale factor. Both of these limitations should be reasonably easy to fix in a future release, however.
+	      </p>
+            </desc>
+            <term>Character panel</term>
+            <desc>
+	      There is a character panel accessible from a button in the standard Font panel. It requires libicu.
+            </desc>
+            <term>Color picker "Magnifier" tool, for grabbing the color of arbitrary parts of the screen</term>
+            <desc>
+	      Currently only implemented on X11/cairo.
+            </desc>
+            <term>Many new image formats supported for reading using Ghostscript and ImageMagick</term>
+            <desc>
+	      The Ghostscript image rep provides PS/EPS/PDF support, however it has some limitations. It is quite slow. Only the first page is rendered, because we use the pngalpha Ghostscript device, which is the only device supporting 8-bit alpha.
+            </desc>
+  	</deflist>
+	
+	<p>Other improvements:</p>
+	<deflist>
+	  <term>NSImage</term>
+	  <desc>
+	    <p>Mac OS X 10.6 drawing methods (-[NSImage drawInRect:fromRect:operation:fraction:respectFlipped:hints:]). The rep selection code was completely overhauled, and it should work much better with images containing many reps. In particular, the DPI metadata in images is now respected, and TIFF images containing multiple resolutions are now fully supported.</p>
+	    <p>Icons are now better supported. By icon, we mean an NSImage whose representations are not all of the same point size. Icons are usually ICNS or TIFF files. (Note that we aren't talking about a TIFF containing sub-images with different pixel sizes but the same point sizes.) The important thing about icons is -[NSImage size] should not be called, because the icon doesn't have one single size in points, but many sizes, so it's not clear which will be returned from this method. Similarly, -[NSImage drawAtPoint:fromRect:operation:fraction:] should be avoided, as should the -compositeToPoint: family of methods, since these use -[NSImage size] to determine how big to draw the image. The benefit of icons is that when -[NSImage drawInRect:fromRect:operation:fraction:] is called, the rep with the largest point size smaller than or equal to the rect to be drawn in will be chosen, resulting in better looking output. For best results, call drawInRect: with a point size you expect the icons to have, like 16x16 or 64x64.</p>
+	  </desc>
+	  <term>NSCursor</term>
+	  <desc>
+	    Support for creating 32-bit ARGB cursors on X11 (with the Xcursor library)
+	  </desc>
+	  <term>NSView</term>
+	  <desc>
+	    Autoresizing algorithm reimplemented to be closer to OS X. View frames generated by autoresizing are now rounded to lie on pixel boundaries.
+	  </desc>
+	</deflist>
+      </section>
+
+     <section>
+      	<heading>Version 0.20.0</heading>
+	<p>A new stable release. Many improvments with Nib loading, documents and document controllers. Fixed
+	many drawing issues, particularly ones related to flipping. Much improved theming.
+	</p>
+	<deflist>
+            <term>NSOutlineView</term>
+            <desc>
+	      Use NSInteger and CGFloat in method names where appropriate.
+            </desc>
+            <term>NSDocument</term>
+            <desc>
+	      Change result type of method-saveToURL:ofType:forSaveOperation:delegate:didSaveSelector:contextInfo:
+	      from BOOL to void.
+            </desc>
+            <term>NSView</term>
+            <desc>
+	      New 10.5 methods.
+            </desc>
+            <term>NSCursor</term>
+            <desc>
+	      New 10.6 methods.
+            </desc>
+  	</deflist>
+      </section>
+
+     <section>
+      	<heading>Version 0.18.0</heading>
+	<p>A new stable release that has had many improvements. Many new
+	Mac OS X methods (10.5 and newer) were added. Many Windows specific
+	improvements were made (particularly with the use of the Windows theme).
+	There is also better compatibility with Mac OS X in terms of usage of NSInteger
+	and other definitions.
+	</p>
+	<deflist>
+            <term>NSSliderCell</term>
+            <desc>
+	      Initial implementaiton of circular sliders.
+            </desc>
+            <term>Spanish Translation</term>
+            <desc>
+	     Added spanish translations in various places.
+            </desc>
+            <term>NSDrawers</term>
+            <desc>
+	      They now work.
+            </desc>
+            <term>NSTableColumn</term>
+            <desc>
+	      New 10.6 methods and constants.
+            </desc>
+            <term>Themes</term>
+            <desc>
+	      Usage of themes to draw UI elements is almost completely implemented.
+            </desc>
+  	</deflist>
+      </section>
+
+      <section>
+      	<heading>Version 0.17.1</heading>
+	<p>Bug fixes.
+	</p>
+	<deflist>
+            <term>NSFont</term>
+            <desc>
+	      Add some missing interface methods from 10.5
+            </desc>
+            <term>NSSplitView</term>
+            <desc>
+	      Add live resize (can be turned off with GSUseGhostResize default)
+            </desc>
+  	</deflist>
+      </section>
+      <section>
+      	<heading>Version 0.17.0</heading>
+	<p>Many many bug fixes and almost complete reorganization of NSToolbar
+	code.
+	</p>
+	<deflist>
+            <term>NSBezierPath, NSAttributedString, NSLayoutManager</term>
+            <desc>
+	      New Mac OS X 10.5 methods.
+            </desc>
+            <term>NSSpeechSynthesizer</term>
+            <desc>
+	      New class.
+            </desc>
+            <term>NSSplitView</term>
+            <desc>
+	      Added new Mac OS X 10.5 methods and some ivars
+            </desc>
+            <term>Toolbars</term>
+            <desc>
+	      Many improvements. NSToolbar methods rearragned and ivar removed.
+            </desc>
+            <term>Menus</term>
+            <desc>
+	      MS Window-stype menus inside a window implemented
+            </desc>
+            <term>Garbage Collection</term>
+            <desc>
+	      Several improvements to work better with GC
+            </desc>
+            <term>HelpViewer</term>
+            <desc>
+	      GSHelpViewer use default added.
+            </desc>
+  	</deflist>
+      </section>
+      <section>
+      	<heading>Version 0.16.0</heading>
+	<p>This is an stable release. A lot of improvements and bug
+	fixes went into this release. Thanks to Wolfgang Lux for fixing plenty
+	of bugs. Note that gnustep-core is now installed in the LOCAL domain
+	by default instead of the SYSTEM domain. You may want to remove old
+	installations in the SYSTEM domain to avoid any incompatibility problems.
+	Or you can force installation in SYSTEM using make 
+	GNUSTEP_INSTALLATION_DOMAIN=SYSTEM install.
+	</p>
+	<deflist>
+            <term>Nib Loading</term>
+            <desc>
+	      Several methods were added and Nib loading in general was refactored
+	      and improved.
+            </desc>
+            <term>NSDocument</term>
+            <desc>
+	      Document autosaving was implemented.
+            </desc>
+            <term>NSSavePanel</term>
+            <desc>
+	      Several methods were added to implement support for document types
+	      with multiple allowed file extensions.
+            </desc>
+            <term>NSWindow</term>
+            <desc>
+	      Definitions and skeleton implementation of attachedSheet.
+            </desc>
+            <term>NSTextView</term>
+            <desc>
+	      Renamed and changed types of attributes related to drag and drop.
+            </desc>
+            <term>NSLayoutManager</term>
+            <desc>
+	      New methods added to handle temporary attributes.
+            </desc>
+            <term>NSWindowController</term>
+            <desc>
+	      NSWindowController was made a subclass of NSResponder.
+            </desc>
+            <term>NSCell</term>
+            <desc>
+	      Rearranged somewhat to use GSTheme implemetations.
+            </desc>
+            <term>NSTokenField, NSTokenFieldCell</term>
+            <desc>
+	      New classes added.
+            </desc>
+	</deflist>
+      </section>
+      <section>
+      	<heading>Version 0.14.0</heading>
+	<p>This is an stable release.
+	</p>
+	<deflist>
+            <term>NSGlyphGenerator</term>
+            <desc>
+	      New class for glyph generation (separated from other classes).
+            </desc>
+            <term>NSControl -mouseDownFlags</term>
+            <desc>
+	      Added old NeXT method for compatibility.
+            </desc>
+            <term>NSSplitView</term>
+            <desc>
+	      setAutosaveName: implemented and new instance variable added.
+            </desc>
+            <term>NSOpenGLView</term>
+            <desc>
+	      Added some Mac OS X 10.3 methods.
+            </desc>
+	</deflist>
+      </section>
+       <section>
+      	<heading>Version 0.13.2</heading>
+	<p>This is an unstable release.
+	</p>
+	<deflist>
+            <term>NSPopUpButtonCell</term>
+            <desc>
+	      The encoding of this object was changed (which is backwards compatible,
+	      but not forwards compatible.
+            </desc>
+            <term>NSTextView</term>
+            <desc>
+	      Add new X secondary selection behavior. Other Mac OS X methods added.
+            </desc>
+            <term>NSWindow</term>
+            <desc>
+	      Device interaction with backend has changed. This release of gui
+	      requires the coresponding gnustep-back release 0.13.2.
+            </desc>
+            <term>NSSegmentedCell</term>
+            <desc>
+	      New class added to draw and render text in segments.
+            </desc>
+            <term>NSDrawer</term>
+            <desc>
+	      Implemented.
+            </desc>
+	</deflist>
+      </section>
+      <section>
+      	<heading>Version 0.13.1</heading>
+	<p>This is an unstable release.
+	Changes to error handling and key-value coding require an
+	update to at least the base library version 1.15.1.
+	</p>
+	<deflist>
+            <term>NSMenu</term>
+            <desc>
+	    Added more MacOS X methods and an ivar.
+            </desc>
+            <term>NSView</term>
+            <desc>
+	    Added support for hiding views.
+            </desc>
+            <term>Key-Value bindings</term>
+            <desc>
+	    Added Key-Value bindings implementation (NSKeyValueBinding)
+	    with support in several classes (NSControl, NSTextField, NSView,
+	    etc).
+            </desc>
+            <term>NSTableView</term>
+            <desc>
+	    Added some MacOS X 10.4 methods.
+            </desc>
+            <term>NSCursor</term>
+            <desc>
+	    Changed hot point to 0,0 for MacOS X compatibility.
+            </desc>
+	</deflist>
+      </section>
+      <section>
+      	<heading>Version 0.13.0</heading>
+	<p>This is an unstable release.
+	Changes to error handling and key-value coding require an
+	update to at least the base library version 1.15.1.
+	</p>
+        	  <deflist>
+            	    <term>Licence</term>
+             	    <desc>
+                  Switched to use LGPL 3 and GPL 3.
+             	    </desc>
+                  <term>New Methods added</term>
+                  <desc> 
+                  Added new methods from Mac OS X 10.4 for NSDragging, NSFontDescriptor,
+                  NSAttributedString, NSImageView, NSStringDrawing, NSParagraphStyle,
+                  NSView, NSCell, NSActionCell, NSAlert, NSApplication, NSBitmapImageRep,
+                  NSBox, NSColor, NSColorSpace, NSComboBox, NSComboBoxCell,
+                  NSDocumentController, NSEvent, NSScreen, NSFont, NSFontManager,
+                  NSFormCell, NSForm, NSWindow, NSTextField, NSTextFieldCell. 
+                  Some ivar names were changed also.
+                  </desc>
+            	    <term>Printing</term>
+             	    <desc>
+                  Moved Postscript printing methods from NSView to NSGraphicsContext.
+             	    </desc>
+            	    <term>View drawing</term>
+             	    <desc>
+                  Rewrote the NSView drawing mechanism to always use
+                  [displayRectIgnoringOpacity:inContext].
+             	    </desc>
+            	    <term>Flipped Controls</term>
+             	    <desc>
+                  Report more controls as being flipped. (NSTextField, NSTableHeaderView,
+                  NSSlider, NSProgressIndicator, NSButton) NSTabView is still missing.
+             	    </desc>
+            	    <term>Font Attribute</term>
+             	    <desc>
+                  Add font attribute fixing to NSAttributedString. To allow for the output
+                  of glyphs not present in the current font.
+             	    </desc>
+            	    <term>Optimization</term>
+             	    <desc>
+                  In NSAffineTransform use optimized primitive methods from
+                  base.
+                  Optimized the validation of edited cells.
+             	    </desc>
+            	    <term>Key-Value Binding</term>
+             	    <desc>
+                  Implementation of special connectors for Key-Value binding.
+             	    </desc>
+         	  </deflist>
+      </section>
+      <section>
+	<heading>Version 0.12.0</heading>
+	<p>
+	It has been a long time since the last release and many things
+	have been added and changed, including new classes, new ivars,
+	and new methods.
+	</p>
+	  <deflist>
+	    <term>Tooltips</term>
+	    <desc> 
+	    A Tooltip implementation was added.
+	    </desc>
+	    <term>NSBitmapImage Improvements</term>
+	    <desc> 
+	    Lots of improvements to the NSBitmapImage subclasses.
+	    </desc>
+	    <term>Theming Improvements</term>
+	    <desc> 
+	    GSTheme and other classes were added to improve support
+	    of theming.
+	    </desc>
+	    <term>New Methods added</term>
+	    <desc> 
+	    Added new methods from Mac OS X 10.4 for NSControl, NSResponder,
+	    NSDocument, NSPrintOperation, NSWindowController, NSCell,
+	    NSMenuItem, NSView. Some ivar names were changed also.
+	    </desc>
+	    <term>New ivars added</term>
+	    <desc> 
+	    Added new ivars for NSMenuItem, NSPrintOperation, NSTableView,
+	    NSDrawer, NSScrollView, NSAlert, NSTextView.
+	    </desc>
+	    <term>New Classes Added</term>
+	    <desc>
+	    New classes from Mac OS X 10.4 and earlier were added including
+	    NSLevelIndicator, NSObjectController, NSUserDefaultsController,
+	    NSKeyValueBinding, NSArrayController, NSController.
+	    </desc>
+	    <term>NSSpellServer moved to base</term>
+	    <desc>
+	    NSSpellServer was moved to GNUstep base for Mac OS X
+	    compatibility.
+	    </desc>
+	    <term>NSTabViewType enumerations</term>
+	    <desc>
+	    Enumerations were changed to match values from Mac OS X.
+	    </desc>
+	    <term>GNUstep GUI updated for Make 2.0</term>
+	    <desc>
+	    GNUstep GUI was updated to work with GNUstep Make 2.0. This
+	    includes versioned resources.
+	    </desc>
+	    <term>NSAffineTransform moved to base</term>
+	    <desc>
+	    Much of NSAffineTransform was moved to gnustep-base to match
+	    with Mac OS X. Many older methods were marked as deprecated
+	    in favor of the more recent Mac OS X methods.
+	    </desc>
+	    <term>NSAlert in alternate threads</term>
+	    <desc>
+	    NSAlerts are performed in the main thread even if called
+	    from another thread.
+	    </desc>
+	    <term>NSAnimation Class Added</term>
+	    <desc>
+	    Preliminary code for the NSAnimation class has been added.
+	    Only NSAnimationNonBlocking mode implemented.
+	    </desc>
+	  </deflist>
+      </section>
+      <section>
+	<heading>Version 0.11.0</heading>
+	  <deflist>
+	    <term>Keyed Encoding/Archiving</term>
+	    <desc>
+	    Support for keyed encoding has been added to all gui classes.
+	    </desc>
+	    <term>Nib loading</term>
+	    <desc>
+	    Nib loading has been implemented. For the most part, nibs
+            are (or should be) compatible between GNUstep and Mac OS X.
+	    </desc>
+	    <term>Color schemes and Themes</term>
+	    <desc>
+            Better support for color schemes and themes has been added. In
+            the near future theming should be integrated into gui itself.
+	    </desc>
+	    <term>RTFD</term>
+	    <desc>
+            Loading and writting of RTFD format was implemented.
+	    </desc>
+	  </deflist>
+      </section>
+      <section>
+	<heading>Version 0.10.3</heading>
+	  <deflist>
+	    <term>Horizontal menus</term>
+	    <desc>
+	    Horizontal (mac)-style menus should now work. Horizontal
+	    menus are activated by setting the 'NSMenuInterfaceStyle' user
+	    default to 'NSMacintoshInterfaceStyle'.
+	    </desc>
+	    <term>Active applications</term>
+	    <desc>
+	    Better support for tracking active applications was
+	    added. Normally a workspace manager should handle this,
+	    but the GUI library can handle it on its own if it is not
+	    handled any other way.
+	    </desc>
+	  </deflist>
+      </section>
+      <section>
+	<heading>Version 0.10.2</heading>
+	  <deflist>
+	    <term>Power Off</term>
+	    <desc>
+	    The notification center posts a power off notification before
+	    sending a terminate: method sent from another app on the assumption
+	    that the terminate: is from a session manager.
+	    </desc>
+	  </deflist>
+      </section>
+      <section>
+	<heading>Version 0.10.1</heading>
+	  <deflist>
+	    <term>Sound library</term>
+	    <desc>
+	    GNUstep now uses v19 of portaudio for the sound daemon. Version
+            v19 hasn't been officially released, but it is still used in
+	    several distributions (SuSE, etc) as v18 is very old.
+	    </desc>
+	  </deflist>
+      </section>
+      <section>
+	<heading>Version 0.10.0</heading>
+	<p>
+	    The interface version of the gui library has changed in
+	    this release.  Applications, libraries and tools that
+	    wish to use this new version must be recompiled
+	    (otherwise, they'll use the older version of the library).
+	</p>
+	  <deflist>
+	    <term>Nib window autopositioning</term>
+	    <desc>
+	    Nib loading has been improved to handle auto-positioning
+	    of windows.
+	    </desc>
+	    <term>NSFont</term>
+	    <desc>
+	    An ivar was added to NSFont to cache flipped fonts.
+	    </desc>
+	    <term>NSApplication</term>
+	    <desc>
+	    An ivar was added to track application launch.
+	    </desc>
+	    <term>Keyed Encoding</term>
+	    <desc>
+	    Work was done in many classes to support keyed
+	    encoding. It may not be fully implemented in every class, however.
+	    </desc>
+	    <term>Backend Versioning</term>
+	    <desc>
+	    The GUI library now looks for the backend bundle with the 
+	    corrent interface version. Thus there should not be any
+	    problems with the GUI using the wrong backend.
+	    </desc>
+	  </deflist>
+      </section>
+      <section>
+	<heading>Version 0.9.5</heading>
+	<p>
+	</p>
+	  <deflist>
+	    <term>NSColor colors</term>
+	    <desc>
+	    Added new control colors and methods from 10.3 version of Cocoa.
+	    </desc>
+	    <term>NSFont methods</term>
+	    <desc>
+	    Added new font methods from 10.3 version of Cocoa
+	    </desc>
+	    <term>NSApplication -runModalSession</term>
+	    <desc>
+	    Behavior of this method was changed. In particular it deviates
+	    from Cocoa documentation. See the GNUstep GUI documentation for
+	    specifics.
+	    </desc>
+	    <term>Runtime version discovery of library</term>
+	    <desc>
+	    A developer can discover the version of the gui library
+            that is loaded using the NSBundle methods <code>[[NSBundle
+            bundleForLibrary: @"gnustep-gui"] infoDictionary]</code>
+            and retrieving the <var>GSBundleVersion</var> key.
+	    </desc>
+	  </deflist>
+      </section>
+      <section>
+	<heading>Version 0.9.4</heading>
+	<p>
+	</p>
+	  <deflist>
+	    <term>Interface version change</term>
+	    <desc>
+	    The interface version of the gui library has changed in
+	    this release.
+	    There is no single reason for this change. Arguably, it
+	    should have been done long ago. In the future the
+	    interface version will only change with releases that
+	    have a new minor version number (that's the second number in the
+	    release number). Applications, libraries and tools that
+	    wish to use this new version must be recompiled
+	    (otherwise, they'll use the older version of the library).
+	    </desc>
+	    <term>PPD's removed</term>
+	    <desc>
+	      All the PPD's have been removed from the gui library
+	      into a separate package (gnustep-ppd). There still
+	      exists a single Generic Postscript Printer PPD which
+	      should work in many cases for printing using the
+	      standard <var>lpr</var> interface. In the future, a
+	      <var>CUPS</var> interface should be available that provides
+	      all the necessary printer information automatically. If
+	      you still want use of the PPD's, you must install the
+	      gnustep-ppd package, although this is not required for
+	      use of gnustep-gui.
+	    </desc>
+	    <term>Printing framework</term>
+	    <desc>
+	      The printing framework was generalized to allow for
+	      various types of native printing systems. The lpr
+	      system is the only complete one, although CUPS printing
+	      is in the works. As such, the printing classes were
+	      revamped to handle this, and the actual system-specific
+	      code is loaded from a bundle.
+	    </desc>
+	    <term>NSScroller, NSScrollView class size change</term>
+	    <desc>
+	      A new ivar was added to the NSScroller and NSScrollView classes.
+	    </desc>
+	  </deflist>
+      </section>
+      <section>
+	<heading>Version 0.9.3</heading>
+	<p>
+	</p>
+	  <deflist>
+	    <term>Spell checker daemon reimplemented using libaspell</term>
+	    <desc>
+	      If the optional library libaspell is found, the spell checker
+	      will use it (otherwise spell checking will not work).
+	    </desc>
+	    <term>New NSComboBox implementation</term>
+	    <desc>
+	      NSComboBox and related classes have been re-implemented
+	      and documented.
+	    </desc>
+	    <term>NSToolbar code redone</term>
+	    <desc>
+	      A lot of changes where made to the NSToolbar class to 
+	      make it more functional.
+	    </desc>
+	    <term>Binary Incompatibilities</term>
+	    <desc>
+	      New ivars were added NSTableView, NSView,
+	      NSSavePanel. Applications that use this class and
+	      subclasses (e.g. NSOutlineView) may need to be
+	      recompiled to work properly.
+	    </desc>
+	  </deflist>
+      </section>
+    </chapter>
+  </body>
+</gsdoc>

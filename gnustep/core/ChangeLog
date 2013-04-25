@@ -1,0 +1,702 @@
+2010-10-16 17:03-EDT Gregory John Casamento <greg.casamento@gmail.com>
+
+	* scripts: Added scripts directory to hold compile-all and other
+	scripts.
+	
+2010-10-16 13:26-EDT Gregory John Casamento <greg.casamento@gmail.com>
+
+	* compile-all: Added --with-layout=gnustep to compile-all script.
+
+2010-02-06 01:16-EST Gregory John Casamento <greg.casamento@gmail.com>
+
+	* compile-all: Moved --with-installation-domain to compile-all
+	script.
+
+2009-12-13 12:02-EST Gregory John Casamento <greg.casamento@gmail.com>
+
+	* compile-all: Added arguments to allow passing to 
+	configure scripts for base.
+
+2008-12-21 17:56-EST Gregory John Casamento <greg_casamento@yahoo.com>
+
+	* COPYING.LIB: Correct license.   We reverted to LGPLv2.1 for the 
+	libraries two months ago.  
+
+2008-12-18  Nicola Pero <nicola.pero@meta-innovation.com>
+
+	* compile-all: Do not use GNUSTEP_INSTALLATION_DOMAIN=SYSTEM when
+	installing gnustep-make since it is ignored.
+
+2008-12-06 09:55-EST Gregory John Casamento <greg_casamento@yahoo.com>
+
+	* compile-all: Fixes to allow it to work properly under
+	MinGW.
+
+2008-09-14 13:13-EDT Gregory John Casamento <greg_casamento@yahoo.com>
+
+	* compile-all: Further enhancements.  Now uses sudo instead of
+	su -c.
+
+2008-09-14 11:41-EDT Gregory John Casamento <greg_casamento@yahoo.com>
+
+	* compile-all: Improved script so that it doesn't need to be run as 
+	root, but prompts for root password on "make install" step only 
+	if needed.
+
+2003-10-25  Richard Frith-Macdonald  <rfm@gnu.org>
+
+	* Source/NSSpellServer.m: ([_pathToDictionary:]) locate directory
+	in the library directory of the user domain.
+
+2005-06-23  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* Documentation/install.texi: Removed
+	* Documentation/readme.texi: Removed
+	* Documentation/GNUmakefile: Removed
+	* Documentation/Makefile.postamble: Removed
+	* Documentation/README: New file
+	* Documentation/INSTALL: New file
+	* compile-all: Fixed path of GNUstep.sh
+	
+2003-10-25  Richard Frith-Macdonald  <rfm@gnu.org>
+
+	* compile-all: Change as suggested by Pascal J Bourguignon to check
+	the installation location before insisting on being root.  Should
+	work unless installing on top of a prior installation where some
+	files are protected so as not to be overwritten.
+
+2002-09-20  Adam Fedor  <fedor@gnu.org>
+
+	* Remove xgps and xdps backends
+	* ANNOUNCE, BUGS, NEWS: Remove
+
+Mon Jul 22 12:40:55 2002  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* compile-all: Use /dev/null, not /dev/NULL (Patch by David
+	Relson <relson@osagesoftware.com>).
+
+Thu May 23 14:28:22 2002  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* INSTALL: Updated to talk about back instead of xgps.
+
+2002-03-27  Adam Fedor  <fedor@gnu.org>
+
+	* compile-all: Compile back instead of xgps.
+
+Wed Feb 20 15:10:24 2002  Nicola Pero  <nicola@brainstorm.co.uk>
+
+	* compile-all: Fixed compiler specification (Patch by David
+	Relson <relson@osagesoftware.com>).
+	* compile-all: Only pass --prefix= to gnustep-make.
+
+2002-02-11  Adam Fedor  <fedor@gnu.org>
+
+	* compile-all: Check for gcc3
+
+2002-02-03  Adam Fedor  <fedor@gnu.org>
+
+	* debian: Removed.
+
+Tue Jan 29 11:37:11 2002  Nicola Pero  <nicola@brainstorm.co.uk>
+
+	* Version: File removed.
+
+2002-01-04  Adam Fedor  <fedor@gnu.org>
+
+	* ANNOUNCE: Remove version, tar package name.
+
+Fri Jul 13 15:59:22 2001  Nicola Pero  <nicola@brainstorm.co.uk>
+
+	* NEWS: Removed reference to the current version being 0.6.7.
+	* INSTALL: Removed reference to the current version being 0.6.7.
+	Say that the gnustep-howto document is in core/make/Documentation.
+	* configure.in: Removed.
+	* GNUmakefile.in: Removed.
+	* GNUmakefile.local.in: Removed.
+	* GNUmakefile.local.service: Removed.
+	* Version: Do not define a global gnustep version.
+
+2001-05-06  Adam Fedor  <fedor@gnu.org>
+
+	* compile-all: Use gmake if available (Patch from 
+	Kim Shrier <kim@tinker.com>).
+
+Sat Mar 17 09:44:33 2001  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* configure, config.guess, config.sub, install-sh: Removed.
+
+2001-02-26  Adam Fedor  <fedor@gnu.org>
+
+	* Documenation/gnustep-howto.texi, etc: Moved to make package
+
+2001-02-19  Adam Fedor  <fedor@gnu.org>
+
+	* Documenation/gnustep-howto.texi, install.texi, etc: Update
+	* GNUstep-HOWTO, README, INSTALL, etc: Regenerate
+
+Tue Jan 30 12:55:27 2001  Nicola Pero  <nicola@brainstorm.co.uk>
+
+	* compile-all: New shell script to compile the whole of gnustep
+	core with a single command for those who want it.
+	* configure.in: Tell the user about the compile-all script.
+	* configure: Regenerated.
+	
+Tue Jan 30 12:35:36 2001  Nicola Pero  <nicola@brainstorm.co.uk>
+
+	* configure.in: Produce an error when configure is run explaining
+	that the huge core package is no longer supported - and how to do.
+	* configure: Regenerated.
+	* GNUstep-HOWTO: Updated.
+	* INSTALL: Refer to the GNUstep-HOWTO for latest instructions.
+	
+2001-01-09  Adam Fedor  <fedor@gnu.org>
+
+	* Documentation/gnustep-howto.texi: Update
+	* Documentation/make.texi: Move to make package.
+
+2000-12-11  Adam Fedor  <fedor@gnu.org>
+
+	* Documentation/gnustep-howto.texi: Update
+	* Documentation/machines.texi: Update.
+
+2000-12-05  Richard Frith-Macdonald  <rfm@gnu.org>
+
+	* GNUmakefile.in:
+	* GNUmakefile.local.in:
+	* configure.in:
+	Updated for flattened directory structure.
+
+2000-11-14  Adam Fedor  <fedor@gnu.org>
+
+	* FAQ: Update (include JIGS info).
+
+2000-11-06  Adam Fedor  <fedor@gnu.org>
+
+	* Documentation: Move tmpl.texi files to texi and update GNUmakefile
+
+2000-11-02  Adam Fedor  <fedor@gnu.org>
+
+	* GNUstep-HOWTO: Update
+
+2000-10-21  Adam Fedor  <fedor@gnu.org>
+
+	* Move Testing directory to new location (gui examples)
+	* configure.in: Remove link references to Testing dir.
+
+2000-10-15  Adam Fedor  <fedor@gnu.org>
+
+	* Documentation/machines.tmpl.texi: Update for RedHat 7.0
+
+Fri Oct 13 16:38:00 2000  Nicola Pero  <n.pero@mi.flashnet.it>
+
+	* GNUmakefile.local.service: New file.
+	* configure.in: Make a link to the GNUmakefile.local.service in 
+	the core/gui/Tools/ directory.
+	* configure: Regenerated.
+	
+2000-09-16  Adam Fedor  <fedor@gnu.org>
+
+	* README.MinGW: New file.
+
+2000-09-06  Adam Fedor  <fedor@gnu.org>
+
+	* Documentation/machines.tmpl.texi: Update
+	* GNUstep-HOWTO: Regenerate
+
+2000-08-07  Adam Fedor  <fedor@gnu.org>
+
+	* Merge 0.6.6 branch into main.
+
+2000-08-06  Adam Fedor  <fedor@gnu.org>
+
+	* Version 0.6.6 released.
+
+2000-08-04  Adam Fedor  <fedor@gnu.org>
+
+	* GNUmakefile.in: Set LIBRARY_COMBO to override environment.
+
+2000-08-02  Richard Frith-Macdonald  <rfm@gnu.org>
+
+	* Documentation/gnustep-howto.tmpl.texi: Update timezone setting info.
+	* GNUstep-HOWTO: Regenerate
+
+2000-08-02  Adam Fedor  <fedor@gnu.org>
+
+	* Version: Update version number
+	* Documentation/announce.tmpl.texi: Update
+	* Documentation/gnustep-howto.tmpl.texi: Likewise.
+	* Documentation/readme.tmpl.texi: Likewise.
+	* Documentation/news.tmpl.texi: Likewise.
+	* Documentation/todo.tmpl.texi: Likewise.
+	* ANNOUNCE, BUGS, NEWS, README, GNUstep-HOWTO: Regenerate
+
+2000-07-30  Adam Fedor  <fedor@gnu.org>
+
+	* configure.in: Link GNUmakefile.local to more testing dirs. (patch
+	from Matthias Klose <doko@cs.tu-berlin.de>.)
+
+2000-07-21  Adam Fedor  <fedor@gnu.org>
+
+	* debian/*: Updated debian files from Matthias Klose
+	<doko@cs.tu-berlin.de>.
+
+2000-07-20  Adam Fedor  <fedor@gnu.org>
+
+	* Documentation/gnustep-howto.tmpl.texi: Update.
+	* Documentation/machines.tmpl.texi: Update.
+	* Documentation/news.tmpl.texi: Update.
+	* Documentation/readme.tmpl.texi: Update.
+
+2000-07-14  Adam Fedor  <fedor@gnu.org>
+
+	* GNUmakefile.local.in (GNUSTEP_SYSTEM_HEADERS): Don't redefine
+	since alternate objc library may exist there.
+	(GNUSTEP_SYSTEM_LIBRARIES): Likewise.
+
+2000-06-20  Adam Fedor  <fedor@gnu.org>
+
+	* configure.in: Don't set program_suffix for cygwin (done in make/)
+
+2000-06-13  Adam Fedor  <fedor@gnu.org>
+
+	* configure.in: Better autoconfiguration with cygwin.
+
+2000-04-25  Adam Fedor  <fedor@gnu.org>
+
+	* Documenatation/gnustep-howto.tmpl.texi: Update.
+
+2000-03-06  Adam Fedor  <fedor@gnu.org>
+
+	* config.guess: Better guess of NetBSD systems. (patch from 
+	Peter Cooper <comrade@obverse.com.au>).
+
+2000-02-23  Adam Fedor  <fedor@gnu.org>
+
+	* configure.in: Make separate sytem root the default. Disable by
+	using --without-system-root when configuring.
+
+2000-02-20  Matthias Klose  <doko@cs.tu-berlin.de>
+
+	* configure.in: Link GNUmakefile.local for all Testing subprojects.
+
+2000-02-17  Adam Fedor  <fedor@gnu.org>
+
+	* Version: 0.6.5 released.
+
+	* Documentation/announce.tmpl.texi: Update.
+	* Documentation/gnustep-howto.tmpl.texi: Update.
+	* Documentation/install.tmpl.texi: Update.
+	* Documentation/readme.tmpl.texi: Update.
+	* ANNOUNCE, BUGS, NEWS, README, GNUstep-HOWTO: Regenerate
+
+2000-02-16  Adam Fedor  <fedor@gnu.org>
+
+	* configure.in: Add enable-system-root configuration (from
+	make/configure.in).
+
+2000-02-14  Adam Fedor  <fedor@gnu.org>
+
+	* Version: Update version number
+	* Documentation/announce.tmpl.texi: Update
+	* Documentation/gnustep-howto.tmpl.texi: Likewise.
+	* Documentation/readme.tmpl.texi: Likewise.
+	* Documentation/news.tmpl.texi: Likewise.
+	* Documentation/todo.tmpl.texi: Likewise.
+	* ANNOUNCE, BUGS, NEWS, README, GNUstep-HOWTO: Regenerate
+
+2000-02-03  Richard Frith-Macdonald <richard@brainstorm.co.uk>
+
+	* Documentation/faq.tmpl.texi: Minor update
+
+2000-02-11  Adam Fedor  <fedor@gnu.org>
+
+	* Documentation/todo.tmpl.texi: Resurect todo file as a BUGS
+	file. Input from Nicola Pero  <n.pero@mi.flashnet.it>.
+
+2000-02-09  Adam Fedor  <fedor@gnu.org>
+
+	* Documentation/faq.tmpl.texi: Update
+	* Documentation/machines.tmpl.texi: Likewise.
+	* Documentation/news.tmpl.texi: Likewise.
+
+
+2000-02-08  Adam Fedor  <fedor@gnu.org>
+
+	* config.guess: New version
+	* config.sub: Likewise.
+
+2000-01-28  Adam Fedor  <fedor@gnu.org>
+
+	* gnustep-core.spec: Remove.
+
+1999-11-11  David Lazaro Saz  <khelekir@encomix.es>
+
+	* Documentation/machines.tmpl.texi (FreeBSD 3.x): Added more specific
+	instructions to get things working.
+
+1999-09-24  Adam Fedor  <fedor@gnu.org>
+
+	* COPYING.LIB: Upgraded to version 2.1
+
+1999-09-07  Adam Fedor  <fedor@gnu.org>
+
+	* Version: 0.6.0
+	* ANNOUNCE, NEWS, GNUstep-HOWTO, FAQ, README: Update
+	* Documentation/*: Likewise.
+
+	* GNUmakefile.in: Add GNUSTEP_HOST
+
+1999-08-22  Adam Fedor  <fedor@gnu.org>
+
+	* debian/*: Updates (from Matthias Klose <doko@smile.cs.tu-berlin.de>)
+
+	* Documentation/news.tmpl.texi: update
+	* Documentation/gnustep-howto.tmpl.texi: update
+
+1999-08-06  Adam Fedor  <fedor@gnu.org>
+
+	* Documentation/machines.tmpl.texi: Add Netwinder info.
+	* COPYING: Change FSF mailing address.
+
+1999-07-29  Adam Fedor  <fedor@gnu.org>
+
+	* config.guess: Updated from latest version + fix for Netwinder.
+	* config.sub: Likewise.
+
+1999-07-29  Richard Frith-macdonald <richard@brainstorm.co.uk>
+
+	* debian/rules: Another update patch from Kai Henningsen
+
+1999-07-26  Richard Frith-macdonald <richard@brainstorm.co.uk>
+
+	* debian/rules: Updated with patch from Kai Henningsen
+
+1999-07-15  Richard Frith-macdonald <richard@brainstorm.co.uk>
+
+	* debian/rules: Updated with patch from Kai Henningsen
+
+Thu Jul  8 22:21:22 1999  Adam Fedor  <fedor@ultra.doc.com>
+
+	* GNUmakefile.local.in: Change base Headers include
+
+1999-07-05  Adam Fedor  <fedor@gnu.org>
+
+	* configure.in: Fix prefix check.
+
+1999-07-03  Adam Fedor  <fedor@gnu.org>
+
+	* debian/rules: Minor fixes (patch from  Kai Henningsen <kai@cats.ms>)
+
+1999-06-29  Richard Frith-macdonald <richard@brainstorm.co.uk>
+
+	* configure.in:  Recognise with-library-combo for xdps
+
+1999-06-24  Adam Fedor  <fedor@gnu.org>
+
+	* configure.in: Add link to backend tools dir.
+	* debian/rules: Fixes to make it work with current snapshot.
+	(Patch from Kai Henningsen <kai@cats.ms>).
+
+1999-06-20  Michael Hanni  <mahnni@sprintmail.com>
+
+	* PoweredByGNUstep.tiff: contributed by ]d <id@windowmaker.org>
+
+1999-06-17  Adam Fedor  <fedor@gnu.org>
+
+	* debian/*: New files for debian packaging (use xgps backend).
+
+1999-06-09  Adam Fedor  <fedor@gnu.org>
+
+	* gnustep-core.spec: Change backend to xgps.
+
+1999-05-27  Adam Fedor  <fedor@gnu.org>
+
+	* Documentation/GNUstep-HOWTO-RH.txt: Updated (from Steven
+	Borrelli <steve@borrelli.org>).
+
+1999-05-04  Adam Fedor  <fedor@gnu.org>
+
+	* Documentation/machines.tmpl.texi: New file.
+	* Documentation/readme.tmpl.texi: Update.
+	* Documentation/gnustep-howto.tmpl.texi: Update
+
+1999-04-22  Adam Fedor  <fedor@gnu.org>
+
+	* configure.in: Add with-dps-[include/library] arg.
+
+Sat Apr 17  5:50:00 1999  Richard Frith-Macdonald <richard@brainstorm.co.uk>
+
+	* GNUmakefile.local.in: Only set BACK_PROJ if it hasn't already been
+	defined.  This permits the backend library makefiles to set their own
+	version - so you can easily build more than one backend on the same
+	host.
+
+Sat Apr  3 10:56:00 1999  Richard Frith-Macdonald <richard@brainstorm.co.uk>
+
+	* configure.in: Make xgps default backend.
+	* Documentation: Various updates for xgps.
+
+1999-03-18  Adam Fedor  <fedor@gnu.org>
+
+	* gnustep-core.spec: New file (for RPMs)
+
+1999-03-17  Adam Fedor  <fedor@gnu.org>
+
+	* Fix include/includes problem. Use version 2.13 of autoconf
+
+Wed Mar 10 15:23:00 1999  Richard Frith-Macdonald <richard@brainstorm.co.uk>
+
+	* configure.in: Fix configure to set up installation directory
+	correctly when the user doesn't specify the system root directory.
+
+1999-03-08  Adam Fedor  <fedor@gnu.org>
+
+	* Merged dawn branch into main.
+
+	* Version 0.5.5 Released.
+
+1999-03-04  Adam Fedor  <fedor@gnu.org>
+
+	* configure.in: Remove checks for tiff and jpeg (but keep
+	--with-xxx-xxx so they are passed to make). Only need checks
+	in make package.
+
+Tue Mar  2 17:09:50 1999  Adam Fedor  <fedor@ultra.doc.com>
+
+	* configure.in: Add AC_PROG_CC to find gcc. 
+	* configure.in: Make jpeg header ERROR a WARN.
+
+1999-03-01  Adam Fedor  <fedor@gnu.org>
+
+	* Update documentation. Notes about X/DPS not working.
+
+Thu Feb 25 03:00:51 1999  Masatake Yamato  <masata-y@is.aist-nara.ac.jp>
+
+	* configure.in: Added macros to check existence of jpeg and tiff.
+        Stolen from gimp-1.0.0/configure.in.
+
+1999-02-22  Adam Fedor  <fedor@gnu.org>
+
+	* Version: set version number to 0.5.5	
+	* Documenatation/faq.tmpl.texi: Update.
+	* Documentation/todo.tmpl.texi: Likewise.
+	* Documentation/gnustep-howto.tmpl.texi: Likewise
+	* ANNOUNCE, FAQ, GNUstep-HOWTO, INSTALL, NEW, README: Likewise.
+	* Documentation/GNUstep-HOWTO-RH.txt: New file.
+	* COPYING, COPYING.LIB: Likewise.
+
+Fri Feb 19 15:15:36 1999  Adam Fedor  <fedor@ultra.doc.com>
+
+	* GNUmakefile.in (EXT_SUBPROJ): New variable, add to all target so
+	it is made after Foundation library.
+	* configure.in: (EXT_SUBPROJ): New variable for extensions.
+
+	* Documentation/fq.tmpl.texi: Update
+	
+1999-02-18  Scott Christley  <scottc@golden.net-community.com>
+
+	* GNUmakefile.in (root-install, root-uninstall): New targets.
+
+Mon Feb 15  6:20:00 1999  Richard Frith-macdonald <richard@brainstorm.co.uk>
+
+	* configure.in: Fix by twhite@rogers.wave.ca to use gstep-base with w32
+
+1992-02-13  Michael Hanni  <mhanni@sprintmail.com>
+
+	* Minor modifications to GNUmakefile(s) to remove copy reference
+	to extensions.make. Removes warning on compilation.
+
+1999-02-10  Adam Fedor  <fedor@gnu.org>
+
+	* configure.in: Check for w32gui dir.
+
+1999-02-08  Adam Fedor  <fedor@gnu.org>
+
+	* configure.in: Configure for w32gui on Windows.
+
+Fri Jan 29  9:15:00 1999  Richard Frith-macdonald <richard@brainstorm.co.uk>
+
+	* configure.in: Make links into new base directory strucutre rather
+	than old one.
+
+Thu Jan 28 10:22:00 1999  Adam Fedor  <fedor@doc.com>
+
+	* GNUmakefile.in (PRE_SUBPROJ): Variable for all pre-library makes
+	* configure.in: Use PRE_SUBPROJ for all pre-library makes.
+	Remove linkes for db and guile.
+	
+Fri Jan 15 10:15:49 1999  Richard Frith-macdonald <richard@brainstorm.co.uk>
+
+	* GNUmakefile.local.in: Fixed error in path to gstep base include
+	directory (was missing 'include'.
+
+Thu Jan  7 16:17:49 1999  Adam Fedor  <fedor@ultra.doc.com>
+
+	* GNUmakefile.local.in (_PKG): Add XGPS support.
+	* configure.in: Likewise.
+
+Sat Jan  2 12:23:46 1999  Adam Fedor  <fedor@ultra.doc.com>
+
+	* GNUmakefile.in (GNUSTEP_TARGET_CPU, GNUSTEP_TARGET_OS): Set.
+	(all:): Don't depend on late-config - no longer needed.  
+	* configure.in: Configure gui and $(BACK_PROJ) here - not
+ 	configured in make process anymore
+
+Mon Dec 21 11:04:45 1998  Matthias Klose  <doko@cs.tu-berlin.de>
+
+        * GNUmakefile.in: Exit with original exit status from submakes.
+
+Sat Dec 19 03:27:06 1998  Matthias Klose  <doko@cs.tu-berlin.de>
+
+        * GNUmakefile.in (make-temp-install): install extensions.make
+          in Makefiles.
+
+Sat Dec 19 10:52:08 1998  Adam Fedor  <fedor@ultra.doc.com>
+
+	* GNUmakefile.local.in: Rewrite to include correct build headers
+ 	first in search list (from Matthias Klose <doko@cs.tu-berlin.de>).
+
+Thu Dec 17 11:39:05 1998  Adam Fedor  <fedor@ultra.doc.com>
+
+	* configure.in: Link GNUmakefile.local into dg and guile.
+
+	* GNUmakefile.local.in (ADDITIONAL_INCLUDE_DIRS): Include base
+ 	machine specific dir.
+
+Tue Dec 15 12:32:02 1998  Adam Fedor  <fedor@ultra.doc.com>
+
+	* GNUmakefile.in: Communicates the exit status out of the toplevel
+ 	makefile. Call make-temp-install and late-config only if it's
+ 	necessary (patches from Matthias Klose <doko@cs.tu-berlin.de>).
+
+Mon Dec  7 11:25:30 1998  Adam Fedor  <fedor@ultra.doc.com>
+
+	* GNUmakefile.in (subproj-all): Break if subproject make fails.
+	
+Tue Dec  1 09:31:03 1998  Adam Fedor  <fedor@ultra.doc.com>
+
+	* GNUmakefile.local.in: include $(TOPLEV)/$(BACKPROJ)/Headers.
+	* */Version: include comment and make the last two Bourne shell
+	compatible. Patch from Matthias Klose <doko@cs.tu-berlin.de>.
+
+	* configure.in: Make xraw the default library.
+
+Tue Nov  3 16:34:51 1998  Adam Fedor  <fedor@doc.com>
+
+	* Documentation/gnustep-howto.tmpl.texi: Update (from Martin Baehr).
+
+Sat Oct  3 06:15:00 1998  Richard Frith-Macdonald <richard@brainstorm.co.uk>
+
+	* configure.in: Use AC_CANONOCAL_HOST so we get the os_host
+	defined for later tests.
+	Added config.sub and config.guess
+
+Mon Sep 28 17:01:31 1998  Adam Fedor  <fedor@ultra.doc.com>
+
+	* GNUmakefile.local.in (BACK_PROJ): New variable.
+	* configure.in: Copy GNUmakefile.local to Testing dir.
+
+Mon Sep 14 11:28:05 1998  Adam Fedor  <fedor@ultra.doc.com>
+
+	* Documentation/todo.tmpl.texi: Add xdps todo.
+	* Documentation/faq.tmpl.texi: Update.
+
+Fri Aug 21 17:13:20 1998  Adam Fedor  <fedor@ultra.doc.com>
+
+	* GNUmakefile.in (suproj-*): Define build variables correctly so
+ 	package made and installed in correct place.
+	(late-config): Add gui configure.
+	* Version: Make readable by sh.
+	* {base,gui,xdps}/Version: Likewise.
+	(patch from doko@cs.tu-berlin.de (Matthias Klose)).
+
+	* Documentation/gnustep-howto.tmpl.texi: Update.
+
+Thu Aug 20 09:57:14 1998  Adam Fedor  <fedor@doc.com>
+
+	* configure.in: Check library_combo for foundation and backend
+	library. 
+	* GNUmakefile.in (SUBPROJECTS): Add configurable $(BACK_PROJ) and
+	$(FOUND_PROJ) 
+
+Mon Jul 20 10:36:21 1998  Adam Fedor  <fedor@ultra.doc.com>
+
+	* GNUmakefile.in (subproj-uninstall, ...): Changed procedure so
+	make is uninstalled/cleaned last.
+
+Fri Jul 10 21:45:39 1998  Adam Fedor  <fedor@ultra.doc.com>
+
+	* Documentation/tofo.tmpl.texi: Update.
+	* Documentation/faq.tmpl.texi: Update.
+
+Tue Jun 30 11:08:43 1998  Adam Fedor  <fedor@ultra.doc.com>
+
+	* Documentation/todo.tmpl.texi: New file.
+	* Documentation/gnustep-howto.tmpl.texi: Update;
+	* Documentation/faq.tmpl.texi: Update;
+
+Fri May 29 10:18:24 1998  Adam Fedor  <fedor@doc.com>
+
+	* GNUmakefile.in (subproj-install): Set GNUSTEP_SYSTEM_ROOT (patch
+ 	from doko@cs.tu-berlin.de (Matthias Klose)).
+
+	* Documentation/gnustep-howto.tmpl.texi: Add info on Unixware.
+
+Wed May 13 15:54:31 1998  Adam Fedor  <fedor@.doc.com>
+
+	* GNUmakefile.in: Update installation dir, make target
+	* Version: Update main ftp machine.
+	* Documentation/announce.tmpl.texi: Likewise.
+	* Documentation/gnustep-howto.tmpl.texi: Update gdb version.
+
+Mon Apr  6 16:36:20 1998  Scott Christley  <scottc@net-community.com>
+
+	* FAQ: New file.
+	* GNUstep-HOWTO: New file.
+	* Documentation/GNUmakefile: Rewrite to us Makefile Package
+	* Documentation/Makefile.postamble: Remove obsolete rules.
+	* Documentation/faq.tmpl.texi: New file.
+	* Documentation/gnustep-howto.tmpl.texi: New file.
+
+Tue Mar 10 16:39:59 1998  Scott Christley  <scottc@net-community.com>
+
+	* Documentation/announce.tmpl.texi: New file.
+	* Documentation/news.tmpl.texi: New file.
+	* ANNOUNCE: New file.
+	* NEWS: New file.
+	* Documentation/GNUmakefile: Add new files.
+	* Documentation/Makefile.postamble: Add new files.
+
+	* GNUmakefile.in (late_config): Pass --prefix parameter.
+	* Version: Update ftp information.
+
+Mon Mar  2 11:39:19 1998  Adam Fedor  <fedor@doc.com>
+
+	* Version: Version 0.5.0
+	* Documentation/install.tmpl.texi: Update
+	* README, INSTALL: Regenerate.
+	* configure.in: Configure alternate subprojects (e.g. libFoundation).
+	* GNUmakefile.in: Make alternate subprojects.
+
+	* configure.in (AC_CONFIG_SUBDIRS): Remove xdps.
+	* configure: Regenerate
+	* GNUmakefile.in (late-config): New target.
+
+Sat Feb 14 16:22:05 1998  Scott Christley  <scottc@net-community.com>
+
+	* GNUmakefile.in (clean-top, distclean-top): New targets.
+	(clean): Make sure makefile package is built before have
+	subdirs do a clean otherwise make errors will occur.
+	(distclean): Likewise.
+	* configure.in: Add GNUmakefile.local link in xdps/Testing.
+	* configure: Regenerate.
+
+Wed Feb 11 17:09:25 1998  Adam Fedor  <fedor@doc.com>
+
+	* GNUmakefile.in (snapshot, dist, snapshot-rtag, dist-rtag): New
+	targets. 
+	* README: New file.
+	* INSTALL: Likewise.
+	* Version: Likewise.
+	* Documentation: New documentation directory.
+

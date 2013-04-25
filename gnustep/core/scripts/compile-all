@@ -1,0 +1,163 @@
+#
+# Run this script as root to configure, compile and install
+# gnustep-make, gnustep-base, gnustep-gui, gnustep-back
+# with a single command
+#
+# Examples:
+#
+# ./compile-all
+#
+# <uses `--prefix=/usr/GNUstep' as option to configure>
+#
+# ./compile-all /usr/local/GNUstep
+#
+# <uses `--prefix=/usr/local/GNUstep' as option to configure>
+#
+
+scriptsdir="`pwd`/scripts"
+
+if [ "$1" != "" ]; then 
+  prefix="$1"
+else
+  prefix="/usr/GNUstep"
+fi
+
+if [ "$2" != "" ]; then
+  options="$2"
+fi
+
+if [ "$3" != "" ]; then
+  compiler="$3"
+fi
+
+if [ "$4" != "" ]; then
+   cxxcompiler="$4"
+fi
+
+# Check if we are compiling under windows...
+UNAME=`uname | cut -d'-' -f1`
+if [ "$UNAME" != "MINGW32_NT" ] ; then
+  if [ ! \( -d $prefix -a -w $prefix \) ] ; then
+    if [ ! \( -d $(basename $prefix) -a -w $(basename $prefix) \) ] ; then
+      NEEDSROOT="true"
+    fi
+  fi  
+fi
+
+# If we are installing into home, then we do not need root...
+if 
+   echo $prefix | grep "^/home/"
+then
+   unset NEEDSROOT
+   make_flags="--disable-importing-config-file"
+fi
+
+if gmake -v >/dev/null 2>&1
+then
+  export MAKE=gmake
+else
+  export MAKE=make
+fi
+
+if [ "$3" == "" ]; then
+  export CC=gcc
+else
+  export CC="$compiler"
+fi
+
+if [ "$4" == "" ]; then
+  export CXX=g++
+else
+  export CXX=$cxxcompiler
+fi
+
+echo "==== compile-all"
+echo "Using compiler $CC"
+echo "Using c++ compiler $CXX"
+echo "===="
+
+# Flags for windows build.
+if [ "$UNAME" == "MINGW32_NT" ] ; then
+  export cc_flags="-fstrict-aliasing -fno-omit-frame-pointer"
+else
+#  export cc_flags="-O0"
+  if [ "$CC" == "clang" ] ; then
+     cc_flags="${cc_flags} -fblocks -fobjc-nonfragile-abi"
+  fi
+fi
+
+# Install make
+cd make
+echo "===="
+echo "Build command: CCFLAGS=$cc_flags CC=$CC ./configure --prefix=$prefix --with-layout=gnustep $make_flags"
+echo "===="
+CCFLAGS=$cc_flags CXX=$CXX CC=$CC ./configure  --prefix=$prefix --with-layout=gnustep $make_flags
+$MAKE
+if [ "true" == "$NEEDSROOT" ]; then
+sudo -u root $MAKE install
+else
+$MAKE messages=yes install
+fi
+
+. $prefix/System/Library/Makefiles/GNUstep.sh
+
+# Install libobjc2, if needed...
+if [ "$CC" == "clang" ] ; then
+   makedir=`pwd`
+
+   # Build and install libobjc2...
+   cd ../../dev-libs/libobjc2
+   # Get environment...
+   . $prefix/System/Library/Makefiles/GNUstep.sh
+   CCFLAGS=$cc_flags CXX=$CXX CC=$CC $MAKE
+   if [ "true" == "$NEEDSROOT" ]; then
+      sudo -u root $scriptsdir/install.sh $prefix $MAKE LOCAL
+   else
+      $MAKE GNUSTEP_INSTALLATION_DOMAIN=LOCAL install
+   fi
+   cd $makedir
+
+   # Reconfigure make to use the new libobjc2 if it has been updated...
+   CCFLAGS=$cc_flags CXX=$CXX CC=$CC ./configure  --prefix=$prefix --with-layout=gnustep $make_flags
+   if [ "true" == "$NEEDSROOT" ]; then
+      sudo -u root $MAKE install
+   else
+      $MAKE messages=yes install
+   fi
+   # Refresh environment...
+   . $prefix/System/Library/Makefiles/GNUstep.sh
+fi
+
+# Install base
+cd ../base
+. $prefix/System/Library/Makefiles/GNUstep.sh
+echo "BASE CONFIGURATION: CCFLAGS=$cc_flags CXX=$CXX CC=$CC ./configure --with-installation-domain=SYSTEM ${options}"
+CCFLAGS=$cc_flags CXX=$CXX CC=$CC ./configure --with-installation-domain=SYSTEM ${options}
+$MAKE messages=yes debug=yes
+if [ "true" == "$NEEDSROOT" ]; then
+sudo -u root ./install.sh $prefix $MAKE
+else
+$MAKE GNUSTEP_INSTALLATION_DOMAIN=SYSTEM messages=yes install
+fi
+
+# Install gui
+cd ../gui
+. $prefix/System/Library/Makefiles/GNUstep.sh
+CCFLAGS=$cc_flags CXX=$CXX CC=$CC ./configure
+$MAKE messages=yes debug=yes
+if [ true == $NEEDSROOT ]; then
+sudo -u root ./install.sh $prefix $MAKE
+else
+$MAKE GNUSTEP_INSTALLATION_DOMAIN=SYSTEM messages=yes install
+fi
+
+# Install back
+cd ../back
+. $prefix/System/Library/Makefiles/GNUstep.sh
+CCFLAGS=$cc_flags CXX=$CXX CC=$CC ./configure
+$MAKE messages=yes debug=yes
+if [ "true" == "$NEEDSROOT" ]; then
+sudo -u root ./install.sh $prefix $MAKE
+else
+$MAKE GNUSTEP_INSTALLATION_DOMAIN=SYSTEM messages=yes install
+fi
