@@ -1,0 +1,40 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# gdb version 7.2 include python bindings to pretty print objects.
+# for Halfmoon, this means that we can do things like pretty print 
+# and Instr * to show the HM opcode.
+# this makes eclipse debugging more effective.
+# PROBLEM is.. only can get gdb7 for linux.
+
+# you have two ways to make this come alive
+# 1. make this file your ~/.gdbinit file
+# 2. point the debug configuration of the eclipse workspace at it (debug tab)
+
+#I don't know how to refer to a env variable in one of these
+#expressions, if you do, use workspace_loc from eclipse..
+# for now, a symlink ~/hm points into the right source tree
+
+python
+import sys
+
+# probably need some python support
+# svn co http://gcc.gnu.org/svn/gcc/trunk/libstdc++-v3/python
+sys.path.insert(0, '/home/mzaleski/build/libstdc++-v3-python/python/')
+
+from libstdcxx.v6.printers import register_libstdcxx_printers
+register_libstdcxx_printers (None)
+
+#good idea to have version numbers in the package name.
+
+
+sys.path.insert(0, '/home/mzaleski/hm/halfmoon/utils/')
+from gdb7_prettyprint import register_halfmoon_printers
+register_halfmoon_printers (None)
+
+end
+
+#makes gdb prettyprint an object based on the vtable it finds there.
+#set print object
+#set print pretty

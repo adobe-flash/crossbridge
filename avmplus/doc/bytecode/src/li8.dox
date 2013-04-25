@@ -1,0 +1,48 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page li8 
+
+\addindex li8
+
+
+\section li8 li8
+
+\subsection operation Operation
+
+Load an 8 bit integer from global memory.
+
+\subsection format Format
+
+\code
+li8
+\endcode
+
+\subsection forms Forms
+\code
+li8 = 53 (0x35)
+\endcode
+\subsection stack Stack
+
+\code
+..., address => value, ...
+\endcode
+
+\subsection description Description
+
+Load an 8 bit unsigned integer from global memory.
+
+The MOPS opcodes all access the backing store of the ByteArray represented by the
+current app domain's ApplicationDomain.domainMemory property. Address ranges for
+accesses will be range checked using standard comparisons.
+
+\subsection rt_execeptions Runtime exceptions
+
+Range check failures will result in an InvalidRangeError exception.
+
+\subsection notes Notes
+
+None.
+
+*/
+

@@ -1,0 +1,37 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+i = immf -1.1
+j = immf 0.0
+k = immf 1.1
+
+; Test each comparison operator. In each case, the result is set to k (1) if it
+; did what it should do, or i (-1) if not.
+
+c1 = eqf j k
+r1 = cmovf c1 i k
+
+c2 = ltf j k
+r2 = cmovf c2 k i
+
+c3 = lef j k
+r3 = cmovf c3 k i
+
+c4 = gtf j k
+r4 = cmovf c4 i k
+
+c5 = gef j k
+r5 = cmovf c5 i k
+
+
+
+; Sum the results. They should all be 1 so an overall result of 5.5 is a pass.
+
+r1_2 = addf r1 r2
+r3_4 = addf r3 r4
+
+r1_4 = addf r1_2 r3_4
+
+res = addf r1_4 r5
+retf res

@@ -1,0 +1,55 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page typeof 
+
+\addindex typeof
+
+
+\section typeof typeof
+
+\subsection operation Operation
+
+Get the type name of a value.
+
+\subsection format Format
+
+\code
+typeof
+\endcode
+
+\subsection forms Forms
+\code
+typeof = 149 (0x95)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ..., typename
+\endcode
+
+\subsection description Description
+
+Pop a value off of the stack. Determine its type name according to the type of value:
+
+-# undefined = "undefined"
+-# null = "object"
+-# Boolean = "Boolean"
+-# Number | int | uint = "number"
+-# String = "string"
+-# Function = "function"
+-# XML | XMLList = "xml"
+-# Object = "object"
+
+Push typename onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

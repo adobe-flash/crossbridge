@@ -1,0 +1,47 @@
+#!/bin/sh
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# assume we're in TR's scope
+bindir=`hg root`/utils/sharkprof
+if [ ! -d $bindir ]; then
+	bindir=`hg root`/third_party/avmplus/utils/sharkprof
+fi
+logdir=/tmp
+tmpdir=/tmp
+
+mksym() {
+	logfile=$1
+	sfile=$2
+	sofile=$3
+	echo mksym $logfile $sfile $sofile
+	if ${bindir}/log2s-32 ${logfile} > ${sfile}; then
+		# 32bit worked
+		gcc -m32 -shared -nostartfiles -nodefaultlibs ${sfile} -o ${sofile}
+	else
+		# try 64
+		${bindir}/log2s-64 ${logfile} > ${sfile}
+		gcc -m64 -shared -nostartfiles -nodefaultlibs ${sfile} -o ${sofile}
+	fi
+	${bindir}/dinkuuid ${sofile}
+}
+
+pid=$1
+if [ "$pid" == "" ]; then
+	# no pid given, look for unprocessed log files
+	for f in /tmp/*.log; do
+		s=`echo $f | sed -e 's/log$/s/'`
+		so=`echo $f | sed -e 's/log$/so/'`
+		if [ ! -f $s ]; then
+			# log file exists but not .s file
+			mksym $f $s $so
+		fi
+	done
+else
+	# pid given, use that one
+	log=${logdir}/${pid}-jit.log
+	s=${logdir}/${pid}-jit.s
+	so=${logdir}/${pid}-jit.so
+	mksym $log $s $so
+fi

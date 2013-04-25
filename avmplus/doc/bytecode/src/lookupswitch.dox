@@ -1,0 +1,57 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page lookupswitch 
+
+\addindex lookupswitch
+
+
+\section lookupswitch lookupswitch
+
+\subsection operation Operation
+
+Jump to different locations based on an index.
+
+\subsection format Format
+
+\code
+lookupswitch
+default_offset 
+case_count 
+case_offsets...
+\endcode
+
+\subsection forms Forms
+\code
+lookupswitch = 27(0x1b)
+\endcode
+\subsection stack Stack
+
+\code
+..., index => ...
+\endcode
+
+\subsection description Description
+
+default_offset is an s24 that is the offset to jump, in bytes, for the default case. 
+case_offsets are each an s24 that is the offset to jump for a particular index. 
+There are case_count+1 case offsets. case_count is a u30.
+
+index is popped off of the stack and must be of type int. If index is less 
+than zero or greater than case_count, the target is calculated by adding 
+default_offset to the base location. Otherwise the target is calculated by 
+adding the case_offset at position index to the base location. Execution 
+continues from the target location.
+
+The base location is the address of the lookupswitch instruction itself.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+Other control flow instructions take the base location to be the address of the following instruction.
+
+*/
+

@@ -1,0 +1,178 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/*! \page loading Loading, linking, verification, and execution
+
+\addindex Loading
+
+\section ld_overview Overview
+An ABC file is processed by the AVM2 in four logical phases, known as loading, linking, verification, 
+and execution. These phases overlap and, in particular, verification overlaps with all of the other 
+phases.
+
+During \c loading, the ABC file is read into memory and decoded. For example, the constant pool is 
+transformed to an in-memory data structure using different encodings. Verification at this stage 
+is relative to the structure of the ABC file, which must conform to the definitions presented in 
+the next chapter.
+
+During \c linking, some names referenced from individual fields of the ABC file structure are resolved, 
+and the resulting objects are linked together into a more complex data structure. For example, 
+a class definition’s “base class” field names the base class; resolving that name finds the 
+definition of the base class, and a final class object for the derived class is created based on 
+information from the two definition objects. Verification at this stage is relative to this web 
+of objects: the names mentioned must resolve; the resulting traits sets must be coherent; and so on.
+
+During \c execution, the bytecodes representing compiled code in the ABC file are run through an 
+interpreter, thus performing computation. Verification at this stage is relative to the stream 
+of instructions and the contents of the execution stack: instructions must not jump outside the 
+bytecode array; instructions that require certain operand types can be applied only to operands 
+whose known type is the correct one; the code must not use more stack and register space than it 
+has reserved; and so on.
+
+When verification fails during any of these phases, the AVM2 throws a VerifyError. VerifyErrors 
+thrown during execution can be caught by the program.
+
+The AVM2 interleaves linking with both loading and execution. When linking is performed during 
+loading, forward references are precluded; for example, class definitions can only reference 
+previously defined classes as base classes. In contrast, when linking is performed during execution, 
+some references to undefined entities may not be flagged as errors; for example, a method that 
+uses the name of a type that hasn’t been defined may not cause a VerifyError to be thrown provided 
+the method isn’t invoked.
+
+\section ld_loading Loading and linking
+
+During the loading and linking phase, the following steps occur. (Note that a fair amount of 
+linking is deferred until the execution phase.)
+
+- Each ABC file is loaded into memory and decoded. This initial decoding verifies that the ABC file has 
+the correct structure and that the fields that matter at this stage contain valid references to other
+parts of the ABC file.
+- Trait objects are created for classes and scripts.
+- Subclass/superclass relationships are resolved. The trait set of each class’s superclass 
+is merged into the trait set for the class, and interfaces in the class’s interface set are 
+looked up. Early resolution ensures that the inheritance graph is a tree.
+- The constant pool is constructed. Each reference to another element of the constant pool 
+is resolved (it must be in range for the correct type).
+- Method bodies are linked with their method information (signature) structures.
+
+\section ld_execution Execution
+
+This section describes the state of the virtual machine as it is observed by the executing bytecode.
+
+\section program_invocation Program invocation and exit
+
+One of the entries in the ABC file is an array of \c script_info entries (see the next chapter). 
+Each of these entries contains a reference to an initialization method for the script and a set of 
+traits to be defined in the script’s environment. The last entry in that array is the entry point 
+for the ABC file; that is, the <i>last</i> entry’s initialization method contains the <i>first</i> bytecode that’s 
+run when the ABC file is executed.
+
+The other scripts’ initialization blocks are run on demand, when entities exported from 
+those scripts are first referenced by the program during property lookup.
+
+As far as the virtual machine is concerned, the initialization blocks are normal methods, and 
+they should signal normal termination by executing one of the return instructions 
+(\c OP_returnvalue, \c OP_returnvoid). The value returned by a script is ignored.
+
+\section class_init Class initialization
+
+The class’s static initializer will be run when the \c newclass instruction is executed on the \c class_info 
+entry for the class.
+
+\section method_entry Method entry
+
+When a method body is first entered, its execution environment is set up in a particular way. In the 
+following discussion, \c method_info and \c method_body_info refer to structures defined in the next chapter.
+
+When control enters a method, three local data areas are allocated for it, as outlined in 
+Chapter 2—an operand stack segment, a scope stack segment, and a set of local registers. 
+The operand stack segment holds operands to the instructions; values are pushed onto that stack 
+or popped off it by most instructions. The scope stack segments holds scope objects in which the 
+virtual machine will look up names at execution time. Objects are pushed onto the scope stack by 
+\c OP_pushscope and \c OP_pushwith, and popped off by \c OP_popscope and by the exception handling machinery. 
+The local registers hold parameter values, local variables, and temporaries.
+
+On method entry, the state of these data areas is as follows.
+
+- The operand stack is empty and has room for \c method_body_info.max_stack values.
+- The scope stack is empty and has room for \c method_body_info.max_scope_stack values.
+- There are \c method_body_info.local_count registers.
+- Register 0 holds the “this” object. This value is never \c null.
+- Registers 1 through \c method_info.param_count holds parameter values coerced to the declared types 
+of the parameters. If fewer than \c method_body_info.local_count values are supplied to the call then 
+the remaining values are either the values provided by default value declarations (optional arguments) 
+or the value \c undefined.
+- If \c NEED_REST is set in \c method_info.flags, the \c method_info.param_count+1 register is set up to 
+reference an array that holds the superflous arguments.
+- If \c NEED_ARGUMENTS is set in \c method_info.flags, the \c method_info.param_count+1 register is set up 
+to reference an “arguments” object that holds all the actual arguments: see ECMA-262 for more 
+information. (The AVM2 is not strictly compatible with ECMA-262; it creates an \c Array object for 
+the “arguments” object, whereas ECMA-262 requires a plain Object.)
+
+\section execution_mechanics Execution mechanics
+
+Execution begins with the first instruction of the code in the \c method_body_info. The address of 
+this first instruction is 0. The first byte of each instruction is the opcode, which is followed by 
+zero or more bytes of operands. The instruction may modify the local data areas as well as objects 
+on the heap, and it may create new objects on the heap either directly or indirectly. (The AVM2 
+instruction set is defined in Section 2.5.)
+
+Branch and jump instructions add a signed offset to the program counter to effectuate the branch. 
+The base value for the program counter is the instruction address following the instruction.
+
+\section call_return Calling and returning
+
+When one of the call instructions is executed, a new local data area is created for the called function. 
+The called function has no access to the local data area of its caller. The actual parameter values 
+are coerced to the types expected by the called function as part of the call protocol.
+
+The return instructions transfer a single value from the returning function’s stack, or the 
+implied value \c undefined, to the caller. The returned value is coerced to the returning function’s 
+declared return type as part of the return protocol. The coerced value replaces the operands of 
+the call instruction in the calling method’s stack, and the called method’s local data area is destroyed.
+
+\section exception_handling Exception handling
+
+Exception handlers are defined by a table associated with each method. The table defines a range of 
+bytecode addresses across which a particular handler is active, the bytecode address of the handler, 
+and a type which is used to determine whether the handler will handle a particular exception.
+
+When an exception is thrown, the call stack is unwound until a method is found that contains a 
+handler which covers the current program counter and whose type is a supertype of the type of the 
+object thrown. The method containing the handler is reactivated and the program counter is set to 
+point to the first address of the handler. The value and scope stacks in the handling method are 
+cleared before the handler is entered.
+
+A \c finally clause is normally translated as an exception handler that accepts any type of value, 
+which it catches and rethrows after the body of the \c finally block finishes executing.
+
+\section verification Verification
+
+As noted earlier, verification does not happen all at once. Verification is often put off until a 
+datum is actually needed or until some dependent object has been loaded, so that forward references 
+will be possible.
+
+The following list summarizes some of the verification errors signaled by the AVM2. 
+(Not all verification errors are listed.)
+
+- There must be no nonzero bits above bit 30 in a u30 value.
+- No control flow instruction must cause control to be transferred outside the code vector or into the
+middle of another instruction.
+- Multiple control flow instructions to the same instruction must have compatible scope stacks, 
+operand stacks, and register values.
+- Named types (for example, in \c coerce instructions or in a base class reference) must always be 
+uniquely resolvable.
+- Names may not reference index zero of the name pool unless explicitly specified for that 
+particular name field.
+- Some name fields (for example, \c instance_info) require the referenced name to be a QName.
+- A class cannot subclass a final class or an interface.
+- The interface set of a class cannot reference interface zero, and must reference interfaces (not classes).
+- Method indices for \c callmethod and \c callstatic must provably be within the range of the receiver 
+object’s method table.
+␣- When an instruction definition section contains wording along the lines of "<value> must be less than <constraint>", this usually implies a static constraint that is checked by the verifier.
+
+
+
+
+
+*/

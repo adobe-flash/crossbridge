@@ -1,0 +1,46 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page esc_xattr 
+
+\addindex esc_xattr
+
+
+\section esc_xattr esc_xattr
+
+\subsection operation Operation
+
+Escape an xml attribute.
+
+\subsection format Format
+
+\code
+esc_xattr
+\endcode
+
+\subsection forms Forms
+\code
+esc_xattr = 114 (0x72)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ..., stringvalue
+\endcode
+
+\subsection description Description
+
+value is popped off of the stack and converted to a string. The result, stringvalue, 
+is pushed onto the stack. This uses the EscapeAttributeValue algorithm as described in 
+the E4X specification, ECMA-357 section 10.2.1.2, to perform the conversion.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

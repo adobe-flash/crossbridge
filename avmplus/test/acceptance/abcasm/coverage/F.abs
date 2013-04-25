@@ -1,0 +1,117 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+method_info { name:findpropstrictErrorCase1 }
+method_body_info {
+	method: findpropstrictErrorCase1
+	exception: {
+			exception {
+			from: beginTry 
+			to:endTry 
+			target:catchRefError 
+			type:ReferenceError 
+		}
+	}
+	code:
+	{
+		getlocal0
+		pushscope
+	beginTry:
+		findproperty COMPARE_STRICTEQ
+	pushstring "findpropstrict zuul"
+		getscopeobject 0 // expected
+		findpropstrict zuul
+		findproperty FAIL
+	swap
+	callpropvoid FAIL 1
+	endTry:
+		returnvoid
+
+	catchRefError:
+		getlocal0
+		pushscope
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+		returnvoid
+	}
+}
+method_info { 
+	name: runTest 
+}
+method_body_info {
+
+	method: runTest
+
+	code:
+	{
+		getlocal0
+		pushscope
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "findproperty"
+		getglobalscope // expected
+		findproperty Number
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "findproperty zuul"
+		getscopeobject 0 // expected
+		findproperty zuul
+
+		pushint 7
+		pushscope
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "findproperty _toString"
+		getscopeobject 0 // expected
+		findproperty _toString
+
+		popscope
+
+		findproperty Object
+		constructprop Object 0
+		pushwith
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "findproperty toLocaleString"
+		getscopeobject 1 // expected
+		findproperty toLocaleString
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "findpropstrict toLocaleString"
+		getscopeobject 1 // expected
+		findpropstrict toLocaleString
+		callpropvoid COMPARE_STRICTEQ 3
+
+		newfunction findpropstrictErrorCase1
+		getlocal0
+		call 0
+
+		returnvoid
+	}
+}
+
+
+
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "Instructions that start with the letter F" 
+	callpropvoid START 1
+	newfunction runTest
+	getlocal0
+	call 0
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+
+script_info{
+	init: main
+		traits: {
+		trait { kind: Trait_Slot name: var1 }
+	}
+}

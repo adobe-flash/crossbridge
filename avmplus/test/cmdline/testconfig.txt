@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+#  This Source Code Form is subject to the terms of the Mozilla Public
+#  License, v. 2.0. If a copy of the MPL was not distributed with this
+#  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# testconfig.txt syntax
+# this file allows failures to be marked as known
+# specify a bug in the notes field for tracking of failures
+# name - is a regular expression to match one or more test names
+# type - is expectedfailure or skip
+#        expectedfailure is preferable and will verify the test fails, if the test passes but is marked
+#             as expectedfailure the result will be unexpectedfailure
+#        skip will ignore whether the test passes or failed, this is used for intermittent problems
+#             where the test does not reliably pass
+# name, type [skip], notes
+
+testMemstats.py, skip, https://bugzilla.mozilla.org/show_bug.cgi?id=529160
+
+
+
+

@@ -1,0 +1,47 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page iftrue 
+
+\addindex iftrue
+
+
+\section iftrue iftrue
+
+\subsection operation Operation
+
+Branch if true.
+
+\subsection format Format
+
+\code
+iftrue
+offset
+\endcode
+
+\subsection forms Forms
+\code
+iftrue = 17 (0x11)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ...
+\endcode
+
+\subsection description Description
+
+offset is an s24 that is the number of bytes to jump. Pop value off the stack and convert 
+it to a Boolean. If the converted value is true, jump the
+number of bytes indicated by offset. Otherwise continue executing code from this point.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

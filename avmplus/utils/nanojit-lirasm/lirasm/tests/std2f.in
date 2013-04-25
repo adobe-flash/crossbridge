@@ -1,0 +1,11 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+ptr = allocp 8
+d = immd -1
+; Store the value twice in consecutive slots to check that it's really stored as 32 bits.
+std2f d ptr 4
+std2f d ptr 0
+d2 = ldf2d ptr 4
+retd d2

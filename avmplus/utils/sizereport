@@ -1,0 +1,61 @@
+#!/bin/sh
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+echo `pwd`
+file="../platform/win32/obj_9/shell/Release/avmplus.map"
+#file="../objdir-release/shell/avmshell.map"
+test "$1" = "" || {
+  file=$1
+}
+
+
+grep -e '^ 0001:00......   ' -e '^ 0002:00......   ' -e '^ 0003:00......   ' <$file |
+	sed -e's/^ 0001:00/1/' -e 's/^ 0002:00/2/' -e 's/^ 0003:00/3/' | 
+	tee x |
+	awk '{ print $3, $0 }' |
+	sort |
+	awk ' 
+		{ 
+			addr=strtonum("0x" $1) 
+			if (saveaddr > 0 && addr > saveaddr) {
+			   size = addr-saveaddr
+			   # print per-function size
+			   #print size, file, addr, saveaddr, $1
+			   filetotal[file] += size
+			   if (size < 100000)
+			   	total += size
+			} 
+			file=$NF
+			saveaddr=addr
+		}
+		END {
+
+			# read the module definitions
+			while (getline <"modules.txt" > 0) {
+				if (NF > 0) {
+					mod = $1
+					if ($3 == "*")
+						for (n in filetotal) { if (index(n,$2)==1) map[n] = mod }
+					else
+						map[$2] = mod
+				}
+			}
+
+			# group files into modules
+			for(n in map) {
+				mod = map[n]
+				filetotal[mod] += filetotal[n]
+				delete filetotal[n]
+			}
+
+			# print per-module size
+			printf "%-7d %-12s 100.0%\n",total,"total"
+			for (f in filetotal) {
+                                if (filetotal[f]>0)
+				printf("%-7d %-12s %.1f%%\n",filetotal[f], f, 100*(filetotal[f]/total))
+			}
+		}
+		' | sort -rn
+test -f x && rm x

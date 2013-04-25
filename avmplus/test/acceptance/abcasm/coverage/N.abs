@@ -1,0 +1,199 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+method_info { name: test_newactivation flags: NEED_ACTIVATION }
+
+method_body_info {
+	method: test_newactivation
+	code: 
+	{
+		newactivation
+		dup
+		setlocal1
+		pushscope
+
+		returnvoid
+	}
+}
+
+method_info{ name: test_newcatch flags: NEED_ACTIVATION }
+method_body_info {
+	method: test_newcatch
+	exception: {
+		exception { from: startTry to:endTry target:catchEx }
+	}
+	code:
+	{
+			getlocal0
+			pushscope
+
+		startTry:
+			pushnull
+			getproperty zibble
+		endTry:
+			pushstring "newcatch"
+			findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+			returnvoid
+		catchEx:
+			getlocal0
+			pushscope
+			pushstring "newcatch: "
+			newcatch 0
+			add
+			findproperty PASS
+	swap
+	callpropvoid PASS 1
+			returnvoid
+	}
+}
+
+function runTest()
+{
+	findproperty COMPARE_STRICTEQ
+	pushstring "negate integer"
+	pushint -4 // expected
+	pushint 4
+	negate
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "negate negative integer"
+	pushint 4 // expected
+	pushint -4
+	negate
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "negate uint"
+	pushint -4 // expected
+	pushuint 4
+	negate
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "negate double"
+	pushint -4 // expected
+	pushdouble 4.
+	negate
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "negate negative double"
+	pushint 4 // expected
+	pushdouble -4.
+	negate
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "negate_i integer"
+	pushint -4 // expected
+	pushint 4
+	negate_i
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "negate_i negative integer"
+	pushint 4 // expected
+	pushint -4
+	negate_i
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "negate_i uint"
+	pushint -4 // expected
+	pushuint 4
+	negate_i
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "negate_i double"
+	pushint -4 // expected
+	pushdouble 4.
+	negate_i
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "negate_i negative double"
+	pushint 4 // expected
+	pushdouble -4.2
+	negate_i
+	callpropvoid COMPARE_STRICTEQ 3
+
+	newfunction test_newactivation
+	getlocal 0
+	call 0
+	pushstring "newfunction and newactivation"
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+	/*
+	 *  TODO: work around the verify error.
+	newfunction test_newactivation_negative
+	getlocal 0
+	call 0
+	*/
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "newarray"
+	//pushdouble 4.2 // expected
+	pushint 4 // expected
+	pushint  49
+	pushdouble 4.2
+	pushnull
+	pushundefined
+	newarray  4
+	getproperty length
+	callpropvoid COMPARE_STRICTEQ 3
+
+	/*
+	 *  TODO: newclass needs more class support
+	 */
+	
+	//  Newfunction tested lots
+
+	newfunction test_newcatch
+	getlocal 0
+	call 0
+
+	newobject 0
+	pushstring "newobject() "
+	swap
+	add
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "newobject getproperty"
+	pushnull // expected
+	pushstring "foo"
+	pushnull
+	newobject 1
+	getproperty foo
+	callpropvoid COMPARE_STRICTEQ 3
+
+	returnvoid
+}
+
+
+
+
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "Instructions that start with the letter N" 
+	callpropvoid START 1
+	newfunction runTest
+	getlocal0
+	call 0
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+script_info{init: main}

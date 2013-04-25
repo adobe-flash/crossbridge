@@ -1,0 +1,52 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page istype 
+
+\addindex istype
+
+
+\section istype istype
+
+\subsection operation Operation
+
+Check whether an Object is of a certain type.
+
+\subsection format Format
+
+\code
+istype
+index
+\endcode
+
+\subsection forms Forms
+\code
+istype = 178 (0xb2)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ..., result
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index into the multiname constant pool. The multiname 
+at index must not be a runtime multiname.
+
+Resolve the type specified by the multiname. Let indexType refer to that type. 
+Compute the type of value, and let valueType refer to that type. If valueType is 
+the same as indexType, result is true. If indexType is a base type of valueType, 
+or an implemented interface of valueType, then result is true. Otherwise result 
+is set to false. Push result onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

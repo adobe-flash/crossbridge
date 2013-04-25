@@ -1,0 +1,28 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function script0$init():*
+{
+			debugfile "namespaces.abs"
+			debugline 1
+
+            getlocal0     	
+			pushscope
+
+			findpropstrict START
+			pushstring "pushnamespace foo.bar"
+			callpropvoid START 1
+
+  			pushnamespace foo.bar
+			//  TODO: do something with this namespace.
+			findpropstrict PASS
+			swap
+			callproperty PASS 1
+
+			findpropstrict END
+			callproperty END 0
+			
+
+            returnvoid
+}

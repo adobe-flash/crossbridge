@@ -1,0 +1,199 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+method_info { 
+	name: runTest 
+//	flags: SETS_DXNS
+}
+method_body_info {
+
+	method: runTest
+
+/*
+	traits: {
+		trait { kind: Trait_Slot name: var1 }
+	}
+	*/
+	code:
+	{
+		pushint 7
+		setlocal 1
+		pushdouble 7.5
+		setlocal2
+		pushnull
+		setlocal3
+
+		//  TODO: add  and debugline
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "declocal"
+		pushint 6 // expected
+		declocal 1
+		getlocal1
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "declocal double"
+		pushdouble 6.5 // expected
+		declocal 2
+		getlocal2
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "declocal - null"
+		pushint -1 // expected
+		declocal 3
+		getlocal3
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "declocal - boolean true"
+		pushint 0 // expected
+		pushtrue
+		setlocal3
+		declocal 3
+		getlocal3
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "declocal - boolean false"
+		pushint -1 // expected
+		pushfalse
+		setlocal3
+		declocal 3
+		getlocal3
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "declocal_i"
+		pushint 5 // expected
+		declocal_i 1
+		getlocal1
+		callpropvoid COMPARE_STRICTEQ 3
+
+		/*
+		 * Taken offline to analyze failure 
+		findproperty COMPARE_STRICTEQ
+		pushstring "declocal_i_double"
+		pushint 5 // expected
+		declocal_i 2
+		getlocal2
+		callpropvoid COMPARE_STRICTEQ 3
+		*/
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "decrement int"
+		pushint 99 // expected
+		pushint 100
+		decrement
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "decrement uint"
+		pushuint 4294967294 // expected
+		pushuint 4294967295
+		decrement
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "decrement uint"
+		pushint -1 // expected
+		pushuint 0
+		decrement
+		callpropvoid COMPARE_STRICTEQ 3
+/* not implemented
+		findproperty COMPARE_STRICTEQ
+	pushstring "deleteproperty noSuchProperty"
+		pushtrue // expected
+		findproperty Object
+		constructprop Object 0
+		deleteproperty noSuchProperty
+		callpropvoid COMPARE_STRICTEQ 3
+
+		//  Should this work?
+		findproperty COMPARE_STRICTEQ
+	pushstring "deleteproperty length"
+		pushtrue // expected
+		findproperty Object
+		constructprop Object 0
+		deleteproperty length
+		callpropvoid COMPARE_STRICTEQ 3
+*/
+		findproperty COMPARE_STRICTEQ
+	pushstring "divide double by int"
+		pushdouble 4.25 // expected
+		pushdouble 8.5
+		pushint 2
+		divide
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "divide int by int"
+		pushdouble 4.25 // expected
+		pushint 17
+		pushint 4
+		divide
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "divide double by uint"
+		pushdouble 4. // expected
+		pushdouble 17179869180.
+		pushuint 4294967294
+		divide
+		pushint 5
+		callproperty COMPARE_NUMBEREQ 4
+		
+
+	/*
+		findproperty COMPARE_STRICTEQ
+	pushstring "dxns"
+		dxns "foo"
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+		pop // COMPARE_STRICTEQ
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "dxnslate"
+		pushstring "foo"
+		dxnslate
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+		pop // COMPARE_STRICTEQ
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "dxnslate - null"
+		pushnull
+		dxnslate
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+		pop // COMPARE_STRICTEQ
+	*/
+
+		returnvoid
+	}
+} //  runTest
+
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "Instructions that start with the letter D" 
+	callpropvoid START 1
+	newfunction runTest
+	getlocal0
+	call 0
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+script_info{init: main 	
+	traits: {
+		trait { kind: Trait_Slot name: var1 }
+	}
+}

@@ -1,0 +1,51 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page debugline 
+
+\addindex debugline
+
+
+\section debugline debugline
+
+\subsection operation Operation
+
+Debugging line number info.
+
+\subsection format Format
+
+\code
+debugline 
+linenum
+\endcode
+
+\subsection forms Forms
+\code
+debugline = 240 (0xf0)
+\endcode
+\subsection stack Stack
+
+\code
+... => ...
+\endcode
+
+\subsection description Description
+
+linenum is a u30 that indicates the current line number the debugger should be using for 
+the code currently executing.
+
+If the debugger is running, then this instruction sets the current line number in 
+the debugger. This lets the debugger know which instructions are associated with 
+each line in a source file. The debugger will treat all instructions as occurring 
+on the same line until a new debugline opcode is encountered.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

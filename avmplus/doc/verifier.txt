@@ -1,0 +1,1338 @@
+<!--
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+-->
+
+= Notes on the AVM Bytecode Verifier =
+Jeff Dyer, Adobe Systems
+
+<hr>
+<pre>
+Revision History:
+November 26, 2008: second draft, reviewed by Tom and Lars
+November 20, 2008: initial draft, not reviewed
+
+Known Problems:
+- certain abstract operations are yet to be defined
+- handling of null as a type modifier
+- dead code is not ignored as it is in AVM
+- more and better examples of verification errors and their resolution
+</pre>
+<hr>
+
+== Introduction ==
+
+<p>ABC (originally for Action Block Code) is the language executed by the AVM (ActionScript 
+Virtual Machine of Tamarin). The full definition of ABC includes a specification of its 
+syntax, static semantics and runtime behavior. Within the static semantics are 
+constraints on the bytecode of each executed method (methods that are not 
+executed are not subject to these constraints.) A bytecode verifier is the mechanism 
+that enforces such static constraints on sequences of bytecode. 
+
+<p>This document describes the AVM bytecode verifier using an abstract machine and 
+the translation of concrete ABC instructions into operations of that abstract machine. 
+The abstract machine described here accepts the same set of programs that the AVM verifier 
+accepts. This is the set of ABC programs that is allowed to be executed by the AVM.
+
+<p>This document does not describe the syntactic or structural constraints on ABC files 
+that do not involve ABC bytecode. Those rules are defined in the AVM2 Overview [3] and elsewhere.
+
+<p>The audience for this document includes developers who are working on and 
+compiler writers who are targeting the AVM. The reader might find helpful to think of 
+this as an alternative interpretation of ABC programs; that is, to not 
+confuse the meaning of types and control flow with that of a particular source 
+language or even the dynamic behavior of the ABC instructions. 
+
+== Invariants ==
+
+<p>
+The following invariants are checked during verification:
+
+<ul>
+  <li> Operand stack does not underflow or overflow
+  <li> Scope stack does not underflow or overflow
+  <li> Storage locations always have an unambiguous state
+  <li> Instruction operands are valid references and have their expected types
+  <li> Instruction pointers point to the beginning of an instruction
+  <li> Constant pool indices point to valid constant pool entries
+</ul>
+
+<p>There are many other constraints on the syntax and semantics of an ABC file. For 
+example it is essential that
+
+<ul>
+  <li> Base classes exist and are not declared 'final'
+  <li> Class methods that are overridden are not declared 'final'
+  <li> ...more here
+</ul>
+
+<p>Such constraints are assumed by this spec to have been checked before bytecode 
+verification.
+
+== Abstract Machine ==
+
+=== Machine State ===
+
+<p>The abstract machine state includes the following components:
+
+<ul>
+  <li> Operand stack of a maximum size containing zero or more types
+  <li> Scope stack of a maximum size containing one or more types
+  <li> Local registers of a maximum size, each containing a type
+  <li> Index of the current instruction
+</ul>
+
+<p>We refer to stack elements and local registers as locations in the machine state. 
+A valid machine state is one whose stack sizes and type of each location are known 
+to be consistent when reached by all possible control flow paths. A valid bytecode 
+sequence is one with only valid machine states.
+
+<p>Accessible locations are initialized to the type Any and so are never in an undefined 
+(or killed) state.
+
+=== Machine Context ===
+
+<p>
+In addition to the state that is mutated in the course of method verification, there is 
+additional state that represents the context of the method. That environment 
+includes:
+
+<ul>
+  <li> Method being verfied including method body and map of machine states for that method
+  <li> Lexically visible bindings (name to type) outside the method
+  <li> Constant pool
+  <li> Script domain (contains top-level fixed definitions)
+</ul>
+
+=== Machine Types ===
+
+<p>
+The verifier type system is factored somewhat differently than that of ActionScript or 
+any other normal object oriented language, for that matter. The key difference is 
+that there are six root types, none of which are compatible with any of the others.
+ActionScript, in contrast, has one root type Any with which all other types are
+assignment compatible. The reason for this deviation is that the verifier type system 
+reflects the compatibility rules of the underlying machine values.
+
+<p>
+The root types of the abstract machine are:
+
+<ul>
+  <li> Atom* (consists of Any, Undefined, Object)
+  <li> Int*
+  <li> UInt*
+  <li> Boolean*
+  <li> Number*
+  <li> Reference* (consists of Null and any sub-class of Object, including String and 
+Namespace)
+</ul>
+
+<NOTE> String and Namespace are special in that there are instructions that expect 
+those types, but otherwise they are treated as all other Reference* types.
+
+<p>
+Two types are considered consistent if they are the same machine type and they 
+merge to a concrete type that is the same machine type. We use the term 'type' to 
+refer to both a machine types (e.g. Atom*) and the concrete types (e.g. Any and 
+Object) without qualification unless the distinction is important and unclear.
+
+<p>
+The rules for merging types are:
+
+<ul>
+  <li> Two identical types merge as the same type
+  <li> Two Atom* types merge as type Any
+  <li> Two Reference* types merge as the type that is the most derived common 
+base class. Two Reference* types are consistent only if they merge to another 
+Reference* type (i.e. not Object)
+  <li> All other type combinations result in a merge error
+</ul>
+
+=== Abstract Operators ===
+
+<p>
+The following operators are the primitives that define possible state transitions of the 
+abstract machine.
+
+<ul>
+  <li> Push type
+  <li> Pop [count]
+  <li> Coerce type
+  <li> Check type [index]
+  <li> Peek symbol [index]
+  <li> Swap
+  <li> Load index
+  <li> Store index
+  <li> PushScope type
+  <li> PopScope
+  <li> Jump offset
+  <li> Throws
+  <li> PopName
+  <li> FindName
+  <li> FindDefName
+  <li> GetSlot
+  <li> GetProp
+  <li> SetSlot
+  <li> SetProp
+</ul>
+
+<p>
+**Push //type//**. Push the specified type onto the operand stack. Raises an error if the 
+number of elements on the operand stack is equal to the maximum stack size.
+
+<p>
+**Pop //[count]//**. Pop count types from the operand stack. If unspecified count is 1. 
+Raises an error if count is greater than the number of elements on the operand 
+stack.
+
+<p>
+**Coerce //type//**. Change the type on the top of the stack to the given type. Raises no 
+error.
+
+<p>
+**Check //type [index]//**. Check that the type at the location of index is of the given 
+type. If index is not provided, then check the type on the top of the stack. Raises an 
+error if index does not indicate a valid location or if the type at that location is not 
+compatible with the specified type.
+
+<p>
+**Peek //symbol [index]//**. Bind meta-name symbol to the type at the location of index. 
+If index is not provided, then binds the type on the top of the operand stack. Raises an 
+error if index does not indicate a valid location.
+
+<p>
+**Swap**. Swap the two values on the top of the operand stack. Raises an error if fewer 
+than two elements are on the operand stack.
+
+<p>
+**Load //index//**. Load the type of local at index onto the stack. Raises an error if index 
+does not indicate a valid local register.
+
+<p>
+**Store //index//**. Store the type on the top of the stack into local //index//. Raises an 
+error if index does not indicate a valid local register.
+
+
+<p>
+**PushScope //type//**. Push the specified type onto the scope stack. Check that it 
+matches the expected type. [**FIXME** how is the pushed type constrainted?]. Raises an error if
+the number of elements on the scope stack is equal to the maximum stack size.
+
+<p>
+**PopScope**. Pop the top type from the scope stack.
+
+<p>
+**Jump //offset//**. Merge the current machine state with the state associated with the 
+instruction indicated by offset. The meaning of merge depends on the direction of the 
+control flow causing the merge.
+
+<p>
+Two machine states merge on a forward edge if each of the following conditions 
+hold:
+
+<ul>
+  <li> operand stack is the same size
+  <li> scope stack is the same size
+  <li> scope type at each scope stack location is consistent
+  <li> type at each value location (operand stack and locals) are consistent
+</ul>
+
+<p>
+A merge of a backward edge is more constrained than a merge on a forward edge.
+On a backward edge it is a verifier error if the merged type is different than the 
+target type. This includes the notNull attribute of that type. The reason for this 
+limitation is that by the time a backward edge is verified, the state of the machine 
+may have been used by a preceding instruction and so the type state cannot safely 
+be modified.
+
+<p>
+Raises an error if offset does not refer to the beginning of an instruction or if the 
+current machine and the state associated with that offset are not consistent.
+
+<p>
+**Throws**. The Throws operation saves the current abstract machine state, configures 
+the scope and operand stacks for the exception handlers, jumps (as if by the Jump 
+operator) to each of the catch handlers, and then restores the saved machine state. 
+Raises no error.
+PopName name. Pop a name from the operand stack. The structure of a name 
+value depends on the kind of name be referenced. Raise an error if the type(s) on 
+the operand stack are either too few or incompatible with the name kind specified by 
+the instruction operand.
+
+<p>
+**FindName //name//**. Resolve the name constructed from the instruction operand and 
+element(s) on the operand stack to a type in the scope stack by searching the scope 
+stack for a type that contains the given name. If found push the found type onto the 
+operand stack. Otherwise push the global type onto the operand stack.
+
+<p>
+**FindDefName //name//**. FIXME
+
+<p>
+**GetSlot //index//**. FIXME
+
+<p>
+**GetName //name//**. FIXME
+
+<p>
+**SetSlot //index//**. FIXME
+
+<p>
+**SetName //name//**. FIXME
+
+=== Interpreter Loop ===
+
+<p>
+The interpreter loop scans the bytecode in a single forward pass interpreting each 
+bytecode with the abstract meaning given below. After an instruction is interpreted, 
+the current machine state is merged with the input state of the next instruction as 
+though there is an implicit edge in the control flow graph to that instruction.
+
+<p>
+If an invariant is violated during execution of an operator or the subsequent merge 
+with the input state of the next instruction, the bytecode sequence is considered 
+invalid and verification terminates.
+
+<NOTE>Machine state is merged with the state of the next instruction even if there is 
+no direct path to that instruction. This allows the machine state to be approximated 
+without using an iterative data flow algorithm. The burden on the compiler that 
+generates the bytecode is to configure the types of live variables before entering the 
+loop through one of these imaginary edges.
+
+<hr>
+{{{
+    R1=0
+    <fixup>
+    jump L2
+    <dead>
+L1: label
+    <body>
+    R1=R1+1
+L2: if <condition> L1
+}}}
+<hr>
+Example 1
+
+<p>
+The machine state at 'jump L2' will be merged with the state at 'L1: label'. Any 
+intervening '<dead>' code will be ignored by the verifier and thus have no effect on 
+the interpreter state. This approximates reality where L1 is reached through the back 
+edge at L2. What is missing is an accounting of the effect that '<body>' has on the 
+machine state at L1. The code generator (or author) of this code must either insert 
+coerce and kill instructions in the region of '<fixup>', or reorganize the control flow 
+so that the condition comes before the body of the loop.
+
+<hr>
+{{{
+    R1=0
+L2: if <condition> L1
+    <body>
+    R1=R1+1
+    jump L2
+L1: label
+}}}
+<hr>
+Example 2
+
+<p>
+In this configuration every use is preceded by an actual definition of a locations 
+state. Any location that is used in <body> will have to be defined before <body> is 
+entered or inside of <body> but before it is used. A later redefinition of that location 
+will still be limited to the current restrictions on type merging on backedges.]
+
+<p>
+<FIXME> the logic of dead code identification is not straightforward and needs to be 
+defined
+
+<p>
+If the interpreter reaches the end of the bytecode, then the bytecode is valid.
+
+==== Control Flow Graphs ====
+
+<p>
+We have already seen that an implicit edge in the control flow graph (CFG) is created 
+to each instruction from the previous instruction. Here is the complete list of rules 
+used to create the CFG for a method.
+
+<ul>
+  <li> to every instruction from the previous instruction
+  <li> to every exception handler from every in scope instruction that can throw an 
+exception
+  <li> from every jump to every jump target (including lookupswitch)
+</ul>
+
+=== ABC Instructions ===
+
+<p>
+The abstract interpretation of ABC bytecode can be expressed in the abstract 
+machine operations defined above. The following is such a mapping from ABC 
+instruction to the abstract operators.
+
+<p>
+<FIXME> this mapping is currently only approximate, and undoubtedly buggy. But is 
+good enough to get us started in the debugging process.]
+
+<p>
+For the most part the notation is self-evident. Parens following an instruction name 
+indicate the type case for that particular definition. ''!'' (e.g. ''!String'') indicates that ''Null'' 
+is excluded from the reference type being named.
+
+<pre>
+**abs_jump**:
+    ; FIXME need definition
+
+
+**add (!String, _)**:  ; NOTE ! means nonNull    
+**add (_, !String)**:    
+    Throws
+    Pop
+    Pop
+    Push String
+
+
+**add (Numeric,  Numeric)**:  ; NOTE Numeric means converts to Number    
+    Throws
+    Pop
+    Pop
+    Push Number
+
+
+**add**:
+    Throws
+    Pop
+    Pop
+    Push Object
+
+
+**add_d**:
+    ; ERROR invalid instruction
+
+
+**add_i**:    
+    Throws
+    Pop 
+    Pop
+    Push Int
+
+
+**applytype argc**:
+    Throws
+    Pop argc+1
+    Push Any  ; FIXME might be more specific if jitting
+
+
+**astype type**:
+    Throws
+    Pop
+    Push type
+
+
+**astypelate**:
+    Throws
+    Check Class
+    Peek c
+    Pop
+    Pop
+    Push instanceTypeOf(c)
+    ; FIXME define instanceTypeOf
+
+    
+**bitand**:
+    Throws
+    Pop
+    Pop
+    Push Int
+
+
+**bitnot**:
+    Throws
+    Pop
+    Push Int
+
+
+**bitor**:
+**bitxor**:
+    ; REF bitand
+
+
+**call argc**:
+    Throws
+    Pop argc+2
+    Push Any
+
+
+**callinterface**:
+**callmethod**:
+    ; ERROR invalid instruction
+
+
+**callproperty name**:
+**callproplex name**:
+**callpropvoid name**:
+    Throws
+    ; CHECK name is not an attribute name
+    PopName name
+
+
+**callstatic method argc**:
+**callsuper method argc**:
+**callsupervoid method argc**:
+    Throws
+    Pop argc+1
+    Push method.resultType
+    ; ASSERT method has parameter types
+    CheckArgs  ; FIXME needs definition
+
+
+**checkfilter**:
+    Throws
+    Pop
+    Push Any
+
+
+**coerce type**:
+    Throws
+    Pop
+    Push type
+
+
+**coerce_a**:
+    Throws
+    Pop
+    Push Any
+
+
+**coerce_b**:
+    Throws
+    Pop
+    Push Boolean
+
+
+**coerce_d**:
+    Throws
+    Pop
+    Push Number
+
+
+**coerce_i**:
+    Throws
+    Pop
+    Push Int
+
+
+**coerce_o**:
+    Throws
+    Pop
+    Push Object
+
+
+**coerce_s**:
+    Throws
+    Pop
+    Push String
+
+
+**coerce_u**:
+    Throws
+    Pop
+    Push Uint
+
+
+**concat**:
+    ; ERROR invalid instruction (see add)
+
+
+**construct name argc**:
+    Throws
+    Pop argc
+    Peek class
+    InstanceTypeOf(class)  ; FIXME needs definition
+
+
+**constructprop name argc**:
+    Throws
+    ; CHECK name is not an attribute name
+    PopName name
+
+
+**constructsuper argc**:
+    Throws
+    Pop argc+1
+    ; CHECK base class is not null
+
+
+**convert_b**:
+    ; REF coerce_b
+
+
+**convert_d**:
+    ; REF coerce_d
+
+
+**convert_i**:
+    ; REF coerce_i
+
+
+**convert_o**:
+    Peek t
+    Pop
+    Push t
+
+**convert_s**:
+    Pop
+    Push String
+
+
+**convert_u**:
+    ; REF coerce_u
+
+
+**debug**:
+**debugfile**:
+**debugline**:
+    Throws
+
+
+**declocal**:
+    Throws
+    Load index
+    Coerce Number
+    Store index
+
+
+**declocal_i**:
+    Throws
+    Load index
+    Coerce Int
+    Store index
+
+
+**decrement**:
+    Throws
+    Pop
+    Push Number
+
+
+**decrement_i**:
+    Throws
+    Pop
+    Push Int
+
+
+**deleteproperty name**:
+    Throws
+    PopName name
+
+
+**divide**:
+    Throws
+    Pop 2
+    Push Number
+
+
+**dup**:
+    Peek t
+    Push t
+
+
+**dxns**:
+    Throws
+
+
+**dxnslate**:
+    Throws
+    Pop
+
+
+**equals**:
+    Throws
+    Pop 2
+    Push Boolean
+
+
+**esc_xattr**:
+**esc_xelem**:
+    ; REF convert_s
+
+
+**finddef name**:
+    Throws
+    FindDefName name
+
+
+**findproperty name**:
+**findpropstrict name**:
+    Throws
+    ; CHECK scope stack is not empty
+    FindName name
+
+
+**getdescendants name**:
+    Throws
+    PopName name
+    Push Any
+
+
+**getglobalscope**:
+    Push typeOfGlobalScope()
+
+
+**getglobalslot index**:
+    Push typeOfGlobalSlot(index)
+    
+
+**getlex name**:
+    Throws
+    ; CHECK scope stack is not empty
+    FindName name
+    GetProp name
+
+
+**getlocal index**:
+    Load index
+
+
+**getlocal0**:
+    Load 0
+
+
+**getlocal1**:
+    Load 1
+
+
+**getlocal2**:
+    Load 2
+
+
+**getlocal3**:
+    Load 3
+
+
+**getouterscope index**:
+    OuterScopeAt index  ; FIXME needs definition
+
+
+**getproperty name**:
+    Throws
+    GetProp name
+
+
+**getscopeobject index**:
+    ScopeAt index ; FIXME needs definition
+
+
+**getslot index**:
+    GetSlot index
+
+
+**getsuper name**:
+    Throws
+    ; CHECK name is not an attribute name
+    GetSuper
+    GetProp name
+    
+
+**greaterequals**:
+**greaterthan**:
+    Throws
+    Pop 2
+    Push Boolean
+
+
+**hasnext**:
+    Throws
+    Check Int
+    Peek t  ; FIXME what this?
+    Pop 2
+    Push Int
+
+
+**hasnext2 index1 index2**:
+    Throws
+    Check Any index1
+    Check Int index2
+    Push Boolean
+    
+
+**ifeq offset**:
+    Throws
+    Pop 2
+    Jump offset
+
+
+**iffalse offset**:
+    Pop
+    Jump offset
+
+
+**ifge offset**:
+**ifgt offset**:
+**ifle offset**:
+**iflt offset**:
+**ifne offset**:
+**ifnge offset**:
+**ifngt offset**:
+**ifnle offset**:
+**ifnlt offset**:
+    ; REF ifeq
+
+
+**ifstricteq offset**:
+**ifstrictneq offset**:
+    Pop 2
+    Jump offset
+
+
+**iftrue offset**:
+    ; REF iffalse
+
+
+**in**:
+    ; REF equals
+
+
+**inclocal index**:
+    ; REF declocal
+
+
+**inclocal_i index**:
+    ; REF declocal_i
+
+**increment**:
+    ; REF decrement
+
+
+**increment_i**:
+    ; REF decrement_i
+
+
+**initproperty name**:
+    Throws
+    Pop
+    PopName name
+    Pop
+    
+
+**instanceof**:
+    ; REF equals
+
+
+**istype name**:
+    Throws
+    Pop
+    Push Boolean
+    ; FIXME the verifier code doesn't actually do this.    
+
+
+**istypelate**:
+    Throws
+    Pop 2
+    Push Boolean
+
+
+**jump offset**:
+    Jump offset
+
+
+**kill index**:
+    Push Undefined
+    Store index
+
+
+**label**:
+    ; NOTE do nothing
+
+
+**lessequals**:
+**lessthan**:
+    ; REF greaterthan
+
+
+**lf64**:
+**lf32**:
+    Throws
+    Pop
+    Push Number
+
+
+**li32**:
+**li16**:
+**li8**:
+    Throws
+    Pop
+    Push Int
+
+
+**lookupswitch offset count targets[count]**:
+    Check Int
+    Pop
+    Jump offset
+    JumpAll targets  ; FIXME needs definition
+    
+    
+**lshift**:
+    Throws
+    Pop 2
+    Push Int
+
+
+**modulo**:
+**multiply**:
+    ; REF divide
+
+
+**multiply_i**:
+    ; REF add_i
+
+
+**negate**:
+    Pop
+    Push Number
+
+
+**negate_i**:
+    Throws
+    Push Int
+
+
+**newactivation**:
+    ; CHECK need_activation flag is set in method info
+    Throws
+    GetActivationScope  ; FIXME needs definition
+
+
+**newarray argc**:
+    Throws
+    Pop argc
+    Push Array
+
+
+**newcatch index**:
+    Throws
+    GetHandlerScope index
+
+
+**newclass index**:
+    Throws
+    Pop
+    GetClassScope index  ; FIXME needs definition
+    ; FIXME to simplistic
+
+
+**newfunction index**:
+    Throws
+    Pop
+    GetFunctionScope index ; FIXME needs definition
+    ; FIXME what's missing?
+
+
+**newobject argc**:
+    Throws
+    ; CHECK every other operand < 2*argc is a String
+    Pop 2*argc
+    Push Object
+
+
+**nextname**:
+**nextvalue**:
+    Throws
+    Check Int
+    Pop 2
+    Push Any
+
+**nop**:
+    ; NOTE do nothing
+
+
+**not**:
+    Pop
+    Push Boolean
+
+
+**pop**:
+    Pop
+
+
+**popscope**:
+    PopScope
+
+
+**pushbyte b**:
+    Push Int
+
+
+**pushdouble d**:
+    Push Number
+
+
+**pushfalse**:
+    Push Boolean
+
+
+**pushint v**:
+    Push Int
+
+
+**pushnamespace index**:
+    Push Namespace
+    
+
+**pushnan**:
+    Push Number
+
+
+**pushnull**:
+    Push Null
+
+
+**pushscope**:
+    Peek s
+    Pop
+    PushScope s
+
+
+**pushshort v**:
+    Push Int
+
+
+**pushstring index**:
+    Push String
+
+
+**pushtrue**:
+    Push Boolean
+
+
+**pushuint**:
+    Push Uint
+
+
+**pushundefined**:
+    Push Undefined
+
+
+**pushwith**:
+    Peek s
+    Pop
+    PushScope s
+
+
+**returnvalue**:
+    Pop
+
+
+**returnvoid**:
+    ; NOTE do nothing
+
+
+**rshift**:
+    ; REF lshift
+
+
+**setglobalslot index**:
+    ; CHECK scope stack is not empty
+    Pop
+
+
+**setlocal  index**:
+    Store index
+
+
+**setlocal0**:
+    Store 0
+
+
+**setlocal1**:
+    Store 1
+
+
+**setlocal2**:
+    Store 2
+
+
+**setlocal3**:
+    Store 3
+
+
+**setproperty**:
+    ; REF initproperty
+
+
+**setslot index**:
+    Throws
+    Pop 2
+
+
+**setsuper name**:
+    Throws
+    ; CHECK name is not an attribute name
+    PopName
+    Pop 2
+
+
+**sf32**:
+**sf64**:
+**si16**:
+**si32**:
+**si8**:
+    Throws
+    Pop 2
+
+
+**strictequals**:
+    ; REF equals
+
+
+**subtract**:
+    ; REF divide
+
+
+**subtract_i**:
+    ; REF add_i
+
+
+**swap**:
+    Swap
+
+
+**sxi1**:
+**sxi8**:
+**sxi16**:
+    Pop
+    Push Int
+
+
+**throw**:
+    Pop
+    Throws
+
+
+**timestamp**:
+    ; ERROR invalid instruction
+
+
+**typeof**:
+    Pop
+    Push String
+
+
+**urshift**:
+    Throws
+    Pop 2
+    Push Uint
+</pre>
+
+== Working Examples ==
+
+In this section we review some common verify errors and how to avoid them.
+
+=== Inconsistent Types on a Forward Edge ===
+
+The following is an example of an unsuccessful merge between an Int and UInt 
+resulting in a verfication error. That error will be avoided if the integer values were 
+both coerced to the Atom* type Any before being stored in local slot 2.
+
+<pre>
+verify <anonymous>()
+                        stack:
+                        scope: [global] 
+                         locals: Object * * * 
+  0:pushbyte 0
+                        stack: int
+                        scope: [global] 
+                         locals: Object * * * 
+  2:setlocal2                            **<-- Insert coerce_a**
+                        stack:
+                        scope: [global] 
+                         locals: Object * int * 
+
+  .
+  .
+  .
+
+  9:iffalse 16
+                        stack:
+                        scope: [global] 
+                         locals: Object * int int 
+  13:getlocal3
+                        stack: int
+                        scope: [global] 
+                         locals: Object * int int 
+  14:convert_u
+                        stack: uint
+                        scope: [global] 
+                         locals: Object * int int 
+  15:setlocal2                           **<-- Insert coerce_a**
+VerifyError: Error #1068: int and uint cannot be reconciled.
+</pre>
+
+=== Inconsistent Type on a Backward Edge ===
+
+==== Forward Edge ====
+
+On a forward edge ''null'' and ''String'' merge to ''String?''.
+
+<pre>
+function f (b) {
+  var x = null
+  if (b) {
+    x = "foo"
+  }
+}
+</pre>
+
+The above ActionScript code might be compiled as the following acceptable bytecode.
+
+<pre>
+verify <anonymous>()
+                        stack:
+                        scope: [global] 
+                         locals: Object * * 
+  0:pushnull
+                        stack: null
+                        scope: [global] 
+                         locals: Object * * 
+  1:setlocal2
+                        stack:
+                        scope: [global] 
+                         locals: Object * null 
+
+  .
+  .
+  .
+
+  4:iffalse 11
+                        stack:
+                        scope: [global] 
+                         locals: Object * null 
+  8:pushstring ""
+                        stack: String
+                        scope: [global] 
+                         locals: Object * null 
+  10:setlocal2
+B0:
+                        stack:
+                        scope: [global] 
+                         locals: Object * String? 
+  11:returnvoid
+</pre>
+
+==== Backward Edge ====
+
+However, on a backward edge ''String?'' and ''null'' do not merge. This is for the simple
+reason that the merge on the backward edge causes the type to
+change: ''null'' -> ''String?''.
+
+<pre>
+function f (b) {
+  var x = null
+  while (b) {
+    x = "foo"
+  }
+}
+</pre>
+
+<p>
+A naive compiler might compile the above code as below. It would do well to
+insert ''coerce_s'' as indicated.
+
+
+<pre>
+verify <anonymous>()
+                        stack:
+                        scope: [global] 
+                         locals: Object * * 
+  0:pushnull
+                        stack: null
+                        scope: [global] 
+                         locals: Object * * 
+  1:setlocal2                                 **<-- Insert coerce_s here**
+                        stack:
+                        scope: [global] 
+                         locals: Object * null 
+  2:jump 10
+B0:
+                        stack:
+                        scope: [global] 
+                         locals: Object? * null 
+  6:label
+                        stack:
+                        scope: [global] 
+                         locals: Object? * null 
+  7:pushstring ""
+                        stack: String
+                        scope: [global] 
+                         locals: Object? * null 
+  9:setlocal2
+B1:
+                        stack:
+                        scope: [global] 
+                         locals: Object? * String? 
+  10:getlocal1
+                        stack: *
+                        scope: [global] 
+                         locals: Object? * String? 
+  11:convert_b
+                        stack: Boolean
+                        scope: [global] 
+                         locals: Object? * String? 
+  12:iftrue 6
+VerifyError: Error #1068: null and String cannot be reconciled.
+</pre>
+
+=== Unbalanced Stack ===
+
+An unbalanced stack results when two or more paths that lead to the same control
+flow point lead to different stack depths. Here is an example:
+
+<pre>
+verify <anonymous>()
+                        stack:
+                        scope: [global] 
+                         locals: Object * 
+  0:getlocal1
+                        stack: *
+                        scope: [global] 
+                         locals: Object * 
+  1:convert_b
+                        stack: Boolean
+                        scope: [global] 
+                         locals: Object * 
+  2:iffalse 9
+                        stack:
+                        scope: [global] 
+                         locals: Object * 
+  6:pushfalse
+                        stack: Boolean
+                        scope: [global] 
+                         locals: Object * 
+  7:dup                                     **<-- either don't dup or move extra push outside of branch**
+                        stack: Boolean Boolean
+                        scope: [global] 
+                         locals: Object * 
+  8:coerce_a
+VerifyError: Error #1030: Stack depth is unbalanced. 2 != 0.
+</pre>
+
+
+== References ==
+
+<p>
+[1] <a href='http://pauillac.inria.fr/~xleroy/publi/bytecode-verification-JAR.pdf'>
+"Java bytecode verification: algorithms and formalizations", Xavier Leroy
+</a>
+
+<p>
+[2] <a href='ftp://ftp.kestrel.edu/pub/papers/coglio/ccpe03.pdf'>
+"Improving the official specification of Java bytecode verification", Alessandro Coglio
+</a>
+
+<p>
+[3] <a href=http://www.adobe.com/devnet/actionscript/articles/avm2overview.pdf>
+"ActionScript Virtual Machine 2 Overview", Adobe Systems
+</a>
+
+

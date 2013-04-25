@@ -1,0 +1,64 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+function returnNull()
+{
+    pushnull
+    returnvalue
+}
+function runTest()
+{
+    // test null returnvalue
+    findproperty COMPARE_STRICTEQ
+    pushstring "returnvalue null"
+    pushnull // expected
+    newfunction returnNull
+    getlocal0
+    call 0
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "rshift null null"
+    pushint 0 // expected
+    pushnull
+    pushnull
+    rshift
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "rshift null uint"
+    pushint 0 // expected
+    pushnull
+    pushuint 0xFFFFFF
+    rshift
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "rshift int null"
+    pushint 12345678 // expected
+    pushint 12345678
+    pushnull
+    rshift
+    callpropvoid COMPARE_STRICTEQ 3
+
+    
+    returnvoid
+}
+
+
+
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "Instructions that start with the letter R" 
+    callpropvoid START 1
+    newfunction runTest
+    getlocal0
+    call 0
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+script_info{init: main}

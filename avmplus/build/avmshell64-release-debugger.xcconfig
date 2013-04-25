@@ -1,0 +1,16 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#include "avmshell-common.xcconfig"
+#include "avmshell-common64.xcconfig"
+
+GCC_PREPROCESSOR_DEFINITIONS = ${COMMON_PREPROCESSOR_DEFINITIONS} DEBUGGER
+GCC_OPTIMIZATION_LEVEL = 3
+
+// As many settings as possible should be in xcconfig, not in pbxproj.
+// See Bugzilla 668836, comment 6 for procedure for migration.
+
+DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+LIBRARY_SEARCH_PATHS = $(inherited) "$(SRCROOT)/build/Release"
+ZERO_LINK = NO

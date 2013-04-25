@@ -1,0 +1,98 @@
+# -*- Mode: makefile -*-
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+##################
+# autoconf imports
+##################
+
+CC := @CC@
+CXX := @CXX@
+GNU_CC := @GNU_CC@
+LD := @LD@
+NANOJIT_ARCH := @NANOJIT_ARCH@
+DEFS := @DEFS@ -DNANOJIT_CENTRAL
+srcdir := @srcdir@
+CFLAGS := @CFLAGS@
+LDFLAGS := @LDFLAGS@
+TESTCFG := @TESTCFG@
+CXXFLAGS := @CXXFLAGS@
+WARNINGS_AS_ERRORS := @WARNINGS_AS_ERRORS@
+EXE_SUFFIX := @EXE_SUFFIX@
+OBJ_SUFFIX := @OBJ_SUFFIX@
+
+# NB: delayed substitution on this one.
+LINK = @LINK@
+
+#######################
+# normal GNU make rules
+#######################
+
+VPATH = $(srcdir)              \
+        $(srcdir)/VMPI.nj      \
+        $(srcdir)/../../nanojit\
+        $(srcdir)/../../vprof  \
+        $(srcdir)/lirasm       \
+        $(srcdir)/lirasm/tests
+
+NATIVE_SRC=Native$(NANOJIT_ARCH).cpp
+OTHER_SRCS=Allocator.cpp       \
+           Assembler.cpp       \
+           avmplus.cpp         \
+           CodeAlloc.cpp       \
+           Containers.cpp      \
+           Fragmento.cpp       \
+           LIR.cpp             \
+           lirasm.cpp          \
+           njconfig.cpp        \
+           RegAlloc.cpp        \
+           VMPI.cpp            \
+           vprof.cpp
+
+
+SRCS := $(OTHER_SRCS) $(NATIVE_SRC)
+HDRS := $(wildcard $(srcdir)/../../nanojit/*.h)
+INS := $(wildcard $(srcdir)/lirasm/tests/*.in)
+
+OBJS := $(notdir $(SRCS:.cpp=$(OBJ_SUFFIX)))
+OUTS := $(filter-out random.out random-opt.out, $(notdir $(INS:.in=.out)))
+
+LIRASM := bin/lirasm$(EXE_SUFFIX)
+
+CPPFLAGS += $(DEFS)
+CPPFLAGS += -I. -I$(srcdir)/VMPI.nj -I$(srcdir)/../.. -I$(srcdir)/../../nanojit
+
+#############
+# Build rules
+#############
+
+$(LIRASM): $(OBJS)
+	mkdir -p $(dir $(LIRASM))
+	$(call LINK,$@) $(OBJS) -ldl
+	chmod 0755 $(LIRASM)
+
+%$(OBJ_SUFFIX): %.cpp $(HDRS) Makefile
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(WARNINGS_AS_ERRORS) -c $<
+
+
+############
+# Test rules
+############
+
+.PHONY: check
+
+check: $(LIRASM) $(OUTS)
+	$(srcdir)/lirasm/testlirc.sh $(LIRASM) $(TESTCFG)
+
+
+###################
+# Reconfigury rules
+###################
+
+$(srcdir)/configure: configure.in
+	cd $(srcdir) && autoconf
+
+Makefile: configure Makefile.in
+	$<

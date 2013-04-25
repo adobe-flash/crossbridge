@@ -1,0 +1,67 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+.begin many_params
+pa = parami 0 0
+pb = parami 1 0
+pc = parami 2 0
+pd = parami 3 0
+pe = parami 4 0
+pf = parami 5 0
+pg = parami 6 0
+ph = parami 7 0
+fa = i2f pa
+fb = i2f pb
+fc = i2f pc
+fd = i2f pd
+fe = ui2f pe
+ff = ui2f pf
+fg = ui2f pg
+fh = ui2f ph
+
+res1 = addf fa fb
+res2 = addf res1 fc
+res3 = addf res2 fd
+res4 = addf res3 fe
+res5 = addf res4 ff
+res6 = addf res5 fg
+res7 = addf res6 fh
+res8 = negf res7
+res9 = addf res8 res1
+res = f2i res9
+reti res
+
+; stress the register allocator
+livef fa
+livef fb
+livef fc
+livef fd
+livef fe
+livef ff
+livef fg
+livef fh
+livef res1
+livef res2
+livef res3
+livef res4
+livef res5
+livef res6
+livef res7
+livef res8
+livef res9
+
+.end
+
+.begin main
+a = immi 1
+b = immi 2
+c = immi 3
+d = immi 4
+e = immi 5
+f = immi 6
+g = immi 7
+h = immi 8
+res = calli many_params fastcall a b c d e f g h
+reti res
+.end

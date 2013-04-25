@@ -1,0 +1,21 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+full = immi -249334698 ; 0xf1237456
+p = allocp 4
+sti full p 0
+
+n0chk = immi 29782 ; sign_extend(0x7456)
+n1chk = immi -3805 ; sign_extend(0xf123)
+
+n0 = lds2i p 2
+n1 = lds2i p 0
+
+; Collate the results.
+r0 = xori n0chk n0
+r1 = xori n1chk n1
+
+r = ori r0 r1
+reti r
+

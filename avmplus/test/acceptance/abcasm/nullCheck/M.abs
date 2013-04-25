@@ -1,0 +1,81 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function runTest()
+{
+    findproperty COMPARE_STRICTEQ
+    pushstring "null null modulo"
+    pushnan // expected
+    pushnull
+    pushnull
+    modulo
+    callpropvoid COMPARE_STRICTEQ 3
+
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "int null modulo"
+    pushnan // expected
+    pushint 23
+    pushnull
+    modulo
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null int modulo"
+    pushint 0 // expected
+    pushnull
+    pushint 23
+    modulo
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "multiply null*null"
+    pushint 0 // expected
+    pushnull
+    pushnull
+    multiply
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "multiply null*int past signed 32-bits"
+    pushint 0 // expected
+    pushnull
+    pushint 0x7FFFFFFF
+    multiply
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "multiply_i null*null"
+    pushint 0 // expected
+    pushnull
+    pushnull
+    multiply_i
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "multiply_i null*int past signed 32-bits"
+    pushint 0 // expected
+    pushnull
+    pushint 0x7FFFFFFF
+    multiply_i
+    callpropvoid COMPARE_STRICTEQ 3
+
+    returnvoid
+}
+
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "instructions that start with the letter M" 
+    callpropvoid START 1
+    newfunction runTest
+    getlocal0
+    call 0
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+script_info{init: main}

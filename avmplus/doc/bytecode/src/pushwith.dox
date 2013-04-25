@@ -1,0 +1,45 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page pushwith 
+
+\addindex pushwith
+
+
+\section pushwith pushwith
+
+\subsection operation Operation
+
+Push a with scope onto the scope stack.
+
+\subsection format Format
+
+\code
+pushwith
+\endcode
+
+\subsection forms Forms
+\code
+pushwith = 28(0x1c)
+\endcode
+\subsection stack Stack
+
+\code
+..., scope_obj => ...
+\endcode
+
+\subsection description Description
+
+scope_obj is popped off of the stack, and the object is pushed onto the scope 
+stack. scope_obj can be of any type.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if scope_obj is null or undefined.
+
+\subsection notes Notes
+
+None.
+
+*/
+

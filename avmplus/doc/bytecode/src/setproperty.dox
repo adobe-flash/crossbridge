@@ -1,0 +1,56 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page setproperty 
+
+\addindex setproperty
+
+
+\section setproperty setproperty
+
+\subsection operation Operation
+
+Set a property.
+
+\subsection format Format
+
+\code
+setproperty
+index
+\endcode
+
+\subsection forms Forms
+\code
+setproperty = 97 (0x61)
+\endcode
+\subsection stack Stack
+
+\code
+..., obj, [ns], [name], value => ...
+\endcode
+
+\subsection description Description
+
+value is the value that the property will be set to. value is popped off the stack and saved.
+
+index is a u30 that must be an index into the multiname constant pool. If the multiname 
+at that index is a runtime multiname the name and/or namespace will also appear on the 
+stack so that the multiname can be constructed correctly at runtime.
+
+The property with the name specified by the multiname will be resolved in obj, and will 
+be set to value. If the property is not found in obj, and obj is dynamic then the property 
+will be created and set to value. See “Resolving multinames” on page 10.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if obj is null or undefined. 
+
+A ReferenceError is thrown if the property is const, or if the property is unresolved and obj is
+not dynamic.
+
+\subsection notes Notes
+
+None.
+
+*/
+

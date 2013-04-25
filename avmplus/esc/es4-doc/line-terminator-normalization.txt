@@ -1,0 +1,32 @@
+NAME:        "Line terminator normalization"
+CATEGORY:    Lexical conventions (E262-3 ch 7)
+SOURCES:     Reference [1]
+SPEC AUTHOR: Lars
+STATUS:      COMPLETE
+REVIEWS:     (none)
+IMPLEMENTED: RI; Tamarin+ESC
+
+
+DESCRIPTION
+
+The character sequences CR and CRLF are all converted to a single LF
+character, in all source contexts, before tokenization takes place.
+
+
+NOTES
+
+The line terminators LS and PS are treated as in ES262-3: they are not
+converted in any way or merged with adjoining characters.
+
+
+DEFINITIONS
+
+LF=U+000A
+CR=U+000D
+LS=U+2028
+PS=U+2029
+
+
+REFERENCES
+
+[1] http://wiki.ecmascript.org/doku.php?id=proposals:line_terminator_normalization

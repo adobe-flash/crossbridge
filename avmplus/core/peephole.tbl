@@ -1,0 +1,222 @@
+//  This Source Code Form is subject to the terms of the Mozilla Public
+//  License, v. 2.0. If a copy of the MPL was not distributed with this
+//  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+// Peephole and superword optimization patterns for the word-code interpreter.
+// See comments in utils/peephole.as for more information.
+//
+// We assume the compiler does a decent job of generating eg IFLT, and
+// not LESSTHAN IFTRUE, so there's no despecialization in the verifier
+// to break IFLT apart, and no specialization in the peephole optimizer
+// to merge that sequence (either in a larger context or by itself).
+// This is only a simplifying measure.
+//
+// On the other hand, we depend on eg GETLOCAL2 being despecialized as GETLOCAL 2,
+// and we respecialize here if the instruction is not consumed as part of a larger
+// pattern.
+
+
+// Get multiple locals
+
+pattern  getlocal ; getlocal
+guard    $0.1 < 65536 && $1.1 < 65536
+action   get2locals ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; getlocal
+guard    $0.1 < 1024 && $1.1 < 1024 && $2.1 < 1024
+action   get3locals ; ($2.1 << 20) | ($1.1 << 10) | $0.1
+
+pattern  getlocal ; getlocal ; getlocal ; getlocal
+guard    $0.1 < 256 && $1.1 < 256 && $2.1 < 256 && $3.1 < 256
+action   get4locals ; ($3.1 << 24) | ($2.1 << 16) | ($1.1 << 8) | $0.1
+
+pattern  getlocal ; getlocal ; getlocal ; getlocal ; getlocal
+guard    $0.1 < 64 && $1.1 < 64 && $2.1 < 64 && $3.1 < 64 && $4.1 < 64
+action   get5locals ; ($4.1 << 24) | ($3.1 << 18) | ($2.1 << 12) | ($1.1 << 6) | $0.1
+
+
+// Get two locals and perform arithmetic, possibly with a store (in the case of add only)
+
+pattern  getlocal ; getlocal ; add
+guard    $0.1 < 65536 && $1.1 < 65536
+action   add_ll ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; add; setlocal
+guard    $0.1 < 1024 && $1.1 < 1024 && $3.1 < 1024
+action   add_set_lll ; ($3.1 << 20) | ($1.1 << 10) | $0.1
+
+pattern  getlocal ; getlocal ; subtract
+guard    $0.1 < 65536 && $1.1 < 65536
+action   subtract_ll ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; multiply
+guard    $0.1 < 65536 && $1.1 < 65536
+action   multiply_ll ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; divide
+guard    $0.1 < 65536 && $1.1 < 65536
+action   divide_ll ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; modulo
+guard    $0.1 < 65536 && $1.1 < 65536
+action   modulo_ll ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; bitand
+guard    $0.1 < 65536 && $1.1 < 65536
+action   bitand_ll ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; bitor
+guard    $0.1 < 65536 && $1.1 < 65536
+action   bitor_ll ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; bitxor
+guard    $0.1 < 65536 && $1.1 < 65536
+action   bitxor_ll ; ($1.1 << 16) | $0.1
+
+
+// Get one local, one immediate, and perform arithmetic
+
+pattern  getlocal ; pushbits ; add
+action   add_lb ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; subtract
+action   subtract_lb ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; multiply
+action   multiply_lb ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; divide
+action   divide_lb ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; bitand
+action   bitand_lb ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; bitor
+action   bitor_lb ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; bitxor
+action   bitxor_lb ; $0.1 ; $1.1
+
+
+// Compare two locals and branch on condition
+
+pattern  getlocal ; getlocal ; iflt
+guard    $0.1 < 65536 && $1.1 < 65536
+action   iflt_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; ifnlt
+guard    $0.1 < 65536 && $1.1 < 65536
+action   ifnlt_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; ifle
+guard    $0.1 < 65536 && $1.1 < 65536
+action   ifle_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; ifnle
+guard    $0.1 < 65536 && $1.1 < 65536
+action   ifnle_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; ifgt
+guard    $0.1 < 65536 && $1.1 < 65536
+action   ifgt_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; ifngt
+guard    $0.1 < 65536 && $1.1 < 65536
+action   ifngt_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; ifge
+guard    $0.1 < 65536 && $1.1 < 65536
+action   ifge_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; ifnge
+guard    $0.1 < 65536 && $1.1 < 65536
+action   ifnge_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; ifeq
+guard    $0.1 < 65536 && $1.1 < 65536
+action   ifeq_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; ifne
+guard    $0.1 < 65536 && $1.1 < 65536
+action   ifne_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; ifstricteq
+guard    $0.1 < 65536 && $1.1 < 65536
+action   ifstricteq_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+pattern  getlocal ; getlocal ; ifstrictne
+guard    $0.1 < 65536 && $1.1 < 65536
+action   ifstrictne_ll ; $2.1 ; ($1.1 << 16) | $0.1
+
+
+// Compare local with constant and branch on condition
+
+pattern  getlocal ; pushbits ; iflt
+action   iflt_lb ; $2.1 ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; ifnlt
+action   ifnlt_lb ; $2.1 ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; ifle
+action   ifle_lb ; $2.1 ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; ifnle
+action   ifnle_lb ; $2.1 ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; ifgt
+action   ifgt_lb ; $2.1 ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; ifngt
+action   ifngt_lb ; $2.1 ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; ifge
+action   ifge_lb ; $2.1 ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; ifnge
+action   ifnge_lb ; $2.1 ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; ifeq
+action   ifeq_lb ; $2.1 ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; ifne
+action   ifne_lb ; $2.1 ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; ifstricteq
+action   ifstricteq_lb ; $2.1 ; $0.1 ; $1.1
+
+pattern  getlocal ; pushbits ; ifstrictne
+action   ifstrictne_lb ; $2.1 ; $0.1 ; $1.1
+
+
+// Miscellaneous
+
+pattern  setlocal ; getlocal
+guard    $0.1 == $1.1
+action   storelocal ; $0.1
+
+pattern  swap ; pop
+action   swap_pop
+
+
+// Specialize instructions that were despecialized by the verifier.
+
+pattern  getlocal
+guard    $0.1 < 4
+action   getlocal0 + $0.1
+
+pattern  setlocal
+guard    $0.1 < 4
+action   setlocal0 + $0.1
+
+
+// This is an example of a sequence that would not appear in a rational instruction
+// set but which might occur frequently in an executed sequence even after the 
+// more common patterns above have been accounted for.  Only iterative analysis will tell.
+//
+// Another consideration here is that it may make sense to conflate storelocal and shiftlocal,
+// since it's dispatches we want to reduce as much as possible.
+//
+//pattern  setlocal ; getlocal
+//guard    $0.1 < 65536 && $1.1 < 65536
+//action   shiftlocal ; ($1.1 << 16) | $0.1
+

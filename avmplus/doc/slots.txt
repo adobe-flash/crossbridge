@@ -1,0 +1,178 @@
+Layout of member constants and member variables of AS3 classes in memory
+------------------------------------------------------------------------
+
+The AS3 class below defines a member variable v of type number and a
+member constant c of type Boolean.
+
+class MyClass {
+    public var v : Number;
+    public const c : Boolean;
+}
+
+When the VM allocates an instance of MyClass it must reserve space in
+the instance to contain the values of v and c.  The VM refers to the
+space reserved for v and c as "slots".  The slot for v is always 8 bytes
+and the slot for c is always 4 bytes. Slots whose type is not one of
+Boolean, Number, uint, or int are the same size as pointers ( 4 bytes in
+32 bit targets, 8 bytes in 64 bit targets ).
+
+
+The memory layout of an instance of MyClass is shown below:
+
+-------------------------------------------
+| avmplus::ScriptObject                   |
+|   includes C++ vtable and               |
+|   base classes of avmplus::ScriptObject |
+|-----------------------------------------|
+| 4 byte slots for MyClass ( slot for c ) |
+| pointer slots for MyClass ( empty )     |
+| 8 byte slots for MyClass ( slot for v ) |
+------------------------------------------|
+
+Classes that are part of the AS3 API exposed by the FlashPlayer, AIR
+Runtime, or AVM shell often contain native methods.  If a class contains
+a native method, then it is a native class.  Native classes must extend
+Object or another native class.  Consider the following classes:
+
+
+[native(cls="EventDispatcherClass", instance="EventDispatcherObject", methods="auto")]
+class EventDispatcher {
+  .
+  .
+  .
+  public native function dispatchEvent(ev : Event, bubbles : Boolean, cancelable : Boolean) : Boolean;
+  private var m_handlers : Dictionary;
+}
+
+[native(cls="DisplayObjectClass", instance="DisplayObject", methods="auto")]
+class DisplayObject extends EventDispatcher {
+  
+  public function get x() : Number { return m_x; }
+  public native function set x(newX : Number);
+  .
+  .
+  .
+  private var m_x : Number;
+  .
+  .
+  .
+}
+
+The memory layout of instances of all subclasses of DisplayObject will
+start with the layout shown below:
+-------------------------------------------------------------
+| avmplus::ScriptObject                                     |
+|   includes C++ vtable and                                 |
+|   base classes of avmplus::ScriptObject                   |
+|-----------------------------------------------------------|
+| avmplus::EventDispatchObject C++ member                   |
+|    variables.                                             |
+| 4 byte slots for EventDispatcher ( empty )                |
+| pointer slots for EventDispatcher ( slot for m_handlers ) |
+| 8 byte slots for MyClass ( empty )                        |
+|-----------------------------------------------------------|
+| avmplus::DisplayObject C++ member variables               |
+| 4 byte slots for DisplayObject ( none )                   |
+| pointer slots for DisplayObject ( none )                  |
+| 8 byte slots for DisplayObject ( slot for m_x )           |
+-------------------------------------------------------------
+
+This memory layout has the property that the offset to a slot of a given
+class does not depend on which C++ class is actually instantiated.  This
+is an important property that previous slot layout schemes did not have.
+
+This slot layout also make it possible for nativegen.py to generate C++
+code that can get or set any slot on an instance of a native AS3 class. 
+For each native AS3 class nativegen.py determines if that class has any
+instance or class slots.  nativegen.py will generate a class will
+generate C++ class and macro for the class instance and class closure if
+they each have slots.  The macros expand to accessor methods for the
+slots and an instance of the generate C++ classes. The last statement of
+the C++ instance class and the C++ class closure classes of all AS3
+native classes should a reference to the corresponding generated macros.
+
+From the previous example, the C++ class definitions for instance and
+classes closure classes for EventDispatch and DisplayObject should be as
+follows:
+
+namespace avmplus
+{
+    class EventDispatcherClass : public ClassClosure
+    {
+        .
+        .
+        .
+        DECLARE_SLOTS_EventDispatcherClass;
+    };
+    
+    
+    class EventDispatcherObject : public ScriptObject
+    {
+        .
+        .
+        .
+        DECLARE_SLOTS_EventDispatcherObject;
+    };
+    
+    .
+    .
+    .
+    .
+    
+    class DisplayObjectClass : public ClassClosure
+    {
+        .
+        .
+        .
+        DECLARE_SLOTS_DisplayObjectClass;
+    };
+    
+    class DisplayObject : public EventDispatcherObject
+    {
+        .
+        .
+        .
+        DECLARE_SLOTS_DisplayObject;
+    };
+}
+
+In the example above, the C++ class EventDispatcherObject will have two
+generated methods for setting and getting the m_handlers slot: void
+EventDispatcherObject::set_private_m_handlers(DictionaryObject*);
+DictionaryObject* EventDispatcherObject::get_private_m_handlers() const;
+
+Both methods are protected methods of EventDispatcherObject and should
+fully inline.  The get methods should compile down to a single load from
+memory instruction in the release build.  The set method will need to
+fire a ref-counted write barrier, but is none the less as efficient as
+code be written by hand or by the JIT.
+
+The C++ class DisplayObject will have two generated methods for setting
+and getting the m_x slot: void DisplayObject::set_private_m_x(double);
+double DisplayObject::get_private_m_x() const;
+
+Both of these methods will fully inline in the release build to memory
+store and load instructions.
+
+If a slot is declared using the const keyword instead of the var
+keyword, then by default nativegen.py will not generate C++ setter
+methods for that slot.  If the C++ code needs to set the value of a
+const slot, the constsetters meta data attribute should be added to the
+native metadata of the AS3 class.  For example:
+
+[native(cls="StackFrameClass", instance="StackFrameObject", methods="auto", constsetters="true")] // @todo: native only for slot getter/setter
+public final class StackFrame
+{
+    .
+    .
+    .
+    public const name:String;
+}
+
+In  the example above, the C++ class StackFrame will have two generted
+methods for setting and getting the name slot: void
+StackFrameObject::set_name(AvmString newVal); AvmString
+StackFrameObject::get_name();
+
+
+

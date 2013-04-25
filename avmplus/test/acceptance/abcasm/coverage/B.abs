@@ -1,0 +1,154 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function runTest()
+{
+	getlocal0
+	pushscope
+
+	findproperty START 
+	pushstring "bitand" 
+	callpropvoid START 1
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "int and int"
+	pushint 0x00001000 // expected
+	pushint 0x00101010
+	pushint 0x0000F000
+	bitand
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "int and uint"
+	pushint 0x00101010 // expected
+	pushint 0x00101010
+	pushuint 0xFFFFFFFF
+	bitand
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "int and double"
+	pushint 1 // expected
+	pushint 7
+	pushdouble 1.2
+	bitand
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty END
+	callpropvoid END 0
+
+	findproperty START 
+	pushstring "bitnot" 
+	callpropvoid START 1
+	findproperty COMPARE_STRICTEQ
+	pushstring "not int"
+	pushint -8 // expected
+	pushint 7
+	bitnot
+	callpropvoid COMPARE_STRICTEQ 3
+
+	//  Somewhat odd...
+	findproperty COMPARE_STRICTEQ
+	pushstring "not uint"
+	pushint 0x7FFFFFFF // expected
+	pushuint 0x80000000
+	bitnot
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "not string"
+	pushint -1 // expected
+	pushstring "there is no Dana only Zuul"
+	bitnot
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "not string -- convertible"
+	pushint -256 // expected
+	pushstring "0xff"
+	bitnot
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty END
+	callpropvoid END 0
+
+	findproperty START 
+	pushstring "bitor" 
+	callpropvoid START 1
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "int or int"
+	pushint 0x0010F010 // expected
+	pushint 0x00101010
+	pushint 0x0000F000
+	bitor
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "int or uint"
+	pushint -1 // expected
+	pushint 0x00101010
+	pushuint 0xFFFFFFFF
+	bitor
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "int or double"
+	pushint 7 // expected
+	pushint 7
+	pushdouble 1.2
+	bitor
+	callpropvoid COMPARE_STRICTEQ 3
+	
+	findproperty END
+	callpropvoid END 0
+
+	findproperty START 
+	pushstring "bitor" 
+	callpropvoid START 1
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "int xor int"
+	pushint 0x0010E010 // expected
+	pushint 0x00101010
+	pushint 0x0000F000
+	bitxor
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "int xor uint"
+	pushint -1052689 /* FFEFEFEF */ // expected
+	pushint 0x00101010
+	pushuint 0xFFFFFFFF
+	bitxor
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "int xor double"
+	pushint 6 // expected
+	pushint 7
+	pushdouble 1.2
+	bitxor
+	callpropvoid COMPARE_STRICTEQ 3
+	
+	findproperty END
+	callpropvoid END 0
+
+	returnvoid
+}
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "Instructions that start with the letter b" 
+	callpropvoid START 1
+	newfunction runTest
+	getlocal0
+	call 0
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+script_info{init: main}

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# usage: avmwrap <avm-path> options...
+#
+# This script wraps execution of the given avm, and appends the commandline
+# to test.sh in the current directory.  Use with test/acceptance/runtest.py
+# or test/performance/runtest.py as follows:
+#
+# runtest.py --avm="avmpath <real-avm-path>" ...
+
+avm=$1; shift
+echo $avm "$@" >>test.sh
+$avm "$@"

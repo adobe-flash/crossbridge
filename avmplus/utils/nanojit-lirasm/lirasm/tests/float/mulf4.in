@@ -1,0 +1,35 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+; Try to exercise as many different possibilities for the register allocator as
+; is feasible.
+
+p1 = allocp 16
+p2 = allocp 16
+
+d1a = immf4 2.0 2.5 3.0 -0
+d1 = mulf4 d1a d1a ; X = X * X
+stf4 d1 p1 0         ; 4,6.25,9,0
+
+d2a = immf4 2.5 0.3 2.5 0.3
+d2b = immf4 -5 5 -0 0
+d2 = mulf4 d2a d2b ; Y = X1 * X2
+stf4 d2b p2 0
+stf4 d2 p2 0       ;  -12.5,1.5,-0,0
+
+d3a = ldf4 p1 0
+d3b = ldf4 p2 0
+d3 = mulf4 d3a d3b ; Y = Y * X
+stf4 d3a p2 0
+stf4 d3 p2 0       ; -50,9.375,-0,0
+
+d4a = ldf4 p2 0
+d4b = ldf4 p1 0
+d4 = mulf4 d4a d4b ; X = X * Y
+stf4 d4a p1 0
+stf4 d4b p2 0
+stf4 d4 p1 0       ; -200,58.59375,-0,0
+
+f = ldf4 p1 0
+retf4 f

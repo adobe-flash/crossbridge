@@ -1,0 +1,105 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/*
+ *  Tests arithmetic with the constant pools.
+ */
+function main():*
+{
+	getlocal0
+	pushscope
+	findpropstrict	{package}::print
+	setlocal1
+
+	pushstring "byte 9 + short 938="
+    pushbyte 9
+	pushshort 938
+	add
+	add // string + int
+	getlocal1
+	swap
+	callproperty print(1)
+
+	pushstring "int 3652147 + uint 0x80000000="
+	pushint 3652147
+	pushuint 0x80000000
+	add
+	add
+	getlocal1
+	swap
+	callproperty print(1)
+
+	pushstring "9.391 / 3.2="
+	pushdouble 9.391
+	pushdouble 3.2
+	divide
+	add //  String add
+	getlocal1
+	swap
+	callproperty print(1)
+
+	pushstring "convert_f(9.391) / convert_f(3.2)="
+	pushdouble 9.391
+	convert_f
+	pushdouble 3.2
+	convert_f
+	divide
+	add //  String add
+	getlocal1
+	swap
+	callproperty print(1) 
+
+	pushstring "9.391f / 3.2f="
+	pushfloat 9.391f
+	pushfloat 3.2f
+	divide
+	add //  String add
+	getlocal1
+	swap
+	callproperty print(1)
+
+	pushstring "9.391f * 3.2f="
+	pushfloat 9.391f
+	pushfloat 3.2f
+	multiply
+	add //  String add
+	getlocal1
+	swap
+	callproperty print(1)
+
+	pushstring "9.391f + 3.2f="
+	pushfloat 9.391f
+	pushfloat 3.2f
+	add
+	add //  String add
+	getlocal1
+	swap
+	callproperty print(1)
+
+	pushstring "9.391f - 3.2f="
+	pushfloat 9.391f
+	pushfloat 3.2f
+	subtract
+	add //  String add
+	getlocal1
+	swap
+	callproperty print(1)
+
+	pushstring "9.391f / 3.2f="
+	pushfloat4 9.391f,-2.2f,NaN,4.5
+	pushstring "3.2"
+	unplus
+	add
+	pushdouble 1.0
+	convert_f4
+	pushfloat 1.0f
+	unplus
+	add
+	multiply
+	getlocal1
+	swap
+	callproperty print(1)
+
+	returnvoid
+}

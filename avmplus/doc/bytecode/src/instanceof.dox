@@ -1,0 +1,47 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page instanceof 
+
+\addindex instanceof
+
+
+\section instanceof instanceof
+
+\subsection operation Operation
+
+
+
+\subsection format Format
+
+\code
+instanceof
+\endcode
+
+\subsection forms Forms
+\code
+instanceof = 177 (0xb1)
+\endcode
+\subsection stack Stack
+
+\code
+..., value, type => ..., result
+\endcode
+
+\subsection description Description
+
+Pop value and type off of the stack. If value is null result is false. Walk up the 
+prototype chain of value looking for type. If type is present anywhere on the prototype, 
+result is true. If type is not found on the prototype chain, result is false. Push result 
+onto the stack. See ECMA-262 section 11.8.6 for a further description.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if type is not an Object.
+
+\subsection notes Notes
+
+None.
+
+*/
+

@@ -1,0 +1,49 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page coerce_s 
+
+\addindex coerce_s
+
+
+\section coerce_s coerce_s
+
+\subsection operation Operation
+
+Coerce a value to a string.
+
+\subsection format Format
+
+\code
+coerce_s
+\endcode
+
+\subsection forms Forms
+\code
+coerce_s = 133 (0x85)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ..., stringvalue
+\endcode
+
+\subsection description Description
+
+value is popped off of the stack and coerced to a String. If value is null or undefined, then 
+stringvalue is set to null. Otherwise stringvalue is set to the result of the ToString algorithm, 
+as specified in ECMA-262 section 9.8. stringvalue is pushed onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+This opcode is very similar to the convert_s opcode. The difference is that convert_s 
+will convert a null or undefined value to the string "null" or "undefined" whereas 
+coerce_s will convert those values to the null value.
+
+
+*/
+

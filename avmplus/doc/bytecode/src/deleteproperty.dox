@@ -1,0 +1,53 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page deleteproperty 
+
+\addindex deleteproperty
+
+
+\section deleteproperty deleteproperty
+
+\subsection operation Operation
+
+Delete a property.
+
+\subsection format Format
+
+\code
+deleteproperty 
+index
+\endcode
+
+\subsection forms Forms
+\code
+deleteproperty = 106 (0x6a)
+\endcode
+\subsection stack Stack
+
+\code
+..., object, [ns], [name] => ..., value
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index into the multiname constant pool. If the multiname 
+at that index is a runtime multiname the name and/or namespace will also appear on the stack 
+so that the multiname can be constructed correctly at runtime.
+
+This will invoke the [[Delete]] method on object with the name specified by the multiname. 
+If object is not dynamic or the property is a fixed property then nothing happens, and false 
+is pushed onto the stack. If object is dynamic and the property is not a fixed property, it 
+is removed from object and true is pushed onto the stack.
+
+
+\subsection rt_execeptions Runtime exceptions
+
+A ReferenceError is thrown if object is null or undefined.
+
+\subsection notes Notes
+
+None.
+
+*/
+

@@ -1,0 +1,72 @@
+NAME:       "Rest parameter"
+CATEGORY:   ?
+SOURCES:    ?
+AUTHOR:     Lars
+STATUS:     ?
+REVIEWS:    (none)
+RI STATUS:  ?
+ESC STATUS: ?
+ESC TEST:   ?
+
+
+DESCRIPTION
+
+A formal parameter list that appears as part of a function definition
+(including constructor functions) or function expression can contain
+an additional, final element called a "rest parameter".  Syntactically
+it is comprised of the token "..." (an sequence of three ASCII full
+stop characters (U+002E) not separated by white space) followed by a
+single identifier.
+
+Upon activation the identifier will be bound as a variable in the
+activation object in the same fashion as the other formal parameters.
+The value stored in the variable will be a fresh Array object.
+
+If there are n formal parameters preceding the rest parameter and m
+actual arguments passed to the function activation, then arguments
+n+1, n+2, and so on up through m will be stored in properties 0, 1,
+and so on up through m-n-1 in the Array object, and the "length"
+property of the Array object will be initialized to m-n.  (If m < n
+then no propeties are stored and "length" is 0.)
+
+The use of a rest parameter precludes the use of the "arguments"
+object in the function.  If the parameter list calls for a rest
+parameter then no "arguments" object will be created and the local
+variable "arguments" will not be implicitly bound on function entry.
+
+
+EXAMPLE
+
+The output of this program:
+
+  function f(p1, p2, ...rest) {
+    print(rest.length);
+    for ( let i=0 ; i < rest.length ; i++ )
+      print(rest[0]);
+  }
+
+  f(1,2,3,4,5)
+
+are the numbers 3, 3, 4, and 5.
+
+
+FUTURE CONSIDERATIONS
+
+We have debated two facilities for type annotation:
+
+  - It might be desirable to make it possible to declare the type of
+    the rest parameter as "Array", eg
+
+       function f(p1, p2, ...rest: Array) 
+
+  - If array structural types are incorporated into ES4 then it will
+    be natural to allow an array-structural type to annotate the rest
+    parameter, giving a type to the array elements.
+
+I have not incorporated these into the proposal yet because I think it
+would be premature to do so.
+
+
+REFERENCES
+
+

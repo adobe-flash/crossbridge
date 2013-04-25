@@ -1,0 +1,53 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+//method_info { name: test_restarg flags: NEED_REST } //not implemented in ABCAsm prototype
+method_info { name: test_restarg flags: NEED_ACTIVATION }
+method_body_info {
+    method: test_restarg
+    code:
+    {
+        // cram a bad value into the "arguments" slot...
+        // Verifier bug wasn't catching this if done
+        // via OP_setlocal0,OP_setlocal1,OP_setlocal2,OP_setlocal3
+        pushint 69
+        setlocal1
+
+        getlocal1
+        getproperty length
+        returnvalue
+    }
+}
+
+
+function main()
+{
+    getlocal0
+    pushscope
+    findproperty START
+    pushstring "Bug 655118 : RestArgAnalyzer doesn't verify correctly"
+    callpropvoid START 1
+
+    newfunction test_restarg
+    setlocal1
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "call length via restArgcHelper"
+    pushint 3 // expected
+
+    getlocal1
+    pushstring "some arg"
+    pushstring "another arg"
+    pushstring "and a third arg"
+    getlocal0
+    call 3
+
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+script_info{init:main}

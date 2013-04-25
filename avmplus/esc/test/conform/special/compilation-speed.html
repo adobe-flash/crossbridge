@@ -1,0 +1,66 @@
+<!-- Load a 1300-line script 10 times from a file, recreating the same
+     top-level function every time.  It's possible the browser could
+     defeat the benchmark by caching compiled code, so we use ten separate
+     copies of the code.
+
+     Compare the time for this to the time you get when you run
+     compilation-speed.sh.  There will be noise that prevents exact 
+     comparison, but the difference will be in the ballpark of the 
+     number we're interested in.  -->
+
+<script>
+var then = new Date
+</script>
+<script src="compilation-speed1.es"></script>
+<script>
+oldscheme = scheme;
+</script>
+<script src="compilation-speed2.es"></script>
+<script>
+document.writeln(scheme === oldscheme);
+oldscheme = scheme;
+</script>
+<script src="compilation-speed3.es"></script>
+<script>
+document.writeln(scheme === oldscheme);
+oldscheme = scheme;
+</script>
+<script src="compilation-speed4.es"></script>
+<script>
+document.writeln(scheme === oldscheme);
+oldscheme = scheme;
+</script>
+<script src="compilation-speed5.es"></script>
+<script>
+document.writeln(scheme === oldscheme);
+oldscheme = scheme;
+</script>
+<script src="compilation-speed6.es"></script>
+<script>
+document.writeln(scheme === oldscheme);
+oldscheme = scheme;
+</script>
+<script src="compilation-speed7.es"></script>
+<script>
+document.writeln(scheme === oldscheme);
+oldscheme = scheme;
+</script>
+<script src="compilation-speed8.es"></script>
+<script>
+document.writeln(scheme === oldscheme);
+oldscheme = scheme;
+</script>
+<script src="compilation-speed9.es"></script>
+<script>
+document.writeln(scheme === oldscheme);
+oldscheme = scheme;
+</script>
+<script src="compilation-speed10.es"></script>
+<script>
+document.writeln(scheme === oldscheme);
+oldscheme = scheme;
+</script>
+<script>
+var now = new Date;
+document.writeln("TIME: " + (now - then)/1000 + "s");
+</script>

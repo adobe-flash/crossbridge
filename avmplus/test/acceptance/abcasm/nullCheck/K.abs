@@ -1,0 +1,36 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function runTest()
+{
+    getlocal0
+    pushscope
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "kill null register"
+    pushundefined
+    pushnull
+    setlocal1
+    kill 1
+    getlocal1
+    callpropvoid COMPARE_STRICTEQ 3
+
+    returnvoid
+}
+
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "Instructions that start with the letter K" 
+    callpropvoid START 1
+    newfunction runTest
+    getlocal0
+    call 0
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+script_info{init: main}

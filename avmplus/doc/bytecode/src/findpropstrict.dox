@@ -1,0 +1,61 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page findpropstrict 
+
+\addindex findpropstrict
+
+
+\section findpropstrict findpropstrict
+
+\subsection operation Operation
+
+Find a property.
+
+\subsection format Format
+
+\code
+findpropstrict 
+index
+\endcode
+
+\subsection forms Forms
+\code
+findpropstrict = 93 (0x5d)
+\endcode
+\subsection stack Stack
+
+\code
+..., [ns], [name] => ..., obj
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index into the multiname constant pool. If the multiname at 
+that index is a runtime multiname the name and/or namespace will also appear on the stack 
+so that the multiname can be constructed correctly at runtime.
+
+This searches the scope stack, and then the saved scope in the method closure, for a 
+property with the name specified by the multiname at index.
+
+If any of the objects searched is a with scope, its declared and dynamic properties will 
+be searched for a match. Otherwise only the declared traits of a scope will be searched. 
+The global object will have its declared traits, dynamic properties, and prototype 
+chain searched.
+
+If the property is resolved then the object it was resolved in is pushed onto the stack. 
+If the property is unresolved in all objects on the scope stack then an exception is thrown.
+
+\subsection rt_execeptions Runtime exceptions
+
+A ReferenceError is thrown if the property is not resolved in any object on the scope stack.
+
+\subsection notes Notes
+
+Functions save the scope stack when they are created, and this saved scope stack is 
+searched if no match is found in the current scope stack.
+
+Objects for the with statement are pushed onto the scope stack with the pushwith instruction.
+
+*/
+

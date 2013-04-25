@@ -1,0 +1,95 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "instructions starting with the letter H" 
+	callpropvoid START 1
+	newfunction .function_id(runTest)
+	getlocal0
+	call 0
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+
+function runTest()
+{
+	findproperty Object
+	constructprop Object 0
+	coerce_a
+	setlocal1
+	getlocal1
+	pushint 7
+	setproperty moo
+
+	pushint 0
+	setlocal2
+
+hasnext_loop:
+	label
+	getlocal1
+	getlocal2
+	hasnext
+	dup
+	iffalse end_hasnext
+	setlocal2
+
+	getlocal1
+	getlocal2
+	nextname
+	pushstring "hasnext "
+	swap
+	add
+	pushstring "="
+	add
+	getlocal1
+	getlocal2
+	nextvalue
+	add
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+	getlocal2
+	increment_i
+	setlocal2
+	jump hasnext_loop
+
+end_hasnext:
+
+	pushint 0
+	setlocal2
+
+hasnext_2_loop:
+	label
+	hasnext2 1,2
+	iffalse end_hasnext2
+
+	getlocal1
+	getlocal2
+	nextname
+	pushstring "hasnext2 "
+	swap
+	add
+	pushstring "="
+	add
+	getlocal1
+	getlocal2
+	nextvalue
+	add
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+	getlocal2
+	increment_i
+	setlocal2
+	jump hasnext_2_loop
+end_hasnext2:
+
+	returnvoid
+}

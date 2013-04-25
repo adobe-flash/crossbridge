@@ -1,0 +1,21 @@
+#!/usr/bin/bash
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+#  Copy files from server to local directories
+#
+# For example ./populate http://flashplatform.macromedia.com/dev/projects/zaphod/Program%20Manager/localization/loc_kit1
+#
+WHAT=ErrorConstants.xml
+WAS=RuntimeErrorConstants.xml
+if [ ${#1} -eq 0 ]; then
+	echo "usage: ./populate http://flashplatform.macromedia.com/dev/projects/zaphod/Program%20Manager/localization/loc_kit1 "
+	echo "   copies the translated versions of $WHAT from the URL into the appropriate localization directories"
+	exit 1
+fi
+
+find . -type f -name $WHAT -exec rm {} \;
+find . -type d -exec curl -G -s -S -o {}/$WHAT $1/{}/$WAS \;
+[ ! -f "$WHAT" ] || rm $WHAT
+find . -type f -name $WHAT -exec ls -la {} \; | awk "{ if (\$6 == 4040) printf \"Error: %s not on server, copied rubish\n\", \$10 }"

@@ -1,0 +1,159 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function runTest()
+{
+    getlocal0
+    pushscope
+
+    findproperty START 
+    pushstring "bitand" 
+    callpropvoid START 1
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "null and int"
+    pushint 0 // expected
+    pushnull
+    pushint 0x0000F000
+    bitand
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null and null"
+    pushint 0 // expected
+    pushnull
+    pushnull
+    bitand
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+function runTest1()
+{
+    findproperty START 
+    pushstring "bitnot" 
+    callpropvoid START 1
+    findproperty COMPARE_STRICTEQ
+    pushstring "not null"
+    pushint -1 // expected
+    pushnull
+    bitnot
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty END
+    callpropvoid END 0
+
+    findproperty START 
+    pushstring "bitor" 
+    callpropvoid START 1
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "int or null"
+    pushint 0x00101010 // expected
+    pushint 0x00101010
+    pushnull
+    bitor
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null or null"
+    pushint 0 // expected
+    pushnull
+    pushnull
+    bitor
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "null or String"
+    pushint 0 // expected
+    pushnull
+    pushstring "asdf"
+    bitor
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null or uint"
+    pushint -1 // expected
+    pushnull
+    pushuint 0xFFFFFFFF
+    bitor
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+function runTest2()
+{
+    findproperty START 
+    pushstring "bitxor" 
+    callpropvoid START 1
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "int xor null"
+    pushint 0x00101010 // expected
+    pushint 0x00101010
+    pushnull
+    bitxor
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null xor null"
+    pushint 0 // expected
+    pushnull
+    pushnull
+    bitxor
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "null xor String"
+    pushint 0 // expected
+    pushnull
+    pushstring "asdf"
+    bitxor
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null xor uint"
+    pushint -1 // expected
+    pushnull
+    pushuint 0xFFFFFFFF
+    bitxor
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty END
+    callpropvoid END 0
+
+    returnvoid
+}
+
+
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "nullcheck - Instructions that start with the letter b" 
+    callpropvoid START 1
+    
+    newfunction runTest
+    getlocal0
+    call 0
+    
+    newfunction runTest1
+    getlocal0
+    call 0
+
+    newfunction runTest2
+    getlocal0
+    call 0
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+script_info{init: main}

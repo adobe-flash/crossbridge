@@ -1,0 +1,40 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#include "lzma-common.xcconfig"
+#include "lzma-common32.xcconfig"
+
+// Below is lifted as common (or corrected) elements from
+// Release/Release_Debugger transcribed configs below
+
+
+// Below is from Release config
+ARCHS = $(ARCHS_STANDARD_32_64_BIT)
+DEBUG_INFORMATION_FORMAT = dwarf-with-dsym
+INSTALL_PATH = /usr/local/lib
+COPY_PHASE_STRIP = YES
+PREBINDING = NO
+PRODUCT_NAME = lzma
+ALWAYS_SEARCH_USER_PATHS = NO
+HEADER_SEARCH_PATHS = ../../../other-licenses/lzma
+USER_HEADER_SEARCH_PATHS = 
+GCC_ENABLE_FIX_AND_CONTINUE = NO
+GCC_MODEL_TUNING = G5
+GCC_PRECOMPILE_PREFIX_HEADER = NO
+GCC_PREFIX_HEADER = 
+GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO
+ZERO_LINK = NO
+
+// Below is from Release_Debugger config
+INSTALL_PATH = /usr/local/lib
+PREBINDING = NO
+PRODUCT_NAME = lzma
+ALWAYS_SEARCH_USER_PATHS = NO
+HEADER_SEARCH_PATHS = ../../../other-licenses/lzma
+USER_HEADER_SEARCH_PATHS = 
+GCC_ENABLE_FIX_AND_CONTINUE = YES
+GCC_MODEL_TUNING = G5
+GCC_PRECOMPILE_PREFIX_HEADER = NO
+GCC_PREFIX_HEADER = 
+GCC_WARN_ABOUT_MISSING_PROTOTYPES = NO

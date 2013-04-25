@@ -1,0 +1,49 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page astype 
+
+\addindex astype
+
+
+\section astype astype
+
+\subsection operation Operation
+
+Return the same value, or null if not of the specified type.
+
+\subsection format Format
+
+\code
+astype
+index
+\endcode
+
+\subsection forms Forms
+\code
+astype = 134 (0x86)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ..., value
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index into the multiname constant pool. The multiname at index must 
+not be a runtime multiname, and must be the name of a type.
+
+Pop value off of the stack. If value is of the type specified by the multiname, push value back 
+onto the stack. If value is not of the type specified by the multiname, then push null onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

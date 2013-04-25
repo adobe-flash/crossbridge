@@ -1,0 +1,58 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page throw 
+
+\addindex throw
+
+
+\section throw throw
+
+\subsection operation Operation
+
+Throws an exception.
+
+\subsection format Format
+
+\code
+throw
+\endcode
+
+\subsection forms Forms
+\code
+throw = 3 (0x03)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ...
+\endcode
+
+\subsection description Description
+
+The top value of the stack is popped off the stack and then thrown. The thrown value can be of any type.
+
+When a throw is executed, the current method’s exception handler table is 
+searched for an exception handler. An exception handler matches if its range 
+of offsets includes the offset of this instruction, and if its type matches 
+the type of the thrown object, or is a base class of the type thrown. The first 
+handler that matches is the one used.
+
+If a handler is found then the stack is cleared, the exception object is 
+pushed onto the stack, and then execution resumes at the instruction offset 
+specified by the handler.
+
+If a handler is not found, then the method exits, and the exception is 
+rethrown in the invoking method, at which point it is searched for an 
+exception handler as described here.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

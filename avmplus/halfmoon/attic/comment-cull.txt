@@ -1,0 +1,493 @@
+
+Long and/or design-note-y comments pulled from source.
+
+6/3/2011
+- pulled from templates.py
+
+======= templates.py =========
+
+# TODO update this
+#
+# syntax for templates:
+# (name (args ...) body...)
+#
+# evaluation order is left to right; use of an opcode that has
+# side effects will schedule the effect in the order it appears
+# in the template.
+#
+# To specify low level code (LIR), use (lir opcode arg...)
+#
+# proposed syntax conventions for literals that appear in templates:
+#   #0      ordinal (int)
+#   `foo    Multiname*
+#   <T>     Traits*
+#   1, -2   int32_t
+#   1.0     double
+#   +3      uint32_t
+
+# read here about an s-expr syntax extension that expresses shared
+# items in a graph (eg for dag or cyclic graphs)
+# http://srfi.schemers.org/srfi-38/srfi-38.html
+#
+# (#0=100 #0# #0#)  => (100 100 100)
+# #1=(x y) #1#      => (x y) (x y)
+#
+# we could use this or a variant with less eye bleed:
+#  - allow symbolic refs, e.g. #foo=(node #foo#) => cycle
+#  - skip trailing #:  #foo=(node #foo)
+#  - skip leading #:   foo=(node foo).  is this easily parsable?
+#
+# hmm, drop the parens and you have lir syntax, pretty much:
+#   foo = node foo
+
+# how to represent statement vs expr?
+#   if we use explicit param and return types, could do it there
+#   or, could use different '->' (if return type is required)
+#
+# consider stripping <> from types
+#
+# param types from initial letter? or full type name?
+#   type name might be tolerable in untemplated ones, but 
+#   name + type for each param starts to blow things out 
+#   * most minimal so far: '->' for expr, '=>' for stmt, 
+#     assume '=>' if missing. (Forces exprs to state return
+#     type, but non-templated ops will be anyway.)
+#
+# type specialization?
+#   multiple sigs for untemplated, but would need nesting
+#   for templates
+#
+# phi/if graph struct?
+#   ?
+
+#
+# (si8 (Ctrl a:Addr Int|(inrange a) Int -> Ctrl))
+#
+# (getmemory (-> Addr))
+#
+# (checkrange (a:Addr Int -> Int|(inrange a)))
+#
+# (fatsi8 (ctrl addr x -> Ctrl) 
+#	(m = (getmemory))
+#	(a = (coerce int addr))
+#	(a2 = (checkrange m a))
+#	(si8 m a2 (coerce int x)))
+#
+# (fatfatsi8 (addr x) (si8 (coerce int addr) (coerce int x)))
+#
+
+'''
+;;; test
+
+(isint (Any -> Boolean))
+(bitandxx (Boolean Boolean -> Boolean))
+
+(bothints (x y) (bitandxx (isint x) (isint y)))
+(iaddxx (Int Int -> Int))
+
+(fatadd (x y)
+  (i = Int)
+  ((f t) = (if (bothints x y)))
+
+  (block t)
+  (tsum = (iaddxx (coerce i x) (coerce i y)))
+  (tend = (jump))
+  
+  (block f)
+  (fsum = (add x y))
+  (fend = (jump))
+
+  (block tend fend)
+  (phi tsum fsum))
+
+'''
+
+======= end templates.py =====
+
+6/2/2011
+- pulled from opt-impl.cpp
+
+======= opt-impl.cpp ==========
+
+/**
+
+ Halfmoon Design Notes
+
+ The code format is based on the Google style guide here, with
+ some poetic license.  For example I can't bring myself to use trailing
+ underscores on field_names_.
+
+ All classes are "struct" because I don't want to worry about public/private
+ for now.  Everything is accessable within the opt files and invisible outside,
+ except for the external api's declared in opt.h.
+
+ All methods are declared in their struct because it lets me write things once.
+ Clearly, it will lead to code bloat, but it is fine for prototyping.  A few
+ cases require circular references and those are broken into separate
+ declaration and definitions.
+
+ Building the instr graph is easiest if bytecode blocks are traversed in reverse
+ postorder, because predecessors are visited before successors, except loop
+ header blocks, which must be join blocks, and can be found easily.  We also
+ don't want to depend on the Verifier (this IR builder will run lazily), so
+ I have not implemented a CodeWriter interface that builds the IR.  One could
+ be built, as a finger exersize.
+
+ AbcAnalyzer and AbcBuilder construct the instr graph in two-passes over the ABC:
+
+ 1. AbcAnalyzer identifies block boundaries and builds a control flow graph of
+ AbcBlock objects, counting predecessors.  It then does a postorder DFS over
+ successor edges to assign a postorder id (post_id) to each block and produces
+ a reverse-postorder block list.
+
+ 2. AbcBuilder.visitBlocks iterates the AbcBlock list (in reverse postorder),
+ reading instructions with a pull-style peephole parser, producing IR instructions
+ and doing peephole optimizations on the instructions during graph construction.
+
+ Validation
+
+ See comments at the top of opt-check.cpp.
+
+ I am not happy with the pattern that each InstrInfo requires virtual
+ methods for key analysis steps, such as computeTypes() and identity().
+ It does seem to make it easy to add new instructions since all the code for
+ a instr is grouped by the instr.  But from the perspective of analysis
+ passes, it spreads out the code too much.  All the code for type modelling
+ is all over the place.  Same for constant folding, pretty printing, etc.
+
+ Scheduling
+
+ Finding blocks, in the face of exception handling, is cumbersome. Each
+ instr that could throw an exception is like a branch, and therefore ends
+ its block.  This gives us many small blocks.
+
+ todo
+ ----
+ * (done) fix up phi creation
+ * (done) handle exception edges
+ * (done) use types in simplify
+ * (done) set up rest/arguments in prologue
+ * (done) lazy-create label instructions
+ * (done) all instructions have array of args, fast access to traverse
+ * (done) make instructions have a uniform layout and fast ref/type accessors
+ * (active) iterator classes
+ * could analyzer avoid building cfg if we lazy create phis?
+ * can analyzer pass first pass avoid building a full cfg? apparently
+ not without extra phis
+ * use a machine generated peephole parser
+ * use allocators with shorter lifetimes
+ * finish remaining abc opcodes
+ * could pack Instr opcode+id into one word and not use C++ vtables
+ * should we model CTRL and HEAP separately? what about IO?
+ * should exception edges be a different type? (XTRL vs CTRL?)
+
+ sketch to avoid building initial cfg:
+ - add block/merge/loop boundaries to table
+ - visit blocks in dfs order to build instr graph
+
+ */
+
+======= end opt-impl.cpp ======
+
+5/19/2011 
+- pulled big note from opt-instr.h
+- pulled ascii art comments from InstrGraph.h
+
+======== opt-instr.h: =========
+
+/* ideas for instr layout
+ *
+ * - often iterate over the inputs, asking for type
+ * - seldom iterate over outputs (only start & switch do it)
+ * - most instructions have fixed in-count and out-count
+ * - block & phi have variable in-count, fixed out-count.
+ * - start & switch have variable out-count, fixed in count.
+ * - no instructions have variable-both.
+ * - use C++ vtable for semantic ops like computeTypes, identity, emit.
+ *
+ * most type queries are [instr + offset], maybe make a XesultRef just
+ * treat a instr as an array of values:
+ * struct {
+ *   union { Type** values; Instr* instr; };
+ *   int field;
+ *   getType()  { return values[field].type }
+ *   getInstr() { return instr }
+ * }
+ *
+ * requires allocating switch+start all at once.
+ *
+ * for iterating inputs, we can afford a little extra work for block+phi:
+ * if (simple) { inputs = this + const }
+ * else { inputs = this + offset }
+ *
+ * all XesultRefs can have offset to type field embedded at creation time.
+ *
+ * struct { vptr, id } - header for all
+ * struct { data, c, out[c] } - start
+ * struct { in[k] } - sink
+ * struct { out[1] } - const
+ * struct { c, in[2], out[c] } - switch
+ * struct { n, out[1], in* } - block, phi
+ * struct { c, data, out[k], in[c] } - calls, array/obj literals
+ * struct { data, in[k], out[k] } - most ops
+ *
+ * legend:
+ *   k = vm build-time const, k = 1..6
+ *   c = known at instr creation, c = 1+
+ *   n = extensible, n >= 0
+ *
+ * if we count inputs when scanning blocks, then we dont need x, only c.
+ *
+ * accessor operations:
+ * argc(instr) - return k, c, or x
+ * type(nref) - return [instr + field]
+ *
+ * interface for instr ops
+ * name()
+ * arity()
+ * getInput()
+ * computeTypes()
+ * numTypes()
+ * getType()
+ * print()
+ * printRef()
+ * printDef()
+ * .. others: identity, emit-lir
+ *
+ * could make computing argc & args easier: add flags to instr header.
+ * assume k=0..6 for fixed-arity instructions, otherwise length extension exists.
+ * struct Instr {
+ *   unsigned fixed:3, id:29;
+ *   int argc() { return fixed < 7 ? fixed : count; }
+ * }
+ * this also could be tricky and hard to debug.  premature.
+ *
+ * IDEA: InstrInfo decorator pattern
+ *
+ * Create a type heirarchy of InstrInfo classes; each InstrInfo
+ * contains a vtable for operator specific semantics, plus fields describing
+ * the layout of corresponding instructions.  Instructions with fixed in/out arity need
+ * just one descriptor.
+ *
+ * Instructions with variable in or out-arity seemingly need a length field in
+ * the instr, plus possibly a pointer field.  How about this:  create N
+ * info objects for such instructions, one per different length.  N would typically
+ * be small; descriptors could be interned between compiler instances.
+ * Now, even variable-arity instructions dont need a length field.  The common
+ * cases are call, start, block, and phi.  uncommon cases include switch.
+ *
+ * struct InstrInfo {
+ *   vptr           // C++ vtable for operator specific functions
+ *   int in_count   // number of XesultRef inputs
+ *   int in_offset  // offsetof(Instr, in[])
+ *   int out_count  // number of Type* results
+ *   int out_offset // offsetof(Instr, out[])
+ * }
+ *
+ * struct Instr {
+ *   InstrInfo* info; // or, int, for better packing on x64
+ *   int id;
+ * }
+ * struct StartInstr: Instr {
+ *   XesultRef in[0];
+ *   Type* out[0]; // actually param_count
+ * }
+ * struct CallInstr: Instr {
+ *   Type* out[4]; // ctrl, val, xtrl, xval
+ *   XesultRef in[0]; // actuall call argc
+ * }
+ *
+ * iterate:  no virtual calls to get arity or arg pointer:
+ *   int argc = instr->info->in_count
+ *   XesultRef* args = (XesultRef*)(instr + instr->info->in_offset)
+ *   for (int i=0; i < argc; i++)
+ *     // use args[i]
+ */
+
+======== InstrGraph.h: =========
+ 
+  /**
+   * Split a list of instructions into two lists.
+   * The first list begins at first, the second list begins with pos.
+   *
+   * \param pos instruction in a block to split at.  Second list will begin
+   * with pos.
+   * \param first is a list of instructions to split.
+   * <pre>
+   * inputs: one list.
+   *
+   *  +-prev_ +------------+ <---+  +-prev_  +---------+ <------+
+   *  |       |   first    |     |  |        | first   |        |
+   *  |       |            |     |  |        | ...     |        | before_list
+   *  |       |            |     |  |        |         |        |
+   *  |       |   P        |     |  +----->  +---------+ next_ -+
+   *  |       +-  pos     -+     |
+   *  |       |   N        |     |  +-prev_- +---------+ <------+
+   *  |       |            |     |  |        | pos     |        | after_list
+   *  |       |            |     |  |        | ...     |        |
+   *  |       | last       |     |  |        | last    |        |
+   *  +---->  +------------+next_+  +----->  +---------+ next_ -+
+   * </pre>
+   *
+   */
+  void splitList(const InstrRange &list, Instr *pos);
+ 
+   /**
+   * Link a list in before pos
+   * \param pos instruction that list will be inserted before
+   * \param list to insert
+   * <pre>
+   *
+   * inputs:
+   *
+   *   | P          |
+   *   +------------+     + prev_     +-----------+  <-----+
+   *   | pos        |     |           | list      |        |
+   *   +------------+     |           |           |  ...   |
+   *   |            |     |           | list_end  |        |
+   *   |            |     +----->     +-----------+  next_ + (list_end)
+   *
+   * outputs: list has been linked in past pos
+   *
+   *    | P          |
+   *    +------------+
+   *    | list       |
+   *    | ...        |
+   *    | list_end   |
+   *    +------------+
+   *    | pos        |
+   *    +------------+
+   *    |            |
+   * </pre>
+   */
+  void insertList(const InstrRange& list, Instr *pos);
+ 
+   /**
+   * Link a list in past pos.
+   * \param pos instruction that list will be appended to
+   * \param list to append
+   * <pre>
+   *
+   * inputs:
+   *
+   *   +------------+     + prev_     +-----------+      <-----+
+   *   | pos        |     |           | list      |            |
+   *   +------------+     |           |           |   ...      |
+   *   |            |     |           | list_end  |            |
+   *   |            |     +----->     +-----------+      next_ +  (list_end)
+   *
+   * outputs: list has been linked in past pos
+   *
+   *    |            |
+   *    +------------+
+   *    | pos        |
+   *    +------------+
+   *    | list       |
+   *    | ...        |
+   *    | list_end   |
+   *    +------------+
+   *    | N          |
+   *    +------------+
+   * </pre>
+   */
+  void appendList(Instr* pos, const InstrRange& list);
+
+  /**
+   * Replace pos with two lists of instructions.
+   * \param pos instruction in a block to replace (ie it will be removed)
+   * \param before_list is a list of instructions to insert before pos.
+   * \param after_list is a list of instructions to insert after pos
+   *
+   * This transformation is for the situation of replacing one instruction
+   * with a series of blocks involving control flow.  The only two blocks
+   * that matter are the first and last ones.
+   *
+   * <pre>
+   * inputs: one instruction (in a block) and two lists.
+   *
+   *  +-prev_ +--------+ <---+   + prev_  +-----------+ <-----+
+   *  |       | b0     |     |   |        |before_list|       |
+   *  |       |        |     |   |        |   ...     |       |
+   *  |       |        |     |   |        |           |       |
+   *  |       | P      |     |   +----->  +-----------+ next_ + (last_before_list)
+   *  |       +-  pos -+     |
+   *  |       | N      |     |   +-prev_- +-----------+ <-----+
+   *  |       |        |     |   |        |after_list |       |
+   *  |       |        |     |   |        |  ...      |       |
+   *  |       | j1     |     |   |        |           |       |
+   *  +---->  +--------+next_+   +----->  +-----------+ next_ + (last_after_list)
+   *
+   * outputs: lists have bee sucked into the block and the instruction at pos
+   *          has been deleted:
+   * case 1. If before_list does not back_ with a branch and after_list doesn't
+   *         begin with a block  (fixme: case1 should be handled by replaceInstr()).
+   *
+   *  +-prev_ +------------+ <---+
+   *  |       |   b0       |     |
+   *  |       |            |     |
+   *  |       |            |     |
+   *  |       |   P        |     |
+   *  |       +------------+     |
+   *  |       |before_list |     |
+   *  |       |   ...      |     |
+   *  |       |            |     |  last_before_list
+   *  |       +------------+     |
+   *  |       |after_list  |     |
+   *  |       |  ...       |     |
+   *  |       |            |     |  last_after_list
+   *  |       +------------+     |
+   *  |       |   N        |     |
+   *  |       |            |     |
+   *  |       |            |     |
+   *  |       |  j0        |     |
+   *  +---->  +------------+next_+
+   *
+   * case 2: before_list ends with a branch AND after_list begins with a block..
+   *
+   *  +-prev_ +------------+ <---+
+   *  |       |   b0       |     |
+   *  |       |            |     |
+   *  |       |            |     |
+   *  |       |   P        |     |
+   *  |       +------------+     |
+   *  |       |before_list |     |
+   *  |       |   ...      |     |
+   *  |       |            |<----+--last_before_list
+   *  +--->   +------------+next_+
+   *
+   *            template here..
+   *
+   *  +prev_  +-----------+ <---+
+   *  |       |after_list |      |
+   *  |       |  ...      |      |
+   *  |       |           |<-----+-last_after_list
+   *  |       +-----------+      |
+   *  |       |   N       |      |
+   *  |       |           |      |
+   *  |       |           |      |
+   *  |       |   j0      |      |
+   *  +---->  +-----------+ next_+
+   * </pre>
+   */
+  void replaceInstr2(Instr* pos, const InstrRange& before_list,
+      const InstrRange& after_list);
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

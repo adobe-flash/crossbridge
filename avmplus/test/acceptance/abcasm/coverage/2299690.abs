@@ -1,0 +1,47 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function runTest()
+{
+	findpropstrict COMPARE_STRICTEQ
+	pushstring "set and get a slot"
+	pushint 7
+	pushint 7
+	setglobalslot 2
+
+	findproperty setSlotTestSlot
+	getproperty setSlotTestSlot
+	
+    callpropvoid COMPARE_STRICTEQ 3
+
+	returnvoid
+}
+function main()
+{
+	getlocal0
+	pushscope
+
+	findpropstrict START
+	pushstring "setglobalslot"
+	callpropvoid START 1
+
+	newfunction runTest
+	getlocal0
+	call 0
+
+	findpropstrict END
+	callproperty END 0
+
+	returnvoid
+}
+
+
+
+script_info {
+	init: main
+	traits: {
+		trait { kind: Trait_Slot name:setpropertyTestVar }
+		trait { kind: Trait_Slot name:setSlotTestSlot slot_id:2 }
+	}
+}

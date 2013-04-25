@@ -1,0 +1,53 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page getsuper 
+
+\addindex getsuper
+
+
+\section getsuper getsuper
+
+\subsection operation Operation
+
+Gets a property from a base class.
+
+\subsection format Format
+
+\code
+getsuper
+index
+\endcode
+
+\subsection forms Forms
+\code
+getsuper = 4 (0x04)
+\endcode
+\subsection stack Stack
+
+\code
+..., obj, [ns], [name] => ..., value
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index into the multiname constant pool. If the multiname at 
+that index is a runtime multiname the name and/or namespace will also appear on the stack so 
+that the multiname can be constructed correctly at runtime
+
+Once the multiname is constructed, the base class of obj is determined and the multiname is 
+resolved in the declared traits of the base class. The value of the resolved property is 
+pushed onto the stack. See “Resolving multinames” on page 10.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if obj is null or undefined, or cannot be coerced to the expected receiver type of the supercall.
+
+A ReferenceError is thrown if the property is unresolved, or if the property is write-only.
+
+\subsection notes Notes
+
+None.
+
+*/
+

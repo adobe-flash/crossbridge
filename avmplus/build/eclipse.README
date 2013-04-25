@@ -1,0 +1,65 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+Eclipse (Galileo) / CDT (6.0) project for Tamarin.
+
+The configurations in this initial version cover 32-bit builds for Mac OS with
+the GCC 4.0 toolchain (installed with Xcode 3.x).
+
+
+Preparing your workspace and perspective
+=====================================
+- Open the C/C++ perspective
+- Open the 'C/C++ Projects' view (Window >> Show View >> C/C++ Projects)
+- Add view filter 'Non-C Elements' (In the top-right of the 'C/C++ Projects'
+view, click the down-arrow, click 'Filters...', check 'Non-C elements')
+- Increase the threshold for 'editor scalability mode' to 20000 lines. As some
+Tamarin source files have more than the Eclipse standard threshold of 5000,
+they do not appear as indexed. The threshold can be adjusted in Eclipse
+preferences >> C/C++ >> Editor >> Scalability.
+- *IMPORTANT* It looks like a bug in Eclipse means that project-specific
+settings for the CDT Indexer do not work, so you have to set these
+manually/globally. What we want is to have the indexer track the currently
+selected build config (so the correct conditional compiles are highlighted in
+the editor). To enable this go to Eclipse preferences >> C/C++ >> Indexer, then
+select 'Use active build configuration' in the 'Build configuration for the
+indexer' section.
+
+
+Importing the project
+=====================================
+- File >> Import >> General >> Existing Projects into Workspace
+- Click next
+- The root directory should be the full path to your top-level tamarin-redux
+directory
+- Ensure the 'avmshell-project' project is checked in the 'Projects' list
+- Uncheck 'Copy projects into workspace'
+- Click finish
+
+
+Building
+=====================================
+4 build configurations are included for MacOS with the GCC 4.0 toolchain. These
+mirror those in the existing Xcode project:
+Mac-32-Release
+Mac-32-Debug
+Mac-32-Release-Debugger
+Mac-32-Debug-Debugger
+
+Note: the build location will be PROJECT_ROOT/BUILD_NAME/avmshell
+Note: As discussed above, the C++ indexer has been setup to track the current
+build config, so the correct conditional compiles are highlighted in the editor
+
+
+Run/Debug:
+=====================================
+For test purposes, a launch config (running the HelloWorld test from esc) has
+been included for each of the build configs. All are available from the Run
+menu.
+
+Note: if you receive an error when trying to run/debug a newly imported
+project, try opening a file in the project first - Eclipse can sometimes get
+confused as to what the 'current project' actually is.
+
+

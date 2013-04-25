@@ -1,0 +1,14 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+SDKROOT = macosx10.5
+ARCHS=x86_64
+
+// Bugzilla 668836: this file is shared amongst all avmshell64-*.xcconfig
+// Migrate settings out of pbxproj as appropriate.
+
+CONFIGURATION_BUILD_DIR = $(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)64
+CONFIGURATION_TEMP_DIR = $(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)64
+GCC_VERSION = 4.0
+PRODUCT_NAME = avm

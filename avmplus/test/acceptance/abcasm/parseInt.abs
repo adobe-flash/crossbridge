@@ -1,0 +1,59 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+function script0$init():*
+{
+  			debugfile "parseInt.abs"
+			debugline 1
+            getlocal0     	
+            pushscope     	
+
+  			debugline 9
+
+			findpropstrict START
+			pushstring "call parseInt"
+			callpropvoid START 1
+
+  //not implemented
+/*            
+		    finddef       	{package}::parseInt
+            pushstring    	"1234567890"
+			callproperty 	parseInt 1
+            setlocal1
+
+			findpropstrict 	PASS
+			pushstring 		"parseInt"
+			callproperty 	PASS 1
+*/
+			findpropstrict 	END
+			callproperty 	END 0
+
+  			debugline 12
+
+			findpropstrict START
+			pushstring "parseInt value"
+			callpropvoid START 1
+
+			findpropstrict COMPARE_STRICTEQ
+			pushstring "value"
+			pushuint 1234567890
+			getlocal1
+
+			callproperty COMPARE_STRICTEQ 3
+			findpropstrict END
+			callproperty END 0
+			
+
+			findpropstrict START
+			pushstring "typeof the parseInt result"
+			callpropvoid START 1
+
+			findpropstrict COMPARE_STRICTEQ
+			pushstring "Result should be a Number"
+			pushstring "number"
+			getlocal1
+			typeof
+			callproperty COMPARE_STRICTEQ 3
+            returnvoid
+}
+script_info{init:script0$init}

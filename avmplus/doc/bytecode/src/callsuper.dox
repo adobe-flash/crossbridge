@@ -1,0 +1,61 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page callsuper 
+
+\addindex callsuper
+
+
+\section callsuper callsuper
+
+\subsection operation Operation
+
+Call a method on a base class.
+
+\subsection format Format
+
+\code
+callsuper 
+index 
+arg_count
+\endcode
+
+\subsection forms Forms
+\code
+callsuper = 69 (0x45)
+\endcode
+\subsection stack Stack
+
+\code
+..., receiver, [ns], [name], arg1,...,argn => ..., value
+\endcode
+
+\subsection description Description
+
+arg_count is a u30 that is the number of arguments present on the stack. The number of arguments 
+specified by arg_count are popped off the stack and saved.
+
+index is a u30 that must be an index into the multiname constant pool. If the multiname at that 
+index is a runtime multiname the name and/or namespace will also appear on the stack so that the 
+multiname can be constructed correctly at runtime.
+
+receiver is the object to invoke the method on.
+
+The base class of receiver is determined and the method indicated by the multiname is resolved 
+in the declared traits of the base class. The method is invoked with the arguments 
+receiver, arg1, ..., argn. The receiver will be used as the “this” value for the method. 
+The result of the method call is pushed onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if receiver is null or undefined. 
+
+An ArgumentError is thrown if the number of arguments does not match the expected
+number of arguments for the method.
+
+\subsection notes Notes
+
+None.
+
+*/
+

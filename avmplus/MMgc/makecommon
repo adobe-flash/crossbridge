@@ -1,0 +1,75 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+MMGC_DEBUG_CFLAGS     := -g -MMD
+MMGC_RELEASE_CFLAGS   := -O3 -MMD
+
+MMGC_DEBUG_CXXFLAGS   := ${MMGC_DEBUG_CFLAGS} -fcheck-new -Wno-invalid-offsetof -rdynamic
+MMGC_RELEASE_CXXFLAGS := ${MMGC_RELEASE_CFLAGS} -fno-rtti -fcheck-new -Wno-invalid-offsetof
+
+ifeq (YES, ${DEBUG})
+   MMGC_CFLAGS       := ${MMGC_DEBUG_CFLAGS}
+   MMGC_CXXFLAGS     := ${MMGC_DEBUG_CXXFLAGS}
+else
+   MMGC_CFLAGS       := ${MMGC_RELEASE_CFLAGS}
+   MMGC_CXXFLAGS     := ${MMGC_RELEASE_CXXFLAGS}
+endif
+
+#************************************************************************
+# DEFS
+#************************************************************************
+ifeq (YES, ${DEBUGGER})
+	MMGC_DEFS := ${MMGC_DEFS} -DAVMPLUS_UNIX -DDEBUGGER -DAVMPLUS_IA32 
+else
+	MMGC_DEFS := ${MMGC_DEFS} -DAVMPLUS_UNIX -DSOFT_ASSERTS -DAVMPLUS_IA32
+endif
+
+ifeq (YES, ${DEBUG})
+	MMGC_DEFS := ${MMGC_DEFS} -DDEBUG
+endif
+
+#************************************************************************
+# Include Paths
+#************************************************************************
+
+MMGC_INCS := -I${MMGC_ROOT} -I${MMGC_ROOT}/../core
+
+#****************************************************************************
+# Preprocessor directives
+#****************************************************************************
+
+MMGC_DEFS := ${MMGC_DEFS} -DUNIX ${MMGC_PLATFORM_DEFS}
+MMGC_CFLAGS   := ${MMGC_CFLAGS} ${MMGC_DEFS}
+MMGC_CXXFLAGS := ${MMGC_CXXFLAGS} ${MMGC_DEFS}${MMGC_CXXFLAGS}
+
+#************************************************************************
+# MMgc common files
+#************************************************************************
+
+MMGC_SRCS := ${MMGC_ROOT}/GCObject.cpp \
+			${MMGC_ROOT}/GCMemoryProfiler.cpp \
+			${MMGC_ROOT}/GCLargeAlloc.cpp \
+			${MMGC_ROOT}/GCHeapUnix.cpp \
+			${MMGC_ROOT}/GCHeap.cpp \
+			${MMGC_ROOT}/GCHashtable.cpp \
+			${MMGC_ROOT}/GCDebugUnix.cpp \
+			${MMGC_ROOT}/GCAllocObjectUnix.cpp \
+			${MMGC_ROOT}/GCAlloc.cpp \
+			${MMGC_ROOT}/GC.cpp \
+			${MMGC_ROOT}/GCPolicyManager.cpp \
+			${MMGC_ROOT}/GCTests.cpp \
+			${MMGC_ROOT}/FixedMalloc.cpp \
+			${MMGC_ROOT}/FixedAlloc.cpp
+
+#************************************************************************
+# MMgc rules
+#************************************************************************
+
+define mmgc-cmd
+	true "=== compiling MMgc: ===" $@ ${OPT}${MMGC_CXXFLAGS}
+    @${CXX} -c ${OPT} ${MMGC_CXXFLAGS} ${MMGC_INCS} $< -o $@
+endef
+
+${MMGC_ROOT}/%.o : ${MMGC_ROOT}/%.cpp
+	$(mmgc-cmd)

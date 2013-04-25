@@ -1,0 +1,91 @@
+AVM Diff
+-------------------
+
+1. Overview
+2. Buildfile (Config)
+3. Environment Variables
+4. Using with runtests.py
+5. Standalone use
+
+
+1. Overview
+---------------------------------------------------------
+avmdiff.py is a python script that is usually used in conjuction with the runtests.py script to verify that the output of running an .abc file in multiple vms / vm switches is the same.  The script can compare any amount of vms and vm switches specified via the avmdiff buildfile (aka config file).
+
+avmdiff will run each vm with each vm switch and then diff the output between all of the results.  Any difference in the results will be a failure.  When different output is found between configurations the most common output
+is considered the expected value. All of the differences are output.
+
+Notes:
+- Runtime errors are stripped in debugger builds so release and debugger output can otherwise match.
+- Stack traces are completely removed so debugger and release builds match.
+- Lines starting with "metric:" are removed so performance tests may be tested.
+- Tests outputting current dates, times or random numbers should be considered non testable with avmdiff and should be excluded or skipped from avmdiff test runs.
+
+2. Buildfile (configuration file)
+---------------------------------------------------------
+The default buildfile is utils/avmdiff.cfg.
+
+There are three sections to the buildfile:
+
+[builds] - A list of vm instances that are to be compared.
+[options] - A list of vm command line options to be run for each vm.
+[combined] - A list of vm / option combinations to be run once
+
+The avmdiff script will compare the output of every combination of [builds] and [options] as well as a single run for every item in [combined]
+
+To specify a custom buildfile, pass in the buildfile using --buildfile=
+
+
+3. Environment variables and default values
+---------------------------------------------------------
+avmdiff will attempt to use the following for default values (environment vars will take precedence over the objdir paths):
+
+Environment vars:
+shell_release
+shell_release_debugger
+shell_debug
+shell_debug_debugger
+
+Objdir paths (with objdir at the root level of the repo):
+objdir-release/shell/avmshell
+objdir-releasedebugger/shell/avmshell
+objdir-debug/shell/avmshell
+objdir-debugdebugger/shell/avmshell
+
+Note that .exe will automatically be appended for windows builds.
+
+
+4. Using avmdiff with test/acceptance/runtests.py
+---------------------------------------------------------
+1. define the proper environment variables to point to the different avm builds
+2. start runtests.py with the avm defined as avmdiff.py and the config manually set to indicate that this is a diff run (with platform replaced by win|mac|linux etc):
+
+runtests.py --avm ../../utils/avmdiff.py --config platform-diff test(s)_to_run.as
+
+If a custom buildfile (config) is to be used, pass that as an argument to avmdiff.py (note that the :
+
+runtests.ppy --avm "../../utils/avmdiff.py --buildfile=../../avmdiff.cfg" ...
+
+Note that the buildfile location is relative to the cwd.
+
+
+5. Standalone use
+---------------------------------------------------------
+avmdiff.py can be used to just test a single file (though it is advised to use runtests.py with the config string set as that will account for known issues/failures).
+
+Proper env vars or paths must still be setup.
+
+./avmdiff.py [--buildfile=avmdiff.cfg] path/to/test.abc
+
+
+
+
+
+
+
+
+
+
+
+
+

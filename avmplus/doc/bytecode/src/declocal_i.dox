@@ -1,0 +1,47 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page declocal_i 
+
+\addindex declocal_i
+
+
+\section declocal_i declocal_i
+
+\subsection operation Operation
+
+Decrement a local register value.
+
+\subsection format Format
+
+\code
+declocal_i 
+index
+\endcode
+
+\subsection forms Forms
+\code
+declocal_i = 195 (0xc3)
+\endcode
+\subsection stack Stack
+
+\code
+... => ...
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index of a local register. The value of the local register 
+at index is converted to an int using the ToInt32 algorithm (ECMA-262 section 9.5) and then 
+1 is subtracted the int value. The local register at index is then set to the result.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

@@ -1,0 +1,48 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page li32 
+
+\addindex li32
+
+
+\section li32 li32
+
+\subsection operation Operation
+
+Load a 32 bit integer from global memory.
+
+\subsection format Format
+
+\code
+li32
+\endcode
+
+\subsection forms Forms
+\code
+li32 = 55 (0x37)
+\endcode
+\subsection stack Stack
+
+\code
+..., address => value, ...
+\endcode
+
+\subsection description Description
+
+Load a 32 bit, little-endian, signed integer from global memory.
+
+The MOPS opcodes all access the backing store of the ByteArray represented by the
+current app domain's ApplicationDomain.domainMemory property. Address ranges for
+accesses will be range checked using standard comparisons.  No alignment is necessary.
+
+\subsection rt_execeptions Runtime exceptions
+
+Range check failures will result in an InvalidRangeError exception.
+
+\subsection notes Notes
+
+None.
+
+*/
+

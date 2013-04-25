@@ -1,0 +1,1421 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+/* Limit this to seven tests per function */
+
+function runTest1()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifeq int and int"
+		pushint 7
+		pushint 7
+		ifeq int7eq7_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump int7eq7_endit
+int7eq7_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+int7eq7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifeq int and double"
+		pushint 7
+		pushdouble 7.
+		ifeq int7eqdouble7_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump int7eqdouble7_endit
+int7eqdouble7_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+int7eqdouble7_endit: 
+		
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifeq null and null"
+		pushnull
+		pushnull
+		ifeq nulleqnull_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump nulleqnull_endit
+nulleqnull_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+nulleqnull_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifeq null and undefined"
+		pushnull
+		pushundefined
+		ifeq nullequndef_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump nullequndef_endit
+nullequndef_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+nullequndef_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "iffalse"
+		pushfalse
+		iffalse if_false_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump if_false_endit
+if_false_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+if_false_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "iffalse null"
+		pushnull
+		iffalse if_false_null_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump if_false_null_endit
+if_false_null_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+if_false_null_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "iffalse undef"
+		pushundefined
+		iffalse if_false_undef_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump if_false_undef_endit
+if_false_undef_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+if_false_undef_endit: 
+
+	returnvoid
+}
+
+function runTest2()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "iffalse true"
+		pushtrue
+		iffalse if_false_true_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump if_false_true_endit
+if_false_true_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+if_false_true_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifge int and eq int"
+		pushint 7
+		pushint 7
+		ifge ifge_i7i7_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifge_i7i7_endit
+ifge_i7i7_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifge_i7i7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifge int and lt int"
+		pushint 7
+		pushint 2
+		ifge ifge_i7i2_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifge_i7i2_endit
+ifge_i7i2_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifge_i7i2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifge int and gt int"
+		pushint 7
+		pushint 799
+		ifge ifge_i7i799_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifge_i7i799_endit
+ifge_i7i799_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifge_i7i799_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifge int and double"
+		pushint 9
+		pushdouble 9.21
+		ifge ifge_i7d9_2_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifge_i7d9_2_endit
+ifge_i7d9_2_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifge_i7d9_2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifge string and string"
+		pushstring "abc"
+		pushstring "abc"
+		ifge ifge_abc_abc_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifge_abc_abc_endit
+ifge_abc_abc_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifge_abc_abc_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifge prefix string and string"
+		pushstring "abc"
+		pushstring "abcd"
+		ifge ifge_abc_abcd_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifge_abc_abcd_endit
+ifge_abc_abcd_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifge_abc_abcd_endit: 
+
+	returnvoid
+}
+
+function runTest3()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifgt int and eq int"
+		pushint 7
+		pushint 7
+		ifgt ifgt_i7i7_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifgt_i7i7_endit
+ifgt_i7i7_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifgt_i7i7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifgt int and lt int"
+		pushint 7
+		pushint 2
+		ifgt ifgt_i7i2_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifgt_i7i2_endit
+ifgt_i7i2_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifgt_i7i2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifgt int and gt int"
+		pushint 7
+		pushint 799
+		ifgt ifgt_i7i799_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifgt_i7i799_endit
+ifgt_i7i799_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifgt_i7i799_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifgt int and double"
+		pushint 9
+		pushdouble 9.21
+		ifgt ifgt_i7d9_2_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifgt_i7d9_2_endit
+ifgt_i7d9_2_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifgt_i7d9_2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifgt string and string"
+		pushstring "abc"
+		pushstring "abc"
+		ifgt ifgt_abc_abc_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifgt_abc_abc_endit
+ifgt_abc_abc_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifgt_abc_abc_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifgt prefix string and string"
+		pushstring "abc"
+		pushstring "abcd"
+		ifgt ifgt_abc_abcd_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifgt_abc_abcd_endit
+ifgt_abc_abcd_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifgt_abc_abcd_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifle int and eq int"
+		pushint 7
+		pushint 7
+		ifle ifle_i7i7_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifle_i7i7_endit
+ifle_i7i7_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifle_i7i7_endit: 
+
+    returnvoid
+}
+
+function runTest4()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifle int and lt int"
+		pushint 7
+		pushint 2
+		ifle ifle_i7i2_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifle_i7i2_endit
+ifle_i7i2_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifle_i7i2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifle int and gt int"
+		pushint 7
+		pushint 799
+		ifle ifle_i7i799_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifle_i7i799_endit
+ifle_i7i799_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifle_i7i799_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifle int and double"
+		pushint 9
+		pushdouble 9.21
+		ifle ifle_i7d9_2_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifle_i7d9_2_endit
+ifle_i7d9_2_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifle_i7d9_2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifle string and string"
+		pushstring "abc"
+		pushstring "abc"
+		ifle ifle_abc_abc_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifle_abc_abc_endit
+ifle_abc_abc_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifle_abc_abc_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifle prefix string and string"
+		pushstring "abc"
+		pushstring "abcd"
+		ifle ifle_abc_abcd_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifle_abc_abcd_endit
+ifle_abc_abcd_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifle_abc_abcd_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "iflt int and eq int"
+		pushint 7
+		pushint 7
+		iflt iflt_i7i7_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump iflt_i7i7_endit
+iflt_i7i7_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+iflt_i7i7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "iflt int and lt int"
+		pushint 7
+		pushint 2
+		iflt iflt_i7i2_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump iflt_i7i2_endit
+iflt_i7i2_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+iflt_i7i2_endit: 
+
+    returnvoid
+}
+
+function runTest5()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "iflt int and gt int"
+		pushint 7
+		pushint 799
+		iflt iflt_i7i799_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump iflt_i7i799_endit
+iflt_i7i799_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+iflt_i7i799_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "iflt int and double"
+		pushint 9
+		pushdouble 9.21
+		iflt iflt_i7d9_2_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump iflt_i7d9_2_endit
+iflt_i7d9_2_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+iflt_i7d9_2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "iflt string and string"
+		pushstring "abc"
+		pushstring "abc"
+		iflt iflt_abc_abc_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump iflt_abc_abc_endit
+iflt_abc_abc_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+iflt_abc_abc_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "iflt prefix string and string"
+		pushstring "abc"
+		pushstring "abcd"
+		iflt iflt_abc_abcd_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump iflt_abc_abcd_endit
+iflt_abc_abcd_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+iflt_abc_abcd_endit: 
+
+
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnge int and eq int"
+		pushint 7
+		pushint 7
+		ifnge ifnge_i7i7_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifnge_i7i7_endit
+ifnge_i7i7_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifnge_i7i7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnge int and lt int"
+		pushint 7
+		pushint 2
+		ifnge ifnge_i7i2_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifnge_i7i2_endit
+ifnge_i7i2_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifnge_i7i2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnge int and gt int"
+		pushint 7
+		pushint 799
+		ifnge ifnge_i7i799_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnge_i7i799_endit
+ifnge_i7i799_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifnge_i7i799_endit: 
+
+    returnvoid
+}
+
+function runTest6()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnge int and double"
+		pushint 9
+		pushdouble 9.21
+		ifnge ifnge_i7d9_2_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnge_i7d9_2_endit
+ifnge_i7d9_2_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifnge_i7d9_2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnge string and string"
+		pushstring "abc"
+		pushstring "abc"
+		ifnge ifnge_abc_abc_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifnge_abc_abc_endit
+ifnge_abc_abc_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifnge_abc_abc_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnge prefix string and string"
+		pushstring "abc"
+		pushstring "abcd"
+		ifnge ifnge_abc_abcd_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnge_abc_abcd_endit
+ifnge_abc_abcd_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifnge_abc_abcd_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifngt int and eq int"
+		pushint 7
+		pushint 7
+		ifngt ifngt_i7i7_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifngt_i7i7_endit
+ifngt_i7i7_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifngt_i7i7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifngt int and lt int"
+		pushint 7
+		pushint 2
+		ifngt ifngt_i7i2_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifngt_i7i2_endit
+ifngt_i7i2_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifngt_i7i2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifngt int and gt int"
+		pushint 7
+		pushint 799
+		ifngt ifngt_i7i799_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifngt_i7i799_endit
+ifngt_i7i799_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifngt_i7i799_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifngt int and double"
+		pushint 9
+		pushdouble 9.21
+		ifngt ifngt_i7d9_2_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifngt_i7d9_2_endit
+ifngt_i7d9_2_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifngt_i7d9_2_endit: 
+
+    returnvoid
+}
+
+function runTest7()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifngt string and string"
+		pushstring "abc"
+		pushstring "abc"
+		ifngt ifngt_abc_abc_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifngt_abc_abc_endit
+ifngt_abc_abc_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifngt_abc_abc_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifngt prefix string and string"
+		pushstring "abc"
+		pushstring "abcd"
+		ifngt ifngt_abc_abcd_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifngt_abc_abcd_endit
+ifngt_abc_abcd_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifngt_abc_abcd_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnle int and eq int"
+		pushint 7
+		pushint 7
+		ifnle ifnle_i7i7_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifnle_i7i7_endit
+ifnle_i7i7_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifnle_i7i7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnle int and lt int"
+		pushint 7
+		pushint 2
+		ifnle ifnle_i7i2_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnle_i7i2_endit
+ifnle_i7i2_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifnle_i7i2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnle int and gt int"
+		pushint 7
+		pushint 799
+		ifnle ifnle_i7i799_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifnle_i7i799_endit
+ifnle_i7i799_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifnle_i7i799_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnle int and double"
+		pushint 9
+		pushdouble 9.21
+		ifnle ifnle_i7d9_2_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifnle_i7d9_2_endit
+ifnle_i7d9_2_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifnle_i7d9_2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnle string and string"
+		pushstring "abc"
+		pushstring "abc"
+		ifnle ifnle_abc_abc_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifnle_abc_abc_endit
+ifnle_abc_abc_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifnle_abc_abc_endit: 
+
+    returnvoid
+}
+
+function runTest8()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnle prefix string and string"
+		pushstring "abc"
+		pushstring "abcd"
+		ifnle ifnle_abc_abcd_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifnle_abc_abcd_endit
+ifnle_abc_abcd_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifnle_abc_abcd_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnlt int and eq int"
+		pushint 7
+		pushint 7
+		ifnlt ifnlt_i7i7_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnlt_i7i7_endit
+ifnlt_i7i7_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifnlt_i7i7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnlt int and lt int"
+		pushint 7
+		pushint 2
+		ifnlt ifnlt_i7i2_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnlt_i7i2_endit
+ifnlt_i7i2_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifnlt_i7i2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnlt int and gt int"
+		pushint 7
+		pushint 799
+		ifnlt ifnlt_i7i799_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifnlt_i7i799_endit
+ifnlt_i7i799_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifnlt_i7i799_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnlt int and double"
+		pushint 9
+		pushdouble 9.21
+		ifnlt ifnlt_i7d9_2_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifnlt_i7d9_2_endit
+ifnlt_i7d9_2_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifnlt_i7d9_2_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnlt string and string"
+		pushstring "abc"
+		pushstring "abc"
+		ifnlt ifnlt_abc_abc_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnlt_abc_abc_endit
+ifnlt_abc_abc_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifnlt_abc_abc_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifnlt prefix string and string"
+		pushstring "abc"
+		pushstring "abcd"
+		ifnlt ifnlt_abc_abcd_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifnlt_abc_abcd_endit
+ifnlt_abc_abcd_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifnlt_abc_abcd_endit: 
+
+    returnvoid
+}
+
+function runTest9()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifne int and int"
+		pushint 7
+		pushint 7
+		ifne int7ne7_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump int7ne7_endit
+int7ne7_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+int7ne7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifne int and double"
+		pushint 7
+		pushdouble 7.
+		ifne int7nedouble7_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump int7nedouble7_endit
+int7nedouble7_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+int7nedouble7_endit: 
+		
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifne null and null"
+		pushnull
+		pushnull
+		ifne nullnenull_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump nullnenull_endit
+nullnenull_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+nullnenull_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifne null and undefined"
+		pushnull
+		pushundefined
+		ifne nullneundef_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump nullneundef_endit
+nullneundef_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+nullneundef_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifstricteq int and int"
+		pushint 7
+		pushint 7
+		ifstricteq ifstricteq_i7_i7_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifstricteq_i7_i7_endit
+ifstricteq_i7_i7_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifstricteq_i7_i7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifstricteq int and double"
+		pushint 7
+		pushdouble 7.
+		ifstricteq ifstricteq_i7_d7_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifstricteq_i7_d7_endit
+ifstricteq_i7_d7_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifstricteq_i7_d7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifstricteq null and null"
+		pushnull
+		pushnull
+		ifstricteq ifstricteq_null_null_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifstricteq_null_null_endit
+ifstricteq_null_null_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifstricteq_null_null_endit: 
+
+    returnvoid
+}
+
+function runTest10()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifstricteq null and undef"
+		pushnull
+		pushundefined
+		ifstricteq ifstricteq_null_undef_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifstricteq_null_undef_endit
+ifstricteq_null_undef_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifstricteq_null_undef_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifstrictne int and int"
+		pushint 7
+		pushint 7
+		ifstrictne ifstrictne_i7_i7_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifstrictne_i7_i7_endit
+ifstrictne_i7_i7_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifstrictne_i7_i7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifstrictne int and double"
+		pushint 7
+		pushdouble 7.
+		ifstrictne ifstrictne_i7_d7_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifstrictne_i7_d7_endit
+ifstrictne_i7_d7_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifstrictne_i7_d7_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifstrictne null and null"
+		pushnull
+		pushnull
+		ifstrictne ifstrictne_null_null_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump ifstrictne_null_null_endit
+ifstrictne_null_null_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+ifstrictne_null_null_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "ifstrictne null and undef"
+		pushnull
+		pushundefined
+		ifstrictne ifstrictne_null_undef_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifstrictne_null_undef_endit
+ifstrictne_null_undef_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+ifstrictne_null_undef_endit: 
+		
+		findproperty COMPARE_STRICTEQ
+	pushstring "iftrue"
+		pushtrue
+		iftrue if_true_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump if_true_endit
+if_true_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+if_true_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "iftrue null"
+		pushnull
+		iftrue if_true_null_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump if_true_null_endit
+if_true_null_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+if_true_null_endit: 
+
+    returnvoid
+}
+
+function runTest11()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "iftrue undef"
+		pushundefined
+		iftrue if_true_undef_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump if_true_undef_endit
+if_true_undef_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+if_true_undef_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "iftrue 0"
+		pushbyte 0
+		iftrue if_true_0_fail
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+	jump if_true_0_endit
+if_true_0_fail: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+if_true_0_endit: 
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "iftrue 9"
+		pushbyte 9
+		iftrue if_true_9_succeeded
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump if_true_9_endit
+if_true_9_succeeded: findproperty PASS
+	swap
+	callpropvoid PASS 1
+if_true_9_endit: 
+
+		findproperty Object
+		constructprop Object 0
+		dup
+		setlocal1
+		pushstring "moo"
+		setproperty moo
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "in pos"
+		pushtrue // expected
+		pushstring "moo"
+		getlocal1
+		in
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "in neg"
+		pushfalse // expected
+		pushstring "zorb"
+		getlocal1
+		in
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "inclocal double"
+		pushdouble 10. // expected
+		pushdouble 9.
+		setlocal2
+		inclocal 2
+		getlocal2
+		callpropvoid COMPARE_STRICTEQ 3
+
+    returnvoid
+}
+
+function runTest12()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "inclocal int"
+		pushint 20 // expected
+		pushint 19
+		setlocal3
+		inclocal 3
+		getlocal3
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "inclocal_i_double"
+		pushint 10 // expected
+		pushdouble 9.98
+		setlocal 7
+		inclocal_i 7
+		getlocal 7
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "increment int"
+		pushint 7 // expected
+		pushint 6
+		increment
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "increment double"
+		pushdouble 7.9 // expected
+		pushdouble 6.9
+		increment
+		callpropvoid COMPARE_STRICTEQ 3
+
+		/*
+		findproperty COMPARE_STRICTEQ
+	pushstring "increment string"
+		pushnan // expected
+		pushstring "Eat at Joe's"
+		increment
+		callpropvoid COMPARE_STRICTEQ 3
+		*/
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "increment_i int"
+		pushint 7 // expected
+		pushint 6
+		increment_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "increment_i_double"
+		pushint 7 // expected
+		pushdouble 6.9
+		increment_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		/* TODO: initproperty needs better class support in abcasm. */
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "Array instanceof Array"
+		pushtrue // expected
+		findproperty Array
+		constructprop Array 0
+		findproperty Array
+		getproperty Array
+		instanceof
+		callpropvoid COMPARE_STRICTEQ 3
+
+    returnvoid
+}
+
+function runTest13()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "Array instanceof Object"
+		pushtrue // expected
+		findproperty Array
+		constructprop Array 0
+		findproperty Object
+		getproperty Object
+		instanceof
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "Array instanceof Number"
+		pushfalse // expected
+		findproperty Array
+		constructprop Array 0
+		findproperty Number
+		getproperty Number
+		instanceof
+		callpropvoid COMPARE_STRICTEQ 3
+
+
+
+
+		returnvoid
+}
+
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "Opcodes that start with the letter I" 
+	callpropvoid START 1
+
+	newfunction runTest1
+	getlocal0
+	call 0
+
+	newfunction runTest2
+	getlocal0
+	call 0
+
+	newfunction runTest3
+	getlocal0
+	call 0
+
+	newfunction runTest4
+	getlocal0
+	call 0
+
+	newfunction runTest5
+	getlocal0
+	call 0
+
+	newfunction runTest6
+	getlocal0
+	call 0
+
+	newfunction runTest7
+	getlocal0
+	call 0
+
+	newfunction runTest8
+	getlocal0
+	call 0
+
+	newfunction runTest9
+	getlocal0
+	call 0
+
+	newfunction runTest10
+	getlocal0
+	call 0
+
+	newfunction runTest11
+	getlocal0
+	call 0
+
+	newfunction runTest12
+	getlocal0
+	call 0
+
+	newfunction runTest13
+	getlocal0
+	call 0
+
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+
+script_info{init: main}
+

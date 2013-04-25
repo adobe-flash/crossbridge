@@ -1,0 +1,48 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page call 
+
+\addindex call
+
+
+\section call call
+
+\subsection operation Operation
+
+Call a closure.
+
+\subsection format Format
+
+\code
+call 
+arg_count
+\endcode
+
+\subsection forms Forms
+\code
+call = 65 (0x41)
+\endcode
+\subsection stack Stack
+
+\code
+..., function, receiver, arg1, arg2, ..., argn => ..., value
+\endcode
+
+\subsection description Description
+
+arg_count is a u30 that is the number of arguments present on the stack for the call. 
+function is the closure that is being called. receiver is the object to use for the “this” value. 
+This will invoke the [[Call]] property on function with the arguments receiver, arg1, ..., argn. 
+The result of invoking the [[Call]] property will be pushed onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if function is not a Function.
+
+\subsection notes Notes
+
+None.
+
+*/
+

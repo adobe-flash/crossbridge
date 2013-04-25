@@ -1,0 +1,51 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page getdescendants 
+
+\addindex getdescendants
+
+
+\section getdescendants getdescendants
+
+\subsection operation Operation
+
+Get descendants.
+
+\subsection format Format
+
+\code
+getdescendants 
+index
+\endcode
+
+\subsection forms Forms
+\code
+getdescendants = 89 (0x59)
+\endcode
+\subsection stack Stack
+
+\code
+..., obj, [ns], [name] => ..., value
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index into the multiname constant pool. If the multiname at 
+that index is a runtime multiname the name and/or namespace will also appear on the stack 
+so that the multiname can be constructed correctly at runtime.
+
+obj is the object to find the descendants in. This will invoke the [[Descendants]] property 
+on obj with the multiname specified by index. For a description of the [[Descendants]] operator, 
+see the E4X spec (ECMA-357) sections 9.1.1.8 (for the XML type) and 9.2.1.8 (for the XMLList type).
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if obj is not of type XML or XMLList.
+
+\subsection notes Notes
+
+None.
+
+*/
+

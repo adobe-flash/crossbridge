@@ -1,0 +1,58 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+GCC_STRICT_ALIASING = YES
+GCC_ENABLE_CPP_EXCEPTIONS=NO
+GCC_ENABLE_CPP_RTTI=NO
+GCC_PREFIX_HEADER = ../../../core/avmplus.h
+GCC_PRECOMPILE_PREFIX_HEADER = YES
+
+// shell is included in this search path only for avmshell-features.h, included from platform/VMPI.h
+HEADER_SEARCH_PATHS=../../../VMPI ../../../vmbase ../../../core ../../../MMgc ../../../pcre ../../../extensions .. ../.. ../../../shell ../../../other-licenses ../../../generated
+
+// The following line should define all controlling cpp macros except DEBUG, _DEBUG, and DEBUGGER
+//
+// The following macros are defined here for specific effect:
+//
+//   AVMSHELL_BUILD : we use this for conditional inclusion of headers in shell builds
+//   _MAC : this is how we recognize the MacOS platform
+//
+// The following macros are defined here because they have always been defined here; I don't know if 
+// they can be removed, but they are not used by AVM code at this time (now == Apr-2009):
+//
+//   SOFT_ASSERTS : effect unknown, all Google results point back to Tamarin, probably dead
+//   TARGET_API_MAC_CARBON=1 : apparently triggers something in the MacOS headers
+//   TARGET_RT_MAC_MACHO=1 : apparently triggers something in the MacOS headers
+//   DARWIN=1 : effect unknown, likely used to distinguish MacOS X / MacOS 9 in the old days, probably dead
+
+COMMON_PREPROCESSOR_DEFINITIONS=AVMSHELL_BUILD _MAC SOFT_ASSERTS TARGET_API_MAC_CARBON=1 TARGET_RT_MAC_MACHO=1 DARWIN=1 
+
+// warnings
+OTHER_CPLUSPLUSFLAGS = -Wextra -Wunused -Wno-invalid-offsetof -Wreorder -Wcast-align -Wdisabled-optimization -Winit-self -Winvalid-pch -Wpointer-arith -Wwrite-strings -Woverloaded-virtual -Wsign-promo -Wno-char-subscripts -Wstrict-aliasing=0 -Wstrict-null-sentinel -msse2
+GCC_TREAT_WARNINGS_AS_ERRORS = YES
+GCC_WARN_ABOUT_MISSING_NEWLINE = YES
+GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES
+GCC_WARN_ABOUT_RETURN_TYPE = YES
+GCC_WARN_CHECK_SWITCH_STATEMENTS = NO
+GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES
+GCC_WARN_INITIALIZER_NOT_FULLY_BRACKETED = YES
+GCC_WARN_MISSING_PARENTHESES = YES
+GCC_WARN_NON_VIRTUAL_DESTRUCTOR = YES
+GCC_WARN_PEDANTIC = NO
+GCC_WARN_SIGN_COMPARE = YES
+GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES
+GCC_WARN_UNKNOWN_PRAGMAS = YES
+GCC_WARN_UNUSED_FUNCTION = YES
+GCC_WARN_UNUSED_LABEL = YES
+GCC_WARN_UNUSED_PARAMETER = YES
+GCC_WARN_UNUSED_VALUE = YES
+GCC_WARN_UNUSED_VARIABLE = YES
+
+// Bugzilla 668836: thie file is shared amongst all avmshell*.xcconfig
+// Migrate settings out of pbxproj as appropriate.
+
+ONLY_ACTIVE_ARCH = NO
+INSTALL_PATH = /usr/local/bin
+ALWAYS_SEARCH_USER_PATHS = NO
+GCC_MODEL_TUNING = G5

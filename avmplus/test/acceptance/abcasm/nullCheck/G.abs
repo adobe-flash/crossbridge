@@ -1,0 +1,125 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function runTest()
+{
+    getlocal0
+    pushscope 
+
+
+
+
+    try {
+        pushnull
+        getproperty length
+        pop
+        
+        findproperty FAIL
+        pushstring "getproperty null"
+        pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_getproperty_null
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "getproperty null"
+        pushstring "TypeError: Error #1009" //Cannot access a property or method of a null object reference.  // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_getproperty_null:
+    returnvoid
+}
+
+function runTest1()
+{
+    getlocal0
+    pushscope
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "greaterequals 7 null"
+    pushtrue // expected
+    pushint 7
+    pushnull
+    greaterequals
+    callpropvoid COMPARE_STRICTEQ 3
+
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "greaterequals null null"
+    pushtrue // expected
+    pushnull
+    pushnull
+    greaterequals
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "greaterequals null string"
+    pushfalse // expected
+    pushnull
+    pushstring "asdf"
+    greaterequals
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "greaterthan 7 null"
+    pushtrue // expected
+    pushint 7
+    pushnull
+    greaterthan
+    callpropvoid COMPARE_STRICTEQ 3
+
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "greaterthan null null"
+    pushfalse // expected
+    pushnull
+    pushnull
+    greaterthan
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "greaterthan null string"
+    pushfalse // expected
+    pushnull
+    pushstring "asdf"
+    greaterthan
+    callpropvoid COMPARE_STRICTEQ 3
+
+    returnvoid
+}
+
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "Instructions that start with the letter G" 
+    callpropvoid START 1
+    
+    newfunction runTest
+    getlocal0
+    call 0
+    
+    newfunction runTest1
+    getlocal0
+    call 0
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+script_info {
+init: main
+    traits: {
+        trait { kind: Trait_Slot  name: globalSlot1 }
+    }
+}

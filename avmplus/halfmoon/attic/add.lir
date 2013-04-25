@@ -1,0 +1,80 @@
+
+bothint:
+	x	= paramp	0
+	y	= paramp	1
+	c1	= immp		kIntptrTag
+	x1	= xori		x c1
+	y1  = xori		y c1
+	o1	= ori 		x1 y1
+	c2	= immp		kAtomTypeMask
+	a1	= andi		o1 c2
+	c0	= immp		0
+	e	= eqi		a1 c0
+		  ret		e
+
+add:
+	x	= paramp	0
+	y	= paramp	1
+	c0	= immi		0
+	b1	= calli		bothint x y
+	eq1	= eq		b1 c0
+		  jf		slow
+	c2	= immi		kIntptrTag
+	s1	= subp		x c2
+	z1	= addjovp	s1 y slow
+		  ret		z1
+slow:	  label
+	z2	= calli		op_add_a_aa x y
+		  ret		z2
+
+------ now, with sugar.
+
+bothint int x int y
+	x1	= xori		x kIntptrTag
+	y1  = xori		y kIntptrTag
+	o1	= ori 		x1 y1
+	a1	= andi		o1 kAtomTypeMask
+	e	= eqi		a1 0
+		  ret		e
+
+add int x int y
+	b1	= calli		bothint x y
+	eq1	= eq		b1 0
+		  jf		slow
+	s1	= subp		x kIntptrTag
+	z1	= addjovp	s1 y slow
+		  ret		z1
+slow:	  label
+	z2	= calli		op_add_a_aa x y
+		  ret		z2
+
+------ now, with phi
+
+add int x int y
+	b1	= calli		bothint x y
+	eq1	= eq		b1 0
+		  jf		slow
+	s1	= subp		x kIntptrTag
+	z1	= addjovp	s1 y slow
+	j1	= j			done
+slow:	  label
+	z2	= calli		op_add_a_aa x y
+done:	  label		j1 -
+	z3	= phi		z1 z2
+		  ret		z3
+
+------ now, with args to jump
+
+add int x int y
+	b1	= calli		bothint x y
+	eq1	= eq		b1 0
+		  jf		slow
+	s1	= subp		x kIntptrTag
+	z1	= addjovp	s1 y slow
+		  j			done z1
+slow:	  label
+	z2	= calli		op_add_a_aa x y
+		  j			done z2	
+done:	  label
+	z3	= phi		0 // 0 means which phi, like param, args implied by jump preds
+		  ret		z3

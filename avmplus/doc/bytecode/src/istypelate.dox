@@ -1,0 +1,47 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page istypelate 
+
+\addindex istypelate
+
+
+\section istypelate istypelate
+
+\subsection operation Operation
+
+Check whether an Object is of a certain type.
+
+\subsection format Format
+
+\code
+istypelate
+\endcode
+
+\subsection forms Forms
+\code
+istypelate = 179 (0xb3)
+\endcode
+\subsection stack Stack
+
+\code
+..., value, type => ..., result
+\endcode
+
+\subsection description Description
+
+Compute the type of value, and let valueType refer to that type. If valueType 
+is the same as type, result is true. If type is a base type of valueType, or an 
+implemented interface of valueType, then result is true. Otherwise result is set 
+to false. Push result onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if type is not a Class.
+
+\subsection notes Notes
+
+None.
+
+*/
+

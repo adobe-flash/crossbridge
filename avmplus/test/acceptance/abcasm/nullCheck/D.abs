@@ -1,0 +1,198 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+method_info { 
+    name: runTest 
+    //    flags: SETS_DXNSk //not implemented
+}
+method_body_info {
+
+    method: runTest
+/*
+    traits: {
+        trait { kind: Trait_Slot name: var1 }
+    }
+*/
+    code:
+    {
+        getlocal0
+        pushscope
+        
+        
+        pushint 7
+        setlocal 1
+        pushdouble 7.5
+        setlocal2
+        pushnull
+        setlocal3
+
+        //  TODO: add debug, debugfile and debugline
+        
+        findproperty COMPARE_STRICTEQ
+        pushstring "declocal - null"
+        pushint -1 // expected
+        declocal 3
+        getlocal3
+        callpropvoid COMPARE_STRICTEQ 3
+
+        // reset local register 3 to null
+        pushnull
+        setlocal3
+
+        findproperty COMPARE_STRICTEQ
+        pushstring "declocal_i null"
+        pushint -1 // expected
+        declocal_i 3
+        getlocal3
+        callpropvoid COMPARE_STRICTEQ 3
+
+        findproperty COMPARE_STRICTEQ
+        pushstring "decrement null"
+        pushint -1 // expected
+        pushnull
+        decrement
+        callpropvoid COMPARE_STRICTEQ 3
+
+        findproperty COMPARE_STRICTEQ
+        pushstring "decrement_i null"
+        pushint -1 // expected
+        pushnull
+        decrement_i
+        callpropvoid COMPARE_STRICTEQ 3
+
+
+/*        
+        
+        try 
+        {
+            pushnull
+            deleteproperty NoSuchProperty
+            pop
+            
+            
+            findproperty FAIL
+            pushstring "deleteproperty on null object"
+            pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+            getlocal1
+            callpropvoid FAIL 3
+            
+            // need to returnvoid here so verifier is ok with assigning a new type to local register 1 in the catch block
+            returnvoid
+            
+            jump finished_deleteproperty_on_null_object
+        }
+        catch
+        {
+            getlocal0
+            pushscope
+            setlocal1   // save typeError
+            findproperty COMPARE_TYPEERROR
+            pushstring "deleteproperty on null object"
+            pushstring "TypeError: Error #1009" // Cannot access a property or method of a null object reference.   // expected
+            getlocal1
+            callpropvoid COMPARE_TYPEERROR 3
+        }
+        
+        finished_deleteproperty_on_null_object:
+        
+*/    
+        returnvoid
+    }
+}
+
+method_info { 
+    name: runTest1 
+    // flags: SETS_DXNS // not implemented
+}
+method_body_info {
+
+    method: runTest1
+
+    traits: {
+        trait { kind: Trait_Slot name: var1 }
+    }
+    code:
+    {
+        getlocal0
+        pushscope
+        findproperty COMPARE_STRICTEQ
+        pushstring "divide double by null"
+        findpropstrict Infinity
+        getproperty Infinity // expected
+        pushdouble 8.5
+        pushnull
+        divide
+        callpropvoid COMPARE_STRICTEQ 3
+
+        findproperty COMPARE_STRICTEQ
+        pushstring "divide null by null"
+        pushnan
+        pushnull
+        pushnull
+        divide
+        callpropvoid COMPARE_STRICTEQ 3
+        
+        findproperty COMPARE_STRICTEQ
+        pushstring "divide null by uint"
+        pushint 0
+        pushnull
+        pushuint 0xFFFFFF
+        divide
+        callpropvoid COMPARE_STRICTEQ 3
+
+        findproperty COMPARE_STRICTEQ
+        pushstring "dup null"
+        pushnull    // expected
+        dup
+        callpropvoid COMPARE_STRICTEQ 3
+
+/* not implemented
+        findproperty COMPARE_STRICTEQ
+        pushstring "dxns"
+        dxns "foo"
+        findproperty PASS
+        swap
+        callpropvoid PASS 1
+        pop // COMPARE_STRICTEQ
+
+        
+        findproperty COMPARE_STRICTEQ
+        pushstring "dxnslate - null"
+        pushnull
+        dxnslate
+        findproperty PASS
+        swap
+        callpropvoid PASS 1
+        pop // COMPARE_STRICTEQ
+
+*/
+        returnvoid
+    }
+}
+
+
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "Instructions that start with the letter D" 
+    callpropvoid START 1
+    
+    newfunction runTest
+    getlocal0
+    call 0
+    
+    newfunction runTest1
+    getlocal0
+    call 0
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+script_info{init: main
+    traits: {
+        trait { kind: Trait_Slot name: var1 }
+    }
+}

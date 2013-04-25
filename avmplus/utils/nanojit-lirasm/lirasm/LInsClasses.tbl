@@ -1,0 +1,123 @@
+/* -*- Mode: C; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 4 -*-
+ * vim: set ts=8 sw=4 et tw=0 ft=c:
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* LIns classes, as required for --random mode.  Includers must define a CL___
+ * macro of the following form:
+ *
+ * #define CL___(name, only64bit, relFreq)     ...
+ *
+ * Selected arguments can be used within the macro expansions.
+ *
+ * Field        Description
+ * -----        -----------
+ * name         Name of the instruction class.  The types are B (boolean), I
+ *              (32-bit integer), Q (64-bit integer), F (64-bit float), N
+ *              (null).  A name of the form LOP_Z_XY means that it takes
+ *              arguments of type X and Y and produces a result of type Z.
+ *
+ * relFreq      We weight each class differently, so that some classes are more
+ *              common than others.  This field gives the relative frequency of
+ *              the instruction class.  All the relFreqs together can sum up to
+ *              any number, but it's easier to think about if the sum is a
+ *              round number.  (That's why the relFreqs add up to 100%;  the
+ *              running total is shown in comments.)  The sum also shouldn't be
+ *              too big, as we generate a table with that many elements in it.
+ *
+ *              Note that we want a decent number of value sinks (eg.
+ *              stores, calls, guards) and not too many value sources (eg.
+ *              immediates, loads) so that the amount of dead code generated is
+ *              reasonable.
+ *
+ * Because certain opcode classes aren't supported on all platforms, CLxyz must be one
+ * of the following:
+ *
+ *   CL___: for opcode classes supported on all platforms.
+ *   CL_64: for opcode classes supported only on 64-bit platforms.
+ */
+
+#ifdef NANOJIT_64BIT
+#   define CL_64(a, b)      CL___(a, b)
+#else
+#   define CL_64(a, b)
+#endif
+
+
+CL___(  LFENCE,         1)  //  1%  LIR_regfence, LIR_xbarrier
+
+CL___(  LALLOC,         1)  //  2%  LIR_alloc
+
+CL___(  LIMM_I,         4)  //  6%  LIR_imm
+CL_64(  LIMM_Q,         3)  //  9%  LIR_quad
+CL___(  LIMM_D,         3)  // 12%  LIR_float
+
+CL___(  LOP_I_I,        2)  // 14%  LIR_neg, LIR_not
+CL_64(  LOP_Q_Q,        0)  // 14%  (none)
+CL___(  LOP_D_D,        2)  // 16%  LIR_fneg
+
+CL___(  LOP_I_II,       6)  // 32%  LIR_add, LIR_and, LIR_eq, etc.
+CL_64(  LOP_Q_QQ,       7)  // 39%  LIR_qiadd, LIR_qiand, LIR_qeq, etc.
+CL_64(  LOP_Q_QI,       2)  // 41%  LIR_qilsh, LIR_qirsh, LIR_qursh
+CL___(  LOP_D_DD,      10)  // 51%  LIR_fadd, etc.
+
+// cmov has a low weight because is also used with LIR_div/LIR_mod.
+CL___(  LOP_I_BII,      1)  // 52%  LIR_cmovi
+CL_64(  LOP_Q_BQQ,      1)  // 53%  LIR_cmovq
+CL___(  LOP_D_BDD,      1)  // 54%  LIR_cmovd
+
+CL___(  LOP_B_II,       3)  // 57%  LIR_eq,  LIR_lt,  etc
+CL_64(  LOP_B_QQ,       3)  // 60%  LIR_qeq, LIR_qlt, etc
+CL___(  LOP_B_DD,       3)  // 63%  LIR_feq, LIR_flt, etc
+
+CL_64(  LOP_Q_I,        1)  // 64%  LIR_i2q, LIR_u2q
+CL___(  LOP_D_I,        1)  // 65%  LIR_i2d, LIR_ui2d
+CL_64(  LOP_I_Q,        1)  // 66%  LIR_q2i
+CL___(  LOP_I_D,        1)  // 67%  LIR_qlo, LIR_qhi, LIR_d2i
+CL_64(  LOP_Q_D,        1)  // 68%  LIR_dasq
+CL_64(  LOP_D_Q,        1)  // 69%  LIR_qasd
+CL___(  LOP_D_II,       1)  // 70%  LIR_qjoin
+
+CL___(  LLD_I,          3)  // 73%  LIR_ld, LIR_ld*b, LIR_ld*s
+CL_64(  LLD_Q,          2)  // 75%  LIR_ldq
+CL___(  LLD_D,          3)  // 78%  LIR_ldd
+
+CL___(  LST_I,          5)  // 83%  LIR_sti
+CL_64(  LST_Q,          4)  // 87%  LIR_stqi
+CL___(  LST_D,          5)  // 92%  LIR_stfi
+
+CL___(  LCALL_I_I1,     1)  // 93%  LIR_icall
+CL___(  LCALL_I_I6,     1)  // 94%  LIR_icall
+CL_64(  LCALL_Q_Q2,     1)  // 95%  LIR_qcall
+CL_64(  LCALL_Q_Q7,     1)  // 96%  LIR_qcall
+CL___(  LCALL_D_D3,     1)  // 97%  LIR_fcall
+CL___(  LCALL_D_D8,     1)  // 98%  LIR_fcall
+CL_64(  LCALL_V_IQD,    1)  // 99%  LIR_icall or LIR_qcall
+
+CL___(  LLABEL,         1)  //100%  LIR_label
+
+CL___(  LIMM_F,         1)  // 101%  LIR_float
+CL___(  LOP_F_F,        1)  // 102%  LIR_fnegf
+CL___(  LOP_F_FF,       1)  // 103%  LIR_faddf, etc.
+CL___(  LOP_F_BFF,      1)  // 104%  LIR_cmovf
+CL___(  LOP_B_FF,       1)  // 105%  LIR_eqf, LIR_ltf, etc
+CL___(  LOP_F_I,        1)  // 106%  LIR_i2f, LIR_ui2f
+CL___(  LOP_I_F,        1)  // 107%  LIR_f2i
+CL___(  LOP_D_F,        1)  // 108%  LIR_f2d
+CL___(  LOP_F_D,        1)  // 109%  LIR_d2f
+CL___(  LST_F,          1)  // 110%  LIR_stf
+CL___(  LLD_F,          1)  // 111%  LIR_ldf
+
+CL___(  LIMM_F4,        1)  // 112%  LIR_float
+CL___(  LOP_F4_F4,      1)  // 113%  LIR_fnegf4
+CL___(  LOP_F4_F4F4,    1)  // 114%  LIR_faddf4, etc.
+CL___(  LOP_F4_BF4F4,   1)  // 115%  LIR_cmovf4
+CL___(  LOP_B_F4F4,     1)  // 116%  LIR_eqf4
+CL___(  LOP_F4_F,       1)  // 117%  LIR_f4x, LIR_f4y, LIR_f4z, LIR_f4w
+CL___(  LOP_F_F4,       1)  // 118%  LIR_f2f4
+CL___(  LST_F4,         1)  // 110%  LIR_stf4
+CL___(  LLD_F4,         1)  // 111%  LIR_ldf4
+
+#undef CL_64

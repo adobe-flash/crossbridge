@@ -1,0 +1,145 @@
+#!/usr/bin/env python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# file contains a list of tests to run
+
+# directory , commands ...
+
+# directory = directory to start, most test suites require starting in the directory
+# commands = all commands and parameters to run testsuite
+# any variable enclosed as ${var} will be replaced with the environment variable
+# the common shell variables are: py, avmr, avmrd, avmd, avmd   
+#     (py=python r=release, rd=release-debugger, d=debug, dd=debug-debugger)
+#
+# windows platforms using native python have problems in subprocess.Popen. 
+# follow these guidelines:
+# - do not use ./ unless it is a parameter to an executable 
+#   e.g. do not use cd ./acceptance
+#        do use ${PYTHON_RUNTESTS} ./runtests.py ...
+# - specify python with the ${PYTHON_RUNTESTS} environment variable
+
+# Bug 456852 - Different runtime errors when -Ojit set in acceptance test run
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} as3/RuntimeErrors/Error1115NotAConstructor.as
+
+# mops.abc_ is crashing at end with exitcode 138: https://bugzilla.mozilla.org/show_bug.cgi?id=521550
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} --vmargs="-Dnogc" mops/mops.abc_
+
+# Solaris SPARC failures, fixed by: http://hg.mozilla.org/tamarin-redux/rev/2669
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} --vmargs="-Ojit" as3/Definitions/Classes/ClassDef/DynamicClassSameMethPropName.as
+
+# ByteArray compress/uncompress: https://bugzilla.mozilla.org/show_bug.cgi?id=436372
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS} --notimecheck --avm=${avmr} as3/ByteArray/ByteArray.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS} --notimecheck --avm=${avmr} as3/ShellClasses/File.as
+
+# https://bugzilla.mozilla.org/show_bug.cgi?id=517858
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} mmgc/outofmemory.as
+
+# test -Dverifyonly in smokes: https://bugzilla.mozilla.org/show_bug.cgi?id=491934
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} --verifyonly as3/Vector/typechecking.as
+
+# We have seen this test fail the GetSizeSamples test
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} as3/sampling/ProcessSampling.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} as3/sampling/ProcessSampling.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} as3/sampling/ProcessSampling.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} as3/sampling/ProcessSampling.as
+
+# Bug https://bugzilla.mozilla.org/show_bug.cgi?id=402864
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} ecma3/GlobalObject/e15_1_2_2_2.as ecma3/TypeConversion/e9_3_1_3.as
+
+# Bug https://bugzilla.mozilla.org/show_bug.cgi?id=493285
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} as3/Definitions/Classes/ExtImpl/DynFinPubClassExtDynIntClassImpIntIntExtPubPub.as as3/Definitions/Classes/ExtImpl/DynFinPubClassExtIntClassImpIntIntExtPubPub.as as3/Definitions/Classes/ExtImpl/IntClassExtIntClassImpIntIntExtIntPub.as
+
+# Bug https://bugzilla.mozilla.org/show_bug.cgi?id=496633
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} regress/vector_domain_bug.as
+
+# Bug https://bugzilla.mozilla.org/show_bug.cgi?id=491489
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS} -v --notimecheck --avm=${avmr} --vmargs="-Dinterp" abcasm/coverage
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS} -v --notimecheck --avm=${avmrd} --vmargs="-Dinterp" abcasm/coverage
+# Bug https://bugzilla.mozilla.org/show_bug.cgi?id=494016
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} --vmargs="-Dinterp" as3/ShellClasses/toplevel.as
+
+# rev 1863:fa7476a03d9c assert fails on mac64 and mac-intel-10.4
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} as3/sampling/InvocationSampling.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} as3/sampling/InvocationSampling.as
+
+# adding new memstats/pyspy testcase, want to make sure it is stable
+# skip test due to intermittent hang https://bugzilla.mozilla.org/show_bug.cgi?id=505436
+# skip test due to issue  https://bugzilla.mozilla.org/show_bug.cgi?id=529160
+# cd cmdline;${py} ./testMemstats.py
+
+# Bug https://bugzilla.mozilla.org/show_bug.cgi?id=491489
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS} -v --notimecheck --avm=${avmr} abcasm
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS} -v --notimecheck --avm=${avmrd} abcasm
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS} -v --notimecheck --avm=${avmdd} abcasm
+
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} as3/Vector
+
+cd performance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} --builtinabc=${BUILTINABC} sunspider/as3
+
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} ecma3/Date/e15_9_2_2_4.as ecma3/Date/e15_9_2_2_4.as ecma3/Date/e15_9_2_2_5.as ecma3/Date/e15_e15_9_2_2_6.as ecma3/Date/e15_9_5_10_1.as ecma3/Date/e15_9_5_12_1.as ecma3/Date/e15_9_5_34_1.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} ecma3/Date/e15_9_2_2_4.as ecma3/Date/e15_9_2_2_4.as ecma3/Date/e15_9_2_2_5.as ecma3/Date/e15_e15_9_2_2_6.as ecma3/Date/e15_9_5_10_1.as ecma3/Date/e15_9_5_12_1.as ecma3/Date/e15_9_5_34_1.as
+
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} --vmargs=-Ojit as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} --vmargs=-Dinterp as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} --vmargs=-Ojit as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} --vmargs=-Dinterp as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} --vmargs=-Ojit as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} --vmargs=-Dinterp as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} --vmargs=-Ojit as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} --vmargs=-Dinterp as3/AbcDecoder/simple.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} mmgc/memlimit.as mmgc/outofmemory.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} --vmargs=-Dinterp mmgc/memlimit.as mmgc/outofmemory.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} mmgc/memlimit.as mmgc/outofmemory.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} --vmargs=-Dinterp mmgc/memlimit.as mmgc/outofmemory.as
+#
+cd performance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} --builtinabc=${BUILTINABC} language/string/typed/split.as
+#
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} ecma3/Date/e15_9_2_2_4.as ecma3/Date/e15_9_2_2_4.as ecma3/Date/e15_9_2_2_5.as ecma3/Date/e15_e15_9_2_2_6.as ecma3/Date/e15_9_5_10_1.as ecma3/Date/e15_9_5_12_1.as ecma3/Date/e15_9_5_34_1.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} ecma3/Date/e15_9_2_2_4.as ecma3/Date/e15_9_2_2_4.as ecma3/Date/e15_9_2_2_5.as ecma3/Date/e15_e15_9_2_2_6.as ecma3/Date/e15_9_5_10_1.as ecma3/Date/e15_9_5_12_1.as ecma3/Date/e15_9_5_34_1.as
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} ecma3/FunctionObjects
+
+cd cmdline;${PYTHON_RUNTESTS} ./testShellSystem.py
+
+cd cmdline;${PYTHON_RUNTESTS} ./testDebugger.py
+
+
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} as3/sampling
+
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} mops
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} mops
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} as3/ShellClasses
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} as3/ShellClasses
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} as3/ShellClasses
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} as3/ShellClasses
+
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} ecma3/String
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} ecma3/String
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} ecma3/String
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} ecma3/String
+
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} ecma3/Math
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} ecma3/Math
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} ecma3/Math
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} ecma3/Math
+
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} ecma3/RegExp
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} ecma3/RegExp
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} ecma3/RegExp
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} ecma3/RegExp
+
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} ecma3/Statements
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} ecma3/Statements
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} ecma3/Statements
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} ecma3/Statements
+
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmr} regress
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmd} regress
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmrd} regress
+cd acceptance;${PYTHON_RUNTESTS} ./runtests.py ${RTARGS}  --notimecheck --avm=${avmdd} regress
+

@@ -1,0 +1,110 @@
+NAME:        "Enumerability and the for-in loop"
+CATEGORY:    Object model; statements
+SOURCES:     ?
+SPEC AUTHOR: Lars
+STATUS:      ?
+REVIEWS:     (none)
+IMPLEMENTED: ?
+
+
+
+SUMMARY OF ES3 SEMANTICS 
+
+The ES3 for-in loop has the following structure:
+
+  for ( [var] V [=init] in Expr )
+      Stmt
+
+where V is a simple identifier and Expr must evaluate to an object O.
+For the purposes of this discussion we ignore the optional 'var'
+keyword and the optional initializer.
+
+The names of the properties of O (including properties in O's
+prototype chain) that are not marked DontEnum are extracted in
+arbitrary order and assigned to V; after each assignment the Stmt is
+evaluated.  Names are filtered; duplicates are not allowed.  If Stmt
+deletes a property that has not yet been reached by enumeration then
+its name is never assigned to V.  If Stmt adds a property with a name
+that has not yet been assigned to V then it is not defined whether
+that name is ever assigned to V.
+
+Names assigned to V are always strings.
+
+
+THE ES4 FOR-IN LOOP:
+
+ * The loop takes one of two forms.  If the value O has the structural
+   type 
+
+
+ES4 SEMANTICS OF THE DEFAULT FOR-IN LOOP:
+
+ * Only dynamic properties in the compatibility namespace 'noNS' are
+   enumerated, and then only if their DontEnum bit is not set.  [We will
+   fix the description to talk about an 'enumerable' bit later, don't
+   worry.]
+
+   Note carefully that the preceding rule excludes properties in any
+   'public' namespace and any fixture properties.  (Fixture properties
+   are excluded not so much because they are fixtures as because they
+   are always in a namespace that is not the compatibility namespace
+   'noNS'.)
+
+   Since enumerated names are always namespace-less then values
+   assigned to V can always be strings, as in ES3.
+
+   Properties are added in noNS by the following structures only:
+
+     * Assignment to nonexistent properties in an object (these and
+       other syntactic variations):
+         obj.newprop = val
+         obj[name] = val     // with name not a Name object with a non-null namespace
+
+     * Object and array initializer:
+         { newprop1: 10, newprop2: 20 }
+         [ 1, 2, 3 ]
+
+     * "prototype" designator in class (though note these are DontEnum):
+         prototype function toString() ...
+
+     * __createProperty__ call with a non-namespaced name:
+         obj.__createProperty__("foo", ...)
+         obj.__createProperty__(new Name(null,"foo"), ...)
+
+ * Enumeration of dynamic properties is always in /insertion order/ in
+   the following sense.  In the absence of deletions and insertions
+   during enumeration, the dynamic properties of object O are
+   enumerated in the order they were inserted into the object.  Then
+   the properties of O's [[Prototype]] are enumerated, and so on.
+
+   The order of enumeration here should be 1, a, 2, b:
+
+     x = { 1: "one", a: "two", 2: "three", b: "four" }
+
+   If a property is deleted from an object before being enumerated but
+   is present in the object's prototype chain then it will be
+   enumerated with the pertinent prototype object.
+
+   If a property is added to an object that is being enumerated, or to
+   one of that object's prototype objects, then the property will
+   always be enumerated (because it is inserted last and enumeration
+   is in insertion order).
+
+ * The value O may evaluate to null or undefined, in which case Stmt
+   is never evaluated at all.
+
+ * The binding keyword may be 'let' (for details see separate let
+   binding proposals).
+
+ * The Ident may be a destructuring pattern (for details see separate
+   destructuring and let binding proposals).
+
+
+OPEN ISSUES / QUESTIONS
+
+  * obj.null::x or obj.::x should reference x in the nons namespace 
+    only (disregarding all open namespaces); don't know what the status
+    is actually here.  I prefer the former, it corresponds with how
+    the Name constructor can be used, and the latter is not pretty.
+
+  * obj[x] presumably allows x to be a Name object

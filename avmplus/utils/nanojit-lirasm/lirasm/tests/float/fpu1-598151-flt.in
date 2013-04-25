@@ -1,0 +1,16 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+	ptr = allocp 8
+
+	a = immf 1.0
+	b = immf 2.5
+	c = addf a b
+	stf c ptr 0
+	j done
+
+foo:	stf c ptr 0
+
+done:	res = ldf ptr 0
+	retf res

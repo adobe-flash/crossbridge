@@ -1,0 +1,48 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page rshift 
+
+\addindex rshift
+
+
+\section rshift rshift
+
+\subsection operation Operation
+
+Signed bitwise right shift.
+
+\subsection format Format
+
+\code
+rshift
+\endcode
+
+\subsection forms Forms
+\code
+rshift = 166 (0xa6)
+\endcode
+\subsection stack Stack
+
+\code
+..., value1, value2 => ..., value3
+\endcode
+
+\subsection description Description
+
+Pop value1 and value2 off of the stack, convert value1 to an int to create value1_int 
+and convert value2 to a uint to create value2_uint. Right shift value1_int by the result 
+of value2_uint & 0x1F (leaving only the 5 least significant bits of value2_uint), and 
+push the result onto the stack. The right shift is sign extended, resulting in a signed 
+32-bit integer. See ECMA-262 section 11.7.2
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

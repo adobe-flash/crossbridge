@@ -1,0 +1,40 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+function hello()
+{
+Loop:
+	label
+	getlocal0
+	pushscope
+
+	getlocal1
+	setlocal2
+
+	popscope
+	getlocal1
+	increment_i
+	dup
+	setlocal1
+	pushbyte 3
+	iflt Loop
+    
+    getlocal0
+	pushscope
+    
+	getlocal2
+    pushbyte 2
+    ifeq passed
+    pushstring "Loop value != 2 FAILED!"
+    //.print
+    jump end
+passed:
+    findpropstrict PASS
+    pushstring "Loop value == 2 PASSED!"
+    callproperty PASS 1
+    //.print
+end:
+	returnvoid
+}
+
+script_info{init: hello}

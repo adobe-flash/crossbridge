@@ -1,0 +1,50 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page newarray 
+
+\addindex newarray
+
+
+\section newarray newarray
+
+\subsection operation Operation
+
+Create a new array.
+
+\subsection format Format
+
+\code
+newarray
+arg_count
+\endcode
+
+\subsection forms Forms
+\code
+newarray = 86 (0x56)
+\endcode
+\subsection stack Stack
+
+\code
+..., value1, value2, ..., valueN => ..., newarray
+\endcode
+
+\subsection description Description
+
+arg_count is a u30 that is the number of entries that will be created in the new 
+array. There will be a total of arg_count values on the stack.
+
+A new value of type Array is created and assigned to newarray. The values on the 
+stack will be assigned to the entries of the array, so newarray[0] = value1, 
+newarray[1] = value2, ...., newarray[N-1] = valueN. newarray is then pushed onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

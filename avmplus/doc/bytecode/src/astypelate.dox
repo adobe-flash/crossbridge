@@ -1,0 +1,46 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page astypelate 
+
+\addindex astypelate
+
+
+\section astypelate astypelate
+
+\subsection operation Operation
+
+Return the same value, or null if not of the specified type.
+
+\subsection format Format
+
+\code
+astypelate
+\endcode
+
+\subsection forms Forms
+\code
+astypelate = 135 (0x87)
+\endcode
+\subsection stack Stack
+
+\code
+..., value, class => ..., value
+\endcode
+
+\subsection description Description
+
+Pop class and value off of the stack. class should be an object of type Class. If value is of the 
+type specified by class, push value back onto the stack. If value is not of the type specified by 
+class, then push null onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if class is not of type Class.
+
+\subsection notes Notes
+
+None.
+
+*/
+

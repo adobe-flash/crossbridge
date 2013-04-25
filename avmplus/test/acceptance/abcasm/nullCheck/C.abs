@@ -1,0 +1,618 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function noArgs()
+{
+    returnvoid
+}
+
+function oneArg(*)
+{
+    getlocal1
+    returnvalue
+}
+
+function propertyOneImpl():int
+{
+    pushint 0x104b
+    returnvalue
+}
+
+function propertyTwoImpl():Object
+{
+    pushnull
+    returnvalue
+}
+
+
+function runTest()
+{
+    getlocal0
+    pushscope
+
+    findproperty START 
+    pushstring "call" 
+    callpropvoid START 1
+    
+    // "call null function ref"
+    newfunction noArgs
+    setlocal1
+    
+    try 
+    {
+        pushnull    // null will be called as a function
+        getlocal0   // reciever = this
+        call 0
+        pop
+        
+        findproperty FAIL
+        pushstring "call null function ref"
+        pushstring "exception should have been thrown: TypeError #1006: value is not a function."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_call_null_function_ref
+    }
+    catch
+    {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_STRICTEQ
+        pushstring "call null function ref"
+        pushstring "TypeError: Error #1006" // value is not a function."   // expected
+        getlocal2
+        coerce_s    // convert TypeError Object to String
+        pushint 0
+        pushint 22
+        // only use first 22 chars so it passes on debugger and release builds
+        callproperty substr 2 
+        callpropvoid COMPARE_STRICTEQ 3
+    }
+    
+    finished_call_null_function_ref:
+    
+    // call oneArg with null arg
+    findproperty COMPARE_STRICTEQ
+    pushstring "call oneArg with null arg"
+    pushnull    // expected
+    newfunction oneArg
+    getlocal0
+    pushnull
+    call 1      // actual
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+function runTest1()
+{
+    //TODO: callmethod
+    
+    getlocal0
+    pushscope
+    
+    findproperty START 
+    pushstring "callproperty" 
+    callpropvoid START 1
+    
+    // callproperty on null object
+    try {
+        pushnull
+        callproperty blah 0
+        pop
+        
+        findproperty FAIL
+        pushstring "call null function ref"
+        pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_callproperty_on_null_object
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "callproperty on null object"
+        pushstring "TypeError: Error #1009" // Cannot access a property or method of a null object reference.   // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_callproperty_on_null_object:
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+/*not implemented
+function runTest2()
+{
+    getlocal0
+    pushscope
+
+    findproperty START 
+    pushstring "callproplex" 
+    callpropvoid START 1
+    
+    // callproplex on null object
+    try {
+        pushnull
+        callproplex NoSuchProperty 0
+        pop
+        
+        findproperty FAIL
+        pushstring "callproplex on null object"
+        pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_callproplex_on_null_object
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "callproplex on null object"
+        pushstring "TypeError: Error #1009" // Cannot access a property or method of a null object reference.   // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_callproplex_on_null_object:
+    
+    findproperty END
+    callpropvoid END 0
+
+    returnvoid
+}
+*/
+function runTest3()
+{
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "callpropvoid" 
+    callpropvoid START 1
+    
+    // callpropvoid on null object
+    try {
+        pushnull
+        pushnull
+        callpropvoid NoSuchProperty 1
+        
+        findproperty FAIL
+        pushstring "callpropvoid on null object"
+        pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_callpropvoid_on_null_object
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "callpropvoid on null object"
+        pushstring "TypeError: Error #1009" // Cannot access a property or method of a null object reference.   // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_callpropvoid_on_null_object:
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+function runTest4()
+{
+ 
+ // TODO: callsuper
+ // TODO: callsupervoid
+ 
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "checkfilter" 
+    callpropvoid START 1
+    
+    // checkfilter on null object
+    try {
+        pushnull
+        checkfilter
+        pop
+        
+        findproperty FAIL
+        pushstring "checkfilter on null object"
+        pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_checkfilter_on_null_object
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "checkfilter on null object"
+        pushstring "TypeError: Error #1009" // Cannot access a property or method of a null object reference.   // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_checkfilter_on_null_object:
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+function runTest5()
+{
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "coerce" 
+    callpropvoid START 1
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "coerce null to uint"
+    pushuint 0  // expected
+    pushnull
+    coerce uint
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "coerce null to String"
+    pushnull // expected
+    pushnull
+    coerce String
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "coerce null to Boolean"
+    pushfalse // expected
+    pushnull
+    coerce Boolean
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "coerce null to Objects"
+    pushnull // expected
+    pushnull
+    coerce Object
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "coerce null to XML"
+    pushnull // expected
+    pushnull
+    coerce XML
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+function runTest6()
+{
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "coerce_a" 
+    callpropvoid START 1
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "coerce_a null"
+    pushnull  // expected
+    pushnull
+    coerce_a
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty END
+    callpropvoid END 0
+
+ // ------------------------------------------------------------------------
+    findproperty START 
+    pushstring "coerce_s" 
+    callpropvoid START 1
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "coerce_s null"
+    pushnull  // expected
+    pushnull
+    coerce_s
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+function runTest7()
+{
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "construct" 
+    callpropvoid START 1
+    
+    // construct null object
+    try {
+        pushnull
+        pushnull
+        construct 1
+        pop
+        
+        findproperty FAIL
+        pushstring "construct null object"
+        pushstring "exception should have been thrown: TypeError: Error #1007: Instantiation attempted on a non-constructor."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_construct_null_object
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "construct null object"
+        pushstring "TypeError: Error #1007" //Instantiation attempted on a non-constructor.  // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_construct_null_object:
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+function runTest8()
+{
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "constructprop" 
+    callpropvoid START 1
+    
+    // constructprop null object
+    try {
+        pushnull
+        pushnull
+        constructprop NoSuchProp 1
+        pop
+        
+        findproperty FAIL
+        pushstring "constructprop null object"
+        pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_constructprop_null_object
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "constructprop null object"
+        pushstring "TypeError: Error #1009" //Cannot access a property or method of a null object reference.  // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_constructprop_null_object:
+    
+    findproperty END
+    callpropvoid END 0
+    
+ // ------------------------------------------------------------------------
+    // TODO: constructsuper
+ // ------------------------------------------------------------------------
+ 
+    findproperty START 
+    pushstring "convert_b" 
+    callpropvoid START 1
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "convert_b null"
+    pushfalse  // expected
+    pushnull
+    convert_b
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+function runTest9()
+{
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "convert_i" 
+    callpropvoid START 1
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "convert_i null"
+    pushint 0  // expected
+    pushnull
+    convert_i
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty END
+    callpropvoid END 0  
+    
+ // ------------------------------------------------------------------------
+ 
+    findproperty START 
+    pushstring "convert_d" 
+    callpropvoid START 1
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "convert_d null"
+    pushint 0  // expected
+    pushnull
+    convert_d
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty END
+    callpropvoid END 0
+    
+ // ------------------------------------------------------------------------
+ 
+    findproperty START 
+    pushstring "convert_o" 
+    callpropvoid START 1
+    
+    // convert_o null
+    try {
+        pushnull
+        convert_o
+        pop
+        
+        findproperty FAIL
+        pushstring "convert_o null"
+        pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_convert_o_null
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "convert_o null"
+        pushstring "TypeError: Error #1009" //Cannot access a property or method of a null object reference.  // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_convert_o_null:
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+function runTest10()
+{
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "convert_u" 
+    callpropvoid START 1
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "convert_u null"
+    pushint 0  // expected
+    pushnull
+    convert_u
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty END
+    callpropvoid END 0
+    
+ // ------------------------------------------------------------------------
+ 
+    findproperty START 
+    pushstring "convert_s" 
+    callpropvoid START 1
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "convert_s null"
+    pushstring "null"  // expected
+    pushnull
+    convert_s
+    callpropvoid COMPARE_STRICTEQ 3
+ 
+	// test a null String ptr through convert_s which should return "null"
+    findproperty COMPARE_STRICTEQ
+    pushstring "convert_s of string type = null"
+    pushstring "null" // expected
+    pushnull
+    coerce_s		// forces type to string
+    convert_s
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty END
+    callpropvoid END 0
+    
+    returnvoid
+} 
+
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "Instructions that start with the letter C" 
+    callpropvoid START 1
+    
+    newfunction runTest
+    getlocal0
+    call 0
+    
+    newfunction runTest1
+    getlocal0
+    call 0
+
+/* not implemented
+    newfunction runTest2
+    getlocal0
+    call 0
+*/    
+    newfunction runTest3
+    getlocal0
+    call 0
+
+    newfunction runTest4
+    getlocal0
+    call 0
+    
+    newfunction runTest5
+    getlocal0
+    call 0
+
+    newfunction runTest6
+    getlocal0
+    call 0
+    
+    newfunction runTest7
+    getlocal0
+    call 0
+    
+    newfunction runTest8
+    getlocal0
+    call 0
+
+    newfunction runTest9
+    getlocal0
+    call 0
+    
+    newfunction runTest10
+    getlocal0
+    call 0
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+script_info{init: main}

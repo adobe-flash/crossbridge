@@ -1,0 +1,17 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#include "avmshell-common.xcconfig"
+#include "avmshell-common64.xcconfig"
+
+GCC_PREPROCESSOR_DEFINITIONS = ${COMMON_PREPROCESSOR_DEFINITIONS} DEBUG _DEBUG
+GCC_OPTIMIZATION_LEVEL = 0
+
+// As many settings as possible should be in xcconfig, not in pbxproj.
+// See Bugzilla 668836, comment 6 for procedure for migration.
+
+COPY_PHASE_STRIP = NO
+LIBRARY_SEARCH_PATHS = $(inherited) "$(SRCROOT)/build/Debug"
+GCC_ENABLE_FIX_AND_CONTINUE = YES
+GCC_DYNAMIC_NO_PIC = NO

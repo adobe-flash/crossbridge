@@ -1,0 +1,175 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+//  Test indirect memory access instructions.
+
+/*
+ *  Initialize the memory buffer: create a ByteArray and
+ *  write 4K of zeroes into it.
+ */
+ 
+function initMemory():void
+{
+	getlocal0     	
+	pushscope     	
+
+	debugfile     	"initMemory"
+	debugline     	1
+
+	findpropstrict	{flash.utils}::ByteArray
+	constructprop 	{flash.utils}::ByteArray (0)
+	setlocal2
+
+	//  Init the loop counter.
+	pushbyte      	0
+	setlocal3
+	
+InitLoop: label         	
+
+	getlocal2
+	pushbyte      	0
+	callpropvoid  	writeByte (1)
+
+	inclocal_i	3   	
+
+	getlocal3
+	pushshort     	4096
+	iflt          	InitLoop
+	
+	//  The ByteArray is initialized, set the domain property and exit.
+	findpropstrict	{avmplus}::Domain
+	getproperty   	{avmplus}::Domain
+	getproperty   	currentDomain
+	getlocal       	2
+	setproperty   	domainMemory
+
+	findpropstrict PASS
+	pushstring "create ByteArray"
+	callpropvoid PASS 1
+
+	
+	returnvoid
+}
+
+/*
+ *  Test the MOPS instructions.
+ */
+function runTest():void
+{
+	getlocal0
+	pushscope
+
+	findpropstrict START
+	pushstring "Testing MOPS instructions"
+	callpropvoid START 1
+
+	pushshort 1000
+    setlocal0
+
+	pushshort 2000
+    setlocal1
+    
+	pushint  0x007fff80
+	getlocal0
+	si32
+
+	pushint  -128
+	getlocal1
+	si32
+
+	pushint  -1
+	getlocal1
+    pushbyte 4
+    add
+	si32
+
+	pushint  127
+	getlocal1
+    pushbyte 8
+    add
+	si32
+
+	pushint  0
+	getlocal1
+    pushbyte 12
+    add
+	si32
+
+    pushbyte 0
+    setlocal2
+
+loop: label
+
+	findpropstrict COMPARE_STRICTEQ
+	pushstring "Sign-extend 8 (neg, branchy)"
+
+    // expected
+	getlocal1
+    li32
+
+	pushbyte 255
+
+    getlocal2
+    pushbyte 1
+    ifeq naked_sx
+
+    // actual
+    pop
+	getlocal0
+	li8
+
+naked_sx:
+	sxi8
+
+	callpropvoid COMPARE_STRICTEQ 3
+
+    inclocal_i 0
+
+    inclocal_i 1
+    inclocal_i 1
+    inclocal_i 1
+    inclocal_i 1
+
+    inclocal_i 2
+
+    getlocal2
+    pushbyte 4
+    ifngt loop
+
+	findpropstrict END
+	callpropvoid END 0
+
+	returnvoid
+}
+
+
+
+function main()
+{
+	getlocal0
+	pushscope
+
+	findpropstrict START
+	pushstring "Create ByteArray"
+	callpropvoid START 1
+
+	newfunction initMemory
+	getlocal0
+	call 0
+
+	findpropstrict END
+	callpropvoid END 0
+	
+
+	newfunction runTest
+	getlocal0
+	call 0
+
+	returnvoid
+}
+
+script_info {
+	init: main
+}
+

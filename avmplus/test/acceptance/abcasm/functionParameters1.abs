@@ -1,0 +1,92 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+//  Test function parameter passing.
+//function oneParam(String)
+method_info { name:oneParam return_type:void param_type: {String} }
+
+method_body_info {
+	method: oneParam
+	code:
+	{
+		findpropstrict COMPARE_STRICTEQ
+		pushstring "String param"
+		pushstring "Param one"
+		getlocal1
+		callproperty COMPARE_STRICTEQ 3
+		returnvoid
+	}
+}
+
+function intFunc(int):int
+{
+	pushdouble 3.14157
+	getlocal1
+	add
+	returnvalue
+}
+
+
+function main()
+{
+	getlocal0
+	pushscope
+
+	findproperty oneParam
+	newfunction oneParam
+	setslot 1
+
+	findproperty intFunc
+	newfunction intFunc
+	setslot 2
+
+	findpropstrict START
+	pushstring "call void function with string"
+	callproperty START 1
+
+	getlocal0
+	pushstring "Param one"
+	callproperty oneParam 1
+
+	findpropstrict END
+	callproperty END 0
+
+	findpropstrict START
+	pushstring "call int function with int param"
+	callproperty START 1
+
+	getlocal0
+	pushbyte 4
+	callproperty intFunc 1
+	setlocal2
+
+	findpropstrict END
+	callproperty END 0
+
+	findpropstrict START
+	pushstring "Check return value"
+	callproperty START 1
+
+	findpropstrict COMPARE_STRICTEQ
+	pushstring "return value"
+	pushbyte 7
+	getlocal2
+	callproperty COMPARE_STRICTEQ 3
+
+	findpropstrict END
+	callproperty END 0
+
+	returnvoid
+}
+
+
+
+
+script_info { 
+	init: main
+	traits: {
+		trait { kind: Trait_Slot name:oneParam slot_id:1 }
+		trait { kind: Trait_Slot name:intFunc slot_id:2}
+	}
+}

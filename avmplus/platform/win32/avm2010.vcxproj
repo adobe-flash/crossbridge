@@ -1,0 +1,1063 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug_Debugger|Win32">
+      <Configuration>Debug_Debugger</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug_Debugger|x64">
+      <Configuration>Debug_Debugger</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_Debugger|Win32">
+      <Configuration>Release_Debugger</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_Debugger|x64">
+      <Configuration>Release_Debugger</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\AVMPI\float4Support.cpp" />
+    <ClCompile Include="..\..\AVMPI\AvmAssert.cpp" />
+    <ClCompile Include="..\..\AVMPI\MMgcPortWin.cpp" />
+    <ClCompile Include="..\..\AVMPI\SpyUtilsWin.cpp" />
+    <ClCompile Include="..\..\core\AbcData.cpp" />
+    <ClCompile Include="..\..\core\AbcEnv.cpp" />
+    <ClCompile Include="..\..\core\AbcParser.cpp" />
+    <ClCompile Include="..\..\core\ActionBlockConstants.cpp" />
+    <ClCompile Include="..\..\core\ArrayClass.cpp" />
+    <ClCompile Include="..\..\core\ArrayObject.cpp" />
+    <ClCompile Include="..\..\core\atom.cpp" />
+    <ClCompile Include="..\..\core\AvmSerializer.cpp" />
+    <ClCompile Include="..\..\core\d2a.cpp" />
+    <ClCompile Include="..\..\core\DictionaryGlue.cpp" />
+    <ClCompile Include="..\..\core\Float4Class.cpp" />
+    <ClCompile Include="..\..\core\FloatClass.cpp" />
+    <ClCompile Include="..\..\core\InvokerCompiler.cpp" />
+    <ClCompile Include="..\..\core\JSONClass.cpp" />
+    <ClCompile Include="..\..\core\ObjectIO.cpp" />
+    <ClCompile Include="..\..\core\ProxyGlue.cpp" />
+    <ClCompile Include="..\..\eval\eval-parse-config.cpp" />
+    <ClCompile Include="..\..\extensions\SelftestExec.cpp" />
+    <ClCompile Include="..\..\MMgc\GCPolicyManager.cpp" />
+    <ClCompile Include="..\..\MMgc\PageMap.cpp" />
+    <ClCompile Include="..\..\core\avmplusList.cpp" />
+    <ClCompile Include="..\..\core\avm.cpp" />
+    <ClCompile Include="..\..\core\AvmCore.cpp" />
+    <ClCompile Include="..\..\core\avmfeatures.cpp" />
+    <ClCompile Include="..\..\core\AvmLog.cpp" />
+    <ClCompile Include="..\..\core\avmplus.cpp" />
+    <ClCompile Include="..\..\core\avmplusDebugger.cpp" />
+    <ClCompile Include="..\..\core\avmplusDebuggerStubs.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\core\avmplusHashtable.cpp" />
+    <ClCompile Include="..\..\core\AvmPlusScriptableObject.cpp" />
+    <ClCompile Include="..\..\core\BigInteger.cpp" />
+    <ClCompile Include="..\..\core\BooleanClass.cpp" />
+    <ClCompile Include="..\..\core\BuiltinTraits.cpp" />
+    <ClCompile Include="..\..\core\CdeclThunk.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\core\ClassClass.cpp" />
+    <ClCompile Include="..\..\core\ClassClosure.cpp" />
+    <ClCompile Include="..\..\core\CodegenLIR.cpp" />
+    <ClCompile Include="..\..\core\Coder.cpp" />
+    <ClCompile Include="..\..\core\Date.cpp" />
+    <ClCompile Include="..\..\core\DateClass.cpp" />
+    <ClCompile Include="..\..\core\DateObject.cpp" />
+    <ClCompile Include="..\..\core\DescribeTypeClass.cpp" />
+    <ClCompile Include="..\..\core\Domain.cpp" />
+    <ClCompile Include="..\..\core\DomainEnv.cpp" />
+    <ClCompile Include="..\..\core\DomainMgr.cpp" />
+    <ClCompile Include="..\..\core\E4XNode.cpp" />
+    <ClCompile Include="..\..\core\ErrorClass.cpp" />
+    <ClCompile Include="..\..\core\ErrorConstants.cpp" />
+    <ClCompile Include="..\..\core\Exception.cpp" />
+    <ClCompile Include="..\..\core\exec-jit.cpp" />
+    <ClCompile Include="..\..\core\exec-osr.cpp" />
+    <ClCompile Include="..\..\core\exec-verifyall.cpp" />
+    <ClCompile Include="..\..\core\exec.cpp" />
+    <ClCompile Include="..\..\core\FrameState.cpp" />
+    <ClCompile Include="..\..\core\FunctionClass.cpp" />
+    <ClCompile Include="..\..\core\instr.cpp" />
+    <ClCompile Include="..\..\core\IntClass.cpp" />
+    <ClCompile Include="..\..\core\Interpreter.cpp" />
+    <ClCompile Include="..\..\core\LirHelper.cpp" />
+    <ClCompile Include="..\..\core\MathClass.cpp" />
+    <ClCompile Include="..\..\core\MathUtils.cpp" />
+    <ClCompile Include="..\..\core\MethodClosure.cpp" />
+    <ClCompile Include="..\..\core\MethodEnv.cpp" />
+    <ClCompile Include="..\..\core\MethodInfo.cpp" />
+    <ClCompile Include="..\..\core\Multiname.cpp" />
+    <ClCompile Include="..\..\core\MultinameHashtable.cpp" />
+    <ClCompile Include="..\..\core\Namespace.cpp" />
+    <ClCompile Include="..\..\core\NamespaceClass.cpp" />
+    <ClCompile Include="..\..\core\NamespaceSet.cpp" />
+    <ClCompile Include="..\..\core\NativeFunction.cpp" />
+    <ClCompile Include="..\..\core\NumberClass.cpp" />
+    <ClCompile Include="..\..\core\ObjectClass.cpp" />
+    <ClCompile Include="..\..\core\peephole.cpp" />
+    <ClCompile Include="..\..\core\PoolObject.cpp" />
+    <ClCompile Include="..\..\core\PrintWriter.cpp" />
+    <ClCompile Include="..\..\core\QCache.cpp" />
+    <ClCompile Include="..\..\core\RegExpClass.cpp" />
+    <ClCompile Include="..\..\core\RegExpObject.cpp" />
+    <ClCompile Include="..\..\core\Sampler.cpp" />
+    <ClCompile Include="..\..\core\ScopeChain.cpp" />
+    <ClCompile Include="..\..\core\ScriptBuffer.cpp" />
+    <ClCompile Include="..\..\core\ScriptObject.cpp" />
+    <ClCompile Include="..\..\core\StackTrace.cpp" />
+    <ClCompile Include="..\..\core\StringBuffer.cpp" />
+    <ClCompile Include="..\..\core\StringClass.cpp" />
+    <ClCompile Include="..\..\core\StringObject.cpp" />
+    <ClCompile Include="..\..\core\Toplevel.cpp" />
+    <ClCompile Include="..\..\core\Traits.cpp" />
+    <ClCompile Include="..\..\core\TypeDescriber.cpp" />
+    <ClCompile Include="..\..\core\UnicodeUtils.cpp" />
+    <ClCompile Include="..\..\core\VectorClass.cpp" />
+    <ClCompile Include="..\..\core\Verifier.cpp" />
+    <ClCompile Include="..\..\core\VTable.cpp" />
+    <ClCompile Include="..\..\core\wopcodes.cpp" />
+    <ClCompile Include="..\..\core\WordcodeEmitter.cpp" />
+    <ClCompile Include="..\..\core\WordcodeTranslator.cpp" />
+    <ClCompile Include="..\..\core\XMLClass.cpp" />
+    <ClCompile Include="..\..\core\XMLListClass.cpp" />
+    <ClCompile Include="..\..\core\XMLListObject.cpp" />
+    <ClCompile Include="..\..\core\XMLObject.cpp" />
+    <ClCompile Include="..\..\core\XMLParser16.cpp" />
+    <ClCompile Include="..\..\eval\eval-abc.cpp" />
+    <ClCompile Include="..\..\eval\eval-avmplus.cpp" />
+    <ClCompile Include="..\..\eval\eval-cogen-expr.cpp" />
+    <ClCompile Include="..\..\eval\eval-cogen-stmt.cpp" />
+    <ClCompile Include="..\..\eval\eval-cogen.cpp" />
+    <ClCompile Include="..\..\eval\eval-compile.cpp" />
+    <ClCompile Include="..\..\eval\eval-lex-xml.cpp" />
+    <ClCompile Include="..\..\eval\eval-lex.cpp" />
+    <ClCompile Include="..\..\eval\eval-parse-expr.cpp" />
+    <ClCompile Include="..\..\eval\eval-parse-stmt.cpp" />
+    <ClCompile Include="..\..\eval\eval-parse-xml.cpp" />
+    <ClCompile Include="..\..\eval\eval-parse.cpp" />
+    <ClCompile Include="..\..\eval\eval-unicode.cpp" />
+    <ClCompile Include="..\..\eval\eval-util.cpp" />
+    <ClCompile Include="..\..\extensions\SamplerScript.cpp" />
+    <ClCompile Include="..\..\extensions\Selftest.cpp" />
+    <ClCompile Include="..\..\extensions\SelftestInit.cpp" />
+    <ClCompile Include="..\..\MMgc\FixedAlloc.cpp" />
+    <ClCompile Include="..\..\MMgc\FixedMalloc.cpp" />
+    <ClCompile Include="..\..\MMgc\GC.cpp" />
+    <ClCompile Include="..\..\MMgc\GCAlloc.cpp" />
+    <ClCompile Include="..\..\MMgc\GCAllocObject.cpp" />
+    <ClCompile Include="..\..\MMgc\GCDebug.cpp" />
+    <ClCompile Include="..\..\MMgc\GCGlobalNew.cpp" />
+    <ClCompile Include="..\..\MMgc\GCHashtable.cpp" />
+    <ClCompile Include="..\..\MMgc\GCHeap.cpp" />
+    <ClCompile Include="..\..\MMgc\GCLargeAlloc.cpp" />
+    <ClCompile Include="..\..\MMgc\GCLog.cpp" />
+    <ClCompile Include="..\..\MMgc\GCMemoryProfiler.cpp" />
+    <ClCompile Include="..\..\MMgc\GCObject.cpp" />
+    <ClCompile Include="..\..\MMgc\GCStack.cpp" />
+    <ClCompile Include="..\..\MMgc\GCTests.cpp" />
+    <ClCompile Include="..\..\MMgc\GCThreads.cpp" />
+    <ClCompile Include="..\..\MMgc\ZCT.cpp" />
+    <ClCompile Include="..\..\nanojit\Allocator.cpp" />
+    <ClCompile Include="..\..\nanojit\Assembler.cpp" />
+    <ClCompile Include="..\..\nanojit\CodeAlloc.cpp" />
+    <ClCompile Include="..\..\nanojit\Containers.cpp" />
+    <ClCompile Include="..\..\nanojit\Fragmento.cpp" />
+    <ClCompile Include="..\..\nanojit\LIR.cpp" />
+    <ClCompile Include="..\..\nanojit\NativeARM.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\nanojit\Nativei386.cpp" />
+    <ClCompile Include="..\..\nanojit\NativeMIPS.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\nanojit\NativePPC.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\nanojit\NativeSparc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\nanojit\NativeX64.cpp" />
+    <ClCompile Include="..\..\nanojit\njconfig.cpp" />
+    <ClCompile Include="..\..\nanojit\RegAlloc.cpp" />
+    <ClCompile Include="..\..\other-licenses\zlib\adler32.c" />
+    <ClCompile Include="..\..\other-licenses\zlib\compress.c" />
+    <ClCompile Include="..\..\other-licenses\zlib\crc32.c" />
+    <ClCompile Include="..\..\other-licenses\zlib\deflate.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\other-licenses\zlib\gzio.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\other-licenses\zlib\infback.c" />
+    <ClCompile Include="..\..\other-licenses\zlib\inffast.c" />
+    <ClCompile Include="..\..\other-licenses\zlib\inflate.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\other-licenses\zlib\inftrees.c" />
+    <ClCompile Include="..\..\other-licenses\zlib\trees.c">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4201;4131;4127;4244</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="..\..\other-licenses\zlib\uncompr.c" />
+    <ClCompile Include="..\..\other-licenses\zlib\zutil.c" />
+    <ClCompile Include="..\..\pcre\pcre_chartables.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_compile.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_config.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_exec.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_fullinfo.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_get.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_globals.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_info.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_maketables.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_newline.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_ord2utf8.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_refcount.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_study.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_tables.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_try_flipped.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_valid_utf8.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_version.cpp" />
+    <ClCompile Include="..\..\pcre\pcre_xclass.cpp" />
+    <ClCompile Include="..\..\shell\avmshell.cpp" />
+    <ClCompile Include="..\..\shell\avmshellWin.cpp" />
+    <ClCompile Include="..\..\core\ByteArrayGlue.cpp" />
+    <ClCompile Include="..\..\shell\ConsoleOutputStream.cpp" />
+    <ClCompile Include="..\..\core\DataIO.cpp" />
+    <ClCompile Include="..\..\shell\DebugCLI.cpp" />
+    <ClCompile Include="..\..\shell\DomainClass.cpp" />
+    <ClCompile Include="..\..\shell\FileClass.cpp" />
+    <ClCompile Include="..\..\shell\FileInputStream.cpp" />
+    <ClCompile Include="..\..\shell\ShellCore.cpp" />
+    <ClCompile Include="..\..\shell\swf.cpp" />
+    <ClCompile Include="..\..\shell\SystemClass.cpp" />
+    <ClCompile Include="..\..\shell\WinFile.cpp" />
+    <ClCompile Include="..\..\vmbase\Safepoint.cpp" />
+    <ClCompile Include="..\..\vmbase\VMThread.cpp" />
+    <ClCompile Include="..\..\VMPI\GenericPortUtils.cpp" />
+    <ClCompile Include="..\..\VMPI\ThreadsWin.cpp" />
+    <ClCompile Include="..\..\VMPI\WinDebugUtils.cpp" />
+    <ClCompile Include="..\..\VMPI\WinPortUtils.cpp" />
+    <ClCompile Include="..\..\vprof\testVprofMT.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\vprof\vprof.cpp" />
+    <ClCompile Include="coff.cpp" />
+    <ClCompile Include="MathUtilsWin.cpp" />
+    <ClCompile Include="nanojit.cpp" />
+    <ClCompile Include="NativeFunctionWin.cpp" />
+    <ClCompile Include="OSDepWin.cpp" />
+    <ClCompile Include="Vtune.cpp" />
+    <ClCompile Include="win32cpuid.cpp" />
+    <ClCompile Include="win32setjmp.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\AVMPI\float4Support.h" />
+    <ClInclude Include="..\..\AVMPI\AvmAssert.h" />
+    <ClInclude Include="..\..\core\AbcEnv-inlines.h" />
+    <ClInclude Include="..\..\core\AbcEnv.h" />
+    <ClInclude Include="..\..\core\AbcParser-inlines.h" />
+    <ClInclude Include="..\..\core\AbcParser.h" />
+    <ClInclude Include="..\..\core\ActionBlockConstants.h" />
+    <ClInclude Include="..\..\core\api-versions.h" />
+    <ClInclude Include="..\..\core\ArrayClass.h" />
+    <ClInclude Include="..\..\core\ArrayObject-inlines.h" />
+    <ClInclude Include="..\..\core\ArrayObject.h" />
+    <ClInclude Include="..\..\core\atom-inlines.h" />
+    <ClInclude Include="..\..\core\atom.h" />
+    <ClInclude Include="..\..\core\AvmSerializer.h" />
+    <ClInclude Include="..\..\core\d2a.h" />
+    <ClInclude Include="..\..\core\DictionaryGlue.h" />
+    <ClInclude Include="..\..\core\Float4Class.h" />
+    <ClInclude Include="..\..\core\FloatClass.h" />
+    <ClInclude Include="..\..\core\InvokerCompiler.h" />
+    <ClInclude Include="..\..\core\JSONClass.h" />
+    <ClInclude Include="..\..\core\ObjectIO.h" />
+    <ClInclude Include="..\..\core\ProxyGlue.h" />
+    <ClInclude Include="..\..\MMgc\GCPolicyManager.h" />
+    <ClInclude Include="..\..\MMgc\PageMap.h" />
+    <ClInclude Include="..\..\core\AtomWriteBarrier.h" />
+    <ClInclude Include="..\..\core\avm.h" />
+    <ClInclude Include="..\..\core\avmbuild.h" />
+    <ClInclude Include="..\..\core\AvmCore-inlines.h" />
+    <ClInclude Include="..\..\core\AvmCore.h" />
+    <ClInclude Include="..\..\core\avmfeatures.h" />
+    <ClInclude Include="..\..\core\AvmLog.h" />
+    <ClInclude Include="..\..\core\avmplus.h" />
+    <ClInclude Include="..\..\core\avmplusDebugger.h" />
+    <ClInclude Include="..\..\core\avmplusHashtable-inlines.h" />
+    <ClInclude Include="..\..\core\avmplusHashtable.h" />
+    <ClInclude Include="..\..\core\avmplusList.h" />
+    <ClInclude Include="..\..\core\avmplusList-inlines.h" />
+    <ClInclude Include="..\..\core\avmplusList-impl.h" />
+    <ClInclude Include="..\..\core\avmplusProfiler.h" />
+    <ClInclude Include="..\..\core\AvmPlusScriptableObject.h" />
+    <ClInclude Include="..\..\core\avmplusStack.h" />
+    <ClInclude Include="..\..\core\avmplusVersion.h" />
+    <ClInclude Include="..\..\core\BigInteger.h" />
+    <ClInclude Include="..\..\core\BitSet.h" />
+    <ClInclude Include="..\..\core\BooleanClass.h" />
+    <ClInclude Include="..\..\core\BuiltinNatives.h" />
+    <ClInclude Include="..\..\core\BuiltinTraits.h" />
+    <ClInclude Include="..\..\core\CdeclThunk.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\core\ClassClass.h" />
+    <ClInclude Include="..\..\core\ClassClosure-inlines.h" />
+    <ClInclude Include="..\..\core\ClassClosure.h" />
+    <ClInclude Include="..\..\core\CodeContext.h" />
+    <ClInclude Include="..\..\core\CodegenLIR-inlines.h" />
+    <ClInclude Include="..\..\core\CodegenLIR.h" />
+    <ClInclude Include="..\..\core\Coder-inlines.h" />
+    <ClInclude Include="..\..\core\Coder.h" />
+    <ClInclude Include="..\..\core\Date.h" />
+    <ClInclude Include="..\..\core\DateClass.h" />
+    <ClInclude Include="..\..\core\DateObject.h" />
+    <ClInclude Include="..\..\core\DescribeTypeClass.h" />
+    <ClInclude Include="..\..\core\Domain.h" />
+    <ClInclude Include="..\..\core\DomainEnv.h" />
+    <ClInclude Include="..\..\core\DomainMgr.h" />
+    <ClInclude Include="..\..\core\E4XNode.h" />
+    <ClInclude Include="..\..\core\ErrorClass.h" />
+    <ClInclude Include="..\..\core\ErrorConstants.h" />
+    <ClInclude Include="..\..\core\Exception.h" />
+    <ClInclude Include="..\..\core\exec-inlines.h" />
+    <ClInclude Include="..\..\core\exec.h" />
+    <ClInclude Include="..\..\core\FrameState-inlines.h" />
+    <ClInclude Include="..\..\core\FrameState.h" />
+    <ClInclude Include="..\..\core\FunctionClass.h" />
+    <ClInclude Include="..\..\core\instr-inlines.h" />
+    <ClInclude Include="..\..\core\instr.h" />
+    <ClInclude Include="..\..\core\IntClass.h" />
+    <ClInclude Include="..\..\core\Interpreter.h" />
+    <ClInclude Include="..\..\core\jit-calls.h" />
+    <ClInclude Include="..\..\core\LirHelper-inlines.h" />
+    <ClInclude Include="..\..\core\LirHelper.h" />
+    <ClInclude Include="..\..\core\MathClass.h" />
+    <ClInclude Include="..\..\core\MathUtils.h" />
+    <ClInclude Include="..\..\core\MethodClosure.h" />
+    <ClInclude Include="..\..\core\MethodEnv-inlines.h" />
+    <ClInclude Include="..\..\core\MethodEnv.h" />
+    <ClInclude Include="..\..\core\MethodInfo-inlines.h" />
+    <ClInclude Include="..\..\core\MethodInfo.h" />
+    <ClInclude Include="..\..\core\Multiname-inlines.h" />
+    <ClInclude Include="..\..\core\Multiname.h" />
+    <ClInclude Include="..\..\core\MultinameHashtable-inlines.h" />
+    <ClInclude Include="..\..\core\MultinameHashtable.h" />
+    <ClInclude Include="..\..\core\Namespace.h" />
+    <ClInclude Include="..\..\core\NamespaceClass.h" />
+    <ClInclude Include="..\..\core\NamespaceSet-inlines.h" />
+    <ClInclude Include="..\..\core\NamespaceSet.h" />
+    <ClInclude Include="..\..\core\NativeFunction.h" />
+    <ClInclude Include="..\..\core\NativeObjectHelpers.h" />
+    <ClInclude Include="..\..\core\NumberClass.h" />
+    <ClInclude Include="..\..\core\ObjectClass.h" />
+    <ClInclude Include="..\..\core\OSDep.h" />
+    <ClInclude Include="..\..\core\OutputStream.h" />
+    <ClInclude Include="..\..\core\PoolObject-inlines.h" />
+    <ClInclude Include="..\..\core\PoolObject.h" />
+    <ClInclude Include="..\..\core\PrintWriter.h" />
+    <ClInclude Include="..\..\core\QCache.h" />
+    <ClInclude Include="..\..\core\RegExpClass.h" />
+    <ClInclude Include="..\..\core\RegExpObject.h" />
+    <ClInclude Include="..\..\core\Sampler.h" />
+    <ClInclude Include="..\..\core\ScopeChain-inlines.h" />
+    <ClInclude Include="..\..\core\ScopeChain.h" />
+    <ClInclude Include="..\..\core\ScriptBuffer.h" />
+    <ClInclude Include="..\..\core\ScriptObject.h" />
+    <ClInclude Include="..\..\core\SortedMap.h" />
+    <ClInclude Include="..\..\core\StackTrace.h" />
+    <ClInclude Include="..\..\core\StringBuffer.h" />
+    <ClInclude Include="..\..\core\StringClass.h" />
+    <ClInclude Include="..\..\core\StringObject.h" />
+    <ClInclude Include="..\..\core\Toplevel-inlines.h" />
+    <ClInclude Include="..\..\core\Toplevel.h" />
+    <ClInclude Include="..\..\core\Traits-inlines.h" />
+    <ClInclude Include="..\..\core\Traits.h" />
+    <ClInclude Include="..\..\core\TraitsIterator.h" />
+    <ClInclude Include="..\..\core\TypeDescriber.h" />
+    <ClInclude Include="..\..\core\UnicodeUtils.h" />
+    <ClInclude Include="..\..\core\VectorClass.h" />
+    <ClInclude Include="..\..\core\Verifier-inlines.h" />
+    <ClInclude Include="..\..\core\Verifier.h" />
+    <ClInclude Include="..\..\core\VTable-inlines.h" />
+    <ClInclude Include="..\..\core\VTable.h" />
+    <ClInclude Include="..\..\core\wopcodes.h" />
+    <ClInclude Include="..\..\core\WordcodeEmitter.h" />
+    <ClInclude Include="..\..\core\WordcodeTranslator.h" />
+    <ClInclude Include="..\..\core\XMLClass.h" />
+    <ClInclude Include="..\..\core\XMLListClass.h" />
+    <ClInclude Include="..\..\core\XMLListObject.h" />
+    <ClInclude Include="..\..\core\XMLObject.h" />
+    <ClInclude Include="..\..\core\XMLParser16.h" />
+    <ClInclude Include="..\..\eval\eval-abc-inlines.h" />
+    <ClInclude Include="..\..\eval\eval-abc.h" />
+    <ClInclude Include="..\..\eval\eval-avmplus.h" />
+    <ClInclude Include="..\..\eval\eval-cogen-inlines.h" />
+    <ClInclude Include="..\..\eval\eval-cogen.h" />
+    <ClInclude Include="..\..\eval\eval-compile.h" />
+    <ClInclude Include="..\..\eval\eval-lex-inlines.h" />
+    <ClInclude Include="..\..\eval\eval-lex.h" />
+    <ClInclude Include="..\..\eval\eval-parse-inlines.h" />
+    <ClInclude Include="..\..\eval\eval-parse.h" />
+    <ClInclude Include="..\..\eval\eval-unicode.h" />
+    <ClInclude Include="..\..\eval\eval-util-inlines.h" />
+    <ClInclude Include="..\..\eval\eval-util.h" />
+    <ClInclude Include="..\..\eval\eval.h" />
+    <ClInclude Include="..\..\extensions\SamplerScript.h" />
+    <ClInclude Include="..\..\extensions\Selftest.h" />
+    <ClInclude Include="..\..\extensions\SelftestClasses.h" />
+    <ClInclude Include="..\..\MMgc\AllocationMacros.h" />
+    <ClInclude Include="..\..\MMgc\BasicList.h" />
+    <ClInclude Include="..\..\MMgc\FixedAlloc-inlines.h" />
+    <ClInclude Include="..\..\MMgc\FixedAlloc.h" />
+    <ClInclude Include="..\..\MMgc\FixedMalloc-inlines.h" />
+    <ClInclude Include="..\..\MMgc\FixedMalloc.h" />
+    <ClInclude Include="..\..\MMgc\GC-inlines.h" />
+    <ClInclude Include="..\..\MMgc\GC.h" />
+    <ClInclude Include="..\..\MMgc\GCAlloc-inlines.h" />
+    <ClInclude Include="..\..\MMgc\GCAlloc.h" />
+    <ClInclude Include="..\..\MMgc\GCAllocObject.h" />
+    <ClInclude Include="..\..\MMgc\GCDebug.h" />
+    <ClInclude Include="..\..\MMgc\GCGlobalNew.h" />
+    <ClInclude Include="..\..\MMgc\GCHashtable-inlines.h" />
+    <ClInclude Include="..\..\MMgc\GCHashtable.h" />
+    <ClInclude Include="..\..\MMgc\GCHeap.h" />
+    <ClInclude Include="..\..\MMgc\GCLargeAlloc-inlines.h" />
+    <ClInclude Include="..\..\MMgc\GCLargeAlloc.h" />
+    <ClInclude Include="..\..\MMgc\GCLog.h" />
+    <ClInclude Include="..\..\MMgc\GCMemoryProfiler.h" />
+    <ClInclude Include="..\..\MMgc\GCObject.h" />
+    <ClInclude Include="..\..\MMgc\GCSpinLock.h" />
+    <ClInclude Include="..\..\MMgc\GCStack.h" />
+    <ClInclude Include="..\..\MMgc\GCTests.h" />
+    <ClInclude Include="..\..\MMgc\GCThreadLocal.h" />
+    <ClInclude Include="..\..\MMgc\GCThreads.h" />
+    <ClInclude Include="..\..\MMgc\GCTypes.h" />
+    <ClInclude Include="..\..\MMgc\GCWeakRef.h" />
+    <ClInclude Include="..\..\MMgc\HeapGraph.h" />
+    <ClInclude Include="..\..\MMgc\MMgc.h" />
+    <ClInclude Include="..\..\MMgc\OOM.h" />
+    <ClInclude Include="..\..\MMgc\StaticAssert.h" />
+    <ClInclude Include="..\..\MMgc\TypeTraits.h" />
+    <ClInclude Include="..\..\MMgc\WriteBarrier.h" />
+    <ClInclude Include="..\..\MMgc\ZCT-inlines.h" />
+    <ClInclude Include="..\..\MMgc\ZCT.h" />
+    <ClInclude Include="..\..\nanojit\Allocator.h" />
+    <ClInclude Include="..\..\nanojit\Assembler.h" />
+    <ClInclude Include="..\..\nanojit\CodeAlloc.h" />
+    <ClInclude Include="..\..\nanojit\Containers.h" />
+    <ClInclude Include="..\..\nanojit\Fragmento.h" />
+    <ClInclude Include="..\..\nanojit\LIR.h" />
+    <ClInclude Include="..\..\nanojit\nanojit.h" />
+    <ClInclude Include="..\..\nanojit\Native.h" />
+    <ClInclude Include="..\..\nanojit\NativeARM.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\nanojit\Nativei386.h" />
+    <ClInclude Include="..\..\nanojit\NativeMIPS.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\nanojit\NativePPC.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\nanojit\NativeSparc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\nanojit\NativeX64.h" />
+    <ClInclude Include="..\..\nanojit\njconfig.h" />
+    <ClInclude Include="..\..\nanojit\njcpudetect.h" />
+    <ClInclude Include="..\..\nanojit\RegAlloc.h" />
+    <ClInclude Include="..\..\other-licenses\zlib\crc32.h" />
+    <ClInclude Include="..\..\other-licenses\zlib\deflate.h" />
+    <ClInclude Include="..\..\other-licenses\zlib\inffast.h" />
+    <ClInclude Include="..\..\other-licenses\zlib\inffixed.h" />
+    <ClInclude Include="..\..\other-licenses\zlib\inflate.h" />
+    <ClInclude Include="..\..\other-licenses\zlib\inftrees.h" />
+    <ClInclude Include="..\..\other-licenses\zlib\mozzconf.h" />
+    <ClInclude Include="..\..\other-licenses\zlib\trees.h" />
+    <ClInclude Include="..\..\other-licenses\zlib\zconf.h" />
+    <ClInclude Include="..\..\other-licenses\zlib\zlib.h" />
+    <ClInclude Include="..\..\other-licenses\zlib\zutil.h" />
+    <ClInclude Include="..\..\pcre\config.h" />
+    <ClInclude Include="..\..\pcre\pcre.h" />
+    <ClInclude Include="..\..\pcre\pcre_avmplus.h" />
+    <ClInclude Include="..\..\pcre\pcre_internal.h" />
+    <ClInclude Include="..\..\pcre\ucp.h" />
+    <ClInclude Include="..\..\pcre\ucpinternal.h" />
+    <ClInclude Include="..\..\shell\avmshell-features.h" />
+    <ClInclude Include="..\..\shell\avmshell.h" />
+    <ClInclude Include="..\..\core\ByteArrayGlue.h" />
+    <ClInclude Include="..\..\shell\ConsoleOutputStream.h" />
+    <ClInclude Include="..\..\core\DataIO.h" />
+    <ClInclude Include="..\..\shell\DebugCLI.h" />
+    <ClInclude Include="..\..\shell\DomainClass.h" />
+    <ClInclude Include="..\..\shell\File.h" />
+    <ClInclude Include="..\..\shell\FileClass.h" />
+    <ClInclude Include="..\..\shell\FileInputStream.h" />
+    <ClInclude Include="..\..\shell\Platform.h" />
+    <ClInclude Include="..\..\shell\Profiler.h" />
+    <ClInclude Include="..\..\shell\ShellCore.h" />
+    <ClInclude Include="..\..\shell\SystemClass.h" />
+    <ClInclude Include="..\..\shell\WinFile.h" />
+    <ClInclude Include="..\..\vmbase\Safepoint-inlines.h" />
+    <ClInclude Include="..\..\vmbase\Safepoint.h" />
+    <ClInclude Include="..\..\vmbase\VMThread-inlines.h" />
+    <ClInclude Include="..\..\vmbase\VMThread.h" />
+    <ClInclude Include="..\..\VMPI\VMPI.h" />
+    <ClInclude Include="..\..\vprof\vprof.h" />
+    <ClInclude Include="..\system-selection.h" />
+    <ClInclude Include="coff.h" />
+    <ClInclude Include="win32-platform.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="win64setjmp.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">ml64.exe /Fo$(IntDir)\win64setjmp.obj /c /Fl$(IntDir)win64setjmp.cod %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">building %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">$(IntDir)\win64setjmp.obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ml64.exe /Fo$(IntDir)\win64setjmp.obj /c /Fl$(IntDir)win64setjmp.cod %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">building %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)\win64setjmp.obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">ml64.exe /Fo$(IntDir)\win64setjmp.obj /c /Fl$(IntDir)win64setjmp.cod %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">building %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">$(IntDir)\win64setjmp.obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ml64.exe /Fo$(IntDir)\win64setjmp.obj /c /Fl$(IntDir)win64setjmp.cod %(FullPath)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">building %(Identity)...</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)\win64setjmp.obj</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{CA852ACB-0BC8-4B48-A52A-FA48D332C361}</ProjectGuid>
+    <RootNamespace>avm2010</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)obj2010\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>avm</TargetName>
+    <IntDir>$(SolutionDir)obj2010\$(Configuration)\int\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)obj2010\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <TargetName>avm</TargetName>
+    <IntDir>$(SolutionDir)obj2010\$(Configuration)\int\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">
+    <OutDir>$(SolutionDir)obj2010\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">
+    <TargetName>avm</TargetName>
+    <IntDir>$(SolutionDir)obj2010\$(Configuration)\int\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">
+    <OutDir>$(SolutionDir)obj2010\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">
+    <TargetName>avm</TargetName>
+    <IntDir>$(SolutionDir)obj2010\$(Configuration)\int\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>avm</TargetName>
+    <OutDir>$(SolutionDir)obj2010\$(Configuration)64\</OutDir>
+    <IntDir>$(SolutionDir)obj2010\$(Configuration)64\int\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>avm</TargetName>
+    <OutDir>$(SolutionDir)obj2010\$(Configuration)64\</OutDir>
+    <IntDir>$(SolutionDir)obj2010\$(Configuration)64\int\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">
+    <TargetName>avm</TargetName>
+    <OutDir>$(SolutionDir)obj2010\$(Configuration)64\</OutDir>
+    <IntDir>$(SolutionDir)obj2010\$(Configuration)64\int\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">
+    <TargetName>avm</TargetName>
+    <OutDir>$(SolutionDir)obj2010\$(Configuration)64\</OutDir>
+    <IntDir>$(SolutionDir)obj2010\$(Configuration)64\int\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\generated;..\..\VMPI;..\..\AVMPI;..\..\vmbase;..\..\shell;..\..\extensions;..\..\MMgc;..\..\other-licenses\zlib;..\..\core;..\..\eval;..\..\pcre;..\..\nanojit;.;..</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAsManaged>false</CompileAsManaged>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32_LEAN_AND_MEAN;AVMSHELL_BUILD;WIN32;_CONSOLE;USE_REAL2INT;_UNICODE;UNICODE;AVMFEATURE_SELFTEST=1;AVMFEATURE_EVAL=1;AVMFEATURE_SWF12=1;AVMFEATURE_SWF13=1;AVMFEATURE_SWF14=1;AVMFEATURE_SWF15=1;AVMFEATURE_SWF16=1;AVMFEATURE_JIT=1;AVMTWEAK_EXACT_TRACING=1;AVMTWEAK_SELECTABLE_EXACT_TRACING=0;%(PreprocessorDefinitions);_DEBUG</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4201;4131;4127</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <AssemblyDebug>true</AssemblyDebug>
+      <LargeAddressAware>true</LargeAddressAware>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\generated;..\..\VMPI;..\..\AVMPI;..\..\vmbase;..\..\shell;..\..\extensions;..\..\MMgc;..\..\other-licenses\zlib;..\..\core;..\..\eval;..\..\pcre;..\..\nanojit;.;..</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAsManaged>false</CompileAsManaged>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32_LEAN_AND_MEAN;AVMSHELL_BUILD;WIN32;_CONSOLE;USE_REAL2INT;_UNICODE;UNICODE;AVMFEATURE_SELFTEST=1;AVMFEATURE_EVAL=1;AVMFEATURE_SWF12=1;AVMFEATURE_SWF13=1;AVMFEATURE_SWF14=1;AVMFEATURE_SWF15=1;AVMFEATURE_SWF16=1;AVMFEATURE_JIT=1;AVMTWEAK_EXACT_TRACING=1;%(PreprocessorDefinitions);_DEBUG;DEBUGGER</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4201;4131;4127</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <AssemblyDebug>true</AssemblyDebug>
+      <LargeAddressAware>true</LargeAddressAware>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\generated;..\..\AVMPI;..\..\VMPI;..\..\vmbase;..\..\shell;..\..\extensions;..\..\MMgc;..\..\other-licenses\zlib;..\..\core;..\..\eval;..\..\pcre;..\..\nanojit;.;..</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAsManaged>false</CompileAsManaged>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32_LEAN_AND_MEAN;AVMSHELL_BUILD;WIN32;_CONSOLE;USE_REAL2INT;_UNICODE;UNICODE;AVMFEATURE_SELFTEST=1;AVMFEATURE_EVAL=1;AVMFEATURE_SWF12=1;AVMFEATURE_SWF13=1;AVMFEATURE_SWF14=1;AVMFEATURE_SWF15=1;AVMFEATURE_SWF16=1;AVMFEATURE_JIT=1;AVMTWEAK_EXACT_TRACING=1;%(PreprocessorDefinitions);_DEBUG</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4201;4131;4127</DisableSpecificWarnings>
+      <OmitFramePointers>false</OmitFramePointers>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <AssemblyDebug>true</AssemblyDebug>
+      <LargeAddressAware>true</LargeAddressAware>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Debugger|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\generated;..\..\AVMPI;..\..\VMPI;..\..\vmbase;..\..\shell;..\..\extensions;..\..\MMgc;..\..\other-licenses\zlib;..\..\core;..\..\eval;..\..\pcre;..\..\nanojit;.;..</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAsManaged>false</CompileAsManaged>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32_LEAN_AND_MEAN;AVMSHELL_BUILD;WIN32;_CONSOLE;USE_REAL2INT;_UNICODE;UNICODE;AVMFEATURE_SELFTEST=1;AVMFEATURE_EVAL=1;AVMFEATURE_SWF12=1;AVMFEATURE_SWF13=1;AVMFEATURE_SWF14=1;AVMFEATURE_SWF15=1;AVMFEATURE_SWF16=1;AVMFEATURE_JIT=1;AVMTWEAK_EXACT_TRACING=1;%(PreprocessorDefinitions);_DEBUG;DEBUGGER</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4201;4131;4127</DisableSpecificWarnings>
+      <OmitFramePointers>false</OmitFramePointers>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateMapFile>true</GenerateMapFile>
+      <AssemblyDebug>true</AssemblyDebug>
+      <LargeAddressAware>true</LargeAddressAware>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <AdditionalIncludeDirectories>..\..\generated;..\..\VMPI;..\..\AVMPI;..\..\vmbase;..\..\shell;..\..\extensions;..\..\MMgc;..\..\other-licenses\zlib;..\..\core;..\..\eval;..\..\pcre;..\..\nanojit;.;..</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAsManaged>false</CompileAsManaged>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32_LEAN_AND_MEAN;AVMSHELL_BUILD;WIN32;_CONSOLE;USE_REAL2INT;_UNICODE;UNICODE;AVMFEATURE_SELFTEST=1;AVMFEATURE_EVAL=1;AVMFEATURE_SWF12=1;AVMFEATURE_SWF13=1;AVMFEATURE_SWF14=1;AVMFEATURE_SWF15=1;AVMFEATURE_SWF16=1;AVMFEATURE_JIT=1;AVMTWEAK_EXACT_TRACING=1;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4201;4131;4127</DisableSpecificWarnings>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateMapFile>true</GenerateMapFile>
+      <AssemblyDebug>true</AssemblyDebug>
+      <LargeAddressAware>true</LargeAddressAware>
+      <AdditionalDependencies>winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <AdditionalIncludeDirectories>..\..\generated;..\..\VMPI;..\..\AVMPI;..\..\vmbase;..\..\shell;..\..\extensions;..\..\MMgc;..\..\other-licenses\zlib;..\..\core;..\..\eval;..\..\pcre;..\..\nanojit;.;..</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAsManaged>false</CompileAsManaged>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32_LEAN_AND_MEAN;AVMSHELL_BUILD;WIN32;_CONSOLE;USE_REAL2INT;_UNICODE;UNICODE;AVMFEATURE_SELFTEST=1;AVMFEATURE_EVAL=1;AVMFEATURE_SWF12=1;AVMFEATURE_SWF13=1;AVMFEATURE_SWF14=1;AVMFEATURE_SWF15=1;AVMFEATURE_SWF16=1;AVMFEATURE_JIT=1;AVMTWEAK_EXACT_TRACING=1;%(PreprocessorDefinitions);NDEBUG;DEBUGGER</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4201;4131;4127</DisableSpecificWarnings>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateMapFile>true</GenerateMapFile>
+      <AssemblyDebug>true</AssemblyDebug>
+      <LargeAddressAware>true</LargeAddressAware>
+      <AdditionalDependencies>winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <AdditionalIncludeDirectories>..\..\generated;..\..\AVMPI;..\..\VMPI;..\..\vmbase;..\..\shell;..\..\extensions;..\..\MMgc;..\..\other-licenses\zlib;..\..\core;..\..\eval;..\..\pcre;..\..\nanojit;.;..</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAsManaged>false</CompileAsManaged>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32_LEAN_AND_MEAN;AVMSHELL_BUILD;WIN32;_CONSOLE;USE_REAL2INT;_UNICODE;UNICODE;AVMFEATURE_SELFTEST=1;AVMFEATURE_EVAL=1;AVMFEATURE_SWF12=1;AVMFEATURE_SWF13=1;AVMFEATURE_SWF14=1;AVMFEATURE_SWF15=1;AVMFEATURE_SWF16=1;AVMFEATURE_JIT=1;AVMTWEAK_EXACT_TRACING=1;%(PreprocessorDefinitions);NDEBUG</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4201;4131;4127</DisableSpecificWarnings>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>false</OmitFramePointers>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateMapFile>true</GenerateMapFile>
+      <AssemblyDebug>true</AssemblyDebug>
+      <LargeAddressAware>true</LargeAddressAware>
+      <AdditionalDependencies>winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_Debugger|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <AdditionalIncludeDirectories>..\..\generated;..\..\AVMPI;..\..\VMPI;..\..\vmbase;..\..\shell;..\..\extensions;..\..\MMgc;..\..\other-licenses\zlib;..\..\core;..\..\eval;..\..\pcre;..\..\nanojit;.;..</AdditionalIncludeDirectories>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAsManaged>false</CompileAsManaged>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_DEPRECATE;WIN32_LEAN_AND_MEAN;AVMSHELL_BUILD;WIN32;_CONSOLE;USE_REAL2INT;_UNICODE;UNICODE;AVMFEATURE_SELFTEST=1;AVMFEATURE_EVAL=1;AVMFEATURE_SWF12=1;AVMFEATURE_SWF13=1;AVMFEATURE_SWF14=1;AVMFEATURE_SWF15=1;AVMFEATURE_SWF16=1;AVMFEATURE_JIT=1;AVMTWEAK_EXACT_TRACING=1;%(PreprocessorDefinitions);NDEBUG;DEBUGGER</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ExceptionHandling>false</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4201;4131;4127</DisableSpecificWarnings>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <OmitFramePointers>false</OmitFramePointers>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateMapFile>true</GenerateMapFile>
+      <AssemblyDebug>true</AssemblyDebug>
+      <LargeAddressAware>true</LargeAddressAware>
+      <AdditionalDependencies>winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

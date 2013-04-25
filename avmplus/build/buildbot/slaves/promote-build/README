@@ -1,0 +1,12 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+Installation notes for the promote-build slave
+----------------------------------------------
+
+The promote-build slave does NOT reclone the tamarin-redux repo on every build
+so it must be cloned manually during slave setup:
+
+1. cd to the buildbot/promote-slave dir on the slave machine
+2. hg clone http://asteam.corp.adobe.com/hg/tamarin-redux/ repo

@@ -1,0 +1,50 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page ifstricteq 
+
+\addindex ifstricteq
+
+
+\section ifstricteq ifstricteq
+
+\subsection operation Operation
+
+Branch if the first value is equal to the second value.
+
+\subsection format Format
+
+\code
+ifstricteq
+offset
+\endcode
+
+\subsection forms Forms
+\code
+ifstricteq = 24 (0x19)
+\endcode
+\subsection stack Stack
+
+\code
+..., value1, value2 => ...
+\endcode
+
+\subsection description Description
+
+offset is an s24 that is the number of bytes to jump if value1 is equal to value2.
+
+Compute value1 === value2 using the strict equality comparison algorithm in ECMA-262 
+section 11.9.6. If the result of the comparison is true, jump the number of bytes 
+indicated by offset. Otherwise continue executing code from this point.
+
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

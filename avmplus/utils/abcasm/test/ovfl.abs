@@ -1,0 +1,74 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+function main()
+{
+	getlocal0
+	pushscope
+    newfunction 1
+	getlocal0
+	call(0)
+	returnvoid
+
+}
+
+function jitover()
+{
+    pushint 0x7f000001
+	pushint 0x01000001
+	add
+	dup
+	dup
+	setlocal1
+	coerce_i
+	setlocal2
+	setlocal3
+
+	pushstring "stored, not yet incremented="
+	findpropstrict print
+	swap
+	getlocal3
+	add
+	callproperty {package}::print (1)
+
+	inclocal_i 3
+
+	pushstring "floating-point 0x7f000001 + 0x01000001="
+	findpropstrict print
+	swap
+	getlocal1
+	add
+	callproperty {package,private}::print (1)
+
+	pushstring "converted to fixed_point="
+	findpropstrict print
+	swap
+	getlocal2
+	add
+	callproperty {package,private}::print (1)
+
+	pushstring "stored and incremented="
+	findpropstrict print
+	swap
+	getlocal3
+	add
+	callproperty {package}::print (1)
+
+	pushint 0x7f000001
+	pushint 0x01000001
+	add
+	dup
+	setlocal1
+	increment_i 1
+	setlocal2
+
+	pushstring "temp result was later incremented="
+	findpropstrict print
+	swap
+	getlocal1
+	add
+	callproperty {package}::print (1)
+
+
+	returnvoid
+}

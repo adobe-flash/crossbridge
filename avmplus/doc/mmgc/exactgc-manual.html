@@ -1,0 +1,779 @@
+<!--
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+-->
+<html>
+
+<head>
+<title>Manual for Exact GC</title>
+</head>
+
+<body>
+<h1><center>Partly Exact GC Support in MMgc
+<br>
+<em>and</em>
+<br>
+All There Is to Know About Writing Annotations</center></h1>
+
+<P> <center> (Largely complete draft, 2011-03-01)</center>
+
+<P> MMgc provides a facility that allows classes to opt-in to "exact
+GC" during garbage collection.  "Exact GC" means that
+information added to the class by the programmer is used by the
+garbage collector to find members of the class that may contain
+GC-pointers (pointers to "GC-allocated", aka "managed", objects), and
+to understand how those members should be interpreted.  Regions of the
+object that cannot contain GC-pointers are ignored by the garbage
+collector.
+
+<P> Before you read this manual you should at least skim
+the <a href="exactgc-cookbook.html">cookbook</a>, which serves as a
+gentle introduction and covers many simple situations with a minimum
+of fuss.
+
+<P> The specially interested may also wish to read
+the <a href="exactgc-architecture.html">architecture document</a>.
+
+<h2> Table of contents </h2>
+
+<a href="#definitions">Definitions</a><br>
+<a href="#overview">Overview</a><br>
+<a href="#rules">Object invariants</a><br>
+<a href="#reference-manual">Reference manual for the annotation system</a><br>
+  <div style="padding-left: 1em">
+  <a href="#adding-gc-annotations">Adding GC annotations to your C++ and AS3 classes</a></br>
+     <div style="padding-left: 1em">
+     <a href="#class-annotations-as3">Class annotations - AS3 side</a><br>
+     <a href="#class-annotations-cpp">Class annotations - C++ side</a><br>
+     <a href="#data-regions">Data annotations - Data regions</a><br>
+     <a href="#data-members">Data annotations - Data members</a><br>
+     <a href="#data-conditional">Data annotations - Conditional compilation</a><br>
+     </div>
+  <a href="#error-checking">Error checking</a><br>
+     <div style="padding-left: 1em">
+     <a href="#correspondences">Correspondences</a><br>
+     <a href="#interlocks">Interlocks</a><br>
+     <a href="#assertions">Assertions</a><br>
+     <a href="#safetynet">Safety Net</a><br>
+     </div>
+  <a href="#limitations">Limitations of the annotation system</a><br>
+  </div>
+<a href="#manual-tracers">Writing manual tracers</a><br>
+<a href="#object-construction">Setting up your construction code</a><br>
+<a href="#roots">Root objects</a><br>
+<a href="#script-running">Running the exactgc.as script, and other scripts</a><br>
+<a href="#vtable-not-affordable">What to do when a vtable is not affordable or possible</a><br>
+<a href="#alloc-and-calloc">How to handle GC::Alloc and GC::Calloc</a><br>
+<a href="#templates">Dealing with templates</a><br>
+<a href="#stacks">Dealing with stack frames</a><br>
+<a href="#roots">Dealing with roots</a><br>
+<a href="#notes">Notes</a><br>
+  <div style="padding-left: 1em">
+  <a href="#mi"> Multiple inheritance </a><br>
+  <a href="#extensions">Obvious (unimplemented) extensions</a><br>
+  </div>
+
+<a name="definitions">
+<h2>Definitions</h2>
+
+<dl>
+<dt><b>Pointer-sized</b>
+<dd><P> Has as many bytes as a pointer.  We assume every pointer is the same size and
+     is the same size as <tt>intptr_t</tt> and <tt>uintptr_t</tt>.
+
+<dt><b>NULL</b>
+<dd><P> A NULL pointer is a pointer represented by all-bits-zero following tag removal,
+    if appropriate.
+
+<dt><b>Tagged pointer, untagged pointer</b>
+<dd><P> A <em>tagged pointer</em> is a pointer whose low-order three bits
+    are to be interpreted not as part of the pointer but as
+    information about the pointer (for example, about the kind of
+    object it is pointing to).  An <em>untagged pointer</em> has
+    the low three bits set to zero.  (In some cases a tag of zero
+    has an interpretation other than "tag absent", but that does not
+    matter here.)
+
+<dt><b>GC-object</b>
+<dd><P>A <em>GC-object</em> is an object that derives from GCObject,
+    GCFinalizedObject, RCObject, or GCTraceableObject, or which is
+    allocated by one of the <tt>new</tt> operators of those classes or
+    by a GC allocator function, such as GC::Alloc or GC::Calloc.
+    GC-objects are also called <em>managed objects</em>.
+
+<dt><b>GC-pointer</b>
+<dd><P>A <em>GC-pointer</em> is, strictly speaking, an untagged pointer to 
+    the start of a GC-object.  Loosely the term is also used about tagged 
+    pointers when the tag correctly identifies the the pointed-to type, or
+    when the tag does not carry type information.
+
+<dt><b>Atom</b>
+<dd><P>An <em>Atom</em> is a tagged pointer-sized datum that may or may not be
+    a GC-pointer when untagged; whether it is or not depends on the value of its tag.
+    It is tagged with one of the distinguished atom tags in AVM+, and 
+    follows the rules of those atom tags.  Some tags are pointer tags and
+    some are not.  For example, if the tag is kStringType then the
+    pointer value without the tag is either NULL or a non-dangling pointer 
+    to a instance of avmplus::String.
+
+<dt><b>Dangling pointer</b>
+<dd> <P>A <em>dangling pointer</em> is a pointer which, when untagged, does not
+     point to the start of a GC-object; if it is a tagged pointer it can also
+     be a pointer that points to the start of a GC-ob ject but whose tag does
+     not correctly designate the type of the pointed-to object.
+
+<dt><b>Trailing array</b>
+<dd> <P>A <em>trailing array</em> in a GC-object is an array of
+     elements allocated beyond the bound of the object (relative to
+     how the object was defined in C++).  The trailing array is always
+     the last element in the object.  Usually, the array is defined as
+     having length 1 at the end of the object.
+</dl>
+
+<a name="overview">
+<h2>Overview</h2>
+
+<P> The primary problems of exact GC is that the GC must be able to
+discover whether an object is to be examined ("traced") exactly or
+not, and if it is, it must be able to find the object's
+pointer-containing fields quickly and examine them appropriately,
+depending on whether they're tagged or not and perhaps depending on
+the tagging system.
+
+<P> Exact GC is fundamentally based on a new base
+class, <tt>GCTraceableBase</tt>, which is the topmost base class
+for <tt>GCFinalizedObject</tt> and <tt>RCObject</tt> as well as for a
+new class <tt>GCTraceableObject</tt>.  <tt>GCTraceableBase</tt>
+provides a single virtual method called <tt>gcTrace</tt> which the GC
+will call in order to determine and examine pointer fields.  A bit in
+the object's metainformation, called <tt>kVirtualGCTrace</tt>, is set
+at construction time if the object implements the exact tracing
+protocol.  It is by setting this bit that the construction code for a
+class instance opts into exact tracing for that instance.
+
+<P> When the <tt>gcTrace</tt> method is called by the GC it must call
+back into the GC with information about the fields in the object that
+need to be examined by the GC, and how they need to be examined.  In
+the simple case of a pointer field the callback passes the address of
+the pointer fields to <tt>GC::TraceLocation</tt>, but there are many
+callbacks, corresponding to various situations (Atom values, ad-hoc
+tagged pointers, and ambiguous values).  Callbacks also exist for
+arrays of pointers and Atoms.  Additionally, the <tt>gcTrace</tt>
+method must behave properly to ensure GC incrementality, by scanning
+large arrays of values in a piecemeal manner.
+
+<P> In practice it is error prone to write tracer methods by hand and
+we've created a fairly simple <em>annotation system</em> that covers most
+common cases.  With the annotation system, the programmer annotates
+the C++ code for a class (and the AS3 code, if there's a user-facing
+AS3 class) and runs a script that generates the tracer code for the
+class.
+
+<P> The annotation system also allows for <em>hooks</em> to be
+written; while the class is annotated and its tracer is generated, the
+generated tracer can call manually written code that handles a tricky
+corner case not expressible in the annotation system.
+
+<P> The main subtlety with exact tracing is that there are invariants
+that the exactly traced objects <em>must</em> obey.  Failure to obey
+these invariants are usually fatal; exact tracing
+is <em>significantly</em> less forgiving than conservative tracing,
+and is incompatible with a number of abuses currently perpetrated in
+the AVM+ and Flash Player code bases.  However, as exact tracing is
+opt-in on a class-by-class (or even instance-by-instance) basis, it is
+at least possible to leave troublesome classes to be conservatively
+traced.
+
+
+<a name="rules"></a>
+<h2>Object invariants</h2>
+
+<P> When the programmer opts a class into exact tracing she discloses
+the fields containing GC-pointers to the garbage collector.
+GC-pointers can be tagged - not just with Atom tags - and GC-pointers
+can be located in member structures, but a number of invariants are
+important.  They are described
+in <a href="gc-rules.html#exactly-traced-types">the rules
+document</a>.
+
+<a name="reference-manual">
+<h2>Reference Manual for the Annotation System</h2>
+
+<a name="adding-gc-annotations">
+<h3>Adding GC annotations to your C++ and AS3 classes</h3>
+
+<a name="class-annotations-as3">
+<h4>Class annotations - AS3 side</h4>
+
+<P> ScriptObject subtypes that have an AS3 counterpart must be
+annotated in the AS3 code side as well as in the C++ code.
+
+<P> The AS3 class definition must carry a new [native] attribute,
+which can be one of <tt>classgc="exact"</tt>, <tt>instancegc="exact"</tt>, or
+<tt>gc="exact"</tt>.  The latter is the combination of the former two;
+the former two are sometimes useful (eg for classes where the
+instances are primitive values) and rarely used outside AVM+.  For
+example,
+
+<pre>
+  [native(cls="ArrayClass", gc="exact", instance="ArrayObject", methods="auto")]
+  public dynamic class Array extends Object { ... }
+</pre>
+
+<P> The requirement for there to be an AS3 annotation is a consequence
+of exact tracing information not being available for the AS3 slots
+that are exposed to C++ code.
+
+<a name="class-annotations-cpp">
+<h4>Class annotations - C++ side</h4>
+
+<P> All C++ class types that are traced exactly must be annotated and
+the traceable fields must also be annotated.
+
+<P> The C++ classes must be annotated to state that the class is
+exactly traced.  If the C++ class is a ScriptObject subclass with an
+AS3 counterpart we use the GC_AS3_EXACT tag annotation:
+<pre>
+  class GC_AS3_EXACT(ArrayClass, MMgc::ClassClosure) { ... }
+</pre>
+
+<P> If the C+ class does not have an AS3 counterpart we use the
+GC_CPP_EXACT annotation:
+
+<pre>
+  class GC_CPP_EXACT(Domain, MMgc::GCTraceableObjectWithTrace) { ... }
+</pre>
+
+<P> There are variants of GC_AS3_EXACT and GC_CPP_EXACT that provide
+for the option of a hook to explicitly trace fields that can't be
+handled by the annotation facility:
+
+<pre>
+  class GC_AS3_EXACT_WITH_HOOK(class, baseclass) { ... }
+  class GC_CPP_EXACT_WITH_HOOK(class, baseclass) { ... }
+</pre>
+
+<P> In both cases the C++ class must <em>declare and provide</em> a hook
+method (which should not be virtual but can usefully be both inline
+and private):
+
+<pre>
+  void gcTraceHook_className(MMgc::GC* gc)
+</pre>
+
+where "className" is the name of the class whose hook it is - the
+redundancy reduces the scope for error significantly.
+
+<P> See <a href="manual-tracers">the section below</a> on how to write
+manual tracers if you need to use the hooking facility.
+
+<a name="gcstruct"/>
+<P> You can use <tt>GC_CPP_EXACT</tt> on a substructure like so:
+
+<pre>
+  class GC_CPP_EXACT(BehaviorList, GCInlineObject) { ...}
+  class GC_CPP_EXACT(ScriptThread, GCFinalized) {
+      BehaviorList GC_STRUCTURE(m_behaviors);
+  };
+</pre>
+
+<a name="data-regions">
+<h4>Data annotations - Data regions</h4>
+
+<P> The program region of a class that holds traceable members must
+be wrapped in <tt>GC_DATA_BEGIN</tt> and <tt>GC_DATA_END</tt> annotations:
+
+<PRE>
+  GC_DATA_BEGIN(Domain)
+private:
+  ...
+  GC_DATA_END(Domain)
+</PRE>
+
+<P> Those annotations must pair up properly but they can nest.  (That
+said, it's bad form to place nested class definitions inside the data
+section of a class.)
+
+<P> Note that the C++ <tt>private:</tt> following the <tt>GC_DATA_BEGIN</tt> is
+intentional because it introduces <tt>public:</tt> into your class.
+<tt>GC_DATA_BEGIN</tt> declares the virtual gcTrace method which has to be
+public.
+
+<P> If a class has no traceable fields, there's an abbreviation:
+<pre>
+  GC_NO_DATA(Domain)
+</pre>
+
+<P> There can be arbitrary data fields (and other stuff) 
+<tt>GC_DATA_BEGIN</tt> and <tt>GC_DATA_END</tt>.  Stylistically it's
+good to restrict that space to data fields (though not all may be
+traced of course).
+
+<a name="data-members">
+<h4> Data annotations - Data members </h4>
+
+<p> Every traceable member of the C++ class must carry an annotation
+that says how to trace it.  These /must/ be between the
+<tt>GC_DATA_BEGIN</tt> and <tt>GC_DATA_END</tt> annotations.  There
+are several kinds of annotations.
+
+<ul>
+<li><p> Known pointers are annotated with <tt>GC_POINTER</tt>:
+
+<P><center><big><b>NOTE!! No GC_POINTER member annotation is required for GCMembers (eg. GCMember&lt;ScriptObject&gt; sObject;)</b></big></center>
+
+<pre>
+  DRCWB(ClassClosure*) GC_POINTER(t);
+</pre>
+
+<P> The <tt>GC_POINTER</tt> annotation can also be used on fields that
+    are tagged pointers represented as <tt>intptr_t</tt>
+    or <tt>uintptr_t</tt>.  However it /may not/ be used on fields
+    declared to be of pointer types if those pointers carry type tags.
+    (If it is then you must use <tt>GC_ATOM</tt> if the field is an
+    atom, or <tt>GC_CONSERVATIVE</tt> if it uses some ad-hoc tagging
+    scheme.)  There are assertions in the GC to keep you honest.
+
+<li><p> Potential pointers are annotated with <tt>GC_CONSERVATIVE</tt>:
+<pre>
+  uintptr_t GC_CONSERVATIVE(thisAndThat);
+</pre>
+
+The field can be a <tt>uintptr_t</tt>, <tt>intptr_t</tt>, or some pointer type
+(where that pointer may carry tags).
+
+<li><P> Substructures, typically <tt>GCList&lt;></tt>
+     and <tt>RCList&lt;></tt> members, are annotated
+     with <tt>GC_STRUCTURE</tt>.  In this case the substructure member
+     can have its tracer generated like a normal GC class or provide
+     a <tt>void gcTrace(MMgc::GC* gc)</tt> method that will be used to
+     trace the substructure.  (See <a href="manual-tracers">the
+     section below</a> on how to write manual tracers.)
+<pre>
+  AtomArray GC_STRUCTURE(m_denseArr);
+</pre>
+
+<li><p> Atoms are annotated with <tt>GC_ATOM</tt>:
+<pre>
+  ATOM_WB GC_ATOM(m_targetObject);
+</pre>
+
+<li><p> Trailing pointer arrays, used in non-AS3-exposed classes, as
+well as in-line pointer arrays, are annotated with <tt>GC_POINTERS</tt>:
+<pre>
+  Domain* GC_POINTERS( m_bases[1], m_baseCount );
+</pre>     
+
+<P> The first argument is the field name and the value to use for
+    declaring the field as an array field (no commas allowed!) and
+    the second is an expression that is used by the tracer to
+    obtain the length of the array.  For example, the above turns
+    into:
+<pre>
+  Domain* m_bases[1];
+</pre>
+and the tracer will take the number of fields to be
+m_baseCount.  If the second argument has commas or parentheses
+it /must/ be encoded as a string - enclosed in double quotes.
+
+<P>If the pointer array is expected to be short (say, less than 200
+    elements) then there may be a small efficiency win in using a
+    hinting version of <tt>GC_POINTERS</tt>, namely <tt>GC_POINTERS_SMALL</tt>:
+<pre>
+  Domain* GC_POINTERS_SMALL( m_bases[1], m_baseCount );
+</pre>
+
+<P> Using the hint when inappropriate can affect the incrementality
+    properties of the GC; not using it when it is appropriate
+    (especially when the arrays tend to be very short) can make the
+    GC slightly less efficient.
+
+<LI><P> Trailing atom arrays, used in non-AS3-exposed classes, are
+    annotated with <tt>GC_ATOMS</tt> and <tt>GC_ATOMS_SMALL</tt>:
+
+<pre>
+  Atom GC_ATOMS(_scopes[1], "getSize()");
+  Atom GC_ATOMS_SMALL(_scopes[1], "getSize()");
+</pre>
+
+</ul>
+
+<P> In general, the field annotation need not be on the same line as
+the type declaration for the field; this script does not sniff type
+information.  The annotation is invariant with respect to the
+pointed-to object(s) containing pointers or not and being RC
+objects or not.
+
+
+<a name="error-checking">
+<h3> Error checking </h3>
+
+<P> Quite a lot of error checking is performed by exactgc.as, with
+more possibly to come.
+
+<a name="correspondences">
+<h4> Correspondences during generation </h4>
+
+<P> There are some redundancies in the annotations; for
+example, <tt>GC_CPP_CLASS</tt>, <tt>GC_DATA_BEGIN</tt>
+and <tt>GC_DATA_END</tt> all name the class (and the begin/end pair is
+itself a redundancy).  Those redundancies enable the generation script
+to check that the annotations look plausible; for example, that there
+are data annotations only within a matched pair of
+<tt>GC_DATA_BEGIN</tt> and <tt>GC_DATA_END</tt>, that every pair
+belongs to a class and that every class has a pair, that classes nest
+properly, and that the data for a class are in a single file.
+
+<P> Please report a bug if you find an error in your annotation that
+you think the script ought to have caught.
+
+<a name="interlocks">
+<h4> Interlocks </h4>
+
+<P> One of the things that is checked is whether the base
+class for an annotated class is exactly traced.  The check is implemented with
+a set of "interlocks" in the emitted code, as follows.  For each
+class <tt>ns1::C</tt> that has a generated tracer, the script emits a <tt>#define</tt>:
+<pre>
+  #define ns1_C_isExactInterlock 1
+</pre>
+
+<P> The name consists of the namespace, the class name, and the
+string <tt>_isExactInterlock</tt>.
+
+<P> Then in the tracing method for each exactly traced
+class <tt>ns2::D</tt> that extends </tt>ns1::C</tt>, the script emits an
+interlock check:
+<pre>
+  void ns2::D::gcTrace(MMgc::GC* gc) {
+      ...
+      (void)(ns1_C_isExactInterlock != 0);
+      ...
+  }
+</pre>
+
+<P> The result of the interlock will be a compilation error if the
+subclass is traced but the base class is not, while retaining the
+ability to generate tracers separately for different namespaces (often
+in different directories).  The interlock <tt>#defines</tt> are
+emitted to separate files that can be included where they're needed.
+
+<P> (The namespace is not something the script sniffs; it is provided
+as an argument to the generator script.  Usually the namespace is
+simply "avmplus" for AVM+ built-ins and avmglue in the Flash Player,
+but Flash Player core objects would presumably use a different
+namespace.)
+
+<P> If the base class is templated then the templated-instantiated
+name of the class is used, with <tt>X</tt> in place of the angle
+brackets: the instantiated base class <tt>ns::C&lt;B></tt> has interlock names of
+the form <tt>ns1_CXBX_isExactInterlock</tt>, and templates
+instantiations can be nested.
+
+<a name="assertions">
+<h4> Assertions </h4>
+
+<P> We emit debug code that's active in DEBUG builds to check that the
+exact tracing callbacks are only invoked on live objects.  An
+assertion in <tt>GC::TracePointer</tt> usually indicates some sort of
+incorrect usage.
+
+<a name="safetynet">
+<h4> Safety Net</h4>
+
+<P> If you forget to annotate an instance
+of <tt>MMgc::SmartPointer</tt> and your class is completely traced by
+the exactgc tracer generator then you will get assertions.  The
+following <tt>MMgc::SmartPointer</tt>'s exist:
+
+<ul>
+<li><tt>GCMember&lt;T&gt;</tt></li>
+<li><tt>MMgc::WriteBarrier&lt;T&gt;</tt> (also used as <tt>DWB(T)</tt>)</li>
+<li><tt>MMgc::WriteBarrierRC&lt;T&gt;</tt> (also used as <tt>DRCWB(T)</tt>)</li>
+</ul>
+
+<P> If your class has a baseclass or uses a structure that isn't
+traced with the annotation system then the safety net doesn't work.
+Its highly recommend to use the annotation system and avoid manual tracers.
+
+<P> Further ideas are tracked
+by <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=604733">Bugzilla&nbsp;604733</a>;
+add your idea there.
+
+<a name="limitations">
+<h3> Limitations of the annotation system </h3>
+
+<ul>
+<li> <P> It's not possible (yet) to generate tracers for templated classes.
+     See <a href="#templates">Dealing with templates</a> for more information.
+
+<li> <P> While it is possible to generate tracers for subclasses of
+     templated classes for which exact tracing has been implemented
+     manually, the debugging interlocks for the templated base class
+     must still be inserted by hand so that the generated code works.
+     See <a href="#templates">Dealing with templates</a>.
+
+</ul>
+
+<a name="manual-tracers">
+<h2> Writing manual tracers </h2>
+
+<P> "There are some cases that no law can be framed to cover."
+
+<P> Sometimes the only way we have of making a data type or a member of
+a data type comprehensible to the exact tracer is to abandon the
+field annotations and write the tracer by hand.
+
+<P> A manual tracer (whether a gcTrace() method on a substructure or a
+gcTraceHook_&lt;className>() method on the object itself) is passed a
+GC* and must call members on that GC* to trace all pointer fields
+that are not otherwise visible to the GC.
+
+<ul>
+<li> TraceLocation(void**p) expects to find an untagged pointer to 
+managed memory at *p.
+
+<li>TraceLocation(uintptr_t* p) expects to find a possibly-tagged
+pointer to managed memory at *p; the tag is discarded.
+
+<li>TraceAtom(Atom* p) expects to find a tagged Atom value at *p;
+the tag is used to determine how to trace the memory.
+
+<li>TraceLocations(void**p, size_T len) scans an array of untagged pointers.
+
+<li> TraceLocations(uintptr_t*p, size_T len) scans an array of possibly-tagged
+ pointers.
+
+<li> TraceAtoms(Atom*p, size_T len) scans an array of atoms.
+
+<li> TraceConservativeLocation(uintptr_t* p) reads the word at *p and if it
+can be interpreted as a pointer into managed memory, possibly after
+stripping the tag, it does so.
+</ul>
+
+<P>(TraceAtom and TraceAtoms should be called TraceLocation and TraceLocations
+too, but because Atom is uintptr_t and C++ does not have name equivalence
+for typedef'd types we're stuck.)
+
+<P> If you write a manual tracer that is a base class for annotated
+classes -- as you must, if you have a templated base class, say --
+then you must be sure to create a suitable interlock definition for
+your manually traced class.  (See the <a href="#interlocks">earlier definition of interlocks</a>.)
+
+
+<a name="object-construction">
+<h2> Setting up your construction code </h2>
+
+<P> It is the responsibility of the object creator to ask for the
+object to be traced exactly by setting a flag on it.  The only way to
+do this is to pass the flag <tt>MMgc::kExact</tt> to the <tt>new</tt>
+operator on one of the classes that admit exact tracing.  Furthermore,
+to ensure that all instances of an exactly traceable class are traced
+exactly, it is best to invoke the <tt>new</tt> operator from only one
+location.  The recommended style is therefore a private or protected
+constructor and a public, static, inline factory function:
+
+<pre>
+   protected:
+     ArrayObject(...);
+   public:
+     REALLY_INLINE static ArrayObject* create(...) {
+       return new (gc, <b>MMgc::kExact,</b> ivtable->getExtraSize()) ArrayObject(...);
+     }
+</pre>
+
+
+<a name="roots">
+<h2>Root objects</h2>
+
+<P> It is possible to opt in to exact tracing for <tt>GCRoot</tt>
+subtypes by overriding the virtual <tt>gcTrace</tt> method
+of <tt>GCRoot</tt>:
+<pre>
+    virtual bool gcTrace(MMgc::GC* gc, size_t cursor);
+</pre>
+
+<P> The signature of a root tracer is compatible with that of a
+regular tracer in order to make use of the standard annotation and
+tracer generator system.  However, a root tracer <em>must</em>
+return <b>false</b> and <em>must</em> fully trace the object when it
+is called with <i>cursor==0</i>.  Root objects should in general be
+small.  Large root objects should be reengineered to become small root
+objects.
+
+
+<a name="script-running">
+<h2>Running the exactgc.as script, and other scripts</h2>
+
+<P> There's a script, utils/exactgc.as, that processes the annotations
+in the C++ and AS3 code.  This script must be rerun whenever the
+annotations change.  At the time of writing, we're trying to integrate
+the running into our build setups so that you won't have to think
+about it.
+
+<P> However, if something is up with this script, start looking in
+core/builtin-tracers.py and shell_toplevel/shell_toplevel-tracers.py
+in the AVM+ source.
+
+<P> For the Flash Player source code the tracers are built by the 
+flash/avmglue/generate.py script and this is done automatically when
+the native glue is built.
+
+<P> Also note that if you modify the AS3 files you must rerun the
+nativegen builders, because they emit C++ code that interact with the
+generated tracers.
+
+
+<a name="vtable-not-affordable">
+<h2>What to do if a vtable is not affordable or possible</h2>
+
+<P> Exact tracing is built on virtual methods
+and <tt>GCTraceableObject</tt> adds a vtable, where <tt>GCObject</tt>
+has none.  On 64-bit systems this means an additional eight bytes; on
+32-bit systems it means from no extra space (the required four bytes
+were previously wasted by alignment) to an additional eight bytes.
+
+<P> For some classes that are particularly small and whose instances
+are exceptionally numerous, the overhead of the vtable may not be
+affordable.  Means may still exist for tracing the instances exactly,
+though not without complication.
+
+<P> The AVM+ implementation of the primitive object hashtable is an
+example here.  The hashtable storage is owned by a hashtable header
+which is in-line in some other object.  For most objects the hash
+table storage is quite small and a vtable is not considered
+affordable.  In this case the hashtable header manually traces the
+hashtable storage by walking the storage and calling back into the GC
+for every pointer in the storage.  The complication is that the
+storage may still have been reached by the conservative tracer first,
+so we incur a cost for checking that, and of course there's the chance
+of false conservative retention if conservative tracing reaches such a
+storage object every time it is traced.
+
+<a name="alloc-and-calloc">
+<h2>How to handle GC::Alloc and GC::Calloc</h2>
+
+<P> Object types (especially array-like types) that are allocated using
+GC::Alloc() and GC::Calloc() are treated as if they implicitly derive
+from GCObject; thus they cannot be traced exactly without change.
+
+<P> To make such types exactly traced you can instead implement them
+as sybtypes of the ExactHeapList generic type, see the
+file <tt>core/avmplusList.h</tt>.  There is a small amount of overhead
+to that.  If that overhead is unaffordable then the technique used for
+the inline hashtable may be used
+(see <a href="#vtable-not-affordable">that section</a>).
+
+<a name="templates">
+<h2> Dealing with templates </h2>
+
+<P> Templated classes and their subclasses can be handled just fine by
+implementing manual tracers.  However, the annotation system does not
+interact well with templated classes yet.  The problem is tracked by
+<a href="https://bugzilla.mozilla.org/show_bug.cgi?id=624403">Bugzilla&nbsp;624403</a>;
+please leave a comment on that bug if this is a hardship.  We hope to
+have a solution in place for Serrano.  In the mean time, here is some
+guidance.
+
+<P> First, templated classes <em>must</em> be traced manually if they
+are to be traced exactly.
+
+<P> Second, it's possible to use annotations on subclasses of templated tracers, but 
+you must insert manual interlocks definitions.
+
+<P> The vector code in AVM+ serves as a good example for both.  Here we have:
+<pre>
+  template&lt;class TLIST>
+  class TypedVectorObject : public VectorBaseObject { ... }
+</pre>
+and then (one of several)
+<pre>
+  class GC_AS3_EXACT(IntVectorObject, TypedVectorObject&lt; DataList&lt;int32_t> >) { ... }
+</pre>
+
+<P> When the annotation system generates a tracer
+for <tt>IntVectorObject</tt> it will generate an interlock check
+for <tt>TypedVectorObject&lt;&nbsp;DataList&lt;int32_t>&nbsp;></tt>;
+following <a href="#interlocks">the usual rules</a> it replaces angle brackets by <tt>X</tt>,
+prepends the namespace and appends <tt>_isExactInterlock</tt>,
+emitting this code:
+<pre>
+  bool IntVectorObject::gcTrace(MMgc::GC* gc, size_t _xact_cursor)
+  {
+      ...
+      (void)(avmplus_TypedVectorObjectXDataListXint32_tXX_isExactInterlock != 0);
+      ...
+  }
+</pre>
+In <tt>core/VectorClass-inlines.h</tt> there is indeed a manully created
+definition to satisfy that check:
+<pre>
+  #define avmplus_TypedVectorObjectXDataListXint32_tXX_isExactInterlock 1
+</pre>
+
+
+<a name="stacks">
+<h2> Dealing with stack frames </h2>
+
+<P> At the present time stack frames, whether C++ frames, interpreter
+frames, or JIT frames, cannot be traced exactly.  Thus there's a risk
+of conservative retention from data in a stack frame that looks like a
+pointer to the conservative tracer.
+
+<P> The inability to trace stacks exactly is tracked
+by <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=599815">Bugzilla&nbsp;599815</a>;
+please leave a comment there if you have interesting information about
+conservative retention from stack scanning.
+
+<P> We are not planning to address stack scanning any time soon, as
+there are various tecniques we can use to reduce the impact of
+conservative retention from stack scanning.  Notably, we can attempt
+to time the stack scan so that it occurs when the stack is empty.  If
+that succeeds even some of the time then false retention from the
+stack will be a less serious problem in most programs.
+
+
+<a name="roots">
+<h2> Dealing with roots </h2>
+
+<P> At the present time subclasses of <tt>GCRoot</tt> cannot be traced
+exactly, which means there's a risk of conservative retention from
+data in a <tt>GCRoot</tt> that looks like a pointer to the
+conservative tracer.  Given the number of roots in the system this
+risk is probably significant.
+
+<P> The inability to trace roots exactly is tracked
+by <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=626611">Bugzilla&nbsp;626611</a>;
+please leave a comment there if this is a hardship.  We hope to remove
+the limitation before long, and also to make it possible to use the
+annotation system on roots.
+
+<a name="#notes">
+<h2>Notes</h2>
+
+<a name="mi">
+<h3> Multiple inheritance </h3>
+
+<P> So far we have no experience with using this system with multiple
+inheritance, and we don't yet know how that's going to play out.  It
+is likely that exact tracing for GCRoots will have to deal with
+multiple inheritance.
+
+<a name="extensions">
+<h3> Obvious extensions </h3>
+
+<P> It is straightforward to expand
+the <tt>_IFDEF</tt>/<tt>_IFNDEF</tt>/<tt>_IF</tt> facility to
+an <tt>_IFNOT</tt> variant.
+
+<P> It is usually straightforward to add new field types to the
+annotation system.
+
+<P>It may be that we want a <tt>GC_CONSERVATIVE_STRUCTURE</tt> to
+handle unions of pointer-sized data that must otherwise be traced
+manually, the hook facility works but is not ideal.
+
+
+</body>
+</html>

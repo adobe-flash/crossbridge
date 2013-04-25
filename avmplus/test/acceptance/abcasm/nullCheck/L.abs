@@ -1,0 +1,131 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function runTest()
+{
+    findproperty COMPARE_STRICTEQ
+    pushstring "null lessequals null"
+    pushtrue // expected
+    pushnull
+    pushnull
+    lessequals
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "-1 lessequals null"
+    pushtrue // expected
+    pushint -1
+    pushnull
+    lessequals
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null lessequals -1"
+    pushfalse // expected
+    pushnull
+    pushint -1
+    lessequals
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null lessthan null"
+    pushfalse // expected
+    pushnull
+    pushnull
+    lessthan
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "-1 lessthan null"
+    pushtrue // expected
+    pushint -1
+    pushnull
+    lessthan
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null lessthan -1"
+    pushfalse // expected
+    pushnull
+    pushint -1
+    lessthan
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    returnvoid
+}
+
+function runTest1()
+{
+    getlocal0
+    pushscope
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "null lf32"
+    pushint 0 // expected
+    pushnull
+    lf32
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null lf64"
+    pushint 0 // expected
+    pushnull
+    lf64
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null li8"
+    pushint 0 // expected
+    pushnull
+    li8
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null li16"
+    pushint 0 // expected
+    pushnull
+    li16
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null li32"
+    pushint 0 // expected
+    pushnull
+    li32
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    
+    // TODO: assembler support for lookupswitch
+        
+    findproperty COMPARE_STRICTEQ
+    pushstring "lshift"
+    pushint 0 // expected
+    pushnull
+    pushnull
+    lshift
+    callpropvoid COMPARE_STRICTEQ 3
+    
+        returnvoid
+}
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "instructions that start with the letter L" 
+    callpropvoid START 1
+    
+    newfunction runTest
+    getlocal0
+    call 0
+    
+    newfunction runTest1
+    getlocal0
+    call 0
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+script_info{init: main}

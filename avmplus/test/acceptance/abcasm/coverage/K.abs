@@ -1,0 +1,49 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function runTest()
+{
+	getlocal0
+	pushscope
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "kill"
+	pushint 77
+	setlocal1
+	getscopeobject 0
+	getproperty someProp
+	kill 1
+	iffalse dataflow_merge
+
+
+	pushnull
+	setlocal1
+	kill 1
+
+	dataflow_merge:
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+	getlocal1
+
+	returnvalue
+}
+
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "Instructions that start with the letter K" 
+	callpropvoid START 1
+	newfunction runTest
+	getlocal0
+	call 0
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+
+script_info{init: main}

@@ -1,0 +1,21 @@
+On mac and linux machines valgrind can be used with tamarin.  On linux
+you may have it already valgrind from your distro but you should
+probably get the sources and build it anyways.  We've only tested with
+3.6 SVN.  See the valgrind web site for details.
+
+After building/installing valgrind you can build tamarin with valgrind
+support using the --enable-valgrind configure flag.  This includes the
+valgrind headers and enables the client requests.  It also sets the
+optimization level to 1 and add -g for symbols.
+
+runtests.py and runsmokes.py have been augmented to support running
+with valgrind.  With runtest.py you can use --valgrind and valgrind
+will be used to run all the tests (using the default memcheck tool).
+Valgrind logs are put in the /tmp directory and you'll need to look
+there for valgrind errors in case of a failure.  runsmokes.py supports
+a RTARGS which can be used to pass arguments to all its runtests
+invocations, ie:
+
+RTARGS=--valgrind ./runsmokes.py
+
+See bug 509020 for the latest on valgrind work.

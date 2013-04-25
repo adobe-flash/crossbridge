@@ -1,0 +1,49 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page setslot 
+
+\addindex setslot
+
+
+\section setslot setslot
+
+\subsection operation Operation
+
+Set the value of a slot.
+
+\subsection format Format
+
+\code
+setslot
+slotindex
+\endcode
+
+\subsection forms Forms
+\code
+setslot = 109 (0x6d)
+\endcode
+\subsection stack Stack
+
+\code
+..., obj, value => ...
+\endcode
+
+\subsection description Description
+
+slotindex is a u30 that must be an index of a slot on obj. slotindex 
+must be greater than 0 and less than or equal to the total number of slots obj has.
+
+This will set the value stored in the slot at slotindex on obj to value. 
+value is first coerced to the type of the slot at slotindex.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if obj is null or undefined.
+
+\subsection notes Notes
+
+None.
+
+*/
+

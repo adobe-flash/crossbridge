@@ -1,0 +1,228 @@
+The eventual goal is that eval should support the same language as ASC.  This
+backlog records all the things we know are not supported; keep it up to date
+and pick tasks off it.
+
+Current status: We can run almost all of the ecma3/ and e4x/
+acceptance tests from source.
+
+Work list is organized as P1/P2/P3/P4/P5 where P1 is highest and these mean:
+
+  - P1 - basic functionality
+  - P2 - rough compatibility with ES3
+  - P3 - rough compatibility with AS3 and E4X
+  - P4 - quality requirements / subtle semantics
+  - P5 - desirable extensions
+
+Note that FIXMEs in the code are generally not noted here.
+
+
+Lexer:
+
+  P3:
+  - a number of tokens we treat as keywords are no longer keywords in AS3
+
+Parser:
+
+  P3:
+  - a number of tokens we treat as keywords are no longer keywords in AS3
+  - metadata spec has changed (again) and parser needs to follow suit (again)
+  - 'config namespace'
+  - program configuration scope, checking
+  - program configuration attributes on blocks, expressions in array / object (but not vector) literals
+  - program configuration attributes on definitions
+  - 'package' is parsed but mainly superficially, see FIXMEs
+  - 'public', 'private', 'protected', 'internal', and named NS are parsed and partly used but not tested much
+  - lots of places that parse by 'identifier()' should parse by something that handles both id and id::id
+  - 'super' expression
+  - getter and setter functions
+
+  P4:
+  - operator-precedence parsing of expressions
+  - non-recursive parsing of if-then-else chains
+  - stack overflow control generally
+
+Code generator:
+
+  P3:
+  - qualified 'import' statement
+  - 'const' statement and definition
+  - 'use namespace' statement
+  - 'namespace' definition, I deliberately broke these
+  - (many more to come, as the parser handles more AS3 constructs)
+
+  P4:
+  - Variable definitions must not override function definitions or param definitions
+    in the same scope, as per E262-3.  Also there may be some fine points with
+    exactly when 'arguments' is initialized.
+  - non-recursive generation of if-then-else chains
+  - stack overflow control generally
+
+
+ABC layer:
+
+  P3:
+  - class and interface are generally supported but there are some FIXMEs
+
+
+Code quality, utility, API, etc:
+
+  P4:
+  - Transition to VMPI_ forms of libc functions everywhere.  I've converted the code
+    but I need to provide macros in the standalone compiler setup as well.  Also note
+    that the VMPI layer in Tamarin does not currently provide a mapping for vsnprintf,
+    for example.
+
+  - Syntax error messages are more ad-hoc than they need be, probably.  See the
+    string constants in eval-compile.cpp.
+
+  - Syntax error messages sometimes provides less information than they need to;
+    the "wrong token" error is the worst but others are bad too.
+
+  - Eval code should not use unadorned 'new' for anything; instead the HostContext
+    should have alloc() and free() methods for allocating memory.  These should be
+    used with placement new or just by themselves as appropriate, and we should
+    never use 'delete' for anything.  Nor should there be any use of malloc or
+    calloc or similar.  The purpose of this rule is to not depend on the memory
+    management provided by new or delete, as they sometimes are diverted to FixedMalloc
+    and sometimes not (depending on platform), when eval is embedded in the avm.
+    
+    Now, Tommy says that we should be moving toward a world where we assume that
+    new and delete are overloaded and point to FixedMalloc, but there are some
+    platforms where that is actually hard (toolchain issues).  So if there's not
+    a lot of work to abstract it out - and there's no reason that it should be
+    a lot of work because almost all allocation goes through the Allocator anyway -
+    then we should probably do it.  (Would also let us know something about the
+    memory consumption of eval.)
+
+  Optimizations:
+  - Store local variables in registers if the function does not close over
+    other functions and does not use 'with' (at least) - ESC implemented this,
+    it yields significant performance improvements
+    
+  - Reuse locals of the same type; right now we generate a lot of local slots
+    in order not to annoy the verifier, but doing better would result in lower
+    stack consumption
+    
+  - Improved scope stack tracking.  Right now the code generator just sums the
+    number of PUSHSCOPE and PUSHWITH instructions, which yields a conservative
+    approximation to the actual depth.  Probably pretty close in practice,
+    but in a function with a lot of exception handlers it may be a substantial
+    overestimate because there will be PUSHSCOPE/PUSHWITH instructions to reconstruct
+    the scope stack inside each handler.
+    
+  - OP_dxns instead of OP_dxnslate when the argument is a string or the name
+    of a namespace definition.
+
+  - namespace qualifiers should be inserted literally when they are known at
+    compile time, not result in RTName code generation.
+
+  - namespace sets should probably be canonicalized (eg in lexicographic order)
+    so that duplicates can be filtered easily, we want to filter duplicates
+    both in the parser and when inheriting namespace sets in the code generator.
+
+
+Test harness:
+
+  - In situations where there are subdirectories with code that's supposed to
+    be compiled independently or imported, the test harness breaks down with
+    eval, and tests fail.
+
+  - Need tests for eval function, too
+
+
+Documentation bugs:
+
+  - AS3 docs list 'to' as a keyword but test suite uses 'to' as an identifier.
+
+
+Bug triage (open bugs):
+
+  - These are the same problem:
+
+        ecma3/ExecutionContexts/e10_1_4_10.as : FAILED contained no testcase messages - reason: 10.1.4-10 Scope Chain and Identifier Resolution
+         | TypeError: Error #1004: Method Number.prototype.toString was invoked on an incompatible object.
+         | at Error$/throwError()
+         | at <anonymous>()
+         | at getTestCases()[ecma3/ExecutionContexts/e10_1_4_10.as:58]
+         | at global$init()[ecma3/ExecutionContexts/e10_1_4_10.as:43]
+        ecma3/Statements/e12_10.as : FAILED contained no testcase messages - reason:
+         | TypeError: Error #1004: Method Number.prototype.valueOf was invoked on an incompatible object.
+         | at Error$/throwError()
+         | at <anonymous>()
+         | at getTestCases()[ecma3/Statements/e12_10.as:53]
+         | at global$init()[ecma3/Statements/e12_10.as:42]
+
+    The structure is "with (new Number(x)) toString()" - or valueOf.
+
+
+Tests in the 'ecma3' test suite that can't pass at this time:
+
+  - ecmas3/LexicalConventions/e7_1_1.as fails with a syntax error because
+    a no-break space encoded in some strange way in a comment trips up the
+    the UTF8 decoder in the string class.  Instead of detecting invalid
+    UTF8 content and letting my code fall back on Latin-1 it decodes it 
+    but screws the decoding up, so final characters are missing and the parse
+    fails.
+
+  - string-to-number conversion:
+       ecma3/GlobalObject/e15_1_2_2_2.as
+       ecma3/GlobalObject/e15_1_2_2_2.as
+       ecma3/GlobalObject/e15_1_2_2_2.as
+       ecma3/LexicalConventions/e7_7_3.as
+       ecma3/LexicalConventions/e7_7_3.as
+       ecma3/LexicalConventions/e7_7_3.as
+       ecma3/LexicalConventions/e7_7_3.as
+       ecma3/Number/e15_7_3_2_1.as
+       ecma3/Number/e15_7_3_2_2.as
+       ecma3/Number/e15_7_3_2_3.as
+       ecma3/ObjectObjects/e15_2_1_1_rt.as
+       ecma3/String/e15_5_4_7_2.as
+       ecma3/TypeConversion/e9_3.as
+       ecma3/TypeConversion/e9_9_1_rt.as
+     The largest number the built-in parser will parse as a non-infinity is 1.7976931348623145e308.
+     But the test cases assume that 1.7976931348623157e308 will be parsed as non-infinity, and
+     the number parser in ASC does this.  Some test cases can be fixed by replacing the latter
+     literal by Number.MAX_VALUE.
+
+  - Also see bugzilla 608474
+
+  - uses 'class':
+     ecma3/Expressions/e11_2_2_1.as
+     ecma3/Expressions/e11_2_4.as
+     ecma3/Expressions/e11_4_3.as
+     ecma3/Expressions/e11_9_4.as
+     ecma3/Expressions/e11_9_5.as
+     ecma3/Statements/e12_6_3_12.as
+     ecma3/RegExp/eregress_122076.as
+
+  - uses 'import':
+     ecma3/ObjectObjects/class_006.as ("import flash.system.Capabilities")
+
+  - uses 'use namespace':
+     ecma3/String/e15_5_3_2_1.as
+     ecma3/String/e15_5_4_6_2_rt.as
+
+  - probably incorrect test:
+     ecma3/TypeConversion/e9_3_1_3_rt.as - wants \0 in a string to turn into a digit '0' but E262-3
+       explicitly sanctions \0 as a valid escape sequence that turns into NUL
+
+
+Tests in the e4x test suite that fail for apparently no fault of eval:
+
+  - fail with the JIT but not with the interpreter:
+
+      shell.as e4x/shell.as e4x/Statements/e12_1.as : 2 =  FAILED! expected: <soap:Body xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      shell.as e4x/shell.as e4x/Statements/e12_1.as : 3 = <Envelope soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><Body><stock:GetLastTradePrice xmlns:stock="http://mycompany.com/stocks"><stock:symbol>DIS</stock:symbol></stock:GetLastTradePrice></Body><soap:Body><stock:GetLastTradePrice xmlns:stock="http://mycompany.com/stocks"><stock:symbol>MYCO</stock:symbol></stock:GetLastTradePrice></soap:Body></Envelope> FAILED! expected: <soap:Envelope soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><stock:GetLastTradePrice xmlns:stock="http://mycompany.com/stocks"><stock:symbol>MYCO</stock:symbol></stock:GetLastTradePrice></soap:Body></soap:Envelope>
+      shell.as e4x/shell.as e4x/Statements/e12_1.as : 6 =  FAILED! expected: http://schemas.xmlsoap.org/soap/envelope/
+      shell.as e4x/shell.as e4x/Statements/e12_1.as : 7 =  FAILED! expected: http://schemas.xmlsoap.org/soap/envelope/
+      shell.as e4x/shell.as e4x/Statements/e12_1.as : 9 =  FAILED! expected: http://schemas.xmlsoap.org/soap/envelope/
+      shell.as e4x/shell.as e4x/Statements/e12_1.as : 14 =  FAILED! expected: bar
+      shell.as e4x/shell.as e4x/Statements/e12_1.as : Namespaces in global scope:  = 0 FAILED! expected: 3
+
+    However the interpreter has other failures (it fails #7 outright), and it looks
+    like the wrong code is generated for property references.  I translate a.x as
+    a.public::x but E4X really wants a.*::x.  This seems like a dangerous fix in
+    general unless * translates as "public" for the purposes of non-E4X objects,
+    so who knows what's actually going on here.  It's possible that there's magic
+    somewhere in Tamarin to handle * as * for E4X and as [public] for everyone
+    else.

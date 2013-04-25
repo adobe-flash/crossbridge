@@ -1,0 +1,29 @@
+(Preliminary, will be updated.)
+
+These results were obtained on lhansen's MacBook Pro.  The format is
+CSV and machine-readable, please keep it that way.  Result recorded is
+best (highest) of three runs, reloaded in the same tab.  Significant
+variability were seen in some runs, see notes.
+
+---- begin ----
+Benchmark,    Firefox 3.6,   Safari 4.0.4,    Chrome 5.0b,  Opera 10.10,   Notes
+
+array-1,      1561,          2317,            2298,            76,
+array-2,       820,          2270,            2532,            69,
+do-1,         3377,          2931,            4317,           258,
+for-1,        3841,          2929,            5180,           159,         30% downward variability on Firefox
+for-in-1,      120,            38,             108,            41,
+for-in-2,      116,            37,              94,            27,
+funcall-1,  694149,       4080172,         3399514,        358470,         may be dominated by cost of 'new Date'
+while-1,      3515,          3275,            4320,           157,
+---- end ----
+
+Other notes:
+
+Opera 10.10 is a bytecode interpreter; the JIT in 10.50 is not yet
+available on Mac.
+
+The funcall-1 benchmark needs to be rewritten, currently it's a loop
+calling an empty function, and obtaining a new Date object for each
+iteration.  The latter probably dominates.  It was written that way
+because of Tamarin's slow integer arithmetic.

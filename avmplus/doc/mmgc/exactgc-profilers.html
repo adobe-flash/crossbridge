@@ -1,0 +1,104 @@
+<!--
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+-->
+<html>
+
+<head>
+<title>Profilers for Exact GC</title>
+</head>
+
+<body>
+<h1>Profilers for Exact GC</h1>
+
+<h2> Overview </h2>
+
+<P> There are two special-purpose allocation profilers that are
+available to us as we are working on exact tracing.
+
+<P> The "conservative tracing profiler" compiles a population profile
+of objects that are conservatively traced, broken down by stack trace.
+(For each stack that reaches the allocator it maintains a byte count
+and an object count.)  This is useful when deciding which object types
+to do next when converting types to exact tracing.
+
+<P> The "deletion profiler" compiles a profile of program sites that
+invoke the delete operator on managed objects.  This is useful because
+explicit deletion will be a source of bugs when using exact tracing:
+exact tracing is entirely intolerant of dangling pointers from objects
+that are exactly traced.  Profiling is one tool we can use to find
+sites that use explicit deletion.  (Another tool is making GC::Free
+private, which will trigger compilation errors in client code that
+calls it.)
+
+
+<h2> Basic operation </h2>
+
+<P> The profilers both work the same way.
+
+<UL>
+
+<LI><P> First we require MMGC_MEMORY_PROFILING to be enabled.  That's
+controlled by AVMFEATURE_MEMORY_PROFILER; in shell builds it is
+enabled in DEBUGGER builds but can otherwise be set explicitly in
+avmshell-features.h.  (TODO: info for Flash Player and
+avmhost-features.h.)
+
+<LI><P> Then the profilers are enabled by uncommenting #defines in
+MMgc.h: either MMGC_CONSERVATIVE_PROFILER or MMGC_DELETION_PROFILER.
+
+<LI><P> You <em>really, really</em> need to have source information
+enabled in the VMPI layer.  For Windows it's on by default; on Mac you
+may need to enable the call to <tt>startATOSProcess</tt> in the
+function <tt>VMPI_setupPCResolution</tt> in MMgcPortMac.cpp.
+
+<LI><P> Then you do a full recompile.
+
+<LI><P> Then you run the product with the environment variable
+MMGC_PROFILE set to "1".
+
+<LI><P> Then you quit the product.  On exit, the profilers will kick
+in and dump the profiles onto some standard logging channel (usually
+stdout or the debugger's console).
+
+</UL>
+
+
+<h2> Output from the conservative profiler </h2>
+
+<P> The output consists of some gross statistics followed by the top
+stack traces by volume (either byte volume or object volume).  Stacks
+are considered the same only if all their entries are the same.
+
+
+<h2> Output from the deletion profiler </h2>
+
+<P> The output consists of some gross statistics followed by the top
+stack traces by object volume.  Stacks are considered the same if they
+are compared from the innermost out and the first element where they
+differ, if any, is neither a destructor frame or an MMgc frame.  This
+tends to merge many more stacks than the conservative profiler and
+thus compresses data well, but it's experimental at this time.
+
+
+<h2> Configuring the number of stacks and how they're sorted </h2>
+
+<P> The stacks are dumped from the <tt>GC::~GC</tt> method in GC.cpp;
+there are calls to <tt>dumpTopBacktraces</tt> for the two profilers.
+Those calls pass parameters for the number of stacks to dump and how
+to sort them (by byte volume or object count).  Passing the number of
+stacks as zero means to dump them all.  It's probably meaningless to
+dump deletion traces by byte volume.
+
+
+<h2> Things to watch out for </h2>
+
+<P> There's one profiler per GC.  If more than one GC is instantiated
+during the run (as in the Flash Player) you may get multiple dumps at
+the end; they will be printed in some order but there's no
+identification of each GC.
+
+
+</body>
+</html>

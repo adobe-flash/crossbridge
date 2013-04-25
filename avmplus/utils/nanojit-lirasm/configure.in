@@ -1,0 +1,414 @@
+dnl -*- Mode: Autoconf; tab-width: 4; indent-tabs-mode: nil; -*-
+dnl vi: set tabstop=4 shiftwidth=4 expandtab:
+dnl This Source Code Form is subject to the terms of the Mozilla Public
+dnl License, v. 2.0. If a copy of the MPL was not distributed with this
+dnl file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+dnl Process this file with autoconf to produce a configure script.
+dnl ========================================================
+
+AC_PREREQ(2.13)
+AC_INIT(configure.in)
+AC_CONFIG_AUX_DIR(${srcdir}/autoconf)
+AC_CONFIG_HEADER(config.h)
+AC_CANONICAL_SYSTEM
+TARGET_CPU="${target_cpu}"
+TARGET_VENDOR="${target_vendor}"
+TARGET_OS="${target_os}"
+
+AC_PROG_AWK
+
+dnl ========================================================
+dnl =
+dnl = Don't change the following two lines.  Doing so breaks:
+dnl =
+dnl = CFLAGS="-foo" ./configure
+dnl =
+dnl ========================================================
+CFLAGS="${CFLAGS=}"
+CPPFLAGS="${CPPFLAGS=}"
+CXXFLAGS="${CXXFLAGS=}"
+LDFLAGS="${LDFLAGS=}"
+TESTCFG="${TESTCFG=}"
+
+dnl ==============================================================
+dnl Default to MSVC for win32
+dnl ==============================================================
+case "$target" in
+*-cygwin*|*-mingw*|*-msvc*|*-mks*)
+    if test -z "$CC"; then CC=cl; fi
+    if test -z "$CXX"; then CXX=cl; fi
+    if test -z "$CPP"; then CPP="cl -E -nologo"; fi
+    if test -z "$CXXCPP"; then CXXCPP="cl -TP -E -nologo"; ac_cv_prog_CXXCPP="$CXXCPP"; fi
+    if test -z "$LD"; then LD=link; fi
+    ;;
+esac
+
+dnl ========================================================
+dnl --enable-debug
+dnl ========================================================
+
+AC_ARG_ENABLE(debug,
+[  --disable-debug         disable debug build (incl. turns off assertions)],
+[ if test "$enableval" != "no"; then
+    NJ_DEBUG=1
+  else
+    NJ_DEBUG=
+  fi ],
+  [NJ_DEBUG=1])
+
+if test "${NJ_DEBUG}" = "1" ; then
+    AC_DEFINE(DEBUG)
+    if test "$CC" = "cl"; then
+       CXXFLAGS="$CXXFLAGS -Zi -Fdlirasm.pdb"
+       CFLAGS="$CFLAGS -Zi -Fdlirasm.pdb"
+       LDFLAGS="$LDFLAGS -DEBUG"
+    else
+       CXXFLAGS="$CXXFLAGS -g"
+       CFLAGS="$CFLAGS -g"
+    fi
+fi
+
+dnl ========================================================
+dnl --enable-float
+dnl ========================================================
+
+AC_ARG_ENABLE(float,
+[  --enable-float         enable float build ],
+[ if test "$enableval" != "no"; then
+    VMCFG_FLOAT=1
+    TESTCFG=float
+  else
+    VMCFG_FLOAT=
+	TESTCFG=nofloat
+  fi ],
+  [VMCFG_FLOAT=
+   TESTCFG=nofloat
+  ])
+
+if test "${VMCFG_FLOAT}" = "1" ; then
+    AC_DEFINE(VMCFG_FLOAT)
+fi
+
+dnl ==============================================================
+dnl Try to handle an x86-on-x64 multilib build
+dnl ==============================================================
+
+AC_MSG_CHECKING([x86-on-x64 multilib build])
+multilib32=no
+case "$target" in
+i?86-*)
+    case "$host" in
+        x86_64*-*)
+        if test "$CC" != "cl"; then
+            CFLAGS="$CFLAGS -m32"
+            CXXFLAGS="$CXXFLAGS -m32"
+            LDFLAGS="$LDFLAGS -m32"
+            multilib32=yes
+        fi
+        ;;
+    esac
+esac
+AC_MSG_RESULT($multilib32)
+
+dnl ========================================================
+dnl Checks for compilers.
+dnl ========================================================
+
+AC_PROG_CC
+AC_PROG_CXX
+
+LD=${CXX}
+
+GNU_CC=
+GNU_CXX=
+GNU_LD=
+
+CC_VERSION='N/A'
+CXX_VERSION='N/A'
+if test "$GCC" = "yes"; then
+    GNU_CC=1
+    CC_VERSION=`$CC -v 2>&1 | grep 'gcc version'`
+fi
+if test "$GXX" = "yes"; then
+    GNU_CXX=1
+    CXX_VERSION=`$CXX -v 2>&1 | grep 'gcc version'`
+fi
+if test "$GNU_CC"; then
+    if `$CC -print-prog-name=ld` -v 2>&1 | grep -c GNU >/dev/null; then
+        GCC_USE_GNU_LD=1
+    fi
+fi
+if test "`echo | $LD -v 2>&1 | grep -c GNU`" != "0"; then
+    GNU_LD=1
+fi
+
+INTEL_CC=
+INTEL_CXX=
+if test "$GCC" = yes; then
+   if test "`$CC -help 2>&1 | grep -c 'Intel(R) C++ Compiler'`" != "0"; then
+     INTEL_CC=1
+   fi
+fi
+
+if test "$GXX" = yes; then
+   if test "`$CXX -help 2>&1 | grep -c 'Intel(R) C++ Compiler'`" != "0"; then
+     INTEL_CXX=1
+   fi
+fi
+
+OBJ_SUFFIX=.o
+EXE_SUFFIX=
+
+WARNINGS_AS_ERRORS=-Werror
+LINK='$(LD) $(LDFLAGS) -o $(1)'
+
+dnl ========================================================
+dnl Special win32 checks
+dnl ========================================================
+
+case "$target" in
+*-cygwin*|*-mingw*|*-msvc*|*-mks*|*-wince)
+    if test "$GCC" != "yes"; then
+        # Check to see if we are really running in a msvc environemnt
+        _WIN32_MSVC=1
+
+        AC_DEFINE(WIN32)
+
+        OBJ_SUFFIX=.obj
+        EXE_SUFFIX=.exe
+
+        # Make sure compilers are valid
+        CFLAGS="$CFLAGS -TC -nologo -EHsc -W4"
+        CXXFLAGS="$CXXFLAGS -TP -nologo -EHsc -W4"
+        WARNINGS_AS_ERRORS="-WX"
+        LD=link
+        LINK='$(LD) $(LDFLAGS) -OUT:$(1)'
+        AC_LANG_SAVE
+        AC_LANG_C
+        AC_TRY_COMPILE([#include <stdio.h>],
+            [ printf("Hello World\n"); ],,
+            AC_MSG_ERROR([\$(CC) test failed.  You must have MS VC++ in your path to build.]) )
+
+        AC_LANG_CPLUSPLUS
+        AC_TRY_COMPILE([#include <new.h>],
+            [ unsigned *test = new unsigned(42); ],,
+            AC_MSG_ERROR([\$(CXX) test failed.  You must have MS VC++ in your path to build.]) )
+        AC_LANG_RESTORE
+
+        changequote(,)
+        _MSVC_VER_FILTER='s|.* ([0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?).*|\1|p'
+        changequote([,])
+
+        # Determine compiler version
+        CC_VERSION=`"${CC}" -v 2>&1 | sed -nre "$_MSVC_VER_FILTER"`
+        _CC_MAJOR_VERSION=`echo ${CC_VERSION} | $AWK -F\. '{ print $1 }'`
+        _CC_MINOR_VERSION=`echo ${CC_VERSION} | $AWK -F\. '{ print $2 }'`
+        _CC_RELEASE=`echo ${CC_VERSION} | $AWK -F\. '{ print $3 }'`
+        _CC_BUILD=`echo ${CC_VERSION} | $AWK -F\. '{ print $4 }'`
+        _MSC_VER=${_CC_MAJOR_VERSION}${_CC_MINOR_VERSION}
+
+        CXX_VERSION=`"${CXX}" -v 2>&1 | sed -nre "$_MSVC_VER_FILTER"`
+        _CXX_MAJOR_VERSION=`echo ${CXX_VERSION} | $AWK -F\. '{ print $1 }'`
+
+        unset _MSVC_VER_FILTER
+    fi # !GNU_CC
+    ;;
+esac
+
+AC_PROG_CC_C_O
+AC_PROG_CPP
+AC_PROG_CXXCPP
+
+AC_SUBST(_MSC_VER)
+AC_SUBST(GNU_CC)
+AC_SUBST(GNU_CXX)
+AC_SUBST(GNU_LD)
+AC_SUBST(INTEL_CC)
+AC_SUBST(INTEL_CXX)
+
+AC_SUBST(OBJ_SUFFIX)
+AC_SUBST(EXE_SUFFIX)
+
+AC_SUBST(WARNINGS_AS_ERRORS)
+AC_SUBST(LINK)
+
+_WARNINGS_CXXFLAGS=
+
+dnl ========================================================
+dnl GNU specific defaults
+dnl ========================================================
+
+if test "$GNU_CC"; then
+
+   _WARNINGS_CXXFLAGS="${_WARNINGS_CXXFLAGS} -Wall"
+
+   AC_MSG_CHECKING([whether the compiler supports -Wno-invalid-offsetof])
+   AC_LANG_SAVE
+   AC_LANG_CPLUSPLUS
+   _SAVE_CXXFLAGS="$CXXFLAGS"
+   CXXFLAGS="$CXXFLAGS -Wno-invalid-offsetof"
+   AC_TRY_COMPILE([], [return(0);],
+                  ac_has_wno_invalid_offsetof="yes",
+                  ac_has_wno_invalid_offsetof="no")
+   CXXFLAGS="$_SAVE_CXXFLAGS"
+   AC_LANG_RESTORE
+   AC_MSG_RESULT($ac_has_wno_invalid_offsetof)
+
+    if test "$ac_has_wno_invalid_offsetof" = "yes"; then
+        _WARNINGS_CXXFLAGS="${_WARNINGS_CXXFLAGS} -Wno-invalid-offsetof"
+    fi
+
+    AC_MSG_CHECKING([whether the compiler supports -Wno-variadic-macros])
+    AC_LANG_SAVE
+    AC_LANG_CPLUSPLUS
+    _SAVE_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS ${_COMPILER_PREFIX}-Wno-variadic-macros"
+    AC_TRY_COMPILE([],
+                   [return(0);],
+                   ac_has_wno_variadic_macros="yes",
+                   ac_has_wno_variadic_macros="no")
+    CXXFLAGS="$_SAVE_CXXFLAGS"
+    AC_LANG_RESTORE
+    AC_MSG_RESULT($ac_has_wno_variadic_macros)
+
+    if test "$ac_has_wno_variadic_macros" = "yes"; then
+        _WARNINGS_CXXFLAGS="${_WARNINGS_CXXFLAGS} ${_COMPILER_PREFIX}-Wno-variadic-macros"
+    fi
+
+    AC_MSG_CHECKING([whether the compiler supports -Wno-psabi])
+    AC_LANG_SAVE
+    AC_LANG_CPLUSPLUS
+    _SAVE_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS ${_COMPILER_PREFIX}-Wno-psabi"
+    AC_TRY_COMPILE([],
+                   [return(0);],
+                   ac_has_wno_psabi="yes",
+                   ac_has_wno_psabi="no")
+    CXXFLAGS="$_SAVE_CXXFLAGS"
+    AC_LANG_RESTORE
+    AC_MSG_RESULT($ac_has_wno_psabi)
+
+    if test "$ac_has_wno_psabi" = "yes"; then
+        _WARNINGS_CXXFLAGS="${_WARNINGS_CXXFLAGS} ${_COMPILER_PREFIX}-Wno-psabi"
+    fi
+fi
+
+dnl ========================================================
+dnl --enable-thumb2
+dnl ========================================================
+
+AC_ARG_ENABLE(thumb2,
+[  --enable-thumb2         enable Thumb2 ARM build ],
+[ if test "$enableval" != "no"; then
+    VMCFG_THUMB2=1
+  else
+    VMCFG_FLOAT=
+  fi ],
+  [VMCFG_FLOAT=
+  ])
+
+dnl ========================================================
+dnl platform-specific stuff
+dnl ========================================================
+
+AC_MSG_CHECKING([nanojit target architecture])
+case "$target" in
+i?86-*)
+    NANOJIT_ARCH=i386
+    AC_DEFINE(AVMPLUS_IA32)
+    AC_DEFINE(VMCFG_SSE2)
+    ;;
+x86_64*-*)
+    NANOJIT_ARCH=X64
+    AC_DEFINE(AVMPLUS_AMD64)
+    AC_DEFINE(AVMPLUS_64BIT)
+    AC_DEFINE(VMCFG_SSE2)
+    ;;
+arm*-*)
+	if test "${VMCFG_THUMB2}" = "1" ; then
+       NANOJIT_ARCH=Thumb2
+       AC_DEFINE(AVMPLUS_ARM)
+       AC_DEFINE(VMCFG_NEON)
+	   if test "${VMCFG_FLOAT}" = "1" ; then
+          CXXFLAGS="$CXXFLAGS  -mthumb -mtune=cortex-a8 -mfloat-abi=hard -march=armv7-a -mfpu=neon -DTARGET_THUMB2"
+          CFLAGS="$CFLAGS  -mthumb -mtune=cortex-a8 -mfloat-abi=hard -march=armv7-a -mfpu=neon -DTARGET_THUMB2"
+	   fi
+    else
+       NANOJIT_ARCH=ARM
+       AC_DEFINE(AVMPLUS_ARM)
+	   if test "${VMCFG_FLOAT}" = "1" ; then
+          CXXFLAGS="$CXXFLAGS  -mfloat-abi=softfp -mfpu=neon"
+          CFLAGS="$CFLAGS  -mfloat-abi=softfp -mfpu=neon"
+	   fi
+    fi
+    ;;
+sparc*-*)
+    NANOJIT_ARCH=Sparc
+    AC_DEFINE(AVMPLUS_SPARC)
+    ;;
+powerpc*-*)
+    NANOJIT_ARCH=PPC
+    AC_DEFINE(AVMPLUS_PPC)
+    ;;
+mips*-*)
+    NANOJIT_ARCH=MIPS
+    AC_DEFINE(AVMPLUS_MIPS)
+    ;;
+sh4*-*)
+    NANOJIT_ARCH=SH4
+    AC_DEFINE(VMCFG_SH4)
+    ;;
+*)
+    AC_MSG_ERROR([Unrecognized nanojit target architecture.])
+esac
+AC_MSG_RESULT([NANOJIT_ARCH=$NANOJIT_ARCH])
+
+case "$target_os" in
+linux*)
+    AC_DEFINE(AVMPLUS_UNIX)
+    AC_DEFINE(AVMPLUS_LINUX)
+    ;;
+darwin*)
+    AC_DEFINE(AVMPLUS_UNIX)
+    ;;
+solaris*)
+    if test "$GCC" != "yes"; then
+    WARNINGS_AS_ERRORS=""
+    fi
+    AC_DEFINE(SOLARIS)
+    AC_DEFINE(AVMPLUS_UNIX)
+    ;;
+freebsd*|kfreebsd*)
+    AC_DEFINE(AVMPLUS_UNIX)
+    ;;
+*cygwin*|*mingw*|*mks*|*msvc*|*wince)
+    AC_DEFINE(AVMPLUS_WIN32)
+    ;;
+*os2*)
+    AC_DEFINE(AVMPLUS_OS2)
+    ;;
+*)
+    AC_MSG_ERROR([Unrecognized nanojit platform.])
+esac
+
+dnl ========================================================
+dnl final pieces
+dnl ========================================================
+
+CXXFLAGS="$CXXFLAGS ${_WARNINGS_CXXFLAGS}"
+
+AC_SUBST(CFLAGS)
+AC_SUBST(LDFLAGS)
+AC_SUBST(CXXFLAGS)
+AC_SUBST(CPPFLAGS)
+AC_SUBST(TESTCFG)
+
+AC_SUBST(LD)
+AC_SUBST(CC)
+AC_SUBST(CXX)
+
+AC_DEFINE(FEATURE_NANOJIT)
+AC_SUBST(NANOJIT_ARCH)
+
+AC_OUTPUT(Makefile)

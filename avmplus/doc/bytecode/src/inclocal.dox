@@ -1,0 +1,48 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page inclocal 
+
+\addindex inclocal
+
+
+\section inclocal inclocal
+
+\subsection operation Operation
+
+Increment a local register value.
+
+\subsection format Format
+
+\code
+inclocal
+index
+\endcode
+
+\subsection forms Forms
+\code
+inclocal = 146 (0x92)
+\endcode
+\subsection stack Stack
+
+\code
+... => ...
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index of a local register. The value of the local 
+register at index is converted to a Number using the ToNumber algorithm (ECMA-262 
+section 9.3) and then 1 is added to the Number value. The local register at index 
+is then set to the result.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

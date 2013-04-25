@@ -1,0 +1,29 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function script0$init():*
+{
+  // local_count=1 max_scope=1 max_stack=3 code_len=24
+  debugfile "namespaces.abs"
+  debugline 1
+  0         getlocal0     	
+  1         pushscope     	
+  2         getlocal0     	
+  3         finddef       	{package}::parseInt
+  5         pushstring    	"123456789012345678"
+  debugline 2
+  7         callproperty  	parseInt (1)
+  10        setlocal 1
+  debugline 3
+			pushscope
+            getlocal0     	
+  			pushnamespace foo.bar
+			dup
+			pushscope
+  12        findpropstrict	{package,private,foo.bar}::print
+  			swap
+  debugline 4
+  20        callproperty  	print (1)
+  23        returnvalue   	
+}

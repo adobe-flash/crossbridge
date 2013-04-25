@@ -1,0 +1,39 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+.begin sinpibytwo
+pi = immf 3.1415926535897932384626433832795
+pi4 = f2f4 pi
+factor = immf4 0.5 1 1.5 2
+mpi = mulf4 pi4 factor
+
+pf1 = f4x mpi
+pd1 = f2d pf1
+res1 = calld sin cdecl pd1
+pf2 = f4y mpi
+pd2 = f2d pf2
+res2 = calld sin cdecl pd2
+pf3 = f4z mpi
+pd3 = f2d pf3
+res3 = calld sin cdecl pd3
+pf4 = f4w mpi
+pd4 = f2d pf4
+res4 = calld sin cdecl pd4
+
+p = allocp 16
+std2f res1 p 0
+std2f res2 p 4
+std2f res3 p 8
+std2f res4 p 12
+res = ldf4 p 0
+retf4 res
+.end
+
+.begin main
+aa4 = callf4 sinpibytwo fastcall
+bb = immf 5.53
+bb4 = f2f4 bb
+res = addf4 aa4 bb4
+retf4 res
+.end

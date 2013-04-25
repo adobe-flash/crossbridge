@@ -1,0 +1,86 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+//http://watsonexp.corp.adobe.com/#bug=3328170
+method_info { 
+    name: runTest 
+//    flags: SETS_DXNSk //not implemented
+}
+method_body_info {
+
+    method: runTest
+
+    traits: {
+        trait { kind: Trait_Slot name: var1 }
+    }
+    code:
+    {
+        getlocal0
+        pushscope
+        
+        findproperty COMPARE_STRICTEQ
+        pushstring "equals null and undefined"
+        pushtrue // expected
+        pushnull
+        pushundefined
+        equals
+        callpropvoid COMPARE_STRICTEQ 3
+        
+        findproperty COMPARE_STRICTEQ
+        pushstring "equals undefined and null "
+        pushtrue // expected
+        pushundefined
+        pushnull
+        equals
+        callpropvoid COMPARE_STRICTEQ 3
+        
+        findproperty COMPARE_STRICTEQ
+        pushstring "equals null and null "
+        pushtrue // expected
+        pushnull
+        pushnull
+        equals
+        callpropvoid COMPARE_STRICTEQ 3
+        
+        findproperty COMPARE_STRICTEQ
+        pushstring "equals uint and null "
+        pushfalse // expected
+        pushuint 0xFFFFFF
+        pushnull
+        equals
+        callpropvoid COMPARE_STRICTEQ 3
+        
+        /* UNIMPLEMNTED OPCODES
+        findproperty COMPARE_STRICTEQ
+        pushstring "esc_xattr null"
+        pushstring "null" // expected
+        pushnull
+        esc_xattr
+        callpropvoid COMPARE_STRICTEQ 3
+        
+        findproperty COMPARE_STRICTEQ
+        pushstring "esc_xelem"
+        pushstring "null" // expected
+        pushnull
+        esc_xelem
+        callpropvoid COMPARE_STRICTEQ 3
+		*/
+        returnvoid
+    }
+}
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "Instructions that start with the letter E" 
+    callpropvoid START 1
+    newfunction runTest
+    getlocal0
+    call 0
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+script_info{init: main}

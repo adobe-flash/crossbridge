@@ -1,0 +1,89 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function runTest()
+{
+		findproperty COMPARE_STRICTEQ
+	pushstring "label and lessequals"
+		pushint 2 // expected
+		pushint 0
+	backEdgeNeedsLabel:
+		label
+		increment_i
+		dup
+		pushint 1
+		lessequals
+		iftrue backEdgeNeedsLabel
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "label and lessthan"
+		pushint 7 // expected
+		pushint 0
+	lessthanBackEdge:
+		label
+		increment_i
+		dup
+		pushint 7
+		lessthan
+		iftrue lessthanBackEdge
+		callpropvoid COMPARE_STRICTEQ 3
+
+		/*
+		 *  TODO: assembler support for lookupswitch
+		 */
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "lshift"
+		pushint 16 // expected
+		pushint 8
+		pushuint 0x00123401
+		lshift
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "lshift 1 << 0x1f"
+		pushint -2147483647 // expected
+		pushint 1
+		pushuint 0x1f
+		lshift
+		//  Working around cheesy assembler limitation
+		swap
+		decrement_i
+		swap
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "lshift 0x010101 << 0x1f"
+		pushint -2147483647 // expected
+		pushint 0x010101
+		pushuint 0x1f
+		lshift
+		//  Working around cheesy assembler limitation
+		swap
+		decrement_i
+		swap
+		callpropvoid COMPARE_STRICTEQ 3
+
+
+
+
+		returnvoid
+}
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "instructions that start with the letter L" 
+	callpropvoid START 1
+	newfunction runTest
+	getlocal0
+	call 0
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+
+script_info{init: main}

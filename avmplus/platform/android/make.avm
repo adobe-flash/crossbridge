@@ -1,0 +1,183 @@
+#  This Source Code Form is subject to the terms of the Mozilla Public
+#  License, v. 2.0. If a copy of the MPL was not distributed with this
+#  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+
+AVMPLUS_DIR := ../..
+
+#****************************************************************************
+# Source files
+#****************************************************************************
+
+AVMPLUS_SRCS := \
+	AbcEnv.cpp \
+	AbcData.cpp \
+	AbcParser.cpp \
+	ActionBlockConstants.cpp \
+	ArrayClass.cpp \
+	ArrayObject.cpp \
+	AvmCore.cpp \
+	avm.cpp \
+    avmfeatures.cpp \
+	avmplus.cpp \
+	avmplusDebugger.cpp \
+	avmplusHashtable.cpp \
+	avmplusList.cpp \
+	AvmPlusScriptableObject.cpp \
+	BigInteger.cpp \
+	BooleanClass.cpp \
+	BuiltinTraits.cpp \
+	ByteArrayGlue.cpp \
+	ClassClass.cpp \
+	ClassClosure.cpp \
+	Date.cpp \
+	DataIO.cpp \
+	DateClass.cpp \
+	DateObject.cpp \
+	DescribeTypeClass.cpp \
+	Domain.cpp \
+	DomainEnv.cpp \
+	DomainMgr.cpp \
+	E4XNode.cpp \
+	ErrorClass.cpp \
+	ErrorConstants.cpp \
+	exec.cpp \
+	exec-jit.cpp \
+	exec-osr.cpp \
+	exec-verifyall.cpp \
+	Exception.cpp \
+	FrameState.cpp \
+	FunctionClass.cpp \
+	instr.cpp \
+	IntClass.cpp \
+	Interpreter.cpp \
+	MathClass.cpp \
+	MathUtils.cpp \
+	MethodClosure.cpp \
+	MethodEnv.cpp \
+	MethodInfo.cpp \
+	Multiname.cpp \
+	MultinameHashtable.cpp \
+	Namespace.cpp \
+	NamespaceClass.cpp \
+	NamespaceSet.cpp \
+	NativeFunction.cpp \
+	NumberClass.cpp \
+	ObjectClass.cpp \
+	peephole.cpp \
+	PoolObject.cpp \
+	PrintWriter.cpp \
+	QCache.cpp \
+	RegExpClass.cpp \
+	RegExpObject.cpp \
+	Sampler.cpp \
+	ScopeChain.cpp \
+	ScriptBuffer.cpp \
+	ScriptObject.cpp \
+	StackTrace.cpp \
+	StringBuffer.cpp \
+	StringClass.cpp \
+	StringObject.cpp \
+	Toplevel.cpp \
+	Traits.cpp \
+	TypeDescriber.cpp \
+	UnicodeUtils.cpp \
+    UnixDebugUtils.cpp \
+	VectorClass.cpp \
+	Verifier.cpp \
+	VTable.cpp \
+	WordcodeEmitter.cpp \
+	WordcodeTranslator.cpp \
+	wopcodes.cpp \
+	XMLClass.cpp \
+	XMLListClass.cpp \
+	XMLListObject.cpp \
+	XMLObject.cpp \
+	XMLParser16.cpp \
+	CodegenLIR.cpp \
+	LirHelper.cpp \
+	Allocator.cpp \
+	CodeAlloc.cpp \
+	Containers.cpp \
+	Assembler.cpp \
+	Fragmento.cpp \
+	LIR.cpp \
+	njconfig.cpp \
+	RegAlloc.cpp \
+	pcre_chartables.cpp \
+	pcre_compile.cpp \
+	pcre_config.cpp \
+	pcre_exec.cpp \
+	pcre_fullinfo.cpp \
+	pcre_get.cpp \
+	pcre_globals.cpp \
+	pcre_info.cpp \
+	pcre_maketables.cpp \
+	pcre_newline.cpp \
+	pcre_ord2utf8.cpp \
+	pcre_refcount.cpp \
+	pcre_study.cpp \
+	pcre_tables.cpp \
+	pcre_try_flipped.cpp \
+	pcre_valid_utf8.cpp \
+	pcre_version.cpp \
+	pcre_xclass.cpp \
+	MathUtilsUnix.cpp \
+	OSDepUnix.cpp \
+	ThreadsPosix.cpp \
+	SpyUtilsPosix.cpp \
+	PosixPortUtils.cpp \
+	AvmLog.cpp \
+	Coder.cpp \
+    eval-abc.cpp \
+    eval-avmplus.cpp \
+    eval-cogen.cpp \
+    eval-cogen-expr.cpp \
+    eval-cogen-stmt.cpp \
+    eval-compile.cpp \
+    eval-lex.cpp \
+    eval-lex-xml.cpp \
+    eval-parse.cpp \
+    eval-parse-config.cpp \
+    eval-parse-expr.cpp \
+    eval-parse-stmt.cpp \
+    eval-parse-xml.cpp \
+    eval-unicode.cpp \
+    eval-util.cpp \
+	atom.cpp \
+	float4Support.cpp \
+	AvmAssert.cpp \
+	ProxyGlue.cpp 
+
+ifeq ($(ENABLE_NANOJIT),true)
+	AVMPLUS_SRCS := ${AVMPLUS_SRCS} NativeARM.cpp
+endif
+	
+vpath %.cpp ${AVMPLUS_DIR}/core	\
+	${AVMPLUS_DIR}/nanojit	\
+	${AVMPLUS_DIR}/pcre	\
+	${AVMPLUS_DIR}/platform/unix \
+ 	${AVMPLUS_DIR}/VMPI \
+ 	${AVMPLUS_DIR}/generated \
+ 	${AVMPLUS_DIR}/eval
+
+AVMPLUS_LIB := ${LIBDIR}/libavmplus.a
+AVMPLUS_OBJS := $(addprefix ${OBJDIR}/avm/, $(AVMPLUS_SRCS:.cpp=.o))
+AVMPLUS_DEPS := $(addprefix ${OBJDIR}/avm/, $(AVMPLUS_SRCS:.cpp=.d))
+
+$(OBJDIR)/avm/%.o: %.cpp
+	${call compile-files-arm,avm}
+
+
+# clz is not supported on thumb before armv6t2
+ifneq (${TARGET_ARCH}, ARMV7-A)
+$(OBJDIR)/avm/NativeARM.o: $(AVMPLUS_DIR)/nanojit/NativeARM.cpp
+	${call compile-files-arm,avm}
+endif
+
+${AVMPLUS_LIB}: ${AVMPLUS_OBJS}
+	${call make-lib,${AVMPLUS_OBJS}}
+	
+-include ${AVMPLUS_DEPS}
+
+

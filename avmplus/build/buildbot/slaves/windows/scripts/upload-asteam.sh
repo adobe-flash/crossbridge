@@ -1,0 +1,55 @@
+#!/bin/bash
+#  This Source Code Form is subject to the terms of the Mozilla Public
+#  License, v. 2.0. If a copy of the MPL was not distributed with this
+#  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+(set -o igncr) 2>/dev/null && set -o igncr; # comment is needed
+
+##
+# Bring in the environment variables
+##
+. ./environment.sh
+
+
+##
+# Calculate the change number and change id
+##
+. ../all/util-calculate-change.sh $1
+
+
+## Upload the normal binaries for this machine
+../all/upload-asteam.sh $change
+
+# bring in the win64 environment this will reset the shell names so that the x64 shells are uploaded
+. ../windows64/scripts/environment.sh
+# Release
+../all/util-upload-ftp-asteam.sh $buildsdir/$change-${changeid}/$platform/$shell_release $ftp_asteam/$branch/$change-${changeid}/$platform/$shell_release
+ret=$?
+if [ "$ret" != "0" ]; then
+    echo "Uploading of $platform/$shell_release failed"
+    exit 1
+fi
+
+# Release_Debugger
+../all/util-upload-ftp-asteam.sh $buildsdir/$change-${changeid}/$platform/$shell_release_debugger $ftp_asteam/$branch/$change-${changeid}/$platform/$shell_release_debugger
+ret=$?
+if [ "$ret" != "0" ]; then
+    echo "Uploading of $platform/$shell_release_debugger failed"
+    exit 1
+fi
+
+# Debug
+../all/util-upload-ftp-asteam.sh $buildsdir/$change-${changeid}/$platform/$shell_debug $ftp_asteam/$branch/$change-${changeid}/$platform/$shell_debug
+ret=$?
+if [ "$ret" != "0" ]; then
+    echo "Uploading of $platform/$shell_debug failed"
+    exit 1
+fi
+
+#Debug_Debugger
+../all/util-upload-ftp-asteam.sh $buildsdir/$change-${changeid}/$platform/$shell_debug_debugger $ftp_asteam/$branch/$change-${changeid}/$platform/$shell_debug_debugger
+ret=$?
+if [ "$ret" != "0" ]; then
+    echo "Uploading of $platform/$shell_debug_debugger failed"
+    exit 1
+fi
+

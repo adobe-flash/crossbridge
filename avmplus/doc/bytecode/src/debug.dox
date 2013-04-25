@@ -1,0 +1,58 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page debug 
+
+\addindex debug
+
+
+\section debug debug
+
+\subsection operation Operation
+
+Debugging info.
+
+\subsection format Format
+
+\code
+debug 
+debug_type 
+index 
+reg
+extra
+\endcode
+
+\subsection forms Forms
+\code
+debug = 239 (0xef)
+\endcode
+\subsection stack Stack
+
+\code
+... => ...
+\endcode
+
+\subsection description Description
+
+debug_type is an unsigned byte. If the value of debug_type is DI_LOCAL (1), then this is 
+debugging information for a local register.
+
+index is a u30 that must be an index into the string constant pool. The string at index is 
+the name to use for this register.
+
+reg is an unsigned byte and is the index of the register that this is debugging information 
+for. extra is a u30 that is currently unused.
+
+When debug_type has a value of 1, this tells the debugger the name to display for the 
+register specified by reg. If the debugger is not running, then this instruction does nothing.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

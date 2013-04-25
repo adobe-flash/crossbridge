@@ -1,0 +1,72 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function funcOne():void
+{
+	//pushstring "inside funcOne"
+	//.print
+	returnvoid
+}
+
+function redefFuncOne():void
+{
+	getlocal0
+	pushscope
+	findproperty funcOne
+	newfunction funcOne
+	setslot 1
+	returnvoid
+}
+
+function main()
+{
+	getlocal0
+	pushscope
+
+	findpropstrict START
+	pushstring "calling a function twice, with different scopes"
+	callproperty START 1
+
+	getlocal0
+	findproperty redefFuncOne
+	newfunction redefFuncOne
+	setslot 2
+
+	getlocal0
+	findproperty funcOne
+	newfunction funcOne
+	dup
+	setlocal3
+	setslot 1
+
+	callpropvoid funcOne 0
+
+	getlocal0
+	callpropvoid redefFuncOne 0
+
+	getlocal0
+	callpropvoid funcOne 0
+
+	getlocal0
+	getlocal3
+	setslot 1
+	callpropvoid funcOne 0
+
+	findpropstrict END
+	callproperty END 0
+
+	returnvoid
+}
+
+
+
+script_info { 
+	init: main
+	traits: {
+		trait { kind: Trait_Slot name: funcOne slot_id:1 }
+		trait { kind: Trait_Slot name: redefFuncOne slot_id:2}
+	}
+}
+

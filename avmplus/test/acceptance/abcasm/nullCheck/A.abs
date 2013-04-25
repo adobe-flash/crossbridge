@@ -1,0 +1,170 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function runTest()
+{
+    getlocal0
+    pushscope
+
+    findproperty START 
+    pushstring "add" 
+    callpropvoid START 1
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "String add"
+    pushstring "String null" // expected
+    pushstring "String "
+    pushnull
+    add // actual
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "Integer add"
+    pushint 9381 // expected
+    pushint 9381
+    pushnull
+    add
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "uint add"
+    pushuint 0x03003231 // expected
+    pushnull
+    pushuint 0x03003231
+    add
+    callpropvoid COMPARE_STRICTEQ 3
+    findproperty COMPARE_STRICTEQ
+    pushstring "double add"
+    pushdouble 999993E+15 // expected
+    pushnull
+    pushdouble 999993E+15
+    add
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty END
+    callpropvoid END 0
+    
+    returnvoid
+}
+
+function runTest1()
+{
+    findproperty START 
+    pushstring "add_i" 
+    callpropvoid START 1
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "add_i ints"
+    pushint 4 // expected
+    pushint 4
+    pushnull
+    add_i
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "add_i int/uint"
+    pushint 0x00008918 // expected
+    pushnull
+    pushint 0x00008918
+    add_i
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty END
+    callpropvoid END 0
+
+    returnvoid
+}
+/* not implemented
+function runTest2()
+{
+    findproperty START 
+    pushstring "astype" 
+    callpropvoid START 1
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "null astype int"
+    pushnull // expected
+    pushnull
+    astype int
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "null astype Object"
+    pushnull // expected
+    pushnull
+    astype Object
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "null astype void"
+    pushnull // expected
+    pushnull
+    astype void
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty END
+    callpropvoid END 0
+
+    returnvoid
+}
+
+function runTest3()
+{
+    findproperty START 
+    pushstring "astypelate" 
+    callpropvoid START 1
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "null astypelate int"
+    pushnull // expected
+    pushnull
+    findproperty int
+    getproperty int
+    astypelate
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "null astypelate Object"
+    pushnull // expected
+    pushnull
+    findproperty Object
+    getproperty Object
+    astypelate 
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty END
+    callpropvoid END 0
+
+    returnvoid
+}
+*/
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "nullcheck - Instructions that start with the letter A" 
+    callpropvoid START 1
+    
+    newfunction runTest
+    getlocal0
+    call 0
+    
+    newfunction runTest1
+    getlocal0
+    call 0
+/* not implemented
+    newfunction runTest2
+    getlocal0
+    call 0
+
+    newfunction runTest3
+    getlocal0
+    call 0
+*/    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+script_info{init: main}

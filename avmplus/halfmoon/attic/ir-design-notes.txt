@@ -1,0 +1,106 @@
+
+IR Features: BUY/SELL/HOLD
+
+1. Sea of nodes: (ed: HOLD, mz: SELL) (really: how to handle control dependencies)
+  - are all edges depends-on relations?
+    SON: yes
+    LLVM/LIR: no, data edges are depends-on, branch targets are anti-deps
+  - is it important to treat dependence uniformly?
+  - our control edges are not PDG-style control dependencies anyway
+  - whether/not FCFG is orthagonal to SON.
+
+  - does the IR preserve blocks?  
+  - are the instructions always in a total order?
+
+SON:  control = value = type = dependence
+   t,f = if (cond)
+
+TRADITIONAL:  control = succ, not value, not typed
+   if (cond, t, f)
+
+2. Instr Infos (mz: BUY)
+  - separate instruction from personality: too cute, or genuinely useful?
+  + saves space
+  + specialize = 1 store. (mutate in place)
+  + don't have to use virtual calls for everything.  node attributes are on info object.
+
+3. ResultRef (ed: HOLD, mz: SPIN) (or, multiple-values per instruction)
+  - alternative: projections might be okay if uncommon
+  - need a store for OP_hasnext2 (2-input, 3-output, has side effects)
+  - N-way branches have N "results" if control successors are "values"
+
+4. Maintain def-use chains? (ed: SELL) (but LLVM does)
+  +/- could hide def-use chain update behind protocol.
+  - replacing one instruction with another is easy.  
+  + sparse algorithms profit from seeing uses at def sites
+  - but, if you traverse anyway, you will visits uses later.  C1 does okay without du chains.
+
+5. S-expressions to hand-write IR.  or another syntax? or nothing?
+  - ed: we just need a shorthand for handwritten IR, nothing more.
+  - Bebenita, others: easy-to-serialize IR is important.
+
+6. two-level IR? (cfg vs IR graph).
+  - C1 and LLVM have CFG, but its all at one level,
+    blocks are a kind of instruction (C1) or value (LLVM).
+  - without a CFG, you must run a scheduler at some point.  
+  + but if you schedule anyway, no problem.
+  - assigning instrs to blocks seems useful even without a total
+    ordering, because dominator algorithms work on blocks. (SSI might need doms)
+
+Beleivable optimizer passes:
+  - inlining
+  - null pointer check elimination
+  - diamond-shaped snippets (OP_add)
+  - PICs  (get/set/call/add)
+--------------------------------------------
+
+CPS:
+   B1:                   B2:
+   goto label(v1,v2);    goto label(v3,v4)
+
+   label:
+     p1 = param 1
+     p2 = param 2
+
+	if cond
+		goto L1(v1,v2)
+	else
+		goto L2(v3,v4)
+
+	L1(p1,p2):
+		... 
+
+
+C1:
+   B1:                   B2:
+   state=[...]           state=[...]
+   goto label;           goto label
+
+   label: preds[b1,b2]
+     phi = 1
+     phi = 2
+
+LLVM: 
+   B1:             B2:
+   goto label      //goto label
+
+   label:
+     p1 = phi((b1,v1),(b2,v3))
+     p2 = phi((b1,v2),(b2,v4))
+
+SSA: 
+   x = ...
+   if (...) B1 else B2
+
+   B1:             B2:
+   goto label      goto label
+
+   label:
+     p1 = phi(v1,v3)
+     p2 = phi(v2,v4)
+	 c = p1 + x
+
+p1 = phi(y,y,y)    => y
+p1 = phi(p1,y,y)   => y
+
+

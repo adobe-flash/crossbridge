@@ -1,0 +1,105 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function runTest()
+{
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "negate null"
+    pushint 0 // expected
+    pushnull
+    negate
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "negate_i null"
+    pushint 0 // expected
+    pushnull
+    negate_i
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "null newarray"
+    pushint 1 // expected
+    pushnull
+    newarray  1
+    getproperty length
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "newobject getproperty"
+    pushnull // expected
+    pushstring "foo"
+    pushnull
+    newobject 1
+    getproperty foo
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    
+    /* TODO: reenable after https://bugzilla.mozilla.org/show_bug.cgi?id=491355 fixed */
+    /*
+    try {
+        pushnull
+        pushint 1234
+        nextname
+        
+        pop
+        
+        findproperty FAIL
+        pushstring "nextname null"
+        pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_nextname_null
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "nextname null"
+        pushstring "TypeError: Error #1009" //Cannot access a property or method of a null object reference.  // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_nextname_null:
+    
+    // nextvalue also crashing
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=491355
+    findproperty COMPARE_STRICTEQ
+    pushstring "nextvalue"
+    pushnull // expected
+    pushnull
+    pushint 8
+    nextvalue
+    callpropvoid COMPARE_STRICTEQ 3
+    */
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "not null"
+    pushtrue // expected
+    pushnull
+    not
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    returnvoid
+}
+
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "Instructions that start with the letter N" 
+    callpropvoid START 1
+    newfunction runTest
+    getlocal0
+    call 0
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+script_info{init: main}

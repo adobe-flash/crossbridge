@@ -1,0 +1,120 @@
+<!--
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+-->
+<div class="Announcement">
+<iframe width="100%" height="30" frameborder="0" scrolling="no" src="status.html"></iframe>
+<center>
+    <table width="100%" valign="top" bgcolor="#efefef" style="border-top-left-radius: 10px; -webkit-border-top-left-radius: 40px;  -webkit-border-top-right-radius: 40px;  -webkit-border-bottom-left-radius: 40px;  -webkit-border-bottom-right-radius: 40px; ">
+        <tr>
+            <td width="23%">
+<!--                <iframe src="left.html"/> -->
+
+                <table valign="top" width="100%">
+                    <tr><td style="text-align: right;"><b>7d
+                    summary:</b></td><td><a target="_blank" href="analytics/status.html">redux interactive applet</a></td></tr>
+                    <tr>
+                    <td colspan="2" align="center">
+                        <a href="analytics/buildbotstatus-redux.png"
+                    class="highslide" onclick="return hs.expand(this);">
+                        <img src="analytics/buildbotstatus-redux-tn.png"/>
+                        </a></td>
+                    </tr>
+                    <!--
+                    <tr><td style="text-align: right;"><b>7d
+                    summary:</b></td><td><a target="_blank" href="analytics/status-argo.html">argo interactive applet</a></td></tr>
+                    <tr>
+                    <td colspan="2" align="center">
+                        <a href="analytics/buildbotstatus-argo.png"
+                    class="highslide" onclick="return hs.expand(this);">
+                        <img src="analytics/buildbotstatus-argo-tn.png"/>
+                        </a></td>
+                    </tr>
+                    -->
+                    <tr>
+                        <td style="text-align: right;">
+                            <b>Builds:</b>
+                        </td>
+                        <td>
+                            <a href="ftp://ftp.mozilla.org/pub/js/tamarin/builds/tamarin-redux/">continuous</a> |
+                            <a href="ftp://ftp.mozilla.org/pub/js/tamarin/builds/milestones/">milestones</a> |
+                            <a href="http://tamarin-builds.mozilla.org/tamarin-redux/analytics/index.html">analytics</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right;">
+                            <b>Development:</b>
+                        </td>
+                        <td>
+                            <a href="http://tamarin-builds.mozilla.org/build_trigger/requestbuild.cfm">request a build</a> |
+                            <a href="http://hg.mozilla.org/tamarin-redux/">source</a> |
+                            <a href="https://bugzilla.mozilla.org/">bugs</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right;">
+                            <b>Tamarin:</b>
+                        </td>
+                        <td>
+                            <a href="http://www.mozilla.org/projects/tamarin/">www</a> |
+                            <a href="http://blog.mozilla.com/tamarin/">blog</a> |
+                            <a href="https://developer.mozilla.org/en/Tamarin">dev</a> |
+                            <a href="https://developer.mozilla.org/En/Tamarin/Tamarin_Build_System_Documentation">build system</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right;">
+                            <b>Tools:</b>
+                        </td>
+                        <td>
+                           <a href="./jetpack.html">jetpack</a>
+                           <a href="./waterfall/help">customize</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td width="1" bgcolor="#CCCCCC">
+            </td>
+            <td width="2%">
+            </td>
+            <td width="72%">
+                <table width="100%">
+                    <script language="javascript">
+                      var deep = "builder=windows-deep&builder=windows64-deep&builder=mac-deep&builder=mac64-deep&builder=linux-deep&builder=linux-arm-deep&builder=linux-mips-deep"
+
+                        var bar = "./horizontal_one_box_per_builder"
+                        var waterfall = "./waterfall"
+                        var status_url = "http://tamarin-builds.mozilla.org/build_trigger/isactive.cfm?builder="
+
+                        function GetUrl(type, content) {
+                            return type + "?" + content;
+                        }
+
+                        function DisplayHeader(name) {
+                            //document.write('<tr><td class="Event" align="center" colspan="3">'+name+'</td></tr>');
+                            document.write('<tr><td class="Event" align="center">Phase</td><td class="Event" align="center">Status</td><td class="Event" align="center">'+name+' Builders</td></tr>');
+                        }
+                        function DisplayBar(content, name, builder) {
+                            document.write("<tr><td><a href='" + GetUrl(waterfall, content) + "'>" + name + "</a></td><td><iframe width='60' height='20' frameborder='0' scrolling='no' src='" + status_url + builder + "'></iframe></td><td width='99%'><iframe width='100%' height='20' frameborder='0' scrolling='no' src='" + GetUrl(bar, content) + "'></iframe></td></tr>\n");
+                        }
+
+                        DisplayHeader("Main Build Phase 1");
+                        document.write('<tr><td align="center" colspan="3">All builds have moved to <a href="http://tamarin-jenkins.corp.adobe.com/view/Tamarin-Redux/">http://tamarin-jenkins.corp.adobe.com/view/Tamarin-Redux/</a></td></tr>');
+                        DisplayHeader("Main Build Phase 2");
+                        document.write('<tr><td>Performance</td><td></td><td>Performance builds have been moved to the <a href="http://tamarin-sandbox.corp.adobe.com:8761/waterfall">internal sandbox</a></td></tr>');
+                        DisplayBar(deep, "Deep-Test", "deep");
+
+                        DisplayHeader("Sandbox Build");
+                        document.write('<tr><td align="center" colspan="3">All builds have moved to <a href="http://tamarin-jenkins.corp.adobe.com/view/Sandbox/">http://tamarin-jenkins.corp.adobe.com/view/Sandbox/</a></td></tr>');
+                    </script>
+
+                </table>
+            </td>
+            <td width="3%">
+            </td>
+        </tr>
+    </table>
+</center>
+
+</div>

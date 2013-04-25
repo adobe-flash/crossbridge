@@ -1,0 +1,78 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+.begin many_params
+qa = paramq 0 0
+qb = paramq 1 0
+qc = paramq 2 0
+qd = paramq 3 0
+; Stack-based args not supported yet, use immediates instead of param
+qq = immq 4
+qe = addq qa qq ;qe = paramq 4 0
+qf = addq qb qq ;qf = paramq 5 0
+qg = addq qc qq ;qg = paramq 6 0
+qh = addq qd qq ;qh = paramq 7 0
+pa = q2i qa
+pb = q2i qb
+pc = q2i qc
+pd = q2i qd
+pe = q2i qe
+pf = q2i qf
+pg = q2i qg
+ph = q2i qh
+da = i2d pa
+db = i2d pb
+dc = i2d pc
+dd = i2d pd
+de = ui2d pe
+df = ui2d pf
+dg = ui2d pg
+dh = ui2d ph
+
+res1 = addd da db
+res2 = addd res1 dc
+res3 = addd res2 dd
+res4 = addd res3 de
+res5 = addd res4 df
+res6 = addd res5 dg
+res7 = addd res6 dh
+res8 = negd res7
+res9 = addd res8 res1
+res = d2i res9
+resq = i2q res
+retq resq
+
+; stress the register allocator
+lived da
+lived db
+lived dc
+lived dd
+lived de
+lived df
+lived dg
+lived dh
+lived res1
+lived res2
+lived res3
+lived res4
+lived res5
+lived res6
+lived res7
+lived res8
+lived res9
+
+.end
+
+.begin main
+a = immq 1
+b = immq 2
+c = immq 3
+d = immq 4
+e = immq 5
+f = immq 6
+g = immq 7
+h = immq 8
+res = callq many_params fastcall a b c d ; Don't pass (e f g h) - se comment in function
+retq res
+.end

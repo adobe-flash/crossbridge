@@ -1,0 +1,48 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page newcatch 
+
+\addindex newcatch
+
+
+\section newcatch newcatch
+
+\subsection operation Operation
+
+Create a new catch scope.
+
+\subsection format Format
+
+\code
+newcatch
+index
+\endcode
+
+\subsection forms Forms
+\code
+newcatch = 90 (0x5a)
+\endcode
+\subsection stack Stack
+
+\code
+... => ..., catchscope
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index of an exception_info structure for this method. 
+
+This instruction creates a new object to serve as the scope object for the catch block for the
+exception referenced by index. This new scope is pushed onto the operand stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

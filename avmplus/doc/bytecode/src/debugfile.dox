@@ -1,0 +1,52 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page debugfile 
+
+\addindex debugfile
+
+
+\section debugfile debugfile
+
+\subsection operation Operation
+
+Debugging line number info.
+
+\subsection format Format
+
+\code
+debugfile 
+index
+\endcode
+
+\subsection forms Forms
+\code
+debugfile = 241 (0xf1)
+\endcode
+\subsection stack Stack
+
+\code
+... => ...
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index into the string constant pool
+
+If the debugger is running, then this instruction sets the current file name in the debugger 
+to the string at position index of the string constant pool. This lets the debugger know 
+which instructions are associated with each source file. The debugger will treat all 
+instructions as occurring in the same file until a new debugfile opcode is encountered.
+
+This instruction must occur before any debugline opcodes.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

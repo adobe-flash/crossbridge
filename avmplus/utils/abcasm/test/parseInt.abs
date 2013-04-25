@@ -1,0 +1,43 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+function script0$init():*
+{
+  // local_count=1 max_scope=1 max_stack=3 code_len=24
+  0         getlocal0     	
+  			debugfile "parseIntPrime.abs"
+  1         pushscope     	
+  2         getlocal0     	
+  			debugline 9
+  			//  multiname qualified with one namespace.
+  3         finddef       	{package}::parseInt
+  5         pushstring    	"123456789012345"
+  			debugline 12
+  			//  Bare name, in this case
+			//  it will resolve to a QName.
+  7         callproperty  	parseInt (1)
+            dup
+  10        setlocal 1
+  			debugline 15
+  			//  This unqualified name
+			//  must be a multiname;
+			//  the assembler will synthesize a
+			//  {package,private} nsset.
+  12        findpropstrict	print
+            dup
+			setlocal3
+  14        pushstring    	"result = "
+  17        getlocal1
+  19        add           	
+  			debugline 21
+  20        callproperty  	print (1)
+
+			//  Print the result's type.
+            getlocal3
+            pushstring "type is "
+			getlocal1
+			typeof
+			add
+			callproperty print(1)
+  23        returnvalue   	
+}

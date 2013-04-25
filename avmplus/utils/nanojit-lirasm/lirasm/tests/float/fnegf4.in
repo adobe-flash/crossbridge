@@ -1,0 +1,18 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+d = allocp 16
+zero = immf -0
+f4 = f2f4 zero
+stf4 f4 d 0
+nan = divf zero zero
+stf nan d 8
+
+p0 = immf4 123.456 0 -0 -9e99
+
+p1 = ldf4 d 0
+p = addf4 p0 p1
+
+n = negf4 p
+retf4 n

@@ -1,0 +1,55 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page callstatic 
+
+\addindex callstatic
+
+
+\section callstatic callstatic
+
+\subsection operation Operation
+
+Call a method identified by index in the abcFile method table.
+
+\subsection format Format
+
+\code
+callstatic 
+index 
+arg_count
+\endcode
+
+\subsection forms Forms
+\code
+callstatic = 68 (0x44)
+\endcode
+\subsection stack Stack
+
+\code
+..., receiver, arg1, arg2, ..., argn => ..., value
+\endcode
+
+\subsection description Description
+
+index is a u30 that is the index of the method_info of the method to invoke. arg_count 
+is a u30 that is the number of arguments present on the stack. receiver is the object to 
+invoke the method on.
+
+The method at position index is invoked with the arguments receiver, arg1, ..., argn. 
+The receiver will be used as the “this” value for the method. The result of the method is
+pushed onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if receiver is null or undefined. 
+
+An ArgumentError is thrown if the number of arguments does not match the expected number 
+of arguments for the method.
+
+\subsection notes Notes
+
+None.
+
+*/
+

@@ -1,0 +1,39 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+ /*
+  *  Bind a function to a global slot; refer to it by .function_id 
+  *  in the newfunction instruction.
+  */
+.script_info {
+	init: .function_id(main)
+	traits : {
+		.trait { kind: Trait_Slot name: zarquon slot_id:1 type_name:* }
+	}
+}
+function main()
+{
+	getlocal0
+	pushscope
+	newfunction .function_id(zarquon)
+ 
+	getglobalscope
+	swap
+	setslot             1
+	getglobalscope
+	getslot 1
+
+	getlocal0
+	call  0
+	returnvoid
+    
+}
+
+function zarquon()
+{
+	findpropstrict      print
+	pushstring          "hello, world."
+	callpropvoid        print (1)
+	returnvoid
+}

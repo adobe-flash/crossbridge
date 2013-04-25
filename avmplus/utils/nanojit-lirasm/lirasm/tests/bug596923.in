@@ -1,0 +1,21 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+; Try to get asm_load64 (ldd) to store straight to a stack slot with a large
+; offset from FP (on ARM, at least).
+
+a = immd 1.1
+p = allocp 1024
+std a p 0
+
+; Emit the load just before a regfence, so the result does not have a register
+; assigned.
+d = ldd p 0
+regfence
+
+retd d
+
+; Ensure that 'p' is live here, so it gets a stack slot before 'd' does (and so
+; extends the range required to store out 'd').
+livep p

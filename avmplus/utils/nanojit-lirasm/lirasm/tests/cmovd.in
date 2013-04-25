@@ -1,0 +1,37 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+i = immd -1.1
+j = immd 0.0
+k = immd 1.1
+
+; Test each comparison operator. In each case, the result is set to k (1) if it
+; did what it should do, or i (-1) if not.
+
+c1 = eqd j k
+r1 = cmovd c1 i k
+
+c2 = ltd j k
+r2 = cmovd c2 k i
+
+c3 = led j k
+r3 = cmovd c3 k i
+
+c4 = gtd j k
+r4 = cmovd c4 i k
+
+c5 = ged j k
+r5 = cmovd c5 i k
+
+
+
+; Sum the results. They should all be 1 so an overall result of 5.5 is a pass.
+
+r1_2 = addd r1 r2
+r3_4 = addd r3 r4
+
+r1_4 = addd r1_2 r3_4
+
+res = addd r1_4 r5
+retd res

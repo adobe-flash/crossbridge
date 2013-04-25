@@ -1,0 +1,90 @@
+/* -*- Mode: fundamental; c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 4 -*- */
+/* vi: set ts=4 sw=4 expandtab: (add to ~/.vimrc: set modeline modelines=5) */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/* Test case for Bugzilla 678952.  The hypothesis is that additional type
+ * information in the verifier can change the meaning of the program in
+ * certain synthetic programs that push objects on the scope chain: if the
+ * static type of the object was previously *, but now is C, then early binding
+ * in the verifier will find a property present in C that was previously 
+ * invisible during scope search.
+ *
+ * The change in Bugzilla 678952 propagates static type information for objects 
+ * read from vectors and would therefore cause such a change in meaning.  This
+ * program demonstrates that the change in meaning is real.
+ */
+function main()
+{
+    getlocal0
+    pushscope
+
+    findpropstrict avmplus::System
+    getproperty    avmplus::System
+    getproperty    swfVersion
+    setlocal       8
+
+    // r1 = new Vector.<C_678952>(1)
+    findpropstrict "__AS3__.vec"::Vector
+    getproperty    "__AS3__.vec"::Vector
+    findpropstrict C_678952
+    getproperty    C_678952
+    applytype      1
+    pushbyte       1
+    construct      1
+    coerce         "__AS3__.vec"::Vector.<C_678952>
+    setlocal       1
+
+    // r1[0] = new C_678952
+    getlocal       1
+    pushbyte       0
+    findpropstrict C_678952
+    getproperty    C_678952
+    construct      0
+    setproperty    []
+
+    // r2 = P_678952 where r1[0] is on the scope chain
+    getlocal       1
+    pushbyte       0
+    getproperty    []
+    pushscope
+    findpropstrict P_678952
+    getproperty    P_678952
+    setlocal       2
+    popscope
+
+    // print(r2)
+    findpropstrict print
+    getlocal       2
+    callproperty   print 1
+
+    // if swfVersion >= 14 then new behavior else old behavior
+    getlocal       8
+    pushbyte       14
+    iflt           Lold
+    // new
+    getlocal       2
+    pushstring     "P from C"
+    ifeq           Lpassed
+    jump           Lfailed
+Lold:
+    // old
+    getlocal       2
+    pushstring     "P from global"
+    ifeq           Lpassed
+    jump           Lfailed
+
+Lpassed:
+    findpropstrict PASS
+    getproperty    PASS
+    jump           Ldoit
+Lfailed:
+    findpropstrict FAIL
+    getproperty    FAIL
+Ldoit:
+    pushnull
+    pushstring     "bug678952"
+    call           1
+    returnvoid
+}

@@ -1,0 +1,48 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page iffalse 
+
+\addindex iffalse
+
+
+\section iffalse iffalse
+
+\subsection operation Operation
+
+Branch if false.
+
+\subsection format Format
+
+\code
+iffalse 
+offset
+\endcode
+
+\subsection forms Forms
+\code
+iffalse = 18 (0x12)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ...
+\endcode
+
+\subsection description Description
+
+offset is an s24 that is the number of bytes to jump. Pop value off the stack and convert 
+it to a Boolean. If the converted value is false, jump the
+
+number of bytes indicated by offset. Otherwise continue executing code from this point.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

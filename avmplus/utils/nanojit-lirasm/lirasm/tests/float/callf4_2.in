@@ -1,0 +1,14 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+f4 = immf4 1 2 4 9
+g4 = immf4 -0 0 0.5 1e100
+i = immi 10
+j = immi -1
+d = immd 9.9e9
+e = immd -5.5e-5
+f = immf 1.1
+g = immf 5.5
+res = callf4 callf4_mt cdecl f i d f4 j e g g4
+retf4 res

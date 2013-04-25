@@ -1,0 +1,46 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page setlocal 
+
+\addindex setlocal
+
+
+\section setlocal setlocal
+
+\subsection operation Operation
+
+Set a local register.
+
+\subsection format Format
+
+\code
+setlocal
+index
+\endcode
+
+\subsection forms Forms
+\code
+setlocal = 99 (0x63)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ...
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index of a local register. The register 
+at index is set to value, and value is popped off the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

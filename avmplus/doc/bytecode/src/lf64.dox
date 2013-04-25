@@ -1,0 +1,49 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page lf64 
+
+\addindex lf64
+
+
+\section lf64 lf64
+
+\subsection operation Operation
+
+Load a 64 bit float from global memory
+
+\subsection format Format
+
+\code
+lf64
+\endcode
+
+\subsection forms Forms
+\code
+lf64 = 57 (0x39)
+\endcode
+\subsection stack Stack
+
+\code
+..., address => value, ...
+\endcode
+
+\subsection description Description
+
+Load a 64 bit (IEEE 754), little-endian, float from global memory
+
+The MOPS opcodes all access the backing store of the ByteArray represented by the
+current app domain's ApplicationDomain.domainMemory property. Address ranges for
+accesses will be range checked using standard comparisons.  No address alignment
+is necessary.
+
+\subsection rt_execeptions Runtime exceptions
+
+Range check failures will result in an InvalidRangeError exception.
+
+\subsection notes Notes
+
+None.
+
+*/
+

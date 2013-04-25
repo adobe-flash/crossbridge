@@ -1,0 +1,87 @@
+<!--
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+-->
+<html>
+<head>
+<title>Cookbook for MMgc</title>
+</head>
+
+<body>
+<h1><center>How to use MMgc
+<br>
+(Cookbook)</center></h1>
+
+<P><B> WORK IN PROGRESS - NOT MUCH HERE YET </B>
+
+<P> MMgc provides garbage collection services for AS2, AS3, and C++
+objects in the Tamarin shell and in the Flash Player.
+
+<h2> When should I use garbage collected storage? </h2>
+
+<P> Garbage collection is handy, but it is not free: the garbage
+collector introduces overheads, and you code and objects must adhere
+to additional invariants for the collector to work.  So when should
+you use it, and when should you not?
+
+
+<h2> Garbage collection basics and terminology </h2>
+
+<P> A <b>managed object</b> is an object allocated on the heap
+controlled by the garbage collector.
+
+<P> Garbage collection starts with a set of <b>roots</b> (the CPU
+stack and specially designated root objects) and then
+<b>marks</b> the <b>live objects</b>: It follows pointers from the
+roots to managed objects and then from those objects to yet other
+managed objects, and sets a mark on every managed object that is
+reached in this manner.  When there are no more pointers to
+follow, <b>garbage</b> (unmarked managed objects) is <b>collected</b>:
+the unmarked managed objects are freed.
+
+<P> When a managed object is freed its destructor may be run. ...
+
+<P> Garbage collection is <b>incremental</b> in the sense that marking
+work is interleaved with the running of the <b>user program</b> (any
+non-collector code).  Incrementality introduces a complication: When
+the user program changes the object graph by storing a pointer to a
+managed object into a field in another managed object, the garbage
+collector must be told about the
+update.<a href="#note-incrementality">[1]</a>
+
+<P> The mechanism that records the pointer update is known as
+a <b>write barrier</b>.  A write barrier is most easily implemented as
+a <tt>GCMember</tt> smart pointer.
+
+
+<h2> Reference counted objects </h2>
+
+<P> For reference counted objects, the write barrier also updates the
+reference counts.
+
+
+<h2>Type discipline</h2>
+
+<h2>Creating a root</h2>
+
+<h2> Rules </h2>
+
+  Omitting write barriers where they
+are required (short answer: on every pointer field in every managed
+object) is a major source of GC bugs.
+
+
+<h2>End notes</h2>
+
+<a name="note-incrementality">
+<P> [1] If the collector is not notified of the update then, some
+objects that should be marked may not be: if a pointer to an object
+not seen by the collector is inserted into one that has already been
+processed by the collector then the former object will not be
+processed by the collector at all.
+
+
+</body>
+
+</html>

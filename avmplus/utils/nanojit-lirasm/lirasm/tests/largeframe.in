@@ -1,0 +1,16 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+; Allocate frame larger than a Win32 page
+; and write to the end of the frame first.
+; This test is just an exerciser for the page
+; probing code, as lirasm will not crash without it.
+
+foo = allocp 8192
+bar = allocp 4
+k = immi 555
+sti k bar 0
+sti k foo 0
+res = ldi bar 0
+reti res

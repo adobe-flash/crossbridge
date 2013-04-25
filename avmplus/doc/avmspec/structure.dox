@@ -1,0 +1,383 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/*! \page structure The structure of the ActionScript Virtual Machine
+
+\addindex Structure
+This section is divided into the following sections:
+<ul>
+<li>\ref constants "Constant values"
+<li>\ref overview "Virtual machine overview"
+<li>\ref names "Names"
+<li>\ref qname "QName (Qualified Name)"
+<li>\ref rtqname "RTQName (Runtime Qualified Name)"
+<li>\ref rtqnamel "RTQNameL (Runtime Qualified Name Late)"
+<li>\ref multiname "Multiname (Multiple Namespace Name)"
+<li>\ref multinamel "MultinameL (Multiple Namespace Name Late)"
+<li>\ref resolving_names "Resolving multinames"
+<li>\ref method_invocation_notes "Method invocation notes"
+<li>\ref instruction_set "Instruction set summary"
+<li>\ref load_store "Load and store instructions"
+<li>\ref arthmetic "Arithmetic instructions"
+<li>\ref bit_manipulation "Bit manipulation instructions"
+<li>\ref type_conv "Type conversion instructions"
+<li>\ref object_create "Object creation and manipulation instructions"
+<li>\ref stack_manipulation "Stack management instructions"
+<li>\ref ctrl_instruction "Control transfer instructions"
+<li>\ref function_invoke "Function invocation and return instructions"
+<li>\ref exception_instruction "Exception instructions"
+<li>\ref debug_instruction "Debugging instructions"
+</ul>
+
+\section constants Constant values
+
+The constant values of the AVM2 are one of the following types: 
+int, uint, double, string, namespace, undefined, or null. 
+The values of these types appear directly in the ABC file or in the instruction 
+encodings. Important characteristics of these types are:
+- int - This type is used to represent an integer valued number whose values are 
+32-bit signed two’s complement integers. The range of values is from -2,147,483,648 
+to 2,147,483,647 (-2^31 to 2^31 - 1), inclusive.
+- uint - This type is used for integer valued numbers with values that are 32-bit 
+unsigned two’s complement integers. The range of values is from 0 to 4,294,967,295 
+(2^32 - 1), inclusive.
+- double - This type is used for capturing floating point numbers using 64-bit double precision IEEE
+754 values as specified in IEEE Standard for Binary Floating-Point Arithmetic (ANSI/IEEE Standard. 
+754 - 1985).
+- string - This type represents a sequence of Unicode characters. Strings are represented in UTF-8
+and can be as long as 2^30 -1 bytes.
+- namespace—Namespaces tie a URI (represented internally by a string) to a trait. The relationship 
+is unidirectional, meaning the namespace data type only contains a URI. Each namespace is also of 
+a particular kind, and there are restrictions regarding the relationships between the trait and 
+kind. These rules are defined later in this chapter.
+- null - A singleton value representing “no object”. 
+- undefined - A singleton value representing “no meaningful value”. This constant value is allowed 
+only in certain contexts.
+
+The AVM2 utilizes several representations for values in its instruction encoding and in the ABC 
+file in order to provide as compact an encoding as is required.
+
+\section overview Virtual machine overview
+
+Computation in the AVM2 is based on executing the <i>code</i> of a <i>method body</i> in the 
+context of <i>method information</i>, a <i>local data area</i>, a <i>constant pool</i>, a <i>heap</i>
+for non-primitive data objects created at run-time, and a <i>run-time environment</i>. 
+Many data elements are static and are read at startup from an <i>ABC file</i>, whose 
+structure is defined in Chapter 4.
+
+\todo insert the right chapter & link
+
+- The code for a method body is composed of <i>instructions</i>, defined in Chapter 5. 
+Each instruction modifies the state of the machine in some way, or has an effect on 
+the external environment by means of input or output. <i>See note (1)</i>
+- The method information determines how the method is used — for example, how default 
+argument values should be substituted for missing arguments when the method is called.
+- The local data area for the method consists of the <i>operand stack</i>, <i>the scope 
+stack</i>, and the <i>local registers</i>.
+ - The operand stack holds operands for the instructions and receives their results. 
+Arguments are pushed onto the stack top or popped off the stack top. The top element 
+always has address 0; the one below it has address 1, and so on. Stack addresses are 
+not used except as a specification mechanism.
+ - The scope stack is part of the run-time environment and holds objects that are to 
+be searched by the AVM2 when an instruction is executed that calls for <i>name lookup</i>. 
+Instructions push elements onto the scope stack as part of the implementation of 
+exception handling, closure creation, and for the ActionScript 3.0 \c with statement.
+ - The local registers hold parameter values, local variables in some cases, and 
+temporaries.
+- The constant pool holds constant values that are referenced, ultimately, by the 
+instruction stream: 
+numbers, strings, and various kinds of names.
+- Instructions and the AVM2 can create new objects at run-time, and these objects 
+are allocated in the heap. The only way to access the heap is through an object 
+allocated in it. Objects in the heap that are no longer needed will eventually 
+be reclaimed by the AVM2.
+- The run-time environment logically consists of a chain of objects, and named 
+properties on these objects are the locations found during a name lookup at run-time. 
+Name lookup proceeds from the innermost (most recently pushed) scope toward the 
+outermost (global) scope.
+- The creation of a method closure causes the run-time environment that is current 
+at the time of creation to be captured in the closure; when the closure is later 
+invoked, that scope is made current, and will be extended by the code in the method body.
+
+\note (1) In practice, the AVM2 may transform the code at run-time by means of a JIT, 
+but this does not affect the semantics of execution, only its performance.
+
+\section names Names
+
+Names in the AVM are represented by a combination of an unqualified name and one or 
+more \c namespaces. These are collectively called \c multinames. Multiname entries usually 
+consist of a name index, and a namespace or namespace set index. Some multinames 
+can have the name and/or namespace part resolved at runtime. There are a number of 
+different types of multinames as described below. Properties of objects are always 
+named by a simple QName (a pair of name and namespace). The other types of multinames 
+are used to resolve properties at runtime.
+
+RTQName, RTQNameL, and MultinameL are collectively referred to as runtime multinames.
+
+\section qname QName (Qualified Name)
+
+This is the simplest form of a multiname. It is a name with exactly one namespace, 
+hence QName for qualified name. QName entries will have a name index followed by a 
+namespace index. The name index is an index into the string constant pool, and the 
+namespace index is an index into the namespace constant pool.
+
+QNames are typically used to represent the names of variables, and for type annotations.
+
+\code
+public var s : String;
+\endcode
+
+This code will produce two QName entries, one for the variable s (public namespace, 
+name "s") and one for the type String (public namespace, name "String").
+
+\section rtqname RTQName (Runtime Qualified Name)
+
+This is a runtime QName, where the namespace is not resolved until runtime. 
+RTQName entries will have only a name index, which is an index into the string 
+constant pool. The namespace is determined at runtime. When a RTQName is an operand 
+to an opcode, there should be a namespace value on the stack the RTQName should use. 
+So when the RTQName is used, the top value of the stack will be popped off, and the 
+RTQName will use that as its namespace.
+
+RTQNames are typically used for qualified names when the namespace is not known at compile time.
+
+\code
+var ns = getANamespace();
+x = ns::r;
+\endcode
+
+This code will produce a RTQName entry for \c ns::r. It will have a name of <i>"r"</i> and code 
+will be generated to push the value of \c ns onto the stack.
+
+\section rtqnamel RTQNameL (Runtime Qualified Name Late)
+
+This is a runtime QName, where both the name and namespace are resolved at runtime. 
+When a RTQNameL is an operand to an opcode there will be a name and a namespace value on 
+the stack. The name value on the stack must be of type String, and the namespace value on 
+the stack must be of type Namespace.
+
+RTQNameLs are typically used for qualified names when neither the name, nor the 
+qualifier is known at compile time.
+\code
+var x = getAName();
+var ns = getANamespace();
+
+w = ns::[x];
+\endcode
+
+This code will produce a RTQNameL entry in the constant pool for \c ns::[x]. It has neither a name nor a
+namespace, but code will be generated to push the value of \c ns and \c x onto the stack.
+
+\section multiname Multiname (Multiple Namespace Name)
+
+This is a multiname with a name and a namespace set. The namespace set is used to represent a collection 
+of namespaces. Multiname entries will have a name index followed by a namespace set index. The name index 
+is an index into the string constant pool, and the namespace set index is an index into the namespace set 
+constant pool.
+
+Multinames are typically used for unqualified names. In these cases all open namespaces are used for the 
+multiname.
+\code
+use namespace t;
+trace(f);
+\endcode
+
+This code will produce a multiname entry for \c f. It will have a name of  <i>"f"</i> and a namespace
+set for all the open namespaces (the public namespace, the namespace \c t, and any private or internal 
+namespaces open in that context). At runtime \c f could be resolved in any of the namespaces specified 
+by the multiname.
+
+\section multinamel MultinameL (Multiple Namespace Name Late)
+
+This is a runtime multiname where the name is resolved at runtime. The namespace set is used to 
+represent a collection of namespaces. MultinameL entries have a namespace set index. The namespace 
+set index is an index into the namespace set constant pool. When a MultinameL is an operand to an 
+opcode there will be a name value on the stack. The name value on the stack must be of type String.
+
+MultinameLs are typically used for unqualified names where the name is not known at compile time.
+\code
+use namespace t; 
+trace(o[x]);
+\endcode
+
+This code will produce a MultinameL entry. It will have no name, and will have a namespace set for 
+all the open namespaces in that context. Code will be generated to push the value of \c x onto the 
+stack, and that value will be used as the name.
+
+\section resolving_names Resolving multinames
+
+Typically, the order of the search for resolving multinames is the object’s declared traits, its dynamic 
+properties, and finally the prototype chain. <i>See note (2)</i> The dynamic properties and prototype chain search will 
+only happen if the multiname contains the public namespace (dynamic properties are always in the public 
+namespace in ActionScript 3.0; a run-time error is signaled if an attempt is add a non-public property). 
+If a search does not include one or more of these locations, it is noted in the text in the following 
+chapters. Otherwise, you can assume that all three are searched in this order to resolve a multiname.
+
+If the multiname is any type of QName, then the QName will resolve to the property with the same name 
+and namespace as the QName. If no property has the same name and namespace as the QName, the QName is 
+unresolved on that object.
+
+If the multiname has a namespace set, then the object is searched for any properties whose name is 
+the same as the multinames name, and whose namespace matches any of the namespaces in the multinames 
+namespace set. Since the multiname may have more than one namespace, there could be multiple properties 
+that match the multiname. If there are multiple properties that match a TypeError is raised since it is
+ambiguous which property the multiname is referring to. If no properties match, then the multiname is 
+unresolved on that object.
+
+\note (2) ECMAScript 3 supports prototyped-based inheritance. See ECMA 262 section 4.2.1 for a description
+of the prototype chain.
+
+\section method_invocation_notes Method invocation notes
+
+When invoking a method in the AVM2, the first argument is always the “this” value to be used in the 
+method. All methods take at least 1 argument (the “this” value), followed by any declared arguments.
+
+When invoking the [[Call]] property, the behavior is different for different types of closures. 
+A closure is an object that contains a reference to a method, and the [[Call]] property acts differently 
+depending on whether it is a function, method, or class closure. A function closure is one that is of a 
+global method that isn‘t associated with any instance of a class. A method closure contains an instance 
+method of a class, and will always remember its original “this” value.
+\code
+function f(){} 
+var a = f; // a is a function closure
+
+class C{ 
+	function m(){}
+} 
+var q = new C();
+var a = q.m; // a is a method closure
+\endcode
+
+If the closure is a function closure, then the first argument passed to [[Call]] is passed on to 
+the method and gets used as the “this” value. If the first argument is \c null or \c undefined, then the 
+global object will be used as the “this” value for the method.
+
+If the closure is a method closure, then the first argument of [[Call]] will be ignored, and the 
+saved “this” value for the method closure will be passed to the method as the first argument. 
+A method closure records what its original “this” value was and always uses that instead of the 
+first argument to [[Call]].
+
+If the closure is a class closure, and there is 1 argument passed to [[Call]] (in addition to 
+the “this” argument), then the call is treated as a type conversion, and the argument will be coerced 
+to the type represented by the closure.
+
+\section instruction_set Instruction set summary
+
+This section provides an overview of the AVM2 instruction set. By convention, instructions specific to a 
+specific data type are named with a suffix which indicates the data type on which it operates. 
+Specifically, the following suffixes are used: \c _b (Boolean), \c _a (any), \c _i (int), \c _d (double), 
+\c _s (string), \c _u (unsigned), and \c _o (object).
+
+\section load_store Load and store instructions
+
+Local registers can be accessed using the following instructions: \c getlocal, \c getlocal0, \c getlocal1, 
+\c getlocal2, \c getlocal3, \c setlocal, \c setlocal0, \c setlocal1, \c setlocal2, s\c etlocal3.
+
+\section arthmetic Arithmetic instructions
+
+The arithmetic instructions provide a full repertoire of mathematical operations. Zero, one, or more 
+typically two operands are removed from the top of the stack and the result of the operation is
+pushed back onto the operand stack.
+
+Addition is performed using one the following: \c increment, \c increment_i, \c inclocal,
+\c inclocal_i, \c add, \c add_i.
+
+Subtraction is accomplished using the following: \c decrement, \c decrement_i, 
+\c declocal, \c declocal_i, \c subtract, \c subtract_i.
+
+Multiplication and division are achieved with \c multiply, \c multiply_i, \c divide, and \c modulo.
+
+In order to reverse the sign of a value, the \c negate or \c negate_i instruction can be used.
+
+There also exists a set of instructions that perform value comparisons on the top two entries on 
+the stack replacing them with a \c true or \c false value. These include \c equals, \c strictequals, \c lessthan, 
+\c lessequals, \c greaterthan, \c greaterequals, \c istype, \c istypelate, and \c in.
+
+\section bit_manipulation Bit manipulation instructions
+
+Instructions that allow the bits of a value to be manipulated include \c bitnot, \c bitand, 
+\c bitor, \c bitxor, \c lshift, \c rshift, \c urshift.
+
+Prior to executing these instructions, the value to be operated upon is converted to 
+an integer, if necessary.
+
+\section type_conv Type conversion instructions
+
+The ActionScript language is a loosely typed language where objects are freely converted into whatever 
+types are necessary in order to complete an operation. In some cases explicit conversion is required 
+and for those instances the coerce instructions are provided. These include \c coerce, 
+\c convert_b, \c coerce_a, \c convert_i, \c convert_d, \c coerce_s, \c convert_s, \c convert_u, and \c convert_o.
+
+\section object_create Object creation and manipulation instructions
+
+Entities are created by using one of the following instructions: \c newclass, \c newobject, \c newarray, 
+\c newactivation.
+
+In order to invoke an object’s constructor the instructions \c construct, \c constructsuper, and 
+\c constructprop are used.
+
+Namespaces can be constructed dynamically using \c dxns and \c dxnslate.
+
+
+\section stack_manipulation Stack management instructions
+
+A number of instructions provide direct access to manipulate values placed on the stack. Instructions 
+that push a value directly include \c pushnull, \c pushundefined, \c pushtrue, \c pushfalse, \c pushnan, 
+\c pushbyte, \c pushshort, \c pushstring, \c pushint, \c pushdouble, \c pushscope, and \c pushnamespace.
+
+A value can be removed from the stack by using \c pop, while \c dup duplicates the value at the top of
+the stack, and similarly \c swap exchanges the top two values on the stack.
+
+\section ctrl_instruction Control transfer instructions
+
+The control transfer instructions transfer execution to an instruction other than the one immediately 
+following the transfer instruction. The transfer can be unconditional or based upon a comparison 
+operation that is implicit with the instruction.
+
+The conditional branches instructions include \c iflt, \c ifle, \c ifnlt, \c ifnle, \c ifgt, 
+\c ifge, \c ifngt, \c ifnge, \c ifeq, \c ifne, \c ifstricteq, \c ifstrictne, \c iftrue, and \c iffalse. 
+These instructions perform any necessary type conversions in order to implement the compare; 
+the conversion rules are outlined in ECMA-262.
+
+The \c label instruction is used to mark the target position of backwards branch 
+instruction. Thus the target location of every backwards branch instruction should land on 
+a \c label instruction.
+
+The \c lookupswitch instruction provides a compact form for encoding a multi-way compare expression.
+
+\section function_invoke Function invocation and return instructions
+
+There are a number of instructions to invoke functions and methods. The \c call instruction implements a 
+fully compliant rendition of \c Function.prototype.call of the ECMA-262 specification. To invoke object 
+instance methods the \c callmethod instruction is utilized. Likewise for calling class, also known as 
+static methods, \c callstatic exists. In order to invoke instance methods not on an object, but on its 
+base class, \c callsuper is used. For named elements which are invoked as a method and for which the 
+ActionScript compiler can validate the usage as such, callproperty and callproplex are available. 
+The latter is for the case when the object for which the property being invoked exists on the stack.
+
+For cases in which the return value of the call is never used, \c callpropvoid and \c callsupervoid can 
+be used in place of \c callproperty and \c callsuper, respectively.
+
+\section exception_instruction Exception instructions
+
+An exception is thrown programmatically using the \c throw instruction. Exceptions can also be thrown 
+by various AVM instructions when an abnormal condition is encountered.
+
+The try/catch statement in the ActionScript language is translated into a table of intervals, and 
+target instructions that are specified in the method body portion of the abc file. The table defines 
+a range of instructions over which a given exception type may be caught. Thus if during the execution 
+of a given set of instructions an exception is thrown and there is an associated entry in the 
+exception table, program execution will continue at the target instruction specified in the table.
+
+\section debug_instruction Debugging instructions
+
+Unlike many traditional execution environments the debugging facilities of the AVM2 are tightly 
+intertwined with a series of instructions that are placed directly in the execution stream. To 
+track current file name and line number information \c debugfile and \c debugline are emitted at appropriate 
+points in the instruction stream. In cases where additional debugging detail is required, the 
+\c debug instruction is used. For example, the names of local variables are provided by this mechanism.
+
+
+
+
+*/

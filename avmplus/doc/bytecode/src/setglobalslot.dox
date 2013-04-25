@@ -1,0 +1,50 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page setglobalslot 
+
+\addindex setglobalslot
+
+
+\section setglobalslot setglobalslot
+
+\subsection operation Operation
+
+Set the value of a slot on the global scope.
+
+\subsection format Format
+
+\code
+setglobalslot
+slotindex
+\endcode
+
+\subsection forms Forms
+\code
+setglobalslot = 111 (0x6f)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ...
+\endcode
+
+\subsection description Description
+
+slotindex is a u30 that must be an index of a slot on the global scope. The 
+slotindex must be greater than zero and less than or equal to the total number 
+of slots the global scope has.
+
+This instruction will set the value of the slot at slotindex of the global 
+scope to value. value is first coerced to the type of the slot indicated by slotindex.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

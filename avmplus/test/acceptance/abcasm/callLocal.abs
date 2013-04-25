@@ -1,0 +1,43 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function zarquon()
+{
+	findpropstrict START
+	pushstring "Simple call to local function"
+	callproperty START 1
+	findpropstrict PASS
+	pushstring "in called local"
+	callproperty PASS 1
+	findpropstrict END
+	callproperty END 0
+
+	returnvoid
+}
+function main()
+{
+	getlocal0
+	pushscope
+	// not supported in new assembler - needs a name identifiier/ will throw missing IDENTIFIER at '0'line 57: function <missing IDENTIFIER>
+	//newfunction 0
+	newfunction zarquon 
+	setlocal1
+ /*
+    NOTE: no traits, so this
+	code won't work and it's
+	unnecessary in any case.
+           getglobalscope
+           swap
+           setslot             1
+           getglobalscope
+           getslot 1
+*/
+	getlocal1
+	getlocal0
+	call  (0)
+	returnvoid
+    
+}
+script_info{init: main}

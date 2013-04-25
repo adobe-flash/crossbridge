@@ -1,0 +1,133 @@
+public var ast = 
+{ 'ast_class': 'Program'
+, 'packages': []
+, 'head': { 'fixtures': [ [ { 'ast_class': 'PropName'
+                            , 'name': { 'ns': { 'ast_class': 'PublicNamespace'
+                                              , 'name': '' }
+                                      , 'id': 'x' } }
+                          , { 'ast_class': 'ValFixture'
+                            , 'type': { 'ast_class': 'SpecialType'
+                                      , 'kind': { 'ast_class': 'AnyType' } }
+                            , 'isReadOnly': false } ]
+                        ,  ]
+          , 'exprs': [  ] }
+, 'block': { 'ast_class': 'Block'
+           , 'head': { 'fixtures': [  ]
+                     , 'exprs': [  ] }
+           , 'stmts': [ { 'ast_class': 'ExprStmt'
+                        , 'expr': { 'ast_class': 'ListExpr'
+                                  , 'exprs': [ { 'ast_class': 'InitExpr'
+                                               , 'target': { 'ast_class': 'VarInit' }
+                                               , 'head': { 'fixtures': [  ]
+                                                         , 'exprs': [  ] }
+                                               , 'inits': [ [ { 'ast_class': 'PropName'
+                                                              , 'name': { 'ns': { 'ast_class': 'PublicNamespace'
+                                                                                , 'name': '' }
+                                                                        , 'id': 'x' } }
+                                                            , { 'ast_class': 'LiteralExpr'
+                                                              , 'literal': { 'ast_class': 'LiteralDecimal'
+                                                                           , 'decimalValue': '10' } } ]
+                                                          ,  ] }
+                                             ,  ] } }
+                      , { 'ast_class': 'WhileStmt'
+                        , 'expr': { 'ast_class': 'ListExpr'
+                                  , 'exprs': [ { 'ast_class': 'LiteralExpr'
+                                               , 'literal': { 'ast_class': 'LiteralBoolean'
+                                                            , 'booleanValue': true } }
+                                             ,  ] }
+                        , 'stmt': { 'ast_class': 'BlockStmt'
+                                  , 'block': { 'ast_class': 'Block'
+                                             , 'head': { 'fixtures': [  ]
+                                                       , 'exprs': [  ] }
+                                             , 'stmts': [ { 'ast_class': 'IfStmt'
+                                                          , 'expr': { 'ast_class': 'ListExpr'
+                                                                    , 'exprs': [ { 'ast_class': 'BinaryExpr'
+                                                                                 , 'op': { 'ast_class': 'Greater' }
+                                                                                 , 'e1': { 'ast_class': 'LexicalRef'
+                                                                                         , 'ident': { 'ast_class': 'Identifier'
+                                                                                                    , 'ident': 'x'
+                                                                                                    , 'nss': [  [ { 'ast_class': 'PublicNamespace'
+                                                                                                                  , 'name': '' }
+                                                                                                                ,  ]
+                                                                                                             ,  [  ]
+                                                                                                             ,  ] } }
+                                                                                 , 'e2': { 'ast_class': 'LiteralExpr'
+                                                                                         , 'literal': { 'ast_class': 'LiteralDecimal'
+                                                                                                      , 'decimalValue': '0' } } }
+                                                                               ,  ] }
+                                                          , 'then': { 'ast_class': 'BlockStmt'
+                                                                    , 'block': { 'ast_class': 'Block'
+                                                                               , 'head': { 'fixtures': [  ]
+                                                                                         , 'exprs': [  ] }
+                                                                               , 'stmts': [ { 'ast_class': 'ExprStmt'
+                                                                                            , 'expr': { 'ast_class': 'ListExpr'
+                                                                                                      , 'exprs': [ { 'ast_class': 'CallExpr'
+                                                                                                                   , 'expr': { 'ast_class': 'LexicalRef'
+                                                                                                                             , 'ident': { 'ast_class': 'Identifier'
+                                                                                                                                        , 'ident': 'print'
+                                                                                                                                        , 'nss': [  [ { 'ast_class': 'PublicNamespace'
+                                                                                                                                                      , 'name': '' }
+                                                                                                                                                    ,  ]
+                                                                                                                                                 ,  [  ]
+                                                                                                                                                 ,  ] } }
+                                                                                                                   , 'args': [ { 'ast_class': 'LexicalRef'
+                                                                                                                               , 'ident': { 'ast_class': 'Identifier'
+                                                                                                                                          , 'ident': 'x'
+                                                                                                                                          , 'nss': [  [ { 'ast_class': 'PublicNamespace'
+                                                                                                                                                        , 'name': '' }
+                                                                                                                                                      ,  ]
+                                                                                                                                                   ,  [  ]
+                                                                                                                                                   ,  ] } }
+                                                                                                                             ,  ] }
+                                                                                                                 ,  ] } }
+                                                                                          , { 'ast_class': 'ExprStmt'
+                                                                                            , 'expr': { 'ast_class': 'ListExpr'
+                                                                                                      , 'exprs': [ { 'ast_class': 'SetExpr'
+                                                                                                                   , 'op': { 'ast_class': 'Assign' }
+                                                                                                                   , 'le': { 'ast_class': 'LexicalRef'
+                                                                                                                           , 'ident': { 'ast_class': 'Identifier'
+                                                                                                                                      , 'ident': 'x'
+                                                                                                                                      , 'nss': [  [ { 'ast_class': 'PublicNamespace'
+                                                                                                                                                    , 'name': '' }
+                                                                                                                                                  ,  ]
+                                                                                                                                               ,  [  ]
+                                                                                                                                               ,  ] } }
+                                                                                                                   , 're': { 'ast_class': 'BinaryExpr'
+                                                                                                                           , 'op': { 'ast_class': 'Minus' }
+                                                                                                                           , 'e1': { 'ast_class': 'LexicalRef'
+                                                                                                                                   , 'ident': { 'ast_class': 'Identifier'
+                                                                                                                                              , 'ident': 'x'
+                                                                                                                                              , 'nss': [  [ { 'ast_class': 'PublicNamespace'
+                                                                                                                                                            , 'name': '' }
+                                                                                                                                                          ,  ]
+                                                                                                                                                       ,  [  ]
+                                                                                                                                                       ,  ] } }
+                                                                                                                           , 'e2': { 'ast_class': 'LiteralExpr'
+                                                                                                                                   , 'literal': { 'ast_class': 'LiteralDecimal'
+                                                                                                                                                , 'decimalValue': '1' } } } }
+                                                                                                                 ,  ] } }
+                                                                                          , { 'ast_class': 'ContinueStmt'
+                                                                                            , 'ident': null }
+                                                                                          ,  ] } }
+                                                          , 'elseOpt': null }
+                                                        , { 'ast_class': 'BreakStmt'
+                                                          , 'ident': null }
+                                                        ,  ] } }
+                        , 'labels': [] }
+                      , { 'ast_class': 'ExprStmt'
+                        , 'expr': { 'ast_class': 'ListExpr'
+                                  , 'exprs': [ { 'ast_class': 'CallExpr'
+                                               , 'expr': { 'ast_class': 'LexicalRef'
+                                                         , 'ident': { 'ast_class': 'Identifier'
+                                                                    , 'ident': 'print'
+                                                                    , 'nss': [  [ { 'ast_class': 'PublicNamespace'
+                                                                                  , 'name': '' }
+                                                                                ,  ]
+                                                                             ,  [  ]
+                                                                             ,  ] } }
+                                               , 'args': [ { 'ast_class': 'LiteralExpr'
+                                                           , 'literal': { 'ast_class': 'LiteralBoolean'
+                                                                        , 'booleanValue': true } }
+                                                         ,  ] }
+                                             ,  ] } }
+                      ,  ] } }

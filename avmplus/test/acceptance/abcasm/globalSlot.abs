@@ -1,0 +1,55 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+ /*
+  *  Testcase uses desuguared script and function declarations, 
+  *  finds, sets, and reads a slot on the global object.
+  */
+
+
+method_info {
+	name:init_method
+	return_type:int
+	param_type:{}
+}
+
+method_body_info {
+	method: init_method
+    local_count:0
+	max_stack:4
+	init_scope_depth:0
+	max_scope_depth:1
+	code:
+	{
+		getlocal0
+		pushscope
+		findpropstrict START
+		pushstring "Global slot"
+		callpropvoid START 1
+
+		findpropstrict zuul
+		pushstring "moo"
+		setslot 1
+
+		findpropstrict COMPARE_STRICTEQ
+		pushstring "Get global slot"
+		pushstring "moo"
+		getglobalscope
+		getslot 1
+		callproperty COMPARE_STRICTEQ 3
+
+		findpropstrict END
+		callproperty END 0
+		
+		returnvalue
+	}
+}
+
+script_info 
+{
+	init : init_method 
+	traits : {
+		trait { kind : Trait_Slot name:zuul slot_id:1 type_name:String }
+	}
+}

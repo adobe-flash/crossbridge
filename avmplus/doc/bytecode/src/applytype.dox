@@ -1,0 +1,57 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/*! \page applytype 
+
+\addindex applytype
+
+\section applytype applytype
+
+\subsection operation Operation
+
+Instantiate a parameterized factory type.
+
+\subsection format Format
+
+\code
+applytype 
+arg_count
+\endcode
+
+\subsection forms Forms
+\code
+add = 83 (0x53)
+\endcode
+\subsection stack Stack
+
+\code
+ ..., factory, parameter1, ..., parametern => ..., newclass
+\endcode
+
+\subsection description Description
+
+arg_count is a u30 that is the number of type parameters present on
+the stack.
+
+Pop the parameters and the factory off of the stack and apply the
+factory to the parameters, yielding an instantiation of the factory
+with the parameters in the form of a class object.
+
+Push newclass onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if factory is not a Factory object or if the
+number of parameters accepted by the factory does not correspond to
+the number of parameters passed.
+
+A VerifyError is thrown if the parameters are not class objects.
+
+\subsection notes Notes
+
+The only Factory type in Tamarin as of the time of writing is __AS3__.vec::Vector.
+
+The use of VerifyError is a bug; see Bugzilla 686746.
+
+*/
+

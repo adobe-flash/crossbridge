@@ -1,0 +1,547 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+function test_iflt()
+{
+    findproperty COMPARE_STRICTEQ
+	pushstring "iflt (NaN < 0.0001)"
+		pushnan
+		pushdouble 0.0001
+		iflt iflt_NaN_double_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump iflt_NaN_double_endit
+
+iflt_NaN_double_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+iflt_NaN_double_endit:
+
+// ----------------------------------------------
+
+findproperty COMPARE_STRICTEQ
+	pushstring "iflt (0.0001 < NaN)"
+		pushnan
+		pushdouble 0.0001
+		iflt iflt_double_NaN_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump iflt_double_NaN_endit
+
+iflt_double_NaN_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+iflt_double_NaN_endit:
+
+// ----------------------------------------------
+    findproperty COMPARE_STRICTEQ
+	pushstring "iflt (NaN < NaN)"
+		pushnan
+		pushnan
+		iflt iflt_NaN_NaN_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump iflt_NaN_NaN_endit
+
+iflt_NaN_NaN_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+iflt_NaN_NaN_endit:
+
+    returnvoid
+}
+
+function test_ifle()
+{
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifle (NaN < 0.0001)"
+		pushnan
+		pushdouble 0.0001
+		ifle ifle_NaN_double_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump ifle_NaN_double_endit
+
+ifle_NaN_double_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+ifle_NaN_double_endit:
+
+// ----------------------------------------------
+
+findproperty COMPARE_STRICTEQ
+	pushstring "ifle (0.0001 < NaN)"
+		pushnan
+		pushdouble 0.0001
+		ifle ifle_double_NaN_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump ifle_double_NaN_endit
+
+ifle_double_NaN_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+ifle_double_NaN_endit:
+
+// ----------------------------------------------
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifle (NaN < NaN)"
+		pushnan
+		pushnan
+		ifle ifle_NaN_NaN_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump ifle_NaN_NaN_endit
+
+ifle_NaN_NaN_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+ifle_NaN_NaN_endit:
+
+    returnvoid
+}
+
+function test_ifnlt()
+{
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifnlt (NaN < 0.0001)"
+		pushnan
+		pushdouble 0.0001
+		ifnlt ifnlt_NaN_double_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnlt_NaN_double_endit
+
+ifnlt_NaN_double_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifnlt_NaN_double_endit:
+
+// ----------------------------------------------
+
+findproperty COMPARE_STRICTEQ
+	pushstring "ifnlt (0.0001 < NaN)"
+		pushnan
+		pushdouble 0.0001
+		ifnlt ifnlt_double_NaN_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnlt_double_NaN_endit
+
+ifnlt_double_NaN_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifnlt_double_NaN_endit:
+
+// ----------------------------------------------
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifnlt (NaN < NaN)"
+		pushnan
+		pushnan
+		ifnlt ifnlt_NaN_NaN_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnlt_NaN_NaN_endit
+
+ifnlt_NaN_NaN_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifnlt_NaN_NaN_endit:
+
+    returnvoid
+}
+
+function test_ifnle()
+{
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifnle (NaN < 0.0001)"
+		pushnan
+		pushdouble 0.0001
+		ifnle ifnle_NaN_double_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnle_NaN_double_endit
+
+ifnle_NaN_double_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifnle_NaN_double_endit:
+
+// ----------------------------------------------
+
+findproperty COMPARE_STRICTEQ
+	pushstring "ifnle (0.0001 < NaN)"
+		pushnan
+		pushdouble 0.0001
+		ifnle ifnle_double_NaN_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnle_double_NaN_endit
+
+ifnle_double_NaN_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifnle_double_NaN_endit:
+
+// ----------------------------------------------
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifnle (NaN < NaN)"
+		pushnan
+		pushnan
+		ifnle ifnle_NaN_NaN_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnle_NaN_NaN_endit
+
+ifnle_NaN_NaN_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifnle_NaN_NaN_endit:
+
+    returnvoid
+}
+
+function test_ifgt()
+{
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifgt (NaN > 0.0001)"
+		pushnan
+		pushdouble 0.0001
+		ifgt ifgt_NaN_double_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump ifgt_NaN_double_endit
+
+ifgt_NaN_double_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+ifgt_NaN_double_endit:
+
+// ----------------------------------------------
+
+findproperty COMPARE_STRICTEQ
+	pushstring "ifgt (0.0001 > NaN)"
+		pushnan
+		pushdouble 0.0001
+		ifgt ifgt_double_NaN_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump ifgt_double_NaN_endit
+
+ifgt_double_NaN_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+ifgt_double_NaN_endit:
+
+// ----------------------------------------------
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifgt (NaN > NaN)"
+		pushnan
+		pushnan
+		ifgt ifgt_NaN_NaN_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump ifgt_NaN_NaN_endit
+
+ifgt_NaN_NaN_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+ifgt_NaN_NaN_endit:
+
+    returnvoid
+}
+
+function test_ifge()
+{
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifge (NaN > 0.0001)"
+		pushnan
+		pushdouble 0.0001
+		ifge ifge_NaN_double_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump ifge_NaN_double_endit
+
+ifge_NaN_double_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+ifge_NaN_double_endit:
+
+// ----------------------------------------------
+
+findproperty COMPARE_STRICTEQ
+	pushstring "ifge (0.0001 > NaN)"
+		pushnan
+		pushdouble 0.0001
+		ifge ifge_double_NaN_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump ifge_double_NaN_endit
+
+ifge_double_NaN_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+ifge_double_NaN_endit:
+
+// ----------------------------------------------
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifge (NaN > NaN)"
+		pushnan
+		pushnan
+		ifge ifge_NaN_NaN_true
+	findproperty PASS
+    swap
+	callpropvoid PASS 1
+	jump ifge_NaN_NaN_endit
+
+ifge_NaN_NaN_true: findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+    
+ifge_NaN_NaN_endit:
+
+    returnvoid
+}
+
+function test_ifngt()
+{
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifngt !(NaN > 0.0001)"
+		pushnan
+		pushdouble 0.0001
+		ifngt ifngt_NaN_double_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifngt_NaN_double_endit
+
+ifngt_NaN_double_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifngt_NaN_double_endit:
+
+// ----------------------------------------------
+
+findproperty COMPARE_STRICTEQ
+	pushstring "ifngt !(0.0001 > NaN)"
+		pushnan
+		pushdouble 0.0001
+		ifngt ifngt_double_NaN_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifngt_double_NaN_endit
+
+ifngt_double_NaN_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifngt_double_NaN_endit:
+
+// ----------------------------------------------
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifngt !(NaN > NaN)"
+		pushnan
+		pushnan
+		ifngt ifngt_NaN_NaN_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifngt_NaN_NaN_endit
+
+ifngt_NaN_NaN_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifngt_NaN_NaN_endit:
+
+    returnvoid
+}
+
+function test_ifnge()
+{
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifnge !(NaN > 0.0001)"
+		pushnan
+		pushdouble 0.0001
+		ifnge ifnge_NaN_double_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnge_NaN_double_endit
+
+ifnge_NaN_double_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifnge_NaN_double_endit:
+
+// ----------------------------------------------
+
+findproperty COMPARE_STRICTEQ
+	pushstring "ifnge !(0.0001 > NaN)"
+		pushnan
+		pushdouble 0.0001
+		ifnge ifnge_double_NaN_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnge_double_NaN_endit
+
+ifnge_double_NaN_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifnge_double_NaN_endit:
+
+// ----------------------------------------------
+    findproperty COMPARE_STRICTEQ
+	pushstring "ifnge !(NaN > NaN)"
+		pushnan
+		pushnan
+		ifnge ifnge_NaN_NaN_true
+	findproperty FAIL
+	swap
+	pushstring "..."
+	dup
+	callpropvoid FAIL 3
+	jump ifnge_NaN_NaN_endit
+
+ifnge_NaN_NaN_true: findproperty PASS
+    swap
+	callpropvoid PASS 1
+    
+ifnge_NaN_NaN_endit:
+
+    returnvoid
+}
+
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "Bug 476556 : If branches with NaN" 
+	callpropvoid START 1
+
+	newfunction test_iflt
+	getlocal0
+	call 0
+    
+    newfunction test_ifle
+	getlocal0
+	call 0
+    
+    newfunction test_ifnlt
+	getlocal0
+	call 0
+    
+    newfunction test_ifnle
+	getlocal0
+	call 0
+    
+    newfunction test_ifgt
+	getlocal0
+	call 0
+    
+    newfunction test_ifge
+	getlocal0
+	call 0
+    
+    newfunction test_ifngt
+	getlocal0
+	call 0
+    
+    newfunction test_ifnge
+	getlocal0
+	call 0
+
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+
+script_info{init: main}

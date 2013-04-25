@@ -1,0 +1,35 @@
+#  This Source Code Form is subject to the terms of the Mozilla Public
+#  License, v. 2.0. If a copy of the MPL was not distributed with this
+#  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+This directory contains self tests in addition to VM extensions.  Self
+test files (*.st) contain templates which are expanded when processed
+by selftests.as.
+
+For more information on the selftest template grammar, see the comments
+at the top of selftests.as
+
+BUILDING
+
+If you haven't modified any self tests, skip steps 1 and 2.
+
+1. build the selftest generator
+
+   asc selftests.as
+
+2. regenerate the selftest CPP files.
+
+   avm selftests.abc -- *.st
+
+3. configure the vm with selftests enabled
+
+   mkdir obj; cd obj
+   configure.py --enable-selftests [other options]
+   make
+
+RUNNING
+
+1. with properly configured vm, pass -Dselftests
+
+   avm -Dselftests [other options]
+

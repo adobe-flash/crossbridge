@@ -1,0 +1,112 @@
+6 October 2011
+
+Copyright (C) 2011 Adobe Systems Incorporated.  See end of file for
+full copyright notice.
+
+
+Some benchmarks comparing the performance of the MOPS and ByteArray
+primitives (and with a Vector case thrown in for good measure).
+
+To build these you need abcasm, which comes with TR.
+
+
+SETUP.
+
+The basic data structure is an array of 2048 32-bit int values, all of
+which are "1".
+
+The basic test is a loop that sums those values into a local variable.
+The loop is repeated 10,000 times.
+
+We test the loop in its "simple" state (one element processed per
+iteration) and in a hand-unrolled version (8x unrolling).  The reason
+for the unrolled version is that the MOPS are expanded inline by the
+JIT and the expanded code is optimized; unrolling the loop should in
+principle give a boost to the MOPS code through CSE, and the unrolled
+code will more closely simulate what happens in compiled code that
+uses the MOPS.
+
+For ByteArray we test the loop both forward and backward (in both
+configurations).  The reason for the backward version is that
+ByteArray biases in favor of forward sequential ("stream") access.
+The backward loop emulates random access: the "position" of the
+ByteArray must be set for each access.
+
+For MOPS and Vector there's no reason to test backward access; these
+do not bias in favor of forward sequential access.
+
+For ByteArray the endianness is set to "littleEndian", which is
+appropriate for x86; MOPS and Vector always use native endianness.
+
+For the results below the machine is a Mac Pro, 2x2.93GHz Xeon.
+
+
+RESULTS.
+
+The shell in column 1 ("Fast") is a Mac-32 release avmshell
+*INCLUDING* the pending ByteArray optimizations (clean up the C++
+code, but no inlining - bug 692042) and also including the
+already-landed Vector optimizations.
+
+The shell in column 2 ("Slow") is Mac-32 release avmshell *WITHOUT*
+not only the ByteArray optimizations but *ALSO WITHOUT* the Vector
+optimizations (tamarin-redux 6547).
+
+Fast       Slow     Description
+
+ByteArray
+
+167ms      488ms    Forward int sum loop, 2048 elements
+243ms      558ms    Backward int sum loop, 2048 elements
+154ms      478ms    Forward int sum unrolled loop, 2048 elements
+268ms      550ms    Backward int sum unrolled loop, 2048 elements
+
+MOPS
+
+74ms       80ms     MOPS forward int loop, 2048 elements
+14ms       14ms     MOPS forward int unrolled loop, 2048 elements
+
+Vector.<int>
+
+53ms      128ms     Vector forward int loop, 2048 elements
+58ms      119ms     Vector forward int unrolled loop, 2048 elements
+
+
+ANALYSIS.
+
+First, the MOPS code gets a big boost from unrolling, which is what
+we'd expect and hope for.  Nothing else gets even close at this time.
+
+Second, the optimized vector code (either variety) is faster than the
+non-unrolled MOPS code; the unrolling does not help Vector but that
+will probably change eventually.
+
+Third, the ByteArray optimizations, even these simple ones, help a
+lot, with a speedup up to 3.1.
+
+Fourth, the Vector optimizations, which are mainly inlining, gives us
+a 2.4 speedup.  We can't hope for that level of speedup for the
+ByteArray code because there is more actual work going on in the fast
+case for ByteArray, so say 2x at most.
+
+Fifth, there's a large gap between the backward and forward ByteArray
+numbers.  This gap can be shrunk significantly by inlining the
+ByteArray.position setter speculatively, because that does very little
+work and is simple to speculate.  So we should assume that the good
+"forward" times are representative even for the "backward" or
+random-access ByteArray case.
+
+So in conclusion, when we land the pending ByteArray optimizations
+have then we're still far away from MOPS performance.  If we inline
+speculatively, we can hope for "forward" numbers for the "backward"
+case, and a 2x speedup, so at that point the non-unrolled ByteArray
+code may be comparable to MOPS numbers.  But the typical case for MOPS
+is still the "unrolled" case.  Getting to those much better unrolled
+numbers for ByteArray will require work in the JIT, probably.
+
+
+/*
+ *  This Source Code Form is subject to the terms of the Mozilla Public
+ *  License, v. 2.0. If a copy of the MPL was not distributed with this
+ *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */

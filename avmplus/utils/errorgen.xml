@@ -1,0 +1,224 @@
+<?xml version='1.0' encoding='utf-8' standalone='no' ?>
+<!-- -*- Mode: xml; c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 4 -*- -->
+<!-- vi: set ts=4 sw=4 expandtab: (add to ~/.vimrc: set modeline modelines=5) -->
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+<ErrorGenerator>
+    <Generate>
+        <File name='../core/ErrorConstants.h' >
+            <![CDATA[{{ErrorGenerator.Copyright}}{{ErrorGenerator.dotH}}]]>
+        </File>
+        <File name='../core/ErrorConstants.cpp' >
+            <![CDATA[{{ErrorGenerator.Copyright}}{{ErrorGenerator.dotCpp}}]]>
+        </File>
+        <File name='../core/ErrorConstants.as' >
+            <![CDATA[{{ErrorGenerator.Copyright}}{{ErrorGenerator.dotAs}}]]>
+        </File>
+
+    </Generate>
+
+
+        <Languages>
+                <language id='0'>en</language>
+                <language id='1'>fr</language>
+                <language id='2'>ja</language>
+                <language id='3'>zh_CN</language>
+        </Languages>
+
+        <LangFile_en    file='../core/ErrorConstants.xml' />
+        <LangFile_fr    file='../localization/fr/ErrorConstants.xml' />
+        <LangFile_ja    file='../localization/ja/ErrorConstants.xml' />
+        <LangFile_zh_CN file='../localization/zh_Hans/ErrorConstants.xml' />
+
+        <dotAs>
+<![CDATA[
+/**
+ * Errors defines the ID's of error messages output
+ * by the Debugger verisons of the Player
+ */
+class Errors
+{
+{{ErrorGenerator.AsConsts}}
+};
+]]>
+        </dotAs>
+        <AsConsts repeat='ErrorGenerator.LangFile_en.errors' trim='1' >
+                <![CDATA[        public static const {{error.@label}} {{column(62)}}= {{error.@id}};
+]]>
+        </AsConsts>
+
+
+        <dotCpp>
+<![CDATA[
+#include "avmplus.h"
+
+namespace avmplus
+{
+    // Error message strings only in non-stubbed DEBUGGER builds.
+    #if defined(DEBUGGER) && !defined(VMCFG_DEBUGGER_STUB)
+    namespace ErrorConstants
+    {
+        LangName languageNames[] =
+        {
+{{ErrorGenerator.LangNames}}
+        };
+
+        MMGC_STATIC_ASSERT((sizeof languageNames/sizeof languageNames[0]) == kLanguages);
+
+        int errorMappingTable[2*kNumErrorConstants] =
+        {
+{{ErrorGenerator.LangMap}}
+        };
+
+        const char* errorConstants[][kNumErrorConstants] =
+        {
+        #ifdef AVMPLUS_ERROR_LANG_en
+            // en
+            {
+{{ErrorGenerator.LangTable_en}}
+            },
+        #endif
+        #ifdef AVMPLUS_ERROR_LANG_fr
+            // fr
+            {
+{{ErrorGenerator.LangTable_fr}}
+            },
+        #endif
+        #ifdef AVMPLUS_ERROR_LANG_ja
+            // ja
+            {
+{{ErrorGenerator.LangTable_ja}}
+            },
+        #endif
+        #ifdef AVMPLUS_ERROR_LANG_zh_CN
+            // zh_CN
+            {
+{{ErrorGenerator.LangTable_zh_CN}}
+            },
+        #endif
+        };
+
+        MMGC_STATIC_ASSERT((sizeof errorConstants/sizeof errorConstants[0]) == kLanguages);
+
+    }
+    #endif /* defined(DEBUGGER) && !defined(VMCFG_DEBUGGER_STUB) */
+}
+]]>
+        </dotCpp>
+
+        <LangMap repeat='ErrorGenerator.LangFile_en.errors' trim='2' >
+                <![CDATA[            {{error.@id}}, {{LangMap.count}},
+]]>
+        </LangMap>
+
+        <LangNames repeat='ErrorGenerator.Languages'>
+                <![CDATA[        #ifdef AVMPLUS_ERROR_LANG_{{language.*.0}}
+            { "{{escape(language.*.0, _, &#045; )}}", {{column(24)}}LANG_{{language.*.0}} },
+        #endif
+]]>
+        </LangNames>
+
+        <LangTable_en repeat='ErrorGenerator.LangFile_en.errors' trim='2' >
+                <![CDATA[                /*{{error.@id}},{{LangTable_en.count}}*/ "{{escape(error.*.0)}}",
+]]>
+        </LangTable_en>
+        <LangTable_fr repeat='ErrorGenerator.LangFile_en.errors' mergeWith='ErrorGenerator.LangFile_fr.errors' mergeAttribute='id' trim='2' >
+                <![CDATA[                /*{{error.@id}},{{LangTable_fr.count}}*/ "{{escape(merge.error.*.0)}}",
+]]>
+        </LangTable_fr>
+        <LangTable_ja repeat='ErrorGenerator.LangFile_en.errors' mergeWith='ErrorGenerator.LangFile_ja.errors' mergeAttribute='id' trim='2' >
+                <![CDATA[                /*{{error.@id}},{{LangTable_ja.count}}*/ "{{escape(merge.error.*.0)}}",
+]]>
+        </LangTable_ja>
+        <LangTable_zh_CN repeat='ErrorGenerator.LangFile_en.errors' mergeWith='ErrorGenerator.LangFile_zh_CN.errors' mergeAttribute='id' trim='2' >
+                <![CDATA[                /*{{error.@id}},{{LangTable_zh_CN.count}}*/ "{{escape(merge.error.*.0)}}",
+]]>
+        </LangTable_zh_CN>
+
+
+        <dotH>
+<![CDATA[
+#ifndef __avmplus_ErrorConstants__
+#define __avmplus_ErrorConstants__
+
+#include "ErrorConstants.h"
+
+namespace avmplus
+{
+    namespace ErrorConstants
+    {
+        #if 0 // Test if any lang subset is defined
+{{ErrorGenerator.TestLanguageSubset1}}
+        #else // None defined?  Define them all
+{{ErrorGenerator.TestLanguageSubset2}}
+        #endif
+
+        enum LangID
+        {
+{{ErrorGenerator.LanguageEnums}}
+            LANG_count
+        };
+
+        typedef struct _LangName
+        {
+            const char* str;
+            LangID      id;
+        }
+        LangName;
+
+        enum
+        {
+{{ErrorGenerator.ConstantEnums}}
+        };
+
+        // Error message strings only in non-stubbed DEBUGGER builds.
+        #if defined(DEBUGGER) && !defined(VMCFG_DEBUGGER_STUB)
+        const int kLanguages = LANG_count;
+        const int kNumErrorConstants = {{ErrorGenerator.last_repeat_count}};
+        extern const char* errorConstants[kLanguages][kNumErrorConstants];
+        extern int errorMappingTable[2*kNumErrorConstants];
+        extern LangName languageNames[kLanguages];
+        #endif
+    }
+}
+
+#endif /*__avmplus_ErrorConstants__*/
+]]>
+        </dotH>
+  <TestLanguageSubset1 repeat='ErrorGenerator.Languages' trim='1' >
+    <![CDATA[{{column(8)}}#elif defined(AVMPLUS_ERROR_LANG_{{language.*.0}})
+]]>
+  </TestLanguageSubset1>
+  <TestLanguageSubset2 repeat='ErrorGenerator.Languages' trim='1' >
+    <![CDATA[{{column(12)}}#define AVMPLUS_ERROR_LANG_{{language.*.0}}
+]]>
+  </TestLanguageSubset2>
+  <LanguageEnums repeat='ErrorGenerator.Languages' trim='1' >
+    <![CDATA[{{column(12)}}#ifdef AVMPLUS_ERROR_LANG_{{language.*.0}}
+{{column(16)}}LANG_{{language.*.0}},
+{{column(12)}}#endif
+]]>
+  </LanguageEnums>
+  <ConstantEnums repeat='ErrorGenerator.LangFile_en.errors' trim='2' >
+            <![CDATA[{{column(12)}}{{error.@label}}{{column(60)}}= {{error.@id}},
+]]>
+        </ConstantEnums>
+
+
+        <Copyright>
+<![CDATA[
+/* -*- c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 4 -*- */
+/* vi: set ts=4 sw=4 expandtab: (add to ~/.vimrc: set modeline modelines=5) */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ * THIS FILE IS AUTO-GENERATED. DO NOT EDIT THIS FILE.
+ * Use the script 'errorgen' to generate this file.
+ */
+]]>
+        </Copyright>
+
+
+</ErrorGenerator>

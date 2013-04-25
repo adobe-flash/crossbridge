@@ -1,0 +1,46 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page hasnext 
+
+\addindex hasnext
+
+
+\section hasnext hasnext
+
+\subsection operation Operation
+
+Determine if the given object has any more properties.
+
+\subsection format Format
+
+\code
+hasnext
+\endcode
+
+\subsection forms Forms
+\code
+hasnext = 31(0x1f)
+\endcode
+\subsection stack Stack
+
+\code
+..., obj, cur_index => ..., next_index
+\endcode
+
+\subsection description Description
+
+cur_index and obj are popped off of the stack. cur_index must be of type int. 
+Get the index of the next property after the property at cur_index. If there are no 
+more properties, then the result is 0. The result is pushed onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

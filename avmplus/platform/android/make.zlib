@@ -1,0 +1,34 @@
+#  This Source Code Form is subject to the terms of the Mozilla Public
+#  License, v. 2.0. If a copy of the MPL was not distributed with this
+#  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+ZLIB_DIR := ../../other-licenses/zlib
+
+#****************************************************************************
+# Source files
+#****************************************************************************
+
+ZLIB_SRCS := \
+	${ZLIB_DIR}/compress.c \
+	${ZLIB_DIR}/inffast.c \
+	${ZLIB_DIR}/crc32.c \
+	${ZLIB_DIR}/zutil.c \
+	${ZLIB_DIR}/trees.c \
+	${ZLIB_DIR}/deflate.c \
+	${ZLIB_DIR}/uncompr.c \
+	${ZLIB_DIR}/infback.c \
+	${ZLIB_DIR}/inflate.c \
+	${ZLIB_DIR}/adler32.c \
+	${ZLIB_DIR}/inftrees.c
+
+ZLIB_OBJS := $(addprefix ${OBJDIR}/zlib/, $(notdir $(addsuffix .o, $(basename ${ZLIB_SRCS}))))
+ZLIB_DEPS := $(addprefix ${OBJDIR}/zlib/, $(notdir $(addsuffix .d, $(basename ${ZLIB_SRCS}))))
+ZLIB_LIB := ${LIBDIR}/libzlib.a
+
+$(OBJDIR)/zlib/%.o: ${ZLIB_DIR}/%.c
+	${call compile-c-files-arm,zlib}
+
+${ZLIB_LIB}: ${ZLIB_OBJS}
+	${call make-lib,${ZLIB_OBJS}}
+
+-include ${ZLIB_DEPS}

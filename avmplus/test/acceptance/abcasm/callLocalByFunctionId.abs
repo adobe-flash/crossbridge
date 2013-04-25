@@ -1,0 +1,49 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+ /*
+  *  Bind a function to a global slot; refer to it by .function_id 
+  *  in the newfunction instruction.
+  */
+
+
+function doTest()
+{
+	findpropstrict      START
+	pushstring "calling function by slot and function_id"
+	callproperty START 1
+
+	findpropstrict PASS
+	pushstring          "hello, world."
+	callproperty PASS 1
+	findpropstrict END
+	callproperty END 0
+
+	returnvoid
+}
+
+function main()
+{
+	getlocal0
+	pushscope
+	newfunction doTest
+ 
+	getglobalscope
+	swap
+	setslot 1
+	getglobalscope
+	getslot 1
+
+	getlocal0
+	call 0
+	returnvoid
+    
+}
+
+script_info {
+	init: main
+	traits : {
+		trait { kind: Trait_Slot name: doTest slot_id:1 type_name:* }
+	}
+}

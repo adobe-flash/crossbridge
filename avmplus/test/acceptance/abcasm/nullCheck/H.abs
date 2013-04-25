@@ -1,0 +1,42 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "instructions starting with the letter H" 
+    callpropvoid START 1
+    newfunction .function_id(runTest)
+    getlocal0
+    call 0
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+function runTest()
+{
+    findproperty COMPARE_STRICTEQ
+    pushstring "hasnext null"
+    pushint 0 // expected
+    pushnull
+    pushint 0xFFFFFF   
+    hasnext
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    pushint 33
+    setlocal1
+    
+    pushnull
+    setlocal2
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "hasnext2 null"
+    pushfalse // expected
+    hasnext2  2,1
+    callpropvoid COMPARE_STRICTEQ 3
+
+    returnvoid
+}

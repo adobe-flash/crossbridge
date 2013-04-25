@@ -1,0 +1,96 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/*
+    Note:  The three bindings supplied (get,set,method) are valid and the
+    default slot binding is not valid for callstatic.
+*/
+
+//http://watsonexp.corp.adobe.com/#bug=3328170
+function staticGetter()
+{
+	getlocal0
+	pushscope
+
+	findproperty PASS
+	pushstring "get binding"
+	callpropvoid PASS 1
+	
+	returnvoid
+}
+
+function staticSetter()
+{
+	getlocal0
+	pushscope
+
+	findproperty PASS
+	pushstring "set binding"
+	callpropvoid PASS 1
+	
+	returnvoid
+}
+
+function staticMethod()
+{
+	getlocal0
+	pushscope
+
+	findproperty PASS
+	pushstring "method binding"
+	callpropvoid PASS 1
+	
+	returnvoid
+}
+
+function main()
+{
+	getlocal0
+    pushscope
+    findproperty START 
+    pushstring "CallStatic" 
+    callpropvoid START 1
+
+	getlocal0
+	callstatic staticMethod 0
+	pop
+
+	getlocal0
+	callstatic staticGetter 0
+	pop
+
+	getlocal0
+	callstatic staticSetter 0
+	pop
+
+	findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+script_info {
+	init: main
+	traits: {
+		trait { 
+			kind: Trait_Getter 
+			method: staticGetter 
+			name:staticGetterBinding
+			disp_id:0
+		}
+
+		trait { 
+			kind: Trait_Setter 
+			method: staticSetter 
+			name:staticSetterBinding
+			disp_id:0
+		}
+
+		trait { 
+			kind: Trait_Method 
+			method: staticMethod 
+			name:staticMethodBinding
+			disp_id:0
+		}
+	}
+}
+	

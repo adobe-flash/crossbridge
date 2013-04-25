@@ -1,0 +1,46 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page constructsuper 
+
+\addindex constructsuper
+
+
+\section constructsuper constructsuper
+
+\subsection operation Operation
+
+Construct an instance of the base class.
+
+\subsection format Format
+
+\code
+constructsuper arg_count
+\endcode
+
+\subsection forms Forms
+\code
+constructsuper = 73 (0x49)
+\endcode
+
+\subsection stack Stack
+
+\code
+..., object, arg1, arg2, ..., argn => ...
+\endcode
+
+\subsection description Description
+
+arg_count is a u30 that is the number of arguments present on the stack. This will invoke 
+the constructor on the base class of object with the given arguments.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if object is null or undefined.
+
+\subsection notes Notes
+
+None.
+
+*/
+

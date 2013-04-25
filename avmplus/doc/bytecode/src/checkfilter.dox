@@ -1,0 +1,47 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page checkfilter 
+
+\addindex checkfilter
+
+
+\section checkfilter checkfilter
+
+\subsection operation Operation
+
+Check to make sure an object can have a filter operation performed on it.
+
+\subsection format Format
+
+\code
+checkfilter
+\endcode
+
+\subsection forms Forms
+\code
+checkfilter = 120 (0x78)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ..., value
+\endcode
+
+\subsection description Description
+
+This instruction checks that the top value of the stack can have a filter operation performed on it. 
+If value is of type XML or XMLList then nothing happens. If value is of any other type a TypeError 
+is thrown.
+
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if value is not of type XML or XMLList.
+
+\subsection notes Notes
+
+None.
+
+*/
+

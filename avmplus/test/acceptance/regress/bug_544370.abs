@@ -1,0 +1,51 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function bugzilla544370():*
+{
+	debugfile "bug_544370.abs"
+	debugline 74
+
+	newfunction bugzilla544370
+
+	findpropstrict PASS
+	pushstring "newfunction on self"
+	callproperty PASS 1
+
+	returnvoid
+}
+
+function doTest():*
+{
+	debugfile "bug_544370.abs"
+	debugline 53
+
+	getlocal0
+	pushscope
+
+	findpropstrict START
+	pushstring "Bugzilla 544370 regression test"
+	callproperty START 1
+
+	newfunction bugzilla544370
+	getlocal0
+	call 0
+	returnvoid
+
+	findpropstrict END
+	callproperty END 0
+}
+
+function main()
+{
+	debugfile "bug_544370.abs"
+	debugline 41
+	getlocal0
+	pushscope
+	newfunction doTest
+	getlocal0
+	call 0
+	returnvoid
+}
+script_info{init: main}

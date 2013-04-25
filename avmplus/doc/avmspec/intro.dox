@@ -1,0 +1,65 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page AVM2
+ 
+ \section intro_sec Introduction
+ 
+ The Adobe&reg; ActionScript&tm; Virtual Machine 2, or AVM2 for short, was designed to
+ execute programs written in the ActionScript 3.0 language. ActionScript 3.0 
+ is based on ECMAScript, the international standardized programming language for 
+ scripting. ActionScript 3.0 is compliant with the ECMAScript Language Specification, 
+ Third Edition (ECMA-262). It also contains functionality based on ongoing work on 
+ ECMAScript Edition 4, occurring within the Ecma International standards body.
+ 
+ This document describes the operation of the AVM2 and defines the file formats, 
+ data structures, and instruction formats used by the AVM2.
+ 
+ \section concepts Concepts
+ 
+The AVM2 was designed to support the ActionScript (AS) 3.0 language, and for the remaining chapters 
+it is assumed that the reader is aware of the terminology and concepts of the language.
+
+The following vocabulary and associated definitions are taken from the ActionScript 3.0 
+Language Specification and are presented only as a review of the material. For full details, 
+refer to the language specification.
+
+- Virtual Machine — A virtual machine is a mechanism that takes as its input the description of a 
+computation and that performs that computation. For the AVM2, the input is in the form of an \c ABC
+\c file, which contains compiled programs; these comprise \c constant \c data, \c instructions from
+the AVM2 instruction set, and various kinds of \c metadata.
+- Script — A script set of traits and an initializer method; a script populates a top-level 
+environment with definitions and data.
+- Bytecode, code — Bytecode or code is a specification of computation in the form of a sequence 
+of simple actions on the virtual machine state.
+- Scope — Scope is a mapping from names to locations, where no two names are the same. Scopes 
+nest, and nested scopes can contain \c bindings (associations between names and locations) that 
+shadow the bindings of the nesting scope.
+- Object — An object is an unordered collection of named properties, which are containers that 
+hold values. A value in ActionScript 3.0 is either an Object reference or one of the special 
+values \c null or \c undefined.
+- Namespace — Namespaces are used to control the visibility of a set of properties independent 
+of the major structure of the program.
+- Class—A class is a named description of a group of objects. Objects are created from classes 
+by \c instantiation.
+- Inheritance — New classes can be derived from older classes by the mechanism known as inheritance 
+or \c subclassing. The new class is called the \c derived \c class or \c subclass of the old class,
+and the old class is called the \c base \c class or \c superclass.
+- Trait—A trait is a fixed-name property shared by all objects that are instances of the same 
+class; a set of traits expresses the type of an object.
+- Method — The \c word method is used with two separate meanings. One meaning is a \c method \c body, 
+which is an object that contains code as well as data that belong to that code or that describe 
+the code. The other meaning is a \c method \c closure, which is a method body together with a reference 
+to the environment in which the closure was created. In this document, functions, constructors, 
+ActionScript 3.0 class methods, and other objects that can be invoked are collectively referred 
+to as method closures.
+- Verification — The contents of an ABC file undergo verification when the file is loaded into the 
+AVM2. The ABC file is rejected by the verifier if it does not conform to the AVM2 Overview. 
+Verification is described in Chapter 3.
+- Just-in-Time (JIT) Compiler — AVM2 implementations may contain an optional run-time compiler 
+for transforming AVM2 instructions into processor-specific instructions. Although not an 
+implementation requirement, employing a JIT compiler provides a performance benefit for many 
+applications.
+\todo fix chapter ref
+ 
+ */

@@ -1,0 +1,51 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page si32 
+
+\addindex si32
+
+
+\section si32 si32
+
+\subsection operation Operation
+
+Store an 32 bit integer to global memory.
+
+\subsection format Format
+
+\code
+si32
+\endcode
+
+\subsection forms Forms
+\code
+si32 = 60 (0x3C)
+\endcode
+\subsection stack Stack
+
+\code
+..., value, address => ...
+\endcode
+
+\subsection description Description
+
+Store an 32 bit integer to global memory.
+
+The value is converted to integer using the equivalent of convert_i,
+then the 32 bits are stored as four bytes in little-endian order.
+
+The MOPS opcodes all access the backing store of the ByteArray represented by the
+current app domain's ApplicationDomain.domainMemory property. Address ranges for
+accesses will be range checked using standard comparisons.
+
+\subsection rt_execeptions Runtime exceptions
+
+Range check failures will result in an InvalidRangeError exception.
+
+\subsection notes Notes
+
+None.
+
+*/
+

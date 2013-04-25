@@ -1,0 +1,51 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function doTest()
+{
+    getlocal0
+	pushscope
+
+	findpropstrict START
+	pushstring "Counted loop with lots of coercions to ANY"
+	callproperty START 1
+
+    pushbyte 0
+	coerce_a
+	setlocal1
+
+loop:
+	label
+	pushbyte 1
+	coerce_a
+	getlocal1
+	coerce_a
+	add
+	coerce_a
+	dup
+	setlocal1
+	pushbyte 10
+	coerce_a
+	ifngt loop
+
+	findpropstrict COMPARE_STRICTEQ
+	pushstring "after loop"
+	pushbyte 11
+	getlocal1
+	callproperty COMPARE_STRICTEQ 3
+
+	findpropstrict END
+	callproperty END 0
+
+	returnvoid
+}
+
+function main()
+{
+	newfunction doTest
+	getlocal0
+	call 0
+	returnvoid
+}
+script_info{init:main}

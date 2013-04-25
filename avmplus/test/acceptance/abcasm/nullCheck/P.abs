@@ -1,0 +1,69 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function runTest()
+{
+    // dummy testcase for P until bugs sorted out
+    findproperty COMPARE_STRICTEQ
+    pushstring "pushwith null"
+    pushtrue // expected
+    pushtrue
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    /*
+    findproperty COMPARE_STRICTEQ
+    pushstring "pushwith null"
+    pushint 0 // expected
+    pushnull
+    pushwith
+    pushtrue
+    callpropvoid COMPARE_STRICTEQ 3
+    */
+    
+    /*
+    try {
+        pushnull
+        pushwith
+        
+        findproperty FAIL
+        pushstring "pushwith null"
+        pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_pushwith_null
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal3   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "pushwith null"
+        pushstring "TypeError: Error #1009" //Cannot access a property or method of a null object reference.  // expected
+        getlocal3
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_pushwith_null:
+    */
+
+    
+    returnvoid
+}
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "Instructions that start with the letter P" 
+    callpropvoid START 1
+    newfunction runTest
+    getlocal0
+    call 0
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+script_info{init: main}

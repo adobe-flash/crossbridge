@@ -1,0 +1,276 @@
+<!--
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+-->
+<html>
+<head>
+<title>AVM Selftest Harness</title>
+</head>
+
+<body>
+<h1> AVM Selftest Harness </h1>
+
+<h2> Purpose </h2>
+
+<P> The selftest infrastructure in the avmplus makes it possible to
+write test cases below the level of abstraction of ABC files.  For
+example, it can be used to create tests for code generation
+optimizations, processor features, and low-level GC features.
+
+<P> The main virtues of the infrastructure is that much of the
+drudgery is taken out of writing (and reading!) test code, and that
+running all tests across the system is quick and easy and requires no
+special knowledge.  Thus everyone can add tests, and they can be run
+routinely, whether manually or in a test framework.
+
+<P> The test infrastructure is non-invasive and can be enabled in
+release builds without other adverse effects than an increase in code
+size and the appearance of the command line switch "-Dselftest".
+
+<h2> Overview </h2>
+
+<h3> Writing and generating tests </h3>
+
+<P> Tests are written in C++, but in order to reduce the amount of
+noise and overhead the test code is placed in a specially formatted
+".st" file.  A script then processes all ".st" files at once and
+generates C++ code for each, plus common initialization code.  At
+this time, each ".st" file lives in the "extensions/" folder and has a
+name that starts with "ST_".
+
+<P> For example, "extensions/ST_avmplus_peephole.st" contains tests
+for the interpreter's peephole optimizer.
+
+<P> The script that processes the selftest files is
+"extensions/selftest.as".  It should be run with "extensions/" as the
+current directory, on all the .st files:
+
+<pre>
+% pwd
+~/work/redux/extensions
+% avmshell selftest.abc -- ST_*.st
+%
+</pre>
+
+<P> A test file - which can contain many tests - belongs to a
+component and a category; each test is in turn named.  By convention,
+the ".st" file and the generated ".cpp" file are named using the
+component and category, eg, "ST_avmplus_peephole.st".
+
+<h3> Running the tests </h3>
+
+<P> The ST_*.cpp files should be added to the avmshell project, and
+AVMPLUS_SELFTEST should be enabled in avmbuild.h.  Once the shell has
+been rebuilt, the tests can be invoked either all at once:
+
+<pre>
+% avmshell -Dselftest
+</pre>
+
+<P> or some can be selected by component, category, and name (using a
+trailing '*' as an MS-DOS style suffix wildcard):
+
+<pre>
+% avmshell '-Dselftest=avmplus,peephole,get*'
+</pre>
+
+<h3> Output format </h3>
+
+<P> The results are formatted as JSON-encoded array data.  At this
+time, they are presented on stdout, and there are no postprocessing
+facilities (see the "TO DO" section).  Each line is tagged with the
+component, category, and (when appropriate) the test name.  For
+example, a successful run of the "basic" test case presented below
+looks like this:
+
+<pre>
+['start', 'avmplus', 'basics']
+['test', 'avmplus', 'basics', 'unsigned_int']
+['pass', 'avmplus', 'basics', 'unsigned_int']
+['test', 'avmplus', 'basics', 'signed_int']
+['pass', 'avmplus', 'basics', 'signed_int']
+['end', 'avmplus', 'basics']
+</pre>
+
+<P> A "start" line is printed as the tests are entered for a component
+and category, and an "end" line when those tests are done.  Then for
+each test name, a "test" line is printed, followed by a "pass",
+"failure", or "exception" line, depending on how the test terminated.
+A "crash" line is printed if the prologue or epilogue code (see below)
+throws an exception.
+
+<h3> Test format </h3>
+
+<P> (A comment block at the top of "extensions/selftest.as" is the
+authoritative definition of the test format.  The information is
+repeated and expanded upon here, but the following description is not
+normative.)
+
+<h4> Grammar </h4>
+
+<P> Apart from comments and blank lines the input file must match the
+nonterminal "file" in the following grammar.
+
+<pre>
+file      ::= component category ifdef* (decls | methods | prologue | epilogue | test)*
+component ::= SOL "%%component" ident EOL
+category  ::= SOL "%%category" ident EOL
+ifdef     ::= SOL "%%ifdef" ident EOL
+decls     ::= SOL "%%decls" EOL text
+methods   ::= SOL "%%methods" EOL text
+prologue  ::= SOL "%%prologue" EOL text
+epilogue  ::= SOL "%%epilogue" EOL text
+test      ::= SOL "%%test" ident EOL (text | verify)*
+verify    ::= SOL "%%verify" expr EOL
+expr      ::= text but not newline
+text      ::= arbitrary text not containing "%%" at SOL
+EOL       ::= newline
+SOL       ::= beginning of line, possibly with leading spaces
+</pre>
+
+<P> Comment lines are C++ style: "//" possibly preceded by blanks, to the end of line.
+
+<P> Blank lines are legal everywhere.
+
+<h4> Semantic constraints on the selftest specification </h4>
+
+<UL>
+<LI> There can be an arbitrary number of tests, but at least one.
+<LI> There can be at most one prologue or epilogue.
+<LI> There can be an arbitrary number of decls and methods, they are just cat'ed together.
+<LI> There must be at least one verify in a test.
+</UL>
+
+<P> (The requirements for at least one test and at least one verify
+are fascistic, but may help catch errors.  Experience will tell.)
+
+<h4> Semantics of the specification </h4>
+
+<P> A selftest file defines one or more test cases for a component
+(like "avmplus" or "player") and a category (like "peephole" or
+"jit").  Additionally, each test is named.  The test harness lets the
+user define the components, categories, and tests to run.
+
+<P> Each generated file is compiled conditionally on the existence of
+AVMPLUS_SELFTEST and also each of the names declared in %%ifdef
+statements.
+
+<P> The code that is generated comprises a class and its methods, all
+within a "namespace avmplus" block. Text in %%decls blocks is inserted
+verbatim into the class definition; text in %%methods blocks is
+inserted verbatim into the top level of the file. These sections allow
+the test case to define and use auxiliary data and methods.
+
+<P> The code in a %%prologue section will be run once, before any test
+in the file is run.  The code in an %%epilogue section will also be
+run once, after all tests in the file have been run. They are
+typically used to initialize instance data (declared by %%decls).
+
+<P> Each %%test is enclosed in an anonymous method of the generated
+class.  Each %%verify that appears in the test will test its
+condition, and if it does not hold that test function will be aborted
+and the error recorded.  Subsequent %%verify statements in that test
+will not be executed; however, subsequent tests in the same selftest
+spec will be executed.
+
+<P> Comment lines preceding directives are copied verbatim to the output.
+
+<h3> Examples </h3>
+
+<h4> Simple example </h4>
+
+<P> The following trivial example containing two tests tests whether
+right shift works as we require it to.
+
+<pre>
+%%component avmplus
+%%category basics
+
+%%test unsigned_int
+
+// Does right shift of unsigned quantities work?
+%%verify (int)(~0U >> 1) > 0
+
+%%test signed_int
+
+// Does right shift of signed quantities work?
+%%verify (-1 >> 1) == -1
+</pre>
+
+<h4> Complicated example </h4>
+
+<P> The following example tests the peephole optimizer.  It shows how
+additional constraints are placed on the test with %%ifdef, how
+instance variables are inserted into the generated class, then
+initialized, used, and destroyed, and how multiple verifications may
+be used in a single test.
+
+<P> (The actual test is that two GETLOCAL instructions are coalesced
+as a GET2LOCALS, provided that the original arguments are in the
+correct range.  The third GETLOCAL is not folded with the earlier ones
+into GET3LOCALS because its argument is too large.)
+
+<pre>
+%%component avmplus
+%%category  peephole
+%%ifdef     AVMPLUS_PEEPHOLE_OPTIMIZER
+
+%%decls
+
+private:
+#ifdef AVMPLUS_DIRECT_THREADED
+    void** opcode_labels;
+#endif
+
+%%prologue
+
+#ifdef AVMPLUS_DIRECT_THREADED
+    int len = WOP_LAST+1
+    opcode_labels = new void*[len];
+    for ( int i=0 ; i &lt; len ; i++ )
+        opcode_labels[i] = (void*)i;
+#endif
+
+%%epilogue
+
+#ifdef AVMPLUS_DIRECT_THREADED
+    delete [] opcode_labels;
+#endif
+
+%%test get2locals
+
+#ifdef AVMPLUS_DIRECT_THREADED
+    Translator* t = new Translator(core, NULL, opcode_labels);
+#else
+    Translator* t = new Translator(core, NULL);
+#endif
+
+    t->emitOp1(WOP_getlocal, 5);
+    t->emitOp1(WOP_getlocal, 4);
+    t->emitOp1(WOP_getlocal, 65536);
+    uint32_t* code;
+    uint32_t len = t->epilogue(&code);
+
+%%verify len == 4
+%%verify code[0] == NEW_OPCODE(WOP_get2locals)
+%%verify code[1] == ((4 &lt;&lt; 16) | 5)
+%%verify code[2] == NEW_OPCODE(WOP_getlocal)
+%%verify code[3] == 65536
+
+    delete t;
+</pre>
+
+
+<h2> TO DO </h2>
+
+<P> <b>Postprocessing facilities:</b> We're really not interested in
+knowing about the tests that pass, only those that fail (in some way),
+but the output is voluminous.  There needs to be a postprocessing
+script.
+
+<P> <b>Negative tests:</b> The only test form is %%verify, but we're
+going to need %%verify-not and %%verify-throw before long, I bet.
+
+</body>
+</html>

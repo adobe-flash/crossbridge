@@ -1,0 +1,906 @@
+<!--
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+-->
+<html>
+
+<head>
+<title>ExactGC Architecture and Design Space</title>
+</head>
+
+<body>
+<h1>ExactGC Architecture and Design Space</h1>
+
+<P> Draft 2011-01-18 / Lars T Hansen.
+
+<P> This document describes the architecture of the opt-in
+partly-exact tracing in MMgc.  Some background information and
+information on rejected designs are also provided.  This document is
+rather discursive and is intended for the specially interested reader
+only.
+
+<P> Those wishing simply to use the exact tracing system should look
+to the <a href="exactgc-cookbook.html">cookbook</a> or
+the <a href="exactgc-manual.html">full manual</a>.
+
+<h2> Table of contents </h2>
+
+<a href="#overview">Overview, Motivation and Requirements</a><br>
+<a href="#design-space">Design Space and Chosen Designs</a><br>
+<a href="#base-classes">Base Classes</a><br>
+<a href="#construction-protocol">Construction Protocol</a><br>
+<a href="#writing-tracers">Writing Tracers</a><br>
+<a href="#api-issues">API issues</a><br>
+<a href="#dont-care">Things I really don't care about</a><br>
+<a href="#optimization-ideas">Optimization Ideas</a><br>
+
+
+<a name="overview">
+<h2> Overview, Motivation and Requirements </h2>
+
+<P> The exact-gc system separates objects in the MMgc heap into those
+that are "exactly traced" and those that are "conservatively traced".
+When the GC is scanning an exactly traced object it will examine only
+the pointer-containing fields; other fields will be skipped.
+Furthermore, when examining atom fields, tags will be decoded and used
+to guide the examination of the datum.
+
+<P> The primary purpose of the exact-gc system is to reduce the
+retention of garbage that results from the conservative GC identifying
+non-pointers as pointers; while not generally a problem it can bite
+hard when it does bite (large heaps and large XML structures tend to
+exacerbate the problem).
+
+<P> A secondary purpose is to speed up collection, as less time will
+be needed to distinguish pointers from non-pointers during tracing.
+
+<P> We can outline some requirements for the work (some of these are
+post-hoc):
+
+<ul>
+<li> <P> <b>Incremental / don't boil that ocean.</b>  It must be
+possible to move the Flash Player code to exact tracing in a piecemeal
+manner: Once a basis layer is present in MMgc and the AVM, we need to
+be able to convert some object types to exact tracing singly or in
+small groups while leaving other object types to be conservatively
+traced.  Piecemeal implementation greatly reduces risk as it allows us
+to perform conversion work as we have time for it, and to defer
+converting types that turn out to be difficult.  It allows us to focus
+on high-volume types first and thus reap early benefits.
+
+<li> <P> <B>Simple.</B>  It must be easy and foolproof to write tracers
+for the vast majority of types (by object count and memory volume).
+Exact tracing for C++ objects will only be acceptable if the
+additional complexity and work are none-to-moderate in almost all
+cases.
+
+<li> <P> <B>Fast.</B>  Exact tracing must be efficient; it must be no
+slower overall than the current conservative tracer.
+</ul>
+
+<P> I firmly believe that we will never desire to move to exact
+tracing for all types -- the economics of tackling the long tail of
+types are wrong, given that we can get above 99% of the object volume
+by converting a few dozen types.  While the probability of
+conservative retention will be nonzero so long as there are any
+conservatively traced objects at all, it will become very small and
+will likely be acceptable.
+
+
+<a name="design-space">
+<h2> Design space and Chosen Designs</h2>
+
+<h3> Uniform objects and simple descriptors vs arbitrary objects and ad-hoc descriptors </h3>
+
+<P> There are two major approaches to introducing exact tracing for
+C++ into MMgc.
+
+<P> One approach is to normalize the layout of GC objects so that the
+garbage collector can easily identify pointer-containing fields and
+tagged-pointer fields without further help from the programmer;
+normally this means that all pointer fields in an object will have to
+be consecutive, as will all atom fields.  This approach will tend to
+require large up-front changes as a change to the layout of an object
+will affect <em>subclasses</em> of the object, eg, we can't trace
+<tt>ScriptObject</tt> exactly without converting all its subclasses,
+and that goes for other parts of the object hierarchy too.
+
+<P> The other approach is to accept that the C++ object layouts are
+what they are and to provide facilities that allow the programmer to
+tell the GC where to look for them and what it will find there (raw
+pointer vs Atom, for example), on a pointer-by-pointer or
+section-by-section basis.  This approach will tend to enable piecemeal
+implementation as it only affects <em>superclasses</em> of the object,
+eg, to trace <tt>DateObject</tt> exactly we also require
+that <tt>ScriptObject</tt> is traced exactly, but not vice versa.
+
+<P> Essentially, in the former case the "descriptor" for where to find
+pointers is baked into the design of object layout and is very simple
+("pointers are stored from here to there"); in the latter case it's
+provided on a case-by-case basis and is more detailed ("this is a
+pointer and this one, but not that one; that over there is an Atom").
+
+<P> <B>Selected design:</B> My attitude has been that the latter
+approach has lower risk and a much greater degree of graduality (and
+also admits for easy escapes to conservative tracing of some object
+fields when needed), and that's what I've gone with.
+
+
+<h3> Representation of Descriptors </h3>
+
+<P> The ad-hoc object descriptor can take several forms, notably
+bitmaps or similar interpreted structures on the one hand, and code to
+trace the object on the other hand.  In the case of code it can be be
+virtual methods on the objects or function pointers stored in the
+objects or in the objects' traits (for instances of AS3 classes).  In
+neither case do all objects need to use the same mechanism so long as
+the GC can tell what method a particular object uses.
+
+<P> Interpretation overhead is undesirable.  On the other hand, the
+number of distinct object types of interest is fairly small (probably
+in the high hundreds as opposed to the high thousands, say), so any
+code size increase incurred by per-type tracing functions is assumed
+to be affordable.  (Also see the subsequent section on code size.)
+
+<P> <B>Selected design:</B> Thus, at this time the sole mechanism for
+exact tracing is a virtual method that is optionally present on
+managed objects, called <tt>gcTrace</tt>.  This method is called by
+the collector to trace the object when the object is designated as
+exactly traced.  The method takes a <tt>GC*</tt> and an integer cursor
+and must inform the GC about all pointer fields in the object by
+calling dedicated tracing methods on the GC, passing locations of the
+pointer fields as arguments.
+
+<P> The integer cursor is a complication that facilitates piecemeal
+tracing of large objects, to ensure proper incrementality of
+collection.  If the object is large the <tt>gcTrace</tt> method should
+only trace an "appropriate" number of pointers, and then return "true"
+to indicate that there's more work to be done; in that
+case, <tt>gcTrace</tt> will be called again later with the next larger
+value for the cursor, and must then continue tracing.
+
+<P> The "appropriate number" of pointers to trace per invocation
+of <tt>gcTrace</tt> is roughly <tt>2000/sizeof(void*)</tt>; the value
+one chooses here does not affect tracing correctness or even tracing
+performance, only incrementality--tracing a very large object
+atomically can induce noticeable pauses, and will tend to grow the
+mark stack too much.
+
+<P> As the tracing is based on virtual functions, all objects in the
+heap derived from <tt>GCFinalizedObject</tt> can have tracing at
+essentially no additional cost (their vtables will be slightly larger
+but the objects themselves will not be).  However there are objects in
+the heap that do not already have a vtable, and here there are several
+options for those.  (Also see the section <a href="#base-classes">Base Classes</a>.)
+
+<P> The garbage collector knows whether an object is exactly traced or
+not by examining a new object header bit, <tt>kVirtualGCTrace</tt>.
+
+<P> The bit is set at the time of object construction if the object
+being constructed provides a tracing method.  The construction
+protocols that make that possible are discussed later.
+
+
+<h3> Roots and stacks </h3>
+
+<P> Observe that the design outlined above is able to identify
+pointers exactly only in managed objects, not in roots or stack
+frames, as the tracing protocol is provided only to the managed
+objects.
+
+<P> In the future we may also separate stack frames and roots into
+exactly and conservatively traced subsets; as of January 2011 both
+groups are traced entirely conservatively.
+
+<P> For roots the obvious design provides an optional
+virtual <tt>gcTrace</tt> method and a flag that states whether it
+should be called; the cost is fairly moderate by definition because a
+large number of roots must not exist in the system (a large number of
+roots will prevent garbage collection from being properly
+incremental).
+
+<P> (The tracker bug for work on GCRoots is
+Bugzilla <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=626611">626611</a>.)
+
+<P> For stack frames it is unlikely that we can ever hope to trace all
+frames exactly because arbitrary C++ stack frames will be interspersed
+with interpreter and JIT stack frames.  (LLVM/Clang/Dehydra groupies
+can object to that assessment, but there will always be some platforms
+where those tools won't apply.)  However, to avoid scanning stacks
+conservatively we also have other tricks available, notably to attempt
+to do stack scanning at opportune moments, notably when the stack is
+particularly small (such as when the player is idle).  We can
+sometimes time the stack scan by hastening it (if it's going to happen
+soon anyway) or delay it (for a little while).  If the timing strategy
+succeeds even some of the time then conservative retention from the
+stack will be a temporary problem that may be cleared up by a
+subsequent GC, and it may not be urgent to have precise stack scanning
+at all.
+
+<P> (The tracker bug for work on stack scanning is
+Bugzilla <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=599815">599815</a>.)
+
+<h3> Variations and rejected designs </h3>
+
+<P> <B> Split tracing protocol.</B> The initial implementation of
+exact tracing used two methods, <tt>gcTrace</tt>
+and <tt>gcTraceLarge</tt>.  The former would only take a <tt>GC*</tt>
+and return no value; the latter would have the full protocol roughly
+as outlined above.  The idea was that the protocol with one fewer
+arguments and no return value and return value checking would be
+faster, for the common case of small objects.  In practice having two
+methods creates a complication because somebody needs to determine
+whether to write one or the other, and it's not clear that the wins of
+a specialized small-object protocol exist (in fact, benchmarking
+suggests that there are no such wins).
+
+<P> <B> Non-virtual function pointer.</B> It seemed to me that with
+vtables present in many objects already there is not much sense in
+adding a function pointer to objects in general.  (However, the
+technique may show up as an optimization in cases where we want to jit
+tracers for AS3 objects.  See the
+section <a href="#optimizations">Optimizations</a>.)
+
+<P> <B> BiBoP tagging of exactly-traced objects.</B>  Instead of
+having a header bit that designates the object as exactly traced,
+which incurs the cost of setting that bit, we could allocate exactly
+traced objects in different memory regions and thus implicitly
+represent the bit.  However, that means we risk running the tracer for
+an object before it has become properly initialized as the tracer
+expects.  See the
+section <a href="#construction-protocols">Construction Protocols</a>
+for more on this issue.
+
+
+<a name="base-classes">
+<h2> Base classes </h2>
+
+<P> As mentioned earlier, <tt>GCFinalizedObject</tt> already has a
+vtable, so <tt>gcTrace</tt> is just added as a method on that table,
+giving every finalizable object (including every <tt>RCObject</tt>)
+the option of exact tracing.
+
+<P> For <tt>GCObject</tt> it's worse; we can't just add a vtable because
+the overhead of a vtable is not affordable.
+
+<P> In the case where the type deriving from <tt>GCObject</tt> can
+accomodate a different base class there is now a new base
+class, <tt>GCTraceableObject</tt>, which is like GCObject but provides
+the virtual <tt>gcTrace</tt> method and a vtable.
+
+<P>(<tt>GCFinalizedObject</tt> and </tt>GCTraceableObject</tt> share a
+base class, <tt>GCTraceableBase</tt>, but that class is internal to
+MMgc.)
+
+<P> In the case where it is not convenient to
+use <tt>GCTraceableObject</tt> there are several options available,
+depending on the situation.  The reasons for not
+using <tt>GCTraceableObject</tt> are at least these:
+
+<ol>
+
+<li> <P> <b>Array classes</b>.  Sometimes managed array storage is
+allocated with GC::Calloc or GC::Alloc, with an "implied base class"
+of <tt>GCObject</tt>. These array objects cannot be exactly traced
+(they don't have a vtable).  To trace them exactly, the arrays can be
+rewritten in terms of the VM's <tt>ExactHeapList</tt> type, for
+example.  Exact tracing of the array storage then happens
+automatically.
+
+<li> <P> <b>Arrays of Struct:</b> For small objects that are allocated
+in packed array (as opposed to pointers which ExactHeapList is for)
+with GC::Calloc <tt>ExactStructContainer</tt> can be used.  Here you also
+have to provide a custom <tt>gcTrace</tt> on the struct type.
+ExactStructContainer subclasses provides a vtable and
+a <tt>gcTrace</tt> that scans each element.
+
+<li> <P> <B>Tiny objects:</B> Objects that are small and populous and
+can't have a vtable because that would increase heap size
+significantly are a little tricky.  (It doesn't happen too often but
+an example is the storage used for <tt>InlineHashtable</tt> in the
+VM's object implementation.)  Right now the only way to trace those
+objects is for the owner-object to perform the tracing.  Typically
+this is done by the small object exporting
+a <tt>void&nbsp;gcTrace(GC*)</tt> method that is called by the small
+object's owner's <tt>gcTrace</tt> method under a guard that checks
+whether the small object has been marked previously.  This approach
+has the big drawback of write barrier firing on the sub object causing
+it to be scanned conservatively (see
+bug <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=636424">636424</a>).
+
+<P> A future possibility is to have off-object tracer methods for
+particular object types, triggered by bits in the object header.
+(That's particularly appealing if we redesign object layouts to
+accomodate more header bits, or through the use of BiBoP allocation.)
+
+<P> A problem with dependent objects that are traced exactly by their
+owners is that the dependent objects may be reached by the
+conservative tracer first, for example, through pointer
+misidentification in a conservative object or stack frame.  In that
+case the dependent object effectively becomes a conservatively traced
+object too.  We can avoid this at a (possibly quite small) cost by
+adding a bit to the dependent object's header that says that it should
+never be traced conservatively.
+
+<P> The case of <tt>InlineHashtable</tt> exhibits one more subtlety:
+while most hash table objects are small, and thus should not have a
+vtable, there is no reason for them not to have a vtable once they
+grow larger.  The hybrid representation is another way of mitigating
+the problem with conservative misidentification described in the
+previous paragraph.
+
+<li> <P> <B>Weird objects:</B> Objects that can't have a vtable for
+semantic reasons (type casting breaks it, etc) can be handled by the
+same means as the tiny objects.
+
+</ol>
+
+
+<a name="construction-protocols">
+<h2> Construction protocols </h2>
+
+<P style="color: red"> This section needs to be updated.  The <tt>setExact</tt> function
+has been removed; instead, a flag is passed to the <tt>new</tt> operator to designate
+the object as exactly traced.  Several invariants are imposed on the object to make
+that work; they need to be documented here and in the manual.  The cookbook has an
+up-to-date (27 January 2011) overview of the mechanism.
+
+<P> The only special thing that has to happen at construction time for
+an exactly traced object is to designate it as exactly traced: since
+the designation is a header bit, that bit must be set.
+
+<UL>
+
+<LI> <P> <B>When can the bit be set?</B> In particular, can the bit be
+set when the storage is allocated, or must it be set later, after
+initialization?  In general the answer is the latter, because it is
+possible for an object to become visible to the garbage collector
+during construction (via a stack reference, if nothing else) and until
+the object has been initialized it may not be in a state where its
+tracer method can make sense of it.  (Though see separate discussion
+below for a much more nuanced view.)
+
+<LI> <P> <B>How must it be set?</B>  At issue is the scope for error:
+not setting the bit when it should be set, and setting it when it
+should not be set.
+
+<P> While it is not incorrect for some instances of a type to be
+traced exactly and others to be traced conservatively, it is
+undesirable.  Thus if a class can be constructed at multiple points in
+the program, each of those points must be rewritten to set the bit,
+and when new allocation sites are created they must all be written so
+that they set the bit.  This is brittle.
+
+<P> On the other hand, it is no better to set the bit at the end of
+the constructor, because this precludes the existence of subclasses
+that are themselves not exactly traced.
+
+</UL>
+
+<P> The templated utility method <tt>MMgc::setExact</tt> makes it easy to
+set the bit at the allocation site, as it can be wrapped around any 'new' call:
+<pre>
+  MMgc::setExact(new (gc, ...) ClassName(...))
+</pre>
+and the result of the expression is exactly the result of the new expression.
+
+<P> However, the most reliable structure by far is to make the
+constructor for the class private (or protected, if you must) and then
+create a factory method for the class so that there is only one
+allocation site:
+
+<pre>
+  REALLY_INLINE static ClassName* create(GC* gc, ...) {
+    return MMgc::setExact(new (gc, ...) ClassName(...));
+  }
+</pre>
+
+<h3> Why it's bad for an object to transition between exact and conservative states, and what we can do about it </h3>
+
+<P> I stated above that we cannot pass a flag to the allocator -- the
+new operator -- to set the flag for us during allocation, because the
+C++ construction protocol will leave the object in a state during
+construction wherein the vtable will not have a valid <tt>gcTrace</tt>
+method: the flag can only be set when construction has completed.
+Thus objects that are in the process of being constructed will always
+be traced conservatively.
+
+<P> But that's not quite true.  If we add the requirement that every
+tracer should be able to handle an all-bits-zero value in any exactly
+traced field, and we require that any exactly traced field should
+never have a bogus value in it, and that the virtual <tt>gcTrace</tt>
+method can always be invoked, then we can set the bit on allocation
+and be done with it.  The first requirement is not a significant
+hardship; it's already true for all the tracing functions in MMgc.
+The last requirement is trivial (it requires that
+GCTraceableBase::gcTrace() is a no-op).  The middle requirement is a
+little trickier because it can be violated in a situation where a
+value in one field tells the tracer whether to trace the value in
+another field; for example, there is a tagged union that can contain
+pointers and non-pointers.  If the setting of the tag and the setting
+of the payload are separated by code that invokes the collector there
+could be trouble.
+
+<P> In addition to a somewhat simpler construction protocol there are
+other benefits.  Objects that are in the process of being destructed
+probably ought to have their <tt>kVirtualGCTrace</tt> bit turned off
+before destruction starts, for the same reason it's not turned on
+until after initialization finishes, but we've no way of doing that
+right now and so we don't.  With the three requirements stated above
+that would no longer matter.
+
+<P> Furthermore, <tt>GC::AbortFree</tt> resets
+the <tt>kVirtualGCTrace</tt> flag if an object is destructed but not
+reclaimed because it's referenced from the mark stack.  That works for
+objects deleted by the GC or the reference counting but it could be an
+issue for objects that are deleted explicitly: If some destructor for
+the object resurrects the object by storing it into another, and thus
+makes it available to the garbage collector via the write barrier, and
+the write barrier moves it to the mark stack and the marker runs, then
+the marker will have access to an object that has no valid <tt>gcTrace</tt>
+method the way things are at present.  With the protocol change that
+problem would disappear.
+
+<P> Bugzilla <a href="https://bugzilla.mozilla.org/show_bug.cgi?id=626612">626612</a>
+tracks this protocol change, which will probably happen.
+
+
+<h3> Rejected designs </h3>
+
+<P> The solution implemented initially was to pass a flag to the
+constructor, which then propagates it up the call chain to some base
+class that actually sets the flag:
+<pre>
+  new (gc, ...) ClassName(..., true)
+</pre>
+
+<P> (Instead of a boolean we could have used distinguished enum for
+better error checking.)
+
+<P> If the constructor for ClassName looked like this:
+<Pre>
+  ClassName::ClassName(...) : BaseClass(...)
+  { ... }
+</pre>
+then it would be rewritten to look like this:
+<pre>
+  ClassName::ClassName(..., bool exactGC=false) : BaseClass(..., exactGC)
+  { ... }
+</pre>
+
+<P> The default value of the 'exactGC' flag would be false, so base
+class constructor calls from subclasses would work correctly without
+being changed.  The main problem with this solution is not just that
+all the allocation sites must be changed - that's true for the
+prefered solution too - but that future allocation sites could
+inadvertently not pass the additional argument to the constructor.
+That is, we still need a factory method for reliability, and at that
+point rewriting all constructors (rather than just making them
+private) did not seem useful.
+
+
+<a name="writing-tracers">
+<h2> Writing tracers </h2>
+
+<P> Tracers are written in two ways, either hand-coded or by
+annotations which are then processed by a script into C++ code.
+
+<P> Annotations cover most simple cases, and can be extended to cover
+yet others.  <a href="exactgc-manual.html">The manual</a> describes
+the use of annotations.  By way of background, the annotation system
+is intended to be robust in the sense that it has enough redundancy to
+be error checked at multiple points during processing, and in the
+sense that it is easy to use and that errors in the annotations are
+relatively easy to spot while reading code.
+
+<P> The program utils/exactgc.as processes annotations and generates
+tracers that are equivalent in power to hand-written tracers;
+generated tracers are not privileged in any way.  Hand-written and
+generated tracers coexist and can be interleaved (with a little care)
+in a class hierarchy.
+
+<P> <a href="exactgc-manual.html">The manual</a> also describes the
+use of hand-written tracers.
+
+<P> TODO: Probably want some information here about the considerations
+that went into the design, and the false starts along the way, notably
+the structured comments that were later rejected (less error
+checking).  Probably want to talk about why we decided not to move
+fields in C++ ScriptObject subtypes into AS3 (simply does not work
+without major surgery).  Probably want to have some information about
+why we have a separate annotation system and do not depend on eg
+scanning for GCMember or DRC/DWBRC fields (less error checking).
+
+
+<a name="api-issues">
+<h2> API issues </h2>
+
+<P> The Flash Player abuses GC types: it makes them member types, and
+it stack-allocates them.  That will have to stop for every exactly
+traced type, and will cause extra work for Flash Player conversion.
+(Initial Player work has found instances of WeakKeyHashtable,
+WeakValueHashtable.  Steven mentions ByteArray as a type that is
+sometimes stack-allocated.)
+
+
+<a name="dont-care">
+<h2>Things I really don't care about</h2>
+
+<P> <b>Code size.</b>  Since a (generated) tracer function has many
+function calls in it, and there are many of those functions (one per
+exactly traced type), we might bloat the code a lot.  The reasons I
+don't care are that (a) I don't think it'll be that bad; and (b) code
+size really does not matter that much, and there are no systematic
+efforts in our development process to control it anyway, just a meme
+that "it matters".
+
+
+<a name="optimization-ideas">
+<h2> Optimization ideas</h2>
+
+<P> <b>Using Type Information:</b> We can specialize
+GC::TraceObjectWithPointers for quasi-leaf types, notably String, so
+that tracing the leaf in the common case results in no work being
+pushed onto the mark stack.  In the case of String, it points either
+to a non-pointer-containing buffer or to a master string.  If it
+points to a non-pointer-containing buffer that can be marked and we're
+done.  If it points to a master string we can recur onto that string
+provided we only have to do so a bounded number of times (once is
+best).  That can be ensured if we have an invariant in the system that
+a derived string's master string is not itself a derived string; such
+an invariant seems useful in its own right (and for all I know we
+might have it already).
+
+<P> Specializing GC::TraceObjectWithPointers is a means of making use
+of type information that is available to the exact tracer but not to
+the conservative tracer.
+
+<P> Obviously Namespace is another candidate type for this type of
+specialization.
+
+<P> This optimization means that we should be careful to cast
+tag-stripped pointers to their true types, notably in GC::TraceAtoms.
+
+<P> <B>Batching Trace Calls:</B> We can overload eg
+GC::TraceObjectWithPointers so that we have variants that take one,
+two, three, and so on arguments - this would reduce the amount of
+typing and boilerplate text in the caller (notably useful in
+hand-written tracers) and it would reduce the function call overhead
+of having to call the tracer once for every pointer.  Each specialized
+implementation of GC::TraceObjectWithPointers would completely unroll
+its "iteration" across the arguments, it would not use variable-length
+argument lists.
+
+<P> <B>Jitting Tracers:</B> It will be helpful to generate native code
+for slot array tracers based on the slot traits.  Doing so removes all
+interpretation overhead currently in GC::TraceSlots.  For objects that
+are sparsely populated with pointers it will be particularly sweet.
+
+<hr>
+
+<P> (Some unfinished sections beyond this point.)
+
+<h2>Native slots</h2>
+
+<P> Note the problem we have with how native slots are generated, and
+how we wish to fix that by cleaning up the slotDestroyInfo.
+
+
+
+
+
+<!--
+
+Headerless arrays I: In many cases vtable-less objects are arrays of
+pointers, structures, or atoms allocated by GC::Alloc or GC::Calloc.
+The easiest option here is frequently to create containers for these
+arrays that provide the tracing methods.  The tracing framework
+currently provides two generic containers, GCTracedPointerContainer<T>
+and GCTracedStructContainer<T>, where the former will handle pointer
+types to managed objects and the latter will handle constructor-less
+structs with a non-virtual gcTrace method.  Thus where code would
+previously read:
+
+    DWB(ClassClosure**) _builtinClassesContainer;
+    _builtinClassesContainer = (ClassClosure**)gc->Calloc(...);
+
+it now reads
+
+    DWB(MMgc::GCTracedPointerContainer<ClassClosure*>*) _builtinClassesContainer;
+    _builtinClassesContainer = GCTracedPointerContainer<ClassClosure*>::create(gc, ...);
+
+I expect the number and behavior of template types for container
+classes to continue to evolve for some time, as more cases are
+uncovered.
+
+Headerless arrays II: In the case of InlineHashtable storage we don't
+really want to pay for the extra object header because most objects
+are quite small and the header would cost at least 8 bytes, maybe more
+if we worry about the alignment of the quads array.  The important
+observation is that the InlineHashtable storage is owned by a single
+InlineHashtable instance, and we can make the latter trace the former
+as if it were a part of itself.
+
+
+If the storage array is large the direct tracing of it from the owning
+object is not ideal as the storage array tracing should be performed
+in pieces.  It may therefore be that InlineHashtable should have a
+hybrid representation, where large storage arrays have their own
+tracing methods and a vtable, and small arrays don't.
+
+[[[this would be "easy" if we did end up using one interface for large
+and small alike; then the cursor would index into the storage rather
+than the InlineHashtable instance, right?]]]
+
+[[[Excellent point.  Provided MarkItem itself does not rule on whether
+an object is large or small, but always obeys the return value from
+gcTrace, then that would work well.  I wonder what that will do for my
+pretty fast path but it might not be bad.  It's definitely a point in
+favor of having a single interface.]]]
+
+That is:
+
+There are methods on the GC to trace different kinds of fields
+(pointers vs atoms)
+
+We distinguish between pointer-containing and non-pointer-containing objects
+
+There are also methods for handling tagged pointers (as uintptr_t) and
+pointers where we don't know whether they point to pointer-containing
+objects or not
+
+There is a method for tracing fields conservatively, which has turned
+out to be useful in a few difficult cases (unions with a rich
+contextual interpretation)
+
+There are also methods for tracing ranges of pointers, ranges of
+atoms, and ranges of slots.  (The latter is a method on Traits, not on
+GC, because it did not seem necessary for the GC to know about slot
+layout.)  The slot tracer is currently not very fast--it's based on a
+FixedBitSet--but it's possible to make it much faster.  See section
+below on Optimizations.
+
+A tracer always calls the base class's tracer (except when the base
+class's tracer has been defined as being inert, as for
+GCFinalizedObject, say)
+
+[[[
+
+Re the exception to the rule, this is so that hand-written tracers do
+not need to contain a call that is certain to be redundant.  Nothing
+annoys people as much as pure busywork.  By defining GCFinalizedObject
+and GCTraceableObject's gcTrace method to do nothing, all those calls
+can be avoided.  It's not for efficiency, just for ease of use.
+
+Also, that means we can have catch-alls with asserts and aborts in the
+base class methods that should not be called, which will allow us to
+catch errors (missing gctrace method).
+
+Re pure virtual : you get less error checking that way.  I found that
+the asserts in the base versions saved my bacon a couple of times.]]]
+
+[[[ Re pure virtual for GCTraceableBase::gcTrace: The desirability of
+a base class implementation is an orthogonal issue for C++, b/c it
+allows pure virtuals to be implemented.
+
+However, I did just run into a comment in GC::AbortFree that clears
+the ET bit and has a comment about the need to do this b/c "the
+destructor snaps the vtable back to GCTracableBase" and that the clear
+would be unnecessary with empty base methods.  So there might be
+another motivating factor for not using pure virtuals lying around
+here ... (or it all might just be a development artifact).]]]
+
+
+
+Exactly Traced Subclasses of ScriptObject, and generating gcTrace functions
+
+ScriptObject subclasses follow the pattern outlined above, with a
+distinguished create method and an exactGC argument that's propagated
+up the constructor chain.
+
+(The hand-crafted ScriptObject::gcTrace is responsible for tracing the
+slot array; it currently does that by interpreting the destruction
+bitset for the object but that's just a stop-gap solution that is
+correct and expedient (see section below on Optimizations).)
+
+For ScriptObject subclasses in particular it is however desirable to
+automatically generate gcTrace functions, to reduce the amount of work
+required in writing and maintaining the tracers.  It is attractive to
+limit tracer generation to ScriptObject subclasses initially because
+we already have an infrastructure for generating C++ slot
+descriptions, getters, and setters from the avmglue and builtin
+classes; other types would be handled later, perhaps.
+
+The problem with ScriptObject subclasses is that they contain C++
+native members in addition to the AS3 slots.  Those native members
+must be found by the code that generates the tracers.  A fair amount
+of experimentation has gone into trying to come up with a good
+structure around that problem; a workable solution is described later
+on.  Here are some observations.
+
+First, if a C++ native slot is of a type that's a subtype of
+AvmPlusScriptableObject (String, Namespace, ScriptObject) or of a
+primitive type that corresponds to an AS3 type (double, int32_t,
+uint32_t, Atom) then it can be moved into the AS3 file, so long as it
+is private; this is true for both class and instance properties.
+(Whether it should be moved is a different issue, since all code that
+accesses the field will need to be updated, at dubious benefit.)
+
+Second, and contrary to what's asserted in Bugzilla 578405, it is
+almost certainly not a good idea to move C++ native slots that aren't
+of a subtype of AvmPlusScriptableObject into the AS3 file:
+
+
+
+The values in these slots cannot in general be safely manipulated by
+AS3 code
+
+All code that accesses them on the C++ side will need to change, but
+for what?
+
+All accesses are from C++ but with the definition in AS3 the distance
+between definition and use just got greater, at no obvious benefit
+
+Since there's not good way of expressing to ASC what the types of the
+native slots should be (they're not AS3 types) we must make ASC, and
+in the worst case the AVM, aware of the [native] annotations on the
+slots, and that does not seem like a good idea.
+
+
+
+Instead we probably want an easily machine-readable description in the
+C++ file itself.  Right now I'm looking at a simple, slightly verbose
+but completely reasonable, annotation mechanism, which works as
+follows.
+
+
+
+First, C++ classes whose instances should be exactly traced are
+annotated:
+
+
+
+//[GC-EXACT(cls="ObjectVectorClass")]
+
+class ObjectVectorClass : public ClassClosure { ... }
+
+
+
+(These lines need not be together; the script only looks for the
+GC-EXACT annotation.  But it's good for them to be together
+generally.)
+
+
+
+[[[
+
+Would it be worth looking at making the annotation format lexically
+compatible with tools like Dehyrda, perhaps putting these into
+__attribute__ blocks (or some other semi-standard annotation format,
+lik.e Doxygen comments) rather than ad-hoc comments?  (Note: I'm not
+suggesting we rely on Dehydra et al as basis for script, but rather
+enable it to be used as sanity check on subset of annotations.)]]]
+
+[[[
+
+It might be, but only if an up-front analysis suggests to us that
+there would be any credible value in doing so, and that those blocks
+can actually represent the information we need to represent.  The
+format is a bit richer than outlined here, see block comment at the
+beginning of utils/exactgc.as in the nativegen patch of the patch
+queue.]]]
+
+
+
+Next, we annotate members that need to be traced.  For pointer fields
+we use GC-POINTER:
+
+
+//[GC-POINTER(cls="ObjectVectorClass", name="index_type")]
+DRCWB(ClassClosure*) index_type; 
+
+Again, the only thing that is processed here is the structured
+comment, which is recognized because it is a double-slash comment not
+preceded by text, whose content is [GC-POINTER...].  The attributes on
+the annotation are cls, which holds the name of the class containing
+the property; name, which is the name of the property, and optionally
+pointers which indicates whether whether the object contains pointers
+(defaults to true).
+
+[[[
+
+Format has much redundancy.  I can see two motivations for format that
+may justify the redundancy: simplified implementation of extractor and
+flexible placement of annotations.  Its probably the right tradeoff
+(much improved over an earlier version of document).  But still worth
+mulling over.]]]
+
+[[[
+
+I assure you the redundancy is very much premeditated, as it reduces
+the scope for error significantly.  Consider that there are GC classes
+in the AVMglue that have GC classes inside them; thus you cannot infer
+that a field without a cls property belongs with a particular class if
+you don't bracket the class in begin/end style annotations.
+
+Also the flexible placement turns out to be very helpful for class
+definitions generated by macros, as the Error subclasses are.]]]
+
+There's a GC-ATOM type that's analogous to GC-POINTER, but used for
+Atom fields.
+
+For substructures that have a public gcTrace method we use
+GC-SUBSTRUCTURE:
+
+//[GC-SUBSTRUCTURE(cls="ArrayObject", name="m_denseArr")] 
+AtomArray m_denseArr; 
+
+In this case the only attributes are cls and name.
+
+[[[ Is this meant to illustrate one of the headerless array examples
+from earlier?  (Which one, the first?)  It would definitely be good to
+explicitly draw the connection between the earlier case analysis and
+each of the examples here (and also ensure each case has a
+corresponding example,).]]]
+
+[[[No, it's meant to illustrate something else, namely where there are
+structured members (not pointers to objects) that need to be traced
+but which themselves get to do the tracing.]]]
+
+
+(Note that with appropriate tweaking this system could be used also
+for types that are not subtypes of ScriptObject; that would be
+attractive.)
+
+In addition, the AS3 side must be annotated, because it will be
+nativegen.py that is responsible for coordinating the generation of
+information, and it must know whether to generate the tracer for a
+class.  Technically we could probably avoid that by having it look at
+the C++, actually, so the AS3 need not have any vestiges of C++-side
+concerns at all.
+
+Anyway, if we feed the set of C++ headers to nativegen.py it can
+extract these descriptions and generate appropriate C++ code as part
+of the slot description it already generates.  With this kind of a
+setup the C++ definitions would be where they're needed and the
+annotations would be right next to them; this is roughly optimal.
+There's room for some error in that (a) a property might be inserted
+without an annotation and (b) the property and its metadata might
+diverge, and they would be processed by the C++ compiler.
+
+[[[ We could use write barriers to detect correctness.  Ie in a debug
+build the write barrier constructors could record their offsets from
+the start of the object and we could compare that to the generated
+pointer map when the constructor chain terminates and the SetExact
+call happens.  ]]]
+
+[[[I like the idea, though the "pointer" map is encoded in code, so
+it's not so easy to make that comparison.  We could generate
+additional debug-mode code to construct the pointer map for us, though
+it's possibly tricky for GC-SUBSTRUCTURE fields.]]]
+
+To summarize, the pattern that's developing is as follows:
+
+General machinery in ScriptObject traces the AS3 slots
+
+A generated in-line function called gcTraceCppProperties in each
+ScriptObject subclass traces any C++ members.
+
+The nativegen.py script generates gcTrace and gcTraceLarge methods,
+including code to trace AS3 native slots, and makes sure that the
+generated functions call gcTraceCppProperties as well as the
+appropriate tracing functions in the base class.
+
+When classes or instances are exactly traced some of the generated
+init code in builtin.h is different: it calls the appropriate create
+method rather than the constructor.
+
+(The system works well in a prototype; more information will appear
+here as this work progresses.)
+
+-->
+
+
+</body>
+</html>

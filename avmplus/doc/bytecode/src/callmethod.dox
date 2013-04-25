@@ -1,0 +1,53 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page callmethod 
+
+\addindex callmethod
+
+
+\section callmethod callmethod
+
+\subsection operation Operation
+
+Call a method identified by index in the object’s method table.
+
+\subsection format Format
+
+\code
+callmethod 
+index 
+arg_count
+\endcode
+
+\subsection forms Forms
+\code
+callmethod = 67 (0x43)
+\endcode
+\subsection stack Stack
+
+\code
+..., receiver, arg1, arg2, ..., argn => ..., value
+\endcode
+
+\subsection description Description
+
+index is a u30 that is the index of the method to invoke on receiver. arg_count is a u30 that 
+is the number of arguments present on the stack. receiver is the object to invoke the method on.
+
+The method at position index on the object receiver, is invoked with the arguments receiver, 
+arg1, ..., argn. The result of the method call is pushed onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if receiver is null or undefined. 
+
+An ArgumentError is thrown if the number of  arguments does not match the expected number 
+of arguments for the method.
+
+\subsection notes Notes
+
+None.
+
+*/
+

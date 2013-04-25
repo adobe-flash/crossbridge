@@ -1,0 +1,64 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page hasnext2 
+
+\addindex hasnext2
+
+
+\section hasnext2 hasnext2
+
+\subsection operation Operation
+
+Determine if the given object has any more properties.
+
+\subsection format Format
+
+\code
+hasnext2
+object_reg 
+index_reg
+\endcode
+
+\subsection forms Forms
+\code
+hasnext2 = 50 (0x32)
+\endcode
+\subsection stack Stack
+
+\code
+..., => ..., value
+\endcode
+
+\subsection description Description
+
+object_reg and index_reg are uints that must be indexes to a local register. The value of 
+the register at position object_reg is the object that is being enumerated and is assigned 
+to obj. The value of the register at position index_reg must be of type int, and that value 
+is assigned to cur_index.
+
+Get the index of the next property after the property located at index cur_index on object 
+obj. If there are no more properties on obj, then obj is set to the next object on the 
+prototype chain of obj, and cur_index is set to the first index of that object. If there 
+are no more objects on the prototype chain and there are no more properties on obj, then 
+obj is set to null, and cur_index is set to 0.
+
+The register at position object_reg is set to the value of obj, and the register at 
+position index_reg is set to the value of cur_index.
+
+If index is not 0, then push true. Otherwise push false.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+hasnext2 works by reference. Each time it is executed it changes the values of local 
+registers rather than simply returning a new value. This is because the object being 
+enumerated can change when it is necessary to walk up the prototype chain to find more 
+properties. This is different from how hasnext works, though the two may seem similar 
+due to the similar names.
+
+*/
+

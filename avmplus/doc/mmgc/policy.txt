@@ -1,0 +1,197 @@
+Garbage collection policy
+
+Working notes, 2009-07-03 / lhansen@adobe.com
+
+Introduction
+
+MMgc provides general memory management services through garbage
+collection, reference counting, and new/delete style "fixed"
+allocation.  Multiple instances of the class GC control segregated
+heaps for garbage collected and reference counted memory; these heaps
+are independent and a reference from one into the other is not seen by
+the collector.  The intent is that each Player instance has a separate
+GC instance.  A single instance of the class FixedMalloc controls a
+thread-safe heap; the FixedMalloc is shared among all Player
+instances.  Finally, a singleton instance of the class GCHeap provides
+block management services to the GC and FixedMalloc instances.
+
+Memory management in MMgc is incremental in two respects.  Reference
+counting is used extensively and provides for prompt deallocation
+without running the marking garbage collector.  The marking collector
+tends to be expensive, so when it does run program work is interleaved
+with mark work in order to limit user-visible collection pauses.
+
+In the isolation of one collector instance the purpose of collection
+policy is to balance the following variables:
+
+ - X: The ratio of garbage collection time to total execution time
+
+ - L: The ratio of peak allocated memory to the program's peak memory
+   requirement.  Also known as the inverse load factor
+
+ - P: The maximum length (in milliseconds, say) of any GC-induced
+   pause in program work
+
+ - G: the ratio of GC work to program work while the GC is running,
+   effectively a control on pause clusters (which appear to the user
+   as one long pause)
+
+In the current MMgc policy, L is controlled through a "free space
+divisor" that limits heap expansion; X is controlled indirectly by a
+minimum time that must pass between instances of collector work; P is
+controlled by a maximum time for incremental mark work; and G is
+controlled as a consequence of the controls on X and P.  Yet there are
+ad-hoc tests in the code that trigger nonincremental collection when
+the heap is about to grow; those are probably necessary adjustments to
+the policy implementation but have broad effects on behavior.  In
+practice MMgc is effective at limiting L but increases X through too
+many collections and increases P and G by running nonincremental
+collection too often.
+
+We wish to do better than the current policy, but there can be no
+miracles: As the old policy is effective at limiting L but not at
+limiting X, P, and G, it follows that a collector policy that is
+better at limiting X, P, and G will likely require a larger L.
+
+That is, a policy change will reduce GC overhead and but the cost will
+almost certainly be an increase in memory use.  (If we're lucky, it's
+a small or negligible increase.)  Importantly though, a more
+controllable policy may allow us to expose the parameters of the GC so
+that the GC can be tuned predictably for a platform, or even on-line
+for a program.
+
+Beyond the single collector instance there are further considerations.  
+
+The GC and FixedMalloc instances all obtain blocks from the same
+GCHeap and therefore compete for those blocks.  If there is pressure
+for blocks in one GC or in FixedMalloc, other GCs should be pushed to
+release free memory.  This suggests a further variable:
+
+ - V_a: fraction of the blocks allocated from GCHeap that was
+   allocated by a particular agent a (a GC or FixedMalloc instance),
+   multiplied by the number of agents.  Non-zero values well below 1
+   indicate that there is no heap pressure in the agent but that there
+   may be pressure elsewhere and that it may be useful to increase the
+   amount of garbage collection work in order to free up any available
+   memory.
+
+The current policy does not consider individual agents in controlling
+V but tests whether memory has been obtained from the operating
+system, and triggers collection if it has.
+
+New policy
+
+In addition to the variables and parameters already introduced, a few more are pertinent:
+
+ - F: the size of the GC'd heap below which the collector does not run
+   at all (the floor).  The player sets this to 2MB at present
+
+ - R: the rate (bytes per second) of incremental marking .  This
+   depends on the hardware but also on the program's data structures
+   (whether they are pointer-rich or not)
+
+ - H: the size of the GC'd heap just following a collection (by
+   definition, the live data)
+
+ - T: the collection trigger, the ratio of the allocation budget that
+   is exhausted following a collection before collection is started
+   again.  This limits the time the collector runs, which in turn
+   reduces write barrier overhead
+
+Then the goal of collector policy is to limit the size of the heap to
+HL while obeying the settings for P, G, and T.  X is not controlled
+directly; it follows primarily from L.  If X is too high there's
+little that can be done except to raise L.
+
+Now for some facts:
+
+ - B = H(L-1) : the allocation budget.  This is the amount of
+   allocation that can be performed before the next collection must be
+   completed, if the heap is in a steady state
+
+ - W = L/((1-T)(L-1)) : the amount of marking work that must be
+   performed per byte allocated if an incremental collection is going
+   to be finished by the time B is exhausted
+
+ - M = PR : the maximum mark work that can be performed per mark
+   increment (that is, invocation of the incremental marker) if we are
+   to obey the setting for P
+
+ - A = M/W : the maximum number of bytes we can allocate between each
+   mark increment.  If allocation proceeds faster than this then the
+   marker cannot keep up to honor both L and P in the steady state
+
+Translating this into a practical policy - in particular, dealing with
+a non-steady state and controlling for G - requires that we trigger
+the collector from time to time, and also that the ideal L and P,
+which are given by the user, are adjusted from time to time to adapt
+to the program behavior.
+
+Collection triggering is easy.  We use A as the budget of bytes that
+can be allocated between each mark increment, subtract the number of
+bytes requested from the budget in the allocation routine and add the
+number of bytes freed in the freeing routine. Once the budget is
+exhausted, the collector is triggered.  (The budget before the first
+triggering of collection is often larger than A: it is BT.)
+
+When the incremental marker runs, the time available to it is bounded
+by P, adjusted for any overshoot of the allocation budget: if the
+budget was overshot by a factor of 2, the marker gets twice as long to
+run.  This violates the P requirement; however, significant
+overshooting can only occur when very large objects are allocated, and
+this happens rarely.  The pause time requirement here yields to the
+requirement of finishing collection by the time the heap size is HL.
+(The alternative is to reduce the allocation budget after the mark
+increment, or even after the several next mark increments, but this
+just leads to greater pause clustering, so we'd solve very little by
+doing so.)
+
+When a collection has finished, L is recomputed for the next
+collection cycle: if the time spent in the collector relative to the
+total time exceeded G then L is increased (though not too much);
+otherwise it is decreased (toward the L originally requested).
+
+ - L_adjusted = L_adjusted + min(1, (L_adjusted - 1)(1 + T_inGC/T_endToEnd))	if T_inGC/T_endToEnd > G 
+ - L_adjusted = (L_adjusted + L_ideal) / 2					otherwise
+
+Finally, L_adjusted is capped at 3 times L_ideal because it is not
+reasonable for it to grow too large, only to cope with significant
+spurts of growth.  The value '3' is somewhat arbitrary; the important
+point is to have such a cap.
+
+Finally, R can be computed fairly accurately by monitoring mark work
+during garbage collection.
+
+TBD: take V into account. Speculating now: V is computed at the end of
+each GC and taken into the computation of A, eg, A=clamp(0.25,V,1)M/W.
+This effectively drives up the rate of collection in the agent with
+low V when that collection is running (but not otherwise).  How to
+test this?  And what does it mean to compute V?  What is the time
+span?  Some fixed number of block allocations sounds appealing,
+perhaps scaled to the number of agents?  256 blocks per agent, maybe?
+Gives us 1MB per agent.  Circular buffer that we just scan when we
+need it?  That sounds pretty good.  Size of buffer might depend on the
+number of agents.
+
+Discussion
+
+The policy may seem complicated but it has few user-tunable parameters
+in practice: L, G, and T.  For these, G=0.25 seems to work pretty well
+in practice, T=0.25 also seems good, and it becomes more a matter of
+finding out which L works.  MMgc's current policy uses a
+freeSpaceDivisor of 4, which translates roughly to L=1.33.
+
+The new policy uses the parameter T to control the cost of the write
+barrier, yet the write barrier will likely have a greater impact with
+the new policy than with the current policy.  When the incremental
+marker is running (that is, after more than T of the allocation budget
+has been used), the write barrier is triggered for assignments and
+will record stores of pointers to unmarked objects into fields of
+marked objects.  That increases mark work (the marked objects will
+have to be re-scanned) and besides, the write barrier is fairly
+expensive.  The current policy triggers collections quite late
+(effectively, its T is large) and suffers from write barrier costs
+only in some circumstances.  Of course, the current policy pays for
+this by failing to obey the pause parameters P and G.
+
+

@@ -1,0 +1,100 @@
+NAME:       "Conditional compilation"
+CATEGORY:   Lexical conventions (E262-3 ch 7)
+SOURCES:    (none)
+AUTHOR:     Lars
+STATUS:     ?
+REVIEWS:    ?
+RI STATUS:  ?
+ESC STATUS: ?
+TEST CASE:  ?
+
+
+           **** VERY PRELIMINARY ****
+           **** UNAPPROVED PROPOSAL ****
+
+Notes:
+
+  - This needs to be compatible somehow with the MSIE approach
+
+  - The condition should really be restricted to "version=n" which 
+    tests whether the browser can handle language version n or higher.
+    IOW, this is equivalent to the mime-type test.
+
+  - It's an interesting fact that code that loads scripts dynamically
+    into a browser that does not support this facility directly
+    can perform the preprocessing fairly easily using existing facilities.
+    That would be a good way to define its semantics.
+
+
+DESCRIPTION
+
+A block comment that is preceded on the same line only by horizontal
+whitespace and that starts with the four-character sequence /**@ is
+part of a conditional compilation directive.
+
+A condition must follow the @ without intervening spaces.  
+
+If the block comment does not end on the same line then:
+
+  If the condition is true, then the text in the block comment
+  starting from the line following the end of the condition through
+  the end of the comment is inserted into the source stream.  
+  Otherwise the contents of the block comment are removed, just as
+  if the comment were an ordinary comment.
+
+Otherwise, if the block comment does end on the same line then:
+
+  If the condition is false, then all the source text following the
+  comment up until the next block comment that begins with the text
+  /**@end (no leading whitespace etc) is removed from the source
+  stream.  Otherwise it is left in place .
+
+  - if the block comment does end on the same line, then the text following 
+
+Directives may nest (useful to test for version=5 inside version=4 code).
+
+No gunk after the condition, or after @else or @end -- only
+whitespace (arbitrary linefeeds OK) and the end-comment thing.
+
+/**@version=4
+testing
+   @else */     // preceded by whitespace, followed by end-of-comment
+
+/**@endif */
+
+
+EXAMPLE 1
+
+/**@version=4
+
+class Point {
+  function Point(x, y) : x=x, y=y {}
+  function scale(n) {
+    x *= 2
+    y *= 2
+  }
+  var x, y
+}
+
+  @else */
+
+function Point(x, y) {
+  this.x = x
+  this.y = y
+}
+
+Point.prototype = {
+  scale:
+    function (n) {
+      x *= 2;
+      y *= 2;
+    }
+}
+/**@end */
+
+
+EXAMPLE 2
+
+/**@version=3 */
+clclclc
+/**@end */

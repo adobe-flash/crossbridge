@@ -1,0 +1,51 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page getproperty 
+
+\addindex getproperty
+
+
+\section getproperty getproperty
+
+\subsection operation Operation
+
+Get a property.
+
+\subsection format Format
+
+\code
+getproperty
+index
+\endcode
+
+\subsection forms Forms
+\code
+getproperty = 102 (0x66)
+\endcode
+\subsection stack Stack
+
+\code
+..., object, [ns], [name] => ..., value
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index into the multiname constant pool. If the multiname at 
+that index is a runtime multiname the name and/or namespace will also appear on the stack 
+so that the multiname can be constructed correctly at runtime.
+
+The property with the name specified by the multiname will be resolved in object, and the 
+value of that property will be pushed onto the stack. If the property is unresolved, 
+undefined is pushed onto the stack. See “Resolving multinames” on page 10.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

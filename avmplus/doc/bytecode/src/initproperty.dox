@@ -1,0 +1,56 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page initproperty 
+
+\addindex initproperty
+
+
+\section initproperty initproperty
+
+\subsection operation Operation
+
+Initialize a property.
+
+\subsection format Format
+
+\code
+initproperty
+index
+\endcode
+
+\subsection forms Forms
+\code
+initproperty = 104 (0x68)
+\endcode
+\subsection stack Stack
+
+\code
+..., object, [ns], [name], value => ...
+\endcode
+
+\subsection description Description
+
+value is the value that the property will be set to. value is popped off the stack and saved.
+
+index is a u30 that must be an index into the multiname constant pool. If the multiname 
+at that index is a runtime multiname the name and/or namespace will also appear on the 
+stack so that the multiname can be constructed correctly at runtime.
+
+The property with the name specified by the multiname will be resolved in object, and will 
+be set to value. This is used to initialize properties in the initializer method. When used 
+in an initializer method it is able to set the value of const properties.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if object is null or undefined. 
+
+A ReferenceError is thrown if the property is not found and object is not dynamic, or if the
+instruction is used to set a const property outside an initializer method.
+
+\subsection notes Notes
+
+None.
+
+*/
+

@@ -1,0 +1,46 @@
+#  This Source Code Form is subject to the terms of the Mozilla Public
+#  License, v. 2.0. If a copy of the MPL was not distributed with this
+#  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+
+MMGC_DIR := $(AVMPLUS_DIR)/MMgc
+
+#****************************************************************************
+# Source files
+#****************************************************************************
+
+MMGC_SRCS := \
+	GCGlobalNew.cpp \
+	GCObject.cpp \
+	GCPolicyManager.cpp \
+	GCMemoryProfiler.cpp \
+	GCLargeAlloc.cpp \
+	GCHeap.cpp \
+	GCHashtable.cpp \
+	GCAllocObject.cpp \
+	GCAlloc.cpp \
+	GC.cpp \
+	GCTests.cpp \
+	GCStack.cpp \
+	PageMap.cpp \
+	ZCT.cpp \
+	FixedMalloc.cpp \
+	FixedAlloc.cpp \
+	GCLog.cpp \
+	GCDebug.cpp \
+	MMgcPortUnix.cpp 
+
+vpath %.cpp ${MMGC_DIR}	\
+	${MMGC_DIR}/VMPI
+
+MMGC_LIB := ${LIBDIR}/libmmgc.a
+MMGC_OBJS := $(addprefix ${OBJDIR}/mmgc/, $(MMGC_SRCS:.cpp=.o))
+MMGC_DEPS := $(addprefix ${OBJDIR}/mmgc/, $(MMGC_SRCS:.cpp=.d))
+
+$(OBJDIR)/mmgc/%.o: %.cpp
+	${call compile-files-arm,mmgc}
+
+${MMGC_LIB}: ${MMGC_OBJS}
+	${call make-lib,${MMGC_OBJS}}
+
+-include ${MMGC_DEPS}

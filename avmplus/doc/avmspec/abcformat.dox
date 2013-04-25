@@ -1,0 +1,1129 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/*! \page abcformat The ActionScript Byte Code (abc) format
+
+\addindex abcformat
+
+Syntactically complete sections of ActionScript code are processed by a compiler into ActionScript Byte 
+Code segments. These segments are described by the \c abcFile structure,which is defined below. The \c abcFile 
+structure is the unit of loading and execution used by the AVM2.
+
+The \c abcFile structure describes the interpretation of a block of 8-bit bytes. Despite the name, 
+the contents of an abcFile does not need to be read from a file in the file system; it can be 
+generated dynamically by a run- time compiler or other tools. The use of the word “file” is historical.
+
+The \c abcFile structure comprises primitive data, structured data, and arrays of primitive and 
+
+structured data. The following sections describe all the data formats.
+
+Primitive data include integers and floating-point numbers encoded in various ways.
+Structured data, including the \c abcFile itself, are presented here using a C-like structural 
+notation, with individual named fields. Fields within this structure are in reality just 
+sequences of bytes that are interpreted according to their type. The fields are stored 
+sequentially without any padding or alignment.
+
+\section primitives Primitive data types
+\addindex Primitives
+
+Multi-byte primitive data are stored in little-endian order (less significant bytes precede 
+more significant bytes). Negative integers are represented using two’s complement.
+
+- The type u8 represents a one-byte unsigned integer value.
+- The type u16 represents a two-byte unsigned integer value.
+- The type s24 represents a three-byte signed integer value.
+- The type u30 represents a variable-length encoded 30-bit unsigned integer value.
+- The types u32 and s32 represent variable-length encoded 32-bit unsigned and signed integer 
+values respectively.
+- The type d64 defines an 8-byte IEEE-754 floating point value. The high byte of the double 
+value contains the sign and upper bits of the exponent, and the low byte contains the least 
+significant bits of the significand.
+
+The variable-length encoding for u30, u32, and s32 uses one to five bytes, depending on the magnitude 
+of the value encoded. Each byte contributes its low seven bits to the value. If the high (eighth) bit 
+of a byte is set, then the next byte of the abcFile is also part of the value. In the case of s32, 
+sign extension is applied: the seventh bit of the last byte of the encoding is propagated to fill out 
+the 32 bits of the decoded value.
+
+\section abcFile abcFile
+\addindex abcFile
+\code
+abcFile
+{
+	u16 minor_version 
+	u16 major_version 
+	cpool_info constant_pool 
+	u30 method_count 
+	method_info method[method_count] 
+	u30 metadata_count metadata_info 
+	metadata[metadata_count] 
+	u30 class_count 
+	instance_info instance[class_count] 
+	class_info class[class_count] 
+	u30 script_count 
+	script_info script[script_count] 
+	u30 method_body_count 
+	method_body_info method_body[method_body_count]
+}
+\endcode
+
+The \c abcFile structure describes an executable code block with all its constant data, type descriptors, code, and
+metadata. It comprises the following fields.
+
+\c minor_version, \c major_version
+
+The values of \c major_version and \c minor_version are the major and minor version numbers of the \c abcFile 
+format. A change in the minor version number signifies a change in the file format that is backward 
+compatible, in the sense that an implementation of the AVM2 can still make use of a file of an older 
+version. A change in the major version number denotes an incompatible adjustment to the file format.
+
+As of the publication of this overview, the major version is 46 and the minor version is 16.
+
+\c constant_pool 
+
+The \c constant_pool is a variable length structure composed of integers, doubles, strings, 
+namespaces, namespace sets, and multinames. These constants are referenced from other parts 
+of the \c abcFile structure.
+
+\c method_count, \c method 
+
+The value of \c method_count is the number of entries in the \c method array. Each entry in the \c method 
+array is a variable length \c method_info structure. The array holds information about every method 
+defined in this \c abcFile. The code for method bodies is held separately in the \c method_body array 
+(see below). Some entries in \b method may have no body—this is the case for native methods, for example.
+
+\c metadata_count, \c metadata 
+
+The value of \c metadata_count is the number of entries in the \c metadata array. Each \b metadata entry 
+is a \c metadata_info structure that maps a name to a set of string values.
+
+\c class_count, \c instance, \c class 
+
+The value of \c class_count is the number of entries in the \c instance and \c class arrays.
+
+Each instance entry is a variable length \c instance_info structure which specifies the characteristics 
+of object instances created by a particular class.
+
+Each \c class entry defines the characteristics of a class. It is used in conjunction with the \c instance 
+field to derive a full description of an AS Class.
+
+\c script_count, \c script 
+
+The value of \c script_count is the number of entries in the \b script array. Each script entry is 
+a \c script_info structure that defines the characteristics of a single script in this file. 
+As explained in the previous chapter, the last entry in this array is the entry point for 
+execution in the \c abcFile.
+
+\c method_body_count, \c method_body 
+
+The value of \c method_body_count is the number of entries in the \c method_bodyarray. Each \c method_body
+entry consists of a variable length \c method_body_info structure which contains the instructions for an
+individual method or function.
+
+\section constant_pool Constant pool
+\addindex Constant pool
+
+The constant pool is a block of array-based entries that reflect the constants used by all methods. 
+Each of the count entries (for example, \c int_count) must be one more than the number of entries in the 
+corresponding array, and the first entry in the array is element “1”. For all constant pools, the 
+index “0” has a special meaning, typically a sensible default value. For example, the “0” entry is 
+used to represent the empty sting (""), the any namespace, or the any type (*) depending on the 
+context it is used in. When “0” has a special meaning it is described in the text below.
+
+\code
+cpool_info 
+{
+	u30 int_count
+	s32 integer[int_count]
+	u30 uint_count
+	u32 uinteger[uint_count]
+	u30 double_count
+	d64 double[double_count]
+	u30 string_count
+	string_info string[string_count]
+	u30 namespace_count
+	namespace_info namespace[namespace_count]
+	u30 ns_set_count
+	ns_set_info ns_set[ns_set_count]
+	u30 multiname_count
+	multiname_info multiname[multiname_count]
+}
+\endcode
+
+If there is more than one entry in one of these arrays for the same entity, such as a name, the AVM may 
+or may not consider those two entries to mean the same thing. The AVM currently guarantees that names 
+flagged as belonging to the “private” namespace are treated as unique.
+
+\c int_count, \c integer
+
+The value of \c int_count can be zero, or the number of entries in the \c integer array, plus one.  The \c integer array holds
+integer constants referenced by the bytecode. The “0” entry of the \c integer array is not present in the 
+\c abcFile; it represents the zero value for the purposes of providing values for optional parameters and 
+field initialization.
+
+\c uint_count, \c uinteger
+
+The value of \c uint_count can be zero, or the number of entries in the \c uinteger array, plus one. The \c uinteger 
+array holds unsigned integer constants referenced by the bytecode. The “0” entry of the \c uinteger 
+array is not present in the \c abcFile; it represents the zero value for the purposes of providing 
+values for optional parameters and field initialization.
+
+\c double_count, \c double
+
+The value of \c double_count can be zero, or the number of entries in the \c double array, plus one. The \c double array
+holds IEEE double-precision floating point constants referenced by the bytecode. The “0” entry of the \c double
+array is not present in the abcFile; it represents the NaN (Not-a-Number) value for the purposes of 
+providing values for optional parameters and field initialization.
+
+\c string_count, \c string
+
+The value of \c string_count can be zero, or the number of entries in the \c string array, plus one. The \c string array
+holds UTF-8 encoded strings referenced by the compiled code and by many other parts of the \c abcFile. 
+In addition to describing string constants in programs, string data in the constant pool are used 
+in the description of names of many kinds. Entry “0” of the \c string array is not present in the \c abcFile; 
+it represents the empty string in most contexts but is also used to represent the “any” name in others 
+(known as “*” in ActionScript).
+
+\c namespace_count, \c namespace
+
+The value of \c namespace_count can be zero, or the number of entries in the \c namespace array, plus one. The 
+\c namespace array describes the namespaces used by the bytecode and also for names of many kinds. 
+Entry “0” of the \c namespace array is not present in the \c abcFile; it represents the “any” 
+namespace (known as “*” in ActionScript).
+
+\c ns_set_count, \c ns_set
+The value of \c ns_set_count can be zero, or the number of entries in the \c ns_setarray, plus one. Then \c s_setarray
+describes namespace sets used in the descriptions of multinames. The “0” entry of the \c ns_set array 
+is not present in the abcFile.
+
+\c multiname_count, \c multiname
+The value of \c multiname_count can be zero, or the number of entries in the \c multiname array, plus one. The 
+\c multiname array describes names used by the bytecode. The “0” entry of the \c multiname array is 
+not present in the \c abcFile.
+
+\section string String
+
+A string_info element encodes a string of 16-bit characters on a length-and-data format. The meaning of 
+each character is normally taken to be that of a Unicode 16-bit code point. The data are UTF-8 encoded. 
+For more information on Unicode, see unicode.org.
+
+\code
+string_info
+{
+	u30 size
+	u8 utf8[size]
+}
+\endcode
+
+\section namespace Namespace
+
+A \c namespace_info entry defines a namespace. Namespaces have string names, represented by indices 
+into the string array, and kinds. User-defined namespaces have kind \c CONSTANT_Namespace or 
+\c CONSTANT_ExplicitNamespace and a non-empty name. System namespaces have empty names and one of 
+the other kinds, and provides a means for the loader to map references to these namespaces onto 
+internal entities.
+
+\code
+namespace_info
+{
+	u8 kind
+	u30 name
+}
+\endcode
+
+A single byte defines the type of entry that follows, thus identifying how the \c name field should be 
+interpreted by the loader. The \c name field is an index into the string section of the constant pool. 
+A value of zero denotes an empty string. The table below lists the legal values for \c kind.
+
+<table>
+<tr>
+<th>Namespace Kind</th>
+<th>Value</th>
+</tr>
+<tr>
+<td>CONSTANT_Namespace</td>
+<td>0x08</td>
+</tr>
+<tr>
+<td>CONSTANT_PackageNamespace</td>
+<td>0x16</td>
+</tr>
+<tr>
+<td>CONSTANT_PackageInternalNs</td>
+<td>0x17</td>
+</tr>
+<tr>
+<td>CONSTANT_ProtectedNamespace</td>
+<td>0x18</td>
+</tr>
+<tr>
+<td>CONSTANT_ExplicitNamespace</td>
+<td>0x19</td>
+</tr>
+<tr>
+<td>CONSTANT_StaticProtectedNs</td>
+<td>0x1A</td>
+</tr>
+<tr>
+<td>CONSTANT_PrivateNs</td>
+<td>0x05</td>
+</tr>
+</table>
+
+\section namespace_set Namespace set
+
+An \c ns_set_info entry defines a set of namespaces, allowing the set to be used as a unit in the 
+definition of multinames.
+
+\code
+ns_set_info
+{
+	u30 count
+	u30 ns[count]
+}
+\endcode
+
+The \c count field defines how many \c ns’s are identified for the entry, while each \c ns is an integer that indexes 
+into the \c namespace array of the constant pool. No entry in the \c ns array may be zero.
+
+\section multiname Multiname
+
+A \c multiname_info entry is a variable length item that is used to define multiname
+entities used by the bytecode. There are many kinds of multinames. The \c kind field
+acts as a tag: its value determines how the loader should see the variable-length \c data
+field. The layout of the contents of the \c data field under a particular \c kind is
+described below by the \c multiname_kind_ structures.
+
+\code
+multiname_info
+{
+        u8   kind
+        u8   data[]
+}
+\endcode
+
+
+<table>
+<tr>
+<th>Multiname Kind</th>
+<th>Value</th>
+</tr>
+<tr>
+<td>CONSTANT_QName</td>
+<td>0x07</td>
+</tr>
+<tr>
+<td>CONSTANT_QNameA</td>
+<td>0x0D</td>
+</tr>
+<tr>
+<td>CONSTANT_RTQName</td>
+<td>0x0F</td>
+</tr>
+<tr>
+<td>CONSTANT_RTQNameA</td>
+<td>0x10</td>
+</tr>
+<tr>
+<td>CONSTANT_RTQNameL</td>
+<td>0x11</td>
+</tr>
+<tr>
+<td>CONSTANT_RTQNameLA</td>
+<td>0x12</td>
+</tr>
+<tr>
+<td>CONSTANT_Multiname</td>
+<td>0x09</td>
+</tr>
+<tr>
+<td>CONSTANT_MultinameA</td>
+<td>0x0E</td>
+</tr>
+<tr>
+<td>CONSTANT_MultinameL</td>
+<td>0x1B</td>
+</tr>
+<tr>
+<td>CONSTANT_MultinameLA</td>
+<td>0x1C</td>
+</tr>
+</table>
+
+Those constants ending in "A" (such as \c CONSTANT_QNameA) represent the names of attributes.
+
+\c QName
+
+The \c multiname_kind_QName format is used for kinds \c CONSTANT_QName and \c CONSTANT_QNameA.
+
+\code
+multiname_kind_QName
+{
+	u30 ns
+	u30 name
+}
+\endcode
+
+The \c ns and \c name fields are indexes into the \c namespace and \c string arrays of
+the \c constant_pool entry, respectively. A value of zero for the \c ns field indicates
+the any ("*") namespace, and a value of zero for the name field indicates the any ("*")
+name.
+
+\c RTQName
+
+The \c multiname_kind_RTQName format is used for kinds \c CONSTANT_RTQName and \c CONSTANT_RTQNameA.
+
+\code
+multiname_kind_RTQName
+{
+	u30 name
+}
+\endcode
+
+The single field,\c name, is an index into the \c string array of the constant pool.
+A value of zero indicates the any ("*") name.
+
+\c RTQNameL
+
+The multiname_kind_RTQNameL format is used for kinds CONSTANT_RTQNameL and CONSTANT_RTQNameLA.
+\code
+multiname_kind_RTQNameL
+{
+}
+\endcode
+
+This kind has no associated data.
+
+\c Multiname
+
+The \c multiname_kind_Multiname format is used for kinds \c CONSTANT_Multiname and \c CONSTANT_MultinameA.
+\code
+multiname_kind_Multiname
+{
+	u30 name
+	u30 ns_set
+}
+\endcode
+
+The \c name field is an index into the \c string array, and the \c ns_set field is an
+index into the \c ns_set array. A value of zero for the \c name field indicates the any
+("*") name. The value of \c ns_set cannot be zero.
+
+\c MultinameL
+
+The \c multiname_kind_MultinameL format is used for kinds \c CONSTANT_MultinameL and \c CONSTANT_MultinameLA.
+\code
+multiname_kind_MultinameL
+{
+	u30 ns_set
+}
+\endcode
+
+The \c ns_set field is an index into the \c ns_set array of the constant pool. The value
+of \c ns_set cannot be zero.
+
+\section meth_sig Method signature
+
+The i\c method_info entry defines the signature of a single method.
+\code
+method_info
+{
+	u30 param_count
+	u30 return_type
+	u30 param_type[param_count]
+	u30 name
+	u8  flags
+	option_info options
+	param_info param_names
+}
+\endcode
+
+The fields are as follows:
+
+\c param_count, \c param_type
+
+The \c param_count field is the number of formal parameters that the method supports;
+it also represents the length of the \c param_type array. Each entry in the \c param_type
+array is an index into the \c multiname array of the constant pool; the name at that
+entry provides the name of the type of the corresponding formal parameter. A zero value
+denotes the any ("*") type.
+
+\c return_type
+
+The \c return_type field is an index into the \c multiname array of the constant pool;
+the name at that entry provides the name of the return type of this method. A zero
+value denotes the any ("*") type.
+
+\c name
+
+The \c name field is an index into the \c string array of the constant pool; the
+string at that entry provides the name of this method. If the index is zero, this
+method has no name.
+
+\c flags
+
+The \c flag field is a bit vector that provides additional information about the
+method. The bits are described by the following table. (Bits not described in the
+table should all be set to zero.)
+
+ 
+<table>
+<tr>
+<th>Name</th>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+<tr>
+<td>NEED_ARGUMENTS</td>
+<td>0x01</td>
+<td>Suggests to the run-time that an “arguments” object (as specified by the ActionScript
+3.0 Language Reference) be created. Must not be used together with \c NEED_REST.</td>
+</tr>
+<tr>
+<td>NEED_ACTIVATION</td>
+<td>0x02</td>
+<td>Must be set if this method uses the \c newactivation opcode.</td>
+</tr>
+<tr>
+<td>NEED_REST</td>
+<td>0x04</td>
+<td>This flag creates an ActionScript 3.0 rest arguments array. Must not be
+used with \c NEED_ARGUMENTS.</td>
+</tr>
+<tr>
+<td>HAS_OPTIONAL</td>
+<td>0x08</td>
+<td>Must be set if this method has optional parameters and the \c options
+field is present in this \c method_info structure.</td>
+</tr>
+<tr>
+<td>SET_DXNS</td>
+<td>0x40</td>
+<td>Must be set if this method uses the \c dxns or \c dxnslate opcodes.</td>
+</tr>
+<tr>
+<td>HAS_PARAM_NAMES</td>
+<td>0x80</td>
+<td>Must be set when the \c param_names field is present in this \c method_info structure.</td>
+</tr>
+</table>
+
+\c options
+
+This entry may be present only if the \c HAS_OPTIONAL flag is set in \c flags.
+
+\c param_names
+
+This entry may be present only if the \c HAS_PARAM_NAMES flag is set in \c flags.
+
+\section opt_parame Optional parameters
+
+The \c option_info entry is used to define the default values for the optional
+parameters of the method. The number of optional parameters is given by \c option_count,
+which must not be zero nor greater than the \c parameter_count field of the enclosing
+\c method_info structure.
+
+\code
+option_info
+{
+        u30 option_count
+        option_detail option[option_count]
+}
+
+option_detail
+{
+	u30 val
+	u8 kind
+}
+\endcode
+
+Each optional value consists of a \c kind field that denotes the type of value
+represented, and a \c val field that is an index into one of the array entries of
+the constant pool. The correct array is selected based on the kind.
+
+<table>
+<tr>
+<th>Name</th>
+<th>Value</th>
+<th>Entry</th>
+</tr>
+<tr>
+<td>CONSTANT_Int</td>
+<td>0x03</td>
+<td>integer</td>
+</tr>
+<tr>
+<td>CONSTANT_UInt</td>
+<td>0x04</td>
+<td>uinteger</td>
+</tr>
+<tr>
+<td>CONSTANT_Double</td>
+<td>0x06</td>
+<td>double</td>
+</tr>
+<tr>
+<td>CONSTANT_Utf8</td>
+<td>0x01</td>
+<td>string</td>
+</tr>
+<tr>
+<td>CONSTANT_True</td>
+<td>0x0B</td>
+<td>-</td>
+</tr>
+<tr>
+<td>CONSTANT_False</td>
+<td>0x0A</td>
+<td>-</td>
+</tr>
+<tr>
+<td>CONSTANT_Null</td>
+<td>0x0C</td>
+<td>-</td>
+</tr>
+<tr>
+<td>CONSTANT_Undefined</td>
+<td>0x00</td>
+<td>-</td>
+</tr>
+<tr>
+<td>CONSTANT_Namespace</td>
+<td>0x08</td>
+<td>namespace</td>
+</tr>
+<tr>
+<td>CONSTANT_PackageNamespace</td>
+<td>0x16</td>
+<td>namespace</td>
+</tr>
+<tr>
+<td>CONSTANT_PackageInternalNs</td>
+<td>0x17</td>
+<td>namespace</td>
+</tr>
+<tr>
+<td>CONSTANT_ProtectedNamespace</td>
+<td>0x18</td>
+<td>namespace</td>
+</tr>
+<tr>
+<td>CONSTANT_ExplicitNamespace</td>
+<td>0x19</td>
+<td>namespace</td>
+</tr>
+<tr>
+<td>CONSTANT_StaticProtectedNs</td>
+<td>0x1A</td>
+<td>namespace</td>
+</tr>
+<tr>
+<td>CONSTANT_PrivateNs</td>
+<td>0x05</td>
+<td>namespace</td>
+</tr>
+</table>
+
+\section para_names Parameter names
+
+The \c param_names entry is available only when the \c HAS_PARAM_NAMES bit is set in
+the \c flags. Each \c param_info element of the array is an index into the constant
+pool's \c string array. The parameter name entry exists solely for external tool
+use and is not used by the AVM2.
+\code
+param_info
+{
+        u30 param_name[param_count]
+}
+\endcode
+
+\section metadata_info metadata_info
+
+The \c metadata_info entry provides a means of embedding arbitrary key/value pairs
+into the ABC file. The AVM2 will ignore all such entries.
+\code 
+metadata_info
+{
+        u30 name
+        u30 item_count
+        item_info items[item_count]
+}
+\endcode
+
+The \c name field is an index into the \c string array of the constant pool; it
+provides a name for the metadata entry. The value of the name field must not be
+zero. Zero or more items may be associated with the entry;
+\c item_count denotes the number of items that follow in the \c items array.
+\code
+item_info
+{
+	u30 key
+	u30 value
+}
+\endcode
+
+The \c item_info entry consists of \c item_count elements that are interpreted as
+key/value pairs of indices into the \c string table of the constant pool. If the
+value of \c key is zero, this is a keyless entry and only carries a value.
+
+\section instance Instance
+
+The \c instance_info entry is used to define the characteristics of a run-time object
+(a class instance) within the AVM2. The corresponding \c class_info entry is used
+in order to fully define an ActionScript 3.0 Class.
+\code
+instance_info
+{
+        u30 name
+        u30 super_name
+        u8  flags
+        u30 protectedNs
+        u30 intrf_count
+        u30 interface[intrf_count]
+        u30 iinit
+        u30 trait_count
+        traits_info trait[trait_count]
+}
+\endcode
+
+\c name
+
+The \c name field is an index into the \c multiname array of the constant pool; it
+provides a name for the class. The entry specified must be a QName.
+
+\c super_name
+
+The \c super_name field is an index into the \c multiname array of the constant pool;
+it provides the name of the base class of this class, if any. A value of zero
+indicates that this class has no base class.
+
+\c flags
+
+The \c flags field is used to identify various options when interpreting the
+\c instance_info entry. It is bit vector; the following entries are defined.
+Other bits must be zero.
+
+<table>
+<tr>
+<th>Name</th>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+<tr>
+<td>CONSTANT_ClassSealed</td>
+<td>0x01</td>
+<td>The class is sealed: properties can not be dynamically added to instances of the class.</td>
+</tr>
+<tr>
+<td>CONSTANT_ClassFinal</td>
+<td>0x02</td>
+<td>The class is final: it cannot be a base class for any other class.</td>
+</tr>
+<tr>
+<td>CONSTANT_ClassInterface</td>
+<td>0x04</td>
+<td>The class is an interface.</td>
+</tr>
+<tr>
+<td>CONSTANT_ClassProtectedNs</td>
+<td>0x08</td>
+<td>The class uses its protected namespace and the \c protectedNs field is present in the
+\c interface_info structure.</td>
+</tr>
+</table>
+
+\c protectedNs
+
+This field is present only if the \c CONSTANT_ProtectedNs bit of \c flags is set. It
+is an index into the \c namespace array of the constant pool and identifies the
+namespace that serves as the protected namespace for this class.
+
+\c intrf_count, \c interface
+
+The value of the \c intrf_count field is the number of entries in the \c interface array. 
+The max value of \c intrf_count is 2^28.
+The interface array contains indices into the \c multiname array of the constant pool;
+the referenced names specify the interfaces implemented by this class. None of the
+indices may be zero.
+
+\c iinit
+This is an index into the \c method array of the \c abcFile; it references the method
+that is invoked whenever an object of this class is constructed. This method is
+sometimes referred to as an instance initializer.
+
+\c trait_count, \c trait
+
+The value of \c trait_count is the number of elements in the \c trait array. The \c trait
+array defines the set of traits of a class instance. The next section defines the
+meaning of the \c traits_info structure.
+
+\section trait Trait
+
+A trait is a fixed property of an object or class; it has a name, a type, and some
+associated data. The \c traits_info structure bundles these data.
+\code
+traits_info
+{
+        u30 name
+        u8  kind
+        u8  data[]
+        u30 metadata_count
+        u30 metadata[metadata_count]
+}
+\endcode
+
+\c name
+
+The \c name field is an index into the \c multiname array of the constant pool; it
+provides a name for the trait. The value can not be zero, and the \c multiname entry
+specified must be a QName.
+
+\c kind
+
+The \c kind field contains two four-bit fields. The lower four bits determine the
+kind of this trait. The upper four bits comprise a bit vector providing attributes
+of the trait. See the following tables and sections for full descriptions.
+
+\c data
+
+The interpretation of the \c data field depends on the type of the trait, which is
+provided by the low four bits of the kind field. See below for a full description.
+
+\c metadata_count, \c metadata
+
+These fields are present only if \c ATTR_Metadata is present in the upper four bits
+of the \c kind field.
+
+The value of the \c metadata_count field is the number of entries in the \c metadata
+array. That array contains indices into the \c metadata array of the \c abcFile.
+
+\section sum_trait_types Summary of trait types
+
+The following table summarizes the trait types.
+
+<table>
+<tr>
+<th>Type</th>
+<th>Value</th>
+</tr>
+<tr>
+<td>Trait_Slot</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Trait_Method</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Trait_Getter</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Trait_Setter</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Trait_Class</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Trait_Function</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Trait_Const</td>
+<td>6</td>
+</tr>
+</table>
+
+\section slot_and_const Slot and const traits
+
+A \c kind value of \c Trait_Slot (0) or \c Trait_Const (6) requires that the \c data
+field be read using \c trait_slot, which takes the following form:
+\code
+trait_slot
+{
+        u30 slot_id
+        u30 type_name
+        u30 vindex
+        u8  vkind
+}
+\endcode
+
+\c slot_id
+
+The \c slot_id field is an integer from 0 to N and is used to identify a position in which this trait resides. A value of 0 requests the AVM2 to assign a position.
+
+\c type_name
+
+This field is used to identify the type of the trait. It is an index into the
+\c multiname array of the \c constant_pool. A value of zero indicates that the type
+is the any type (*).
+
+\c vindex
+
+This field is an index that is used in conjunction with the vkind field in order to
+define a value for the trait. If it is 0, \c vkind is empty; otherwise it references
+one of the tables in the constant pool, depending on the value of \c vkind.
+
+\c vkind
+
+This field exists only when \c vindex is non-zero. It is used to determine how \c vindex
+will be interpreted.
+
+See the “Constant Kind” table above for details.
+
+\section class_traits Class traits
+
+A \c kind value of \c Trait_Class (0x04) implies that the \c trait_class entry should
+be used.
+\code
+trait_class
+{
+	u30 slot_id
+	u30 classi
+}
+\endcode
+
+\c slot_id
+
+The \c slot_id field is an integer from 0 to N and is used to identify a position in which this trait resides. A value of 0 requests the AVM2 to assign a position.
+
+\c class
+
+The \c classi field is an index that points into the \c class array of the \c abcFile entry.
+
+\section func_traits Function traits
+
+A \c kind value of \c Trait_Function (0x05) implies that the \c trait_function entry
+should be used.
+\code
+trait_function
+{
+        u30 slot_id
+        u30 function
+}
+\endcode
+
+\c slot_id
+
+The \c slot_id field is an integer from 0 to N and is used to identify a position in
+which this trait resides. A value of 0 requests the AVM2 to assign a position.
+
+\c function
+
+The \c function field is an index that points into the method array of the \c abcFile entry.
+
+\section meth_get_set Method, getter, and setter traits
+
+A \c kind value of \c Trait_Method (0x01), \c Trait_Getter (0x02) or
+\c Trait_Setter (0x03) implies that the \c trait_method entry should be used.
+\code
+trait_method
+{
+	u30 disp_id
+	u30 method
+}
+\endcode
+
+\c disp_id
+
+The \c disp_id field is a compiler assigned integer that is used by the AVM2 to
+optimize the resolution of virtual function calls. An overridden method must have the
+same \c disp_id as that of the method in the base class. A value of zero disables this
+optimization.
+
+\c method
+
+The \c method field is an index that points into the \c method array of the \c abcFile entry.
+
+\section trai_attr Trait attributes
+
+As previously mentioned the upper nibble of the \c kind field is used to encode
+attributes. A description of how the attributes are interpreted for each \c kind
+is outlined below. Any other combination of \c attribute with \c kind is ignored.
+
+
+<table>
+<tr>
+<th>Attribute</th>
+<th>Value</th>
+<th>Usage</th>
+</tr>
+<tr>
+<td>ATTR_Final</td>
+<td>0x01</td>
+<td>Is used with \c Trait_Method, \c Trait_Getter and \c Trait_Setter. It marks a method that cannot be overridden by a sub-class</td>
+</tr>
+<tr>
+<td>ATTR_Override</td>
+<td>0x02</td>
+<td>Is used with \c Trait_Method, \c Trait_Getter and \c Trait_Setter. It marks a method that has been overridden in this class</td>
+</tr>
+<tr>
+<td>ATTR_Metadata</td>
+<td>0x04</td>
+<td>Is used to signal that the fields \c metadata_count and \c metadata follow the \c data field in the \c traits_info entry</td>
+</tr>
+</table>
+
+\section class__ Class
+
+The \c class_info entry is used to define characteristics of an ActionScript 3.0 class.
+
+\code
+class_info
+{
+        u30 cinit
+        u30 trait_count
+        traits_info traits[trait_count]
+} 
+\endcode
+
+\c cinit
+
+This is an index into the \c method array of the \c abcFile; it references the method
+that is invoked when the class is first created. This method is also known as the
+static initializer for the class.
+
+\c trait_count, \c trait
+
+The value of \c trait_count is the number of entries in the \c trait array. The \c trait array
+holds the traits for the class (see above for information on traits).
+
+\section script__ Script
+
+The \c script_info entry is used to define characteristics of an ActionScript 3.0 script.
+\code
+script_info
+{
+        u30 init
+        u30 trait_count
+        traits_info trait[trait_count]
+}
+\endcode
+
+\c init
+
+The \c init field is an index into the \c method array of the \c abcFile. It identifies a function that is to be invoked prior to any other code in this script.
+
+\c trait_count, \c trait
+
+The value of \c trait_count is the number of entries in the \c trait array. The \c trait array is the set of traits defined by the script.
+
+\section method_body Method body
+
+The \c method_body_info entry holds the AVM2 instructions that are associated with a
+particular method or function body. Some of the fields in this entry declare the
+maximum amount of resources the body will consume during execution. These
+declarations allow the AVM2 to anticipate the requirements of the method without
+analyzing the method body prior to execution. The declarations also serve as
+promises about the resource boundary within which the method has agreed to remain.
+
+Note: Any code loaded from an untrusted source will be examined in order to
+verify that the code stays within the declared limits.
+
+There can be fewer method bodies in the \c method_body table than than there are
+\c method signatures in the method table—some methods have no bodies. Therefore
+the \c method_body contains a reference to the method it belongs to, and other
+parts of the \c abcFile always reference the \c method table, not the \c method_body table.
+
+\code
+method_body_info
+{
+        u30 method
+        u30 max_stack
+        u30 local_count
+        u30 init_scope_depth
+        u30 max_scope_depth
+        u30 code_length
+        u8  code[code_length]
+        u30 exception_count
+        exception_info exception[exception_count]
+        u30 trait_count
+        traits_info trait[trait_count]
+}
+\endcode
+
+\c method
+
+The \c method field is an index into the method array of the \c abcFile; it identifies
+the method signature with which this body is to be associated.
+
+\c max_stack
+
+The \c max_stack field is maximum number of evaluation stack slots used at any point during the execution of this body.
+
+\c local_count
+
+The \c local_count field is the index of the highest-numbered local register this method will use, plus one.
+
+\c init_scope_depth
+
+The \c init_scope_depth field defines the minimum scope depth, relative to max_scope_depth, that may be accessed within the method.
+
+\c max_scope_depth
+
+The \c max_scope_depth field defines the maximum scope depth that may be accessed within
+the method. The difference between \c max_scope_depth and \c init_scope_depth determines
+the size of the local scope stack.
+
+\c code_length, \c code
+
+The value of \c code_length is the number of bytes in the \c code array. The \c code array holds AVM2 instructions for this method body.
+
+\c exception_count, \c exception
+The value of \c exception_count is the number of elements in the \c exception array. The
+\c exception array associates exception handlers with ranges of instructions within the
+code array (see below).
+
+\c trait_count
+The value of \c trait_count is the number of elements in the \c trait array. The
+\c trait array contains all the traits for this method body (see above for more
+information on traits).
+
+\section except Exception
+
+The \c exception_info entry is used to define the range of ActionScript 3.0 instructions over which a particular exception handler is engaged.
+\code
+exception_info
+{
+        u30 from
+        u30 to
+        u30 target
+        u30 exc_type
+        u30 var_name
+}
+\endcode
+
+\c from
+
+The starting position in the \c code field from which the exception is enabled.
+
+\c to
+
+The ending position in the \c code field after which the exception is disabled.
+
+\c target
+
+The position in the \c code field to which control should jump if an exception of
+type \c exc_type is encountered while executing instructions that lie within
+the region [ \c from, \c to] of the \c code field.
+
+\c exc_type
+
+An index into the \c string array of the constant pool that identifies the name
+of the type of exception that is to be monitored during the reign of this
+handler. A value of zero means the any type ("*") and implies that this exception
+handler will catch any type of exception thrown.
+
+\c var_name
+
+This is an entry in the constant pool in the form of a \c multiname and defines the
+name of the variable that is to receive the exception object when the exception is
+thrown and control is transferred to \c target location. If the value is zero then
+there is no name associated with the exception object.
+
+
+*/
+

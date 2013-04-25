@@ -1,0 +1,41 @@
+<!--
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+-->
+<html>
+
+<head>
+<title>GC Blacklist Tutorial</title>
+</head>
+
+<body>
+<h1><center>GC Blacklist Tutorial</h1>
+
+<h2>Introduction</h2>
+
+<P>The blacklist feature attempts to answer the question "Why isn't
+the GC collecting my object?".  It does this by allowing objects to be
+registered with the GC and then printing the "back pointer chain" of
+those objects after a GC collection.<P>
+
+<P>A back pointer chain is the list of objects that connect the object
+in question to a GC root.  There may be many paths from the roots to
+this object, we just print out the one the GC actually traversed. <P>
+
+<h2>Setup</h2>
+
+<UL>
+<LI>Enable AVMTWEAK_HEAP_GRAPH in the avmhost-features.h header (or avmshell-features.h for the shell).</LI>
+<LI>Make sure you are on a mac or windows machine and your build has debugging symbols</LI>
+<LI>Set the MMGC_PROFILE=1 env var to 1 when launching the process</LI>
+<LI>Add calls to GC::addToBlacklist in your program for the objects in question</LI>
+</UL>
+
+
+<h2>Example</h2>
+
+TBD
+
+</body>
+</html>

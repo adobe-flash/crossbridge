@@ -1,0 +1,54 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page newobject 
+
+\addindex newobject
+
+
+\section newobject newobject
+
+\subsection operation Operation
+
+Create a new object.
+
+\subsection format Format
+
+\code
+newobject
+arg_count
+\endcode
+
+\subsection forms Forms
+\code
+newobject = 85 (0x55)
+\endcode
+\subsection stack Stack
+
+\code
+..., name1, value1, name2, value2,...,nameN, valueN => ..., newobj
+\endcode
+
+\subsection description Description
+
+arg_count is a u30 that is the number of properties that will be created in newobj. 
+There will be a total of arg_count name values on the stack, which will be of type 
+String (name1 to nameN). There will be an equal number of values on the stack, 
+which can be of any type, and will be the initial values for the properties
+
+A new value of type Object is created and assigned to newobj. The properties 
+specified on the stack will be dynamically added to newobj. The names of the 
+properties will be name1, name2,..., nameN and these properties will be set 
+to the corresponding values (value1, value2,..., valueN). newobj is then 
+pushed onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

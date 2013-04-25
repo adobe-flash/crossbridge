@@ -1,0 +1,61 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/*! \page instructions AVM2 Instructions
+
+\addindex Instruction set
+
+\section instruction AVM2 Instructions
+
+The AVM2 instruction descriptions follow the following format.
+
+\section inst_name Instruction name 
+
+\subsection operation Operation
+
+Brief description of the instruction.
+
+\subsection format Format
+
+A description of the instruction with any operands that appear with it in the code.
+\code
+instruction
+operand1 
+operand2 
+...
+\endcode
+
+\subsection forms Forms
+
+instruction = opcode
+
+\subsection stack Stack
+
+A description of the stack before and after the instruction is executed. The stack top is on the right; 
+portions marked ... are not altered by the instruction.
+\code
+ ..., value1, value2 => ..., value3
+\endcode
+
+\subsection description Description
+
+A detailed description of the instruction, including information about the effect on the stack, 
+information of the operands, result of the instruction, etc.
+
+\subsection rt_execeptions Runtime exceptions
+
+A description of any errors that may be thrown by this instruction. A number of these 
+instructions may invoke operations behind the scene. For example, name resolution can 
+fail to find a name or it can resolve it ambiguously; value conversion can run arbitrary 
+user code that may fail and therefore throw exceptions. To the program it will appear as 
+if the instruction threw those exceptions, but they will not be noted in the description 
+of the instruction.
+
+\subsection notes Notes
+
+Additional information that may be useful.
+
+
+*/
+
+

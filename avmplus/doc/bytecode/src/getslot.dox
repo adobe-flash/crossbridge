@@ -1,0 +1,49 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page getslot 
+
+\addindex getslot
+
+
+\section getslot getslot
+
+\subsection operation Operation
+
+Get the value of a slot.
+
+\subsection format Format
+
+\code
+getslot
+slotindex
+\endcode
+
+\subsection forms Forms
+\code
+getslot = 108 (0x6c)
+\endcode
+\subsection stack Stack
+
+\code
+..., obj => ..., value
+\endcode
+
+\subsection description Description
+
+slotindex is a u30 that must be an index of a slot on obj. slotindex must be less 
+than the total number of slots obj has.
+
+This will retrieve the value stored in the slot at slotindex on obj. This value is 
+pushed onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if obj is null or undefined.
+
+\subsection notes Notes
+
+None.
+
+*/
+

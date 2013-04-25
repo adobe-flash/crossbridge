@@ -1,0 +1,33 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+function main()
+{
+	getlocal0
+	pushscope
+	newfunction 1 
+	setlocal1
+ /*
+    NOTE: no traits, so this
+	code won't work and it's
+	unnecessary in any case.
+           getglobalscope
+           swap
+           setslot             1
+           getglobalscope
+           getslot 1
+*/
+	getlocal1
+	getlocal0
+	call  (0)
+	returnvoid
+    
+}
+
+function zarquon()
+{
+	findpropstrict      print
+	pushstring          "hello, world."
+	callpropvoid        print (1)
+	returnvoid
+}

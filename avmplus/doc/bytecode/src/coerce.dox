@@ -1,0 +1,51 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page coerce 
+
+\addindex coerce
+
+
+\section coerce coerce
+
+\subsection operation Operation
+
+Coerce a value to a specified type
+
+\subsection format Format
+
+\code
+coerce 
+index
+\endcode
+
+\subsection forms Forms
+\code
+coerce = 128 (0x80)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ..., coercedvalue
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index into the multiname constant pool. The multiname at index 
+must not be a runtime multiname.
+
+The type specified by the multiname is resolved, and value is coerced to that type. The 
+resulting value is pushed onto the stack. If any of value’s base classes, or implemented
+interfaces matches the type specified by the multiname, then the conversion succeeds and 
+the result is pushed onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if value cannot be coerced to the specified type.
+
+\subsection notes Notes
+
+None.
+
+*/
+

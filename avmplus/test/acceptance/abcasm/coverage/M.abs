@@ -1,0 +1,98 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function runTest()
+{
+	findproperty COMPARE_STRICTEQ
+	pushstring "modulo"
+	pushint 1 // expected
+	pushint 5
+	pushint 4
+	modulo
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "modulo double/int"
+	pushdouble 1.25 // expected
+	pushdouble 5.25
+	pushint 4
+	modulo
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "modulo double/double"
+	pushdouble .0 // expected
+	pushdouble 5.
+	pushdouble 2.5
+	modulo
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "multiply int*int"
+	pushint 0x40 // expected
+	pushint 0x20
+	pushint 2
+	multiply
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "multiply int*int past signed 32-bits"
+	pushuint 4294967294 // expected
+	pushint 0x7FFFFFFF
+	pushint 2
+	multiply
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "multiply double * double"
+	pushdouble 21.78125 // expected
+	pushdouble 5.125
+	pushdouble 4.25
+	multiply
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "multiply_i int*int"
+	pushint 0x40 // expected
+	pushint 0x20
+	pushint 2
+	multiply_i
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "multiply_i int*int past signed 32-bits"
+	pushint -2 // expected
+	pushint 0x7FFFFFFF
+	pushint 2
+	multiply_i
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "multiply_i double * double"
+	pushint 20 // expected
+	pushdouble 5.125
+	pushdouble 4.25
+	multiply_i
+	callpropvoid COMPARE_STRICTEQ 3
+
+
+	returnvoid
+}
+
+
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "instructions that start with the letter M" 
+	callpropvoid START 1
+	newfunction runTest
+	getlocal0
+	call 0
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+
+script_info{init: main}

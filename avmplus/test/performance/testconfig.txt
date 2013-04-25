@@ -1,0 +1,84 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# format for testconfig:
+# name,operation,description
+# name=regular expression matching testname 
+# operation:
+#    skip - the test/dir is not run, for example the configuration does not support a feature or the file is not a test and is a helper file to another test
+#    include - includes a specific testcase/dir even if the parent has been skipped
+
+sunspider.*/.*        , sunspider ,, include , sunspider testsuite
+jsbench/.*            , jsbench   ,, include , jsbench testsuite
+v8/.*                 , v8        ,, include , v8 testsuite 
+v8.5/.*               , v8        ,, include , v8 testsuite 
+scimark/.*            , scimark   ,, include , scimark testsuite
+language/.*           , language  ,, include , language micro-benchmarks testsuite
+mmgc/.*               , mmgc      ,, include  , mmgc testsuite
+
+canaries/.*           , canaries  ,, include , canaries testsuite
+.*/canaries/.*        , canaries  ,, include , canaries testsuite
+
+canaries/simpleflexapp.*, misc,, skip, test is failing due to changes to builtin - dschaffe is investigating (10/13/10)
+
+sunspider.*/.*        , misc    ,, skip  , skip sunspider
+jsbench/.*            , misc    ,, skip  , skip jsbench
+v8.*/.*               , misc    ,, skip  , skip v8
+jsmicro/.*            , misc    ,, skip  , skip jsmicro
+
+misc/.*               , miscdir ,, include  , misc testsuite
+misc/driver           , .*      ,, skip  , included by test files
+
+## skip mmgc tests always, they are to be run manually for the time being
+mmgc/.*               , misc    ,, skip , mmgc diagnostic tests
+
+## skip fc64, crashes -memstats on windows
+.*fc64.*              , .*      ,, skip  , skip fc64 bug 488114
+
+## misc-mobile : required since the canaries tests require access to additional abc files which will not be on the device
+sunspider.*/.*        , misc-mobile.*  ,, skip  , skip sunspider
+jsbench/.*            , misc-mobile.*  ,, skip  , skip jsbench
+v8.*/.*               , misc-mobile.*  ,, skip  , skip v8
+jsmicro/.*            , misc-mobile    ,, skip  , skip jsmicro
+canaries/.*           , misc-mobile.*  ,, skip  , skip canaries as they require additional files to run which will not be on the device
+.*/canaries/.*        , misc-mobile.*  ,, skip  , skip canaries as they require additional files to run which will not be on the device
+
+## sunspider-mobile : required because controlflow-recursive overflows the stack https://bugzilla.mozilla.org/show_bug.cgi?id=458055
+sunspider.*/.*              , sunspider-mobile.* ,, include , sunspider testsuite
+.*/controlflow-recursive.*  , sunspider-mobile.* ,, skip , sunspider testsuite
+
+
+## WONTFIX: Stack-overflow on winmo when running sunspider/s3d-cude with the interpreter
+.*/s3d-cube  , sunspider-mobile-Dinterp ,, skip , https://bugzilla.mozilla.org/show_bug.cgi?id=496942
+
+jsbench/Search    , .*,,       skip    ,       skip test runs too long and times out buildbot
+.*util.*             , .*,,       skip    ,       skip internal files
+
+sunspider/(as3/|)regexp-dna  ,.*       ,,skip, large string.match(regexp) verifier error:1068 https://bugzilla.mozilla.org/show_bug.cgi?id=409206
+#sunspider/(as3/|)date-format-tofte  ,.*       ,,skip, contains eval
+sunspider/(as3/|)date-format-xparb ,.*       ,,skip, contains eval
+#sunspider/(as3/|)string-unpack-code,.*       ,,skip, too slow: javascript compressor code runs slowly https://bugzilla.mozilla.org/show_bug.cgi?id=409225
+sunspider/(as3/|)string-base64 ,.*       ,,skip, string indexing throws ReferenceError "z"[0] https://bugzilla.mozilla.org/show_bug.cgi?id=409210
+sunspider/(as3/|)string-tagcloud ,.*       ,,skip, contains eval
+
+sunspider-0.9.1/.*/date-format-tofte  ,.*       ,,skip, contains eval
+sunspider-0.9.1/.*/date-format-xparb ,.*       ,,skip, contains eval
+sunspider-0.9.1/.*/string-base64 ,.*       ,,skip, string indexing throws ReferenceError "z"[0] https://bugzilla.mozilla.org/show_bug.cgi?id=409210
+sunspider-0.9.1/.*/string-tagcloud ,.*       ,,skip, contains eval
+
+# util file for language tests
+language/string/timetest, .*,, skip, included in test files
+
+# util files for v8 tests
+v8/base,         .*,, skip, included by test files
+v8/run ,         .*,, skip, file used to run entire suite at once
+v8.*/.*/base,    .*,, skip, included by test files
+v8.*/.*/run ,    .*,, skip, file used to run entire suite at once
+
+# util files for jsmicro tests
+jsmicro/generate-drivers , .* ,, skip , run manually to generate driver files during development
+
+asmicro/driver, .* ,, skip, included by test files
+asmicro/float.*, .*,, skip, skip the float asmicro testcases until float is enabled by default
+

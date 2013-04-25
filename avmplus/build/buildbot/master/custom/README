@@ -1,0 +1,9 @@
+The buildbot directory defines customized buildbot source files that have been modified for
+use in the tamarin buildbot.  In order for these files to override the original buildbot source
+the following environment variable MUST be defined:
+
+export PYTHONPATH="path/to/custom/buildbot_dir;$PYTHONPATH"
+
+This will force python to search through these custom directories before loading the 
+original buildbot source in site-packages.
+

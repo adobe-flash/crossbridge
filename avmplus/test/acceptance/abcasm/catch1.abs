@@ -1,0 +1,87 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+//  Test exception handling.
+method_info { name: catchIt flags: NEED_ACTIVATION }
+
+method_body_info {
+    method: catchIt
+
+	exception: {
+		exception { from: StartTry to: EndTry type: int target: BadCatch }
+	    exception { from: StartTry to: EndTry target: Catch1 }
+	}
+
+	code:
+	{
+		newactivation 
+		dup
+		setlocal1
+		pushscope
+
+		findpropstrict START
+		pushstring "Catch processing "
+		callpropvoid START 1
+
+		getscopeobject 0
+	    pushnull
+		setslot 1
+		getscopeobject 0
+		getslot 1
+	StartTry:
+		callpropvoid moo 0
+		jump Endit
+	EndTry:
+
+	Catch1:
+		getlocal1
+		pushscope
+
+		pushstring "Caught :"
+		swap
+		add
+		findpropstrict PASS
+		swap
+		callpropvoid PASS 1
+	    jump Endit
+
+	BadCatch:
+		getlocal1
+		pushscope
+
+		pushstring "Wrong catch!"
+		swap
+		add
+		findpropstrict FAIL
+		swap
+		callpropvoid FAIL 1
+		returnvoid
+
+	Endit:
+		findpropstrict END
+		callpropvoid END 0
+
+	    returnvoid
+	}
+}
+
+function main()
+{
+	getlocal0
+	pushscope
+	newfunction catchIt
+	getlocal0
+	call 0
+	returnvoid
+}
+
+script_info{
+	init: main
+	traits: {
+	    trait { kind: Trait_Slot name: this  }
+	    trait { kind: Trait_Slot name: zuul slot_id:1 }
+	}
+
+}

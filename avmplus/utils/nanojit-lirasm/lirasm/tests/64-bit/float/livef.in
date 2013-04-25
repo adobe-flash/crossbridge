@@ -1,0 +1,77 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+.begin many_params
+qa = paramq 0 0
+qb = paramq 1 0
+qc = paramq 2 0
+qd = paramq 3 0
+; Stack-based args not supported yet, use immediates instead of param
+qq = immq 4
+qe = addq qa qq ;qe = paramq 4 0
+qf = addq qb qq ;qf = paramq 5 0
+qg = addq qc qq ;qg = paramq 6 0
+qh = addq qd qq ;qh = paramq 7 0
+pa = q2i qa
+pb = q2i qb
+pc = q2i qc
+pd = q2i qd
+pe = q2i qe
+pf = q2i qf
+pg = q2i qg
+ph = q2i qh
+fa = i2f pa
+fb = i2f pb
+fc = i2f pc
+fd = i2f pd
+fe = ui2f pe
+ff = ui2f pf
+fg = ui2f pg
+fh = ui2f ph
+
+res1 = addf fa fb
+res2 = addf res1 fc
+res3 = addf res2 fd
+res4 = addf res3 fe
+res5 = addf res4 ff
+res6 = addf res5 fg
+res7 = addf res6 fh
+res8 = negf res7
+res9 = addf res8 res1
+res = f2i res9
+reti res
+
+; stress the register allocator
+livef fa
+livef fb
+livef fc
+livef fd
+livef fe
+livef ff
+livef fg
+livef fh
+livef res1
+livef res2
+livef res3
+livef res4
+livef res5
+livef res6
+livef res7
+livef res8
+livef res9
+
+.end
+
+.begin main
+a = immq 1
+b = immq 2
+c = immq 3
+d = immq 4
+e = immq 5
+f = immq 6
+g = immq 7
+h = immq 8
+res = calli many_params fastcall a b c d ; Don't pass (e f g h) - se comment in function
+reti res
+.end

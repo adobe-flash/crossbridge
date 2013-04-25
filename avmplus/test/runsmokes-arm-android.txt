@@ -1,0 +1,87 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# file contains a list of tests to run
+
+# directory , commands ...
+
+# directory = directory to start, most test suites require starting in the directory
+# commands = all commands and parameters to run testsuite
+# any variable enclosed as ${var} will be replaced with the environment variable
+# the common shell variables are: avmr, avmrd, avmd, avmd   (r=release, rd=release-debugger, d=debug, dd=debug-debugger)
+#
+
+# Bug https://bugzilla.mozilla.org/show_bug.cgi?id=514400
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads ecma3/String/eregress_137879.as
+
+# Bug https://bugzilla.mozilla.org/show_bug.cgi?id=500195
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads ecma3/TypeConversion/e9_3_1_3_rt.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads as3/AbcDecoder/simple.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp as3/AbcDecoder/simple.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit as3/AbcDecoder/simple.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads ecma3/Date/e15_9_2_2_4.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp ecma3/Date/e15_9_2_2_4.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit ecma3/Date/e15_9_2_2_4.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads ecma3/Date/e15_9_2_2_5.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp ecma3/Date/e15_9_2_2_5.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit ecma3/Date/e15_9_2_2_5.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads as3/Vector/reverse.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp as3/Vector/reverse.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit as3/Vector/reverse.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads as3/ByteArray/ByteArray.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp as3/ByteArray/ByteArray.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit as3/ByteArray/ByteArray.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads ecma3/FunctionObjects/e15_3_1_1_1_rt.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp ecma3/FunctionObjects/e15_3_1_1_1_rt.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit ecma3/FunctionObjects/e15_3_1_1_1_rt.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads ecma3/Date/e15_9_2_2_6.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp ecma3/Date/e15_9_2_2_6.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads  --vmargs=-Ojit ecma3/Date/e15_9_2_2_6.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads e4x/Statements/e12_1.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp e4x/Statements/e12_1.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit e4x/Statements/e12_1.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit ecma3/Unicode/u0000_BasicLatin.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads ecma3/Unicode/u0000_BasicLatin.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp ecma3/Unicode/u0000_BasicLatin.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads ecma3/Date/e15_9_5_12_1.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp ecma3/Date/e15_9_5_12_1.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit ecma3/Date/e15_9_5_12_1.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads ecma3/Date/e15_9_5_34_1.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp ecma3/Date/e15_9_5_34_1.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit ecma3/Date/e15_9_5_34_1.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads mmgc/memstats.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp mmgc/memstats.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit mmgc/memstats.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads as3/DescribeType/describeType.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp as3/DescribeType/describeType.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit as3/DescribeType/describeType.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads ecma3/TypeConversion/e9_7.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp ecma3/TypeConversion/e9_7.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit ecma3/TypeConversion/e9_7.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads as3/MethodClosures/MethodClosureFunc.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp as3/MethodClosures/MethodClosureFunc.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit as3/MethodClosures/MethodClosureFunc.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads ecma3/Number/tostring_001.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp ecma3/Number/tostring_001.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit ecma3/Number/tostring_001.as
+
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads regress/bug_460872.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Dinterp regress/bug_460872.as
+cd ./acceptance;./runtests.py  --notimecheck --androidthreads --vmargs=-Ojit regress/bug_460872.as

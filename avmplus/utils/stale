@@ -1,0 +1,56 @@
+#!/bin/sh
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+#
+# check for unused constants
+# 
+
+echo "Moving some files temporarily "
+mv -v ../core/ErrorConstants.as ../core/ErrorConstants.a
+mv -v ../core/ErrorConstants.h ../core/ErrorConstants.ash
+
+if [ -f "../core/ErrorConstants.as" ]; then
+	echo "../core/ErrorConstants.as must be temporarily renamed before running this script "
+	exit 1;
+fi
+if [ -f "../core/ErrorConstants.h" ]; then
+	echo "../core/ErrorConstants.h must be temporarily renamed before running this script "
+	exit 1;
+fi
+
+# hunka big file!
+echo "Building monster big file for processing"
+find ../. -name \*.cpp -exec cat {} \; > stale.raw
+find ../. -name \*.as -exec cat {} \; >> stale.raw
+find ../. -name \*.h -exec cat {} \; >> stale.raw
+
+echo "Restoring files "
+mv -v  ../core/ErrorConstants.a ../core/ErrorConstants.as
+mv -v  ../core/ErrorConstants.ash ../core/ErrorConstants.h
+
+echo "Generating constant list"
+./avmplus ./errorgen.abc -- stale.xml
+
+echo "Searching for unused constants"
+MISSING=" ";
+for PATT in `cat stale.lst`
+do
+	grep -Hniq $PATT stale.raw
+	if [ "${?}" != 0 ]; then
+		MISSING=`echo -e $MISSING  "\r\n"  $PATT`
+	fi
+done
+
+echo "Removing monster big file "
+rm stale.raw
+rm stale.lst
+
+echo "Unused : "
+
+for CHK in ${MISSING}
+do
+	echo "    " $CHK
+	#add some commands here to help you pin down this missing constants
+done

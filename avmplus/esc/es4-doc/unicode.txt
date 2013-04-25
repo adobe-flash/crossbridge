@@ -1,0 +1,135 @@
+NAME:       "Unicode updates"
+CATEGORY:   Lexical conventions (E262-3 ch 7)
+SOURCES:    Reference [1]
+AUTHOR:     ?
+STATUS:     ?
+REVIEWS:    ?
+RI STATUS:  ?
+ESC STATUS: ?
+TEST CASE:  ?
+
+
+           **** VERY PRELIMINARY ****
+
+
+
+THE CONSTRAINTS
+
+  * Don't really want to force implementations to move to full
+    Unicode, though most probably will anyhow.  (A lot of hair with
+    the browser API, DOM, etc -- significant work.)  Would be nice to
+    let browsers stay in the ES3 world for another iteration.
+
+  * Would like to define what it means to implement full Unicode in
+    the language.
+
+ISSUES
+
+  * Backward compatibility:
+
+    Currently "\uXXXX\uYYYY".length is 2 even if the two code points 
+    form a surrogate pair (ie a character).  But Waldemar claims the
+    Unicode people will lynch us if we support full Unicode and don't
+    require merging.
+
+    Ditto for the use of unicode escapes for identifiers.
+
+    String.prototype.charCodeAt is defined as returning a number less
+    than 2^16 (or NaN).
+
+    String.prototype.fromCharCode is defined as chopping its argument
+    (after conversion to int) to 16 bits.
+
+    If s1 and s2 are strings, then (s1 + s2).length == s1.length + s2.length.
+    But if we merge surrogate pairs here then that will no longer be true.
+    (This is not the same case as above because that talks about source text,
+    this about run-time semantics.)
+
+  * Usability / reliability of the solution
+
+
+DESCRIPTION
+
+There are several parts to this:
+
+  * Upgrade to Unicode 5 and the full Unicode character set (going
+    beyond 16-bit code points)
+
+  * Encoding of Unicode code points in source text
+
+  * Handling surrogate pairs in existing source text
+
+  * Handling splitting of code points into surrogate pairs in
+    implementations that don't support 21-bit code points
+
+
+ENCODING UNICODE CODE POINTS
+
+Unicode code points can be expressed using a new escape character
+syntax that is valid whereever the current \u syntax is valid.  A code
+point is expressed as "\u{n...n}" where each n is a hexadecimal digit.
+
+If the integer value of n...n does not denote a valid Unicode code
+point then the effects are implementation-defined.
+
+If the implementation does not support 21-bit code points then the
+code point must be split into a surrogate pair of 16-bit code point
+values.
+
+
+MERGING SURROGATE PAIRS
+
+Probably uncontroversial:
+
+In version 4 scripts on implementations that support 21-bit code
+points, surrogate pairs in the source text are merged to a single code
+point.  
+
+In version 3 scripts, surrogate pairs are never merged under any
+circumstances, for backward compatibility reasons.
+
+The implementation either supports or does not support 21-bit code
+points.  If it does, then version 3 code may read code point values
+above 2^16 from a string, and String.fromCharCode called from version
+3 code may not truncate the input value to 16 bits.
+
+
+Maybe more open to discussion:
+
+Code points that form half of a surrogate pair are allowed by
+themselves.  (Even if we do prohibit them and prohibit their creation
+in String.fromCharCode, ES3 code can still create them by using a
+string literal containing a pair and then reading the individual parts
+from that string.  We can't prohibit that because that would break
+backward compatibility.  But obviously those values can leak into ES4
+code.)
+
+Surrogate pairs are never automatically merged when written into a
+string singly, as in c1 + c2 where c1 ends with the high part of a
+code point and c2 starts with the low part.  (It wouldn't be hard to
+change this, though it would mean different string concatenation
+semantics in ES3 and ES4 code.)
+
+
+NOTES
+
+We are not using the more obvious notation \Unnnnnnnn instead of the
+proposed \u{n...n} because the former is backward incompatible with
+ES3.  In current ES3 programs, "\U" means "U".  The proposed syntax
+does not have this problem.  We could change that by interpreting \U
+differently under the version=4 tag, and I think that would be my
+preference, esp since we are proposing to handle surrogate pairs
+differently under version=4 in any case.
+
+
+MORE RADICAL APPROACHES
+
+Just say that ES4 upgrades to 21-bit unicode and that implementations
+that claim to support the full language will have to follow; code may
+break but c'est la guerre.
+
+
+
+REFERENCES
+
+[1] http://wiki.ecmascript.org/doku.php?id=proposals:update_unicode

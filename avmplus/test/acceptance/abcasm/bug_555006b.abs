@@ -1,0 +1,39 @@
+/* -*- Mode: js; c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 4 -*- */
+/* vi: set ts=4 sw=4 expandtab: (add to ~/.vimrc: set modeline modelines=5) */
+
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+ /*
+    Try/catch won�t catch a verifier error b/c the Verifier runs before the ABC code executes.
+    Therefore, this test exits w/ an exitcode=1 and throws the VerifyError.
+ */
+ 
+// See bug https://bugzilla.mozilla.org/show_bug.cgi?id=555006 for details
+
+
+method_info { name: C return_type: * }
+method_body_info {
+    method: C
+    local_count: 1
+    max_stack: 1
+    max_scope_depth: 1
+    code: 
+    {
+        getlocal0
+        greaterequals
+        getlocal0
+        returnvoid
+    }
+}
+
+function main()       
+{
+    newfunction C
+    getlocal0
+    call 0
+    returnvoid
+}
+
+script_info{init: main}

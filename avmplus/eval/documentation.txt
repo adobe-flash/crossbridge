@@ -1,0 +1,104 @@
+Run-time compiler for ActionScript 3 - some usage and implementation notes.
+2011-07-07 / lhansen@adobe.com
+
+
+Note, this list may be out of date now, see notes about what works and doesn't
+at the end of backlog.txt.
+
+
+= AS3 support =
+
+AS3 extensions supported so far (also see notes below):
+
+- Rest arguments
+- Type annotations
+- "namespace" definitions
+- "include" directive
+- unqualified "import" directive (ie, 'import foo.*')
+- operators "is", "as", "to"
+- E4X
+- classes, interfaces, "super" statement and built-in namespaces 
+  except "protected" are mostly supported
+
+
+= 'include' directives =
+
+The 'include' directive is allowed if the script containing the
+'include' originates from a file; if not, a SyntaxError is thrown.
+
+The resolution of the file name in the directive is delegated to the
+implementer of the AvmCore instance.  In the avmshell the name is
+resolved relative to the file name of the script contining the
+directive.
+
+Recursive includes are allowed, currently to unlimited depth without
+checking for cycles, as names are not canonicalized.  It is easy to
+place a depth limit in the parser.
+
+
+= Changes to the language relative to ASC =
+
+- 'use namespace' and 'import' are allowed even as the substatements
+  of 'if' etc, not just on the top level of blocks.  Seems silly to
+  prohibit the former use when it's allowed for 'var' and 'const'.
+
+- We aim not to early-bind to any global names, unlike ASC, except
+  names with predefined meaning (""::Object, etc) in contexts where
+  they are used to implement language semantics (and even there it
+  may not matter due to how loading works).  ASC has different
+  behavior for "var x:T = new T()" if there is more than one T
+  visible: it early-binds to the first in standard mode and to both
+  in strict mode.  The standard-mode behavior is likely a bug.
+
+
+= Other documentation =
+
+Feature backlog:
+
+	See the file 'backlog.txt' in this directory
+
+AS3 documentation:
+
+	Francis Cheng writes:
+ 
+	"The most up to date [AS3 documentation] version is posted on the web.
+	It is not only incomplete but also outdated. It represents the language
+	as it was in early Spring 2006, I believe.
+ 
+	http://livedocs.adobe.com/specs/actionscript/3/as3_specification.html"
+ 
+ES3 documentation and errata:
+
+	http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
+	http://www.mozilla.org/js/language/E262-3-errata.html
+
+E4X documentation and errata:
+
+	http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-357.pdf
+	https://bugzilla.mozilla.org/attachment.cgi?id=169406
+
+AVM documentation:
+
+    I'm working from the avm2overview.pdf document; URL tbd.
+
+
+= Instruction set and/or verifier bugs =
+
+* The object that's created with NEWACTIVATION must not be coerced to atom before
+  being pushed, or local variable lookup stops functioning.  To see this, just
+  introduce COERCE_A just before pushscope when pushing the activation object
+  in the function prologue and when restoring the scope stack in an exception handler.
+
+* The same is true for the object that is created with NEWCATCH.  In this case it
+  introduces a bigger problem, which is that the local that holds a reference to
+  the catch object (so that the scope stack can be restored) now is known by the
+  verifier to be of a certain type, which is irreconcilable with the type that
+  that local has on any exit from the catch body.  Since we can't coerce the value
+  (there is no coerce-to-catch-object instruction) the local must be killed on every
+  exit, which introduces complexity into the code generator: insert kills before the
+  jump when handling unstructured control flow.  I don't know how general that hack is.
+
+* The requirement that the second operand to HASNEXT2 must have an integer value
+  causes the same complications as NEWCATCH, though they can be worked around
+  because the instruction set has an instruction to coerce to int.  See comments
+  before ForInStmt::cogen.

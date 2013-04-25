@@ -1,0 +1,111 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/*
+ *  Test trait definitions, function lookup by name,
+ *  explicit function-level metadata
+ */
+
+
+method_info
+{
+	name:foo
+	return_type:int
+	//param_count:2
+	//param_type:{int, int}
+
+}
+
+method_body_info {
+	
+	method: foo
+	
+	 
+		max_stack:4 local_count:3 init_scope_depth:1 max_scope_depth:2
+		 
+	code:
+	{
+		getlocal0
+		pushscope
+
+		findpropstrict COMPARE_STRICTEQ
+		pushstring "Access slot in this"
+		pushstring          "hello, x-land"
+		findpropstrict x
+		getslot             1  //  NOTE: lexical scoping!
+		callproperty COMPARE_STRICTEQ 3
+
+		returnvoid
+	}
+	/*
+	traits : {
+		trait { kind:Trait_Slot name:poot type_name:String slot_id:1}
+	}
+	*/
+	
+}
+
+/*
+Equivalent syntactic sugar for the above traits:
+var x:String
+var one:int = 1
+var foo
+*/
+
+function main():*      
+{
+	getlocal0
+	pushscope
+	getglobalscope
+	debugfile "functionBindingAndTraits.abs"
+
+	findpropstrict START
+	pushstring "Create and bind function and value to slots"
+	callproperty START 1
+
+	getlocal0
+	newfunction         foo
+	setslot             3
+	pushstring          "hello, x-land"
+	getglobalscope
+	swap
+	setslot             1
+
+	findpropstrict PASS
+	pushstring "Binding"
+	callproperty PASS 1
+
+	findpropstrict END
+	callproperty END 0
+
+/*
+//unimplemented
+	findpropstrict START
+	pushstring "Call bound function"
+	callproperty START 1
+
+	debugline 9
+	findpropstrict      foo
+	callproperty        foo 0
+	
+	coerce_a
+
+	findpropstrict END
+	callproperty END 0
+*/
+	returnvalue
+}
+
+
+script_info
+{
+	init : main
+	//  trait_count accumulated and set by the assembler, 
+	//  can also be specified
+	traits: {
+	trait{ kind:Trait_Slot name:x slot_id:1 type_name:String}
+	trait{ kind:Trait_Slot name:foo slot_id:2}
+	trait{ kind:Trait_Slot name:three slot_id:3 type_name:int}
+	}
+}

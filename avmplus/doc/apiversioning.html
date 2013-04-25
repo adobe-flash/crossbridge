@@ -1,0 +1,332 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+
+
+
+<h1>API Versioning in AVM</h1>
+
+<hr>
+<pre>
+Revision History:
+14-Sep-2009  jodyer@adobe.com  updated to reflect new bitmask mechanics
+22-Jul-2009  jodyer@adobe.com  initial draft
+</pre>
+<hr>
+
+<h2>OVERVIEW</h2>
+
+<P><span class="pcounter"></span>
+API versioning in AVM allows code compiled against one version of a built-in API 
+to see exactly the same set of bindings when run on a different, compatible 
+version of that API. A compatible version is one that has zero or more public 
+names added to it, and none removed from it. Thus, in AVM, APIs may add global 
+and class members without the risk of breaking existing ABC programs. The 
+versioning mechanism described here supports simultaneously executing ABCs of 
+different versions.
+
+<h2>BACKGROUND</h2>
+
+<P><span class="pcounter"></span>
+Logically, a version can be thought of as a set of bindings. There is a partial 
+order of versions such that every version is a subset of itself and zero or more 
+other versions. A version is said to be compatible with every other version of 
+which it is a superset including itself.
+
+<P><span class="pcounter"></span>
+By way of example, imagine there exists a runtime called FR. It supports the 
+evolution of two coexisting profiles over time. One product supports program 
+execution in one of the the various browsers via a plugin (let's call it FP). The 
+other product supports the execution of standalone applications and is compatible 
+with the web product (let's refer to it as AR). At any point in time the latest 
+version of AR is larger than (includes a superset of names of) FP. And 
+over time each new release of each products is larger than all previous releases 
+of the same product.
+
+<P><span class="pcounter"></span>
+Now imagine that there exists versions of these two products as described
+by the following relations:
+
+<pre>
+FP_9_0    <   AR_1_0
+FP_9_0    <   FP_10_0
+AR_1_0    <   AR_1_5
+FP_10_0   <   FP_10_1
+FP_10_0   <   AR_1_5
+AR_1_5    <   AR_1_5_1
+AR_1_5_1  <   AR_2_0
+FP_10_1   <   AR_2_0
+</pre>
+
+<P><span class="pcounter"></span>From these relations we can see, for example, that a binding introduced in 
+FP_9_0 will be in every other version; a binding introduced in AR_1_0 is not in 
+FP_9_0 (or any other FP version, for that matter) but is in AR_1_5; and a binding 
+introduced in AR_2_0 is only in AR_2_0.
+
+<P><span class="pcounter"></span>
+In source code, each built-in (library code) definition may be annotated with a 
+metadata attribute that indicates the version or versions in which it was 
+introduced. If no metadata occurs on a definition, it is assumed to have been 
+introduced in the smallest version (FP_9_0). Library code reference names are 
+always of the largest version (in this case AR_2_0). This means that regardless 
+of the version they are added to library code, references can "see" all names 
+that are in scope of that reference.
+
+<P><span class="pcounter"></span>
+Non-builtin code (client code) definitions and references are of the version it 
+was built with, as indicated by the embedding host. There is no version 
+information encoded into the ABC format to indicate its API version. In fact, it 
+is up to the host embedding to allocate version numbers and compatibility 
+relations between those versions, and to provide that information to AvmCore on
+startup.
+
+<P><span class="pcounter"></span>
+Only public names in AVM library code (that which is built into the AVM binary)
+may be versioned. Furthermore, it is prohibited to version names in a private, 
+protected, internal, interface, or user defined namespace. Private 
+names are not visible outside of the builtin code and so versioning has no 
+effect on them; other names might be visible outside of the builtin code but 
+are not required by currently targeted use cases to be versioned and therefore 
+doing so unnecessarily complicates the implementation.
+
+<P><span class="pcounter"></span>
+We also limit the set of names being versioned to those whose namespaces have
+one of the host defined URI strings.
+
+<h2>USAGE</h2>
+
+<h3>API Version Metadata</h3>
+
+The metadata syntax for marking a builtin API with a version is this:
+
+<pre>
+VersionMetaData := '[' 'API' '(' VersionList ')' ']'
+VersionList     := VersionList ',' Version
+Version         := <b>Integer</b>
+</pre>
+
+<P><span class="pcounter"></span>
+The value of <b><code>Integer</code></b> is determined by the host embedding. In our running
+example of the hypothetical FR runtime, imagine that we assign the following version numbers
+to the various versions:
+
+<pre>
+FP_9_0      660 
+AR_1_0      661                                                                                           
+FP_10_0     662                                                                                                         
+AR_1_5      663                                                                                                            
+AR_1_5_1    664                                                                                                          
+FP_10_1     665                                                                                                         
+AR_2_0      666
+</pre>
+
+[TODO] ASC configuration variables are defined to alias these integers. Thus to
+indicate that a particular method was introduced in both AR_1_0 and in FP_10_0
+we would use the following annotation:
+
+<pre>
+[API(AR_1_0, FP_10_0)] 
+public function ...
+</pre>
+
+<P><span class="pcounter"></span>
+Such dual versioning occurs when a name is introduced first in the larger 
+profile and later migrated to a smaller profile.
+
+<P><span class="pcounter"></span>
+It is an ASC compile error to use an invalid version number in API metadata.
+
+<P><span class="pcounter"></span>
+[NOTE: Embedders should be aware that the ASC released with the Flex SDK is
+configured for targeting Flash Runtime versions. This is of no consequence to
+embedders that do not version their library code and to users in general.
+Embedders that want to version their library code and who use ASC to compile
+that code will either need to repurpose the Flash versions and compatibility
+relations or update the version information compiled into ASC. See the section
+titled 'apivergen.abc' below)
+
+<h3>Invoking ASC</h3>
+
+<P><span class="pcounter"></span>
+When using ASC to compile builtin code with ASC's ScriptCompiler, both the 
+'-builtin' and '-apiversioning' flags must be used. This causes names in a 
+versioned namespace to be marked either with the specified version or the 
+default version (FP_9_0, in our running example).
+
+<P><span class="pcounter"></span>
+When using ASC to compile client code (this includes all code that is not
+treated as built-in code by AvmCore) as any version other than the largest 
+version (AR_2_0, in our example) it is necessary to use the '-api' flag to 
+specify the presumed version of that code. The given version is used to exclude 
+names of larger versions during ABC import. ASC does nothing version specific to 
+the generated ABCs of client code. Among other things this means that third 
+party tools that read ABC will continue to work as before.
+
+<h3>Invoking AVM</h3>
+
+<P><span class="pcounter"></span>
+By default AVM is built with API versioning turned off. However, for the purpose
+of testing versioning, the macro <code>VMCFG_TEST_API_VERSIONING</code> can be defined to
+enable Flash Player like versioning in AVM.
+
+<P><span class="pcounter"></span>
+Since client version information is not stored in ABC files, the AVM has no way 
+to know what version client code is compiled against. For this reason there is 
+a command-line flag <code>-api</code> which allows an api version to be specified for all 
+user ABCs. [NOTE: this flag is only available with versioning is enabled as describe 
+in the previous paragraph.]
+
+<h2>MECHANICS</h2>
+
+<h3>AVM Mechanics</h3>
+
+<P><span class="pcounter"></span>
+Namespaces control the visibility of names in AS3 and AVM. We exploit this fact 
+by adding a bit mask to namespaces to indicate the version of the associated name,
+and a bit mask to the binding (multiname hash) table entry to indicate all versions 
+in which a name is visible. A bitwise comparision between these two bitmasks is 
+done during name lookup to determine whether or not a name is a match.
+
+<P><span class="pcounter"></span>
+To cause versioned bindings to be visible to code of larger (and therefore different) 
+versions, we set the version bit of each larger (compatible) version in the binding
+table. This is true for client, as well as library, code to allow  SWFs of larger 
+versions to "see" bindings of SWFs of smaller versions.
+
+<P><span class="pcounter"></span>
+In order to avoid changing the ABC file format we encode the version of a namespace
+in the URI of the namespace in the ABC file and strip it out during ABC parsing,
+replacing it with the version bitmask in the instantiated namespace object. A version 
+mark is a single Unicode character from the Private Use Area (0xE000 to 0xF8FF). Such 
+a mark is appended to the normal (base) URI. The unicode character used to represent 
+a version has the code point equal to the sum of 0xE000 and the version number (in 
+our example, FP_9_0 namespaces would be marked with the character whose code point
+is 0xE000+660).
+
+<P><span class="pcounter"></span>
+The important differences between builtin and client code are that: 
+<ul>
+<li>built-ins can contain bindings of different versions, whereas client code 
+bindings within an ABC are always of the same version
+<li>built-in versions are explicitly encoded in each trait name, whereas client 
+code versions are indicated by the host
+<li>version numbers appear nowhere in client code. this is important because
+because version numbers might change, intentionally or accidently, from release
+to release causing content containing that information to be brittle
+</ul>
+
+<P><span class="pcounter"></span>
+On AVM startup, the version compatibility information is passed to AvmCore via
+the instance method <code>AvmCore::setAPIInfo()</code>. (See <code>./shell/ShellCore.cpp</code> 
+for an example).
+
+<P><span class="pcounter"></span>
+During ABC parsing, the version of the ABC being parsed is given to the parser 
+by the host embedding code. Again, builtin code is by default treated as if of 
+the largest version. The version number is cached in the PoolObject associated 
+with the ABC and versioned namespaces have their appropriate version bit set.
+When traits (and scripts for toplevel bindings) are added to the various 
+multiname hash tables the version bit on the hash table entry is set for each 
+version that is compatible with the initial version(s). [NOTE: builtin traits 
+can be introduced in multiple versions and so the set of compatible versions 
+must be computed as the union of the compatibility sets of each of the initial 
+versions.]
+
+<P><span class="pcounter"></span>
+At runtime, dynamically computed names (e.g E4X names) that have a versioned URI 
+must also be versioned. AS3 and E4X namespaces share the same syntax and values 
+in the language. For example, the expression <code>obj.public::x</code> is a valid 
+reference to the an xml element or an ordinary object property. Therefore it is 
+necessary (or at least expedient) to also version E4X names.
+
+<P><span class="pcounter"></span>
+TESTING NOTE: Create an E4X value with elements with names in a namespace with a 
+versioned URI (e.g. the empty string) and passing that value to code of a smaller
+version. Are the elements of that value visible to the receiver code? They 
+should not be, but is that a problem in practice. At least its something to document. 
+[NOTE: this is not a problem for ordinary object properties, since such 
+properties have no namespace.]
+
+<P><span class="pcounter"></span>
+At runtime, the PoolObject of the executing code must be derived from the dynamic 
+scope of the callee (which is builtin code). The innermost client MethodEnv 
+contains a reference to its PoolObject (through a MethodInfo). This pool contains 
+the current API version.
+
+<P><span class="pcounter"></span>
+Any code that reflects on the names of a value needs to reflect only those names 
+that are of the same version as the caller (e.g. describeType).
+
+<P><span class="pcounter"></span>
+Any code that formats a name needs to strip off the version marker of that 
+name's namespace. (For example, E4X methods that return the URI of a qname and 
+namespace, and the Multiname format method)
+
+<h3>ASC Mechanics</h3>
+
+<P><span class="pcounter"></span>
+ASC only marks versioned namespaces of traits when both the '-builtin' and 
+'-apiversioning' are passed to ASC's ScriptCompiler (the driver used to compile
+builtins in the AVM shell). All other uses of ASC will result in unversioned 
+traits. Builtin traits have names that are constant multinames. Non-builtin 
+names are single qualified name constants (as before) and so there is no need to 
+bump the abc version number.
+
+<P><span class="pcounter"></span>
+ASC marks all builtin trait names with a version by appending a version marker
+to the uri of the names namespace. Definitions with no version metadata are 
+marked with the smallest version (e.g. FP_9_0=0xE000+660). All other definitions 
+are marked with the version(s) specified by metadata.
+
+<P><span class="pcounter"></span>
+ASC ABC import (AbcParser.java) ignores traits that are introduced in a larger 
+version than the version of the code being compiled. The version of the current 
+code is specified by the '-api' flag on the ASC command line. It is an error to 
+use '-api' and '-apiversioning' on the same command line. This is because 
+builtin code is always of the largest version and so the '-api' flag is 
+meaningless. [NOTE: the '-api' flag has no effect on the import of '.as' files.]
+
+<P><span class="pcounter"></span>
+It is an error to use an invalid version number with API metadata. The definition
+of valid versions can be found found in the file ./shell/api-versions.xml (see
+below).
+
+
+<h2>UTILITIES</h2>
+
+<h3>nativegen.py</h3>
+
+<P><span class="pcounter"></span>nativegen.py reads the builtin ABC files and generates thunks for native 
+methods contained within. This tool ignores duplicates that result from 
+versioning, and it strips off the version marker when generating thunk names.
+
+<h3>apivergen.abc</h3>
+
+<P><span class="pcounter"></span>
+Version numbers and compatibility information are specified in an domain
+specific xml file that is processed by the utility named <code>apivergen.abc</code>.
+(e.g. <code>./shell/api-versions.xml</code>). The XML file is used as input to 
+<code>./utils/apivergen.abc</code> to generated equivalent C++ and Java code. Copy and/or 
+rename these files as appropriate.
+
+<P><span class="pcounter"></span>
+To build apivergen.abc, execute
+
+<pre>
+   java -jar asc.jar apivergen.as
+</pre>
+
+<P><span class="pcounter"></span>
+To compile api-versions.xml, execute
+
+<pre>
+   avmshell apivergen.abc -- api-versions.xml
+</pre>
+
+<P><span class="pcounter"></span>
+
+This will result in the files <code>api-versions.xml.h</code> and <code>api-versions.xml.java</code>
+being generated. These files must then be copied to the appropriately named files 
+(e.g. api-versions.h and APIVersions.java) in their respective locations in the 
+avm/player and ASC workspaces. [NOTE: This process should not be automated as it 
+is performed once per release.]

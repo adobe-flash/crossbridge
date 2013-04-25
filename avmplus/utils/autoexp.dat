@@ -1,0 +1,236 @@
+;  * This Source Code Form is subject to the terms of the Mozilla Public
+;  * License, v. 2.0. If a copy of the MPL was not distributed with this
+;  * file, You can obtain one at http://mozilla.org/MPL/2.0/. *
+
+; This autoexp.dat file is an insert for the VC++ autoexp.dat located at
+; {yourVCdir}\Common7\Packages\Debugger.
+; It defines a set of visualizers for avmplus, especially Strings and Atoms.
+; For Atoms, there is a dummy structure definition AtomP in AtomConstants.cpp
+; that allows you to cast an Atom to an AtomP. In the Watches window, you can
+; visualize an atom with this statement:
+; *(avmplus::AtomP*) &myAtom
+; Insert the code below right after the [Visualizer] tag.
+
+; Please feel free to add your own visualizer, or to let me know which additional
+; visualizer you would like to have. Email me at daumling@adobe.com.
+
+; avmplus
+
+MMgc::RCObject|avmplus::AvmPlusScriptableObject|avmplus::ScriptObject {
+	preview(
+		#if (&$e == 0) ( "NULL" )
+		#else
+		( #(
+			[((int) &$e),x],
+			" ref=",
+			[((int)($e.composite & 0xFF)-1),d]
+		) )
+	)
+}
+
+avmplus::AtomP {
+	preview(
+		#switch ($e.value & 7)
+			#case 0		( #( "untagged ", [$e.value,x] ) )
+			#case 1		( #( "Object ", (avmplus::ScriptObject*) ($e.value & ~7) ) )
+			#case 2		( #( "String ", (avmplus::String*) ($e.value & ~7) ) )
+			#case 3		( #( "Namespace ", (avmplus::Namespace*) ($e.value & ~7) ) )
+			#case 4		( #( "undefined" ) )
+			#case 5		( #( "bool ", ($e.value & 8) != 0 ) )
+			#case 6		( #( "int ", [$e.value >> 3,d] ) )
+			#case 7		( #( "double ", *((double*) ($e.value & ~7)) ) )
+	)
+}
+
+avmplus::String {
+	preview( 
+		#if( &$e == 0) ( "NULL" )
+		#else ( #(
+			#(
+				; print [n] "text" if non 0-terminated
+				; print "text" if 0-terminated
+				#switch ($e.m_bitsAndFlags & 0x03)
+					#case 0x01 
+					( 
+						#if ($e.m_buffer.p8[$e.m_length] != 0 )
+						( #(
+							"[",
+							[$e.m_length,d],
+							"] ",
+							[$e.m_buffer.p8,s]
+						) )
+						#else
+						( #(
+							[$e.m_buffer.p8,s]
+						) )
+					)
+					#case 0x02
+					( 
+						#if ($e.m_buffer.p16[$e.m_length] != 0 )
+						( #(
+							"[",
+							[$e.m_length,d],
+							"] ",
+							[$e.m_buffer.p16,su]
+						) )
+						#else
+						( #(
+							[$e.m_buffer.p16,su]
+						) )
+					)
+					#default   ( "[INVALID STRING WIDTH]" )
+			)
+		) )
+	)
+	stringview( 
+		#(
+			#switch ($e.m_bitsAndFlags & 0x03)
+				#case 0x01 ( [$e.m_buffer.p8,sb] )
+				#case 0x02 ( [$e.m_buffer.p16,sub] )
+		)
+	)
+	children( #( 
+		[raw]		: [$e,!],
+		[test]		: ["A",s],
+		refcount	: [((int)($e.composite & 0xFF)-1),d],
+		interned	: ($e.m_bitsAndFlags & 0x00000010) != 0,
+		width       : [($e.m_bitsAndFlags & 0x03) << 3,d],
+		length		: [$e.m_length,d],
+		charsLeft	: [($e.m_bitsAndFlags >> 9) & 0x7FFFFF,d],
+		#if (($e.m_bitsAndFlags & 0x0000000C) == 8) 
+		( 
+			#( master: $e.m_master ) 
+		)
+		#else 
+		( 
+			#( numeric value: [$e.m_index,d] ) 
+		),
+		#(
+			#switch ($e.m_bitsAndFlags & 0x03)
+				#case 0x01 ( #( text: [$e.m_buffer.p8,s] ) )
+				#case 0x02 ( #( text: [$e.m_buffer.p16,su] ) )
+				#default   ( #( invalid text: ) )
+		),
+		#switch ($e.m_bitsAndFlags & 0x0000000C)
+			#case 0x00000000 ( #( type is DYNAMIC: 1==1 ) )
+			#case 0x00000004 ( #( type is STATIC: 1==1 ) )
+			#case 0x00000008 ( #( type is DEPENDENT: 1==1 ) )
+			#case 0x0000000C ( #( type: 3 ) )
+	) )
+}
+
+avmplus::Traits {
+	preview( 
+		#if( &$e == 0) ( "NULL" )
+		#else 
+		( #(
+			"Traits",
+			$e._name
+		) )
+	)
+	children( #( 
+		[raw]		: [$e,!]
+	) )
+}
+
+avmplus::MethodInfo {
+	preview( 
+		#if( &$e == 0) ( "NULL" )
+		#else ( #(
+			"MethodInfo",
+			#if ($e._declaringScopeOrTraits & 1)
+				( ((avmplus::Traits*)($e._declaringScopeOrTraits & ~1))->_name )
+			#else
+				( ((avmplus::ScopeTypeChain*)($e._declaringScopeOrTraits))->_traits->_name )
+		) )
+	)
+	children( #( 
+		[raw]		    : [$e,!],
+		#if ($e._declaringScopeOrTraits & 1) 
+		( #(
+			declaringTraits: (avmplus::Traits*)($e._declaringScopeOrTraits & ~1) 
+		) )
+		#else 
+		( #(
+			declaringScope: (avmplus::ScopeTypeChain*)($e._declaringScopeOrTraits)
+		) ),
+		#if ($e._activationScopeOrTraits & 1) 
+		( #(
+			activationTraits: (avmplus::Traits*)($e._activationScopeOrTraits & ~1) 
+		) )
+		#else 
+		( #(
+			activationScope: (avmplus::ScopeTypeChain*)($e._activationScopeOrTraits)
+		) )
+	) )
+}
+
+avmplus::ScopeTypeChain {
+	preview( 
+		#if( &$e == 0) ( "NULL" )
+		#else (
+			#(
+				"ScopeTypeChain[",
+				[$e.fullsize,d],
+				"],",
+				$e._traits
+			 )
+		)
+	)
+	children( #( 
+		[raw]		    : [$e,!],
+		scopes          : #array ( expr: $e._scopes[$i], size: $e.fullsize )
+	) )
+}
+
+avmplus::List<*>{
+	preview(
+		#if( &$e == 0) ( "NULL" )
+		#else (
+			#(
+				"List[", [$e.len,d], "]"
+			)
+		)
+	)
+	children
+	(
+		#array
+		(
+			expr : $e.data[$i],
+			size : $e.len
+		)
+	)
+}
+
+avmplus::Namespace {
+	preview(
+		#if( &$e == 0) ( "NULL" )
+		#else (
+			#(
+				#(
+					#switch ($e.m_uri & 7)
+						#case 0 ( "public" )
+						#case 1 ( "protected" )
+						#case 2 ( "internal" )
+						#case 3 ( "private" )
+						#case 4 ( "explicit" )
+						#case 5 ( "staticprotected" )
+						#case 6 ( "unknown 6" )
+						#case 7 ( "unknown 7" )
+				),
+				" Namespace ",
+				; not null or undefined
+				#if ($e.m_prefix > 0x07)
+				( #(
+					#( (avmplus::String*) ($e.m_prefix & ~7) ),
+					";",
+					#( (avmplus::String*) ($e.m_uri & ~7) )
+				) )
+				#else
+				(
+					#( (avmplus::String*) ($e.m_uri & ~7) )
+				)
+			)
+		)
+	)
+}

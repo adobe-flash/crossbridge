@@ -1,0 +1,52 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+    EXPORT _setjmp3
+    EXPORT longjmp_arm
+    AREA longjump_funcs, CODE, READONLY
+    THUMB
+    ; typedef struct _JUMP_BUFFER {
+    ;    unsigned long Frame;
+    ;
+    ;    unsigned long R4;
+    ;    unsigned long R5;
+    ;    unsigned long R6;
+    ;    unsigned long R7;
+    ;    unsigned long R8;
+    ;    unsigned long R9;
+    ;    unsigned long R10;
+    ;    unsigned long R11;
+    ;
+    ;    unsigned long Sp;
+    ;    unsigned long Pc;
+    ;    unsigned long Fpscr;
+    ;    unsigned long long D[8]; // D8-D15 VFP/NEON regs
+    ; } _JUMP_BUFFER;
+
+; int _setjmp3(jmp_buf buf, int arg, ...)
+_setjmp3
+    STR        R1, [R0]       ; buf.Frame = arg ? That's what x64 version does. It's always 0.
+    ADD        R0, #4
+    STMIA      R0!, {R4,R5,R6,R7,R8,R9,R10,R11} ; buf.{R4-R11}
+    MOV        R2, SP         ; SP
+    STMIA      R0!, {R2,R14}  ; SP and LP
+    VMRS       R2, FPSCR
+    STR        R2, [R0]       ; buf.Fpscr
+    ADD        R0, #4
+    VSTMIA     R0!, {D8,D9,D10,D11,D12,D13,D14,D15}
+    MOV        R0, #0         ; return 0
+    BX         LR
+    ; void longjmp_arm(jmp_buf buf, int arg)
+longjmp_arm
+    ADD        R0, #4  ; skip the first word (buf.Frame)
+    LDMIA      R0!, {R4,R5,R6,R7,R8,R9,R10,R11} ; buf.{R4-R11}
+    LDMIA      R0!, {R2,R14} ; load SP into R2, LP is loaded directly
+    MOV        SP, R2        ; set SP
+    LDR        R2, [R0]      ; load FPSCR
+    VMSR       FPSCR, R2
+    ADD        R0, #4
+    VLDMIA     R0!, {D8,D9,D10,D11,D12,D13,D14,D15}
+    MOV        R0, R1        ; setup the value to be returned from setjmp
+    BX         LR
+    END

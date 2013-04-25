@@ -1,0 +1,77 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+/*
+ *  Tests arithmetic with the constant pools.
+ */
+ 
+ 
+function doTest():*
+{
+    debugfile "arithmetic.abs"
+	debugline 55
+
+	getlocal0
+	pushscope
+
+	findpropstrict START
+	pushstring "Arithmetic using the int and uint pools"
+	callproperty START 1
+
+	pushstring "byte 9 + short 938="
+    pushbyte 9
+	pushshort 938
+	add
+	dup
+	setlocal2
+	//  String + int
+	add
+	setlocal3
+
+	findpropstrict COMPARE_STRICTEQ
+	pushstring "byte 9 + short 938"
+	pushshort 947
+	getlocal2
+	callproperty COMPARE_STRICTEQ 3
+
+	findpropstrict COMPARE_STRICTEQ
+	pushstring "add string and previous result"
+	pushstring "byte 9 + short 938=947"
+	getlocal3
+
+	findpropstrict COMPARE_STRICTEQ
+	pushstring "int 3652147 + uint 0x80000000"
+	pushint 3652147
+	pushuint 0x80000000
+	add
+	pushuint 2151135795
+	callproperty COMPARE_STRICTEQ 3
+
+	findpropstrict COMPARE_STRICTEQ
+	pushstring "9.391 / 3.2"
+	pushdouble 9.391
+	pushdouble 3.2
+	divide
+	pushdouble 2.9346875
+	callproperty COMPARE_STRICTEQ 3
+
+	findpropstrict END
+	callproperty END 0
+
+	returnvoid
+}
+ 
+function main()
+{
+    debugfile "arithmetic.abs"
+	debugline 44
+    getlocal0
+	pushscope
+    newfunction doTest
+	getlocal0
+	call 0
+	returnvoid
+}
+
+script_info{init: main}

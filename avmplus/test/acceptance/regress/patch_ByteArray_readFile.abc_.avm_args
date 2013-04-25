@@ -1,0 +1,5 @@
+# patch_ByteArray_readFile.abc_ hacks the ByteArray prototype to add the now-removed method "readFile",
+# used by a few fuzzed files we'd rather not have to re-create. This file just calls "printpassed"
+# after we execute patch_ByteArray_readFile.abc_, to pacify the testing machinery. 
+# See https://bugzilla.mozilla.org/show_bug.cgi?id=564248 for more info.
+$DIR/printpassed.abc_

@@ -1,0 +1,28 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+function main()
+{
+    getlocal0
+	pushscope
+
+    pushbyte 0
+	setlocal1
+
+loop:
+	findproperty print
+	getlocal1
+	callpropvoid print(1)
+	//callproperty print(1)
+	//pop //  lose the print return
+	//pushbyte 1
+	inclocal_i 1
+	getlocal1
+	//dup
+	//coerce int
+	//setlocal1
+	pushbyte 10
+	ifngt loop
+
+	returnvoid
+}

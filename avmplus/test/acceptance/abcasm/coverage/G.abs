@@ -1,0 +1,212 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+	
+
+
+method_info { name: getsuper_test }
+method_body_info {
+	method: getsuper_test
+	exception: {
+		exception { from: beginTry to: endTry target:catchNoProp }
+	}
+	code:
+	{
+		getlocal0
+		pushscope
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "getsuper"
+		pushundefined // expected
+
+		findproperty Array
+		constructprop Array 0
+
+	beginTry:
+		getsuper length
+		pop
+	endTry:
+		pushstring "getsuper length"
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+		returnvoid
+	//  TODO: bad testcase?
+	catchNoProp:
+		getlocal0
+		pushscope
+		pushstring "getsuper FIXME FAIL "
+		swap
+		add
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+		returnvoid
+	}
+}
+	
+function runTest()
+{
+	getlocal0
+	pushscope 
+
+	getglobalscope
+	pushint 77
+	setproperty globalSlot1
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "getproperty Array[] length"
+	pushint 0 // expected
+	findpropstrict Array
+	constructprop Array 0
+	getproperty length
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "getproperty Array(77) length"
+	pushint 77 // expected
+	findpropstrict Array
+	pushint 77
+	constructprop Array 1
+	getproperty length
+	callpropvoid COMPARE_STRICTEQ 3
+
+	pushint 392
+	setlocal 3
+	pushdouble 2.
+	setlocal 20
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "getlocal3"
+	pushint 392 // expected
+	getlocal3
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "getlocal 20"
+	pushdouble 2. // expected
+	getlocal 20
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "getproperty"
+	pushint 0 // expected
+	findproperty Array
+	constructprop Array 0
+	dup
+	setlocal 4
+	getproperty length
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "getproperty - NoSuchProperty"
+	pushundefined // expected
+	getglobalscope
+	getproperty NoSuchProperty
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "getscopeobject 1"
+	pushint 0 // expected
+	getlocal 4
+	pushscope
+	getscopeobject 1
+	getproperty length 
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "getscopeobject 0"
+	pushint 77 // expected
+	getscopeobject 0
+	getproperty globalSlot1
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "getslot"
+	pushint 77 // expected
+	getglobalscope
+	getslot 1
+	callpropvoid COMPARE_STRICTEQ 3
+
+	newfunction getsuper_test
+	getlocal 0
+	call 0
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "greaterequals"
+	pushtrue // expected
+	pushint 7
+	pushint 7
+	greaterequals
+	callpropvoid COMPARE_STRICTEQ 3
+
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "greaterequals"
+	pushtrue // expected
+	pushint 77
+	pushint 7
+	greaterequals
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "greaterequals"
+	pushfalse // expected
+	pushint 7
+	pushint 77
+	greaterequals
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "greaterthan"
+	pushfalse // expected
+	pushint 7
+	pushint 7
+	greaterthan
+	callpropvoid COMPARE_STRICTEQ 3
+
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "greaterthan"
+	pushtrue // expected
+	pushint 77
+	pushint 7
+	greaterthan
+	callpropvoid COMPARE_STRICTEQ 3
+
+	findproperty COMPARE_STRICTEQ
+	pushstring "greaterthan"
+	pushfalse // expected
+	pushint 7
+	pushint 77
+	greaterthan
+	callpropvoid COMPARE_STRICTEQ 3
+
+
+	returnvoid
+}
+
+
+
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "Instructions that start with the letter G" 
+	callpropvoid START 1
+	newfunction runTest
+	getlocal0
+	call 0
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+
+script_info {
+	init: main
+	traits: {
+		trait { kind: Trait_Slot  name: globalSlot1 }
+	}
+}

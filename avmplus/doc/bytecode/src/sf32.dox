@@ -1,0 +1,52 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page sf32 
+
+\addindex sf32
+
+
+\section sf32 sf32
+
+\subsection operation Operation
+
+Store a 32 bit float to global memory
+
+\subsection format Format
+
+\code
+sf32
+\endcode
+
+\subsection forms Forms
+\code
+sf32 = 61 (0x3D)
+\endcode
+\subsection stack Stack
+
+\code
+..., value, address => ...
+\endcode
+
+\subsection description Description
+
+Store a 32 bit (IEEE 754) float to global memory.
+
+The input value is converted to Number using the equivalent of
+convert_d, truncated to 32-bit float, then stored as four bytes
+in little-endian order.
+
+The MOPS opcodes all access the backing store of the ByteArray represented by the
+current app domain's ApplicationDomain.domainMemory property. Address ranges for
+accesses will be range checked using standard comparisons.
+
+\subsection rt_execeptions Runtime exceptions
+
+Range check failures will result in an InvalidRangeError exception.
+
+\subsection notes Notes
+
+None.
+
+*/
+

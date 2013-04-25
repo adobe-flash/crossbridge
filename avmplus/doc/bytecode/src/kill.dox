@@ -1,0 +1,50 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page kill 
+
+\addindex kill
+
+
+\section kill kill
+
+\subsection operation Operation
+
+Kills a local register.
+
+\subsection format Format
+
+\code
+kill
+index
+\endcode
+
+\subsection forms Forms
+\code
+kill = 8 (0x08)
+\endcode
+\subsection stack Stack
+
+\code
+... => ...
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index of a local register. The local register at index 
+is killed. It is killed by setting its value to undefined.
+
+\subsection rt_execeptions Runtime exceptions
+
+This is usually used so that different jumps to the same location will have the same 
+types in the local registers. The verifier ensures that all paths to a location have 
+compatible values in the local registers, if not a VerifyError occurs. This can be 
+used to kill temporary values that were stored in local registers before a jump so 
+that no VerifyError occurs.
+
+\subsection notes Notes
+
+None.
+
+*/
+

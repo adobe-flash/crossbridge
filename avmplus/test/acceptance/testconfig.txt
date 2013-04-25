@@ -1,0 +1,376 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+########################################################################################################################
+# DOCUMENTATION:
+#   acceptance/testconfig.txt controls when test files and test cases are
+#   marked as expected failure and skip for a specific configuration.
+#
+#   testconfig.txt should only be used for permanent entries not due to bugs.
+#   failconfig.txt should be used for all bugs.
+#
+#   the format for non-comment lines in this file is comma separated:
+#   test, include config, exclude config, command, comments
+#
+# field descriptions:   
+#
+# test: a regular expression consisting of path to file relative from test/acceptance
+#   The format is "filename:testcase name" where the : and testcase name are optional.
+#   If a testcase name is not specified, then the command will apply to the entire test.
+#
+# include config & exclude config both are regexp to match the configuration
+#   string with the format {CPU_ARCH}-{OS}-{VM}-{VERSION}-{VMSWITCH}
+#
+# all configs that match the include config and do not match the exclude 
+#   config will apply to the command.
+#
+# commands are one of:
+#   expectedfail - expects the test or testcase(s) to fail
+#
+#   The following commands only operate at a testfile level and not individual tests:
+#
+#   exclude - Do not compile and do not execute
+#   ats_skip - don't generate an ATS swf as these files are not ATS compatible
+#   deep - test should only run in deep phase for specified configs
+#   skip - the test is not run, for example the configuration does not support
+#          a feature or the file is not a test and is a helper file to another test
+#   verify_skip - skip test when doing a verify run
+#
+# comments: please include bug reference and reason for the entry
+#
+########################################################################################################################
+
+# Some operating systems do not adjust past dates for historical DST settings
+regress/bug_606478:.*(19\d\d|200[0-6]).*, (arm-lnx|mips-lnx|win), diff, expectedfail, Operating system does not adjust past dates for historical DST settings
+# These fail when run on panda boards. Turning them off for all android to avoid unexpected passes when run againnst actual phone devices.
+regress/bug_606478:.*(19\d\d|200[0-6]).*, (arm-android-ssh-), diff, skip, Skip on android because panda boards do not adjust past dates for historical DST settings
+
+####################
+# abcasm:
+####################
+abcasm/adhoc , .* ,, skip, inconsistencies in different debug output, need to implement regex matching of diffs
+abcasm/abs_helper , .* ,, skip, abcasm helper, not a test
+# Test uses abcasm to check a boundary condition, failure is correct result
+abcasm/traitsSparseSlots , .* ,, expectedfail , Error 1107 is correct output
+# Test uses abcasm to check a boundary condition, failure is correct result
+abcasm/semanticErrorDuplicateSlotName , .* ,, expectedfail , Error 1107 is correct output
+# Test uses abcasm to check a boundary condition, failure is correct result
+abcasm/funcRedef , .* ,, expectedfail , Error 1107 is correct output
+# TODO: bug number?
+abcasm/stringEscapes , .* ,, skip, Test not ready for prime-time
+# Test is supposed to throw a verifyerror
+abcasm/bug_481171, verifyall,, skip, Intended behaviour is to throw a verifyerror.
+abcasm/nullCheck/CallStatic , verifyall ,, expectedfail, \
+    Expected failure in -Dverifyall, see https://bugzilla.mozilla.org/show_bug.cgi?id=491356
+abcasm/bug_678952 , (interp|wordcode) , , skip , this test is only consistent in jit mode and was written that way, avm_args contains -Ojit
+abcasm/bug_612641 , (interp|wordcode) , , skip , this test needs to run the jit so skip when running interp, avm_args contains -Djitordie
+abcasm/coverage/C , wordcode , , skip , 10-10-2011 - test is failing across five platforms in deep see https://bugzilla.mozilla.org/show_bug.cgi?id=690779
+
+####################
+# Differential testing (avmdiff.py)
+####################
+# sampling only works on debugger for avmdiff skip
+as3/sampling/.*  , .*diff ,, skip , skip since output differs debugger vs nondebugger
+
+# mmgc tests fail on avmdiff due to outputing time
+mmgc/.* , .*diff ,, skip , skip since memtests have time output
+
+# trim down tests to save time
+ecma3/Unicode/.*, .*diff,, skip , trim down tests
+ecma3/Date/.*, .*diff,, skip, trim down tests
+abcasm/.*, .*diff,, skip, trim down tests
+# avmdiff does not handle .exitcode
+ecma3/Exceptions/exception_011_rt , .*diff,, expectedfail, known issue: avmdiff does not handle .exitcode
+regress/bug_515935, .*diff,, skip, known issue: avmdiff does not handle .exitcode
+regress/bug_555097.*, .*diff,, skip, known issue: avmdiff does not handle .exitcode
+regress/bug_551587_2.*, .*diff,, skip, test runs different testcases based on run mode
+
+# specific skips when running differential testing between 32bit and 64bit shells
+as3/Array/regress_524122 , .*3264-diff,, skip , swf 9/10 32bit and 64bit shells return different results, so can not run diff
+as3/ByteArray/ByteArray_bug662851 , .*3264-diff,, skip , testcase runs different testcases for 32 and 64bit
+
+# Different error codes based on runmode for swf9/10, this test has been superseded by vectorIndexRangeExceptions.as
+as3/Vector/nonindexproperty, .*diff, , skip, https://bugzilla.mozilla.org/show_bug.cgi?id=456852
+
+
+####################
+# Windows Mobile
+####################
+mops/mops, arm-winmobile,, skip, multiple abc files not supported on winmo devices
+abcasm/.*, arm-winmobile,, skip, multiple abc files not supported on winmo devices
+versioning/.*, arm-winmobile,, skip, passing args to abc does not work with winmo tools that we use
+
+####################
+# ARM
+####################
+ecma3/Unicode/u5000_CJKUnifiedIdeographs , (arm|mips|sh4),, deep , test runs too slowly
+ecma3/Unicode/u6000_CJKUnifiedIdeographs , (arm|mips|sh4),, deep , test runs too slowly
+ecma3/Unicode/u7000_CJKUnifiedIdeographs , (arm|mips|sh4),, deep , test runs too slowly
+ecma3/Unicode/u8000_CJKUnifiedIdeographs , (arm|mips|sh4),, deep , test runs too slowly
+ecma3/Unicode/u9000_CJKUnifiedIdeographs , (arm|mips|sh4),, deep , test runs too slowly
+ecma3/Unicode/uE000_PrivateUseArea , (arm|mips|sh4),, deep , test runs too slowly
+ecma3/Unicode/u3400_CJKUnifiedIdeographsExtensionA , (arm|mips|sh4),, deep , test runs too slowly
+ecma3/Unicode/uAC00_HangulSyllables , (arm|mips|sh4),, deep , test runs too slowly
+ecma3/Unicode/uA000_YiSyllables, (arm|mips|sh4),, deep, tests run too slowly on winmo
+mops/mops , (arm|mips|sh4),, deep, test runs too slowly
+
+####################
+# Windows Mobile Emulator
+####################
+# emulator is not using DST by default
+ecma3/Date/e15_9_5_14, arm-winmobile-emulator,, skip, emulator DST problem
+ecma3/Date/e15_9_5_34_1, arm-winmobile-emulator,, skip, emulator DST problem
+ecma3/Date/e15_9_5_35_1, arm-winmobile-emulator,, skip, emulator DST problem
+ecma3/Date/e15_9_5_10, arm-winmobile-emulator,, skip, tests run too slowly on winmo
+
+####################
+# SH4
+####################
+abcasm/syntaxErrors , sh4.*,, skip, sh4 box lacks java
+versioning/bugcompat , sh4.*,, skip, sh4 box lacks java
+as3/Expressions/indexProperties , sh4.*,, skip , \
+    This testcase causes the SH4 box to run out of memory when running inside buildbot  
+
+####################
+# Performance-acceptance testing: tests that must run on a performance machine 
+####################
+misc/performance_placeholder, .*,, performance, \
+    This test is used to make sure that only performance tests are run when -performance is set in the config.
+
+as3/Definitions/Function/RestOptimization,  .* ,  (interp|wordcode|(debugger-(?!.*Dnodebugger))) , \
+    performance, Optimization not enabled unless running JIT without a debugger
+as3/Definitions/Function/ArgumentsOptimization,  .* ,  (interp|wordcode|(debugger-(?!.*Dnodebugger))) , \
+    performance, Optimization not enabled unless running JIT without a debugger
+
+####################
+# run slow tests in deep test phase
+####################
+ecma3/Unicode/u3400_CJKUnifiedIdeographsExtensionA,((sparc-sol|x64-win|ppc-mac|ppc64-mac)-asc[0-9]+-debug(|debugger).*),, deep, bug 499685 skip slow tests
+ecma3/Unicode/u5000_CJKUnifiedIdeographs,((sparc-sol|x64-win|ppc-mac|ppc64-mac)-asc[0-9]+-debug(|debugger).*),, deep, bug 499685 skip slow tests
+ecma3/Unicode/u6000_CJKUnifiedIdeographs,((sparc-sol|x64-win|ppc-mac|ppc64-mac)-asc[0-9]+-debug(|debugger).*),, deep, bug 499685 skip slow tests
+ecma3/Unicode/u7000_CJKUnifiedIdeographs,((sparc-sol|x64-win|ppc-mac|ppc64-mac)-asc[0-9]+-debug(|debugger).*),, deep, bug 499685 skip slow tests
+ecma3/Unicode/u9000_CJKUnifiedIdeographs,((sparc-sol|x64-win|ppc-mac|ppc64-mac)-asc[0-9]+-debug(|debugger).*),, deep, bug 499685 skip slow tests
+ecma3/Unicode/uE000_PrivateUseArea, ((sparc-sol|x64-win|ppc-mac|ppc64-mac)-asc[0-9]+-debug(|debugger).*),, deep, bug 499685 skip slow tests
+ecma3/Unicode/uAC00_HangulSyllables, ((sparc-sol|x64-win|x64-lnx|ppc-mac|ppc64-mac)-asc[0-9]+-debug(|debugger).*),, deep, bug 499685 skip slow tests
+mops/mops, ((sparc-sol|x64-win|ppc-mac|ppc64-mac)-asc[0-9]+-debug(|debugger).*),, deep, bug 499685 skip slow tests
+regress/bug_483783, .*,, deep, skip slow tests - https://bugzilla.mozilla.org/show_bug.cgi?id=483783
+mmgc/pauseForGCIfCollectionImminent, mips-.*,, deep,  bug 499685 skip slow tests
+misc/catchableTimeout, .*,, deep, skip slow tests
+misc/doubleTimeout, .*,, deep, skip slow tests
+spidermonkey/js1_5/Array/regress-157652, .*,, deep, skip slow tests
+spidermonkey/js1_5/Regress/regress-203278-1, .*,, deep, skip slow tests
+spidermonkey/js1_5/Regress/regress-360969-0(5|6), .*,, deep, skip slow tests
+spidermonkey/js1_5/Regress/regress-80981, .*,, deep, skip slow tests
+spidermonkey/js1_5/Regress/regress-96128-n, .*,, deep, skip slow tests
+spidermonkey/js1_6/extensions/regress-456826, .*,, deep, skip slow tests
+
+# Do not run test on windows mobile due to bug 570848. Once this bug
+# is fixed will also need to find a way to not run on testcase with
+# wordcode shell, which currently only runs on winmo in the deep
+# phase, all other platforms run it in the first phase
+# Update: Do not run test on arm-linx due to bug 604547
+misc/testJitordieSwitch, .*, arm-(winmobile|lnx), deep, include slow tests in deep phase
+misc/testJitordieSwitch, arm-(winmobile|lnx), , skip, include slow tests in deep phase
+
+# skip slow tests when running in -Dgreedy mode
+e4x/Global/e13_1_2_1, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Date/e15_9_5_10, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Date/e15_9_5_10_11, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Date/e15_9_5_12_1, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Date/e15_9_5_12_4, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Date/e15_9_5_14, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Date/e15_9_5_16, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Date/e15_9_5_18, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Date/e15_9_5_20, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Date/e15_9_5_22_1, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Date/e15_9_5_22_2, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Expressions/e11_10_2, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Expressions/e11_10_3, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Expressions/e11_7_1, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Expressions/e11_7_2, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Expressions/e11_7_3, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Function/apply_001, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/RegExp/multibyte_regress, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Unicode/uA000_YiSyllables, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+mmgc/memlimit, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+mmgc/outofmemory, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+mmgc/pauseForGCIfCollectionImminent, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+spidermonkey/js1_5/Regress/regress-155081-2, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+spidermonkey/js1_5/Regress/regress-155081, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+spidermonkey/js1_5/Regress/regress-244470, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+spidermonkey/js1_5/Regress/regress-256501, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+spidermonkey/js1_5/Regress/regress-280769-2, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+spidermonkey/js1_5/Regress/regress-280769-3, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+spidermonkey/js1_5/Regress/regress-366122, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907)
+ecma3/Unicode/u3400_CJKUnifiedIdeographsExtensionA, Dgreedy,, skip, skip slow test in -Dgreedy mode
+ecma3/Unicode/u5000_CJKUnifiedIdeographs, Dgreedy,, skip, skip slow test in -Dgreedy mode
+ecma3/Unicode/u6000_CJKUnifiedIdeographs, Dgreedy,, skip, skip slow test in -Dgreedy mode
+ecma3/Unicode/u7000_CJKUnifiedIdeographs, Dgreedy,, skip, skip slow test in -Dgreedy mode
+ecma3/Unicode/u8000_CJKUnifiedIdeographs, Dgreedy,, skip, skip slow test in -Dgreedy mode (bugzilla 707907 and 512738)
+ecma3/Unicode/u9000_CJKUnifiedIdeographs, Dgreedy,, skip, skip slow test in -Dgreedy mode
+ecma3/Unicode/uE000_PrivateUseArea, Dgreedy,, skip, skip slow test in -Dgreedy mode
+ecma3/Unicode/uAC00_HangulSyllables, Dgreedy,, skip, skip slow test in -Dgreedy mode
+mops/mops, Dgreedy,, skip, skip slow test in -Dgreedy mode
+
+
+####################
+# verifier
+####################
+regress/bug_555705, -Dverifyall,, skip, test throws an expected verifyerror that is normally caught by the test itself
+regress/bug_498979, -Dverifyall,, skip, test contains OP_callstatic instruction which can't be verified in -Dverifyall mode
+regress/bug_618215, -Dverifyall,, skip, test contains OP_callstatic instruction which can't be verified in -Dverifyall mode
+
+####################
+# ATS
+####################
+util/shell_ats, .*,, skip, shell file for ats media creation
+
+# Skipped tests - These tests will not be exported when generating ATS swfs
+misc/isGlobalObject, .*,, ats_skip, uses avmplus.System.isGlobal
+misc/doubleTimeout, .*,, ats_skip, test purposefully times out the player
+misc/invalid_opcodes, .*,, ats_skip, test purposefully throws a VerifyError
+misc/testJitordieSwitch, .*,, ats_skip, tests -Djitordie switch in vm shell
+regress/vector_domain_bug, .*,, ats_skip, uses avmplus::Domain
+regress/bug_515935, .*,, ats_skip, test purposefully causes player OOM
+regress/security/bug_441280, .*,, ats_skip, uses avmplus::Domain
+as3/ShellClasses/.*, .*,, ats_skip, Tests avmplus ShellClasses
+as3/sampling/.*, .*,, ats_skip, sampling tests
+ecma3/Exceptions/exception_011_rt, .*,, ats_skip, test purposefully throws an uncaught error
+mmgc/.*, .*,, ats_skip, mmgc tests
+abcasm/.*, .*,, ats_skip, abcasm tests
+mops/.*, .*,, ats_skip, mops test - we don't have source to generate swf
+regress/vector_domain_bug, .*,, ats_skip, uses avmplus.Domain
+as3/RuntimeErrors/Error1034TypeCoercionFailed, .*,, ats_skip, -AS3 switch breaks test
+ecma3/Exceptions/exception_011_rt, .*,, ats_skip, test throws an undefined which is not catchable
+ecma3/Unicode/u3400_CJKUnifiedIdeographsExtensionA,.*,, ats_skip, bug 499685 skip slow tests
+ecma3/Unicode/u5000_CJKUnifiedIdeographs,.*,, ats_skip, bug 499685 skip slow tests
+ecma3/Unicode/u6000_CJKUnifiedIdeographs,.*,, ats_skip, bug 499685 skip slow tests
+ecma3/Unicode/u7000_CJKUnifiedIdeographs,.*,, ats_skip, bug 499685 skip slow tests
+ecma3/Unicode/u9000_CJKUnifiedIdeographs,.*,, ats_skip, bug 499685 skip slow tests
+ecma3/Unicode/uE000_PrivateUseArea, .*,, ats_skip, bug 499685 skip slow tests
+ecma3/Unicode/uAC00_HangulSyllables, .*,, ats_skip, bug 499685 skip slow tests
+
+####################
+#  --verify skips
+####################
+abcasm/.*, .*,, verify_skip, abcasm tests not compatible with --verify
+
+####################
+#  --verifyonly skips : tests that intentionally fail will "pass" in -Dverifyonly runs
+####################
+abcasm/bug_554915a, .*-Dverifyonly.*,, skip, -Dtimeout test will not timeout when only being verified
+ecma3/Exceptions/exception_011_rt, .*-Dverifyonly.*,, skip, Test expects exitcode=1: exits with uncaught exception
+regress/bug_515935, .*-Dverifyonly.*,, skip, out of memory test
+regress/bug_555542, .*-Dverifyonly.*,, skip, uncaught ReferenceError test
+regress/bug_555705, .*-Dverifyonly.*,, skip, test intentionally throws a verifyerror
+abcasm/bug_655118, .*-Dverifyonly.*,, skip, uncaught ReferenceError test
+
+####################
+# AOT specific
+####################
+abcasm/bug_481171,              AOT ,, skip, unlabled backwards branches aren't errors with the GO
+abcasm/bug_554915a,             AOT ,, skip, AOT'ed apps don't support script timeout
+abcasm/bug_554915b,             AOT ,, skip, AOT'ed apps don't support script timeout
+abcasm/bug_555006a,             AOT ,, skip, AOT catches Verify errors at compile time 
+abcasm/bug_612641,              AOT ,, skip, AOT does not support -Djitordie switch
+abcasm/bug_678952,              AOT ,, skip, AOT does not support versioning yet
+as3/Array/regress_524122,       AOT ,, skip, AOT does not support versioning yet
+as3/ByteArray/ByteArray_bug763519, AOT,, skip, test allocates too much memory and gets a kill -9  from the OS
+as3/ByteArray/ByteArrayLzmaThirdParty, AOT,, skip, test attempts to load a lzma compressed file which can't be done on iOS
+as3/Definitions/FunctionAccessors/InfRec,   AOT ,, skip, AOT'ed apps don't support script timeout
+as3/GlobalObject/parseFloat_513018, AOT ,, skip, AOT does not support versioning yet
+as3/RuntimeErrors/Error1115NotAConstructor, AOT ,, skip, AOT does not support versioning yet
+as3/sampling/.*,                AOT ,, skip, AOT does not yet support profiling
+as3/ShellClasses/Domain,        AOT ,, skip, AOT does not support loadBytes()
+as3/String/localeCompare_585791, AOT ,, skip, AOT does not support versioning yet
+as3/Types/Number/e15_7_4_6_1,   AOT ,, skip, AOT does not support versioning yet
+as3/Types/Number/visibility,    AOT ,, skip, AOT does not support versioning yet
+as3/Vector/bug504525/bug504525, AOT ,, skip, AOT does not support versioning yet
+as3/Vector/nonindexproperty,    AOT ,, skip, AOT does not support versioning yet
+as3/Vector/vectorIndexRangeExceptions, AOT ,, skip, AOT does not support versioning yet
+as3/Workers/.*,                 AOT ,, skip, workers feature not yet supported on iOS
+e4x/XML/e13_4_4_29,             AOT ,, skip, AOT does not support versioning yet
+e4x/XML/e13_4_4_3,              AOT ,, skip, AOT does not support versioning yet
+e4x/XML/e13_4_4_32,             AOT ,, skip, AOT does not support versioning yet
+ecma3/JSON/versioned,           AOT ,, skip, AOT does not support versioning yet
+misc/bug_526662,                AOT ,, skip, AOT does not support versioning yet
+misc/invalid_opcodes,           AOT ,, skip, Handled by the GO
+mops/mops,                      AOT ,, skip, precompilation of AOT application currently doesn't handle precompiled abcs
+regress/bug_498979,             AOT ,, skip, AOT catches Verify errors at compile time 
+regress/bug_520888,             AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_548684,             AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_551587_2,           AOT ,, skip, AOT does not support versioning yet
+regress/bug_555045,             AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_555048,             AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_555053,             AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_555097a,            AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_555097b,            AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_555097c,            AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_555102,             AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_555542,             AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_555568,             AOT ,, skip, Needs additional abc files at compile time
+regress/bug_555612,             AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_555614,             AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_555705,             AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_558442a,            AOT ,, skip, negative test that expects a verify error http://watsonexp.corp.adobe.com/#bug=3156646
+regress/bug_558442b,            AOT ,, skip, AOT catches Verify errors at compile time
+regress/bug_558863,             AOT ,, skip, AOT does not support versioning yet
+regress/bug_609416,             AOT ,, skip, AOT does not support versioning yet
+regress/bug_618215, AOT,, skip, test attempts to load loads a fuzzed binary .abc using Domain.load which can't be done on iOS
+regress/bug_654807,             AOT ,, skip, AOT does not support versioning yet
+regress/patch_ByteArray_readFile, AOT ,, skip, used by bug_555568
+regress/printpassed,            AOT ,, skip, used by bug_555568
+regress/security/bug_441280,    AOT ,, skip, AOT catches Verify errors at compile time
+regress/security/bug_555059a,   AOT ,, skip, AOT catches Verify errors at compile time
+regress/security/bug_555059b,   AOT ,, skip, AOT catches Verify errors at compile time
+regress/security/bug_556543,    AOT ,, skip, AOT catches Verify errors at compile time
+regress/security/bug_689243b,   AOT ,, skip, jit only testcase
+regress/security/bug567284,     AOT ,, skip, attempts to load additional abc file at runtime
+regress/security/bug636565,     AOT ,, skip, attempts to load additional abc file at runtime
+regress/vector_domain_bug,      AOT ,, skip, AOT does not support loadBytes()
+versioning/.*,                  AOT ,, skip, AOT does not support versioning yet
+
+
+###########
+# MMgc
+###########
+mmgc/outofmemory , (.*-Dgcthreshold|.*-Dverifyonly) ,, skip , Threshold test takes too long to run out of mem
+mmgc/pauseForGCIfCollectionImminent, arm-.*-debug,, skip, Test takes too long to run on debug android shell
+as3/ByteArray/ByteArray_bug662851 , (AOT|x86-mac-asc[0-9]+-releasedebugger-air),, skip , system malloc on mac32 produces stderr for this testcase which trips up the testing framework
+mmgc/outofmemory, .*, , verify_skip, Test takes too long to run when attempting to run with --verify
+
+###########
+# Running -ES compiled tests
+###########
+e4x/XML/setNotification , .*-ES , , skip, Testcase does not work with -ES
+
+####################
+# Float/Float4
+####################
+as3/Types/Float/.* , .* ,  .*float.* , exclude , Only valid when float is enabled.
+as3/Types/Float4/.* , .* , .*float.* , exclude , Only valid when float is enabled.
+abcasm/coverage/float/.* , .* , .*float.* , exclude , Only valid when float is enabled.
+abcasm/float/.* , .* , .*float.* , exclude , Only valid when float is enabled.
+as3/asc/.* , .* , .*float.* , exclude , Only valid when float is enabled.
+as3/AMF/AMFSerializer_float , .* , .*float.* , exclude , Only valid when float is enabled.
+
+####################
+# Valgrind
+####################
+ecma3/Unicode/uAC00_HangulSyllables , .*valgrind , , skip , This test takes over 10 minutes to run in valgrind
+
+###########
+# Helper files
+###########
+as3/asc/import-with-float4-helper , .* , , skip , Not a test on its own
+generated/.* , .* , , skip , Not a test on its own
+as3/ByteArray/ByteArrayLzmaThirdParty , arm-android,, skip, reads helper files which are not deployed on Android see https://bugzilla.mozilla.org/show_bug.cgi?id=733051
+
+
+###########
+# halfmoon
+###########
+# these should be expected failures but there's no way to specify that particular swf versions fail
+as3/Vector/nonindexproperty,                 halfmoon, , skip, halfmoon acts like interpreter instead of JIT for early swf versions
+regress/bug_551587_2,                        halfmoon, , skip, halfmoon acts like interpreter instead of JIT for early swf versions

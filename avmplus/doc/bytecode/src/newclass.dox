@@ -1,0 +1,53 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page newclass 
+
+\addindex newclass
+
+
+\section newclass newclass
+
+\subsection operation Operation
+
+Create a new class.
+
+\subsection format Format
+
+\code
+newclass
+\endcode
+
+\subsection forms Forms
+\code
+newclass = 88 (0x58)
+\endcode
+\subsection stack Stack
+
+\code
+..., basetype => ..., newclass
+\endcode
+
+\subsection description Description
+
+index is a u30 that is an index of the ClassInfo that is to be created. basetype 
+must be the base class of the class being created, or null if there is no base class.
+
+The class that is represented by the ClassInfo at position index of the ClassInfo 
+entries is created with the given basetype as the base class. This will run the 
+static initializer function for the class. The new class object, newclass, will 
+be pushed onto the stack.
+
+When this instruction is executed, the scope stack must contain all the scopes 
+of all base classes, as the scope stack is saved by the created ClassClosure.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

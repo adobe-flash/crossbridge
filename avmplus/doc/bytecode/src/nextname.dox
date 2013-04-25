@@ -1,0 +1,45 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page nextname 
+
+\addindex nextname
+
+
+\section nextname nextname
+
+\subsection operation Operation
+
+Get the name of the next property when iterating over an object.
+
+\subsection format Format
+
+\code
+nextname
+\endcode
+
+\subsection forms Forms
+\code
+nextname = 30(0x1e)
+\endcode
+\subsection stack Stack
+
+\code
+..., obj, index => ..., name
+\endcode
+
+\subsection description Description
+
+index and obj are popped off of the stack. index must be a value of type int. 
+Gets the name of the property that is at position index + 1 on the object obj, 
+and pushes it onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+index will usually be the result of executing hasnext on obj.
+*/
+

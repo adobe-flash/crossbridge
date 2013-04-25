@@ -1,0 +1,56 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+function doTest()
+{
+    debugfile "branchToCommon.abs"
+	debugline 2
+
+	findpropstrict	START
+	pushstring	"ifeq test, jump target resolution"
+	callproperty	START 1
+
+    pushstring "x"
+	dup
+	pushbyte 12
+	ifeq poot
+
+    pop
+	pushstring "y"
+	jump poot
+
+	//  Shouldn't get here.
+	findpropstrict FAIL
+	callproperty FAIL 0
+
+
+poot:
+	setlocal1
+	findpropstrict COMPARE_STRICTEQ
+	pushstring "else branch"
+	pushstring "y"
+	getlocal1
+	callproperty COMPARE_STRICTEQ 3
+
+	returnvoid
+}
+
+/*
+ *  Tests function calling and branching in JIT'd code.
+ */
+function main()
+{
+    debugfile "branchToCommon.abs"
+	debugline 1
+    getlocal0
+	pushscope
+    newfunction doTest
+	getlocal0
+	call 0
+	returnvoid
+}
+
+script_info{init: main}

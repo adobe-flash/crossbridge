@@ -1,0 +1,65 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ 
+ /*
+    Try/catch won’t catch a verifier error b/c the Verifier runs before the ABC code executes.
+    Therefore, this test exits w/ an exitcode=1 and throws the VerifyError.
+ */
+
+function test_bug_481171()
+{
+    getlocal0
+	pushscope
+
+    pushbyte 0
+	setlocal1
+
+    try {
+        loop:
+            getlocal1
+            
+            inclocal_i 1
+            getlocal1
+            pushbyte 10
+            ifngt loop
+        
+        findproperty FAIL
+		pushstring "getproperty of null ref"
+		pushstring "VerifyError should have been thrown"
+		getlocal1
+		callpropvoid FAIL 3
+        
+        jump after_try_block
+    } catch {
+        getlocal0
+		pushscope
+
+		findproperty PASS
+		swap
+		callpropvoid PASS 1
+    }
+    
+    after_try_block:
+
+	returnvoid
+}
+
+ 
+ function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "Bug 481171 : ABC backwards branch without label crashes wordcode emitter - should throw VerifyError: PASSED!"
+	callpropvoid START 1
+
+	newfunction test_bug_481171
+	getlocal0
+	call 0
+    
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+
+script_info{init: main}

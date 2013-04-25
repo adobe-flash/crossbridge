@@ -1,0 +1,26 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function main() {
+    getlocal0
+    pushscope
+    
+loop:
+    label
+    try {
+        jump loop
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save Error
+        getlocal2
+        pushstring "Exception thrown outside try, should not have been caught FAILED!"
+    }
+    pushstring "End"
+    
+    returnvoid
+}
+
+script_info{init:main}

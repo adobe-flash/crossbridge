@@ -1,0 +1,51 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page getlex 
+
+\addindex getlex
+
+
+\section getlex getlex
+
+\subsection operation Operation
+
+Find and get a property.
+
+\subsection format Format
+
+\code
+getlex
+index
+\endcode
+
+\subsection forms Forms
+\code
+getlex = 96 (0x60)
+\endcode
+\subsection stack Stack
+
+\code
+... => ..., obj
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index into the multiname constant pool. The multiname at 
+index must not be a runtime multiname, so there are never any optional namespace or name 
+values on the stack.
+
+This is the equivalent of doing a findpropstict followed by a getproperty. It will find 
+the object on the scope stack that contains the property, and then will get the value 
+from that object. See “Resolving multinames” on page 10.
+
+\subsection rt_execeptions Runtime exceptions
+
+A ReferenceError is thrown if the property is unresolved in all of the objects on the scope stack.
+
+\subsection notes Notes
+
+None.
+
+*/
+

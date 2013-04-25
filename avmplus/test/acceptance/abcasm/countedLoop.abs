@@ -1,0 +1,47 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+function doTest()
+{
+    getlocal0
+	pushscope
+
+	findpropstrict START
+	pushstring "for local1 0..10"
+	callproperty START 1
+
+    pushbyte 0
+	setlocal1
+
+loop:
+	label
+	inclocal_i 1
+	getlocal1
+	pushbyte 10
+	ifngt loop
+
+
+	findpropstrict COMPARE_STRICTEQ
+
+    pushstring "After loop"
+	pushbyte 11
+	getlocal1
+	callproperty COMPARE_STRICTEQ 3
+
+	findpropstrict END
+	callproperty END 0
+	returnvoid
+}
+
+function main()
+{
+	newfunction doTest
+	getlocal0
+	call 0
+	returnvoid
+}
+
+script_info{init:main}

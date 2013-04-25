@@ -1,0 +1,71 @@
+#!/usr/bin/env python
+#  This Source Code Form is subject to the terms of the Mozilla Public
+#  License, v. 2.0. If a copy of the MPL was not distributed with this
+#  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+The cmdline test suite is designed as a flexible way to run automated tests against the shell and other cmdline 
+tamarin tools.
+
+Tests are written in python.  Each test specifies a list of executables with arguments to run.  Also optionally
+a list of strings may be specified for passing input to the vm.
+
+Verfification can be any one of:
+- test exit code matches
+- test stdout regexp matches against a list of strings
+- test stderr regexp matches against a list of strings
+
+All tests must match test*.py
+
+To all run tests run:
+   ./runtests.py
+
+Any specific test can be run individually as long as the __main__ is specified.
+
+Any failures in matching strings or exit code failures the output will be saved to a file with the testcase name.
+
+The testconfig.txt contains a list of known failures.  Testcases can be marked as expectfail.  The test file
+can be marked as skip and the test file will not run.
+
+
+sample usage:
+$ ./runtests.py
+compile all
+compiling testdata/exec.as
+
+exec.abc, 142 bytes written
+compiling testdata/exit.as
+
+exit.abc, 97 bytes written
+compiling testdata/readline.as
+
+readline.abc, 146 bytes written
+compiling testdata/trace1.as
+
+trace1.abc, 162 bytes written
+compiling testdata/write.as
+
+write.abc, 133 bytes written
+compiling testdata/sleep.as
+
+sleep.abc, 234 bytes written
+compiling testdata/debug.as
+
+debug.abc, 852 bytes written
+testAvmShell.run()
+shell -Dtimeout                PASSED
+testDebugger.run()
+debugger basic                 PASSED
+debugger list                  PASSED
+debugger break                 EXPECTED FAIL, see debugger break.output
+debugger stacktrace            PASSED
+debugger break2                EXPECTED FAIL, see debugger break2.output
+debugger next                  EXPECTED FAIL, see debugger next.output
+debugger locals                EXPECTED FAIL, see debugger locals.output
+debugger exception             PASSED
+debugger local exception       EXPECTED FAIL, see debugger local exception.output
+testShellSystem.run()
+ trace                         PASSED
+ write                         PASSED
+ exit                          PASSED
+ readline                      PASSED
+ exec                          PASSED

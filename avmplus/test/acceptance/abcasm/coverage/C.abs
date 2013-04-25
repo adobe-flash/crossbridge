@@ -1,0 +1,694 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function noArgs()
+{
+	returnvoid
+}
+
+function oneArg(*)
+{
+	getlocal1
+	findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+	returnvoid
+}
+
+function propertyOneImpl():int
+{
+	pushint 0x104b
+	returnvalue
+}
+
+function propertyTwoImpl():Object
+{
+	pushnull
+	returnvalue
+}
+
+method_info { name: runTest1 }
+method_body_info {
+
+	method: runTest1
+
+	exception: { 
+		exception { 
+			from: try_null_callproperty 
+			to: end_try_null_callproperty 
+			target: nullObj 
+		} 
+		exception { 
+			from: try_invalidprop_callproperty 
+			to: end_try_invalidprop_callproperty 
+			target: invalidprop_callproperty 
+		} 
+		exception { 
+			from: try_invalid_checkfilter
+			to: end_try_invalid_checkfilter
+			target: catch_invalid_checkfilter
+		}
+/*		exception { 
+			from: try_invalid_coerce_XML
+			to: end_try_invalid_coerce_XML
+			target: catch_invalid_coerce_XML
+		} 
+*/
+		exception { 
+			from: try_invalid_convert_o
+			to: end_try_invalid_convert_o
+			target: catch_invalid_convert_o
+		} 
+	}
+
+	code:
+	{
+		getlocal0
+		pushscope
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "call noArg twice"
+		newfunction noArgs
+		setlocal1
+
+		getlocal1
+		getlocal0
+		call 0
+		pop
+		getlocal1
+		getlocal0
+		call 0
+		pop
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+		pop
+
+		/*findproperty COMPARE_STRICTEQ
+	pushstring "call oneArg with string arg"*/
+		newfunction oneArg
+		setlocal 1
+		getlocal1
+		getlocal0
+		pushstring "string arg to oneArg"
+		call 1
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+		/*findproperty COMPARE_STRICTEQ
+	pushstring "call oneArg with int arg"*/
+		getlocal1
+		getlocal0
+		pushint 99
+		call 1
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+		/*findproperty COMPARE_STRICTEQ
+	pushstring "call oneArg with double arg"*/
+		getlocal1
+		getlocal0
+		pushdouble 9283.1928
+		call 1
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "setup properties"
+		findproperty propertyOne
+		newfunction propertyOneImpl
+		setproperty  propertyOne
+		findproperty propertyTwo
+		newfunction propertyTwoImpl
+		setproperty  propertyTwo
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+		pop
+
+		//  TODO: callmethod
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "callproperty"
+		pushint 0x104b // expected
+		findproperty propertyOne
+		callproperty propertyOne 0
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "callproperty extra arg"
+		pushnull // expected
+		findproperty propertyTwo
+		pushstring "Too many args"
+		callproperty propertyTwo 1
+		callpropvoid COMPARE_STRICTEQ 3
+
+	try_null_callproperty:
+		pushnull
+		callproperty propertyTwo 0
+		pop
+		pushstring "null base object: should throw exception"
+		findproperty FAIL
+	swap
+	callpropvoid FAIL 1
+	end_try_null_callproperty:
+		jump endNullTry
+
+	nullObj:
+		getlocal0
+		pushscope
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+	endNullTry:
+
+	try_invalidprop_callproperty:
+		getlocal0
+		callproperty NoSuchProperty 0
+		pop
+		pushstring "invalid property: should throw exception"
+		findproperty FAIL
+	swap
+	callpropvoid FAIL 1
+	end_try_invalidprop_callproperty:
+		jump end_invalidprop_callproperty
+
+	invalidprop_callproperty:
+		getlocal0
+		pushscope
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+	end_invalidprop_callproperty:
+
+/*
+		findproperty COMPARE_STRICTEQ
+	pushstring "callproplex"
+		pushint 0x104b // expected
+		findproperty propertyOne
+		callproplex propertyOne 0
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "callproplex extra arg"
+		pushnull // expected
+		findproperty propertyTwo
+		pushstring "Too many args"
+		callproplex propertyTwo 1
+		callpropvoid COMPARE_STRICTEQ 3
+*/
+		findproperty COMPARE_STRICTEQ
+	pushstring "callpropvoid"
+		pushint 77 // expected
+		pushint 77
+		findproperty propertyOne
+		callpropvoid propertyOne 0
+		callpropvoid COMPARE_STRICTEQ 3
+
+		/*
+		 *  TODO:
+		 *  callsuper/callsupervoid need class support
+		 */
+
+		/*findproperty COMPARE_STRICTEQ
+	pushstring "checkfilter"*/
+		findproperty XML
+		getproperty XML
+		pushstring "<foo><bar/></foo>"
+		construct 1
+		checkfilter
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+	try_invalid_checkfilter:
+		pushint 7
+		checkfilter
+		pushstring "invalid checkfilter"
+		findproperty FAIL
+	swap
+	callpropvoid FAIL 1
+		jump end_invalid_checkfilter
+	end_try_invalid_checkfilter:
+
+	catch_invalid_checkfilter:
+		getlocal0
+		pushscope
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+		pushint 7	//  appease verifier
+
+	end_invalid_checkfilter:
+		pop			//  lose appeasement
+
+
+/*
+	try_invalid_coerce_XML:
+		pushstring "<foo/>"
+		coerce XML
+		coerce_a	//  verifier appeasment
+
+	end_try_invalid_coerce_XML:
+		jump end_invalid_coerce_XML
+
+	catch_invalid_coerce_XML:
+		getlocal0
+		pushscope
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+		pushstring "verifier appeasment"
+		coerce_a
+
+	end_invalid_coerce_XML:
+		pop	//  lose appeasment
+*/
+
+		/*findproperty COMPARE_STRICTEQ
+	pushstring "convert_o int"*/
+		pushint 7
+		convert_o
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+	try_invalid_convert_o:
+		pushnull
+		convert_o
+		pop
+	end_try_invalid_convert_o:
+		pushstring "convert_o null"
+		findproperty FAIL
+	swap
+	callpropvoid FAIL 1
+		jump end_invalid_convert_o
+
+		catch_invalid_convert_o:
+		getlocal0
+		pushscope
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+	end_invalid_convert_o:
+	
+
+		returnvoid
+	}
+} // method_body_info
+
+function runTest2()
+{
+		getlocal0
+		pushscope
+
+/* coerce_* not supported
+		
+findproperty COMPARE_STRICTEQ
+	pushstring "coerce_i uint to int"
+		pushint 79 // expected
+		pushuint 79
+		coerce_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce_i String to int"
+		pushint 79 // expected
+		pushstring "79"
+		coerce_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce_i boolean true to int"
+		pushint 1 // expected
+		pushtrue
+		coerce_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce_i boolean false to int"
+		pushint 0 // expected
+		pushfalse
+		coerce_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce_u int to uint"
+		pushuint 4294967217 // expected
+		pushint -79
+		coerce_u
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce_u String to int"
+		pushuint 79 // expected
+		pushstring "79"
+		coerce_u
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce_u boolean true to int"
+		pushuint 1 // expected
+		pushtrue
+		coerce_u
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce_u boolean false to int"
+		pushuint 0 // expected
+		pushfalse
+		coerce_u
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce_o null to Object"
+		pushnull // expected
+		pushnull
+		coerce_o
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce_o undefined to Object"
+		pushnull // expected
+		pushundefined
+		coerce_o
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce_s int to String"
+		pushstring "7" // expected
+		pushint 7
+		coerce_s
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce_s global to String"
+		pushstring "[object global]" // expected
+		getlocal0
+		coerce_s
+		callpropvoid COMPARE_STRICTEQ 3
+*/
+		/*findproperty COMPARE_STRICTEQ
+	pushstring "constructprop - Object"*/
+
+		findproperty Object
+		constructprop Object 0
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+		/*findproperty COMPARE_STRICTEQ
+	pushstring "constructprop - XML"*/
+		findproperty XML
+		pushstring "<foo><bar/></foo>"
+		constructprop XML 1
+		pushstring "XML constructor"
+		swap
+		add
+		findproperty PASS
+	swap
+	callpropvoid PASS 1
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_b int"
+		pushtrue // expected
+		pushint 1
+		convert_b
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_b false int"
+		pushfalse // expected
+		pushint 0
+		convert_b
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_b string"
+		pushtrue // expected
+		pushstring "true"
+		convert_b
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_b string"
+		pushtrue // expected
+		pushstring "1"
+		convert_b
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_b string"
+		pushtrue // expected
+		pushstring "asdf"
+		convert_b
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_b false string"
+		pushtrue // expected
+		pushstring "false"
+		convert_b
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_b empty string"
+		pushfalse // expected
+		pushstring ""
+		convert_b
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_d empty string"
+		pushdouble 0.0 // expected
+		pushstring ""
+		convert_d
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_d int"
+		pushdouble 4.0 // expected
+		pushint 4
+		convert_d
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_d long"
+		pushdouble 4294967295. // expected
+		pushuint 4294967295
+		convert_d
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "zuul"
+		pushdouble 4294967295. // expected
+		pushuint 4294967295
+		//convert_d
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_i empty string"
+		pushint 0 // expected
+		pushstring ""
+		convert_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_i non-numeric string"
+		pushint 0 // expected
+		pushstring "not numeric"
+		convert_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		//  TODO: platform dependencies?
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_i '-0'"
+		pushint 0 // expected
+		pushstring "-0"
+		convert_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_i '-0'"
+		pushint -0 // expected
+		pushstring "-0"
+		convert_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_i '0x104b'"
+		pushint 4171 // expected
+		pushstring "0x104b"
+		convert_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_i '104b'"
+		pushint 0 // expected
+		pushstring "104b"
+		convert_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_i double"
+		pushint 49 // expected
+		pushdouble 49.983
+		convert_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_i NaN"
+		pushint 0 // expected
+		pushnan
+		convert_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_i long"
+		pushint -1 // expected
+		pushuint 4294967295
+		convert_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_i long bis"
+		pushint -1 // expected
+		pushuint 4294967295
+		convert_i
+		convert_i
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce int to String"
+		pushstring "7" // expected
+		pushint 7
+		coerce String
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce int to uint"
+		pushint 87 // expected
+		pushint 87
+		coerce uint
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce uint to int"
+		pushint 79 // expected
+		pushuint 79
+		coerce int
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce String to int"
+		pushint 79 // expected
+		pushstring "79"
+		coerce int
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce String to boolean"
+		pushtrue // expected
+		pushstring "79"
+		coerce Boolean
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce false String to boolean"
+		pushtrue // expected
+		pushstring "false"
+		coerce Boolean
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "coerce String to Object"
+		pushstring "s to o" // expected
+		pushstring "s to o"
+		coerce Object
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_u double"
+		pushdouble 4294967295. // expected
+		pushdouble 429496729599.
+		convert_u
+		callpropvoid COMPARE_STRICTEQ 3
+
+		//  Ensure convert_u is idempotent
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_u double bis"
+		pushdouble 4294967295. // expected
+		pushdouble 429496729599.
+		convert_u
+		convert_u
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_i NaN"
+		pushint 0 // expected
+		pushnan
+		convert_u
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_u long"
+		pushuint 4294967295 // expected
+		pushuint 4294967295
+		convert_u
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_s null"
+		pushstring "null" // expected
+		pushnull
+		convert_s
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_s Nan"
+		pushstring "NaN" // expected
+		pushnan
+		convert_s
+		callpropvoid COMPARE_STRICTEQ 3
+
+		findproperty COMPARE_STRICTEQ
+	pushstring "convert_s undefined"
+		pushstring "undefined" // expected
+		pushundefined
+		convert_s
+		callpropvoid COMPARE_STRICTEQ 3
+
+	returnvoid
+}
+
+function main() {
+	getlocal0
+	pushscope
+	findproperty START 
+	pushstring "Instructions that start with the letter C" 
+	callpropvoid START 1
+	newfunction runTest1
+	getlocal0
+	call 0
+	newfunction runTest2
+	getlocal0
+	call 0
+	findproperty END
+	callpropvoid END 0
+	returnvoid
+}
+script_info {
+init: main
+	traits: {
+		trait { kind: Trait_Slot name: propertyOne }
+		trait { kind: Trait_Slot name: propertyTwo }
+	}
+}

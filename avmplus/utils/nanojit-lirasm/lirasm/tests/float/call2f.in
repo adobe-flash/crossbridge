@@ -1,0 +1,11 @@
+; This Source Code Form is subject to the terms of the Mozilla Public
+; License, v. 2.0. If a copy of the MPL was not distributed with this
+; file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+pi = immf 3.14
+half = immf 0.5
+halfpi1 = mulf pi half
+halfpi = f2d halfpi1
+res = callf sin cdecl halfpi
+resf = d2f res
+retf resf

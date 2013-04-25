@@ -1,0 +1,76 @@
+#  This Source Code Form is subject to the terms of the Mozilla Public
+#  License, v. 2.0. If a copy of the MPL was not distributed with this
+#  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import sys
+
+############################################
+####   Method to handle spy on Windows  ####
+############################################
+
+
+def WinSpyRoutine():
+	try:
+		import win32event
+		import win32pipe	
+		import win32file
+	except ImportError:
+		print "Error: You need the python win32 extensions installed"
+		sys.exit(1)
+
+	e = "MMgc::MemoryProfiler::DumpFatties"
+	h = None
+	try:
+		h = win32event.OpenEvent(win32event.EVENT_MODIFY_STATE, False, e)
+	except Exception:
+		print "Error: No registered event: " + e
+		sys.exit(1)
+
+	win32event.SetEvent(h)
+
+	pipe = "\\\\.\\pipe\MMgc_Spy" 
+	readHandle = None
+	while True:
+		try:
+			readHandle = win32file.CreateFile(pipe, win32file.GENERIC_READ, 0, None, win32file.OPEN_EXISTING, 0, None)
+			win32pipe.WaitNamedPipe(pipe, 100)
+		except Exception:
+			pass
+		if readHandle:
+			break
+
+	while True:
+		try:
+			data = win32file.ReadFile(readHandle, 128)
+			sys.stdout.write(data[1])
+		except:
+			break
+
+
+####################################################
+####   Method to handle spy on Posix platform   ####
+####################################################
+
+def PosixSpyRoutine():
+	import socket, sys
+
+	s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+	s.connect("/tmp/MMgc_Spy")
+
+	while True:
+		data = s.recv(1024)
+		if not data: break
+		sys.stdout.write(data)
+
+	s.close()
+
+#########################
+####   Main Program  ####
+#########################
+
+if  sys.platform == 'win32':
+	WinSpyRoutine()
+else:
+	PosixSpyRoutine()
+
+

@@ -1,0 +1,46 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page in
+
+\addindex in
+
+
+\section in in
+
+\subsection operation Operation
+
+Determine whether an object has a named property.
+
+\subsection format Format
+
+\code
+in
+\endcode
+
+\subsection forms Forms
+\code
+in = 180 (0xb4)
+\endcode
+\subsection stack Stack
+
+\code
+..., name, obj => ..., result
+\endcode
+
+\subsection description Description
+
+name is converted to a String, and is looked up in obj. If no property is found, then the 
+prototype chain is searched by calling [[HasProperty]] on the prototype of obj. If the 
+property is found result is true. Otherwise result is false. Push result onto the stack.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

@@ -1,0 +1,102 @@
+/* -*- c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 4 -*- */
+/* vi: set ts=4 sw=4 expandtab: (add to ~/.vimrc: set modeline modelines=5) */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function main() {
+    getlocal0
+    pushscope
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus on a float returns a float"
+    pushstring "float"
+    pushfloat  1f
+    unplus
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus does not modify the value"
+    pushfloat  3.1245f // expected
+    pushfloat  3.1245f
+    unplus
+    callproperty COMPARE_STRICTEQ 3
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus does not modify the value"
+    pushfloat  -3.1245f // expected
+    pushfloat  -3.1245f
+    unplus
+    callproperty COMPARE_STRICTEQ 3
+
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus on a float4 returns a float4"
+    pushstring "float4"
+    pushfloat4  1f,2f,3f,4f
+    unplus
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus does not modify the value"
+    pushfloat4  4f,3f,2f,1f // expected
+    pushfloat4  4f,3f,2f,1f
+    unplus
+    callproperty COMPARE_STRICTEQ 3
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus does not modify the value"
+    pushfloat4  -4f,-3f,-2f,-1f // expected
+    pushfloat4  -4f,-3f,-2f,-1f
+    unplus
+    callproperty COMPARE_STRICTEQ 3
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus on a Number returns a Number"
+    pushstring "number"
+    pushdouble  1.1
+    unplus
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus does not modify the value"
+    pushdouble  3.1245 // expected
+    pushdouble  3.1245
+    unplus
+    callproperty COMPARE_STRICTEQ 3
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus does not modify the value"
+    pushdouble  -3.1245 // expected
+    pushdouble  -3.1245
+    unplus
+    callproperty COMPARE_STRICTEQ 3
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus on an int returns a Number"
+    pushstring "number"
+    pushint 12
+    unplus
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus does not modify the value"
+    pushint     13 // expected
+    pushint     13
+    unplus
+    callproperty COMPARE_STRICTEQ 3
+
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "unary plus does not modify the value"
+    pushint     -3 // expected
+    pushint     -3
+    unplus
+    callproperty COMPARE_STRICTEQ 3
+
+    returnvoid
+
+}

@@ -1,0 +1,27 @@
+#!/usr/bin/env python
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+# file contains a list of tests to run
+
+# directory , commands ...
+
+# directory = directory to start, most test suites require starting in the directory
+# commands = all commands and parameters to run testsuite
+# any variable enclosed as ${var} will be replaced with the environment variable
+# the common shell variables are: py, avmr, avmrd, avmd, avmd   
+#     (py=python r=release, rd=release-debugger, d=debug, dd=debug-debugger)
+#
+# windows platforms using native python have problems in subprocess.Popen. 
+# follow these guidelines:
+# - do not use ./ unless it is a parameter to an executable 
+#   e.g. do not use cd ./acceptance
+#        do use ${PYTHON_RUNTESTS} ./runtests.py ...
+# - specify python with the ${PYTHON_RUNTESTS} environment variable
+
+#  running release-debugger vm shell with -Dnoincgc crashes on several performance tests 
+# https://bugzilla.mozilla.org/show_bug.cgi?id=482794
+cd performance;${PYTHON_RUNTESTS} ./runtests.py  --avm=${avmrd} --vmargs="-Dnoincgc" sunspider/
+
+

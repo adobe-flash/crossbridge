@@ -1,0 +1,50 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page getscopeobject 
+
+\addindex getscopeobject
+
+
+\section getscopeobject getscopeobject
+
+\subsection operation Operation
+
+Get a scope object.
+
+\subsection format Format
+
+\code
+getscopeobject
+index
+\endcode
+
+\subsection forms Forms
+\code
+getscopeobject = 101 (0x65)
+\endcode
+\subsection stack Stack
+
+\code
+... => ..., scope
+\endcode
+
+\subsection description Description
+
+index is an unsigned byte that specifies the index of the scope object to retrieve from 
+the local scope stack. index must be less than the current depth of the scope stack. The 
+scope at that index is retrieved and pushed onto the stack. The scope at the top of the 
+stack is at index scope_depth-1, and the scope at the bottom of the stack is index 0.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+The indexing of elements on the local scope stack is the reverse of the indexing of 
+elements on the local operand stack.
+
+
+*/
+

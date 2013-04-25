@@ -1,0 +1,47 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page returnvalue 
+
+\addindex returnvalue
+
+
+\section returnvalue returnvalue
+
+\subsection operation Operation
+
+Return a value from a method.
+
+\subsection format Format
+
+\code
+returnvalue
+\endcode
+
+\subsection forms Forms
+\code
+returnvalue = 72 (0x48)
+\endcode
+\subsection stack Stack
+
+\code
+..., return_value => ...
+\endcode
+
+\subsection description Description
+
+Return from the currently executing method. This returns the top value on 
+the stack. return_value is popped off of the stack, and coerced to the 
+expected return type of the method. The coerced value is what is actually 
+returned from the method.
+
+\subsection rt_execeptions Runtime exceptions
+
+A TypeError is thrown if return_value cannot be coerced to the expected return type of the executing method.
+
+\subsection notes Notes
+
+None.
+
+*/
+

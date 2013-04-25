@@ -1,0 +1,45 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page dxnslate 
+
+\addindex dxnslate
+
+
+\section dxnslate dxnslate
+
+\subsection operation Operation
+
+Sets the default XML namespace with a value determined at runtime.
+
+\subsection format Format
+
+\code
+dxns
+\endcode
+
+\subsection forms Forms
+\code
+dxnslate = 7 (0x07)
+\endcode
+\subsection stack Stack
+
+\code
+..., value => ...
+\endcode
+
+\subsection description Description
+
+The top value on the stack is popped, converted to a string, and that string is used as
+the uri for the default XML namespace for this method.
+
+\subsection rt_execeptions Runtime exceptions
+
+A VerifyError is thrown if dxnslate is used in a method that does not have the SETS_DXNS flag set.
+
+\subsection notes Notes
+
+None.
+
+*/
+

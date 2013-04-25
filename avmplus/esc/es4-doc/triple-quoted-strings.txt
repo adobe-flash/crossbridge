@@ -1,0 +1,56 @@
+NAME:        "Triply quoted string literals"
+CATEGORY:    Lexical conventions (E262-3 ch 7)
+SOURCES:     References [1], [4]
+SPEC AUTHOR: Lars
+STATUS:      OPEN ISSUES
+REVIEWS:     (none)
+IMPLEMENTED: RI; Tamarin+ESC
+
+
+DESCRIPTION
+
+A sequence of three unescaped SINGLEQUOTE or three unescaped
+DOUBLEQUOTE characters signifies the start of a triply-quoted string
+literal.  The literal is terminated by the earliest sequence of three
+unescaped instances of the the same quote character that is not
+followed by a fourth quote character of the same kind.
+
+Arbitrary characters, including line terminator characters, are
+allowed between the starting and ending quotes.  Following
+determination of the starting and ending quotes the input text between
+the starting and ending quotes is subject to escape character
+processing, wherein sequences of characters starting with BACKSLASH
+are replaced by those single characters signified by the sequences.
+
+The escape character processing is performed exactly as for singly
+quoted strings.
+
+
+NOTES
+
+As always, line terminator normalization [2] is in effect.
+
+
+OPEN ISSUES
+
+There is a note on the wiki [4] regarding whether \<lineterminator>
+should be handled differently in triple-quoted strings than in
+double-quoted strings.  Brendan's opinion is it should -- it should
+escape the <lineterminator>.  The RI does not implement that behavior,
+and the present proposal follows the RI.  See [3] for a more general
+discussion.
+
+
+DEFINITIONS
+
+BACKSLASH=U+005C
+SINGLEQUOTE=U+0027
+DOUBLEQUOTE=U+0022
+
+
+REFERENCES
+
+[1] http://wiki.ecmascript.org/doku.php?id=proposals:triple_quotes
+[2] "Line terminator normalization" spec
+[3] "Line continuation in string literals" spec
+[4] http://wiki.ecmascript.org/doku.php?id=proposals:line_terminator_normalization

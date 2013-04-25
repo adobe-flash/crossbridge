@@ -1,0 +1,46 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page dxns 
+
+\addindex dxns
+
+
+\section dxns dxns
+
+\subsection operation Operation
+
+Sets the default XML namespace.
+
+\subsection format Format
+
+\code
+dxns 
+index
+\endcode
+
+\subsection forms Forms
+\code
+dxns = 6 (0x06)
+\endcode
+\subsection stack Stack
+
+\code
+... => ...
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index into the string constant pool. 
+The string at index is used as the uri for the default XML namespace for this method.
+
+\subsection rt_execeptions Runtime exceptions
+
+A VerifyError is thrown if dxns is used in a method that does not have the SETS_DXNS flag set.
+
+\subsection notes Notes
+
+None.
+
+*/
+

@@ -1,0 +1,235 @@
+/* -*- c-basic-offset: 4; indent-tabs-mode: nil; tab-width: 4 -*- */
+/* vi: set ts=4 sw=4 expandtab: (add to ~/.vimrc: set modeline modelines=5) */
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function main() {
+    getlocal0
+    pushscope
+
+/*
+The value ToFloat4(input) is computed as follows (float4 working draft section 8.1):
+1. If Type(input) is float4 then return input.
+2. Let v = ToFloat(input)
+3. Return a new float4 value whose x, y, z, and w elements are all v.
+
+The value ToFloat(input) is computed as follows (float working draft section 9.2, float4 working draft section 8.3):
+1. If input is undefined then return the float NaN.
+2. If input is null then return the float +0.
+3. If input is false then return the float +0.
+4. If input is true then return the float +1.
+5. If Type(input) is float4 then return the float NaN.
+6. If Type(input) is Number then:
+   a. If input is NaN then return the float NaN.
+   b. If input is negative or positive infinity, then return the float negative or positive infinity.
+   c. If the unbiased exponent of input is less than or equal to 127 then convert input to float
+      by rounding its significand to nearest and retaining the exponent and sign.
+   d. If input is negative then return the float negative infinity, otherwise return the float
+      positive infinity.
+7. If Type(input) is float then return input.
+8. If Type(input) is String then return ToFloat(ToNumber(input)).
+9. If Type(input) is Namespace then return ToFloat(input.uri).
+10. Otherwise, Type(input) is Object.  Return ToFloat(ToNumber(input)).
+*/
+
+    // 1. If input is undefined then return the float NaN.
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on undefined returns type float4"
+    pushstring "float4"
+    pushundefined
+    convert_f4
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on undefined is float4(float.NaN)"
+    pushfloat4  NaN,NaN,NaN,NaN // expected
+    pushundefined
+    convert_f4
+    callproperty COMPARE_STRICTEQ 3
+
+    // 2. If input is null then return the float +0.
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on null returns type float"
+    pushstring "float4"
+    pushnull
+    convert_f4
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f on null is float4(+0)"
+    pushfloat4  0f,0f,0f,0f // expected
+    pushnull
+    convert_f4
+    callproperty COMPARE_STRICTEQ 3
+
+    // 3. If input is false then return the float +0.
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on Boolean returns type float4"
+    pushstring "float4"
+    pushfalse
+    convert_f4
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on false is float4(+0)"
+    pushfloat4  0f,0f,0f,0f // expected
+    pushfalse
+    convert_f4
+    callproperty COMPARE_STRICTEQ 3
+
+    // 4. If input is true then return the float +1.
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on true returns type float4"
+    pushstring "float4"
+    pushtrue
+    convert_f4
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on true is float4(1f)"
+    pushfloat4  1f,1f,1f,1f // expected
+    pushtrue
+    convert_f4
+    callproperty COMPARE_STRICTEQ 3
+
+    // 5. If Type(input) is float4 then return the float NaN.
+    // This case never happens since ToFloat4 would just return the value
+
+    // 6. If Type(input) is Number then:
+    //    a. If input is NaN then return the float NaN.
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on Number.NaN returns type float4"
+    pushstring "float4"
+    pushnan
+    convert_f4
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on Number.NaN is float4(NaN)"
+    pushfloat4  NaN,NaN,NaN,NaN // expected
+    pushnan
+    convert_f4
+    callproperty COMPARE_STRICTEQ 3
+
+
+    // 6. If Type(input) is Number then:
+    //    b. If input is negative or positive infinity, then return the float negative or positive infinity.
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on Infinity returns type float4"
+    pushstring "float4"
+    pushdouble  1.0   // calculate Number +Infinity
+    pushdouble  0.0
+    divide
+    convert_f4
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+/*
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on Infinity is float4(float.POSITIVE_INFINITY)"
+    pushfloat  1.0f  // calculate float +Infinity
+    pushfloat  0.0f
+    divide
+    setlocal   1
+    getlocal   1
+    pushfloat4 1,1,1,1
+    pushdouble  1.0  // calculate Number +Infinity
+    pushdouble  0.0
+    divide
+    convert_f
+    callproperty COMPARE_STRICTEQ 3
+*/
+
+    // 6. If Type(input) is Number then:
+    //     c. If the unbiased exponent of input is less than or equal to 127 then convert input to float
+    //        by rounding its significand to nearest and retaining the exponent and sign.
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on 3.4028235e+38 returns type float4"
+    pushstring "float4"
+    pushdouble  3.4028235e+38
+    convert_f4
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on 3.4028235e+38 is float4(3.4028235e+38f)"
+    pushfloat4   3.4028235e+38f,3.4028235e+38f,3.4028235e+38f,3.4028235e+38f // expected
+    pushdouble  3.4028235e+38
+    convert_f4
+    callproperty COMPARE_STRICTEQ 3
+
+
+    // 6. If Type(input) is Number then:
+    //   d. If input is negative then return the float negative infinity, otherwise return the float
+    //       positive infinity.
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on 1.234e+128 returns type float4"
+    pushstring "float4"
+    pushdouble  1.234e+128
+    convert_f4
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+/*
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on 1.234e+128 is float4(float.POSITIVE_INFINITY)"
+    pushfloat  1.0f  // calculate float +Infinity
+    pushfloat  0.0f
+    divide
+    pushdouble  1.234e+128
+    convert_f4
+    callproperty COMPARE_STRICTEQ 3
+*/
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on -1.234e+128 returns type float4"
+    pushstring "float4"
+    pushdouble  -1.234e+128
+    convert_f4
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+/*
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on -1.234e+128 is flaot4(float.NEGATIVE_INFINITY)"
+    pushfloat  -1.0f  // calculate float -Infinity
+    pushfloat  0.0f
+    divide
+    pushdouble  -1.234e+128
+    convert_f4
+    callproperty COMPARE_STRICTEQ 3
+*/
+
+    // 7. If Type(input) is float then return input.
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on float returns type float4"
+    pushstring "float4"
+    pushfloat 12.126f
+    convert_f4
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on float is the float4(value)"
+    pushfloat4 12.126f,12.126f,12.126f,12.126f // expected
+    pushfloat 12.126f
+    convert_f4
+    callproperty COMPARE_STRICTEQ 3
+
+    // 8. If Type(input) is String then return ToFloat(ToNumber(input)).
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on String returns type float4"
+    pushstring "float4"
+    pushstring "12.126"
+    convert_f4
+    typeof
+    callproperty COMPARE_STRICTEQ 3
+    findpropstrict COMPARE_STRICTEQ
+    pushstring "convert_f4 on String is the result of ToFloat4(ToFloat(ToNumber(input)))"
+    pushstring "12.126" // expected, String
+    coerce_a            // expected, ToNumber
+    convert_f           // expected, ToFloat
+    convert_f4          // expected, ToFloat4
+    pushstring "12.126"
+    convert_f4
+    callproperty COMPARE_STRICTEQ 3
+
+
+    returnvoid
+
+}

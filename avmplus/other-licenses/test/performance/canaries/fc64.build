@@ -1,0 +1,12 @@
+#!/bin/bash
+(set -o igncr) 2>/dev/null && set -o igncr; # comment is needed
+
+basedir=`dirname $0`
+c64=`find $basedir/fc64util/c64 -name "*.as"`
+core=`find $basedir/fc64util/core -name "*.as"`
+flash="$basedir/fc64util/flash/*.as"
+files="$basedir/fc64util/globals.as $core $c64 $flash $basedir/fc64.as"
+
+
+echo java -ea -DAS3 -DAVMPLUS -classpath $ASC macromedia.asc.embedding.ScriptCompiler -d -import $GLOBALABC -import $SHELLABC -builtin $basedir/fc64util/main.as $files
+java -ea -DAS3 -DAVMPLUS -classpath $ASC macromedia.asc.embedding.ScriptCompiler -d -import $GLOBALABC -import $SHELLABC -builtin $basedir/fc64util/main.as $files

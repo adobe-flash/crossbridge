@@ -1,0 +1,600 @@
+<!--
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+-->
+<html>
+<head>
+<title>Full List of Rules for Managed Storage in MMgc</title>
+</head>
+
+<body>
+<h1><center>Full List of Rules for Managed Storage in MMgc</h1>
+
+<P><center><I>"If you lie to the garbage collector, it will get you."</I></center>
+
+<P> This document lists all the rules for using managed storage
+(objects managed by the reference counter and garbage collector) in
+MMgc.
+
+<P> <I>Note:</I> Throughout I will assume that the old write barrier
+macros <b>DRC</b>, <b>DRCWB</b>, and <b>DWB</b> have all been replaced
+by the new <b>GCMember</b> smart pointer template.  The resulting
+simplification of the rules is significant, and by the time this
+document becomes useful to anyone the transition will likely be
+complete.
+
+<P>
+<a href="#the-rules">The Rules</a>
+<div style="padding-left: 1em">
+  <a href="#objects-and-allocation">Objects and allocation</a><br>
+  <a href="#liveness">Liveness: Write barriers, roots, and locks</a><br>
+  <a href="#destruction-and-finalization">Destruction and finalization</a><br>
+  <a href="#exactly-traced-types">Exactly traced types</a><br>
+  <a href="#gcref">SafeGC, GCRef</a><br>
+  <a href="#the-gc">The garbage collector instance</a><br>
+  <a href="odds-and-ends">Odds and ends</a><br>
+</div>
+<a href="#not-yet-rules">Not yet rules</a><br>
+<a href="#good-ideas">Good ideas</a><br>
+
+
+<h2>The Rules</h2>
+
+<a name="objects-and-allocation">
+<h3>Objects and allocation</h3>
+
+<dl>
+<DT> <B>Managed classes <u>MUST</u> be subtypes of the GC base types</B>
+
+<DD> <P><b>The rule:</B> Every managed object should derive from one
+     of the predefined types GCObject, GCFinalizedObject,
+     GCTraceableObject, or RCObject.
+
+     <P><b>Rationale:</b> These types provide data fields and vtables
+     that the garbage collector depends on.
+     
+     <P><B>Exception:</B> GCObject is currently an empty type and it
+     is legal to allocate objects that implicitly inherit from
+     GCObject by means of GC::Alloc and GC::Calloc.
+
+     <P><B>Critique:</B> There are too many (disjoint) base types to
+     choose from.  In the long term, GCObject and RCObject may
+     disappear.
+
+     <P><B>Enforcement:</B> Not directly enforced.  (Will be enforced
+     by the C++ compiler once GC::Alloc and GC::Calloc are removed.)
+
+<dt> <B>Managed types <u>MUST</u> always be allocated via the GC</B>
+
+<DD> <P> <B>The Rule:</B> If an object is an instance of a subtype of
+     GCObject, GCTraceableObject, GCFinalizedObject, or RCObject then
+     it must never be allocated on the stack, in global variables, or
+     in FixedMalloc / VMPI_alloc / malloc memory, but must always be
+     allocated via the 'new' operator on one of those types.  GCObject
+     subtypes can be allocated with GC::Alloc and GC::Calloc, but the
+     others cannot.
+
+     <P> <B>Implication:</B> Managed types can never be members of
+     other types.
+
+     <P> <B>Rationale:</B> The garbage collector needs the freedom to
+     manage the managed types; if they are tied to non-managed heap
+     areas then the GC cannot reclaim objects, among other things.
+     Also, managed types carry GC-specific information that does not
+     belong in other types.
+
+     <P> <B>Enforcement:</b> TBD.  Assertions in the constructors, for
+     one.
+
+<DT> <B>Non-managed types <u>MUST NOT</u> be allocated via the GC</B>
+
+<DD> <P><B>The Rule</B>: If a type is a subtype of any type other than
+     GCObject, GCTraceableObject, GCFinalizedObject, or RCObject, and is
+     not a subtype of no type, then its instances must not be allocated
+     on the managed heap (through GC::Alloc or GC::Calloc).
+
+     <P><B>Rationale</B>: The GC wants to make assumptions about the 
+     storage allocated on its heap.
+
+     <P><B>Enforcement:</B> None.  (Will be enforced by the C++
+     compiler once GC::Alloc and GC::Calloc are removed.)
+
+<dt><b>Request sizes to GC::Alloc and GC::Calloc <u>MUST NOT</u> be zero</b>
+
+<dd> <P> <B>The Rule:</b> Never try to allocate zero bytes from the GC.
+
+     <P> <B>Rationale:</B> Unknown.  (There's an optimization in the
+     allocator that's made possible by the rule, but the API came
+     first, the optimization much later.)
+
+     <P> <B>Critique:</B> This appears to be bad API design and the
+     restriction should likely be removed; a zero request should
+     return an object whose useful size is zero.
+
+     <P> <B>Enforcement:</B> Assertion in Debug builds; crashes in
+     Release builds.
+
+<DT> <B>Allocation flags <u>MUST</u> be used carefully.</B>
+
+<DD> <P><B>The Rule:</B> If you use GC::Alloc and GC::Calloc the only
+     flags you should pass are kZero, kContainsPointers, and kCanFail.
+     If you pass kContainsPointers you must also pass kZero unless you
+     can guarantee that the object will be fully initialized before it
+     is seen by the garbage collector.
+
+     <P> <B>Exception:</B> The Flash Player may use kFinalize in some
+     instances; Tamarin does not.
+
+     <P> <B>Critique:</B> There is no good reason why (a) kZero is
+     even required and/or (b) we can't outright require it for
+     pointer-containing storage in all cases.
+
+     <P> <B>Enforcement:</B> TBD.  Should be easy enough to do with
+     some asserts.  The non-desirable flags should be hidden in a
+     private API inside the GC, not exposed with the other flags.
+
+<dt> <b>A GCObject subtype <u>MUST NOT</u> have a useful destructor</b>
+
+<DD> <P> <B>The Rule:</b> If a GCObject subclass has a destructor then
+     it must be empty, and if it has in-line member objects then their
+     destructors, if any, must also be empty.
+
+     <P> <B>Rationale:</B> A GCObject subclass can only be allocated
+     on the managed heap, and will normally be deleted by the garbage
+     collector; the collector will not run the finalizer.  Thus a
+     useful destructor will, as a rule, not be run, and should
+     therefore not be present.
+
+     <P> <B>Critique:</B> The underlying issue is that
+     GCFinalizedObject and RCObject use the C++ destructor for
+     finalization, so that there is an expectation that the destructor
+     of a managed object does anything at all.  If/when we clean up
+     finalization we probably want to neuter the destructor
+     completely.
+     
+     <P> <B>Enforcement:</B> None, though the script
+     utils/gcClasses.as can be used to find GCObject subtypes that
+     have destructors.
+
+</dl>
+
+<a name="liveness">
+<h3>Liveness: Write barriers, roots, and locks</h3>
+
+<dl>
+<dt> <B>Roots or locks <u>MUST</u> be used to keep externally
+     referenced objects alive</B>
+
+<dd> <P><B>Background:</B> The garbage collector finds dead objects by
+     separating them from the live ones; any object not known to be live
+     is assumed dead.  If a live object points to another object then
+     the latter is also live, but live objects that are not referenced
+     from other objects must be kept alive by other meands.
+
+     <P><B>The Rule:</B> If a non-managed object points to a managed
+     object then the non-managed object must be a GCRoot, or the
+     managed object must be locked using the GC's LockObject API.
+     (The latter is generally the better choice, as roots are usually
+     more expensive.)
+
+     <P><B>Rationale:</B> It's a fact of life that non-managed storage
+     needs to point to managed storage.
+
+     <P><B>Enforcement:</B> None.  A static checker could do a lot here.
+
+<dt> <b>Write barriers <u>MUST NOT</u> be omitted in objects</b>
+
+<dd> <P><B>Background:</B> The write barrier is a mechanism that makes
+     reference counting and incremental garbage collection work: it
+     ensures that all live objects are recognized as live by
+     intercepting all pointer stores and performing actions on the
+     referencing and referenced objects.  (For example, it's the write
+     barrier that increments and decrements reference counts.)
+
+     <P><B>The Rule:</B> When a pointer to one managed object is
+     stored into another managed object, or when a pointer to an
+     RCObject is stored into a root, the store must go through a write
+     barrier that tracks it.  Omitting write barriers on initializing
+     stores is only correct if the object cannot become visible to the
+     garbage collector until after the store has happened.
+
+     <P><B>Notes:</B> The barrier is automatic if the field receiving
+     the value is a GCMember, but the GCMember is optional and a
+     manual write barrier (WB, WBRC) can be used instead.  Code
+     sometimes tries to optimize object initialization by omitting
+     write barriers on initializing stores entirely (no GCMember, no
+     WB/WBRC).  In particular, we often see this on "const" fields.
+
+     <P> It is difficult to guarantee that the object we're updating
+     isn't visible to the GC.  It is not enough to reason that we have
+     not made a pointer to the object visible by storing it somewhere;
+     rather, we must reason that the GC will not be invoked, because
+     the object is usually visible via a pointer in the stack or a CPU
+     register.
+
+     <P> It is very easy to invoke the GC.  An allocation may invoke
+     it, and expressions that allocate frequently occur in field
+     initializers (and sometimes inside functions called from field
+     initializers).  More subtly, an initializing write to a field
+     that has a GCMember smart pointer can cause storage to be
+     allocated (in the GC's write barrier data structures), and that
+     allocation can invoke the GC.  With (future) concurrent marking
+     there may be additional synchronization points where the GC may
+     be invoked.
+
+     <P> There are probably some cases where a barrier can be omitted
+     safely, but generally speaking, they are few and far between.
+     The only reliable rule is always to use a write barrier on
+     pointer stores.
+
+     <P><B>Rationale:</B> Software write barriers have consistently
+     been found to outperform crude hardware-based barriers such as
+     write-protecting pages and intercepting the resulting traps, and
+     are also vastly more portable.  As for reference counting and
+     incremental garbage collection, we'd like to remove the former
+     but we'd need to keep the latter, so the needs for barriers would
+     remain.  Future introduction of generational collection will also
+     require the use of write barriers.
+
+     <P> <B>Critique:</B> Barriers have traditionally been omitted in
+     some places because they are relatively expensive, especially on
+     reference-counted storage.  The rule would be simpler if it did
+     not allow for omitting barriers; a faster barrier (with faster RC
+     or no RC) would allow for that.
+
+     <P> <B>Enforcement:</B> TBD.  (We have some tools that discover
+     missing barriers after the fact, if enabled at run-time.  They're
+     expensive and imprecise; the more precise, the more expensive.)
+
+<dt><B>Write barriers <U>MUST NOT</U> be used on the stack</B>
+
+<dd> <P><B>The rule:</b> Any stack-allocated object must not have
+     GCMember fields.  (This is really a corollary to earlier rules.)
+
+     <P><B>Rationale:</B> Stack memory (including VMPI_alloca memory)
+     does not need write barriers and should not have them.  (This is
+     not a problem since managed types cannot be stack-allocated, see
+     above.)
+
+     <P><B>Enforcement:</B> TBD.
+
+</dl>
+
+<a name="destruction-and-finalization">
+<h3>Destruction and finalization</h3>
+
+<dl>
+<dt> <b>Instances of RCObject subclasses <u>MUST</u> be zeroed by their destructors</b>
+
+<dd> <P><B>Background:</B> Every RCObject's C++ destructor is invoked
+     when the object is collected by the GC or by the RC reaper.
+
+     <P><B>The Rule:</B> Every field in the object must be zeroed by
+     the destructor.  GCMember fields will be zeroed automatically;
+     the destructor must zero other fields, including non-pointer fields.
+
+     <P><B>Rationale:</B> Since the smart pointers zero some of the
+     fields the destructor may as well zero all of them, instead of
+     relying on the GC to zero all of them and thus redundantly
+     zeroing the ones that have already been zeroed by the smart pointers.
+
+     <P><B>Critique:</B> This is probably a bad rule because it
+     complicates the API.  Bulk zeroing in the GC would be simpler, if
+     slightly more expensive in the case of a non-moving collector
+     such as MMgc.
+
+     <P><B>Enforcement:</b> Run-time assertions in the guts of the GC
+     checks that the object is cleared when it is about to be put on
+     the free list.
+
+<dt> <B>Garbage <u>MUST NOT</u> be made reachable ("no resurrection")</B>
+
+<DD> <P> <B>Background:</B> The C++ destructor for a finalizable type
+     (a subtype of GCFinalizedObject or RCObject) runs in a critical
+     section inside the garbage collector and has access to both
+     objects that are live and objects that are garbage ("dead").  It
+     is possible for the destructor to try to turn a dead object into
+     a live object ("resurrecting" it) by storing a pointer to the
+     dead object into a live object.
+
+    <P> <B>The Rule:</B> Objects must never be resurrected.
+
+    <P> <B>Rationale:</B> The garbage collector was not constructed to
+    handle resurrection, and anyway resurrection is not compatible
+    with the C++ notion of destruction.
+
+    <P> <B>Critique:</B> In practice this restriction is not a
+    hardship - resurrection is not normally needed.  However, since
+    the destructor code, or code it calls, gets to examine dead
+    objects it is easy for the code to mistakenly resurrect objects.
+
+    <P> <B>Enforcement:</B> There was no enforcement possible with the
+    conservative collector.  With the exact collector we have asserts
+    in place that will sometimes catch the problem, diagnosing it as
+    a dangling pointer bug.
+
+<dt> <B>Destructors <u>MUST NOT</U> make assumptions about destruction order</B>
+
+<DD> <P><B>Background:</B> When the garbage collector is about to
+     reclaim storage, it makes a pass over the heap and runs the
+     destructors on all finalizable objects (subtypes of
+     GCFinalizedObject and RCObject).  It does not reclaim any storage
+     until it's run all the destructors, but it runs destructors in a
+     non-determinstic order.
+
+     <P><B>The Rule:</B> A destructor must not make assumptions about
+     whether objects it references have been destructed or not, unless
+     it knows those objects to be live.
+
+     <P><B>Rationale:</B> Destruction order during garbage collection
+     is nondeterministic.  Destruction order during ZCT reaping is also
+     nondeterministic (it's mostly bottom-up now but that's because
+     the ZCT is used as a stack; previously, the ZCT had a free list
+     and had a different order)
+
+     <P><B>Enforcement:</B> None.  We could find bugs by perturbing
+     the order, probably.
+
+<dt> <B>Destructors <u>MAY</u> inspect dead objects</B>
+
+<dd> <P><B>The Rule:</B> A destructor that is run from the
+     finalization pass of the GC may look at both dead and live
+     objects, and it may look at dead objects that have been finalized
+     within that same critical section.  RCObjects that have been
+     finalized before the destructor in question will be zero.  It is
+     not safe to invoke virtual methods on objects that are not known
+     not to have been finalized.  Finalization order is unspecified
+     and may change.
+
+<dt> <B>Free'd objects <u>MUST NOT</u> be accessed or used</B>
+
+<DD> <P><B>The Rule</b>: Once an object has been passed to GC::Free it
+     is dead: the pointer must never be dereferenced, used with a
+     write barrier, or in other ways manipulated.  The object's memory
+     may be poisoned, zeroed, reused, or returned to the operating
+     system.
+
+     <P><B>Enforcement:</B> None?
+
+</dl>
+
+<a name="exactly-traced-types">
+<h3>Exactly traced types</h3>
+
+<P> When the programmer opts a class into exact tracing she discloses
+the fields containing GC-pointers to the garbage collector.  A number
+of invariants are important:
+
+<dl>
+<dt> <b>A traced type <u>MUST</u> derive from a GC type with a vtable</b>
+
+<DD> <P><b>The Rule:</b> An exactly traced class <em>must</em> derive from GCTraceableObject,
+     GCFinalizedObject, or RCObject.  It <em>must not</em> derive from
+     GCObject, or from no GC class at all.
+
+     <P><B>Rationale:</B> The object needs a vtable that provides
+     the <tt>gcTrace</tt> method.
+
+     <P> Sometimes the VTable is not affordable, or not possible.  See
+     the
+     section <a href="exactgc-manual.html#vtable-not-affordable">What
+     to do when the vtable is not affordable</a> for more information.
+
+<dt> <B>Inline types <u>SHOULD</u> derive from GCInlineObject</b>
+
+<dd> <P> If a class contains GC pointers and isn't allocated directly
+     but is instead used to compose other GC objects as an inline
+     member it must inherit
+     from <tt>GCInlineObject</tt>.  <tt>GCInlineObject</tt> subclasses
+     can use the same annotation system and have generated tracers
+     just like objects allocated directly.  <tt>GCInlineObject</tt>
+     does not introduce a vtable or any other members and where it is
+     used must be decorated with the GC_STRUCTURE annotation
+     (see <a href="exactgc-manual.html#gcstruct">example</a>).
+
+<dt> <B>An exactly traced type <u>MUST ONLY</u> subclass an exactly traced type</B>
+
+<DD> <P> A class can be exactly traced only if its base class is
+     exactly traced.
+
+     <P> The reason for this is that the <tt>gcTrace</tt> method in a subclass
+     usually starts or ends by calling its parent's <tt>gcTrace</tt> method to
+     trace the parent's fields; if the parent is not exactly traced this will
+     not work.
+
+<dt> <B>Pointer fields <u>MUST NOT</u> be hidden</B>
+
+<DD> <P> The class <em>must</em> disclose <em>all</em> its GC-pointer
+     fields to the garbage collector, including fields in member
+     structures.  For this it can use a combination of annotations and
+     hand-written code.
+
+     <P> The reason for this should be obvious: if the GC can't see a
+     pointer then the pointed-to objects won't be kept alive.
+
+<dt> <B>Pointer fields <u>MUST</u> be NULL or point to live storage</B>
+
+<DD> <P> A GC-pointer member's value, after tag
+     stripping, <em>must always</em> be either NULL or a pointer to the
+     beginning of a <em>live</em> GC-allocated object.
+
+     <P> This invariant is subtle in a number of ways.  
+
+     <ul>
+     <li> <P> When the invariant says <em>always</em> this is meant to be
+     taken literally, from the moment the object is allocated to the
+     instant when it is passed into <tt>GC::Free</tt> to be reclaimed.
+     It is only the memory manager itself that may store values
+     in the field that are not NULL or a pointer to a live object.
+
+     <li> <P> The phrase <em>live GC-allocated object</em> is also meant to
+     be taken literally.  It is <em>never</em> correct to delete a
+     managed object explictly (by passing it to <tt>GC::Free</tt> or
+     the <tt>delete</tt> operator) without being certain that all
+     pointers to the object from exactly traced managed objects have
+     been cleared.
+
+     <li> <P> More subtly still, the reference counting system performs
+     explicit deletion on behalf of the VM or Flash Player code in
+     response to reference count decrementation.  Code that cleverly
+     transfers a pointer to an RC object from one structure to the
+     other behind the back of the RC system and leaves the pointer
+     uncleared in the source object, is simply wrong: the number of
+     pointers has now increased, but the reference count has not.
+     When the reference count reaches zero the object may therefore be
+     deleted without all pointers having been cleared.
+
+     <li> <P> Unions can also cause trouble.  A union of a GC-pointer
+     and non-GC-pointer can be handled by conservative tracing (use the
+     <tt>GC_CONSERVATIVE</tt> annotation) or by means of a manually
+     written hook, if there's a tag or other information that allows
+     the tracer function to distinguish the values.
+
+     <P> Code that maintains a tag field external to the union is at
+     risk if the tag and the union are not updated "atomically" with
+     respect to memory management.  If a union that contains a
+     non-pointer value has a tag field that states that, but is
+     updated to contain a pointer field, then it is important that the
+     tag and pointer field are updated together without any chance of
+     an allocation or deallocation happening between the two updates,
+     as that can expose the out-of-sync member to the GC.
+
+     <li> <P> Finally, code sometimes uses a member declared to hold
+     a GC-pointer to store non-GC-pointer values; this is effectively 
+     a disguised union.  This is stunningly bad style, 
+     causing aliasing problems in C++, and makes it hard to know how
+     to trace the field.
+
+     </ul>
+
+     <P> Overall you'll be best off if you opt-in to exact tracing
+     only for data types that use clean DWB, DRCWB, and GCMember
+     fields for its GC-pointers and whose instances are always deleted
+     by the garbage collector or reference counter.
+
+<DT> <B>The tracer <U>MUST ALWAYS</U> handle all-bits-zero field values</B>
+
+<DD> <P> The tracer must always be able to deal with all-bits-zero values.
+
+     <P> As the flag that denotes an exactly traced object is set upon
+     allocation and the object can become visible to the collector as
+     soon as the first non-MMgc constructor runs, the tracer may be run before the object is
+     fully initialized.  Thus the object must always be in a consistent state, and in practice
+     the tracer should be able to treat uninitialized (zero) fields as null pointers.
+
+     <P> The invariant is rarely a problem but it's sometimes subtle.
+     In one case, the <tt>AbcEnv</tt> structure had a pointer
+     (<tt>m_pool</tt>) to it's ABC pool object, and that pool object
+     contained the count of the number of elements in
+     the <tt>AbcEnv</tt>'s method array.  When the GC got a chance to
+     run before <tt>m_pool</tt> could be initialized the tracer would
+     read through the NULL pointer in order to obtain the length of
+     the method array and crash.  To obey the invariant, the tracer
+     would have to check that <tt>m_pool</tt> was not NULL.
+</DL>
+
+<a name="gcref">
+<h3>SafeGC, GCRef</h3>
+
+(To be copied out of the SafeGC Cheat Sheet, more or less.)
+
+<a name="the-gc">
+<h3>The garbage collector instance</h3>
+
+<dl>
+
+<DT> <B>Pointers from one GC's heap to another's <U>MUST</U> be
+     treated as external pointers into the latter</B>
+
+<DD> <P><B>Rationale:</B> A pointer from one heap to the other is not
+     traced by either heap's garbage collector: the pointed-to object
+     must be anchored by a GCRoot or a lock, as described above.  The
+     heaps are disjoint.
+
+<DT> <B>Access to the GC <U>MUST</U> be serialized</B>
+
+<DD> <P><B>Rationale:</B> It isn't thread-safe (yet).
+
+</dl>
+
+<a name="odds-and-ends">
+<h3> Odds and ends </h3>
+
+<dl>
+<DT> <B>GCRef or GCMember <u>MUST NOT</u> be subclassed</B>
+
+<DD> <P><B>The Rule:</B> Just don't.
+
+     <P><B>Enforcement</b>: None.
+
+</dl>
+
+
+<a name="not-yet-rules">
+<h2> Not yet rules </h2>
+
+<dl>
+<DT> <B>Do not lie about the size of a GCRoot</B>
+
+<DD> <P> This is listed as a rule in the MMgc doc, but it's not really much of one - basically it says, do not hide pointers,
+and so it is subsumed by the rule about using roots or locks to hold onto externally referenced objects.
+
+</dl>
+
+
+<a name="good-ideas">
+<h2>Good ideas</h2>
+
+<P> These are not really rules, but treating them as rules will make
+everyone's life easier.
+
+<dl>
+<dt> <b>Do not use manual write barriers (WB, WBRC); do use GCMember fields</b>
+
+<dd> <P> WB and WBRC are harder to use correctly.  Sometimes they have to
+     be used because the normal write barrier functionality is not
+     available or not reliable (notably for array types); those are
+     bugs, though.  Long term we want to remove WB and WBRC
+     altogether.
+
+
+<dt> <b>Do not point to an RCObject from a GCObject</b>
+
+<dd> <P> Generally such a pointer will require a barrier to manage the
+     reference counts on the RCObject, and the barrier will be a smart
+     pointer with a destructor.  But the GCObject's destructor will
+     not be run by the collector.  Ergo manual destruction of the
+     GCObject is required to correctly manage the pointed-to RCObject.
+     Manual destruction of a managed object is silly.
+
+     <P> Generally, RCObjects should only be pointed to from roots or
+     other RCObjects.
+
+<dt> <B> Moderate your use of GC::GetGC(ptr)</B>
+
+<dd> <P> This API is pretty cheap but we can't guarantee that it will remain cheap.
+
+<dt> <B> Do not use GC::Alloc or GC::Calloc </b>
+
+<dd> <P> Right now they're required for array-like storage, but we're
+     working on that, and the APIs will be removed, so avoid using
+     them gratuitously.
+
+<dt> <B> Do not use GC::Free </b>
+
+<dd> <P> This API will almost certainly be removed.
+
+<dt> <B> Do not explicitly delete managed storage </B>
+
+<dd> <P> The ability to explicitly delete managed storage will almost certainly be removed.
+
+<dt> <B> Do not use GCHiddenPtr</B>
+
+<dd> <P> Or maybe the rule should be, if you want to hide a pointer,
+     do use GCHiddenPtr so that we can see that that's what's going on.
+
+</dl>
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+ /*! \page newfunction 
+
+\addindex newfunction
+
+
+\section newfunction newfunction
+
+\subsection operation Operation
+
+Create a new function object.
+
+\subsection format Format
+
+\code
+newfunction
+index
+\endcode
+
+\subsection forms Forms
+\code
+newfunction = 64 (0x40)
+\endcode
+\subsection stack Stack
+
+\code
+... => ..., function_obj
+\endcode
+
+\subsection description Description
+
+index is a u30 that must be an index of a method_info. A new function object is 
+created from that method_info and pushed onto the stack. For a description of 
+creating a new function object, see ECMA-262 section 13.2.
+
+When creating the new function object the scope stack used is the current scope 
+stack when this instruction is executed, and the body is the method_body entry 
+that references the specified method_info entry.
+
+\subsection rt_execeptions Runtime exceptions
+
+None.
+
+\subsection notes Notes
+
+None.
+
+*/
+

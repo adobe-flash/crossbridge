@@ -1,0 +1,40 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/*
+ *  Test various syntax errors.
+ */
+function script0$init():*
+{
+	//  Unknown opcode.
+	zuul 12 ls "zeeb"
+
+	//  callproperty insn without enough operands
+	callproperty  	parseInt 
+
+	//  This is going to show up in a diagnostic
+	//  for "callproperty" because the input is free-format
+	pushnull
+
+	//  callproperty insn with wrong type operands
+	callproperty  	parseInt (44.2)
+
+	//  Too many integer prefixes
+	10 11       setlocal 1
+
+	//  pushscope succeeds, but extra_operand is parsed as an insn
+	pushscope extra_operand
+
+	// invalid string arg to debugline
+	debugline "zerg"
+
+  //  Last insn in the function is invalid.
+  foodle
+}
+
+function poot()
+{
+	//  empty function body -- not allowed
+}
+
+//  This, on the other hand, is perfectly fine!

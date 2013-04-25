@@ -1,0 +1,212 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+function runTest()
+{
+    getlocal0
+    pushscope
+
+   
+    pushnull
+    setlocal1
+    
+    try {
+        pushstring "moo"
+        pushnull
+        in
+        
+        pop
+        
+        findproperty FAIL
+        pushstring "in null"
+        pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_in_null
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "in null"
+        pushstring "TypeError: Error #1009" //Cannot access a property or method of a null object reference.  // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_in_null:
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "inclocal int"
+    pushint 1 // expected
+    pushnull
+    setlocal3
+    inclocal 3
+    getlocal3
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "inclocal_i null"
+    pushint 1 // expected
+    pushnull
+    setlocal 7
+    inclocal_i 7
+    getlocal 7
+    callpropvoid COMPARE_STRICTEQ 3
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "increment null"
+    pushint 1 // expected
+    pushnull
+    increment
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "increment_i null"
+    pushint 1 // expected
+    pushnull
+    increment_i
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    
+    // initproperty opcode not implemented: see https://bugzilla.mozilla.org/show_bug.cgi?id=491024
+    /*
+    try {
+        pushnull
+        initproperty no_such_property
+        
+        findproperty FAIL
+        pushstring "initproperty null"
+        pushstring "exception should have been thrown: TypeError: Error #1009: Cannot access a property or method of a null object reference."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_initproperty_null
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "initproperty null"
+        pushstring "TypeError: Error #1009" //Cannot access a property or method of a null object reference.  // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_initproperty_null:
+    */
+    returnvoid
+}
+
+function runTest1()
+{
+    getlocal0
+    pushscope
+
+    findproperty COMPARE_STRICTEQ
+    pushstring "null instanceof Array"
+    pushfalse // expected
+    pushnull
+    findproperty Array
+    getproperty Array
+    instanceof
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    findproperty COMPARE_STRICTEQ
+    pushstring "null instanceof Object"
+    pushfalse // expected
+    pushnull
+    findproperty Object
+    getproperty Object
+    instanceof
+    callpropvoid COMPARE_STRICTEQ 3
+    
+    try {
+        findproperty Array
+        constructprop Array 0
+        pushnull
+        instanceof
+        
+        pop
+        
+        findproperty FAIL
+        pushstring "Array instanceof null"
+        pushstring "exception should have been thrown: TypeError: Error #1040: The right-hand side of instanceof must be a class or function."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_instanceof_null
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "Array instanceof null"
+        pushstring "TypeError: Error #1040"   // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+    }
+    
+    finished_instanceof_null:
+    
+    try {
+        pushnull
+        pushnull
+        instanceof
+        
+        pop
+        
+        findproperty FAIL
+        pushstring "null instanceof null"
+        pushstring "exception should have been thrown: TypeError: Error #1040: The right-hand side of instanceof must be a class or function."
+        getlocal1
+        callpropvoid FAIL 3
+        
+        jump finished_null_instanceof_null
+        
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save typeError
+        findproperty COMPARE_TYPEERROR
+        pushstring "null instanceof null"
+        pushstring "TypeError: Error #1040"   // expected
+        getlocal2
+        callpropvoid COMPARE_TYPEERROR 3
+        
+    }
+    
+    finished_null_instanceof_null:
+ 
+    returnvoid
+}
+
+function main() {
+    getlocal0
+    pushscope
+    findproperty START 
+    pushstring "Opcodes that start with the letter I" 
+    callpropvoid START 1
+    
+    newfunction runTest
+    getlocal0
+    call 0
+    
+    newfunction runTest1
+    getlocal0
+    call 0
+    
+    findproperty END
+    callpropvoid END 0
+    returnvoid
+}
+
+
+script_info{init:main}

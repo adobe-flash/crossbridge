@@ -1,0 +1,86 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+
+
+function runTest()
+{
+	getlocal0
+	pushscope 
+
+	try
+	{
+		pushnull
+		getproperty PropertyOfNull
+		setlocal1
+
+		findproperty FAIL
+		pushstring "getproperty of null ref"
+		pushstring "exception should have been thrown"
+		getlocal1
+		callpropvoid FAIL 3
+
+		jump check_nested_try
+	}
+	catch
+	{
+		getlocal0
+		pushscope
+
+		findproperty PASS
+		swap
+		callpropvoid PASS 1
+
+	}
+
+	check_nested_try:
+
+	//  Test nested try/catch blocks.
+	try
+	{
+		try
+		{
+			pushstring "threw a string"
+			throw 
+		}
+		catch Number
+		{
+			getlocal0
+			pushscope
+
+			coerce_a
+			setlocal1
+
+			findproperty FAIL
+			pushstring "Nested try/catch"
+			pushstring "should have been caught by outer catch"
+			getlocal1
+
+			callpropvoid FAIL 3
+			returnvoid
+		}
+	}
+	catch String
+	{
+		getlocal0
+		pushscope
+
+		findproperty PASS
+		swap
+		callpropvoid PASS 1
+	}
+
+	returnvoid
+}
+
+
+function main()
+{
+	newfunction runTest
+	getlocal0
+	call 0
+	returnvoid
+}
+
+script_info {init: main}

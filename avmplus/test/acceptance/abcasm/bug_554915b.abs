@@ -1,0 +1,44 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
+function main() {
+    getlocal0
+    pushscope
+
+    try {
+loop:
+        label
+        jump aftercatch
+    }
+    catch {
+        getlocal0
+        pushscope
+        setlocal2   // save Error
+        jump test
+    }
+    
+aftercatch:
+    jump loop
+    
+test:
+    getlocal2
+    callproperty toString 0
+    pushbyte 0
+    pushbyte 18
+    callproperty substr 2
+    pushstring "Error: Error #1502"
+    ifeq passed
+    pushstring "Did not throw Error #1502 FAILED!"
+    .print
+    jump end
+    
+passed:
+    pushstring "Correctly caught Error: Error #1502: A script has executed for longer than the default timeout period of 15 seconds. PASSED!"
+    .print
+    
+    end:
+    returnvoid
+}
+
+script_info{init: main}
