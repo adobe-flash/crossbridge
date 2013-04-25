@@ -77,7 +77,8 @@ int main(int argc, char **argv)
   {
     pthread_t tid;
     printf("creating #%d\n", i);
-    pthread_create(&tid, NULL, foo, &bar);
+    int x = pthread_create(&tid, NULL, foo, &bar);
+    printf("creating #%d\n", x);
   }
 	
   while(done != THREADS);

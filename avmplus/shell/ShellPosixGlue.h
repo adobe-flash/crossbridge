@@ -105,8 +105,6 @@ namespace avmplus {
 		virtual int sigwait(int A_set, int A_sig, int errnoPtr);
 		virtual int shm_unlink(int A_path, int errnoPtr);
 		virtual int pselect(int A_nd, int A_in, int A_ou, int A_ex, int A_ts, int A_sm, int errnoPtr);
-		virtual int __getcwd(int A_buf, int A_buflen, int errnoPtr);
-		virtual int issetugid(int errnoPtr);
 	private:
 		DECLARE_SLOTS_ShellPosixObject;
 	};

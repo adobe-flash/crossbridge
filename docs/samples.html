@@ -73,7 +73,6 @@ working examples that use real open source applications and code.</p>
 <li><a href="#T8">GDB</a> - A simple C program that demonstrates how you can debug it running in the Flash Player using GDB.</li>
 <li><a href="#T9">Pthreads</a> -  Shared memory multi-threading is available in Flash Player 11.5. This app shows how you can spawn a thread but still interact with the Flash display list from that thread using the helpers in <b>AS3++.h</b>.</li>
 <li><a href="#T10">MessageChannel</a> - This Flash API lets you communicate easily between Flash workers including serializing and sending ActionScript objects between threads.</li>
-<li><a href="#T11">OpenMP</a> - This library includes many constructs to make it easier to write multi-threaded code in C/C++. This example shows how you can use its constructs to automatically parallelize a simple mandelbrot fractal rendering app. Clicking on the swf adds more threads into the threadpool.</li>
 <li><a href="#T12">Stage3D</a> - This simple example shows how to use the Flash++ interop to talk directly to the Stage3D API in Flash Player to render to the GPU.</li>
 </ol>
 
@@ -569,29 +568,6 @@ a few lines of code using the <code>step</code> command:</p>
   <div>
     <p>This example shows how to combine the use of pthreads with the event-based communication that the Flash Player exposes via the MessageChannel API.</p>
     <p>Thibault Imbert has a good introduction to this API from a pure AS3 point of view <a href="http://www.bytearray.org/?p=4423" target="_blank">on his blog</a>.</p>
-  </div>
-</section>
-
-<section id="T11">
-  <div class="page-header">
-    <h1>Sample 11: OpenMP</h1>
-  </div>
-  <div>
-    <div class="pull-right">
-      <div class="well">
-        <img src="images/sample11.png"/><br/>
-      </div>
-    </div>
-
-    <p>
-      The <a href="http://www.openmp.org/">OpenMP library</a> is an attempt at bringing high-level multi-threaded primitives to low-level pthread-based programs. The OpenMP library handles thread pooling and task scheduling and lets the developer write what looks like single threaded code that is then automatically parallelized. This is done using various compiler pragmas to annotate which loops are suitable for parallel execution.
-    </p>
-    <p>
-      In this particular example a simple Mandlebrot fractal zoomer is automatically parallelized by using a for loop pragma so that multiple lines in the image can be rasterized in parallel. Clicking on the SWF increase the number of available threads by calling the <code>omp_set_num_threads</code> API. When multiple threads are used the pixels will each have a blue tint based on which thread is being used to render them. You will see that this isn't consistent across frames because of the dynamic load balancing that OpenMP uses to allocate work to different threads.
-    </p>
-    <p>When compiling code to use OpenMP make sure to pass <i>-fopenmp</i> to gcc/g++. This enables the OpenMP pragmas and links against the GNU OpenMP support library.</p>
-    <p>Some good reference material on OpenMP can be found here: <a href="http://www.nic.uoregon.edu/iwomp2005/iwomp2005_tutorial_openmp_rvdp.pdf">http://www.nic.uoregon.edu/iwomp2005/iwomp2005_tutorial_openmp_rvdp.pdf</a> and here <a href="http://gcc.gnu.org/onlinedocs/libgomp/">http://gcc.gnu.org/onlinedocs/libgomp/</a>.
-    </p>
   </div>
 </section>
 
