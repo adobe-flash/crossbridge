@@ -1,0 +1,13 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # setup a conditional breakpoint that shouldn't get hit\n
+break 23 if s == -1
+echo # setup a conditional breakpoint that should get hit\n
+break 28 if t >= 1
+echo # should break at the second conditional breakpoint\n
+c
+kill
+q

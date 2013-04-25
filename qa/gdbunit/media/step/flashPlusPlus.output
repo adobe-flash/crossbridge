@@ -1,0 +1,30 @@
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=IGNORE --target=avm2-elf".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+No symbol table is loaded.  Use the "file" command.
+Breakpoint 1 (main) pending.
+0xdddddddd in ?? ()
+
+Breakpoint 1, INSTRUCTPT in main () at flashPlusPlus.cpp:18
+18	    flash::display::Stage stage = internal::get_Stage();
+# Ensure nexting over Flash++ lines works
+19	    stage->scaleMode = flash::display::StageScaleMode::NO_SCALE;
+18	    flash::display::Stage stage = internal::get_Stage();
+19	    stage->scaleMode = flash::display::StageScaleMode::NO_SCALE;
+# set a breakpoint after a Date is created
+Breakpoint 2 at INSTRUCTPT: file flashPlusPlus.cpp, line 46.
+
+Breakpoint 2, INSTRUCTPT in main () at flashPlusPlus.cpp:46
+46	    char* dstr = internal::utf8_toString(myDate1);
+47	    printf("%s\n", dstr);
+# show the date string (ALC-657)
+$1 = 0xIGNORE
+# show the year (ALC-657)
+$2 = 2012
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]

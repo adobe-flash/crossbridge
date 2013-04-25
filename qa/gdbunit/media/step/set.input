@@ -1,0 +1,28 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # break in the loop\n
+break 25
+c
+echo # show initial value of s, t\n
+print s
+print t
+echo # continue once thru the loop\n
+c
+echo # show value of s, t\n
+print s
+print t
+echo # modify the value of s, t\n
+set variable s=20
+set variable t=22
+echo # show the modified value\n
+print s
+print t
+echo # continuing again should double t\n
+c
+print s
+print t
+kill
+q

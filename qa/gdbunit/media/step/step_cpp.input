@@ -1,0 +1,44 @@
+# gdbunit_config_target_makefile="helloWorldCPP.make"
+# gdbunit_config_target_swf="helloWorldCPP.swf"
+# gdbunit_config_timeout_runtime="300"
+set breakpoint pending on
+break main
+run
+echo # sanity test that C++ programs work\n
+step
+step
+echo # step\n
+step
+echo # show locals\n
+info locals
+echo # step\n
+step
+echo # step\n
+step
+echo # next\n
+next
+echo # next\n
+next
+echo # set a breakpoint at square\n
+break square
+echo # continue to square\n
+c
+echo # step\n
+s
+echo # break in a try + catch block\n
+break 36
+break 46
+echo # continue into the try\n
+c
+echo # step in the try\n
+next
+next
+next
+echo # continue into square()\n
+c
+echo # continue into the catch\n
+c
+echo # show locals\n
+info locals
+kill
+q

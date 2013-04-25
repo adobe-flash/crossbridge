@@ -1,0 +1,26 @@
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=IGNORE --target=avm2-elf".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+No symbol table is loaded.  Use the "file" command.
+Breakpoint 1 (func_with_debuginfo_C) pending.
+0xdddddddd in ?? ()
+
+Breakpoint 1, INSTRUCTPT in func_with_debuginfo_C (arg=42) at mixeddebug-withdebug.c:19
+19		printf("func_with_debuginfo_A %d\n", arg);
+# show backtrace
+#0  INSTRUCTPT in func_with_debuginfo_C (arg=42) at mixeddebug-withdebug.c:19
+#1  INSTRUCTPT in func_with_no_debuginfo_C () from remote:IGNORE.elf
+#2  INSTRUCTPT in func_with_debuginfo_B (arg=42) at mixeddebug-withdebug.c:14
+#3  INSTRUCTPT in func_with_no_debuginfo_B () from remote:IGNORE.elf
+#4  INSTRUCTPT in func_with_debuginfo_A (arg=42) at mixeddebug-withdebug.c:8
+#5  INSTRUCTPT in func_with_no_debuginfo_A () from remote:IGNORE.elf
+#6  INSTRUCTPT in main () at mixeddebug-main.c:11
+#7  INSTRUCTPT in _start1 () from remote:IGNORE.elf
+#8  0x00000000 in ?? ()
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]

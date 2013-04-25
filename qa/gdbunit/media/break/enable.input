@@ -1,0 +1,26 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # setup two breakpoints\n
+break 25
+break 30
+echo # disable one of these breakpoints\n
+disable 2
+echo # re-enable this breakpoint\n
+enable 2
+c
+echo # disable this breakpoint again\n
+disable 2
+echo # re-enable the breakpoint for only one hit\n
+enable once 2
+echo # should break once at 25\n
+c
+echo # then should break at 30 \n
+c
+where
+echo # try to enable a non-existent breakpoint\n
+enable 999
+kill
+q

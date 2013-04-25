@@ -1,0 +1,20 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # break at line 28\n
+break 28
+c
+echo # stepping should work (ALC-193)\n
+s
+echo # step\n
+s
+echo # step\n
+s
+echo # step\n
+s
+echo # step\n
+s
+kill
+q

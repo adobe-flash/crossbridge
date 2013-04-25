@@ -1,0 +1,48 @@
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=IGNORE --target=avm2-elf".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+No symbol table is loaded.  Use the "file" command.
+Breakpoint 1 (main) pending.
+0xdddddddd in ?? ()
+
+Breakpoint 1, INSTRUCTPT in main (argc=0, argv=0x200ff0) at call.c:66
+66	    int s = 2;
+Breakpoint 2 at INSTRUCTPT: file call.c, line 101.
+
+Breakpoint 2, INSTRUCTPT in main (argc=0, argv=0x200ff0) at call.c:101
+101	    printf("returnCharPtr=%c\n", *(returnCharPtr(charPtr)));
+# step first (ALC-491) 
+0xf00001be in returnCharPtr (a=70 'F') at call.c:50
+50	    char* new = &a;
+51	    return new;
+0xf0000329 in main (argc=0, argv=0x200ff0) at call.c:101
+101	    printf("returnCharPtr=%c\n", *(returnCharPtr(charPtr)));
+104	    fooPtr.x = 55;
+# int 
+$1 = 4
+# double
+$2 = 4
+# float
+$3 = 4
+# char 
+$4 = 66 'B'
+# struct
+$5 = {x = 5, y = 66 'B'}
+# int* 
+$6 = 22
+# double* 
+$7 = 3.1415000000000002
+# float* 
+$8 = 2.7183001
+# char* 
+$9 = 70 'F'
+# struct* 
+$10 = 0 '\000'
+# void 
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]

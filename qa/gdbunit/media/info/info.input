@@ -1,0 +1,29 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+break square
+echo # locals after breaking at main should be zero (http://bugs.adobe.com/jira/browse/ALC-79)\n
+info locals
+watch a > 5
+echo # show the command line arguments\n
+info args
+echo # show the command line arguments\n
+i args
+echo # show the breakpoints\n
+info breakpoints
+echo # show the breakpoints\n
+info break
+echo # show information on the first breakpoint\n
+info break 1
+echo # show information on the second breakpoint\n
+info break 2
+echo # show the watchpoints\n
+info watchpoints
+echo # show the registers in use\n
+info registers
+echo # show the threads in use\n
+info threads
+kill
+q

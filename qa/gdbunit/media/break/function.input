@@ -1,0 +1,13 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # should be in main()\n
+where
+break square
+c
+echo # should be in square()\n
+where
+kill
+q

@@ -1,0 +1,66 @@
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=IGNORE --target=avm2-elf".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+No symbol table is loaded.  Use the "file" command.
+Breakpoint 1 (main) pending.
+0xdddddddd in ?? ()
+
+Breakpoint 1, INSTRUCTPT in main () at helloWorldCPP.cpp:20
+20	    int s = 2;
+# sanity test that C++ programs work
+21	    int t = 1;
+23	    int i = 0;
+# step
+24	    for (i = 0; i < 8; i++){
+# show locals
+s = 2
+t = 1
+i = 0
+# step
+25	        t *= 2;
+# step
+24	    for (i = 0; i < 8; i++){
+# next
+25	        t *= 2;
+# next
+24	    for (i = 0; i < 8; i++){
+# set a breakpoint at square
+Breakpoint 2 at INSTRUCTPT: file helloWorldCPP.cpp, line 15.
+# continue to square
+
+Breakpoint 2, INSTRUCTPT in square (a=2) at helloWorldCPP.cpp:15
+15	    return a * a;
+# step
+INSTRUCTPT in main () at helloWorldCPP.cpp:29
+29	    cout << s << "*" << s << "=" << square(s) << endl;IGNORE
+# break in a try + catch block
+Breakpoint 3 at INSTRUCTPT: file helloWorldCPP.cpp, line 36.
+Breakpoint 4 at INSTRUCTPT: file helloWorldCPP.cpp, line 46.
+# continue into the try
+
+Breakpoint 3, INSTRUCTPT in main () at helloWorldCPP.cpp:36
+36	    	for (et = 0; et < 10; et++){ 
+# step in the try
+37	            cout << et << endl; 
+36	    	for (et = 0; et < 10; et++){ 
+37	            cout << et << endl; 
+# continue into square()
+
+Breakpoint 2, INSTRUCTPT in square (a=10) at helloWorldCPP.cpp:15
+15	    return a * a;
+# continue into the catch
+
+Breakpoint 4, INSTRUCTPT in main () at helloWorldCPP.cpp:46
+46	        cout << "An exception occurred. Exception Number: " << e << endl;
+# show locals
+e = 20
+s = 2
+t = 256
+i = 8
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]

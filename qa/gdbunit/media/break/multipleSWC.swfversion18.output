@@ -1,0 +1,91 @@
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=IGNORE --target=avm2-elf".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+# 
+# Break in the first SWC
+# 
+# show the namespace we're using
+The AS3 namespace of the inferior is "sample.MultipleSWC1".
+# break inside the first SWC
+No symbol table is loaded.  Use the "file" command.
+Breakpoint 1 (multipleSWC1) pending.
+0xdddddddd in ?? ()
+
+Breakpoint 1, INSTRUCTPT in multipleSWC1 () at multipleSWC1.cpp:18
+18	    int result = 5;
+19	    int squared = square1(result);
+INSTRUCTPT in square1 (a=5) at multipleSWC1.cpp:5
+5		return a * a;
+#0  INSTRUCTPT in square1 (a=5) at multipleSWC1.cpp:5
+#1  INSTRUCTPT in multipleSWC1 () at multipleSWC1.cpp:19
+#2  0x00000000 in ?? ()
+0xf0000087 in multipleSWC1 () at multipleSWC1.cpp:19
+19	    int squared = square1(result);
+21	    AS3_Return(result);
+result = 5
+squared = 25
+#0  INSTRUCTPT in multipleSWC1 () at multipleSWC1.cpp:21
+#1  0x00000000 in ?? ()
+(*)global/sample.MultipleSWC1::multipleSWC1()[IGNORE]
+   multipleSWC/initCode()[IGNORE]
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]
+# 
+# Break in the second SWC
+# 
+# show the namespace we're using
+The AS3 namespace of the inferior is "sample.MultipleSWC2".
+# break inside the second SWC
+Function "multipleSWC2" not defined.
+Breakpoint 2 (multipleSWC2) pending.
+Function "square2" not defined.
+Breakpoint 3 (square2) pending.
+warning: Temporarily disabling breakpoints for unloaded shared library "remote:0.elf"
+0xdddddddd in ?? ()
+
+Breakpoint 2, INSTRUCTPT in multipleSWC2 () at multipleSWC2.cpp:18
+18	    int result = 10;
+# continue to square2()
+
+Breakpoint 3, INSTRUCTPT in square2 (a=10) at multipleSWC2.cpp:5
+5		return a * a;
+# bt in square2()
+#0  0xf000004f in square2 (a=10) at multipleSWC2.cpp:5
+#1  0xf0000087 in multipleSWC2 () at multipleSWC2.cpp:19
+#2  0x00000000 in ?? ()
+# as3bt in square2()
+(*)global/sample.MultipleSWC2IGNORE
+   global/sample.MultipleSWC2IGNORE
+   multipleSWC/initCode()[IGNORE]
+# info args in square2()
+a = 10
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]
+# 
+# Break in the third SWC
+# 
+# show the namespace we're using
+The AS3 namespace of the inferior is "sample.MultipleSWC3".
+# break inside the third SWC
+Function "multipleSWC3" not defined.
+Breakpoint 4 (multipleSWC3) pending.
+warning: Temporarily disabling breakpoints for unloaded shared library "remote:0.elf"
+0xdddddddd in ?? ()
+
+Breakpoint 4, INSTRUCTPT in multipleSWC3 () at multipleSWC3.cpp:18
+18	    int result = 15;
+19	    int squared = square3(result);
+# check that call works (ALC-595)
+$1 = 9
+# bt in multipleSWC3()
+#0  INSTRUCTPT in multipleSWC3 () at multipleSWC3.cpp:19
+#1  0x00000000 in ?? ()
+# as3bt in multipleSWC3()
+(*)global/sample.MultipleSWC3::multipleSWC3()[IGNORE]
+   multipleSWC/initCode()[IGNORE]
+# done
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]

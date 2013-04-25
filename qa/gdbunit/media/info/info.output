@@ -1,0 +1,70 @@
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=IGNORE --target=avm2-elf".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+No symbol table is loaded.  Use the "file" command.
+Breakpoint 1 (main) pending.
+0xdddddddd in ?? ()
+
+Breakpoint 1, INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+20	    int s = 2;
+Breakpoint 2 at INSTRUCTPT: file helloWorld.c, line 15.
+# locals after breaking at main should be zero (http://bugs.adobe.com/jira/browse/ALC-79)
+s = 0
+t = 0
+i = 0
+Watchpoint 3: a > 5
+# show the command line arguments
+argc = 0
+argv = 0x200ff0
+# show the command line arguments
+argc = 0
+argv = 0x200ff0
+# show the breakpoints
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:20
+	breakpoint already hit 1 time
+2       breakpoint     keep y   INSTRUCTPT in square at helloWorld.c:15
+3       watchpoint     keep y              a > 5
+# show the breakpoints
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:20
+	breakpoint already hit 1 time
+2       breakpoint     keep y   INSTRUCTPT in square at helloWorld.c:15
+3       watchpoint     keep y              a > 5
+# show information on the first breakpoint
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:20
+	breakpoint already hit 1 time
+# show information on the second breakpoint
+Num     Type           Disp Enb Address    What
+2       breakpoint     keep y   INSTRUCTPT in square at helloWorld.c:15
+# show the watchpoints
+Num     Type           Disp Enb Address    What
+3       watchpoint     keep y              a > 5
+# show the registers in use
+eax            IGNORE
+ecx            0x200fb0	2101168
+edx            0x0	0
+ebx            0xe132	57650
+esp            0xe1ffff60	0xe1ffff60
+ebp            0x200fd0	0x200fd0
+esi            0xef32	61234
+edi            0xef64	61284
+eip            INSTRUCTPT	INSTRUCTPT <main+IGNORE>
+eflags         0x0	[ ]
+cs             0xcccccccc	-858993460
+ss             0xcccccccc	-858993460
+ds             0xcccccccc	-858993460
+es             0xcccccccc	-858993460
+fs             0xcccccccc	-858993460
+gs             0xcccccccc	-858993460
+# show the threads in use
+  Id   Target Id         Frame 
+* 1    Worker 1          INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]

@@ -1,0 +1,19 @@
+# gdbunit_config_target_makefile="flashPlusPlus.make"
+# gdbunit_config_target_swf="flashPlusPlus.swf"
+set breakpoint pending on
+break main
+run
+echo # Ensure nexting over Flash++ lines works\n
+next
+next
+next
+echo # set a breakpoint after a Date is created\n
+break 46
+c
+next
+echo # show the date string (ALC-657)\n
+print dstr
+echo # show the year (ALC-657)\n
+print year
+kill
+q

@@ -1,0 +1,39 @@
+# gdbunit_config_target_makefile="call.make"
+# gdbunit_config_target_swf="call.swf"
+set breakpoint pending on
+break main
+run
+break 101
+c
+echo # step first (ALC-491) \n
+step
+step
+step
+step
+echo # int \n
+call returnInt(2)
+echo # double\n
+call returnDouble(2.0)
+echo # float\n
+call returnFloat(2.0)
+echo # char \n
+call returnChar('A')
+echo # struct\n
+call returnFoo(a)
+#
+# pointer
+#
+echo # int* \n
+call *(returnIntPtr(intPtr))
+echo # double* \n
+call *(returnDoublePtr(doublePtr))
+echo # float* \n
+call *(returnFloatPtr(floatPtr))
+echo # char* \n
+call *(returnCharPtr(charPtr))
+echo # struct* \n
+call (returnFooPtr(fooPtr))->y
+echo # void \n
+call returnVoid()
+kill
+q

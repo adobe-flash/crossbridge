@@ -1,0 +1,69 @@
+# gdbunit_config_target_makefile="as3Commands.make"
+# gdbunit_config_target_swf="as3Commands.swf"
+set breakpoint pending on
+break main
+run
+echo # step\n
+s
+echo # step\n
+s
+echo # as3step\n
+as3step
+echo # as3step\n
+as3step
+echo # as3step\n
+as3step
+echo # as3step\n
+as3step
+echo # as3step\n
+as3step
+echo # as3step\n
+as3step
+echo # as3step\n
+as3step
+echo # as3step\n
+as3step
+echo # as3step\n
+as3step
+echo # as3step\n
+as3step
+echo # as3step\n
+as3step
+echo # as3step\n
+as3step
+echo # show the args in the increment() function\n
+as3args
+echo # show the locals in the increment() function\n
+as3locals
+echo # show the long string\n
+monitor eval longLocalVariableString
+echo # as3up should move the (*) to getNumberHelper() \n
+as3up
+echo # show the args in the getNumberHelper() function \n
+as3args
+echo # should be no locals in the getNumberHelper() function \n
+as3locals
+echo # as3up should move the (*) to getNumber() \n
+as3up
+echo # show the args in the getNumber() function \n
+as3args
+echo # show the locals in the getNumber() function \n
+as3locals
+echo # as3up should move the (*) to F_main() \n
+as3up
+echo # as3down should move the (*) back to the getNumber() function \n
+as3down
+echo # show the args in the getNumber() function \n
+as3args
+echo # as3down should move the (*) back to the getNumberHelper() function \n
+as3down
+echo # show the args in the getNumberHelper() function \n
+as3args
+echo # as3down should move the (*) back to the increment() function \n
+as3down
+echo # show the args in the increment() function \n
+as3args
+echo # as3down should warn if you are at the bottom of the stack (ALC-230)\n
+as3down
+kill
+q

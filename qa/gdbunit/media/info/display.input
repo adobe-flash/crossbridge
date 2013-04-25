@@ -1,0 +1,23 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # break in the loop\n
+break 25
+echo # display the value of t and an expression at each break\n
+display t
+display t > 1
+echo # value and expression result should be shown\n
+c
+echo # value and expression result should be shown\n
+c
+echo # show what displays are setup\n
+info display
+echo # turn off the first display\n
+undisplay 1
+echo # ensure it was undisplayed \n
+i display
+c
+kill
+q

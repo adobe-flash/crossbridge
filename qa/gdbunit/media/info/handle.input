@@ -1,0 +1,11 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # just make sure that setting up a handle doesn't crash things since we can't simulate signals in gdbunit\n
+handle SIGPWR nostop noprint 
+echo # show the handle info\n
+info handle
+kill
+q

@@ -1,0 +1,43 @@
+# gdbunit_config_target_makefile="Quake1.make"
+# gdbunit_config_target_swf="Quake1.swf"
+# gdbunit_config_timeout_runtime="360"
+# gdbunit_config_timeout_compile="600"
+set breakpoint pending on
+break main
+run
+echo # sanity test we can debug into a Quake SWF\n
+list
+echo # show locals\n
+info locals
+echo # step a few times\n
+step
+step
+step
+step
+echo # Tick the engine a couple times \n
+break engineTick
+c
+c
+c
+echo # Break at R_DrawSurface() a couple times\n
+break R_DrawSurface
+c
+c
+c
+c
+echo # step a few times\n
+step
+step
+step
+info locals
+step
+step
+echo # next a few times\n
+next
+next
+info locals
+next
+next
+info locals
+kill
+q

@@ -1,0 +1,16 @@
+# gdbunit_config_target_makefile="setjmp.make"
+# gdbunit_config_target_swf="setjmp.swf"
+set breakpoint pending on
+break main
+run
+echo # step a few times \n
+step
+step
+step
+step
+echo # setup a breakpoint at the end\n
+break 38
+echo # continue shouldn't break before line 38\n
+c
+kill
+quit

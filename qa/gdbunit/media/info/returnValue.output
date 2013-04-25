@@ -1,0 +1,39 @@
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=IGNORE --target=avm2-elf".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+No symbol table is loaded.  Use the "file" command.
+Breakpoint 1 (main) pending.
+0xdddddddd in ?? ()
+
+Breakpoint 1, INSTRUCTPT in main () at helloWorldCPP.cpp:20
+20	    int s = 2;
+# break at lines 40 and 41
+Breakpoint 2 at INSTRUCTPT: file helloWorldCPP.cpp, line 40.
+Breakpoint 3 at INSTRUCTPT: file helloWorldCPP.cpp, line 41.
+
+Breakpoint 2, INSTRUCTPT in main () at helloWorldCPP.cpp:40
+40	        int squared = square(et);
+# step into square
+INSTRUCTPT in square (a=10) at helloWorldCPP.cpp:15
+15	    return a * a;
+# show locals
+No locals.
+# change a parameter value
+# continue to line 41
+
+Breakpoint 3, INSTRUCTPT in main () at helloWorldCPP.cpp:41
+41	    	cout << es << "*" << es << "=" << squared << endl; 
+# squared should be 25
+et = 10
+es = 1
+squared = 25
+s = 2
+t = 256
+i = 8
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]

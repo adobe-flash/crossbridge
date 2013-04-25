@@ -1,0 +1,59 @@
+# gdbunit_config_target_makefile="multipleSWC.make"
+# gdbunit_config_target_swf="multipleSWC.swf"
+set breakpoint pending on
+echo # \n
+echo # Break in the first SWC\n
+echo # \n
+set as3namespace sample.MultipleSWC1
+echo # show the namespace we're using\n
+show as3namespace
+echo # break inside the first SWC\n
+break multipleSWC1
+run
+step
+step
+bt
+step
+step
+info locals
+bt
+as3bt
+kill
+echo # \n
+echo # Break in the second SWC\n
+echo # \n
+set as3namespace sample.MultipleSWC2
+echo # show the namespace we're using\n
+show as3namespace
+echo # break inside the second SWC\n
+break multipleSWC2
+break square2
+run
+echo # continue to square2()\n
+c
+echo # bt in square2()\n
+bt
+echo # as3bt in square2()\n
+as3bt
+echo # info args in square2()\n
+info args
+kill
+echo # \n
+echo # Break in the third SWC\n
+echo # \n
+set as3namespace sample.MultipleSWC3
+echo # show the namespace we're using\n
+show as3namespace
+echo # break inside the third SWC\n
+break multipleSWC3
+run
+next
+echo # check that call works (ALC-595)\n
+call square3(3)
+echo # bt in multipleSWC3()\n
+bt
+echo # as3bt in multipleSWC3()\n
+as3bt
+echo # done\n
+kill
+quit

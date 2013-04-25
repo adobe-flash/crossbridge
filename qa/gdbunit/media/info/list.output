@@ -1,0 +1,90 @@
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=IGNORE --target=avm2-elf".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+No symbol table is loaded.  Use the "file" command.
+Breakpoint 1 (main) pending.
+0xdddddddd in ?? ()
+
+Breakpoint 1, INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+20	    int s = 2;
+# show source code
+15	    return a * a;
+16	}
+17	
+18	int main (int argc, const char * argv[])
+19	{
+20	    int s = 2;
+21	    int t = 1;
+22	    
+23	    int i;
+24	    for (i = 0; i < 8; i++){
+25	        t *= 2;
+26	    }
+27	
+28	    printf("Hello, World!\n");
+29	    printf("%d*%d=%d", s, s, square(s));
+30	    return 0;
+31	}
+32	
+# show source code for main
+15	    return a * a;
+16	}
+17	
+18	int main (int argc, const char * argv[])
+19	{
+20	    int s = 2;
+21	    int t = 1;
+22	    
+23	    int i;
+24	    for (i = 0; i < 8; i++){
+# show source code for square
+10	char letters[5] = {'A', 'B', 'C', 'D', 'E'};
+11	int numbers[5] = {1, 2, 3, 4, 5};
+12	
+13	int square(int a)
+14	{
+15	    return a * a;
+16	}
+17	
+18	int main (int argc, const char * argv[])
+19	{
+# show source code around line 15
+10	char letters[5] = {'A', 'B', 'C', 'D', 'E'};
+11	int numbers[5] = {1, 2, 3, 4, 5};
+12	
+13	int square(int a)
+14	{
+15	    return a * a;
+16	}
+17	
+18	int main (int argc, const char * argv[])
+19	{
+# show source code from line 17-19
+17	
+18	int main (int argc, const char * argv[])
+19	{
+# show source code from a file
+10	char letters[5] = {'A', 'B', 'C', 'D', 'E'};
+11	int numbers[5] = {1, 2, 3, 4, 5};
+12	
+13	int square(int a)
+14	{
+15	    return a * a;
+16	}
+17	
+18	int main (int argc, const char * argv[])
+19	{
+# show default list size
+Number of source lines gdb will list by default is 10.
+# change list size to three lines
+Number of source lines gdb will list by default is 3.
+20	    int s = 2;
+21	    int t = 1;
+22	    
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]

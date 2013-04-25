@@ -1,0 +1,98 @@
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=IGNORE --target=avm2-elf".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+No symbol table is loaded.  Use the "file" command.
+Breakpoint 1 (main) pending.
+0xdddddddd in ?? ()
+
+Breakpoint 1, INSTRUCTPT in main (c=0, v=0x200ff0) at sys_sdl.c:377
+377		enableCrunLoop = c > 0;
+# sanity test we can debug into a Quake SWF
+372	
+373	int main (int c, char **v)
+374	{
+375		quakeparms_t parms;
+376		
+377		enableCrunLoop = c > 0;
+378	
+379	//	signal(SIGFPE, floating_point_exception_handler);
+380		signal(SIGFPE, SIG_IGN);
+381	
+# show locals
+parms = {basedir = 0x0, cachedir = 0x0, argc = 2101184, argv = 0x0, membase = 0x0, memsize = 0}
+# step a few times
+380		signal(SIGFPE, SIG_IGN);
+382		parms.memsize = 16*1024*1024;
+383		parms.membase = malloc (parms.memsize);
+384		parms.basedir = basedir;
+# Tick the engine a couple times 
+Breakpoint 2 at INSTRUCTPT: file sys_sdl.c, line 428.
+
+Breakpoint 2, INSTRUCTPT in engineTick () at sys_sdl.c:428
+428	    newtime = Sys_FloatTime ();
+
+Breakpoint 2, INSTRUCTPT in engineTick () at sys_sdl.c:428
+428	    newtime = Sys_FloatTime ();
+
+Breakpoint 2, INSTRUCTPT in engineTick () at sys_sdl.c:428
+428	    newtime = Sys_FloatTime ();
+# Break at R_DrawSurface() a couple times
+Breakpoint 3 at INSTRUCTPT: file r_surf.c, line 260.
+
+Breakpoint 3, INSTRUCTPT in R_DrawSurface () at r_surf.c:260
+260		R_BuildLightMap ();
+
+Breakpoint 3, INSTRUCTPT in R_DrawSurface () at r_surf.c:260
+260		R_BuildLightMap ();
+
+Breakpoint 2, INSTRUCTPT in engineTick () at sys_sdl.c:428
+428	    newtime = Sys_FloatTime ();
+
+Breakpoint 3, INSTRUCTPT in R_DrawSurface () at r_surf.c:260
+260		R_BuildLightMap ();
+# step a few times
+INSTRUCTPT in R_BuildLightMap () at r_surf.c:159
+159		surf = r_drawsurf.surf;
+161		smax = (surf->extents[0]>>4)+1;
+162		tmax = (surf->extents[1]>>4)+1;
+tmax = 4
+i = 0
+lightmap = 0x3f800000 ""
+surf = 0x6a5ab0
+smax = 3
+t = 1860840
+size = 0
+scale = 838861064
+maps = 6032700
+163		size = smax*tmax;
+164		lightmap = surf->samples;
+# next a few times
+166		if (r_fullbright.value || !cl.worldmodel->lightdata)
+174		for (i=0 ; i<size ; i++)
+tmax = 5
+i = 0
+lightmap = 0x6452f0 "sdUxhXwi\\rf\\lb\\"
+surf = 0x6a5ab0
+smax = 3
+t = 1860840
+size = 15
+scale = 838861064
+maps = 6032700
+175			blocklights[i] = r_refdef.ambientlight<<8;
+174		for (i=0 ; i<size ; i++)
+tmax = 5
+i = 0
+lightmap = 0x6452f0 "sdUxhXwi\\rf\\lb\\"
+surf = 0x6a5ab0
+smax = 3
+t = 1860840
+size = 15
+scale = 838861064
+maps = 6032700
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]

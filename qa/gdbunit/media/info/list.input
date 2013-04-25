@@ -1,0 +1,26 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # show source code\n
+list
+l
+echo # show source code for main\n
+list main
+echo # show source code for square\n
+list square
+echo # show source code around line 15\n
+list 15
+echo # show source code from line 17-19\n
+list 17,19
+echo # show source code from a file\n
+list helloWorld.c:square
+echo # show default list size\n
+show listsize
+echo # change list size to three lines\n
+set listsize 3
+show listsize
+list
+kill
+q

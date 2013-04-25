@@ -1,0 +1,23 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # sanity test that simple instruction stepping works\n
+stepi
+stepi
+stepi
+stepi
+stepi
+si
+si
+echo # sanity test that simple instruction next works\n
+nexti
+nexti
+nexti
+nexti
+nexti
+ni
+ni
+kill
+q
