@@ -1,0 +1,2 @@
+NOASM=exit.o
+
