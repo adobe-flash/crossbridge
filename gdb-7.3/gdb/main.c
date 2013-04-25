@@ -44,6 +44,9 @@
 #include "python/python.h"
 #include "objfiles.h"
 
+char *SetFlasccSDKLocation(const char *);
+static char *flascc_sdk = NULL;
+
 /* The selected interpreter.  This will be used as a set command
    variable, so it should always be malloc'ed - since
    do_setshow_command will free it.  */
@@ -816,6 +819,15 @@ captured_main (void *data)
   if (home_gdbinit && !inhibit_gdbinit)
     catch_command_errors (source_script, home_gdbinit, 0, RETURN_MASK_ALL);
 
+  if (!flascc_sdk) 
+    {
+      flascc_sdk = SetFlasccSDKLocation("/../../usr");
+    }
+  
+  char *flascc_init;
+  asprintf (&flascc_init, "%s/share/flascc-init.gdb", flascc_sdk);
+  catch_command_errors (source_script, flascc_init, 0, RETURN_MASK_ALL);
+
   /* Now perform all the actions indicated by the arguments.  */
   if (cdarg != NULL)
     {
@@ -841,8 +853,10 @@ captured_main (void *data)
          catch_command_errors returns non-zero on success!  */
       if (catch_command_errors (exec_file_attach, execarg,
 				!batch_flag, RETURN_MASK_ALL))
+        ;
+        /* AVM2 change: the file command doesn't attempt to load symbols.
 	catch_command_errors (symbol_file_add_main, symarg,
-			      !batch_flag, RETURN_MASK_ALL);
+			      !batch_flag, RETURN_MASK_ALL); */
     }
   else
     {

@@ -917,7 +917,7 @@ list_command (char *arg, int from_tty)
     dummy_beg = 1;
   else
     {
-      sals = decode_line_1 (&arg1, 0, 0, 0, 0);
+      sals = decode_line_1 (&arg1, 1, 0, 0, 0); //AVM2: find the first line for the function rather than expecting to have info for the PC
 
       if (!sals.nelts)
 	return;			/*  C++  */
@@ -1629,6 +1629,7 @@ the other arg."));
   if (dbx_commands)
     add_com_alias ("file", "list", class_files, 1);
 
+#if 0
   c = add_com ("disassemble", class_vars, disassemble_command, _("\
 Disassemble a specified section of memory.\n\
 Default is the function surrounding the pc of the selected frame.\n\
@@ -1640,6 +1641,7 @@ Two arguments (separated by a comma) are taken as a range of memory to dump,\n\
   set_cmd_completer (c, location_completer);
   if (xdb_commands)
     add_com_alias ("va", "disassemble", class_xdb, 0);
+#endif
 
   /* NOTE: cagney/2000-03-20: Being able to enter ``(gdb) !ls'' would
      be a really useful feature.  Unfortunately, the below wont do

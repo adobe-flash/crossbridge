@@ -2124,6 +2124,7 @@ enum bfd_architecture
   bfd_arch_lm32,      /* Lattice Mico32 */
 #define bfd_mach_lm32      1
   bfd_arch_microblaze,/* Xilinx MicroBlaze. */
+  bfd_arch_avm2,/* Adobe AVM2. */
   bfd_arch_last
   };
 

@@ -611,8 +611,15 @@ print_frame_info (struct frame_info *frame, int print_level,
   if (source_print && sal.symtab)
     {
       int done = 0;
+      /*
       int mid_statement = ((print_what == SRC_LINE)
 			   && frame_show_address (frame, sal));
+      */
+      /* AVM2 change: since the debugger always thinks it is in the middle of
+         a statement due to the way that debuglines are emitted, turn this
+         off to avoid printing the value of the pc each time the program stops.
+       */
+      int mid_statement = 0;
 
       if (annotation_level)
 	done = identify_source_line (sal.symtab, sal.line, mid_statement,

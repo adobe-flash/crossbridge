@@ -47,6 +47,9 @@
 
 #include "xcoffsolib.h"
 
+extern char avm2_exec_file[PATH_MAX];
+void push_avm2_target();
+
 struct vmap *map_vmap (bfd *, bfd *);
 
 void (*deprecated_file_changed_hook) (char *);
@@ -200,6 +203,19 @@ exec_file_attach (char *filename, int from_tty)
 {
   /* Remove any previous exec file.  */
   exec_close ();
+  if (!ptid_equal (inferior_ptid, null_ptid))
+    {
+      target_kill ();
+      init_thread_list ();
+
+      struct program_space *ss;
+      ALL_PSPACES (ss)
+      {
+          set_current_program_space (ss);
+          breakpoint_program_space_exit (ss);
+      }
+      symbol_file_clear (0);
+    }
 
   /* Now open and digest the file the user requested, if any.  */
 
@@ -212,6 +228,13 @@ exec_file_attach (char *filename, int from_tty)
     }
   else
     {
+#if 1
+      /* Hack alert! Rather than setting the target by actually examining
+       * the "executable" we've been given, assume it's a SWF and just set
+       * the avm2-remote target. */
+      push_avm2_target ();
+      strcpy (&avm2_exec_file[0], filename);
+#else
       struct cleanup *cleanups;
       char *scratch_pathname;
       int scratch_chan;
@@ -299,11 +322,15 @@ exec_file_attach (char *filename, int from_tty)
       add_target_sections (sections, sections_end);
       xfree (sections);
 
+#endif // AVM2
+
       /* Tell display code (if any) about the changed file name.  */
       if (deprecated_exec_file_display_hook)
 	(*deprecated_exec_file_display_hook) (filename);
 
+#if 0
       do_cleanups (cleanups);
+#endif
     }
   bfd_cache_close_all ();
   observer_notify_executable_changed ();
@@ -364,7 +391,8 @@ file_command (char *arg, int from_tty)
   /* FIXME, if we lose on reading the symbol file, we should revert
      the exec file, but that's rough.  */
   exec_file_command (arg, from_tty);
-  symbol_file_command (arg, from_tty);
+  /* AVM2 change: the file command shouldn't attempt to read symbols
+  symbol_file_command (arg, from_tty); */
   if (deprecated_file_changed_hook)
     deprecated_file_changed_hook (arg);
 }

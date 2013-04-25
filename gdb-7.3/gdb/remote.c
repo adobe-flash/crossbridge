@@ -68,6 +68,15 @@
 #include "ax.h"
 #include "ax-gdb.h"
 
+#include "SetAlchemySDKLocation.c"
+#include <dirent.h>
+
+char avm2_exec_file[PATH_MAX];
+static char *flascc_sdk = NULL;
+
+static pid_t avm2_player_pid = 0;
+static pid_t avm2_bridge_pid = 0;
+
 /* Temp hacks for tracepoint encoding migration.  */
 static char *target_buf;
 static long target_buf_size;
@@ -116,6 +125,8 @@ static void remote_mourn (struct target_ops *ops);
 static void extended_remote_restart (void);
 
 static void extended_remote_mourn (struct target_ops *);
+
+static void avm2_remote_mourn (struct target_ops *);
 
 static void remote_mourn_1 (struct target_ops *);
 
@@ -680,6 +691,8 @@ static struct target_ops remote_ops;
 
 static struct target_ops extended_remote_ops;
 
+static struct target_ops avm2_remote_ops;
+
 static int remote_async_mask_value = 1;
 
 /* FIXME: cagney/1999-09-23: Even though getpkt was called with
@@ -787,6 +800,14 @@ static int remote_async_terminal_ours_p;
 /* The executable file to use for "run" on the remote side.  */
 
 static char *remote_exec_file = "";
+
+/* The AS3 namespace that contains the AlcDbgHelper to attach to. */
+
+static char *remote_as3_helper_namespace = NULL;
+
+/* The level of performance logging in the debug bridge. 0 means none. */
+
+static long remote_avm2_bridge_perf_log_level = 0;
 
 
 /* User configurable variables for the number of characters in a
@@ -1434,6 +1455,7 @@ remote_add_inferior (int pid, int attached)
     }
 
   inf->attach_flag = attached;
+  inf->control.past_first_stop = 0;
 
   return inf;
 }
@@ -3414,6 +3436,15 @@ extended_remote_open (char *name, int from_tty)
   remote_open_1 (name, from_tty, &extended_remote_ops, 1 /*extended_p */);
 }
 
+/* Open a connection to a remote debugger using the avm2
+   remote gdb protocol.  NAME is the filename used for communication.  */
+
+static void
+avm2_remote_open (char *name, int from_tty)
+{
+  remote_open_1 (name, from_tty, &avm2_remote_ops, 0);
+}
+
 /* Generic code for opening a connection to a remote target.  */
 
 static void
@@ -4147,6 +4178,12 @@ extended_remote_detach (struct target_ops *ops, char *args, int from_tty)
   remote_detach_1 (args, from_tty, 1);
 }
 
+static void
+avm2_remote_detach (struct target_ops *ops, char *args, int from_tty)
+{
+  remote_detach_1 (args, from_tty, 0);
+}
+
 /* Same as remote_detach, but don't send the "D" packet; just disconnect.  */
 
 static void
@@ -4276,6 +4313,120 @@ static void
 extended_remote_attach (struct target_ops *ops, char *args, int from_tty)
 {
   extended_remote_attach_1 (ops, args, from_tty);
+}
+
+/* Attach to the process specified by ARGS.  If FROM_TTY is non-zero,
+   be chatty about it.  */
+
+static void
+avm2_remote_attach_1 (struct target_ops *target, char *args, int from_tty)
+{
+  struct remote_state *rs = get_remote_state ();
+  int pid;
+  char *wait_status = NULL;
+
+  pid = parse_pid_to_attach (args);
+
+  /* Remote PID can be freely equal to getpid, do not check it here the same
+     way as in other targets.  */
+
+  if (remote_protocol_packets[PACKET_vAttach].support == PACKET_DISABLE)
+    error (_("This target does not support attaching to a process"));
+
+  sprintf (rs->buf, "vAttach;%x", pid);
+  putpkt (rs->buf);
+  getpkt (&rs->buf, &rs->buf_size, 0);
+
+  if (packet_ok (rs->buf,
+		 &remote_protocol_packets[PACKET_vAttach]) == PACKET_OK)
+    {
+      if (from_tty)
+	printf_unfiltered (_("Attached to %s\n"),
+			   target_pid_to_str (pid_to_ptid (pid)));
+
+      if (!non_stop)
+	{
+	  /* Save the reply for later.  */
+	  wait_status = alloca (strlen (rs->buf) + 1);
+	  strcpy (wait_status, rs->buf);
+	}
+      else if (strcmp (rs->buf, "OK") != 0)
+	error (_("Attaching to %s failed with: %s"),
+	       target_pid_to_str (pid_to_ptid (pid)),
+	       rs->buf);
+    }
+  else if (remote_protocol_packets[PACKET_vAttach].support == PACKET_DISABLE)
+    error (_("This target does not support attaching to a process"));
+  else
+    error (_("Attaching to %s failed"),
+	   target_pid_to_str (pid_to_ptid (pid)));
+
+  set_current_inferior (remote_add_inferior (pid, 1));
+
+  inferior_ptid = pid_to_ptid (pid);
+
+  if (non_stop)
+    {
+      struct thread_info *thread;
+
+      /* Get list of threads.  */
+      remote_threads_info (target);
+
+      thread = first_thread_of_process (pid);
+      if (thread)
+	inferior_ptid = thread->ptid;
+      else
+	inferior_ptid = pid_to_ptid (pid);
+
+      /* Invalidate our notion of the remote current thread.  */
+      record_currthread (minus_one_ptid);
+    }
+  else
+    {
+      /* Now, if we have thread information, update inferior_ptid.  */
+      inferior_ptid = remote_current_thread (inferior_ptid);
+
+      /* Add the main thread to the thread list.  */
+      add_thread_silent (inferior_ptid);
+    }
+
+  /* Next, if the target can specify a description, read it.  We do
+     this before anything involving memory or registers.  */
+  target_find_description ();
+
+  if (!non_stop)
+    {
+      /* Use the previously fetched status.  */
+      gdb_assert (wait_status != NULL);
+
+      if (target_can_async_p ())
+	{
+	  struct stop_reply *stop_reply;
+	  struct cleanup *old_chain;
+
+	  stop_reply = stop_reply_xmalloc ();
+	  old_chain = make_cleanup (do_stop_reply_xfree, stop_reply);
+	  remote_parse_stop_reply (wait_status, stop_reply);
+	  discard_cleanups (old_chain);
+	  push_stop_reply (stop_reply);
+
+	  target_async (inferior_event_handler, 0);
+	}
+      else
+	{
+	  gdb_assert (wait_status != NULL);
+	  strcpy (rs->buf, wait_status);
+	  rs->cached_wait_status = 1;
+	}
+    }
+  else
+    gdb_assert (wait_status == NULL);
+}
+
+static void
+avm2_remote_attach (struct target_ops *ops, char *args, int from_tty)
+{
+  avm2_remote_attach_1 (ops, args, from_tty);
 }
 
 /* Convert hex digit A to a number.  */
@@ -5084,8 +5235,9 @@ remote_parse_stop_reply (char *buf, struct stop_reply *event)
 		error (_("Malformed packet(a) (missing colon): %s\n\
 Packet: '%s'\n"),
 		       p, buf);
-	      if (strncmp (p, "thread", p1 - p) == 0)
+	      if (strncmp (p, "thread", p1 - p) == 0) {
 		event->ptid = read_ptid (++p1, &p);
+              }
 	      else if ((strncmp (p, "watch", p1 - p) == 0)
 		       || (strncmp (p, "rwatch", p1 - p) == 0)
 		       || (strncmp (p, "awatch", p1 - p) == 0))
@@ -5686,6 +5838,8 @@ send_g_packet (void)
   if (buf_len % 2 != 0)
     error (_("Remote 'g' packet reply is of odd length: %s"), rs->buf);
 
+  if (remote_debug)
+      fprintf_unfiltered(gdb_stdlog, "packet g okay\n");
   return buf_len / 2;
 }
 
@@ -7365,6 +7519,27 @@ extended_remote_kill (struct target_ops *ops)
 }
 
 static void
+avm2_remote_kill (struct target_ops *ops)
+{
+  int statloc;
+  if (avm2_bridge_pid)
+  {
+    kill (avm2_bridge_pid, SIGTERM);
+    avm2_bridge_pid = 0;
+    waitpid (avm2_bridge_pid, &statloc, 0);
+  }
+  
+  if (avm2_player_pid)
+  {
+    kill (avm2_player_pid, SIGTERM);
+    avm2_player_pid = 0;
+    waitpid (avm2_player_pid, &statloc, 0);
+  }
+  
+  target_mourn_inferior ();
+}
+
+static void
 remote_mourn (struct target_ops *ops)
 {
   remote_mourn_1 (ops);
@@ -7448,6 +7623,21 @@ static void
 extended_remote_mourn (struct target_ops *ops)
 {
   extended_remote_mourn_1 (ops);
+}
+
+static void
+avm2_remote_mourn_1 (struct target_ops *target)
+{
+  unpush_target (target);
+  
+  /* remote_close takes care of doing most of the clean up.  */
+  generic_mourn_inferior ();
+}
+
+static void
+avm2_remote_mourn (struct target_ops *ops)
+{
+  avm2_remote_mourn_1 (ops);
 }
 
 static int
@@ -7571,6 +7761,195 @@ extended_remote_create_inferior (struct target_ops *ops,
 }
 
 
+/* Convert cygwin style paths to native paths. Return zero
+   on success, non-zero on error. */
+#ifdef __CYGWIN__
+int
+cygwin_get_native_path (char *dest, char *cyg_path)
+{
+  char *escaped_path = malloc(strlen(cyg_path) * 2);
+  char *escape_ptr = escaped_path;
+
+  // escape any windows path separators that might be in the input
+  while (*cyg_path) {
+    if (*cyg_path == '\\') {
+      *escape_ptr = '\\';
+      escape_ptr++;
+     }
+    *escape_ptr = *cyg_path;
+    escape_ptr++;
+    cyg_path++;
+  }
+  *escape_ptr = '\0';
+
+  char *cygpath_cmd;
+  asprintf (&cygpath_cmd, "cygpath -w %s", escaped_path);
+  free(escaped_path);
+  FILE *cygpath_file = popen (cygpath_cmd, "r");
+  free (cygpath_cmd);
+  if (!cygpath_file)
+    return 1;
+  
+  memset (dest, 0, MAX_PATH);
+  fread (dest, 1, MAX_PATH, cygpath_file);
+  /* Get rid of trailing newline */
+  dest[strlen (dest) - 1] = '\0';
+  pclose (cygpath_file);
+
+  return 0;
+}
+#endif
+
+
+/* Whether we've already sourced the file containing avm2-specific
+ * command definitions. Only do this once. */
+static int avm2_sourced = 0;
+
+
+/* In the extended protocol we want to be able to do things like
+   "run" and have them basically work as expected.  So we need
+   a special create_inferior function.  We support changing the
+   executable file and the command line arguments, but not the
+   environment.  */
+
+static void
+avm2_remote_create_inferior_1 (char *exec_file, char *args,
+				   char **env, int from_tty)
+{
+  if (!flascc_sdk) 
+  {
+    flascc_sdk = SetFlasccSDKLocation("/../../usr");
+  }
+  
+
+  char *player = getenv("FLASCC_GDB_RUNTIME");
+  if (!player)
+  {
+    error("Please set the FLASCC_GDB_RUNTIME environment"
+      " variable to the path to a debugger player or browser.\n");
+    return;
+  }
+  
+  if ((avm2_bridge_pid = fork()))
+  {
+      if ((avm2_player_pid = fork())) 
+      {
+          char *defs, *run;
+          asprintf (&defs, "%s/share/flascc.gdb", flascc_sdk);
+          asprintf (&run, "%s/share/flascc-run.gdb", flascc_sdk);
+          // TODO: wait for bridge to listen
+          sleep(1);
+          if (!avm2_sourced)
+          {
+            source_script(defs, 1);
+            avm2_sourced = 1;
+          }
+          source_script(run, 1);
+          if (!target_can_async_p())
+          {
+              continue_command(NULL, 0);
+          }
+
+          free (defs);
+          free (run);
+
+      } else {
+        char *cmd;
+        char *args[3];
+        args[0] = player;
+        args[1] = NULL;
+	args[2] = NULL;
+	signal (SIGINT, SIG_IGN);
+#ifdef __CYGWIN__
+	char pathbuf[MAX_PATH];
+	if (cygwin_get_native_path (&pathbuf[0], exec_file))
+	  error ("Unable to determine path to program to be run.\n");
+	args[1] = &pathbuf[0];
+	execv (player, args);
+#else
+        char *player_exec_dir;
+        asprintf (&player_exec_dir, "%s/Contents/MacOS/", player);
+        DIR *player_dir = opendir (player_exec_dir);
+        if (!player_dir) {
+            error ("Unable to find player or browser executable.\n");
+            return;
+        }
+        char *player_exec = NULL;
+        while (!player_exec) {
+            struct dirent *ent = readdir (player_dir);
+            if (!ent) 
+            {
+                error ("Unable to find player or browser executable.\n");
+                return;
+            } else if (ent->d_name[0] != '.') 
+            {
+                asprintf (&player_exec, "%s/Contents/MacOS/%s", player,
+                    ent->d_name);
+            }
+        }
+        closedir (player_dir);
+        
+        if (fork())
+        {
+            // The player currently prints annoying debug messages when
+            // workers are created or destroyed. Redirect stdout and stderr
+            // so that the user doesn't see these messages.
+            freopen ("/dev/null", "w", stdout);
+            freopen ("/dev/null", "w", stderr);
+            execv (player_exec, args);
+        } else {
+            // Wait to give the player a chance to load. If we don't do this
+            // there's a chance this will happen first, causing two players
+            // to load, and we won't be able to kill the one launched here
+            sleep (1);
+            asprintf (&cmd, "open -g -a \"%s\" %s", player, exec_file);
+            system (cmd);
+            free (cmd);
+        }
+        free (player_exec);
+#endif
+        exit (0);
+      }
+  } else {
+      char *alcdb;
+#ifdef __CYGWIN__
+      char pathbuf[MAX_PATH];
+      asprintf (&alcdb, "%s/lib/alcdb.jar", flascc_sdk);
+      if (cygwin_get_native_path (&pathbuf[0], alcdb))
+      {
+        error ("Unable to determine path to debug bridge.\n");
+      }
+      free (alcdb);
+      alcdb = pathbuf;
+#else
+      asprintf (&alcdb, "%s/lib/alcdb.jar", flascc_sdk);
+#endif
+      char *args[9];
+      char log_level_buf[512];
+      snprintf(&log_level_buf[0], sizeof(log_level_buf), "%u", 
+                    remote_avm2_bridge_perf_log_level);
+      args[0] = "java";
+      args[1] = "-jar";
+      args[2] = alcdb;
+      args[3] = (getenv("ALC_GDB_VERBOSE")) ? "-v" : "-q";
+      args[4] = "-n";
+      args[5] = remote_as3_helper_namespace;
+      args[6] = "-p";
+      args[7] = &log_level_buf[0];
+      args[8] = NULL;
+      signal(SIGINT, SIG_IGN); 
+      execvp ("java", args);
+  }
+}
+
+static void
+avm2_remote_create_inferior (struct target_ops *ops, 
+				 char *exec_file, char *args,
+				 char **env, int from_tty)
+{
+  avm2_remote_create_inferior_1 (exec_file, args, env, from_tty);
+}
+
 /* Insert a breakpoint.  On targets that have software breakpoint
    support, we ask the remote target to do the work; on targets
    which don't, we insert a traditional memory breakpoint.  */
@@ -7626,6 +8005,12 @@ static int
 remote_remove_breakpoint (struct gdbarch *gdbarch,
 			  struct bp_target_info *bp_tgt)
 {
+  /* This can be called after the remote inferior has shut down, do
+   * nothing in that case. (See ALC-238). */
+  if (!remote_desc) {
+     return 0; 
+  }
+  
   CORE_ADDR addr = bp_tgt->placed_address;
   struct remote_state *rs = get_remote_state ();
 
@@ -7763,6 +8148,16 @@ remote_check_watch_resources (int type, int cnt, int ot)
 	return 1;
     }
   return -1;
+}
+
+static int
+avm2_remote_check_watch_resources (int type, int cnt, int ot)
+{
+  /* AVM2 does not allow hardware watchpoints. */
+  if (type == bp_hardware_watchpoint)
+    return 0;
+  else
+    return remote_check_watch_resources (type, cnt, ot);
 }
 
 static int
@@ -8502,6 +8897,41 @@ packet_command (char *args, int from_tty)
   puts_filtered ("\n");
 }
 
+static void
+perf_logging_command (char *args, int from_tty)
+{
+  struct remote_state *rs = get_remote_state ();
+
+  if (args == NULL)
+    error ("Argument required (integer).");
+  else
+    {
+      char *end;
+      remote_avm2_bridge_perf_log_level = strtoul (args, &end, 0);
+      if (args == end)
+	error ("Invalid remote-perf-logging (bad syntax).");
+    }
+
+  if (remote_desc)
+    {
+      char buf[512];
+      snprintf (&buf, sizeof(buf), "monitor set-perf-log %u", 
+                        remote_avm2_bridge_perf_log_level);
+      target_rcmd (&buf, NULL);
+    }
+}
+
+static void
+perf_log_command (char *args, int from_tty)
+{
+  if (remote_desc)
+    {
+      target_rcmd ("monitor show-perf-log", gdb_stdtarg);
+    }
+  else
+    error (_("command can only be used with remote target"));
+}
+
 #if 0
 /* --------- UNIT_TEST for THREAD oriented PACKETS ------------------- */
 
@@ -8649,6 +9079,50 @@ init_remote_threadtests (void)
 }
 
 #endif /* 0 */
+
+/* Convert a thread ID to a string.  Returns the string in a static
+   buffer.  */
+
+static char *
+avm2_remote_pid_to_str (struct target_ops *ops, ptid_t ptid)
+{
+  static char buf[64];
+  struct remote_state *rs = get_remote_state ();
+
+  if (ptid_is_pid (ptid))
+    {
+      /* Printing an inferior target id.  */
+
+      /* When multi-process extensions are off, there's no way in the
+	 remote protocol to know the remote process id, if there's any
+	 at all.  There's one exception --- when we're connected with
+	 target extended-remote, and we manually attached to a process
+	 with "attach PID".  We don't record anywhere a flag that
+	 allows us to distinguish that case from the case of
+	 connecting with extended-remote and the stub already being
+	 attached to a process, and reporting yes to qAttached, hence
+	 no smart special casing here.  */
+      if (!remote_multi_process_p (rs))
+	{
+	  xsnprintf (buf, sizeof buf, "Remote target");
+	  return buf;
+	}
+
+      return normal_pid_to_str (ptid);
+    }
+  else
+    {
+      if (ptid_equal (magic_null_ptid, ptid))
+	xsnprintf (buf, sizeof buf, "Thread <main>");
+      else if (remote_multi_process_p (rs))
+	xsnprintf (buf, sizeof buf, "Thread %d.%ld",
+		   ptid_get_pid (ptid), ptid_get_tid (ptid));
+      else
+	xsnprintf (buf, sizeof buf, "Worker %ld",
+		   ptid_get_tid (ptid));
+      return buf;
+    }
+}
 
 /* Convert a thread ID to a string.  Returns the string in a static
    buffer.  */
@@ -9079,6 +9553,24 @@ remote_hostio_send_command (int command_bytes, int which_packet,
   return ret;
 }
 
+/* AVM2 optimization:
+ * Since reading symbol files can take a long time, and most of this time is
+ * spent calling into the player to retrieve a small amount of data, we
+ * read and cache each symbol file once it is opened.
+ */
+struct cached_target_file {
+  gdb_byte *file_buffer;
+  int buffer_len;
+};
+
+static struct cached_target_file **target_files = NULL;
+static unsigned int num_target_files = 0;
+static const unsigned int READ_SIZE = 10 * 1024;
+
+static int
+remote_hostio_pread (int fd, gdb_byte *read_buf, int len,
+		     ULONGEST offset, int *remote_errno);
+
 /* Open FILENAME on the remote target, using FLAGS and MODE.  Return a
    remote file descriptor, or -1 if an error occurs (and set
    *REMOTE_ERRNO).  */
@@ -9102,8 +9594,32 @@ remote_hostio_open (const char *filename, int flags, int mode,
 
   remote_buffer_add_int (&p, &left, mode);
 
-  return remote_hostio_send_command (p - rs->buf, PACKET_vFile_open,
+  int fd =  remote_hostio_send_command (p - rs->buf, PACKET_vFile_open,
 				     remote_errno, NULL, NULL);
+  if (fd != -1) {
+    if (fd >= num_target_files) {
+      num_target_files += 1024;
+      target_files = xrealloc (target_files, num_target_files * 
+                                sizeof (struct cached_target_file *));
+      gdb_assert (fd < num_target_files);
+    }
+    struct cached_target_file *cfile = xmalloc(
+                                        sizeof (struct cached_target_file));
+    cfile->file_buffer = NULL;
+    cfile->buffer_len = 0;
+    target_files[fd] = NULL;
+    int nread = 0;
+    do {
+        cfile->buffer_len += READ_SIZE;
+        cfile->file_buffer = xrealloc (cfile->file_buffer, 
+                                        cfile->buffer_len);
+        nread += remote_hostio_pread(fd, cfile->file_buffer + nread, 
+                                    READ_SIZE, nread, remote_errno);
+    } while (nread == cfile->buffer_len);
+    cfile->buffer_len = nread;
+    target_files[fd] = cfile;
+  }
+  return fd;
 }
 
 /* Write up to LEN bytes from WRITE_BUF to FD on the remote target.
@@ -9118,7 +9634,7 @@ remote_hostio_pwrite (int fd, const gdb_byte *write_buf, int len,
   char *p = rs->buf;
   int left = get_remote_packet_size ();
   int out_len;
-
+ 
   remote_buffer_add_string (&p, &left, "vFile:pwrite:");
 
   remote_buffer_add_int (&p, &left, fd);
@@ -9148,6 +9664,15 @@ remote_hostio_pread (int fd, gdb_byte *read_buf, int len,
   int left = get_remote_packet_size ();
   int ret, attachment_len;
   int read_len;
+
+  /* If possible, read the value out of the buffer and don't talk to
+   * the target at all. */
+  if (fd >= 0 && fd < num_target_files && target_files[fd] != NULL) {
+    if ((offset + len) <= target_files[fd]->buffer_len) {
+      memmove(read_buf, target_files[fd]->file_buffer + offset, len);
+      return len;
+    }
+  }
 
   remote_buffer_add_string (&p, &left, "vFile:pread:");
 
@@ -9183,6 +9708,12 @@ remote_hostio_close (int fd, int *remote_errno)
   struct remote_state *rs = get_remote_state ();
   char *p = rs->buf;
   int left = get_remote_packet_size () - 1;
+
+  if (fd >= 0) {
+    xfree (target_files[fd]->file_buffer);
+    xfree (target_files[fd]);
+    target_files[fd] = NULL;
+  }
 
   remote_buffer_add_string (&p, &left, "vFile:close:");
 
@@ -9974,6 +10505,12 @@ remote_trace_start (void)
 }
 
 static int
+avm2_remote_get_trace_status (struct trace_status *ts)
+{
+    return -1;
+}
+
+static int
 remote_get_trace_status (struct trace_status *ts)
 {
   /* Initialize it just to avoid a GCC false warning.  */
@@ -10262,6 +10799,12 @@ remote_traceframe_info (void)
   return NULL;
 }
 
+static int
+avm2_remote_can_async_p (void)
+{
+  return target_async_permitted;
+}
+
 static void
 init_remote_ops (void)
 {
@@ -10376,6 +10919,32 @@ Specify the serial device it is connected to (e.g. /dev/ttya).";
   extended_remote_ops.to_detach = extended_remote_detach;
   extended_remote_ops.to_attach = extended_remote_attach;
   extended_remote_ops.to_kill = extended_remote_kill;
+}
+
+/* Set up the avm2 remote vector by making a copy of the standard
+   remote vector and adding to it.  */
+
+static void
+init_avm2_remote_ops (void)
+{
+  avm2_remote_ops = remote_ops;
+
+  avm2_remote_ops.to_shortname = "avm2-remote";
+  avm2_remote_ops.to_longname =
+    "AVM2 remote target in gdb-specific protocol";
+  avm2_remote_ops.to_doc =
+    "Use a Flash Player Debugger on the local machine, "
+    "using a gdb-specific protocol.";
+  avm2_remote_ops.to_open = avm2_remote_open;
+  avm2_remote_ops.to_create_inferior = avm2_remote_create_inferior;
+  avm2_remote_ops.to_mourn_inferior = avm2_remote_mourn;
+  avm2_remote_ops.to_detach = avm2_remote_detach;
+  avm2_remote_ops.to_attach = avm2_remote_attach;
+  avm2_remote_ops.to_kill = avm2_remote_kill;
+  avm2_remote_ops.to_get_trace_status = avm2_remote_get_trace_status;
+  avm2_remote_ops.to_can_use_hw_breakpoint = avm2_remote_check_watch_resources;
+  avm2_remote_ops.to_can_async_p = avm2_remote_can_async_p;
+  avm2_remote_ops.to_pid_to_str = avm2_remote_pid_to_str;
 }
 
 static int
@@ -10554,6 +11123,32 @@ remote_upload_trace_state_variables (struct uploaded_tsv **utsvp)
 }
 
 void
+push_avm2_target (void)
+{
+  push_target (&avm2_remote_ops);
+}
+
+void
+avm2_select_thread_for_continue_command (char *args, int from_tty)
+{
+  if (!non_stop)
+    return;
+  if (is_executing (inferior_ptid))
+    error ("Cannot execute this command while the selected thread is running.");
+  set_general_thread (inferior_ptid);
+}
+
+void
+avm2_select_thread_for_bt_command (char *args, int from_tty)
+{
+  if (!non_stop)
+    return;
+  if (is_executing (inferior_ptid))
+    error ("Target is executing.");
+  set_general_thread (inferior_ptid);
+}
+
+void
 _initialize_remote (void)
 {
   struct remote_state *rs;
@@ -10579,6 +11174,9 @@ _initialize_remote (void)
 
   init_extended_remote_ops ();
   add_target (&extended_remote_ops);
+
+  init_avm2_remote_ops ();
+  add_target (&avm2_remote_ops);
 
   /* Hook into new objfile notification.  */
   observer_attach_new_objfile (remote_new_objfile);
@@ -10712,6 +11310,35 @@ Show the maximum size of the address (in bits) in a memory packet."), NULL,
 			   NULL,
 			   NULL, /* FIXME: i18n: */
 			   &setlist, &showlist);
+
+  char *default_ns = "com.adobe.flascc";
+  remote_as3_helper_namespace = malloc(strlen(default_ns) + 1);
+  strcpy(remote_as3_helper_namespace, default_ns);
+  add_setshow_string_cmd ("as3namespace", no_class,
+			   &remote_as3_helper_namespace, "\
+Set the AS3 namespace of the inferior.", "\
+Show the AS3 namespace of the inferior.", NULL,
+			   NULL,
+			   NULL, 
+			   &setlist, &showlist);
+
+  add_cmd ("avm2-select-thread-for-continue", class_obscure, 
+            avm2_select_thread_for_continue_command, "\
+Force the remote target to select the current thread to be resumed.",
+	   &cmdlist);
+
+  add_cmd ("avm2-select-thread-for-bt", class_obscure, 
+            avm2_select_thread_for_bt_command, "\
+Force the remote target to select the current thread to report a stacktrace.",
+	   &cmdlist);
+
+  add_cmd ("remote-perf-logging", class_maintenance, perf_logging_command, "\
+Instruct the remote target to turn on performance logging.\n",
+	   &maintenancelist);
+
+  add_cmd ("remote-perf-log", class_maintenance, perf_log_command, "\
+Display a performance summary of the remote target.\n",
+	   &maintenancelist);
 
   add_packet_config_cmd (&remote_protocol_packets[PACKET_X],
 			 "X", "binary-download", 1);

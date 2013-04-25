@@ -437,6 +437,7 @@ DESCRIPTION
 .  bfd_arch_lm32,      {* Lattice Mico32 *}
 .#define bfd_mach_lm32      1
 .  bfd_arch_microblaze,{* Xilinx MicroBlaze. *}
+.  bfd_arch_avm2,{* Adobe AVM2. *}
 .  bfd_arch_last
 .  };
 */
@@ -478,6 +479,7 @@ DESCRIPTION
 extern const bfd_arch_info_type bfd_alpha_arch;
 extern const bfd_arch_info_type bfd_arc_arch;
 extern const bfd_arch_info_type bfd_arm_arch;
+extern const bfd_arch_info_type bfd_avm2_arch;
 extern const bfd_arch_info_type bfd_avr_arch;
 extern const bfd_arch_info_type bfd_bfin_arch;
 extern const bfd_arch_info_type bfd_cr16_arch;
@@ -555,6 +557,7 @@ static const bfd_arch_info_type * const bfd_archures_list[] =
     &bfd_alpha_arch,
     &bfd_arc_arch,
     &bfd_arm_arch,
+    &bfd_avm2_arch,
     &bfd_avr_arch,
     &bfd_bfin_arch,
     &bfd_cr16_arch,

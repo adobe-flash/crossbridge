@@ -635,7 +635,8 @@ call_function_by_hand (struct value *function, int nargs, struct value **args)
 	CORE_ADDR dummy_addr;
 
 	real_pc = funaddr;
-	dummy_addr = entry_point_address ();
+	//dummy_addr = entry_point_address ();
+	dummy_addr = 0x0;
 	/* A call dummy always consists of just a single breakpoint, so
 	   its address is the same as the address of the dummy.  */
 	bp_addr = dummy_addr;
@@ -772,6 +773,7 @@ call_function_by_hand (struct value *function, int nargs, struct value **args)
   /* Create a momentary breakpoint at the return address of the
      inferior.  That way it breaks when it returns.  */
 
+#if 0
   {
     struct breakpoint *bpt;
     struct symtab_and_line sal;
@@ -786,6 +788,7 @@ call_function_by_hand (struct value *function, int nargs, struct value **args)
     bpt = set_momentary_breakpoint (gdbarch, sal, dummy_id, bp_call_dummy);
     bpt->disposition = disp_del;
   }
+#endif
 
   /* Create a breakpoint in std::terminate.
      If a C++ exception is raised in the dummy-frame, and the
@@ -805,7 +808,7 @@ call_function_by_hand (struct value *function, int nargs, struct value **args)
   /* Everything's ready, push all the info needed to restore the
      caller (and identify the dummy-frame) onto the dummy-frame
      stack.  */
-  dummy_frame_push (caller_state, &dummy_id);
+  //dummy_frame_push (caller_state, &dummy_id);
 
   /* Discard both inf_status and caller_state cleanups.
      From this point on we explicitly restore the associated state
@@ -914,6 +917,7 @@ When the function is done executing, GDB will silently stop."),
 	       name);
     }
 
+#if 0
   if (stopped_by_random_signal || stop_stack_dummy != STOP_STACK_DUMMY)
     {
       const char *name = get_function_name (funaddr,
@@ -1016,6 +1020,7 @@ When the function is done executing, GDB will silently stop."),
       /* The above code errors out, so ...  */
       internal_error (__FILE__, __LINE__, _("... should not be here"));
     }
+#endif
 
   do_cleanups (terminate_bp_cleanup);
 

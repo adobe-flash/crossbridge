@@ -50,7 +50,7 @@ initialize_tdesc_i386 (void)
   tdesc_create_reg (feature, "es", 13, 1, NULL, 32, "int32");
   tdesc_create_reg (feature, "fs", 14, 1, NULL, 32, "int32");
   tdesc_create_reg (feature, "gs", 15, 1, NULL, 32, "int32");
-  tdesc_create_reg (feature, "st0", 16, 1, NULL, 80, "i387_ext");
+  tdesc_create_reg (feature, "st0", 16, 1, NULL, 64, "ieee_double");
   tdesc_create_reg (feature, "st1", 17, 1, NULL, 80, "i387_ext");
   tdesc_create_reg (feature, "st2", 18, 1, NULL, 80, "i387_ext");
   tdesc_create_reg (feature, "st3", 19, 1, NULL, 80, "i387_ext");

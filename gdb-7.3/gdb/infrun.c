@@ -2697,10 +2697,9 @@ fetch_inferior_event (void *client_data)
   /* Now figure out what to do with the result of the result.  */
   handle_inferior_event (ecs);
 
+  struct inferior *inf = find_inferior_pid (ptid_get_pid (ecs->ptid));
   if (!ecs->wait_some_more)
     {
-      struct inferior *inf = find_inferior_pid (ptid_get_pid (ecs->ptid));
-
       delete_step_thread_step_resume_breakpoint ();
 
       /* We may not find an inferior if this was a process exit.  */
@@ -2725,8 +2724,14 @@ fetch_inferior_event (void *client_data)
 
   /* If the inferior was in sync execution mode, and now isn't,
      restore the prompt.  */
-  if (was_sync && !sync_execution)
+  if (was_sync && !sync_execution && 
+        (inf == NULL || inf->control.past_first_stop))
     display_gdb_prompt (0);
+
+  if (inf && !inf->control.past_first_stop) {
+    continue_command(NULL, 0);
+    inf->control.past_first_stop = 1;
+  }
 }
 
 /* Record the frame and location we're currently stepping through.  */
@@ -3197,7 +3202,12 @@ handle_inferior_event (struct execution_control_state *ecs)
 	 loading that we aren't interested in, resume the program.  If
 	 we're running the program normally, also resume.  But stop if
 	 we're attaching or setting up a remote connection.  */
-      if (stop_soon == STOP_QUIETLY || stop_soon == NO_STOP_QUIETLY)
+      
+      /* AVM2 change:
+         If we are stepping, don't resume the inferior in response to
+         a shared library load event. */
+      if (!ecs->wait_some_more &&  
+          (stop_soon == STOP_QUIETLY || stop_soon == NO_STOP_QUIETLY))
 	{
 	  /* Loading of shared libraries might have changed breakpoint
 	     addresses.  Make sure new breakpoints are inserted.  */
@@ -3207,6 +3217,11 @@ handle_inferior_event (struct execution_control_state *ecs)
 	  resume (0, TARGET_SIGNAL_0);
 	  prepare_to_wait (ecs);
 	  return;
+	} 
+      else if (ecs->wait_some_more) 
+	{ 
+          keep_going (ecs);
+          return;
 	}
 
       break;
@@ -4047,13 +4062,17 @@ process_event_stop_test:
 
       stopped_by_random_signal = 1;
 
-      if (signal_print[ecs->event_thread->suspend.stop_signal])
+      if (!ecs->event_thread->control.in_infcall 
+          && signal_print[ecs->event_thread->suspend.stop_signal])
 	{
 	  printed = 1;
 	  target_terminal_ours_for_output ();
 	  print_signal_received_reason
 				     (ecs->event_thread->suspend.stop_signal);
 	}
+      
+      if (ecs->event_thread->control.in_infcall)
+        stop_print_frame = 0;
       /* Always stop on signals if we're either just gaining control
 	 of the program, or the user explicitly requested this thread
 	 to remain stopped.  */
@@ -4268,7 +4287,10 @@ process_event_stop_test:
       case BPSTAT_WHAT_STOP_NOISY:
         if (debug_infrun)
 	  fprintf_unfiltered (gdb_stdlog, "infrun: BPSTAT_WHAT_STOP_NOISY\n");
-	stop_print_frame = 1;
+        if (ecs->event_thread->control.in_infcall)
+          stop_print_frame = 0;
+        else
+	  stop_print_frame = 1;
 
 	/* We are about to nuke the step_resume_breakpointt via the
 	   cleanup chain, so no need to worry about it here.  */
@@ -4554,6 +4576,21 @@ process_event_stop_test:
       return;
     }
 
+   /* AVM2-specific code:
+      stop_pc is zero if the debugger is stopped at a line in Actionscript
+      for which we don't have debugging information. This could be AS that
+      wasn't compiled from C/C++ and thus doesn't have debugging information,
+      or it could be script init code that is setting up a CModule. In the
+      latter case, we may need to stop after the init code has run, so
+      single step until we get out of the script init code.
+      See ALC-629.
+    */
+   if (!stop_pc)
+     {
+       keep_going (ecs);
+       return;
+     }
+
   /* Check for subroutine calls.  The check for the current frame
      equalling the step ID is not necessary - the check of the
      previous frame's ID is sufficient - but it is a common case and
@@ -4571,10 +4608,22 @@ process_event_stop_test:
      initial outermost frame, before sp was valid, would
      have code_addr == &_start.  See the comment in frame_id_eq
      for more.  */
+ 
+  /* AVM2-specific code:
+     In Actionscript, it's possible to call up to two functions before
+     hitting a debugline. So here gdb unwinds the stack up to two times
+     when attempting to detect a function call.
+   */
+  struct frame_id up = frame_unwind_caller_id (get_current_frame ());
+  struct frame_info *upin = frame_find_by_id (up);
+  struct frame_id ssfi = ecs->event_thread->control.step_stack_frame_id;
+  int one_frame_down = frame_id_eq(up, ssfi);
+  int two_frames_down = frame_id_eq(frame_unwind_caller_id(upin), ssfi);
+  struct frame_info *caller = one_frame_down ? frame : upin;
+
   if (!frame_id_eq (get_stack_frame_id (frame),
 		    ecs->event_thread->control.step_stack_frame_id)
-      && (frame_id_eq (frame_unwind_caller_id (get_current_frame ()),
-		       ecs->event_thread->control.step_stack_frame_id)
+      && ((one_frame_down || two_frames_down)
 	  && (!frame_id_eq (ecs->event_thread->control.step_stack_frame_id,
 			    outer_frame_id)
 	      || step_start_function != find_pc_function (stop_pc))))
@@ -4644,7 +4693,7 @@ process_event_stop_test:
 						    sr_sal, null_frame_id);
 	    }
 	  else
-	    insert_step_resume_breakpoint_at_caller (frame);
+	    insert_step_resume_breakpoint_at_caller (caller);
 
 	  keep_going (ecs);
 	  return;
@@ -4684,7 +4733,14 @@ process_event_stop_test:
       {
 	struct symtab_and_line tmp_sal;
 
-	tmp_sal = find_pc_line (ecs->stop_func_start, 0);
+        /* AVM2 change: If we have line number information, adjust the pc
+           to the first executable line in the function. Native does this
+           adjustment later, since it tends to have line number info
+           for fuctions' start pc values. We don't, so we'll miss the entire
+           function call if we don't adjust now. */
+	CORE_ADDR adjusted_pc = gdbarch_skip_prologue (gdbarch, 
+                                                       ecs->stop_func_start);
+	tmp_sal = find_pc_line (adjusted_pc, 0);
 	if (tmp_sal.line != 0)
 	  {
 	    if (execution_direction == EXEC_REVERSE)
@@ -4944,7 +5000,13 @@ process_event_stop_test:
       return;
     }
 
-  if ((stop_pc == stop_pc_sal.pc)
+
+  /* AVM2-specific change:
+     Contrary to the comment below, stop even if we end up in the
+     middle of a different line. Because of the way that debuglines are
+     generated, gdb often ends up in the middle of lines.
+   */
+  if ((stop_pc >= stop_pc_sal.pc)
       && (ecs->event_thread->current_line != stop_pc_sal.line
  	  || ecs->event_thread->current_symtab != stop_pc_sal.symtab))
     {
@@ -5636,8 +5698,13 @@ normal_stop (void)
   /* If an auto-display called a function and that got a signal,
      delete that auto-display to avoid an infinite recursion.  */
 
+  /* AVM2-specific change: don't disable auto-display expressions
+     because there is no risk of infinite recursion, and because of
+     the way that AVM2 calls functions, it always appears to be
+     stopped due to a signal.
   if (stopped_by_random_signal)
     disable_current_display ();
+    */
 
   /* Don't print a message if in the middle of doing a "step n"
      operation for n > 1 */
@@ -5994,6 +6061,10 @@ handle_command (char *args, int from_tty)
       else if (wordlen >= 4 && !strncmp (*argv, "nopass", wordlen))
 	{
 	  UNSET_SIGS (nsigs, sigs, signal_program);
+	}
+      else if (wordlen >= 4 && !strncmp(*argv, "stopnoprint", wordlen))
+	{
+	  UNSET_SIGS (nsigs, sigs, signal_print);
 	}
       else if (digits > 0)
 	{

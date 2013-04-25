@@ -56,6 +56,9 @@
 #include "inline-frame.h"
 #include "tracepoint.h"
 
+extern char avm2_exec_file[PATH_MAX];
+void push_avm2_target();
+
 /* Functions exported for general use, in inferior.h: */
 
 void all_registers_info (char *, int);
@@ -519,7 +522,12 @@ run_command_1 (char *args, int from_tty, int tbreak_at_main)
   if (tbreak_at_main)
     tbreak_command (main_name (), 0);
 
+#if 0
   exec_file = (char *) get_exec_file (0);
+#else
+  exec_file = avm2_exec_file;
+  push_avm2_target ();
+#endif
 
   if (non_stop && !target_supports_non_stop ())
     error (_("The target does not support running in non-stop mode."));
@@ -597,7 +605,11 @@ run_command_1 (char *args, int from_tty, int tbreak_at_main)
 
   /* Start the target running.  Do not use -1 continuation as it would skip
      breakpoint right at the entry point.  */
+  /* Don't actually proceed on avm2, since we want to stop at the begining
+     of the world anyway */
+#if 0
   proceed (regcache_read_pc (get_current_regcache ()), TARGET_SIGNAL_0, 0);
+#endif
 
   /* Since there was no error, there's no need to finish the thread
      states here.  */
@@ -2822,6 +2834,7 @@ needed."),
 		  _("Kill execution of program being debugged."),
 		  &killlist, "kill ", 0, &cmdlist);
 
+#if 0
   add_com ("attach", class_run, attach_command, _("\
 Attach to a process or file outside of GDB.\n\
 This command attaches to another target, of the same type as your last\n\
@@ -2840,6 +2853,7 @@ Detach a process or file previously attached.\n\
 If a process, it is no longer traced, and it continues its execution.  If\n\
 you were debugging a file, the file is closed and gdb no longer accesses it."),
 		  &detachlist, "detach ", 0, &cmdlist);
+#endif
 
   add_com ("disconnect", class_run, disconnect_command, _("\
 Disconnect from a target.\n\
@@ -2896,11 +2910,13 @@ command).\n\
 Execution will also stop upon exit from the current stack frame."));
   set_cmd_completer (c, location_completer);
 
+#if 0
   c = add_com ("jump", class_run, jump_command, _("\
 Continue program being debugged at specified line or address.\n\
 Give as argument either LINENUM or *ADDR, where ADDR is an expression\n\
 for an address to start at."));
   set_cmd_completer (c, location_completer);
+#endif
 
   if (xdb_commands)
     {

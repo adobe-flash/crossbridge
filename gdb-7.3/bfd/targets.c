@@ -560,6 +560,7 @@ extern const bfd_target aout_arm_little_vec;
 extern const bfd_target aout_mips_big_vec;
 extern const bfd_target aout_mips_little_vec;
 extern const bfd_target apollocoff_vec;
+extern const bfd_target bfd_avm2_vec;
 extern const bfd_target arm_epoc_pe_big_vec;
 extern const bfd_target arm_epoc_pe_little_vec;
 extern const bfd_target arm_epoc_pei_big_vec;
@@ -903,6 +904,7 @@ static const bfd_target * const _bfd_target_vector[] =
 #if 0
 	&apollocoff_vec,
 #endif
+	&bfd_avm2_vec,
 	&arm_epoc_pe_big_vec,
 	&arm_epoc_pe_little_vec,
 	&arm_epoc_pei_big_vec,

@@ -404,6 +404,17 @@ struct inferior_control_state
 {
   /* See the definition of stop_kind above.  */
   enum stop_kind stop_soon;
+
+  /* AVM2-specific field:
+     Running the AVM2 target entails attaching to a remote debugger
+     and gdb typically stops the inferior as part of the attach
+     process. However, the AVM2 target aims to preserve the behavior
+     of the "run" command, which does not stop the inferior until
+     it hits a breakpoint or other signal. This field is used to
+     decide whether the inferior should be automatically resumed
+     in order to mimic the behavior of "run".
+   */
+  int past_first_stop;
 };
 
 /* Inferior process specific part of `struct infcall_suspend_state'.

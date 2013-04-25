@@ -794,10 +794,12 @@ extern initialize_file_ftype _initialize_gdbarch_utils;
 void
 _initialize_gdbarch_utils (void)
 {
+#if 0
   add_setshow_enum_cmd ("endian", class_support,
 			endian_enum, &set_endian_string, 
 			_("Set endianness of target."),
 			_("Show endianness of target."),
 			NULL, set_endian, show_endian,
 			&setlist, &showlist);
+#endif
 }
