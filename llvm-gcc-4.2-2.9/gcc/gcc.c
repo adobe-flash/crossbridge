@@ -363,6 +363,8 @@ static const char *if_exists_spec_function (int, const char **);
 static const char *if_exists_else_spec_function (int, const char **);
 static const char *replace_outfile_spec_function (int, const char **);
 static const char *version_compare_spec_function (int, const char **);
+static const char *alc_sdkroot_spec_function (int, const char **);
+static const char *useabcstdlibs_spec_function (int, const char **);
 static const char *include_spec_function (int, const char **);
 
 /* The Specs Language
@@ -706,6 +708,7 @@ proper position among the other output files.  */
 #endif
 #endif
 
+
 /* -u* was put back because both BSD and SysV seem to support it.  */
 /* %{static:} simply prevents an error message if the target machine
    doesn't handle -static.  */
@@ -838,10 +841,8 @@ static const char *cpp_debug_options = "%{d*}";
 /* LLVM LOCAL begin */
 static const char *llvm_options =
 #ifdef ENABLE_LLVM
-"%{O4|emit-llvm|flto:%{S:-emit-llvm} \
-                     %{!S:-emit-llvm-bc \
-                     %{c: %W{o*} %{!o*:-o %b%w.o}} \
-                     %{!c:-o %d%w%u%O}}}"
+"%{O4|emit-llvm|emit-llvm-bc|flto:%{S:-emit-llvm;: -emit-llvm-bc} ;: %{S:-emit-as3} %:useabcstdlibs() } \
+%{!S: %{c: %W{o*} %{!o*:-o %b%w.o}} %{!c:-o %d%w%u%O}}"
 #else
   "%{emit-llvm:%e--emit-llvm is not supported in this configuration.}"
 #endif
@@ -870,6 +871,7 @@ static const char *cc1_options =
 static const char *asm_options =
 "%a %Y %{c:%W{o*}%{!o*:-o %w%b%O}}%{!c:-o %d%w%u%O}";
 
+#ifndef TARGET_AVM2
 static const char *invoke_as =
 #ifdef AS_NEEDS_DASH_FOR_PIPED_INPUT
 /* LLVM LOCAL */
@@ -877,6 +879,9 @@ static const char *invoke_as =
 #else
 /* LLVM LOCAL */
 "%{!O4:%{!emit-llvm:%{!flto:%{!S:-o %|.s |\n as %(asm_options) %m.s %A }}}}";
+#endif
+#else
+static const char *invoke_as = "";
 #endif
 
 /* Some compilers have limits on line lengths, and the multilib_select
@@ -1008,6 +1013,8 @@ static const struct compiler default_compilers[] =
   {".p", "#Pascal", 0, 0, 0}, {".pas", "#Pascal", 0, 0, 0},
   {".java", "#Java", 0, 0, 0}, {".class", "#Java", 0, 0, 0},
   {".zip", "#Java", 0, 0, 0}, {".jar", "#Java", 0, 0, 0},
+  {".as", "@as3", 0, 1, 0},
+  {"@as3", "%{!M:%{!MM:%{!E:%{!S:as %(asm_debug) %(asm_options) %i %A }}}} %{emit-swf: -target-player} %{emit-swc=*: -target-player}", 0, 1, 0},
   /* Next come the entries for C.  */
   {".c", "@c", 0, 1, 1},
   {"@c",
@@ -1162,6 +1169,18 @@ static const struct option_map option_map[] =
 #ifdef ENABLE_LLVM
    {"--emit-llvm", "-emit-llvm", 0 },
 #endif
+// --- AVM2 ---
+   {"--emit-swf", "-emit-swf", 0 },
+   {"--emit-swc", "-emit-swc=", "a" },
+   {"--swf-ns", "-swf-ns=", "a" },
+   {"--enable-debugger", "-enable-debugger", 0},
+   {"--symbol-class", "-symbol-class=", "a"},
+   {"--symbol-abc", "-symbol-abc=", "a"},
+   {"--swf-size", "-swf-size=", "a"},
+   {"--swf-version", "-swf-version=", "a"},
+   {"--jvmopt", "-jvmopt=", "a"},
+   {"--ascopt", "-ascopt=", "a"},
+// --- AVM2 ---
    {"--encoding", "-fencoding=", "aj"},
    {"--entry", "-e", 0},
    {"--extra-warnings", "-W", 0},
@@ -1567,9 +1586,11 @@ static const char *gcc_libexec_prefix;
 #define MD_STARTFILE_PREFIX_1 ""
 #endif
 
-static const char *const standard_exec_prefix = STANDARD_EXEC_PREFIX;
-static const char *const standard_exec_prefix_1 = "/usr/libexec/gcc/";
-static const char *const standard_exec_prefix_2 = "/usr/lib/gcc/";
+//static const char *const standard_exec_prefix = STANDARD_EXEC_PREFIX;
+char* standard_exec_prefix = NULL; // AVM2 Specific -- Trying to make all paths relative to the SDK location at runtime
+
+static const char *const standard_exec_prefix_1 = "/usr/bin/";
+static const char *const standard_exec_prefix_2 = "/usr/bin/";
 static const char *md_exec_prefix = MD_EXEC_PREFIX;
 
 static const char *md_startfile_prefix = MD_STARTFILE_PREFIX;
@@ -1583,9 +1604,12 @@ static const char *const standard_startfile_prefix_2
 static const char *const tooldir_base_prefix = TOOLDIR_BASE_PREFIX;
 static const char *tooldir_prefix;
 
-static const char *const standard_bindir_prefix = STANDARD_BINDIR_PREFIX;
+//static const char *const standard_bindir_prefix = STANDARD_BINDIR_PREFIX;
+char* standard_bindir_prefix = NULL; // AVM2 Specific -- Trying to make all paths relative to the SDK location at runtime
 
-static const char *standard_libexec_prefix = STANDARD_LIBEXEC_PREFIX;
+//static const char *standard_libexec_prefix = STANDARD_LIBEXEC_PREFIX;
+char* standard_libexec_prefix = NULL; // AVM2 Specific -- Trying to make all paths relative to the SDK location at runtime
+
 
 /* Subdirectory to use for locating libraries.  Set by
    set_multilib_dir based on the compilation options.  */
@@ -1698,6 +1722,8 @@ static const struct spec_function static_spec_functions[] =
   { "if-exists-else",		if_exists_else_spec_function },
   { "replace-outfile",		replace_outfile_spec_function },
   { "version-compare",		version_compare_spec_function },
+  { "alc-sdkroot",		alc_sdkroot_spec_function },
+  { "useabcstdlibs",		useabcstdlibs_spec_function },
   { "include",			include_spec_function },
 #ifdef EXTRA_SPEC_FUNCTIONS
   EXTRA_SPEC_FUNCTIONS
@@ -3560,9 +3586,10 @@ process_command (int argc, const char **argv)
   if (!gcc_exec_prefix)
     {
       /* LLVM LOCAL begin no-canonical-prefixes */
-      gcc_exec_prefix = get_relative_prefix (argv[0],
-					     standard_bindir_prefix,
-					     standard_exec_prefix);
+      //gcc_exec_prefix = get_relative_prefix (argv[0],
+      //				     standard_bindir_prefix,
+      //				     standard_exec_prefix);
+      gcc_exec_prefix = xstrdup(standard_exec_prefix);
       gcc_libexec_prefix = get_relative_prefix (argv[0],
 					     standard_bindir_prefix,
 					     standard_libexec_prefix);
@@ -3591,15 +3618,13 @@ process_command (int argc, const char **argv)
     {
       int len = strlen (gcc_exec_prefix);
 
-      if (len > (int) sizeof ("/lib/gcc/") - 1
+      if (len > (int) sizeof ("/lib/") - 1
 	  && (IS_DIR_SEPARATOR (gcc_exec_prefix[len-1])))
 	{
-	  temp = gcc_exec_prefix + len - sizeof ("/lib/gcc/") + 1;
+	  temp = gcc_exec_prefix + len - sizeof ("/lib/") + 1;
 	  if (IS_DIR_SEPARATOR (*temp)
-	      && strncmp (temp + 1, "lib", 3) == 0
-	      && IS_DIR_SEPARATOR (temp[4])
-	      && strncmp (temp + 5, "gcc", 3) == 0)
-	    len -= sizeof ("/lib/gcc/") - 1;
+	      && strncmp (temp + 1, "lib", 3) == 0)
+	    len -= sizeof ("/lib/") - 1;
 	}
 
       set_std_prefix (gcc_exec_prefix, len);
@@ -5626,6 +5651,16 @@ do_spec_1 (const char *spec, int inswitch, const char *soft_matched_part)
 	      }
 	    break;
 
+	  case 'k':
+          // AVM2 specific
+          {
+              const char *sysroot = alc_sdkroot_spec_function(NULL, NULL);
+              
+              obstack_grow (&obstack, sysroot,
+                            strlen (sysroot));
+          }
+          break;
+          
 	  case 'S':
 	    value = do_spec_1 (startfile_spec, 0, NULL);
 	    if (value != 0)
@@ -6527,6 +6562,9 @@ fatal_error (int signum)
   kill (getpid (), signum);
 }
 
+#define SPECIAL_MALLOC 1
+#include <SetAlchemySDKLocation.c>
+
 extern int main (int, char **);
 
 int
@@ -6542,6 +6580,24 @@ main (int argc, char **argv)
   char *specs_file;
   const char *p;
   struct user_specs *uptr;
+    
+  // AVM2 -- make sure the FlasCC directory is the the search path
+    const char *bindirsuffix = "/usr/bin/";
+    const char *execsuffix = "/usr/lib/";
+    const char *libexecsuffix = "/usr/bin/";
+    char *sdklocation;
+
+    sdklocation = SetFlasccSDKLocation("/../..");
+
+    standard_exec_prefix = (char*)xmalloc(strlen(sdklocation) + strlen(execsuffix) + 1);
+    sprintf(standard_exec_prefix, "%s%s", sdklocation, execsuffix);
+
+    standard_libexec_prefix = (char*)xmalloc(strlen(sdklocation) + strlen(libexecsuffix) + 1);
+    sprintf(standard_libexec_prefix, "%s%s", sdklocation, libexecsuffix);
+
+    standard_bindir_prefix = (char*)xmalloc(strlen(sdklocation) + strlen(bindirsuffix) + 1);
+    sprintf(standard_bindir_prefix, "%s%s", sdklocation, bindirsuffix);
+  // AVM2
 
   /* APPLE LOCAL begin CC_PRINT_OPTIONS (radar 3313335, 3360444) */
   cc_print_options = getenv ("CC_PRINT_OPTIONS");
@@ -6717,7 +6773,7 @@ main (int argc, char **argv)
         target_sysroot_suffix = xstrdup (argbuf[argbuf_index -1]);
     }
 
-#ifdef HAVE_LD_SYSROOT
+#if 0 // def HAVE_LD_SYSROOT
   /* Pass the --sysroot option to the linker, if it supports that.  If
      there is a sysroot_suffix_spec, it has already been processed by
      this point, so target_system_root really is the system root we
@@ -8309,6 +8365,23 @@ compare_version_strings (const char *v1, const char *v2)
   return strverscmp (v1, v2);
 }
 
+static const char *
+alc_sdkroot_spec_function (int argc, const char **argv)
+{
+    if(target_system_root && strlen(target_system_root) > 0)  {
+        return target_system_root;
+    }
+    return SetFlasccSDKLocation("/../..");
+}
+
+static const char *
+useabcstdlibs_spec_function (int argc, const char **argv)
+{
+  const char abclibs[1024];
+  sprintf(abclibs, "%s%s", standard_exec_prefix, "stdlibs_abc/");
+  add_prefix (&startfile_prefixes, abclibs, NULL, PREFIX_PRIORITY_FIRST, 0, 0);        
+  return "";
+}
 
 /* version_compare built-in spec function.
 

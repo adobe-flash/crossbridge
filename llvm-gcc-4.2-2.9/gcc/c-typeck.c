@@ -7680,6 +7680,9 @@ c_finish_goto_label (tree label)
 tree
 c_finish_goto_ptr (tree expr)
 {
+// AVM2 Specific
+  error ("Computed goto is not yet supported in FlasCC.");
+// AVM2 Specific
   if (pedantic)
     pedwarn ("ISO C forbids %<goto *expr;%>");
   expr = convert (ptr_type_node, expr);

@@ -53,6 +53,10 @@ D
 C ObjC C++ ObjC++ Joined Separate
 -D<macro>[=<val>]	Define a <macro> with <val> as its value.  If just <macro> is given, <val> is taken to be 1
 
+swf-version-internal=
+Undocumented C ObjC C++ ObjC++ Joined Var(swf_version_internal) 
+SWF version (defaults to 18)
+
 E
 C ObjC C++ ObjC++ Undocumented
 
@@ -368,6 +372,16 @@ Wdirect-ivar-access
 ObjC ObjC++ Var(warn_direct_ivar_access)
 Warn about direct access to gc-enabled ivars
 ; APPLE LOCAL end radar 5376125
+
+; AVM2 specific
+jvmopt=
+C ObjC C++ ObjC++ Joined Separate Var(jvmopt) 
+VM options to use whenever invoking the JVM
+
+; AVM2 specific
+ascopt=
+C ObjC C++ ObjC++ Joined Separate Var(ascopt) 
+Extra options to pass to Falcon when compiling ActionScript code
 
 Wnon-template-friend
 C++ ObjC++ Var(warn_nontemplate_friend) Init(1)
@@ -806,7 +820,7 @@ Enable garbage collection (GC) in Objective-C/Objective-C++ programs
 
 ; APPLE LOCAL begin radar 5811887 - blocks
 fblocks
-C ObjC C++ ObjC++ Var(flag_blocks) Init(-1)
+C ObjC C++ ObjC++ Var(flag_blocks) Init(0)
 Program supports c/objc extension blocks
 ; APPLE LOCAL end radar 5811887 - blocks
 

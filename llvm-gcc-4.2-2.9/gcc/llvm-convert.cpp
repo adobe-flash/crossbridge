@@ -6241,7 +6241,7 @@ bool TreeToLLVM::EmitBuiltinCall(tree exp, tree fndecl,
         return false;
       }
     }
-#if defined(TARGET_ARM) && defined(CONFIG_DARWIN_H)
+#if defined(TARGET_ARM) && defined(CONFIG_DARWIN_H) || defined(TARGET_AVM2)
     Value *Buf = Emit(TREE_VALUE(arglist), 0);
     Buf = Builder.CreateBitCast(Buf, Type::getInt8Ty(Context)->getPointerTo());
     Builder.CreateCall(Intrinsic::getDeclaration(TheModule,

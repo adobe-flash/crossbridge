@@ -45,11 +45,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "llvm/Transforms/IPO.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/StringMap.h"
+#include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/MemoryBuffer.h"
 #include "llvm/Support/StandardPasses.h"
+#include "llvm/Support/system_error.h"
 #include "llvm/Support/FormattedStream.h"
 #include "llvm/Support/Program.h"
+#include "llvm/Support/Path.h"
+
+#include "SetAlchemySDKLocation.c"
 
 #include <cassert>
 extern "C" {
@@ -70,6 +75,7 @@ extern "C" {
 #include "langhooks.h"
 #include "cgraph.h"
 #include "params.h"
+#include "opts.h"
 }
 
 // Non-zero if bytecode from PCH is successfully read.
@@ -394,7 +400,7 @@ void llvm_initialize_backend(void) {
   DoInit(LLVM_TARGET_NAME, AsmPrinter);
 #undef DoInit
 #undef DoInit2
-  
+
   // Initialize LLVM options.
   std::vector<const char*> Args;
   Args.push_back(progname); // program name
@@ -639,6 +645,8 @@ void llvm_pch_write_init(void) {
   // wrong for llvm/.bc emission cases.
   flag_no_ident = 1;
 
+  emit_llvm_bc = 1;
+
   flag_llvm_pch_read = 0;
 
   timevar_pop(TV_LLVM_INIT);
@@ -736,6 +744,17 @@ static void createPerModuleOptimizationPasses() {
   PerModulePasses->add(new TargetData(*TheTarget->getTargetData()));
   bool HasPerModulePasses = false;
 
+  if(debug_info_level == DINFO_LEVEL_NONE)
+  {
+    // When compiling with -g, strip debug info
+    PerModulePasses->add(createStripSymbolsPass(true));
+  }
+  else
+  {
+    // When compiling without -g, force no inlining
+    flag_inline_trees = 0;
+  }
+    
   if (!DisableLLVMOptimizations) {
     bool NeedAlwaysInliner = false;
     llvm::Pass *InliningPass = 0;
@@ -763,53 +782,16 @@ static void createPerModuleOptimizationPasses() {
                                InliningPass);
   }
 
-  if (emit_llvm_bc) {
+  if (!emit_llvm) {
     // Emit an LLVM .bc file to the output.  This is used when passed
     // -emit-llvm -c to the GCC driver.
     PerModulePasses->add(createBitcodeWriterPass(*AsmOutRawStream));
     HasPerModulePasses = true;
-  } else if (emit_llvm) {
+  } else {
     // Emit an LLVM .ll file to the output.  This is used when passed 
     // -emit-llvm -S to the GCC driver.
     PerModulePasses->add(createPrintModulePass(AsmOutRawStream));
     HasPerModulePasses = true;
-  } else {
-    // If there are passes we have to run on the entire module, we do codegen
-    // as a separate "pass" after that happens.
-    // However if there are no module-level passes that have to be run, we
-    // codegen as each function is parsed.
-    // FIXME: This is disabled right now until bugs can be worked out.  Reenable
-    // this for fast -O0 compiles!
-    if (PerModulePasses || 1) {
-      FunctionPassManager *PM = CodeGenPasses =
-        new FunctionPassManager(TheModule);
-      PM->add(new TargetData(*TheTarget->getTargetData()));
-
-      CodeGenOpt::Level OptLevel = CodeGenOpt::Default;
-
-      switch (optimize) {
-      default: break;
-      case 0: OptLevel = CodeGenOpt::None; break;
-      case 3: OptLevel = CodeGenOpt::Aggressive; break;
-      }
-
-      // Request that addPassesToEmitFile run the Verifier after running
-      // passes which modify the IR.
-#ifndef NDEBUG
-      bool DisableVerify = false;
-#else
-      bool DisableVerify = true;
-#endif
-
-      // Normal mode, emit a .s file by running the code generator.
-      // Note, this also adds codegenerator level optimization passes.
-      if (TheTarget->addPassesToEmitFile(*PM, *AsmOutRawStream,
-                                         TargetMachine::CGFT_AssemblyFile,
-                                         OptLevel, DisableVerify)) {
-        errs() << "Error interfacing to target machine!\n";
-        exit(1);
-      }
-    }
   }
 
   if (!HasPerModulePasses) {
@@ -828,7 +810,7 @@ void llvm_asm_file_start(void) {
                               formatted_raw_ostream::DELETE_STREAM);
   flag_llvm_pch_read = 0;
 
-  if (emit_llvm_bc || emit_llvm)
+  if (true || emit_llvm_bc || emit_llvm || emit_as3) // FlasCC never wants this ident
     // Disable emission of .ident into the output file... which is completely
     // wrong for llvm/.bc emission cases.
     flag_no_ident = 1;
@@ -872,6 +854,77 @@ static void CreateStructorsList(std::vector<std::pair<Constant*, int> > &Tors,
 					  Array, Name);
   GV->setUnnamedAddr(true);
 }
+
+std::string runcmd(std::string cmd, std::vector<std::string> &args)
+{
+    std::string appPath = llvm::sys::Program::FindProgramByName(cmd).c_str();
+    llvm::sys::Path *ioredirects[3] = {NULL, NULL, NULL};
+    ioredirects[0] = new llvm::sys::Path();
+    ioredirects[1] = new llvm::sys::Path(std::string(llvm::sys::Path::GetTemporaryDirectory().c_str()) + "alctmp");
+    ioredirects[2] = new llvm::sys::Path(std::string(llvm::sys::Path::GetTemporaryDirectory().c_str()) + "alctmp");
+
+    // redirect stdout/stderr somewhere
+    ioredirects[1]->createTemporaryFileOnDisk();
+    ioredirects[2]->createTemporaryFileOnDisk();
+
+    char **argptrs = new char*[args.size()+2];
+    argptrs[0] = (char*)appPath.c_str();
+    argptrs[args.size()+1] = NULL;
+    for(unsigned int i=0; i<args.size(); i++) {
+        argptrs[1+i] = (char*)args[i].c_str();
+    }
+    std::string ErrMsg;
+    int result = llvm::sys::Program::ExecuteAndWait(llvm::sys::Path(appPath), (const char**)argptrs, NULL, (const llvm::sys::Path**)&ioredirects[0], 0, 0, &ErrMsg);
+
+    OwningPtr<llvm::MemoryBuffer> stdoutbuffer,stderrbuffer;
+    llvm::MemoryBuffer::getFile(ioredirects[1]->c_str(), stdoutbuffer);
+    llvm::MemoryBuffer::getFile(ioredirects[2]->c_str(), stderrbuffer);
+    std::string stdoutstring = stdoutbuffer->getBuffer();
+    std::string stderrstring = stderrbuffer->getBuffer();
+    ioredirects[1]->eraseFromDisk();
+    ioredirects[2]->eraseFromDisk();
+
+    if(result != 0) {
+        std::string argstring = "";
+        for(unsigned int i=0; i<args.size(); i++)
+            argstring += args[i] + " ";
+
+        llvm::report_fatal_error("Failed to run " + appPath + " with args: " + argstring + "\nError: " + ErrMsg + "\n" + stdoutstring + stderrstring);
+    }
+    
+    size_t p = stdoutstring.find_last_not_of(" \t\f\v\n\r");
+    if (p != std::string::npos)
+        stdoutstring.erase(p+1);
+    else
+        stdoutstring.clear();
+    
+    return stdoutstring;
+}
+
+// defined in gcc.c
+extern "C" struct optlist* getascoptlist();
+extern "C" struct optlist* getjvmoptlist();
+
+std::string javapath()
+{
+  std::vector<std::string> args;
+  args.push_back("java");
+  return runcmd("which", args);
+}
+
+inline std::string winfriendlypath(std::string str)
+{
+#if defined(__CYGWIN__) || defined(__MINGW32__)
+    std::vector<std::string> args;
+    args.push_back("-at");
+    args.push_back("windows");
+    args.push_back(str);
+    return runcmd("cygpath", args);
+#else
+    return str;
+#endif
+}
+
 
 /// llvm_asm_file_end - Finish the .s file.
 void llvm_asm_file_end(void) {
@@ -1042,11 +1095,51 @@ void llvm_asm_file_end(void) {
   AsmOutRawStream = 0;
   delete AsmOutStream;
   AsmOutStream = 0;
+
+  // if we really wanted ABC/AS3 invoke OPT/LLC
+    if(!emit_llvm_bc && !emit_llvm) {
+        std::string sdk = SetFlasccSDKLocation("/../../../../../../..");
+        std::vector<std::string> args;
+        if(debug_info_level > DINFO_LEVEL_NONE) {
+          args.push_back("-O0");
+        }
+
+        args.push_back("-jvm=" + winfriendlypath(javapath()));
+        args.push_back(std::string("-filetype=") + (emit_as3 ? "asm" : "obj"));
+        args.push_back(winfriendlypath(asm_file_name));
+        args.push_back("-o");
+        args.push_back(winfriendlypath(asm_file_name));
+        if(use_asc) {
+          args.push_back("-use-legacy-as3-asm");
+        }
+        
+        struct optlist *jvmopts = getjvmoptlist();
+        while(jvmopts) {
+          args.push_back("-jvmopt");
+          args.push_back(jvmopts->opt);
+          jvmopts = jvmopts->next;
+        }
+
+        struct optlist *ascopts = getascoptlist();
+        while(ascopts) {
+          args.push_back("-ascopt");
+          args.push_back(ascopts->opt);
+          ascopts = ascopts->next;
+        }
+
+        if(target_player) {
+          args.push_back("-target-player");
+        }
+
+        runcmd(sdk + "/usr/bin/llc", args);
+    }
+    
   timevar_pop(TV_LLVM_PERFILE);
 }
 
 // llvm_call_llvm_shutdown - Release LLVM global state.
 void llvm_call_llvm_shutdown(void) {
+  llvm::sys::Path::GetTemporaryDirectory().eraseFromDisk(true);
 #ifndef NDEBUG
   delete PerModulePasses;
   delete PerFunctionPasses;

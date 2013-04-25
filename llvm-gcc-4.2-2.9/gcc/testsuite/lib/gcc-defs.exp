@@ -49,6 +49,9 @@ proc ${tool}_check_compile {testcase option objname gcc_output} {
 
     set gcc_output [prune_warnings $gcc_output]
 
+    # Ignore LLVM warnigns
+    regsub -all "(^|\n)\[^\n\]*WARNING: While resolving call to function \[^\n\]*" $gcc_output "" gcc_output
+	
     set unsupported_message [${tool}_check_unsupported_p $gcc_output]
     if { $unsupported_message != "" } {
 	unsupported "$testcase: $unsupported_message"

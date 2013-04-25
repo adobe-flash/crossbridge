@@ -37,6 +37,10 @@ Common
 -version
 Common
 
+pthread
+Common Var(enable_pthreads) Init(0)
+Link in the pthread library. Requires SWF version 18 or higher.
+
 G
 Common Joined Separate UInteger
 -G<number>	Put global and static data smaller than <number> bytes into a special section (on some targets)
@@ -217,13 +221,33 @@ Common Separate
 ; LLVM LOCAL begin
 ; Emit LLVM assembly to the .s file instead of native code.
 emit-llvm
-Common Report Var(emit_llvm)
+Common Report Var(emit_llvm) Init(0)
 Emit LLVM code to the .s file instead of native machine code.
 
 ; Emit LLVM IR to the output file instead of native code.
 emit-llvm-bc
 Common Report Var(emit_llvm_bc)
 Emit LLVM IR to the output file instead of native machine code.
+
+; AVM2 specific / compiler internal
+disable-falcon-parallel
+Common Var(disable_falcon_parallel) Init(0) Undocumented
+Prevent falcon from doing parallel compilation.
+
+; AVM2 specific / compiler internal
+muse-legacy-asc
+Common Var(use_asc) Init(0) Undocumented
+Internal only
+
+; AVM2 specific
+target-player
+Common Var(target_player) Init(0) 
+Target Flash Player instead of AVMShell
+
+; AVM2 specific / compiler internal
+emit-as3
+Common Var(emit_as3) Init(0) 
+Emit AS3 code.
 
 ; Calculate log, log2, log10, exp, exp2, pow(10,x) to a limited precision for
 ; single-precision floating-point numbers.
@@ -576,9 +600,10 @@ Common Report Var(flag_no_function_cse,0) PerFunc
 Allow function addresses to be held in registers
 ; APPLE LOCAL end optimization pragmas 3124235/3420242
 
-ffunction-sections
-Common Report Var(flag_function_sections)
-Place each function into its own section
+; Removed. Unapplicable for AVM2
+; ffunction-sections
+; Common Report Var(flag_function_sections)
+; Place each function into its own section
 
 ;; APPLE LOCAL begin 5695218
 fglobal-alloc-prefer-bytes
@@ -724,7 +749,7 @@ Does nothing.  Preserved for backward compatibility.
 ; LLVM LOCAL begin
 ; Enable Link Time Optimization
 flto
-Common Report Var(emit_llvm)
+Common Report Var(emit_llvm_bc)
 Enable link time optimizaton.
 ; LLVM LOCAL end
 
@@ -1312,18 +1337,18 @@ Store strings in writable data section
 ; APPLE LOCAL begin mainline in darwin.opt
 ; APPLE LOCAL begin iframework for 4.3 add C++ 4094959
 fapple-kext
-Target Report C++ Var(flag_apple_kext)
+Target Report C++ Var(flag_apple_kext) Undocumented
 Generate code for darwin loadable kernel extentions
 ; APPLE LOCAL end iframework for 4.3 add C++ 4094959
 
 mkernel
-Target Report Var(flag_mkernel)
+Target Report Var(flag_mkernel) Undocumented
 Generate code for the kernel or loadable kernel extentions
 ; APPLE LOCAL end mainline in darwin.opt
 
 ; APPLE LOCAL begin iframework for 4.3 darwin.opt 4094959
 iframework
-Target RejectNegative C ObjC C++ ObjC++ Joined Separate 
+Target RejectNegative C ObjC C++ ObjC++ Joined Separate Undocumented
 -iframework <dir>	Add <dir> to the end of the system framework include path
 ; APPLE LOCAL end iframework for 4.3 darwin.opt 4094959
 

@@ -245,6 +245,9 @@ m32c*-*-*)
         cpu_type=m32c
 	tmake_file=m32c/t-m32c
         ;;
+avm2-*-*)
+	cpu_type=avm2
+	;;
 alpha*-*-*)
 	cpu_type=alpha
 	need_64bit_hwint=yes
@@ -649,6 +652,10 @@ case ${target} in
 	if test -f $srcdir/config/${cpu_type}/t-$rest
 	then tmake_file=${cpu_type}/t-$rest
 	fi
+	;;
+avm2-*-freebsd*)
+        extra_parts=""
+        tm_file="${tm_file} dbxelf.h elfos.h ${fbsd_tm_file} avm2/freebsd.h"
 	;;
 alpha*-*-unicosmk*)
 	use_collect2=yes
@@ -2601,6 +2608,9 @@ m32c-*-elf*)
 esac
 
 case ${target} in
+avm2-*-*)
+	tmake_file="${tmake_file} i386/t-gmm_malloc"
+	;;
 i[34567]86-*-linux*aout* | i[34567]86-*-linux*libc1)
 	tmake_file="${tmake_file} i386/t-gmm_malloc"
 	;;

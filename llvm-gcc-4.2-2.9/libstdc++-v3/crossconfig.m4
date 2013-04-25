@@ -62,11 +62,32 @@ case "${host}" in
     ;;
 
   *-freebsd*)
+    
     AC_CHECK_HEADERS([nan.h ieeefp.h endian.h sys/isa_defs.h \
       machine/endian.h machine/param.h sys/machine.h sys/types.h \
       fp.h locale.h float.h inttypes.h sys/resource.h sys/stat.h \
       sys/time.h unistd.h])
-    SECTION_FLAGS='-ffunction-sections -fdata-sections'
+     
+    case "${host}" in
+       avm2-*-*)
+           SECTION_FLAGS='-fdata-sections'
+           AC_DEFINE(HAVE_ACOSL)
+           AC_DEFINE(HAVE_ASINL)
+           AC_DEFINE(HAVE_ATANL)
+           AC_DEFINE(HAVE_COSL)
+           AC_DEFINE(HAVE_SINL)
+           AC_DEFINE(HAVE_TANL)
+           AC_DEFINE(HAVE_ATAN2L)
+           AC_DEFINE(HAVE_CEILL)
+           AC_DEFINE(HAVE_FLOORL)
+           AC_DEFINE(HAVE_FREXPL)
+           AC_DEFINE(HAVE_LDEXPL)
+           ;;
+       *)
+           SECTION_FLAGS='-ffunction-sections -fdata-sections'
+            ;;
+    esac
+
     AC_SUBST(SECTION_FLAGS) 
     GLIBCXX_CHECK_LINKER_FEATURES
     GLIBCXX_CHECK_COMPLEX_MATH_SUPPORT

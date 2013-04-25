@@ -1,3 +1,4 @@
+
 /* APPLE LOCAL file Macintosh alignment */
 
 /* { dg-do run } */
@@ -203,7 +204,7 @@ static void check(const char * rec_name, int actual, int expected32, int expecte
 /* APPLE LOCAL end radar 4869885 */
 {
     int expected;
-#ifdef __i386__
+#if defined(__i386__) || defined(__AVM2__)
     expected = expected_ia32;
 #elif defined (__arm__)
     expected = expected_arm;
@@ -255,10 +256,12 @@ int main(int argc, char *argv[])
     check(Q(sizeof(C5)), 1, 1, 1, 1, "static as 2nd field");
     check(Q(sizeof(C6)), 1, 1, 1, 1, "enum as 2nd field");
     check(Q(sizeof(C7)), 1, 1, 1, 1, "empty class, power mode");
+#ifndef __AVM2__ // bsd doesn't support mac alignements
 #ifndef __LP64__
     check(Q(sizeof(C8)), 2, 2, 2, 1, "empty class, mac68k mode");
     check(Q(sizeof(C9)), 2, 2, 2, 1, "class with empty base class and one char, mac68k");
     check(Q(offsetof(C9, f1)), 0, 0, 0, 0, "offset of 1st field after empty base class");
+#endif
 #endif
     check(Q(sizeof(C10)), 1, 1, 1, 1, "class based on an empty class, power mode");
     check(Q(sizeof(C11)), 8, 16, 8, 8, "class with long, char");

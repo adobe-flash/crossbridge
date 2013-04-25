@@ -42,7 +42,7 @@ fabsf(float x)
 }
 #endif
 
-#ifndef HAVE_FABSL
+#if 0 // ndef HAVE_FABSL
 long double
 fabsl(long double x)
 {
@@ -280,7 +280,7 @@ hypot(double x, double y)
 }
 #endif
 
-#ifndef HAVE_HYPOTL
+#if 0 // ndef HAVE_HYPOTL
 long double
 hypotl(long double x, long double y)
 {
@@ -357,7 +357,7 @@ modff(float x, float *iptr)
 }
 #endif
 
-#ifndef HAVE_MODFL
+#if 0 // ndef HAVE_MODFL
 long double
 modfl(long double x, long double *iptr)
 {

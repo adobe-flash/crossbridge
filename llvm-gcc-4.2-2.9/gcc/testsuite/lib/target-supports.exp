@@ -167,6 +167,12 @@ proc check_weak_available { } {
 	return 0
     }
 
+    # AVM2 targets support it
+
+    if { [istarget "AVM2-*-*"] } {
+	return 1
+    }
+
     # ELF and ECOFF support it. a.out does with gas/gld but may also with
     # other linkers, so we should try it
 

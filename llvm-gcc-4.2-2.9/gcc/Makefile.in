@@ -619,7 +619,7 @@ endif
 #
 LIBGCC2_DEBUG_CFLAGS = -g
 LIBGCC2_CFLAGS = -O2 $(LIBGCC2_INCLUDES) $(GCC_CFLAGS) $(TARGET_LIBGCC2_CFLAGS) \
-		 $(LIBGCC2_DEBUG_CFLAGS) $(GTHREAD_FLAGS) \
+		 $(GTHREAD_FLAGS) \
 		 -DIN_LIBGCC2 -D__GCC_FLOAT_NOT_NEEDED \
 		 $(INHIBIT_LIBC_CFLAGS)
 # APPLE LOCAL gcov 5573505
@@ -1154,6 +1154,7 @@ ifneq ($(LLVMOBJDIR),)
 LLVMTARGETCOMPONENT := \
   case $(target) in \
     alpha*-*-*) echo alpha;; \
+    avm2-*-*) echo avm2shim;; \
     arm*-*-*) echo arm;; \
     ia64-*-*) echo ia64;; \
     i[34567]86-*-*) echo x86;; \
@@ -1190,6 +1191,7 @@ LLVMTARGETSYMBOLS := \
   _LLVMInitializeARMTarget _LLVMInitializeARMAsmPrinter \
   _LLVMInitializePowerPCTarget _LLVMInitializePowerPCAsmPrinter\
   _LLVMInitializeX86Target _LLVMInitializeX86AsmPrinter \
+  _LLVMInitializeAVM2ShimTarget _LLVMInitializeX86AsmPrinter \
 
 endif
 

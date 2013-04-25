@@ -71,6 +71,14 @@ struct cl_option_state {
   char ch;
 };
 
+struct optlist {
+  char *opt;
+  struct optlist *next;
+};
+
+extern struct optlist* getascoptlist();
+extern struct optlist* getjvmoptlist();
+
 extern const struct cl_option cl_options[];
 extern const unsigned int cl_options_count;
 extern const char *const lang_names[];

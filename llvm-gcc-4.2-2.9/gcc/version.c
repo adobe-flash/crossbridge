@@ -11,12 +11,12 @@
 /* APPLE LOCAL begin Apple version */
 #ifdef ENABLE_LLVM
 #ifdef LLVM_VERSION_INFO
-#define VERSUFFIX " (Based on Apple Inc. build 5658) (LLVM build " LLVM_VERSION_INFO ")"
+#define VERSUFFIX " for Adobe AVM2 (Based on Apple Inc. build 5658) (LLVM build " LLVM_VERSION_INFO ")"
 #else
-#define VERSUFFIX " (Based on Apple Inc. build 5658) (LLVM build)"
+#define VERSUFFIX " for Adobe AVM2 (Based on Apple Inc. build 5658) (LLVM build)"
 #endif
 #else
-#define VERSUFFIX " (Based on Apple Inc. build 5658)"
+#define VERSUFFIX " for Adobe AVM2 (Based on Apple Inc. build 5658)"
 #endif
 /* APPLE LOCAL end Apple version */
 

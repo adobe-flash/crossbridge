@@ -5344,9 +5344,9 @@ objc_add_static_instance (tree constructor, tree class_decl)
 
   /* We may be writing something else just now.
      Postpone till end of input.  */
-  DECL_DEFER_OUTPUT (decl) = 1;
+//XXX AVM2 SEP // DECL_DEFER_OUTPUT (decl) = 1;
   pushdecl_top_level (decl);
-  rest_of_decl_compilation (decl, 1, 0);
+//XXX AVM2 SEP // rest_of_decl_compilation (decl, 1, 0);
 
   /* Add the DECL to the head of this CLASS' list.  */
   TREE_PURPOSE (*chain) = tree_cons (NULL_TREE, decl, TREE_PURPOSE (*chain));

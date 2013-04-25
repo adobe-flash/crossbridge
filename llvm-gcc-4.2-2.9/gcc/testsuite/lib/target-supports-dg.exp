@@ -20,7 +20,7 @@ proc dg-require-weak { args } {
     set weak_available [ check_weak_available ]
     if { $weak_available == -1 } {
 	upvar name name
-	unresolved "$name"
+	unresolved "$name -- REQUIRES WEAK"
     }
     if { $weak_available != 1 } {
 	upvar dg-do-what dg-do-what
@@ -35,7 +35,7 @@ proc dg-require-visibility { args } {
     set visibility_available [ check_visibility_available [lindex $args 1 ] ]
     if { $visibility_available == -1 } {
 	upvar name name
-	unresolved "$name"
+	unresolved "$name -- REQUIRES VISIBILITY"
     }
     if { $visibility_available != 1 } {
 	upvar dg-do-what dg-do-what
@@ -50,7 +50,7 @@ proc dg-require-alias { args } {
     set alias_available [ check_alias_available ]
     if { $alias_available == -1 } {
 	upvar name name
-	unresolved "$name"
+	unresolved "$name -- REQUIRES ALIAS"
     }
     if { $alias_available < 2 } {
 	upvar dg-do-what dg-do-what

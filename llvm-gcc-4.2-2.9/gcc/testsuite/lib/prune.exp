@@ -31,6 +31,7 @@ proc prune_gcc_output { text } {
     regsub -all "(^|\n)\[^\n\]*: warning: -f(pic|PIC) ignored for target\[^\n\]*" $text "" text
     regsub -all "(^|\n)\[^\n\]*: warning: -f(pic|PIC)( and -fpic are| is)? not supported\[^\n\]*" $text "" text
 
+
     # Ignore errata warning from IA64 assembler.
     regsub -all "(^|\n)\[^\n\]*: Additional NOP may be necessary to workaround Itanium processor A/B step errata" $text "" text
     regsub -all "(^|\n)\[^\n*\]*: Assembler messages:\[^\n\]*" $text "" text
@@ -52,6 +53,10 @@ proc prune_gcc_output { text } {
 
 if { [info procs prune_warnings] == "" } then {
     proc prune_warnings { text } {
-	return $text
+        # Ignore LLVM warnigns
+        regsub -all "(^|\n)\[^\n\]*WARNING:\[^\n\]*" $text "" text
+        send_log "tried to filter\n"
+	
+        return $text
     }
 }

@@ -47,7 +47,7 @@ Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 /* Allow -isysroot to override ALL include paths. This is done by
    setting add_sysroot for all default include paths.  */
 /* LLVM LOCAL begin - fix sysroot on non-Darwin systems */
-#ifdef CONFIG_DARWIN_H
+#if 1 // def CONFIG_DARWIN_H // AVM2 HACK
 #define ADD_SYSROOT 1
 #else
 #define ADD_SYSROOT 0
@@ -69,7 +69,7 @@ const struct default_include cpp_include_defaults[]
     /* Pick up GNU C++ backward and deprecated include files.  */
     { GPLUSPLUS_BACKWARD_INCLUDE_DIR, "G++", 1, 1, ADD_SYSROOT, 0 },
 #endif
-#ifdef LOCAL_INCLUDE_DIR
+#if 0 // def LOCAL_INCLUDE_DIR // AVM2 HACK
     /* /usr/local/include comes before the fixincluded header files.  */
     { LOCAL_INCLUDE_DIR, 0, 0, 1, 1, 0 },
 #endif

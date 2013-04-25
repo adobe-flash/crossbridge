@@ -733,9 +733,14 @@ objc_send_load (void)
   /* Special check to allow creating and sending messages to constant
      strings in +load methods. If these classes are not yet known,
      even if all the other classes are known, delay sending of +load.  */
+#if 0 //SEP make sure load gets sent (tracks most recent gnustep?)
   if (! objc_lookup_class ("NXConstantString") ||
       ! objc_lookup_class ("Object"))
     return;
+#else
+  if (! objc_lookup_class ("Object"))
+    return;
+#endif
 
   /* Iterate over all modules in the __objc_module_list and call on
      them the __objc_create_classes_tree function. This function
@@ -860,7 +865,9 @@ __objc_init_protocols (struct objc_protocol_list *protos)
   for (i = 0; i < protos->count; i++)
     {
       struct objc_protocol *aProto = protos->list[i];
+#ifndef __AVM2__ // TODO what's actually going on here?
       if (((size_t)aProto->class_pointer) == PROTOCOL_VERSION)
+#endif
 	{
 	  /* assign class pointer */
 	  aProto->class_pointer = proto_class;
@@ -868,6 +875,7 @@ __objc_init_protocols (struct objc_protocol_list *protos)
 	  /* init super protocols */
 	  __objc_init_protocols (aProto->protocol_list);
 	}
+#ifndef __AVM2__
       else if (protos->list[i]->class_pointer != proto_class)
 	{
 	  objc_error (nil, OBJC_ERR_PROTOCOL_VERSION,
@@ -876,6 +884,7 @@ __objc_init_protocols (struct objc_protocol_list *protos)
 			    - (char *) 0),
 		     PROTOCOL_VERSION);
 	}
+#endif
     }
 
   objc_mutex_unlock (__objc_runtime_mutex);

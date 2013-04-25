@@ -54,6 +54,12 @@ Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
 #define TARGET_OPTF(ARG)
 #endif
 
+struct optlist *jvmoptlist = NULL, *jvmoptlisthead = NULL;
+struct optlist *ascoptlist = NULL, *ascoptlisthead = NULL;
+
+struct optlist* getascoptlist() { return ascoptlisthead; }
+struct optlist* getjvmoptlist() { return jvmoptlisthead; }
+
 /* CPP's options.  */
 static cpp_options *cpp_opts;
 
@@ -657,6 +663,35 @@ c_common_handle_option (size_t scode, const char *arg, int value)
       flag_no_asm = !value;
       break;
 
+    case OPT_jvmopt_:
+    {
+      struct optlist *ol;
+      ol = xmalloc(sizeof(struct optlist));
+      ol->opt = xstrdup(arg);
+      ol->next = NULL;
+      if(jvmoptlisthead == NULL) {
+        jvmoptlist = jvmoptlisthead = ol;
+      } else {
+        jvmoptlist->next = ol;
+        jvmoptlist = ol;
+      }
+      break;
+    }
+    case OPT_ascopt_:
+    {
+      struct optlist *ol;
+      ol = xmalloc(sizeof(struct optlist));
+      ol->opt = xstrdup(arg);
+      ol->next = NULL;
+      if(ascoptlisthead == NULL) {
+        ascoptlist = ascoptlisthead = ol;
+      } else {
+        ascoptlist->next = ol;
+        ascoptlist = ol;
+      }
+      break;
+    }
+
       /* APPLE LOCAL begin CW asm blocks */
     case OPT_fasm_blocks:
       flag_iasm_blocks = value;
@@ -846,6 +881,8 @@ c_common_handle_option (size_t scode, const char *arg, int value)
       flag_use_repository = value;
       if (value)
 	flag_implicit_templates = 0;
+
+      error("ERROR: FlasCC does not yet support -frepo.\n");
       break;
 
     case OPT_frtti:

@@ -1846,7 +1846,7 @@ process_options (void)
   /* LLVM LOCAL begin */
 #ifdef ENABLE_LLVM
   /* Disable verbose_asm flag if -emit-llvm is used, it's totally bogus then */
-  if (emit_llvm || emit_llvm_bc)
+  if (emit_llvm || emit_llvm_bc || emit_as3)
     flag_verbose_asm = 0;
 #endif
   /* LLVM LOCAL end */

@@ -15589,7 +15589,7 @@ then
 		fi
 		;;
 
-	    i?86-*-*,x86_64-*-* \
+	    i?86-*-*,x86_64-*-*,avm2-*-* \
 	    | powerpc*-*-*,powerpc64*-*-*)
 		CROSS="$CROSS -DNATIVE_CROSS" ;;
 	esac
@@ -16845,7 +16845,7 @@ foo:	.long	25
 	;;
 	i[34567]86-*-darwin*)
 	;;
-  i[34567]86-*-*)
+  i[34567]86-*-*|avm2-*-*)
     conftest_s='
 	.section ".tdata","awT",@progbits
 foo:	.long	25
@@ -17611,7 +17611,7 @@ _ACEOF
 fi
     ;;
 
-  i[34567]86-*-* | x86_64-*-*)
+  i[34567]86-*-* | x86_64-*-* | avm2-*-*)
     case $target_os in
       cygwin* | pe | mingw32*)
 	# Used for DWARF 2 in PE
@@ -18137,7 +18137,7 @@ esac
 # ??? Once 2.11 is released, probably need to add first known working
 # version to the per-target configury.
 case "$target" in
-  i?86*-*-* | mips*-*-* | alpha*-*-* | powerpc*-*-* | sparc*-*-* | m68*-*-* \
+  i?86*-*-* | avm2-*-* | mips*-*-* | alpha*-*-* | powerpc*-*-* | sparc*-*-* | m68*-*-* \
   | x86_64*-*-* | hppa*-*-* | arm*-*-* | strongarm*-*-* | xscale*-*-* \
   | xstormy16*-*-* | cris-*-* | xtensa-*-* | bfin-*-* | score*-*-*)
     insn="nop"
