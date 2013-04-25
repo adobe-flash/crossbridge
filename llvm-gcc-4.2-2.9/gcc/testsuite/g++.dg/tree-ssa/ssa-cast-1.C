@@ -1,0 +1,14 @@
+/* { dg-do compile } */
+/* { dg-options "-O1 -fdump-tree-optimized" } */
+/* LLVM LOCAL test not applicable */
+/* { dg-require-fdump "" } */
+
+int &f(int *a)
+{
+  return *a;
+}
+
+/* There should be no cast as pointer and references are
+   considered the same type. */
+/* { dg-final { scan-tree-dump-times "\\(int &\\)" 0 "optimized"} } */
+/* { dg-final { cleanup-tree-dump "optimized" } } */

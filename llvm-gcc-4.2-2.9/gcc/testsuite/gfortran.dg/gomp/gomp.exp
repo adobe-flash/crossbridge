@@ -1,0 +1,18 @@
+# GCC testsuite that uses the `dg.exp' driver.
+
+# Load support procs.
+load_lib gfortran-dg.exp
+
+if ![check_effective_target_fopenmp] {
+  return
+}
+
+# Initialize `dg'.
+dg-init
+
+# Main loop.
+gfortran-dg-runtest [lsort \
+       [find $srcdir/$subdir *.\[fF\]{,90,95,03} ] ] " -fopenmp"
+
+# All done.
+dg-finish

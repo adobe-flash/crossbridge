@@ -1,0 +1,69 @@
+# APPLE LOCAL file testsuite
+#   Copyright (C) 2002 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+
+
+# Load support procs.
+load_lib gcc-dg.exp
+
+# Initialize `dg'.
+dg-init
+
+set timeout 30
+
+set prms_id 0
+set bug_id 0
+
+set testfile "longcall-prog"
+set binfile ${objdir}/${subdir}/${testfile}
+set srcfile ${srcdir}/${subdir}/${testfile}.c
+
+set libfilestem "longcall"
+set libfile "lib${libfilestem}"
+set libbinfile ${objdir}/${subdir}/${libfile}.dylib
+set libsrcfile ${srcdir}/${subdir}/${libfile}.c
+
+file mkdir ${objdir}/${subdir}
+
+set test "longcall/dylib"
+
+proc note_result {success diagnostic} {
+    set verb [expr {($success) ? "pass" : "fail"}]
+    eval {$verb $diagnostic}
+}
+
+set whine "building $test library"
+set additional_flags "additional_flags=-dynamiclib -mlongcall"
+set result [expr {[gcc_target_compile "${libsrcfile}" "${libbinfile}" executable [list debug $additional_flags]] == ""}]
+note_result $result $whine
+
+set whine "building $test test program" 
+set additional_flags "additional_flags=-L${objdir}/${subdir} -l${libfilestem}"
+set result [expr {[gcc_target_compile "${srcfile}" "${binfile}" executable [list debug $additional_flags]] == ""}]
+note_result $result $whine
+
+set result [gcc_load "$binfile" "" ""]
+set status [lindex $result 0]
+set output [lindex $result 1];
+if {$status == "pass" } {
+    pass $test
+    file delete $libbinfile $binfile
+} else {
+    fail $test
+}
+
+# All done.
+dg-finish
