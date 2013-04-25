@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+** ADOBE SYSTEMS INCORPORATED
+** Copyright 2012 Adobe Systems Incorporated
+** All Rights Reserved.
+**
+** NOTICE:  Adobe permits you to use, modify, and distribute this file in accordance with the
+** terms of the Adobe license agreement accompanying it.  If you have received this file from a
+** source other than Adobe, then your use, modification, or distribution of it requires the prior
+** written permission of Adobe.
+-->
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   width="640" height="960"
+			   applicationComplete="appInit(event)">
+	<fx:Script>
+		<![CDATA[
+			import sample.qrencode.CModule;
+			import flash.utils.ByteArray;
+			import flash.utils.getTimer;
+			import mx.controls.Alert;
+			import mx.core.UIComponent;
+			import QREncode;
+
+			internal var uic:UIComponent
+			internal var bm:Bitmap
+
+			include "../TestingCode.as";
+
+			internal function appInit(event:Event):void
+			{
+				CModule.rootSprite = this
+				//CModule.vfs.console = this
+				CModule.startAsync(this)
+
+				uic = new UIComponent()
+				imgbox.addElement(uic)
+
+				runScript(null)
+			}
+
+			internal function runScript(event:Event):void
+			{
+				var qrcode:QRcode = new QRcode()
+				qrcode.swigCPtr = QREncode.QRcode_encodeString(srctext.text, vers.value, ecc.value, QREncode.QR_MODE_8, 1)
+
+				if (qrcode.swigCPtr == 0 || qrcode.width <= 0) {
+					return
+				}
+
+				var bmd:BitmapData = new BitmapData(qrcode.width, qrcode.width, false, 0xAAAAAA)
+				var d:int = qrcode.data
+				for(var y:int=0; y<qrcode.width; y++) {
+					for(var x:int=0; x<qrcode.width; x++) {
+						bmd.setPixel(x, y, CModule.read8(d++) & 1 ? 0x0 : 0xFFFFFF)
+					}
+				}
+
+				if(bm) {
+				  uic.removeChild(bm)
+				}
+				bm = new Bitmap(bmd)
+				bm.smoothing = false
+				bm.scaleX = bm.scaleY = 2
+				uic.addChild(bm)
+				initTesting();
+			}
+
+			private function errorCorrectionCodeName(val:String):String {
+            	switch(val) {
+            		case "0": return "EC Level L"
+            		case "1": return "EC Level M"
+            		case "2": return "EC Level Q"
+            		case "3": return "EC Level H"
+            	}
+            	return null
+            }
+
+            private function versionTip(val:String):String {
+            	return "Version: " + val
+            }
+
+			public function output(s:String):void
+			{
+			}
+
+			public function write(fd:int, buf:int, nbyte:int, errno_ptr:int):int
+			{
+				var str:String = CModule.readString(buf, nbyte);
+				output(str);
+				return nbyte;
+			}
+
+			public function read(fd:int, buf:int, nbyte:int, errno_ptr:int):int
+			{
+				return 0
+			}
+		]]>
+	</fx:Script>
+	<s:Panel title="flascc QR Code Demo" width="100%" height="100%">
+		<s:VGroup left="10" right="10" top="10" bottom="10">
+			<mx:TextArea id="srctext" text="http://www.adobe.com" width="100%" height="10%" change="runScript(event)"/>
+			<s:HGroup><s:Label text="Error Correction:"/><s:HSlider id="ecc" maximum="3" value="2" change="runScript(event)" dataTipFormatFunction="errorCorrectionCodeName"/></s:HGroup>
+			<s:HGroup><s:Label text="Version:"/><s:HSlider id="vers" maximum="40" minimum="1" value="15" change="runScript(event)" dataTipFormatFunction="versionTip"/></s:HGroup>
+			<s:TileGroup width="100%" height="100%" left="10" right="10" top="10" bottom="10" id="imgbox"/>
+		</s:VGroup>
+	</s:Panel>
+</s:Application>

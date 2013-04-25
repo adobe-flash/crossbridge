@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Lua Flash</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="bootstrap/css/docs.css" rel="stylesheet">
+    <link href="bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+
+    <script type="text/javascript" src="swfobject.js"></script>
+    <script type="text/javascript">
+    swfobject.registerObject("mainswf", "11.3.0", "expressInstall.swf");
+
+     function newLuaScript(value) {
+        $("#errorlog").text("\n\n\n");
+         swfobject.getObjectById("mainswf").newLuaScript(value);
+     }
+
+     function reportError(value) {
+        //alert(value);
+         $("#errorlog").text(value);
+     }
+ </script>
+</head>
+  <body data-spy="scroll" data-target=".subnav" data-offset="50">
+    <div class="container">
+      <!-- Masthead
+      ================================================== -->
+      <header class="jumbotron subhead" id="overview">
+        <h1>Lua / Flash</h1>
+        <p class="lead">FlasCC compiled Lua interpreter + Flash interop + Starling = ...</p>
+      </header>
+      <section id="content">
+<div>
+<table><tr><td>
+  <div>
+  <object id="mainswf" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="640" height="960">
+    <param name="movie" value="LuaStarling.swf" />
+    <!--[if !IE]>-->
+    <object type="application/x-shockwave-flash" data="LuaStarling.swf" width="640" height="960">
+    <!--<![endif]-->
+      <param name="wmode" value="direct" />
+      <param name="allowScriptAccess" value="sameDomain" />
+      <param name="bgcolor" value="CCCCCC" /> 
+      <div>
+        <h1>Update flash:</h1>
+        <p><a href="http://www.adobe.com/go/getflashplayer"><img src="http://www.adobe.com/images/shared/download_buttons/get_flash_player.gif" alt="Get Adobe Flash player" /></a></p>
+      </div>
+    <!--[if !IE]>-->
+    </object>
+    <!--<![endif]-->
+  </object>
+  </div>
+</td><td>
+<div class="tabbable" style="margin-bottom: 9px;">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#1" data-toggle="tab">BunnyMark</a></li>
+          <li><a href="#2" data-toggle="tab">BunnyMark FadeZoom</a></li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="1">
+            <form onsubmit="return false;">
+    <input type="button" value="Run Script" onclick="newLuaScript(this.form.codeeditor1.value);" /><br />
+    <textarea id="codeeditor1" spellcheck="false" style="height: 960px; width: 640px;" name="codeeditor1"> -- Loading...</textarea>
+</form>
+          </div>
+          <div class="tab-pane" id="2">
+            <form onsubmit="return false;">
+    <input type="button" value="Run Script" onclick="newLuaScript(this.form.codeeditor2.value);" /><br />
+    <textarea id="codeeditor2" spellcheck="false" style="height: 960px; width: 640px;" name="codeeditor2"> -- Loading...</textarea>
+</form>
+          </div>
+        </div>
+      </div> <!-- /tabbable -->
+</td></tr></table>
+</pre>
+</div>
+<div class="page-header" width="100%">
+    <h2>Error Log</h2>
+    <pre id="errorlog">
+
+
+    </pre>
+</div>
+</div>
+</div>
+</section>
+</div>
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="assets/js/bootstrap-tab.js"></script>
+
+    <script>
+      $.ajax({
+        url: "game.lua",
+        dataType: "text",
+        success: function(data) {
+          document.getElementById("codeeditor1").value = data;
+        },
+      });
+      $.ajax({
+        url: "game2.lua",
+        dataType: "text",
+        success: function(data) {
+          document.getElementById("codeeditor2").value = data;
+        },
+      });
+    </script>
+</body>
+</html>

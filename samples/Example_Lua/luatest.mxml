@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+** ADOBE SYSTEMS INCORPORATED
+** Copyright 2012 Adobe Systems Incorporated
+** All Rights Reserved.
+**
+** NOTICE:  Adobe permits you to use, modify, and distribute this file in accordance with the
+** terms of the Adobe license agreement accompanying it.  If you have received this file from a
+** source other than Adobe, then your use, modification, or distribution of it requires the prior
+** written permission of Adobe.
+-->
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+               xmlns:s="library://ns.adobe.com/flex/spark" 
+               xmlns:mx="library://ns.adobe.com/flex/mx"
+               width="480" height="960"
+               applicationComplete="appInit(event)"
+               implements="sample.lua.vfs.ISpecialFile">
+    <fx:Script>
+        <![CDATA[
+            import sample.lua.CModule;
+            import sample.lua.vfs.ISpecialFile;
+            import flash.utils.ByteArray;
+            import flash.utils.getTimer;
+            import mx.controls.Alert;
+            import Lua;
+
+            internal var luastate:int
+
+            internal function appInit(event:Event):void
+            {
+                CModule.rootSprite = this
+                CModule.vfs.console = this
+                CModule.startAsync(this)
+
+                runScript(null)
+            }
+
+            internal function runScript(event:Event):void
+            {
+                var err:int = 0
+                outbox.text = ""
+                luastate = Lua.luaL_newstate()
+                
+                Lua.luaL_openlibs(luastate)
+                err = Lua.luaL_loadstring(luastate, inbox.text)
+                if(err) {
+                    Lua.lua_settop(luastate, -2)
+                    Lua.lua_close(luastate)
+                    output("Can't parse script: " + err)
+                    return
+                }
+
+                var runtime:int = getTimer()
+                err = Lua.lua_pcallk(luastate, 0, Lua.LUA_MULTRET, 0, 0, null)
+                runtime = getTimer() - runtime
+                runtimelabel.text = "Script time: " + runtime + "ms" /* + " final stack depth: " + Lua.lua_gettop(luastate) */
+
+                if (err) {
+                    output("Failed to run script: " +  Lua.lua_tolstring(luastate, -1, 0))
+                } else {
+                    var result:Number = Lua.lua_tonumberx(luastate, -1, 0)
+                    output("Script returned: " + result)
+                }
+
+                Lua.lua_settop(luastate, -2)
+                Lua.lua_close(luastate)
+            }
+
+            public function output(s:String):void
+            {
+                outbox.text += s
+                trace( s )
+            }
+
+            /**
+            * The PlayerKernel implementation will use this function to handle
+            * C IO write requests to the file "/dev/tty" (e.g. output from
+            * printf will pass through this function). See the ISpecialFile
+            * documentation for more information about the arguments and return value.
+            */
+            public function write(fd:int, bufPtr:int, nbyte:int, errnoPtr:int):int
+            {
+              var str:String = CModule.readString(bufPtr, nbyte)
+              output(str)
+              return nbyte
+            }
+
+            /**
+            * The PlayerKernel implementation will use this function to handle
+            * C IO read requests to the file "/dev/tty" (e.g. reads from stdin
+            * will expect this function to provide the data). See the ISpecialFile
+            * documentation for more information about the arguments and return value.
+            */
+            public function read(fd:int, bufPtr:int, nbyte:int, errnoPtr:int):int
+            {
+              return 0
+            }
+
+            /**
+            * The PlayerKernel implementation will use this function to handle
+            * C fcntl requests to the file "/dev/tty" 
+            * See the ISpecialFile documentation for more information about the
+            * arguments and return value.
+            */
+            public function fcntl(fd:int, com:int, data:int, errnoPtr:int):int
+            {
+              return 0
+            }
+
+            /**
+            * The PlayerKernel implementation will use this function to handle
+            * C ioctl requests to the file "/dev/tty" 
+            * See the ISpecialFile documentation for more information about the
+            * arguments and return value.
+            */
+            public function ioctl(fd:int, com:int, data:int, errnoPtr:int):int
+            {
+              return 0;
+            }
+        ]]>
+    </fx:Script>
+    <s:Panel title="flascc Lua Demo" width="100%" height="100%">
+        <s:VGroup left="10" right="10" top="10" bottom="10">
+            <mx:TextArea id="inbox" width="100%" height="100%">
+                <mx:text>
+<![CDATA[
+-- bisect.lua
+-- bisection method for solving non-linear equations
+
+delta=1e-6  -- tolerance
+
+function bisect(f,a,b,fa,fb)
+ local c=(a+b)/2
+ io.write(n," c=",c," a=",a," b=",b,"\n")
+ if c==a or c==b or math.abs(a-b)<delta then return c,b-a end
+ n=n+1
+ local fc=f(c)
+ if fa*fc<0 then return bisect(f,a,c,fa,fc) else return bisect(f,c,b,fc,fb) end
+end
+
+-- find root of f in the inverval [a,b]. needs f(a)*f(b)<0
+function solve(f,a,b)
+ n=0
+ local z,e=bisect(f,a,b,f(a),f(b))
+ io.write(string.format("after %d steps, root is %.17g with error %.1e, f=%.1e\n",n,z,e,f(z)))
+end
+
+-- our function
+function f(x)
+ return x*x*x-x-1
+end
+
+-- find zero in [1,2]
+solve(f,1,2)
+]]></mx:text>
+            </mx:TextArea>
+            <s:HGroup>
+                <s:Button label="Run Script" click="runScript(event)"/>
+                <s:Label id="runtimelabel" text="Script time: "/>
+            </s:HGroup>
+            <mx:TextArea id="outbox" text="" width="100%" height="100%"/>
+        </s:VGroup>
+    </s:Panel>
+</s:Application>
