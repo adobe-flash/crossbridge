@@ -13,6 +13,8 @@
 
 char cvsroot_main_cxx[] = "$Id: main.cxx 12536 2011-03-14 07:22:08Z wsfulton $";
 
+#include "SetAlchemySDKLocation.c"  // for setting swiglib directory
+
 #include "swigconfig.h"
 
 #if defined(_WIN32)
@@ -38,6 +40,7 @@ int Verbose = 0;
 int AddExtern = 0;
 int NoExcept = 0;
 int SwigRuntime = 0;		// 0 = no option, 1 = -runtime, 2 = -noruntime
+char *flasccSDKLocation = 0;
 
 /* Suppress warning messages for private inheritance, preprocessor evaluation etc...
    WARN_PP_EVALUATION            202
@@ -907,9 +910,12 @@ int SWIG_main(int argc, char *argv[], Language *l) {
 
   // Create Library search directories
 
+  // Set flascc SDK directory
+  flasccSDKLocation = SetFlasccSDKLocation("/../..");
+
   // Check for SWIG_LIB environment variable
   if ((c = getenv("SWIG_LIB")) == (char *) 0) {
-#if defined(_WIN32)
+#if 0 // defined(_WIN32) // CYGWIN should take the unix path?
     char buf[MAX_PATH];
     char *p;
     if (!(GetModuleFileName(0, buf, MAX_PATH) == 0 || (p = strrchr(buf, '\\')) == 0)) {
@@ -918,7 +924,10 @@ int SWIG_main(int argc, char *argv[], Language *l) {
     }
     SwigLib = Swig_copy_string(SWIG_LIB_WIN_UNIX);	// Unix installation path using a drive letter (for msys/mingw)
 #else
-    SwigLib = Swig_copy_string(SWIG_LIB);
+    String *alcSDK = NewString(flasccSDKLocation);
+    Append(alcSDK, "/usr/share/swig/2.0.4/");
+    SwigLib = Swig_copy_string(Char(alcSDK));
+    Delete(alcSDK);
 #endif
   } else {
     SwigLib = Swig_copy_string(c);
@@ -1305,6 +1314,8 @@ int SWIG_main(int argc, char *argv[], Language *l) {
   }
 
   delete lang;
+
+  fflush(stdout);
 
   return Swig_error_count();
 }

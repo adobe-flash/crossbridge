@@ -27,6 +27,7 @@
 %include <ruby/rubykw.swg>
 %include <tcl/tclkw.swg>
 %include <perl5/perlkw.swg>
+%include <as3/as3kw.swg>
 
 
 #endif //__Lib_allkw_swg__

@@ -79,11 +79,12 @@ am_eswig_OBJECTS = CParse/cscanner.$(OBJEXT) CParse/parser.$(OBJEXT) \
 	Modules/swigmain.$(OBJEXT) Modules/tcl8.$(OBJEXT) \
 	Modules/typepass.$(OBJEXT) Modules/uffi.$(OBJEXT) \
 	Modules/utils.$(OBJEXT) Modules/xml.$(OBJEXT) \
-	Preprocessor/cpp.$(OBJEXT) Preprocessor/expr.$(OBJEXT) \
-	Swig/cwrap.$(OBJEXT) Swig/deprecate.$(OBJEXT) \
-	Swig/error.$(OBJEXT) Swig/fragment.$(OBJEXT) \
-	Swig/getopt.$(OBJEXT) Swig/include.$(OBJEXT) \
-	Swig/misc.$(OBJEXT) Swig/naming.$(OBJEXT) Swig/parms.$(OBJEXT) \
+	Modules/as3.$(OBJEXT) Preprocessor/cpp.$(OBJEXT) \
+	Preprocessor/expr.$(OBJEXT) Swig/cwrap.$(OBJEXT) \
+	Swig/deprecate.$(OBJEXT) Swig/error.$(OBJEXT) \
+	Swig/fragment.$(OBJEXT) Swig/getopt.$(OBJEXT) \
+	Swig/include.$(OBJEXT) Swig/misc.$(OBJEXT) \
+	Swig/naming.$(OBJEXT) Swig/parms.$(OBJEXT) \
 	Swig/scanner.$(OBJEXT) Swig/stype.$(OBJEXT) \
 	Swig/symbol.$(OBJEXT) Swig/tree.$(OBJEXT) \
 	Swig/typeobj.$(OBJEXT) Swig/typemap.$(OBJEXT) \
@@ -435,7 +436,8 @@ eswig_SOURCES = CParse/cscanner.c		\
 		Modules/uffi.cxx		\
 		Modules/utils.cxx		\
 		Modules/xml.cxx			\
-		Preprocessor/cpp.c		\
+		Modules/as3.cxx                 \
+                Preprocessor/cpp.c		\
 		Preprocessor/expr.c		\
 		Swig/cwrap.c			\
 		Swig/deprecate.c		\
@@ -652,6 +654,8 @@ Modules/utils.$(OBJEXT): Modules/$(am__dirstamp) \
 	Modules/$(DEPDIR)/$(am__dirstamp)
 Modules/xml.$(OBJEXT): Modules/$(am__dirstamp) \
 	Modules/$(DEPDIR)/$(am__dirstamp)
+Modules/as3.$(OBJEXT): Modules/$(am__dirstamp) \
+	Modules/$(DEPDIR)/$(am__dirstamp)
 Preprocessor/$(am__dirstamp):
 	@$(MKDIR_P) Preprocessor
 	@: > Preprocessor/$(am__dirstamp)
@@ -722,6 +726,7 @@ mostlyclean-compile:
 	-rm -f DOH/void.$(OBJEXT)
 	-rm -f Modules/allegrocl.$(OBJEXT)
 	-rm -f Modules/allocate.$(OBJEXT)
+	-rm -f Modules/as3.$(OBJEXT)
 	-rm -f Modules/browser.$(OBJEXT)
 	-rm -f Modules/cffi.$(OBJEXT)
 	-rm -f Modules/chicken.$(OBJEXT)
@@ -793,6 +798,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@DOH/$(DEPDIR)/void.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/allegrocl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/allocate.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/as3.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/browser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/cffi.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@Modules/$(DEPDIR)/chicken.Po@am__quote@

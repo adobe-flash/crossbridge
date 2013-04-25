@@ -77,6 +77,7 @@ skip-uffi	= test -n "@SKIP_UFFI@"
 skip-r		= test -n "@SKIP_R@"
 skip-go		= test -n "@SKIP_GO@"
 skip-d		= test -n "@SKIP_D@"
+skip-as3	= test -n "@SKIP_AS3@"
 
 # Additional dependencies for some tests
 skip-gcj        = test -n "@SKIP_GCJ@"
@@ -118,6 +119,7 @@ check-aliveness:
 	@$(skip-r) 	  || ./$(TARGET) -r          -help
 	@$(skip-go)	  || ./$(TARGET) -go         -help
 	@$(skip-d) 	  || ./$(TARGET) -d          -help
+	@$(skip-as3)  || ./$(TARGET) -as3        -help
 
 check-ccache:
 	test -z "$(ENABLE_CCACHE)" || (cd $(CCACHE) && $(MAKE) check)
@@ -145,7 +147,8 @@ check-examples:					\
 	check-cffi-examples			\
 	check-r-examples			\
 	check-go-examples			\
-	check-d-examples
+	check-d-examples			\
+	check-as3-examples
 
 tcl_examples       :=$(shell sed '/^\#/d' $(srcdir)/Examples/tcl/check.list)
 perl5_examples     :=$(shell sed '/^\#/d' $(srcdir)/Examples/perl5/check.list)
@@ -169,6 +172,7 @@ cffi_examples      :=
 r_examples         :=$(shell sed '/^\#/d' $(srcdir)/Examples/r/check.list)
 go_examples        :=$(shell sed '/^\#/d' $(srcdir)/Examples/go/check.list)
 d_examples         :=$(shell sed '/^\#/d' $(srcdir)/Examples/d/check.list)
+as3_examples       :=$(shell sed '/^\#/d' $(srcdir)/Examples/as3/check.list)
 
 # all examples
 check-%-examples :
@@ -421,7 +425,7 @@ install-main:
 	@$(INSTALL_PROGRAM) $(TARGET) $(DESTDIR)$(BIN_DIR)/`echo $(TARGET_NOEXE) | sed '$(transform)'`@EXEEXT@
 
 lib-languages = gcj typemaps tcl perl5 python guile java mzscheme ruby php ocaml octave \
-	pike chicken csharp modula3 allegrocl clisp lua cffi uffi r go d
+	pike chicken csharp modula3 allegrocl clisp lua cffi uffi r go d as3
 
 lib-modules = std
 

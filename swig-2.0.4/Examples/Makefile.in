@@ -42,6 +42,14 @@ LIBCRYPT   = @LIBCRYPT@
 SYSLIBS    = $(LIBM) $(LIBC) $(LIBCRYPT)
 LIBPREFIX  =
 
+# Setup nativepath
+$?UNAME=$(shell uname -s)
+ifneq (,$(findstring CYGWIN,$(UNAME)))
+	$?nativepath=$(shell cygpath -at mixed $(1))
+else
+	$?nativepath=$(1)
+endif
+
 # RUNTOOL is for use with runtime tools, eg set it to valgrind
 RUNTOOL    =
 # COMPILETOOL is a way to run the compiler under another tool, or more commonly just to stop the compiler executing
@@ -1278,3 +1286,42 @@ d_clean:
 	rm -f *_wrap* *~ .~* runme runme.exe `find . -name \*.d | grep -v runme.d`
 	rm -f core @EXTRA_CLEAN@
 	rm -f *.@OBJEXT@ *@SO@
+
+##################################################################
+#####                       AS3                             ######
+##################################################################
+
+# Set this to the path to your flascc sdk root
+ALCSDK=$(prefix)/../
+ifneq (,$(USE_ASC))
+	LEGACY_ASC=-use-legacy-asc
+else
+	LEGACY_ASC=
+endif
+
+# ----------------------------------------------------------------
+# Build an avmshell projector (C)
+# ----------------------------------------------------------------
+
+as3: $(SRCS) ../main.c
+	$(SWIG) -as3 $(SWIGOPT) $(INTERFACEPATH)
+	$(ALCSDK)/usr/bin/gcc -c $(CFLAGS) $(LEGACY_ASC) $(SRCS) ../main.c $(ISRCS) $(INCLUDES)
+	$(ALCSDK)/usr/bin/gcc -enable-debugger $(LEGACY_ASC) -o $(TARGET) *.o $(AS_SRCS)
+
+# ----------------------------------------------------------------
+# Build an avmshell projector (C++)
+# ----------------------------------------------------------------
+
+as3_cpp: $(CXXSRCS) ../main.c
+	$(SWIG) -as3 -c++ $(SWIGOPT) $(INTERFACEPATH)
+	$(ALCSDK)/usr/bin/g++ -c $(CFLAGS) $(LEGACY_ASC) $(CXXSRCS) ../main.c \
+		$(ICXXSRCS) $(INCLUDES)
+	$(ALCSDK)/usr/bin/g++ -enable-debugger $(LEGACY_ASC) -o $(TARGET) *.o $(AS_SRCS)
+
+# -----------------------------------------------------------------
+# Cleaning the AS3 examples
+# -----------------------------------------------------------------
+
+as3_clean:
+	rm -f *_wrap* *.abc *.o `find . -name \*.as | grep -v runme.as`
+
