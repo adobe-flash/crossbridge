@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Crossbridge - Samples</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="bootstrap/css/docs.css" rel="stylesheet">
+    <link href="bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+  </head>
+  <body data-spy="scroll" data-target=".subnav" data-offset="50">
+
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="http://www.github.com/adobe/crossbridge" target="_blank"><span>Crossbridge</span></a>
+        <div>
+          <ul class="nav">
+            <li class="">
+              <a href="../README.html">Readme</a>
+            </li>
+            <li class="">
+              <a href="./Reference.html">Reference</a>
+            </li>
+            <li class="active">
+              <a href="./samples.html">Samples</a>
+            </li>
+            <li class="">
+              <a href="./capidocs/index.html">C/C++ API Reference</a>
+            </li>
+            <li class="">
+              <a href="./apidocs/index.html">AS3 API Reference</a>
+            </li>
+            <li class="">
+              <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/">Flash API Reference</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <header class="jumbotron subhead" id="overview">
+      <h1>Crossbridge</h1>
+      <p class="lead">A complete BSD-like C/C++ development environment with a GCC based cross-compiler capable of targeting the Adobe Flash Runtime.</p>
+    </header>
+
+<section>
+<div class="page-header">
+      <h1>Samples</h1>
+    </div>
+    <div>
+<p>Contained within the samples folder are several samples demonstrating how to use
+Crossbridge. Techniques and functionality are introduced gradually so it's worth
+following them in ascending order. As well as the samples there are also several fully
+working examples that use real open source applications and code.</p>
+
+<ol>
+<li><a href="#T1">Hello World</a> - as simple as it sounds.</li>
+<li><a href="#T2">Interop</a> - shows basic interop with AS3 APIs from C, and more advanced C++ interop using the Flash++ API.</li>
+<li><a href="#T3">Drawing</a> - building on the interop sample this shows how to draw to the
+   stage.</li>
+<li><a href="#T4">Animation</a> - creating a runloop involves writing a custom Console.as.</li>
+<li><a href="#T5">SWC</a> - how to manually expose some C++ functions to AS3 in a SWC.</li>
+<li><a href="#T6">SWIG</a> - how to use SWIG to automatically generate the wrapper code needed for
+   a SWC.</li>
+<li><a href="#T7">Filesystem</a> - how to package up local files into a virtual filesystem that can be embedded within a SWF and accessed using normal libc file IO.</li>
+<li><a href="#T8">GDB</a> - A simple C program that demonstrates how you can debug it running in the Flash Player using GDB.</li>
+<li><a href="#T9">Pthreads</a> -  Shared memory multi-threading is available in Flash Player 11.5. This app shows how you can spawn a thread but still interact with the Flash display list from that thread using the helpers in <b>AS3++.h</b>.</li>
+<li><a href="#T10">MessageChannel</a> - This Flash API lets you communicate easily between Flash workers including serializing and sending ActionScript objects between threads.</li>
+<li><a href="#T11">OpenMP</a> - This library includes many constructs to make it easier to write multi-threaded code in C/C++. This example shows how you can use its constructs to automatically parallelize a simple mandelbrot fractal rendering app. Clicking on the swf adds more threads into the threadpool.</li>
+<li><a href="#T12">Stage3D</a> - This simple example shows how to use the Flash++ interop to talk directly to the Stage3D API in Flash Player to render to the GPU.</li>
+</ol>
+
+<p>Working Examples:</p>
+<ul>
+<li><a href="http://www.box2d.org">Box2D</a> - A simple and popular 2D physics library, used in many 2D game frameworks.</li>
+<li><a href="http://www.bulletphysics.org">Bullet</a> - As used in many games and movies the Bullet Physics library is a high quality physics engine that handles all sorts of advanced 3D physics.</li>
+<li><a href="http://www.lua.org">Lua</a> - A real world example showing how to wrap the Lua interpreter
+   with SWIG and execute Lua programs in the Flash Player.</li>
+<li><a href="http://www.idsoftware.com/">Quake 1</a> - The original true 3D FPS game, you'll need to download the shareware game data from ID's <a href="ftp://ftp.idsoftware.com/idstuff/quake">ftp server</a> or alternatively use the full game data if you have the original CD/floppy disks.</li>
+<li><a href="https://github.com/fukuchi/libqrencode">libQREncode</a> - A small library for generating various kinds of 2D <a href="http://en.wikipedia.org/wiki/QRcode">QRCodes</a> wrapped with a simple MXML gui.</li>
+</ul>
+</div>
+</section>
+
+<section>
+  <div class="page-header">
+    <h1>Building the samples</h1>
+  </div>
+  <div>
+
+<p>Each sample comes with a makefile, and there is a makefile in the root samples
+folder that will build all of the samples. The makefile needs to be told where
+your Crossbridge SDK is located and also where your Flex SDK is located. The
+samples should be compiled with Flex SDK 4.6 or higher:</p>
+
+<pre>
+Mac&gt; make FLASCC=~/flascc/sdk FLEX=/path/to/flexsdk
+Win&gt; make FLASCC=/cygdrive/c/flascc/sdk FLEX=/cygdrive/c/path/to/flexsdk
+</pre>
+</div>
+</section>
+
+
+<section id="T1">
+  <div class="page-header">
+    <h1>Sample 1: Hello World</h1>
+  </div>
+  <div>
+
+<p>This is a simple, traditional, Hello World example, that you use to ensure you can compile and have the correct paths to the Crossbridge and Flex SDK. Open <b>hello.c</b> and you'll find a standard hello world example containing a main function that uses <code>printf</code> to display the string "Hello World". </p>
+
+<p>The makefile invokes gcc twice, once to produce a projector binary and again to
+produce a SWF. A projector binary is a native executable that contains both the
+ActionScript VM and the compiled ActionScript byte code (ABC).</p>
+
+<p>Here is an example of the output when making on Windows:</p>
+
+<pre>
+<span style="color:#008000">user@WINMACHINE</span> <span style="color: #808000">/cygdrive/c/flascc/samples/01_HelloWorld</span>
+
+$ make FLEX=/cygdrive/c/path/to/flexsdk FLASCC=/cygdrive/c/flascc/sdk
+-------- Sample 1 --------
+
+First let's compile it as a projector:
+"/cygdrive/c/flascc/sdk/usr/bin/gcc" -Werror -Wno-write-strings -Wno-trigraphs hello.c -o hello.exe
+
+Now lets compile it as a SWF:
+"/cygdrive/c/flascc/sdk/usr/bin/gcc" -Werror -Wno-write-strings -Wno-trigraphs hello.c -emit-swf -swf-size=200x200 -o hello.swf</pre>
+
+</div>
+</section>
+
+
+<section id="T2">
+  <div class="page-header">
+    <h1>Sample 2: AS3 Interop</h1>
+  </div>
+  <div>
+
+<h4>Basic Interop</h4>
+
+<p>Like the previous example this sample just has one main function. But in
+addition to printf, this example shows how to interleave snippets of
+ActionScript code with your C/C++ code. You can pass variables from C/C++ into the
+ActionScript code, and ActionScript code can be used to update C/C++ variables.</p>
+
+<p>
+Crossbridge uses GCC's inline asm syntax, which lets you write arbitrary
+ActionScript inside your C/C++ code. This allows for very easy interop
+between AS3 and C/C++.
+</p>
+<p>
+For a complete guide to the asm statement and how it is used read the
+GCC documentation. These resources on <a href="http://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html" target="_blank">extended asm</a> and <a href="http://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html" target="_blank">inline assembly</a> may be useful.</p>
+<p>
+Crossbridge converts each function or method in your C/C++ code
+into an AS3 function. This
+limits what AS3 you can put in an inline asm statement inside
+a function. You can't write an AS3 class declaration inside an inline
+asm statement inside a C/C++ function. You can, however, write a class
+declaration outside any C/C++ function.
+</p>
+<p>
+For more information, see the code comments in <b>hellointerop.c</b>.
+</p>
+
+<p>This sample also introduces the CModule helper class, which is linked into all
+Crossbridge code. CModule contains functions to read and write to the Crossbridge heap,
+invoke malloc/free and lookup and invoke symbols. The full CModule documentation
+can be found <a href="apidocs/index.html">here</a>.</p>
+
+<h4>Flash++ Interop</h4>
+<p>The <a href="./Reference.html#section_interop">Flash++ library</a> makes it easy for C++ developers to interact with AS3 classes in the Flash Runtime. Flash++ exposes all of the <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/" target="_blank">Flash APIs</a> as strongly typed C++ classes. The <strong>c++interop.cpp</strong> file  demonstrates an example of how to use this library to draw a series of circles on the screen.  </p>
+
+<h4>BitmapData example</h4>
+<p>Flash has a <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/BitmapData.html">BitmapData</a></code> class that can be used in conjunction with the <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/Bitmap.html">Bitmap</a></code> class to display RGBA bitmap data in the Flash display list. Flash++ makes it easy to efficiently copy data between a <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/BitmapData.html">BitmapData</a></code> object and C memory.</p>
+
+<p>The <b>bitmapdata.cpp</b> example starts by using Flash drawing primitives to render some vector graphics into a <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/BitmapData.html">BitmapData</a></code> object. Whenever the user clicks on the screen the C++ code in <code>mouseDownHandler</code> copies the RGBA data out of the <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/BitmapData.html">BitmapData</a></code> object using the <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/BitmapData.html#copyPixelsToByteArray()">copyPixelsToByteArray</a></code> API, performs a transformation on the pixel data, and then copies it back to the <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/BitmapData.html">BitmapData</a></code> object using the <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/BitmapData.html#setPixels()">setPixels</a></code>  API.</p>
+
+<p>For maximum efficiency you could also keep a copy of the pixel data in C memory and then you would only need to copy the data once into the <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/BitmapData.html">BitmapData</a></code> object to display it, although this would obviously require more memory.</p>
+
+  </div>
+</section>
+
+<section id="T3">
+  <div class="page-header">
+    <h1>Sample 3: Drawing</h1>
+  </div>
+  <div>
+
+    <div class="pull-right">
+      <div class="well">
+        <img src="images/sample3.png"/><br/>
+      </div>
+    </div>
+
+<p>Building on the previous interop sample, this sample illustrates slightly more
+complex interop, which draws to the stage. This example consists of two cpp
+files, so review the makefile to see how this impacts invoking
+g++.</p>
+
+<p>If you aren't familiar with Voronoi diagrams you can read more about them <a href="http://en.wikipedia.org/wiki/Voronoi_diagram">on Wikipedia</a>,
+but this is not necessary for the sample. The actual implementation of the Voronoi diagram algorithm
+(VoronoiDiagramGenerator.*) was taken from <a href="http://www.skynet.ie/~sos/mapviewer/voronoi.php" target="_new">http://www.skynet.ie/~sos/mapviewer/voronoi.php</a> and hasn't been modified so it
+can safely be ignored. For the purposes of this sample you only need to look
+inside voronoi.cpp to review the Flash interop.</p>
+
+<p>If you look at the code in voronoi.cpp you'll see a reference to a class called
+<code>Console</code>. The source code for this class is located in
+<b>sdk/usr/share/Console.as</b>. The purpose of Console.as is to provide
+implementations of various low level system calls that libc expects to be
+available in its host environment.</p>
+
+<p>Console.as also acts as the root sprite for your SWF and sets up the stage. The default
+implementation that ships with Crossbridge puts a <code>TextField</code> on the stage and redirects
+any stdout or stderr messages into this TextField. For a real SWF/SWC you will most
+likely want to replace this class completely. Replacing <b>Console.as</b> will be shown
+in the next sample, but for this simple drawing example we just grab the
+current instance of Console from its public static <code>current</code> property and
+draw some lines using its graphics object, as you would with any Sprite.</p>
+
+<p>When compiled using the default SWF version of 18 Crossbridge will attempt to run the code in a background worker. But for this sample we are directly talking to the Stage object and attempting to draw on it which needs to be done in a certain way from a background thread. We will introduce more about threading in later tutorials, so for now this tutorial just specifies a SWF version of 17 in the Makefile so that the code is run synchronously on the main Flash thread.</p>
+
+</div>
+</section>
+
+<section id="T4">
+  <div class="page-header">
+    <h1>Sample 4: Animation</h1>
+  </div>
+  <div>
+    <div class="pull-right">
+      <div class="well">
+        <img src="images/sample4.png"/><br/>
+      </div>
+    </div>
+
+<p>The last sample showed how to inter-operate with the stage during <code>main()</code>, but
+what if you want to drive an animation from C++? Because AS3 is single threaded, you can't simply put a <code>while(true)</code> loop in main as that would block the main
+Flash player thread and block  screen updates, input events, and sound.</p>
+
+<p>Instead, you need to structure the code so that a small amount of work is done
+every frame. You can do this with either an Enter Frame handler or a timer.
+This sample replaces the default Console implementation with one
+that uses an Enter Frame handler to call a function.</p>
+
+<p>Open up <b>Console.as</b>. First you'll notice a call to <code>CModule.startAsync</code> in the
+Console constructor; this is a helper method that invokes main. But before
+main runs, code for all of the C++ static initializers will run. And when
+main returns, C++ static destructors will be run. This is important to understand
+because when using Crossbridge-compiled code as a library or driving an animation, main
+must return without running these destructors. To prevent the destructors from running,
+throw an AS3 exception at the very end of main. For an example, see <code>main()</code> in
+<b>GameOfLife.cpp</b>.</p>
+
+<p>In <b>GameOfLife.cpp</b>, you will also see a function called <code>updateUniverse</code> that is
+marked <code>extern "C"</code>. This prevents the C++ compiler from
+mangling the name so that it is a easier to look up from <code>Console</code>.
+However, as you will see in the next sample, you can control
+generated function names without using this technique.</p>
+
+<p>Returning to <b>Console.as</b>, you will see a function called <code>frameBufferBlit</code> that
+is hooked up to an Enter Frame event listener. In this function the <code>getPublicSymbol</code>
+helper is used to find the address of the <code>updateUniverse</code> function,
+which is then passed to the <code>callFunI</code> helper along with any necessary arguments
+(in this case the function needs no arguments).</p>
+
+<p>In summary, to implement a simple run loop you do the following:</p>
+
+<ul>
+<li>Replace <code>Console</code> with one that has an enter frame/timer based loop.</li>
+<li>Call main using the <code>startAsync</code> helper and throw out of it using the <code>AS3_GoAsync()</code> macro defined in <b>AS3.h</b></li>
+<li>Call your C/C++ <code>tick</code> function using the CModule helpers.</li>
+</ul>
+
+<p>Open the makefile in a text editor to see how the replacement <code>Console</code> is compiled
+and how it is passed to gcc using the <i>-symbol-abc</i> option.</p>
+
+</div>
+</section>
+
+<section id="T5">
+  <div class="page-header">
+    <h1>Sample 5: SWC</h1>
+  </div>
+  <div>
+
+<p>Now that you can compile code into SWFs and implement a run loop
+using a mixture of C++ and AS3, the next step is to compile code as a SWC library,
+so it can be easily distributed and used in standard AS3 workflows. This sample uses a hashing library
+called MurmurHash. The implementation is public domain and is hosted at
+<a href="http://code.google.com/p/smhasher/">http://code.google.com/p/smhasher/</a></p>
+
+<p>Review the header. This library is very simple and
+defines only three different hash functions. In this sample we expose just one
+of these functions:<code>MurmurHash3_x86_32</code>.</p>
+
+<p>The files <b>MurmurHash3.cpp/.h</b> are unmodified. The wrapper code is located in
+<b>as3api.cpp</b>. This file shows how to use the as3sig annotation syntax that
+Crossbridge provides to control the resulting AS3 function signature for a given
+C/C++ function.</p>
+
+<p>This syntax offers a good way to write the interface functions that sit between
+the AS3 and C/C++ codebases, performing any necessary marshaling and conversion.</p>
+
+<p>For an interface like this one, you might imagine that the wrapper
+functions could be generated automatically. As you will see in the next sample
+Crossbridge comes with a modified version of SWIG (<a href="http://www.swig.org/" target="_blank">Simplified Wrapper and
+Interface Generator</a>), which
+can do just that.</p>
+
+<p>As with the animation sample, you must provide a simple <code>main</code> method that
+throws out via AS3 so that C++ static init code is run, but the destructors are
+not. The client code that uses the generated <b>MurmurHash.swc</b> in <b>swcdemo.as</b>
+calls <code>startAsync</code> first to run the static inits. The MurmurHash3 function that
+was defined in <b>as3api.cpp</b> can then be imported from the <code>sample.MurmurHash</code>
+namespace and used.</p>
+
+<p>The makefile for this sample compiles a native executable using the code in
+<b>demo.cpp</b>, which uses the MurmurHash library the same way that the code in
+<b>swcdemo.as</b> does. Running the generated SWF in the Flash Player and running
+the native executable on the command line should produce the same results.</p>
+
+</div>
+</section>
+
+<section id="T6">
+  <div class="page-header">
+    <h1>Sample 6: SWIG</h1>
+  </div>
+  <div>
+<p>This sample contains four examples using SWIG:</p>
+<ul>
+<li><strong>MurmurHash</strong> - Demonstrates using SWIG to automatically wrap the functions in the MurmurHash library that was manually wrapped in the previous sample</li>
+<li><strong>PassingData</strong> - Demonstrates how to pass different data types between ActionScript and C</li>
+<li><strong>LodePNG</strong> - Demonstrates wrapping an existing library that has many functions and types</li>
+<li><strong>Typemaps</strong> - Demonstrates how to use SWIG's typemap directives to make the ActionScript API of your SWC easier to use</li>
+</ul>
+
+<p>Choosing between SWIG and manual wrapping is a trade-off between convenience and control.
+Manually coding the wrapper code lets you  produce more natural idiomatic
+AS3 interfaces for a library, but takes more time. SWIG can produce a full
+AS3 interface for a large library very quickly with minimal manual intervention,
+but it might not produce the cleanest interface.</p>
+
+<p>SWIG is a complex system and offers lots of control over the generated
+  interfaces, but there is too much to mention in this short sample. For more information,
+  review the <a href="http://www.swig.org/Doc2.0/SWIGDocumentation.html" target="_blank">SWIG documentation</a> for
+  a deeper explanation of SWIG functionality.</p>
+
+<p>At a high level what happens is that you invoke SWIG with a file containing
+header files and SWIG processing directives. SWIG inspects these headers to
+find Class/Struct and function definitions. Given no directives it tries to
+generate wrappers for all of these types, but these wrappers can be modified or
+hidden by various directives to SWIG (see SWIG documentation for more info).</p>
+
+<p>SWIG generates both a C file and an AS file. The C file contains wrapper
+functions, similar to the one written in the previous sample. The AS file exposes
+these functions on a class and contains additional code to make
+the wrappers work correctly.</p>
+
+<p>Compile the generated C file with gcc/g++ as though it were a normal
+source file in the project. If you are wrapping a library that is compiled to
+a ".a" static archive by its build system, then this generated C file should be
+compiled along with that archive to produce the final SWC.</p>
+
+<p>The generated AS file must be compiled with ASC and then passed on the
+command line to gcc/g++ when producing the final SWC. ABC files given on the
+gcc/g++ command line are linked into the SWF/SWC being produced.</p>
+
+<h3>Further Examples</h3>
+
+<p>The version of SWIG provided with the Crossbridge SDK can generate ActionScript
+wrapper classes for C structs. This is useful when you'd like to manipulate
+or read the contents of a struct in your own ActionScript code. In order to
+use this feature, the SWIG input file must be valid C code, which means that
+SWIG directives can't appear in the file unless enclosed within an <code>ifdef</code>. For example:</p>
+
+<pre>
+#ifdef SWIG
+// SWIG directives go here
+%typemap(in) foo {...};
+#endif
+// C struct definitions, function prototypes, and so on, go here
+struct foobar {
+    int foo;
+    char bar;
+};</pre>
+
+<p>When SWIG processes this file, it preprocesses and parses it twice, once
+with the SWIG macro defined, and then without that macro defined. The first
+pass determines what wrappers will be generated and how types will be
+converted. The second pass determines how structs will be wrapped.</p>
+
+<p>In general, it's good practice to always surround SWIG directives with
+ifdefs, so that the SWIG interface file is valid C code.</p>
+
+<p>The ActionScript SWIG module generally respects the standard SWIG typemaps,
+and adds a few new typemaps that you can use, as appropriate. See
+<b>sdk/usr/share/swig/2.0.4/as3/as3.swg</b> for examples of typemap use. Note that
+defining typemaps is an advanced use of SWIG, and is unnecessary in many situations.
+For more information on typemaps, see:
+<a href="http://www.swig.org/Doc2.0/Typemaps.html" target="_blank">http://www.swig.org/Doc2.0/Typemaps.html</a></p>
+
+</div>
+</section>
+
+<section id="T7">
+  <div class="page-header">
+    <h1>Sample 7: Filesystem</h1>
+  </div>
+  <div>
+
+<p>When using the Crossbridge compiler to generate standalone projector executables, the
+resulting code runs inside the AVM shell. Unlike the Flash Runtime, the AVM shell
+has special extensions that allow unrestricted access to the local filesystem.</p>
+
+<p>When compiling applications or libraries to either SWF or SWC, the AVM shell extensions
+are no longer available, so compiled code will be unable to access or inspect the
+local filesystem.</p>
+
+<p>By default, the low level filesystem APIs in the standard library are routed to
+a virtual filesystem (VFS), which you can populate by embedding the actual files into your SWF or by implementing the <code>IBackingStore</code> interface and handling filesystem requests in a custom way. The <code>genfs</code> tool that ships with the Crossbridge SDK can be used to generate embedded, zipped, web-based or LSO-based VFS implementations (see the <a href="Reference.html#section_vfs">Reference guide</a> for more information on how to use the genfs tool).</p>
+
+<p>If the type is "http" then the output will be a manifest file that is designed to be included by the code in <b>sdk/usr/share/HttpBackingStore.as</b>. You will need to construct this class and listen for the complete event before being able to use the http based VFS.</p>
+
+<p>In this example there is a single file, <b>vfs/rocks.txt</b>, which appears in the VFS as
+<b>/rocks.txt</b> because the vfsroot path is stripped off the resulting paths in the VFS.
+The VFS supports nested directories.</p>
+
+<p>It's also possible to load files from the web rather than embedding them
+in your SWF. The sample demonstrates "mounting" a <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/URLLoader.html" target="_blank">URLLoader</a>-based filesystem
+at <b>/web</b> in the SWF's VFS. The single file inside of this
+filesystem is available to your application as <b>/web/remote.txt</b>.</p>
+</div>
+</section>
+
+<section id="T8">
+  <div class="page-header">
+    <h1>Sample 8: GDB</h1>
+  </div>
+  <div>
+<p>This sample demonstrates how to start a GDB debugging session and execute
+some simple GDB commands. Before continuing with this sample you will need to follow the <a href="Reference.html#section_gdb">Setting up GDB</a> instructions in the reference guide.</p>
+<p>To run a Crossbridge SWF in GDB, you compile with the <i>-g -O0</i>
+  flags, for example:</p>
+
+<pre>
+/path/to/sdk/usr/bin/gcc -g -O0 -emit-swf -o debuggingexample.swf debuggingexample.c
+</pre>
+
+<p>Then launch GDB with the output SWF as a parameter:
+
+<pre>
+/path/to/sdk/usr/bin/gdb debuggingexample.swf
+</pre>
+
+<p>This launches GDB and passes it the <b>debuggingexample.swf</b> file as the target
+application. This displays the GDB prompt, which looks something like this:</p>
+
+<pre>
+  GNU gdb (GDB) 7.3
+  Copyright (C) 2011 Free Software Foundation, Inc.
+  License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
+  This is free software: you are free to change and redistribute it.
+  There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+  and "show warranty" for details.
+  This GDB was configured as "--host=x86_64-apple-darwin10 --target=avm2-elf".
+  For bug reporting instructions, please see:
+  &lt;http://www.gnu.org/software/gdb/bugs/&gt;...
+  (gdb)</pre>
+
+<p>At the GDB prompt, issue the <code>break main</code> command to set a breakpoint at main():</p>
+
+<pre>
+  (gdb) break main
+</pre>
+
+<p>To start the SWF, issue the <code>run</code> command:</p>
+
+<pre>
+  (gdb) run
+</pre>
+
+<p>At this point you are now in the SWF and ready to start debugging, stepping through
+code, inspecting variables, listing source code, and so on. This example steps through
+a few lines of code using the <code>step</code> command:</p>
+
+<pre>
+  (gdb) step
+  0xf0000032  21      int t = 1;
+  (gdb) step
+  0xf0000034  24      for (i = 0; i &lt; 8; i++){
+  (gdb) step
+  0xf0000037  25          t *= 2;
+  (gdb) step
+  0xf0000039  24      for (i = 0; i &lt; 8; i++){
+  (gdb) step
+  0xf0000037  25          t *= 2;</pre>
+
+<p>Use the <code>info</code> command to check the values of the local variables:</p>
+
+<pre>
+  (gdb) info locals
+  s = 2
+  t = 2
+  i = 1</pre>
+
+<p>Use the <code>continue</code> command to run to the end of the C code:</p>
+
+<pre>
+  (gdb) continue
+</pre>
+
+<p>Notice that the SWF is now shown.</p>
+
+<p>See the section in the <a href="Reference.html#section_gdb">Crossbridge reference guide</a> and  the <a href="http://www.gnu.org/software/gdb/documentation" target="_blank">GDB documentation</a> to learn more about debugging using GDB.</p>
+</div>
+</section>
+
+<section id="T9">
+  <div class="page-header">
+    <h1>Sample 9: Pthreads</h1>
+  </div>
+  <div>
+  <p>
+    With Flash player 11.5 Pthreads based multi-threading is fully supported via Crossbridge. Existing pthread-based code should run without any need to modify it. When running in the background not all Flash APIs are available (see the <a href="Reference.html#section_concurrency">Reference guide</a> for a full list of APIs that are not supported in the background) so you may need to communicate with the primary worker that does have full access to the Flash API set to perform certain operations. </p>
+  <p>
+    Remember to compile your SWF with the option <i>-pthread</i> to enable pthread support. This will require the SWF version to be at least 18 (the default value) because the features of the Flash Player used by concurrency are only available to SWF 18 and higher.
+  </p>
+
+  <h3>pthreads.cpp explained</h3>
+  <p>
+    In this example a background thread is started that sleeps until it receives a mouseMove event from the foreground thread at which point it updates the position of a circle on the stage. This demonstrates how you can use the automatic marshaling support in <b>AS3++.h</b> to interact with objects on different threads.
+  </p>
+
+  <p>
+    Here's a breakdown of what takes place on each Thread/Worker in this example:
+  </p>
+
+  <ul>
+    <li><code>main</code> runs in a new Flash Worker by default when targeting SWF version 18.</li>
+
+    <li>Using the call to <code>get_Stage()</code> from the <code>AS3::ui</code> namespace returns a reference to the Flash Stage that will automatically marshal any property access or method calls to the main Flash Worker regardless of what C thread is using it.</li>
+
+    <li>A new thread is spawned using <code>pthread_create</code> that runs the C function <code>threadProc</code> in a new Flash Worker</li>
+
+    <li>When <code>threadProc</code> starts running it registers a  mouseMove event listener using a function pointer to the C function <code>mouseMoveProc</code>. Again the automatic marshaling will ensure that this function is run from the main Flash Worker but run with the current C thread's ID so that it has full access to the Flash API set when running and access to the correct thread-local variables (while correctly ensuring no two workers are running the same C thread concurrently).</li>
+
+    <li>The background thread <code>threadProc</code> sits in a loop waiting to be woken up by the mouseMove event handler, at which point it does a simple <code>printf</code>.
+
+  </ul>
+  <p>
+  </p>
+  </div>
+</section>
+
+<section id="T10">
+  <div class="page-header">
+    <h1>Sample 10: MessageChannel</h1>
+  </div>
+  <div>
+    <p>This example shows how to combine the use of pthreads with the event-based communication that the Flash Player exposes via the MessageChannel API.</p>
+    <p>Thibault Imbert has a good introduction to this API from a pure AS3 point of view <a href="http://www.bytearray.org/?p=4423" target="_blank">on his blog</a>.</p>
+  </div>
+</section>
+
+<section id="T11">
+  <div class="page-header">
+    <h1>Sample 11: OpenMP</h1>
+  </div>
+  <div>
+    <div class="pull-right">
+      <div class="well">
+        <img src="images/sample11.png"/><br/>
+      </div>
+    </div>
+
+    <p>
+      The <a href="http://www.openmp.org/">OpenMP library</a> is an attempt at bringing high-level multi-threaded primitives to low-level pthread-based programs. The OpenMP library handles thread pooling and task scheduling and lets the developer write what looks like single threaded code that is then automatically parallelized. This is done using various compiler pragmas to annotate which loops are suitable for parallel execution.
+    </p>
+    <p>
+      In this particular example a simple Mandlebrot fractal zoomer is automatically parallelized by using a for loop pragma so that multiple lines in the image can be rasterized in parallel. Clicking on the SWF increase the number of available threads by calling the <code>omp_set_num_threads</code> API. When multiple threads are used the pixels will each have a blue tint based on which thread is being used to render them. You will see that this isn't consistent across frames because of the dynamic load balancing that OpenMP uses to allocate work to different threads.
+    </p>
+    <p>When compiling code to use OpenMP make sure to pass <i>-fopenmp</i> to gcc/g++. This enables the OpenMP pragmas and links against the GNU OpenMP support library.</p>
+    <p>Some good reference material on OpenMP can be found here: <a href="http://www.nic.uoregon.edu/iwomp2005/iwomp2005_tutorial_openmp_rvdp.pdf">http://www.nic.uoregon.edu/iwomp2005/iwomp2005_tutorial_openmp_rvdp.pdf</a> and here <a href="http://gcc.gnu.org/onlinedocs/libgomp/">http://gcc.gnu.org/onlinedocs/libgomp/</a>.
+    </p>
+  </div>
+</section>
+
+<section id="T12">
+  <div class="page-header">
+    <h1>Sample 12: Stage3D</h1>
+  </div>
+  <div>
+    <p>This sample shows how you can use the as3wig (AS3 wrapper interface generator) tool that is included with the Crossbridge SDK to let you automatically generate strongly typed C++ bindings for pure AS3 libraries. In this example we use as3wig on the AGALMiniAssembler which is an ActionScript library that compiles AGAL assembly into AGAL bytecode suitable for use with the Stage3D API in the Flash Runtime.</p>
+
+    <p>This sample also demonstrates how the <a href="./Reference.html#section_interop">Flash++</a> bindings to Stage3D can be used to render 3D content with the gpu in the Flash runtime. Although this isn't any different from previous interop samples in its scope it is something a lot of Crossbridge users will be doing.</p>
+
+    <p>There is also a larger example called Space Triangle that shows a more complete game being developed purely in Flash++.</p>
+  </div>
+</section>
+</div>
+
+  <footer class="footer">
+
+  </footer>
+
+  <script type="text/javascript" src="bootstrap/js/widgets.js"></script>
+  <script type="text/javascript" src="bootstrap/js/jquery.min.js"></script>
+  <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="bootstrap/js/bootstrap-tab.js"></script>
+</body>
+</html>

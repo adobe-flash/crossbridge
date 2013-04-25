@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Crossbridge - Readme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="bootstrap/css/docs.css" rel="stylesheet">
+    <link href="bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+  </head>
+  <body data-spy="scroll" data-target=".subnav" data-offset="50">
+
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="http://www.github.com/adobe/crossbridge" target="_blank"><span>Crossbridge</span></a>
+        <div>
+          <ul class="nav">
+            <li class="">
+              <a href="../README.html">Readme</a>
+            </li>
+            <li class="active">
+              <a href="./Reference.html">Reference</a>
+            </li>
+            <li class="">
+              <a href="./samples.html">Samples</a>
+            </li>
+            <li class="">
+              <a href="./capidocs/index.html">C/C++ API Reference</a>
+            </li>
+            <li class="">
+              <a href="./apidocs/index.html">AS3 API Reference</a>
+            </li>
+            <li class="">
+              <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/">Flash API Reference</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header class="jumbotron subhead" id="overview">
+      <h1>Crossbridge</h1>
+      <p class="lead">A complete BSD-like C/C++ development environment with a GCC based cross-compiler capable of targeting the Adobe Flash Runtime.</p>
+    </header>
+
+    <section>
+      <div class="page-header">
+        <h1>Debugging Multi-threaded Applications with gdb</h1>
+      </div>
+      <div>
+        <p>Multi-threaded C/C++ applications that use the pthread library can be compiled with Crossbridge to run in <a href="http://www.adobe.com/support/flashplayer/downloads.html" target="_blank">Flash Player 11.5</a> (or newer). This page demonstrates how to use gdb to debug multi-threaded Crossbridge applications.</p>
+        <h1>Getting Started</h1>
+        <p>This page assumes that you already have your computer setup for single threaded debugging as outlined in the <a href="Reference.html#section_gdb">debugging with gdb</a> reference section.</p>
+        <p>To get started we're going to use a very basic multi-threaded C program called <strong>sample.c</strong> from <a href="https://computing.llnl.gov/tutorials/pthreads/" target="_blank">this excellent pthreads tutorial</a>:</p>
+<pre lang="c">#include &lt;pthread.h&gt;
+#include &lt;stdio.h&gt;
+#define NUM_THREADS     5
+
+void *PrintHello(void *threadid)
+{
+   long tid;
+   tid = (long)threadid;
+   printf("Hello World! It's me, thread #%ld!\n", tid);
+   pthread_exit(NULL);
+}
+
+int main (int argc, char *argv[])
+{
+   pthread_t threads[NUM_THREADS];
+   int rc;
+   long t;
+   for(t=0; t&lt;NUM_THREADS; t++){
+      printf("In main: creating thread %ld\n", t);
+      rc = pthread_create(&threads[t], NULL, PrintHello, (void *)t);
+      if (rc){
+         printf("ERROR; return code from pthread_create() is %d\n", rc);
+         exit(-1);
+      }
+   }
+
+   /* Last thing that main() should do */
+   pthread_exit(NULL);
+}</pre>
+        <p>This application simply creates a few threads that print out strings to the screen. First compile the program into a debug SWF with gcc:</p>
+        <pre>.../flascc/sdk/usr/bin/gcc -g -O0 -pthread sample.c -emit-swf -o sample.swf</pre>
+        <p>Now launch gdb with this SWF:</p>
+        <pre>.../flascc/sdk/usr/bin/gdb sample.swf</pre>
+        <p>Let's put a breakpoint at PrintHello and run the application:</p>
+<pre>(gdb) break PrintHello
+No symbol table is loaded.  Use the "file" command.
+Make breakpoint pending on future shared library load? (y or [n]) y
+
+Breakpoint 1 (PrintHello) pending.
+(gdb) run
+Starting program: sample.swf
+0xdddddddd in ?? ()</pre>
+        <p>Notice that the PrintHello function is clearly running as you can see its output in the Flash Player window, but the debugger didn't break on it. This is because, by default, gdb only operates on the main thread. In order to interact with other threads we need to explicitly turn on multi-threading support in gdb.</p>
+        <p>To turn on multi-threading support we need to enable gdb's "<a href="http://sourceware.org/gdb/onlinedocs/gdb/Non_002dStop-Mode.html#Non_002dStop-Mode" target="_blank">non-stop mode</a>". Non-stop mode means that when one thread in a program stops, other threads will continue running. In non-stop mode, gdb executes some commands asynchronously. When given an asynchronous, or background, command, gdb prompts you for the next command while the original command continues executing in the background. gdb will notify you when the background command finishes. Crossbridge gdb allows all threads to be controlled individually by the debugger when in this mode.</p>
+        <p>Non-stop mode is slightly different from the default mode of gdb which is called "<a href="http://sourceware.org/gdb/onlinedocs/gdb/All_002dStop-Mode.html#All_002dStop-Mode" target="_blank">all-stop mode</a>". In all-stop mode gdb executes all commands synchronously, meaning that each command must complete before you can enter the next command. In this mode, Crossbridge gdb ignores all threads except the main thread. Note that this behavior is specific to Crossbridge gdb; in other gdb implementations, all-stop mode means that when one thread in a program stops, all other threads will stop as well.</p>
+        <p>Let's quit this gdb session by pressing <code>CTRL+C</code>, then <code>quit</code>, then <code>y</code>:</p>
+<pre>
+^C
+Program received signal SIGTRAP, Trace/breakpoint trap.
+0x00000000 in ?? ()
+(gdb) q
+A debugging session is active.
+
+	Inferior 1 [Remote target] will be killed.
+
+Quit anyway? (y or n) y</pre>
+		<p>Then launch gdb again and this time we'll try using non-stop mode:</p>
+	    <pre>.../flascc/sdk/usr/bin/gdb sample.swf</pre>
+		<p>&nbsp;</p>
+        <h1>Debugging in Non-stop Mode</h1>
+        
+        <div class="clearfix">
+          <div class="alert alert-warning pull-right span3">
+          <p><strong>TIP:</strong> If you find it annoying to type these three commands at the start of every gdb session you can define a custom gdb command in a <strong>.gdbinit</strong> file:</p>
+<pre>define myCustomCommand
+    set pagination off
+    set target-async on
+    set non-stop on
+end</pre>
+  <p>This <strong>.gdbinit</strong> file is run automatically when gdb starts up. The <strong>.gdbinit</strong> file can either be placed in your home directory or the current directory. The next time you start gdb you just need to enter one command to turn on non-stop mode:</p>
+  <pre>(gdb) myCustomCommand</pre>
+          </div>
+          
+<p>Non-stop mode must be enabled explicitly at the beginning of your debug session. In order to turn on non-stop mode you need to call three commands: </p>
+
+<pre>(gdb) set pagination off 
+(gdb) set target-async on
+(gdb) set non-stop on</pre>
+
+<p>Now we're ready to start debugging this program in non-stop mode. The first thing we're going to do is put a breakpoint at main:</p>
+<pre>(gdb) break main</pre>
+<p>Then <code>run</code> the SWF:</p>
+<pre>(gdb) run</pre>
+<p>It may take a few seconds to load up and stop at main. You can ignore the <code>[Worker 1]#1 stopped</code> output that shows up and wait until you see that we are indeed stopped at main:</p>
+<pre>Breakpoint 1, 0xf0000083 in main (argc=0, argv=0x200ff0) at sample.c:18
+18          for(t=0; t&lt;NUM_THREADS; t++){
+(gdb)</pre>
+<p>Up until now this should seem familiar to the default mode of gdb, but this is where things start to change. You might expect that you should be able to step through main right now, but if you try doing that you will see an error: </p>
+<pre>(gdb) step
+ Cannot execute this command while the selected thread is running.</pre>
+<p>gdb reports this error because while one thread has stopped at a breakpoint, the selected thread is still running. You might wonder why there are two threads in the program at this point. After all, the program we're debugging has not called pthread_create yet. The reason is that when threading support is available, Crossbridge calls the main function on a background thread. This allows your C code to perform long running operations without blocking the UI. You can use the <code>info threads</code> command to see the running threads in your program:</p>
+
+        </div>
+<pre>(gdb) info threads
+  Id   Target Id         Frame
+  2    Worker 2          0xf0000083 in main (argc=0, argv=0x200ff0) at sample.c:18
+* 1    Worker 1          (running)</pre>
+<p>You can see that thread 2 is stopped at a breakpoint on line 18 of our program. Thread 1, which is the UI thread, is currently running. In addition to managing UI events, the UI thread also services various low level calls on behalf of other threads. For these reasons, it's generally best to avoid interrupting the UI thread if you want other threads to run unimpeded.</p>
+<p>The <code>*</code> signifies which thread is currently selected in gdb. In order to change which thread is currently selected use gdb's <code>thread</code> command and pass in the <code>Id</code> listed above. Here let's change to the thread that is currently broken at main:</p>
+<pre>(gdb) thread 2
+[Switching to thread 2 (Worker 2)]
+#0  0xf0000083 in main (argc=0, argv=0x200ff0) at sample.c:18
+18          for(t=0; t&lt;NUM_THREADS; t++){</pre>
+<p>Now that we are on the thread that is suspended at main let's step twice: </p>
+<pre>(gdb) step
+19              printf("In main: creating thread %ld\n", t);
+(gdb) step
+20              rc = pthread_create(&amp;threads[t], NULL, PrintHello, (void *)t);</pre>
+<p>At this point we are about to create a thread using the pthread_create function. That thread will be calling the PrintHello function. If you look at the source code of sample.c above you will notice that we're actually going to create a bunch of threads in the for loop. Let's put a breakpoint on the PrintHello function so we have complete control over every thread created to call that function: </p>
+<pre>(gdb) break PrintHello
+Breakpoint 2 at 0xf000004e: file sample.c, line 8.</pre>
+<p>Now that our breakpoint is setup lets try stepping over the pthread_create line and see what happens: </p>
+<pre>(gdb) step
+21              if (rc){
+(gdb) [New Worker 4]
+
+Breakpoint 2, 0xf000004f in PrintHello (threadid=0x0) at sample.c:8
+8           tid = (long)threadid;</pre>
+<p>If you looked closely what you saw might feel a little strange. What happened is you stepped over that line and got another <code>(gdb)</code> prompt just like normal. But meanwhile another thread was in the process of starting up to call PrintHello. As soon as it hit the PrintHello breakpoint that output was dumped onto the screen and now it doesn't look like we have a <code>(gdb)</code> prompt anymore. Don't worry this is all normal. You'll notice that you can still type gdb commands even though you don't see a prompt at the start of the line.</p>
+<p>If you do ever want to get the prompt back again you can always hit <code>CTRL+C</code>. Try hitting <code>CTRL+C</code> and then call <code>info threads</code> to see what threads are now started:</p>
+<pre>Quit
+(gdb) info threads
+  Id   Target Id         Frame
+  3    Worker 4          0xf000004f in PrintHello (threadid=0x0) at sample.c:8
+* 2    Worker 2          0xf00000a2 in main (argc=0, argv=0x200ff0) at sample.c:21
+  1    Worker 1          (running)
+(gdb)</pre>
+<h3><strong>Using the <code>step</code> command</strong></h3>
+<p>The thread that was created to call PrintHello is now listed with an Id of 3 and suspended at the PrintHello function on line 8. Let's switch over to that thread and step twice: </p>
+<pre>(gdb) thread 3
+[Switching to thread 3 (Worker 4)]
+#0  0xf000004f in PrintHello (threadid=0x0) at sample.c:8
+8           tid = (long)threadid;
+(gdb) step
+9           printf("Hello World! It's me, thread #%ld!\n", tid);
+(gdb) step
+10          pthread_exit(NULL);
+(gdb)</pre>
+<p>At this point we are on the last line of the PrintHello function where the call to pthread_exit() is. If we step one more time it means that this thread will run to completion and we won't see any output: </p>
+<pre>(gdb) step</pre>
+<p>Don't worry this is again normal behavior. What happened is the <code>step</code> command tells gdb to run until the current thread is about to begin executing the next line of source code. However in this case since the pthread_exit function causes the calling thread to terminate without returning to the caller, there won't be a next line to arrive at (the thread has finished). So gdb patiently waits for another line that isn't ever going to come. At this point you can hit <code>CTRL+C</code> to interrupt gdb, hit <code>CTRL+C</code> again to get a prompt back, then call <code>info threads</code> to see what is going on in the program:</p>
+<pre>(gdb) info threads
+  Id   Target Id         Frame
+  2    Worker 2          0xf00000a2 in main (argc=0, argv=0x200ff0) at sample.c:21
+  1    Worker 1          (running)
+
+The current thread  has terminated.  See `help thread'.
+(gdb)</pre>
+
+<p>Notice that thread 3 (which we had selected) has been terminated and no longer shows up in the thread list. There is also no <code>*</code> signifying a selected thread and a message telling you that <code>the current thread has terminated</code>. Let's now go back to the thread that is suspended at main:</p>
+
+<pre>(gdb) thread 2
+[Switching to thread 2 (Worker 2)]
+#0  0xf00000a2 in main (argc=0, argv=0x200ff0) at sample.c:21
+21              if (rc){</pre>
+
+<p>If we step in this function four more times we will start another thread to call PrintHello: </p>
+<pre>(gdb) step
+18          for(t=0; t&lt;NUM_THREADS; t++){
+(gdb) step
+19              printf("In main: creating thread %ld\n", t);
+(gdb) step
+20              rc = pthread_create(&amp;threads[t], NULL, PrintHello, (void *)t);
+(gdb) step
+21              if (rc){
+(gdb) [New Worker 5]
+
+Breakpoint 2, 0xf000004f in PrintHello (threadid=0x1) at sample.c:8
+8           tid = (long)threadid;</pre>
+
+<p>Now hit <code>CTRL+C</code> to get a prompt back and then select the new thread:</p>
+<pre>Quit
+(gdb) info threads
+  Id   Target Id         Frame
+  4    Worker 5          0xf000004f in PrintHello (threadid=0x1) at sample.c:8
+* 2    Worker 2          0xf00000a2 in main (argc=0, argv=0x200ff0) at sample.c:21
+  1    Worker 1          (running)
+(gdb) thread 4
+[Switching to thread 4 (Worker 5)]
+#0  0xf000004f in PrintHello (threadid=0x1) at sample.c:8
+8           tid = (long)threadid;
+(gdb)</pre>
+<h3><strong>Using the <code>continue</code> command</strong></h3>
+<p>This time instead of stepping to the end of this thread let's simply hit <code>continue</code>:</p>
+<pre>(gdb) continue
+Continuing.</pre>
+<p>When gdb continues a thread, it waits until the program stops at a breakpoint before allowing you to enter a new command. In this case though, since thread 2 is suspended and we just allowed thread 4 to terminate, the program will not hit any more breakpoints until we resume thread 2. In order to debug our program further, we must interrupt gdb and regain control over thread 2. Hit <code>CTRL+C</code> once to interrupt gdb, <code>CTRL+C</code> again to get the prompt back, and issue the <code>info threads</code> command:</p>
+<pre>(gdb) info threads
+  Id   Target Id         Frame
+  2    Worker 2          0xf00000a2 in main (argc=0, argv=0x200ff0) at sample.c:
+21
+  1    Worker 1          (running)
+
+The current thread  has terminated.  See `help thread'.
+(gdb)</pre>
+<p>Go back to the thread suspended at main and <code>step</code> 4 times again to create another thread:</p>
+<pre>(gdb) thread 2
+[Switching to thread 2 (Worker 2)]
+#0  0xf00000a2 in main (argc=0, argv=0x200ff0) at sample.c:21
+21              if (rc){
+(gdb) step
+18          for(t=0; t&lt;NUM_THREADS; t++){
+(gdb) step
+19              printf("In main: creating thread %ld\n", t);
+(gdb) step
+20              rc = pthread_create(&amp;threads[t], NULL, PrintHello, (void *)t);
+(gdb) step
+21              if (rc){
+(gdb) [New Worker 6]
+
+Breakpoint 2, 0xf000004f in PrintHello (threadid=0x2) at sample.c:8
+8           tid = (long)threadid;</pre>
+<p>Hit <code>CTRL+C</code> to get the prompt back and then switch to the thread suspended at PrintHello:</p>
+<pre>Quit
+(gdb) info threads
+  Id   Target Id         Frame
+  5    Worker 6          0xf000004f in PrintHello (threadid=0x2) at sample.c:8
+* 2    Worker 2          0xf00000a2 in main (argc=0, argv=0x200ff0) at sample.c:
+21
+  1    Worker 1          (running)
+(gdb) thread 5
+[Switching to thread 5 (Worker 6)]
+#0  0xf000004f in PrintHello (threadid=0x2) at sample.c:8
+8           tid = (long)threadid;
+(gdb)</pre>
+<h3><strong>Using the <code>continue&amp;</code> command</strong></h3>
+<p>Now we're going to call <code>continue</code> again, but this time slightly differently. Instead of issuing the <code>continue</code> command we are going to issue the <code>continue&amp;</code> command. The ampersand at the end of this command means that the command will be issued asynchronously and then a prompt immediately shown ready to receive the next command:</p>
+<pre>(gdb) continue&amp;
+Continuing.
+(gdb)</pre>
+<p>Notice that the next <code>(gdb)</code> prompt immediately shows up after issuing the command. This command allows us to continue long running threads, but still issue other commands or debug other threads at the same time. There is a list near the bottom of this page which shows what commands support an <code>&amp;</code> at the end.</p>
+<p>If we now issue the <code>info threads</code> command we'll see that thread has run to completion:</p>
+<pre>(gdb) info threads
+  Id   Target Id         Frame
+  2    Worker 2          0xf00000a2 in main (argc=0, argv=0x200ff0) at sample.c:
+21
+  1    Worker 1          (running)
+
+The current thread  has terminated.  See `help thread'.</pre>
+
+<p>In this case <code>continue&amp;</code> was quite handy as it stopped us from needing to hit <code>CTRL+C</code> after the thread had been terminated.</p>
+<p>Let's go back to the thread suspended at main and continue it to completion using <code>continue&amp;</code>:</p>
+<pre>(gdb) thread 2
+[Switching to thread 2 (Worker 2)]
+#0  0xf00000a2 in main (argc=0, argv=0x200ff0) at sample.c:21
+21              if (rc){
+(gdb) continue&amp;
+Continuing.
+(gdb)
+Breakpoint 2, 0xf000004f in PrintHello (threadid=0x3) at sample.c:8
+8           tid = (long)threadid;
+
+Breakpoint 2, 0xf000004f in PrintHello (threadid=0x4) at sample.c:8
+8           tid = (long)threadid;</pre>
+<p>If you watched closely you would again notice that the &amp; returned the gdb prompt right away and then later on once the remaining threads were started they broke at PrintHello. Hit <code>CTRL+C</code> again to get a gdb prompt back.</p>
+<h3><strong>Using the <code>thread apply</code> command</strong></h3>
+<p>When debugging multi-threaded applications there may be many threads and you may need to switch between them often. A handy shortcut to working with multiple threads at once is the <code>thread apply</code> command. This command allows you to call the same command on a series of threads, for example let's get the backtrace of the two threads suspended at PrintHello:</p>
+<pre>(gdb) info threads
+  Id   Target Id         Frame
+  7    Worker 8          0xf000004f in PrintHello (threadid=0x4) at sample.c:8
+  6    Worker 7          0xf000004f in PrintHello (threadid=0x3) at sample.c:8
+  1    Worker 1          (running)
+
+The current thread  has terminated.  See `help thread'.
+(gdb) thread apply 6 7 backtrace
+
+Thread 6 (Worker 7):
+#0  0xf000004f in PrintHello (threadid=0x3) at sample.c:8
+#1  0xf000ce95 in _thread_start () from remote:6.elf
+#2  0xf000152e in _thread_run () from remote:2.elf
+#3  0x00000000 in ?? ()
+
+Thread 7 (Worker 8):
+#0  0xf000004f in PrintHello (threadid=0x4) at sample.c:8
+#1  0xf000ce95 in _thread_start () from remote:6.elf
+#2  0xf000152e in _thread_run () from remote:2.elf
+#3  0x00000000 in ?? ()
+(gdb)</pre>
+
+<p>You could also apply this command to all active threads by using <code>thread apply all</code>:</p>
+<pre>(gdb) thread apply all backtrace
+
+Thread 7 (Worker 8):
+#0  0xf000004f in PrintHello (threadid=0x4) at sample.c:8
+#1  0xf000ce95 in _thread_start () from remote:6.elf
+#2  0xf000152e in _thread_run () from remote:2.elf
+#3  0x00000000 in ?? ()
+
+Thread 6 (Worker 7):
+#0  0xf000004f in PrintHello (threadid=0x3) at sample.c:8
+#1  0xf000ce95 in _thread_start () from remote:6.elf
+#2  0xf000152e in _thread_run () from remote:2.elf
+#3  0x00000000 in ?? ()
+
+Thread 1 (Worker 1):
+Target is executing.
+(gdb)</pre>
+<p>You now know how to get started debugging muli-threaded Crossbridge applications with non-stop mode in gdb.</p>
+<h1>Command Summary</h1>
+<p>These commands are typically useful when when debugging multi-threaded applications: </p>
+<ul>
+	<li><code>info threads</code> - Displays a list of threads</li>
+	<li><code>thread X</code> - Sets thread with ID of <code>X</code> to the selected thread</li>
+	<li><code>thread apply X Y</code> - Applies the command <code>Y</code> to a list of threads <code>X</code>. For example "<code>thread apply 3 4 step</code>"</li>
+	<li><code>thread apply all Y</code> - Applies the command <code>Y</code> to all active threads. For example "<code>thread apply all step</code>"</li>
+</ul>
+<p>These gdb commands can be made asynchronous with "&amp;":
+</p>
+<ul>
+	<li><code>step&amp;</code> - Asynchronously step the program onto the next source line (going into subroutine calls)</li>
+	<li><code>next&amp;</code> - Asynchronously move the program onto the next source line (going over subroutine calls)</li>
+	<li><code>continue&amp;</code> - Asynchronously continue the current selected thread</li>
+</ul>
+<h1>More Resources</h1>
+<ul>
+	<li><a href="http://sourceware.org/gdb/onlinedocs/gdb/Threads.html" target="_blank">Debugging Programs with Multiple Threads</a></li>
+	<li><a href="http://sourceware.org/gdb/onlinedocs/gdb/Non_002dStop-Mode.html#Non_002dStop-Mode" target="_blank">gdb non-stop mode</a></li>
+	<li><a href="http://sourceware.org/gdb/onlinedocs/gdb/All_002dStop-Mode.html#All_002dStop-Mode" target="_blank">gdb all-stop mode</a></li>
+	<li><a href="https://computing.llnl.gov/tutorials/pthreads/" target="_blank">POSIX Threads Programming</a></li>
+</ul>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="footer">
+  </footer>
+
+  <script type="text/javascript" src="bootstrap/js/widgets.js"></script>
+  <script type="text/javascript" src="bootstrap/js/jquery.min.js"></script>
+  <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="bootstrap/js/bootstrap-tab.js"></script>
+</body>
+</html>

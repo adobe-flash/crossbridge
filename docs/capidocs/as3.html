@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Crossbridge - AS3.h API Reference</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="../bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="../bootstrap/css/docs.css" rel="stylesheet">
+    <link href="../bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+    <style type="text/css">
+		.parameterName {
+			font-family: monospace;
+		}
+	</style>
+  </head>
+  <body data-spy="scroll" data-target=".subnav" data-offset="50">
+
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="http://www.github.com/adobe/crossbridge" target="_blank"><span>Crossbridge</span></a>
+        <div>
+          <ul class="nav">
+            <li class="">
+              <a href="../../README.html">Readme</a>
+            </li>
+            <li class="">
+              <a href="../Reference.html">Reference</a>
+            </li>
+            <li class="">
+              <a href="../samples.html">Samples</a>
+            </li>
+            <li class="active">
+              <a href="./index.html">C/C++ API Reference</a>
+            </li>
+            <li class="">
+              <a href="../apidocs/index.html">AS3 API Reference</a>
+            </li>
+            <li class="">
+              <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/">Flash API Reference</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container">
+
+	<header class="jumbotron subhead" id="overview">
+      <h1>Crossbridge</h1>
+      <p class="lead">A complete BSD-like C/C++ development environment with a GCC based cross-compiler capable of targeting the Adobe Flash Runtime.</p>
+    </header>
+
+
+    <section>
+      <div class="page-header">
+        <h2>C/C++ API Reference</h2>
+      </div>
+      <div>
+
+
+		<h3>AS3.h</h3>
+		<p>Use the macros in the AS3.h header file to inject ActionScript 3 code into your C/C++ code.</p>
+		<table class="table">
+		  <tr>
+			<th>Function</th>
+			<th>Description</th>
+		  </tr>
+		  <tr>
+			<td>
+                <p>inline_as3</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="inline_as3"></div> 
+            </td>
+			<td><p><code>#define inline_as3(...)</code></p>
+			  <p> The inline_as3 macro correctly restores the global stack pointer and lets you inject arbitrary
+				AS3 code within the body of a C/C++ function. Refer to the Crossbridge documentation for examples
+			  of how you can use GCC's inline asm syntax for interoperating between C/C++ and AS3. </p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">...</span> - Arbitrary ActionScript code including <a href="http://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html" target="_blank">inline asm</a>.</li>
+              </ul>
+<p><strong>Example Usage:</strong> </p>
+<p>See the <a href="../samples.html#T2">02_Interop</a> sample (hellointerop.c)</p></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>inline_nonreentrant_as3</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="inline_nonreentrant_as3"></div> 
+            </td>
+			<td><p><code>#define inline_nonreentrant_as3(...)</code></p>
+			  <p> If your AS3 code doesn't re-enter Crossbridge code you can use this.
+				But if it does re-enter Crossbridge code (either directly or indirectly via something like
+				CModule.mallocString) then your stack will be smashed.
+			  Use <strong>inline_as3</strong> unless you are really sure this is what you want! </p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">...</span> - Arbitrary ActionScript code including <a href="http://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html" target="_blank">inline asm</a>.</li>
+              </ul>
+<p><strong>Example Usage:</strong> </p>
+<p>See the Example_Lua sample</p></td>
+		  </tr>
+          <tr>
+			<td>
+                <p>package_as3</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="package_as3"></div> 
+            </td>
+			<td><p><code>#define package_as3(...)</code></p>
+			  <p>The package_as3 macro lets you inject arbitrary AS3 into the module namespace
+				associated with the current C/C++ translation unit. This is useful for declaring global
+			  AS3 variables that you want to reference from inline as3 asm statements within C/C++ functions. </p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">...</span> - Arbitrary ActionScript code including <a href="http://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html" target="_blank">inline asm</a>.</li>
+              </ul>
+<p><strong>Example Usage:</strong> </p>
+<p>See the Example_Lua sample</p></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_GoAsync</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_GoAsync"></div> 
+            </td>
+			<td><p><code>#define AS3_GoAsync()</code></p>
+			  <p> When breaking a C/C++ run-loop so that Crossbridge code is suitable for use
+				without using multi-threading you need to execute main, so the static initializers for your code are run, but
+				you want to prevent the static destructors from running so it is important that main does not return.
+			  By throwing an AS3 exception and preserving the stack we can effectively interrupt the execution of main.</p>
+			  <p><strong>Example Usage:</strong> </p>
+			  <p>See the <a href="../samples.html#T4">04_Animation</a> sample</p></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_Return</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_Return"></div> 
+            </td>
+			<td><p><code>#define AS3_Return(CVAR)</code></p>
+			  <p>Returns a  value via an AS3 return. Must be a scalar value.</p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">CVAR</span> - A variable in C.</li>
+              </ul>
+            <p><strong>Example Usage:</strong> </p>
+            <p>The code in this example is designed to be compiled into a SWC. See the <a href="../samples.html#T5">05_SWC</a> sample to learn how to compile and run this example.</p>
+<pre>
+#include &lt;stdlib.h&gt;
+#include "AS3/AS3.h"
+
+void returnPi() __attribute__((used,
+	annotate("as3sig:public function returnPi():Number"),
+	annotate("as3package:MyLibrary")));
+
+void returnPi(){
+    float pi = 3.14159;
+    AS3_Return(pi);
+}
+
+int main(){
+    // See the code comments in samples/05_SWC for more details.
+    AS3_GoAsync();
+}</pre></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_ReturnAS3Var</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_ReturnAS3Var"></div> 
+            </td>
+			<td><p><code>#define AS3_ReturnAS3Var(AS3VAR)</code></p>
+			  <p>Returns an AS3 variable via an AS3 return. </p>
+<p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">AS3VAR</span> - An AS3 variable.</li>
+              </ul>
+<p><strong>Example Usage:</strong> </p>
+<p>The code in this example is designed to be compiled into a SWC. See the <a href="../samples.html#T5">05_SWC</a> sample to learn how to compile and run this example.</p>
+<pre>
+#include &lt;stdlib.h&gt;
+#include "AS3/AS3.h"
+
+void returnString() __attribute__((used,
+	annotate("as3sig:public function returnString():String"),
+	annotate("as3package:MyLibrary")));
+
+void returnString(){
+    char* s = "Hello World";
+    
+    // We can't just call AS3_Return(s) because s is not a scalar.
+    // Instead we need to marshall the C string into AS3 and use 
+    // AS3_ReturnAS3Var().
+    
+    AS3_DeclareVar(myString, String);
+    AS3_CopyCStringToVar(myString, s, 11);
+    AS3_ReturnAS3Var(myString);
+}
+
+int main(){
+    // See samples/05_SWC for more details.
+    AS3_GoAsync();
+}</pre></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_Trace</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_Trace"></div> 
+            </td>
+			<td><p><code>#define AS3_Trace(STR)</code></p>
+			  <p> Simple wrapper to trace strings to the flash log file, which can be found in one of these locations:      </p>
+			  <ul>
+				<li>Windows 95/98/ME/2000/XP - C:\Documents and Settings\username\Application Data\Macromedia\Flash Player\Logs</li>
+				<li>Windows Vista/Windows 7 - C:\Users\username\AppData\Roaming\Macromedia\Flash Player\Logs</li>
+				<li>Macintosh OS X - /Users/username/Library/Preferences/Macromedia/Flash Player/Logs/</li>
+				<li>Linux - /home/username/.macromedia/Flash_Player/Logs/</li>
+			  </ul>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">STR</span> - A string.</li>
+              </ul>
+<p><strong>Example Usage:</strong> </p>
+<pre>#include &lt;AS3/AS3.h&gt;
+
+int main() {
+    AS3_Trace("Hello World!"); 
+}</pre>
+</td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_MallocString</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_MallocString"></div> 
+            </td>
+			<td><p><code>#define AS3_MallocString(CVAR, STR)</code></p>
+			  <p>Marshalls an AS3 string into a C char*.
+			  This will call malloc behind the scenes so you must  free it later.</p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">CVAR</span> - A variable in C.</li>
+                <li><span class="parameterName">STR</span> - An ActionScript string.</li>
+              </ul>
+<p><strong>Example Usage:</strong></p>
+<pre>
+#include &lt;AS3/AS3.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    inline_as3("var myString:String = 'hello';\n");
+    
+    char *str = NULL;
+    AS3_MallocString(str, myString);
+        
+    printf("str=%s", str); // output: str=hello
+    free(str); // remember to free
+}</pre>
+<p>Also see the <a href="../samples.html#T5">05_SWC</a> sample</p></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_StringLength</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_StringLength"></div> 
+            </td>
+			<td><p><code>#define AS3_StringLength(CVAR, STR)</code></p>
+			  <p>Sets the value of <span class="parameterName">CVAR</span> to the length of the ActionScript string <span class="parameterName">STR</span>.</p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">CVAR</span> - A variable in C.</li>
+                <li><span class="parameterName">STR</span> - A string or an ActionScript variable.</li>
+              </ul>
+<p><strong>Example Usage:</strong> </p>
+<pre>
+#include &lt;AS3/AS3.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    inline_as3("var myString:String = 'hello';\n");
+    
+    int strLen = 0;
+    
+    AS3_StringLength(strLen, myString);
+    printf("strLen=%d\n", strLen); // output: 5
+    
+    AS3_StringLength(strLen, "hello world");
+    printf("strLen=%d\n", strLen); // output: 11
+}</pre>
+<p>Also see the <a href="../samples.html#T5">05_SWC</a> sample</p></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_DeclareVar</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_DeclareVar"></div> 
+            </td>
+			<td><p><code>#define AS3_DeclareVar(AS3NAME, AS3TYPE)</code></p>
+			  <p>Declares an AS3 variable in the current function. </p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">AS3NAME</span> - Name of the ActionScript variable to declare.</li>
+                <li><span class="parameterName">AS3TYPE</span> - Type of the ActionScript variable to declare (ex: String).</li>
+              </ul>
+<p><strong>Example Usage:</strong> </p>
+<pre>
+#include &lt;AS3/AS3.h&gt;
+
+int main() {
+    int x = 5;
+    // declare an ActionScript variable of type Number
+    AS3_DeclareVar(myAS3Number, Number);
+    // assign a value to that variable
+    AS3_CopyScalarToVar(myAS3Number, x); 
+    // trace the value
+    AS3_Trace("myAS3Number=" + myAS3Number); 
+}</pre>
+<p>Also see the Example_Lua sample</p></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_CopyCStringToVar</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_CopyCStringToVar"></div> 
+            </td>
+			<td><p><code>#define AS3_CopyCStringToVar(AS3VAR, CSTRPTR, LEN)</code></p>
+			  <p>Marshalls a C character string   into a local AS3 string variable.</p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">AS3VAR</span> - ActionScript variable to assign the string value to.</li>
+                <li><span class="parameterName">CSTRPTR</span> - Pointer to the C character string.</li>
+                <li><span class="parameterName">LEN</span> - Length of the C character string.</li>
+              </ul>
+<p><strong>Example Usage:</strong></p>
+<pre>
+#include &lt;AS3/AS3.h&gt;
+
+int main() {
+    char* str = "hello";
+    
+    AS3_DeclareVar(myString, String);
+    AS3_CopyCStringToVar(myString, str, 5);
+    AS3_Trace("myString=" + myString);
+}</pre>
+<p>Also see the Example_Lua sample</p></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_CopyCharToVar</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_CopyCharToVar"></div> 
+            </td>
+			<td><p><code>#define AS3_CopyCharToVar(AS3VAR, CSTRPTR)</code></p>
+			  <p>Marshalls a C character  into a local AS3 string variable.</p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">AS3VAR</span> - ActionScript variable to assign the character value to.</li>
+                <li><span class="parameterName">CSTRPTR</span> - Pointer to the C character.</li>
+              </ul>
+              <p><strong>Example Usage:</strong></p>
+<pre>
+#include &lt;AS3/AS3.h&gt;
+
+int main() {
+    char* ch = &quot;A&quot;;<br>    <br>    AS3_DeclareVar(myString, String);<br>    AS3_CopyCharToVar(myString, ch);<br>    AS3_Trace(&quot;myString=&quot; + myString);
+}</pre></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_CopyScalarToVar</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_CopyScalarToVar"></div> 
+            </td>
+			<td><p><code>#define AS3_CopyScalarToVar(AS3VAR, VAL)</code></p>
+			  <p>Copies a scalar C value into a local AS3 variable.</p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">AS3VAR</span> - ActionScript variable to assign the scalar to.</li>
+                <li><span class="parameterName">VAL</span> - A scalar value (ex: int, double, boolean).</li>
+              </ul>
+              <p><strong>Example Usage:</strong></p>
+<pre>
+#include &lt;AS3/AS3.h&gt;
+
+int main() {
+    int x = 5;
+    // declare an ActionScript variable of type Number
+    AS3_DeclareVar(myAS3Number, Number);
+    // assign a value to that variable
+    AS3_CopyScalarToVar(myAS3Number, x); 
+    // trace the value
+    AS3_Trace("myAS3Number=" + myAS3Number); 
+}</pre></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_GetScalarFromVar</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_GetScalarFromVar"></div> 
+            </td>
+			<td><p><code>#define AS3_GetScalarFromVar(CVAR, AS3VAR)</code></p>
+			  <p>Copies an AS3 local variable into a local C variable. </p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">CVAR</span>  - A C variable to copy the value into.</li>
+                <li><span class="parameterName">AS3VAR</span> - ActionScript variable.</li>
+              </ul>
+              <p><strong>Example Usage:</strong></p>
+<pre>
+#include &lt;AS3/AS3.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    inline_as3("var myAS3Number:Number = 5");
+
+    int x;
+    AS3_GetScalarFromVar(x, myAS3Number);
+    printf("x=%d\n", x); // output: x=5
+}</pre></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_GetVarxxFromVar</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_GetVarxxFromVar"></div> 
+            </td>
+			<td><p><code>#define AS3_GetVarxxFromVar(CVARXX, AS3VAR)</code></p>
+			  <p>Copies an AS3 local variable into an <a href="as3++.html">AS3::local::var</a> C++ variable.</p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">CVARXX</span> - An AS3::local::var object.</li>
+                <li><span class="parameterName">AS3VAR</span> - ActionScript variable.</li>
+              </ul>
+              <p><strong>Example Usage:</strong></p>
+              <pre>
+#include &lt;AS3/AS3.h&gt;
+#include &lt;AS3/AS3++.h&gt;
+
+int main() {
+    inline_as3("var myString = 'hello';");
+    
+    AS3::local::var cVar;
+    AS3_GetVarxxFromVar(cVar, myString);
+    
+    char* str = AS3::local::internal::utf8_toString(cVar);
+    printf("cVar=%s\n", str); // output: cVar=hello
+    free(str);
+}</pre></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_CopyVarxxToVar</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_CopyVarxxToVar"></div> 
+            </td>
+			<td><p><code>#define AS3_CopyVarxxToVar(AS3VAR, CVARXX)</code></p>
+			  <p>Copies an <a href="as3++.html">AS3::local::var</a> C++ variable into an AS3 local variable.</p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">AS3VAR</span> - ActionScript variable.</li>
+                <li><span class="parameterName">CVARXX</span> - An AS3::local::var object.</li>
+              </ul>
+              <p><strong>Example Usage:</strong>              </p>
+              <pre>
+#include &lt;AS3/AS3.h&gt;
+#include &lt;AS3/AS3++.h&gt;
+
+int main() {   
+    inline_as3("var myString:String = 'hello';");
+    AS3_Trace(myString); // output: hello
+    
+    AS3::local::var cVar = AS3::local::internal::new_String("world");
+    AS3_CopyVarxxToVar(myString, cVar);
+    AS3_Trace(myString); // output: world
+}</pre></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_SendMetricString</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_SendMetricString"></div> 
+            </td>
+			<td><p><code>void AS3_SendMetricString(const char* metric, const char *value); </code></p>
+			  <p> Sends a metric to Adobe Scout with a string value. The metric will
+			  show up in the metric summary panel for the frame it was sent in. </p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">metric</span> - C character string representing the metric name.</li>
+                <li><span class="parameterName">value</span>  - C character string representing the metric value.</li>
+              </ul>
+              <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3.h&gt;
+
+int main() {
+    char* status = "success";
+    AS3_SendMetricString("my.metric.complete", status);
+}</pre></td>
+		  </tr>
+		  <tr>
+			<td>
+                <p>AS3_SendMetricInt</p>
+                <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                <div style="margin-top:-80px" id="AS3_SendMetricInt"></div> 
+            </td>
+			<td><p><code>void AS3_SendMetricInt(const char* metric, int value); </code></p>
+			  <p> Sends a metric to Adobe Scout with an integer value. The metric will
+			  show up in the metric summary panel for the frame it was sent in.</p>
+			  <p><strong>Parameters:</strong></p>
+              <ul>
+                <li><span class="parameterName">metric</span> - C character string representing the metric name.</li>
+                <li><span class="parameterName">value</span>  - An integer value.</li>
+              </ul>
+              <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3.h&gt;
+
+int main() {
+    int result = 5;
+    AS3_SendMetricInt("my.metric.complete", result);
+}</pre>
+				<p>Also see the Example_Quake sample</p>
+              </td>
+		  </tr>
+		</table>
+		<p>&nbsp;</p>
+		</div>
+	  </section>
+	</div>
+
+  <footer class="footer">
+  </footer>
+</body>
+</html>

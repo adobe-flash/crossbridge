@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Crossbridge - AS3++.h API Reference</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="../bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="../bootstrap/css/docs.css" rel="stylesheet">
+    <link href="../bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+    <style type="text/css">
+		.parameterName {
+			font-family: monospace;
+		}
+	</style>
+  </head>
+  <body data-spy="scroll" data-target=".subnav" data-offset="50">
+
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="http://www.github.com/adobe/crossbridge" target="_blank"><span>Crossbridge</span></a>
+        <div>
+          <ul class="nav">
+            <li class="">
+              <a href="../../README.html">Readme</a>
+            </li>
+            <li class="">
+              <a href="../Reference.html">Reference</a>
+            </li>
+            <li class="">
+              <a href="../samples.html">Samples</a>
+            </li>
+            <li class="active">
+              <a href="./index.html">C/C++ API Reference</a>
+            </li>
+            <li class="">
+              <a href="../apidocs/index.html">AS3 API Reference</a>
+            </li>
+            <li class="">
+              <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/">Flash API Reference</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container">
+
+
+	<header class="jumbotron subhead" id="overview">
+      <h1>Crossbridge</h1>
+      <p class="lead">A complete BSD-like C/C++ development environment with a GCC based cross-compiler capable of targeting the Adobe Flash Runtime.</p>
+    </header>
+
+
+    <section>
+      <div class="page-header">
+        <h2>C/C++ API Reference</h2>
+      </div>
+      <div>
+
+		<h3>AS3++.h</h3>
+
+        <p>The AS3++.h header file contains macros that help you quickly create C++ instances
+        of ActionScript3 (AS3) objects.</p>
+        <p>In order to use the AS3++ library you will need to <code>#include &lt;AS3/AS3++.h&gt;</code> and pass the <code>-lAS3++</code> compiler argument to g++, for example:</p>
+        <pre>/crossbridge/sdk/usr/bin/g++ sample.cpp -emit-swf -o sample.swf -lAS3++</pre>
+        <p>Some of the examples on this page also use the <a href="Flash++.html">Flash++ library</a>. Be sure to include the correct compiler arguments when compiling those examples.</p>
+        <p>&nbsp;</p>
+        <h4>Class: <code>var</code></h4>
+        <p>The var class is a C++ representation of an ActionScript object. It could be a scalar or an object similar to how ActionScript's <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/specialTypes.html#*">* special type</a> works. All objects and properties of Flash++ classes have var as a base type. In order to work with var objects you can use some of the helper functions listed below.</p>
+        <p>For example if you have a Date object and ask for its fullYear property that will be returned as a var. Printing the value of that var directly as a decimal won't be very useful:</p>
+		<pre>
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+using namespace AS3::local;
+
+int main(){
+    Date myDate = Date::_new();
+
+    printf("%d\n", myDate-&gt;fullYear); // output: 7
+}</pre>
+			<p>Instead you might want to use the internal::int_valueOf() function to convert the value of that var into a scalar integer:</p>
+		<pre>
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+using namespace AS3::local;
+
+int main(){
+    Date myDate = Date::_new();
+
+    int year = AS3::local::internal::int_valueOf(myDate-&gt;fullYear);
+    printf("%d\n", year); // output: 2012
+}</pre>
+		<p>&nbsp;</p>
+		<h4><strong>Namespace: <code>AS3</code></strong></h4>
+			<table class="table">
+			  <tr>
+				<th>Function</th>
+				<th>Description</th>
+			  </tr>
+			  <tr>
+				<td>
+               		<p>sz2stringAndFree</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="sz2stringAndFree"></div>
+                </td>
+				<td><p><code>inline std::string sz2stringAndFree(const char *s);</code></p>
+				  <p>Turns a <a href="http://en.wikipedia.org/wiki/Null-terminated_string" target="_blank">null-terminated</a> char* into a std::string and frees the memory it used in the process.</p>
+			     <p><strong>Parameters:</strong></p>
+                 <ul>
+                   <li><span class="parameterName">s</span> - C character string to be converted into a std::string.</li>
+                 </ul>
+			    <p><strong>Example Usage:</strong>
+                <pre>
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+using namespace AS3::local;
+
+int main() {
+    Date myDate = Date::_new();
+    std::string dateStr = AS3::sz2stringAndFree(internal::utf8_toString(myDate));
+    printf("%s\n", dateStr.c_str()); // output: Sat Nov 10 09:29:53 GMT-0800 2012
+}</pre>
+                </td>
+			  </tr>
+            </table>
+	    <p>&nbsp;</p>
+	    <h4><strong>Namespace: <code>AS3::local::internal</code> or <code>AS3::ui::internal</code></strong></h4>
+			<p>Each of the following functions comes in two variants.  The first variant is the “local” variant in namespace AS3::local. These functions operate on AS3 values in the context of the executing Worker. This means that access to mouse or keyboard input, Clipboard, etc. will not work outside of the primordial or “UI” Worker. Cross-Worker sharing of these types will result in (hard to debug!) runtime errors. This means that they should not be shared across Pthreads.</p>
+			<p>The second variant is the “ui” variant in namespace AS3::ui. These functions operate on AS3 values that are maintained in the primordial/UI Worker. As accesses to these types are automatically delegated to the primordial/UI Worker, they may be shared across Workers/Pthreads and may be used to access UI features from any Worker/Pthread. There is some performance overhead to this delegation, and these types should be used with caution in performance-sensitive code.			</p>
+			<p>The example code on this page is single threaded and doesn't interact with the mouse/keyboard/stage/etc. so it uses the AS3::local namespace by default.</p>
+			<table class="table">
+			  <tr>
+				<th>Function</th>
+				<th>Description</th>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_int</p>
+                	<!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_int"></div>    
+                </td>
+				<td><p><code>var new_int(int n);</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/int.html" target="_blank">int</a> object.</p>
+			     <p><strong>Parameters:</strong></p>
+                 <ul>
+                   <li><span class="parameterName">n</span> - int value.</li>
+                 </ul>
+				  <p><strong>Example Usage:</strong> </p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var x = AS3::local::internal::new_int(5);
+    
+    // show the type and value of that var
+    char* type = AS3::local::internal::utf8_toString(AS3::local::internal::_typeof(x));
+    int value = AS3::local::internal::int_valueOf(x);
+    printf("type: %s, value: %d\n", type, value); // output: type: number, value: 5
+    free(type);
+}</pre>
+			    <p>Also see the <a href="../samples.html#T10">10_MessageChannel</a> sample</p></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_uint</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_uint"></div>    
+                </td>
+				<td><p><code>var new_uint(unsigned n);</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/uint.html" target="_blank">uint</a> object.</p>
+			      <p><strong>Parameters:</strong></p>
+                  <ul>
+                    <li><span class="parameterName">n</span> - unsigned integer value.</li>
+                  </ul>
+                <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var x = AS3::local::internal::new_uint(5);
+    
+    // show the type and value of that var
+    char* type = AS3::local::internal::utf8_toString(AS3::local::internal::_typeof(x));
+    unsigned value = AS3::local::internal::uns_valueOf(x);
+    printf("type: %s, value: %d\n", type, value); // output: type: number, value: 5
+    free(type);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_Number</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_Number"></div>    
+                </td>
+				<td><p><code>var new_Number(double n);</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Number.html" target="_blank">Number</a> object.</p>
+			      <p><strong>Parameters:</strong></p>
+                  <ul>
+                    <li><span class="parameterName">n</span> - double value.</li>
+                  </ul>
+				  <p><strong>Example Usage:</strong> </p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var x = AS3::local::internal::new_Number(5.5);
+    
+    // show the type and value of that var
+    char* type = AS3::local::internal::utf8_toString(AS3::local::internal::_typeof(x));
+    double value = AS3::local::internal::double_valueOf(x);
+    printf("type: %s, value: %f\n", type, value); // output: type: number, value: 5.500000
+    free(type);
+}</pre>
+				  <p>Also see the <a href="../samples.html#T12">12_Stage3D</a> sample</p>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_Boolean</p>
+                	<!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_Boolean"></div> 
+                </td>
+				<td><p><code>var new_Boolean(bool b);</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Boolean.html" target="_blank">Boolean</a> object.</p>
+			      <p><strong>Parameters:</strong></p>
+                  <ul>
+                   <li><span class="parameterName">b</span> - boolean value.</li>
+                  </ul>
+                <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var x = AS3::local::internal::new_Boolean(true);
+    
+    bool value = AS3::local::internal::bool_valueOf(x);
+    
+    if (value)
+        printf("x == true"); // output: x == true
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_String</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_String"></div> 
+                </td>
+				<td><p><code>var new_String(const char *s, int len = -1);</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/String.html" target="_blank">String</a> object. If <span class="parameterName">len</span> is set to -1 then strlen is called on the string to calculate its length. Explicitly providing <span class="parameterName">len</span> means the string does not need to be <a href="http://en.wikipedia.org/wiki/Null-terminated_string" target="_blank">null-terminated</a> and avoids the call to strlen.</p>
+<p><strong>Parameters:</strong></p>
+                  <ul>
+                    <li><span class="parameterName">s</span> - C character string containing the AS3 String to be created.</li>
+                    <li><span class="parameterName">len</span> (optional) - Length of the C character string <span class="parameterName">s</span>.</li>
+                  </ul>
+				  <p><strong>Example Usage:</strong> </p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var x = AS3::local::internal::new_String("hello");
+    
+    char* str = AS3::local::internal::utf8_toString(x);
+    printf("%s\n", str); // output: hello
+    free(str);
+}</pre>
+				  <p>Also see the <a href="../samples.html#T10">10_MessageChannel</a> sample</p>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_Namespace</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_Namespace"></div> 
+                </td>
+				<td><p><code>var new_Namespace(const char *s, int len = -1);</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Namespace.html" target="_blank">Namespace</a> object. If <span class="parameterName">len</span> is set to -1 then strlen is called on the string to calculate its length. Explicitly providing <span class="parameterName">len</span> means the string does not need to be <a href="http://en.wikipedia.org/wiki/Null-terminated_string" target="_blank">null-terminated</a> and avoids the call to strlen.</p>
+			      <p><strong>Parameters:</strong></p>
+                  <ul>
+                    <li><span class="parameterName">s</span> - C character string containing the name of the namespace to be created.</li>
+                    <li><span class="parameterName">len</span> (optional) - Length of the C character string <span class="parameterName">s</span>.</li>
+                  </ul>
+                <p><strong>Example Usage:</strong></p>
+                <pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+using namespace AS3::local;
+
+int main() {
+    // create a class closure that represents the MouseEvent class
+    AS3::local::var ns = AS3::local::internal::new_Namespace("flash.events", 12);
+    AS3::local::var className = AS3::local::internal::new_String("MouseEvent");
+    AS3::local::var cc = AS3::local::internal::getlex(ns, className);
+    
+    // construct a MouseEvent object
+    AS3::local::var arg1 = AS3::local::internal::new_String("mouseDown");
+    AS3::local::var event = AS3::local::internal::construct(cc, arg1);
+    
+    char* strEvent = AS3::local::internal::utf8_toString(event);
+    printf("event=%s\n", strEvent); // output: event=[MouseEvent type=&quot;mouseDown&quot; ...
+    free(strEvent);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_Array</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_Array"></div> 
+                </td>
+				<td><p><code>var new_Array(int count, var *elems);</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Array.html" target="_blank">Array</a> containing references to the specified AS3 vars.</p>
+			      <p><strong>Parameters:</strong></p>
+                  <ul>
+                    <li><span class="parameterName">count</span> - int specifying the number of elements in the Array.</li>
+                    <li><span class="parameterName">elems</span> - array of var objects.</li>
+                  </ul>
+                <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var x1 = AS3::local::internal::new_int(5);
+    AS3::local::var x2 = AS3::local::internal::new_int(6);
+    AS3::local::var nums[2] = {x1, x2};
+    AS3::local::var myArray = AS3::local::internal::new_Array(2, nums);
+    
+    char* str = AS3::local::internal::utf8_toString(myArray);
+    printf("myArray=%s\n", str); // output: myArray=5,6
+    free(str);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_Function</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_Function"></div>     
+                </td>
+				<td><p><code>var new_Function(var (*fun)(void *data, var args), void *data);</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Function.html" target="_blank">Function</a> object of a C function pointer.				  The C function  must declare two parameters: a void*  that represents the passed in C context, and a var that  represents the AS3 parameters that were passed to this Function when it is called.</p> 
+<p><strong>Parameters:</strong></p>
+                  <ul>
+                    <li><span class="parameterName">fun</span> - C function pointer that will be wrapped by the returned AS3 Function.</li>
+                    <li><span class="parameterName">data</span> -  Arbitrary data that is passed to the first parameter of the C function. May be used to provide the C function context.</li>
+                  </ul>
+				  <p><strong>Example Usage:</strong> </p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+AS3::local::var square(void *arg, AS3::local::var as3Args) {
+    // C argument
+    int x = (int) arg;
+    
+    // AS3 arguments
+    AS3::local::var test1 = as3Args[0];
+    AS3::local::var test2 = as3Args[1];
+    
+    printf("C arg: %d\n", x); // output: C arg: 5
+    
+    printf("as3Args: %d, %d\n", 
+           AS3::local::internal::int_valueOf(test1), 
+           AS3::local::internal::int_valueOf(test2)); // output: as3Args: 5, 6
+    
+    return AS3::local::internal::new_String("hello");
+}
+
+int main() {
+    // create some AS3 arguments to pass to the function
+    AS3::local::var x1 = AS3::local::internal::new_int(5);
+    AS3::local::var x2 = AS3::local::internal::new_int(6);
+    AS3::local::var nums[2] = {x1, x2};
+    AS3::local::var argsArray = AS3::local::internal::new_Array(2, nums);
+    
+    // create the Function var
+    AS3::local::var myFun = AS3::local::internal::new_Function(square, (void*) 5);    
+    
+    // call the Function
+    AS3::local::var rcv = AS3::local::internal::_null;
+    AS3::local::var res = AS3::local::internal::call_v(myFun, rcv, argsArray);
+    
+    // show the return value
+    char* resultString = AS3::local::internal::utf8_toString(res);
+    printf("result=%s\n", resultString); // output: result=hello
+    free(resultString);
+}</pre>
+				  <p>Also see the <a href="../samples.html#T10">10_MessageChannel</a> sample and the handling mouse input <a href="flash++.html">Flash++ example</a>.</p>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_Vector</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_Vector"></div> 
+                </td>
+				<td><p><code>var new_Vector(var cc);</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Vector.html" target="_blank">Vector</a>.&lt;cc&gt;, where <span class="parameterName">cc</span> is a class closure.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">cc</span> - var containing a class closure.</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+using namespace AS3::local;
+
+int main() {
+    // create a class closure that represents the MouseEvent class
+    AS3::local::var ns = AS3::local::internal::new_Namespace("flash.events", 12);
+    AS3::local::var className = AS3::local::internal::new_String("MouseEvent");
+    AS3::local::var cc = AS3::local::internal::getlex(ns, className);
+    
+    // create a Vector of MouseEvents
+    AS3::local::var v = AS3::local::internal::new_Vector(cc);
+    v[0] = flash::events::MouseEvent::_new(AS3::local::internal::new_String("mouseDown"));
+    v[1] = flash::events::MouseEvent::_new(AS3::local::internal::new_String("mouseUp"));
+    v[2] = flash::events::MouseEvent::_new(AS3::local::internal::new_String("mouseClick"));
+    
+    char* vStr = AS3::local::internal::utf8_toString(v);
+    printf("v=%s\n", vStr); // output: v=[MouseEvent type=&quot;mouseDown&quot; ...
+    free(vStr);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_Vector_int</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_Vector_int"></div> 
+                </td>
+				<td><p><code>var new_Vector_int();</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Vector.html" target="_blank">Vector</a> of type int.</p>
+<p><strong>Example Usage:</strong></p>
+                  <pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var v = AS3::local::internal::new_Vector_int();
+    v[0] = AS3::local::internal::new_int(0);
+    v[1] = AS3::local::internal::new_int(1);
+    v[2] = AS3::local::internal::new_int(2);
+    
+    char* vStr = AS3::local::internal::utf8_toString(v);
+    printf("v=%s\n", vStr); // output: v=0,1,2
+    free(vStr);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_Vector_uint</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_Vector_uint"></div> 
+                </td>
+				<td><p><code>var new_Vector_uint();</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Vector.html" target="_blank">Vector</a> of type uint.
+                    <uint>
+				  </p>
+				  <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    // create a Vector of uints
+    AS3::local::var v = AS3::local::internal::new_Vector_uint();
+    v[0] = AS3::local::internal::new_uint(0);
+    v[1] = AS3::local::internal::new_uint(1);
+    v[2] = AS3::local::internal::new_uint(2);
+    
+    char* vStr = AS3::local::internal::utf8_toString(v);
+    printf("v=%s\n", vStr); // output: v=0,1,2
+    free(vStr);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_Vector_Boolean</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_Vector_Boolean"></div> 
+                </td>
+				<td><p><code>var new_Vector_Boolean();</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Vector.html" target="_blank">Vector</a> of type Boolean.                  </p>
+				  <p><strong>Example Usage:</strong></p>
+                  <pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    // create a Vector of Booleans
+    AS3::local::var v = AS3::local::internal::new_Vector_Boolean();
+    v[0] = AS3::local::internal::_true;
+    v[1] = AS3::local::internal::_false;
+    v[2] = AS3::local::internal::_true;
+    
+    char* vStr = AS3::local::internal::utf8_toString(v);
+    printf("v=%s\n", vStr); // output: v=true,false,true
+    free(vStr);
+}</pre>
+                </td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_Vector_String</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_Vector_String"></div> 
+                </td>
+				<td><p><code>var new_Vector_String();</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Vector.html" target="_blank">Vector</a> of type String.
+                    <String>
+				  </p>
+				  <p><strong>Example Usage:</strong></p>
+                  <pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    // create a Vector of Strings
+    AS3::local::var v = AS3::local::internal::new_Vector_String();
+    v[0] = AS3::local::internal::new_String("a");
+    v[1] = AS3::local::internal::new_String("b");
+    v[2] = AS3::local::internal::new_String("c");
+    
+    char* vStr = AS3::local::internal::utf8_toString(v);
+    printf("v=%s\n", vStr); // output: v=a,b,c
+    free(vStr);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_Vector_Number</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_Vector_Number"></div> 
+                </td>
+				<td><p><code>var new_Vector_Number();</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Vector.html" target="_blank">Vector</a> of type Number.
+                    <Number>
+				  </p>
+				  <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    // create a Vector of Numbers<br>    AS3::local::var v = AS3::local::internal::new_Vector_Number();<br>    v[0] = AS3::local::internal::new_Number(1.1);<br>    v[1] = AS3::local::internal::new_Number(2.2);<br>    v[2] = AS3::local::internal::new_Number(3.3);<br>    <br>    char* vStr = AS3::local::internal::utf8_toString(v);<br>    printf(&quot;v=%s\n&quot;, vStr); // output: v=1.1,2.2,3.3<br>    free(vStr);
+}</pre>
+			    <p> Also see the <a href="../samples.html#T12">12_Stage3D</a> sample</p></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_undefined</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_undefined"></div> 
+                </td>
+				<td><p><code>var new_undefined();</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/package.html#undefined" target="_blank">undefined</a> object. See   <a href="#_undefined">_undefined</a>.</p></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>new_null</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="new_null"></div> 
+                </td>
+				<td><p><code>var new_null();</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/statements.html#null" target="_blank">null</a> object. See  <a href="#_null">_null</a>.</p>
+				  <p><code>template &lt;typename T&gt; T new_null()</code></p>
+				  <p>Create an AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/statements.html#null" target="_blank">null</a> object of type T. See  <a href="#_null">_null</a>.</p></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>get_Worker</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="get_Worker"></div> 
+                </td>
+				<td><p><code>var get_Worker(long tid = -1);</code></p>
+				  <p>Get a reference to the <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Worker.html" target="_blank">Worker</a> object for a given thread id.</p>
+<p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">tid</span> (optional) - A BSD-like thread id which comes from the thr_self call in sys/thr.h. The default is -1, which indicates the currently running thread.</li>
+				  </ul>
+				  <p><strong>Example Usage:</strong> </p>
+				  <p>See the <a href="../samples.html#T10">10_MessageChannel</a> sample</p>
+			    <p></p></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>get_ram</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="get_ram"></div> 
+                </td>
+				<td><p><code>var get_ram();</code></p>
+				  <p>Get a reference to the currently assigned <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/ApplicationDomain.html#domainMemory" target="_blank">domainMemory</a> ByteArray.</p>
+				  <p><strong>Example Usage:</strong> </p>
+				  <p>See the <a href="../samples.html#T10">10_MessageChannel</a> sample</p></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>_undefined</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="_undefined"></div> 
+                </td>
+				<td><p><code>extern const var _undefined;</code></p>
+				  <p>The AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/package.html#undefined" target="_blank">undefined</a> var. </p>
+<p><strong>Example Usage:</strong> </p>
+<pre>
+#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+// sample function that demonstrates how to return an undefined value
+AS3::local::var goodValue(void *arg, AS3::local::var as3Args) {
+    int arg1 = AS3::local::internal::int_valueOf(as3Args[0]);
+    
+    if (arg1 > 0)
+        return AS3::local::internal::new_String("valid");
+    else
+        return AS3::local::internal::_undefined;
+}
+
+int main() {
+    // create the Function var
+    AS3::local::var myFun = AS3::local::internal::new_Function(goodValue, NULL);    
+    
+    // create the arguments to pass to the function
+    AS3::local::var arg1 = AS3::local::internal::new_int(0);
+    AS3::local::var args[1] = {arg1};
+    
+    // call the Function
+    AS3::local::var rcv = AS3::local::internal::_null;
+    AS3::local::var output = AS3::local::internal::call(myFun, rcv, 1, args);
+    
+    // show the return value
+    char* resultString = AS3::local::internal::utf8_toString(output);
+    printf("result=%s\n", resultString); // output: result=undefined 
+    free(resultString);
+}</pre>
+			    <p>Also see the <a href="../samples.html#T12">12_Stage3D</a> sample</p></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>_null</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="_null"></div> 
+                </td>
+				<td><p><code>extern const var _null;</code></p>
+				  <p>The AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/statements.html#null" target="_blank">null</a> var.</p>
+<p><strong>Example Usage:</strong> </p>
+<pre>
+#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+// sample function that demonstrates how to return a null value
+AS3::local::var goodValue(void *arg, AS3::local::var as3Args) {
+    int arg1 = AS3::local::internal::int_valueOf(as3Args[0]);
+    
+    if (arg1 > 0)
+        return AS3::local::internal::new_String("valid");
+    else
+        return AS3::local::internal::_null;
+}
+
+int main() {
+    // create the Function var
+    AS3::local::var myFun = AS3::local::internal::new_Function(goodValue, NULL);    
+    
+    // create the arguments to pass to the function
+    AS3::local::var arg1 = AS3::local::internal::new_int(0);
+    AS3::local::var args[1] = {arg1};
+    
+    // call the Function
+    AS3::local::var rcv = AS3::local::internal::_null;
+    AS3::local::var output = AS3::local::internal::call(myFun, rcv, 1, args);
+    
+    // show the return value
+    char* resultString = AS3::local::internal::utf8_toString(output);
+    printf("result=%s\n", resultString); // output: result=null
+    free(resultString);
+}</pre>
+			    <p>Also see the <a href="../samples.html#T09">09_Pthreads</a> sample</p></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>_true</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="_true"></div> 
+                </td>
+				<td><p><code>extern const var _true; </code></p>
+				  <p>The AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/statements.html#true" target="_blank">true</a> var.</p>
+				  <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    // create a Boolean var that is initially false
+    AS3::local::var x = AS3::local::internal::new_Boolean(false);
+
+    // then set it to the _true var
+    x = AS3::local::internal::_true;
+
+    // show the value
+    if (AS3::local::internal::bool_valueOf(x))
+        printf("x == true"); // output: x == true
+    else
+        printf("x == false");
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>_false</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="_false"></div> 
+                </td>
+				<td><p><code>extern const var _false; </code></p>
+				  <p>The AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/statements.html#false" target="_blank">false</a> var.</p>
+				  <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    // create a Boolean var that is initially true
+    AS3::local::var x = AS3::local::internal::new_Boolean(true);
+
+    // then set it to the _false var
+    x = AS3::local::internal::_false;
+
+    // show the value
+    if (AS3::local::internal::bool_valueOf(x))
+        printf("x == true");
+    else
+        printf("x == false"); // output: x == false
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>_typeof</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="_typeof"></div> 
+                </td>
+				<td><p><code>var _typeof(var val);</code></p>
+				  <p>Equivalent to the AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/operators.html#typeof" target="_blank">typeof
+				    operator</a>, which returns a String representation of the type of the AS3 object.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">val</span> - var containing the value for which the AS3 type is returned.</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var myObject = AS3::local::internal::new_String("Hello");
+    AS3::local::var myObjectType = AS3::local::internal::_typeof(myObject);
+    
+    char* str = AS3::local::internal::utf8_toString(myObjectType);
+    printf("type=%s\n",str); // output: type=string
+    free(str);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>equals</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="equals"></div> 
+                </td>
+				<td><p><code>bool equals(var a, var b);</code></p>
+				  <p>Equivalent to the AS3 <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/operators.html#equality" target="_blank"> equality operator "=="</a>.</p>
+				  <p>Other similar functions include:</p>
+                  <ul>
+                    <li><code>bool strictequals(var a, var b);</code></li>
+                    <li><code>bool lessthan(var a, var b);</code></li>
+                    <li><code>bool lessequals(var a, var b);</code></li>
+                    <li><code>bool greaterthan(var a, var b);</code></li>
+                    <li><code>bool greaterequals(var a, var b);</code></li>
+                  </ul>
+<p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">a</span> - var containing an AS3 object.</li>
+				    <li><span class="parameterName">b</span> - var containing an AS3 object.</li>
+				  </ul>
+				  <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var e1 = AS3::local::internal::new_String("5");
+    AS3::local::var e2 = AS3::local::internal::new_Number(5);
+    
+    bool equal = AS3::local::internal::equals(e1, e2);
+    bool strictEqual = AS3::local::internal::strictequals(e1, e2);
+    
+    if (equal)
+        printf("e1 == e2"); // output: e1 == e2
+    if (strictEqual)
+        printf("e1 === e2");
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>call_v</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="call_v"></div> 
+                </td>
+				<td><p><code>var call_v(var fun, var rcv, var vargs, void *ramPos = (void *)-1);</code></p>
+				  <p>Use <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Function.html#apply()" target="_blank">Function.apply</a>
+				     to call a Function object with an Array of arguments.				  </p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">fun</span> - var that represents a C function pointer (see <a href="#new_Function">new_Function</a>).</li>
+				    <li><span class="parameterName">rcv</span> - var equivalent to the thisArg parameter of <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Function.html#apply()" target="_blank">Function.apply</a>.</li>
+				    <li><span class="parameterName">vargs</span> - var that contains an AS3 Array of vars to pass as arguments to the function (see <a href="#new_Array">new_Array</a>).</li>
+				    <li><span class="parameterName">ramPos</span> (optional) - the position to set on the domainMemory ByteArray before executing the function. For example, useful when calling setPixels with the domainMemory as an argument.</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+AS3::local::var square(void *arg, AS3::local::var as3Args) {
+    // AS3 arguments
+    AS3::local::var test1 = as3Args[0];
+    AS3::local::var test2 = as3Args[1];
+    
+    printf("as3Args=%d, %d\n", 
+           AS3::local::internal::int_valueOf(test1), 
+           AS3::local::internal::int_valueOf(test2)); // output: as3args=5, 6
+    
+    return AS3::local::internal::new_String("hello");
+}
+
+int main() {
+    // create some AS3 arguments to pass to the function
+    AS3::local::var x1 = AS3::local::internal::new_int(5);
+    AS3::local::var x2 = AS3::local::internal::new_int(6);
+    AS3::local::var nums[2] = {x1, x2};
+    AS3::local::var argsArray = AS3::local::internal::new_Array(2, nums);
+    
+    // create the Function var
+    AS3::local::var myFun = AS3::local::internal::new_Function(square, NULL);    
+    
+    // call the Function
+    AS3::local::var rcv = AS3::local::internal::_null;
+    AS3::local::var output = AS3::local::internal::call_v(myFun, rcv, argsArray);
+    
+    // show the return value
+    char* resultString = AS3::local::internal::utf8_toString(output);
+    printf("result=%s\n", resultString); // output: result=hello
+    free(resultString);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>call</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="call"></div> 
+                </td>
+				<td><p><code>var call(var fun, var rcv, int argCount, var *args, void *ramPos = (void *)-1);</code></p>
+				  <p>Use <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Function.html#apply()">Function.apply</a> to call a Function object with the arguments array constructed automatically.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">fun</span> - var that represents a C function pointer (see <a href="#new_Function">new_Function</a>).</li>
+                    <li><span class="parameterName">rcv</span> - var equivalent to the thisArg parameter of <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Function.html#apply()" target="_blank">Function.apply</a>.</li>
+				    <li><span class="parameterName">argCount</span> - int specifying the number of arguments.</li>
+				    <li><span class="parameterName">args</span> - array of vars that are passed as arguments to the function.</li>
+				    <li><span class="parameterName">ramPos</span> (optional) - the position to set on the domainMemory ByteArray before executing the function. For example, useful when calling setPixels with the domainMemory as an argument.</li>
+				  </ul>
+				  <p><strong>Example Usage:</strong></p>
+                  <pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+AS3::local::var square(void *arg, AS3::local::var as3Args) {
+    // AS3 arguments
+    AS3::local::var test1 = as3Args[0];
+    AS3::local::var test2 = as3Args[1];
+    
+    printf("as3Args=%d, %d\n", 
+           AS3::local::internal::int_valueOf(test1), 
+           AS3::local::internal::int_valueOf(test2)); // output: as3Args=5,6
+    
+    return AS3::local::internal::new_String("hello");
+}
+
+int main() {
+    // create some AS3 arguments to pass to the function
+    AS3::local::var x1 = AS3::local::internal::new_int(5);
+    AS3::local::var x2 = AS3::local::internal::new_int(6);
+    AS3::local::var nums[2] = {x1, x2};
+    
+    // create the Function var
+    AS3::local::var myFun = AS3::local::internal::new_Function(square, NULL);    
+    
+    // call the Function
+    AS3::local::var rcv = AS3::local::internal::_null;
+    AS3::local::var output = AS3::local::internal::call(myFun, rcv, 2, nums);
+    
+    // show the return value
+    char* resultString = AS3::local::internal::utf8_toString(output);
+    printf("result=%s\n", resultString); // output: result=hello
+    free(resultString);
+}</pre>
+				  <p> Also see the <a href="../samples.html#T10">10_MessageChannel</a> sample</p>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>getproperty</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="getproperty"></div> 
+                </td>
+				<td><p><code>var getproperty(var obj, var name);</code></p>
+			      <p>Gets a property from an object referenced via the specified name in the public namespace.</p>
+				  <p><code>var getproperty(var obj, var ns, var name);</code></p>
+<p>Gets a property from an object referenced via the specified name and namespace.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">obj</span> - object containing the property to be retrieved.</li>
+				    <li><span class="parameterName">ns</span> - var containing the namespace of the property to be retrieved.</li>
+				    <li><span class="parameterName">name</span> - var containing the name of the property to be retrieved.</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+                <pre>#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+using namespace AS3::local;
+
+int main() {
+    Date myDate = Date::_new();
+    AS3::local::var propertyName = AS3::local::internal::new_String("fullYear");
+    AS3::local::var propertyValue = AS3::local::internal::getproperty(myDate, propertyName);
+    
+    std::string str = AS3::sz2stringAndFree(internal::utf8_toString(propertyValue));
+    printf("fullYear=%s\n", str.c_str()); // output: fullYear=2012
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>setproperty</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="setproperty"></div> 
+                </td>
+				<td><p><code>void setproperty(var obj, var name, var val);</code></p>
+			      <p>Sets a property on an object referenced via the specified name in the public namespace.</p>
+			      <p><code>void setproperty(var obj, var ns, var name, var val);</code></p>
+				  <p>Sets a property on an object referenced via the specified name and namespace.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">obj</span> - object containing the property to be set.</li>
+                    <li><span class="parameterName">ns</span> - var containing the namespace of the property to be set.</li>
+                    <li><span class="parameterName">name</span> - var containing the name of the property to be set.</li>
+				    <li><span class="parameterName">val</span> - var containing the value to be applied to <span class="parameterName">name</span>.</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+                <pre>#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+using namespace AS3::local;
+
+int main() {
+    Date myDate = Date::_new();
+    AS3::local::var propertyName = AS3::local::internal::new_String("fullYear");
+    AS3::local::var newValue = AS3::local::internal::new_int(1999);
+    
+    // change the year
+    AS3::local::internal::setproperty(myDate, propertyName, newValue);
+    
+    std::string str = AS3::sz2stringAndFree(internal::utf8_toString(myDate));
+    printf("myDate=%s\n", str.c_str()); // output: myDate=Wed Nov 10...1999
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>getlex</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="getlex"></div> 
+                </td>
+				<td><p><code>var getlex(var name);</code></p>
+				  <p>Gets a property from the current global object.</p>
+				  <p><code>var getlex(var ns, var name);</code></p>
+<p>Gets a property from the current global object in the specified namespace.</p>
+<p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">ns</span> - var containing the namespace.</li>
+				    <li><span class="parameterName">name</span> - var containing the name of the property to be retrieved.</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+                <pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+using namespace AS3::local;
+
+int main() {
+    // create a class closure that represents the flash.events.MouseEvent class
+    AS3::local::var ns = AS3::local::internal::new_Namespace("flash.events", 12);
+    AS3::local::var className = AS3::local::internal::new_String("MouseEvent");
+    AS3::local::var cc = AS3::local::internal::getlex(ns, className);
+
+    // Tip: Another way of getting a class closure is to use the internal::getClosure() 
+    // function of Flash++ classes:
+    //
+    // Class cc = flash::events::MouseEvent::internal::getClosure();
+
+    // construct a MouseEvent object
+    AS3::local::var arg1 = AS3::local::internal::new_String("mouseDown");
+    AS3::local::var event = AS3::local::internal::construct(cc, arg1);
+    
+    char* strEvent = AS3::local::internal::utf8_toString(event);
+    printf("event=%s\n", strEvent); // output: event=[MouseEvent ...
+    free(strEvent);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>setlex</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="setlex"></div> 
+                </td>
+				<td><p><code>void setlex(var name, var val);</code></p>
+				  <p>Sets a property on the current global object.</p>
+<p><code>void setlex(var ns, var name, var val);</code></p>
+				  <p>Sets a property on the current global object in  the specified namespace.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">ns</span> - var containing the namespace.</li>
+				    <li><span class="parameterName">name</span> - var containing the name of the property to be set.</li>
+				    <li><span class="parameterName">val</span> - var containing the value to be applied to <span class="parameterName">name</span>.</li>
+				  </ul>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>construct</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="construct"></div> 
+                </td>
+				<td><p><code>var construct(var cc);</code></p>
+				  <p><code>var construct(var cc, var a1);</code></p>
+				  <p><code>var construct(var cc, var a1, var a2);</code></p>
+				  <p><code>var construct(var cc, var a1, var a2, var a3);</code></p>
+				  <p><code>var construct(var cc, var a1, var a2, var a3, var a4);</code></p>
+				  <p><code>var construct(var cc, var a1, var a2, var a3, var a4, var a5);</code></p>
+				  <p>Constructs an object of type <span class="parameterName">cc</span>.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">cc</span> - var specifying the class to be constructed.</li>
+				    <li><span class="parameterName">a1</span> through <span class="parameterName">a5</span> - vars containing up to five parameters passed to the constructor. </li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+using namespace AS3::local;
+
+int main() {
+    // create a class closure that represents the MouseEvent class
+    AS3::local::var ns = AS3::local::internal::new_Namespace("flash.events", 12);
+    AS3::local::var className = AS3::local::internal::new_String("MouseEvent");
+    AS3::local::var cc = AS3::local::internal::getlex(ns, className);
+    
+    // construct a MouseEvent object
+    AS3::local::var arg1 = AS3::local::internal::new_String("mouseDown");
+    AS3::local::var event = AS3::local::internal::construct(cc, arg1);
+    
+    char* strEvent = AS3::local::internal::utf8_toString(event);
+    printf("event=%s\n", strEvent); // output: event=[MouseEvent ...
+    free(strEvent);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>coerce</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="coerce"></div> 
+                </td>
+				<td><p><code>var coerce(var cc, var v);</code></p>
+				  <p>Coerce an object <span class="parameterName">v</span> to type <span class="parameterName">cc</span>. This differs slightly from the as function because it throws an error when <span class="parameterName">v</span> cannot be coerced into <span class="parameterName">cc</span> whereas the as function does not throw an error and instead returns _null. See the <a href="http://help.adobe.com/en_US/ActionScript/3.0_ProgrammingAS3/WS5b3ccc516d4fbf351e63e3d118a9b90204-7f87.html" target="_blank">AS3 type conversions</a> documentation for more details.</p>
+<p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">cc</span> - var containing a class closure for the target type.</li>
+				    <li><span class="parameterName">v</span> - var containing the object to be coerced.				</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+                <pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var n = AS3::local::internal::new_int(5);
+    
+    // create a class closure that represents the String class
+    AS3::local::var className = AS3::local::internal::new_String("String");
+    AS3::local::var cc = AS3::local::internal::getlex(className);
+    
+    // coerce an int to a String
+    AS3::local::var output = AS3::local::internal::coerce(cc, n);
+    
+    char* strOutput = AS3::local::internal::utf8_toString(output);
+    char* strType = AS3::local::internal::utf8_toString(AS3::local::internal::_typeof(output));
+    printf("type=%s, value=%s\n", strType, strOutput); // output: type=string, value=5
+    free(strOutput);
+    free(strType);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>_delete</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="_delete"></div> 
+                </td>
+				<td><p><code>bool _delete(var obj, var prop);</code></p>
+				  <p>Equivalent to the <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/operators.html#delete" target="_blank">AS3 delete operator</a>. Returns true if the deletion succeeded.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">obj</span> - var containing the Object to delete the property from.</li>
+				    <li><span class="parameterName">prop</span> - var containing the name of the property to be deleted.				</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+using namespace AS3::local;
+
+int main() {
+    // create an object with a first name property
+    Object o = Object::_new();
+    o["firstName"] = AS3::local::internal::new_String("Mike");
+    
+    // show the value of that property
+    char* outputString = internal::utf8_toString(o["firstName"]);
+    printf("firstName=%s\n", outputString);  // output: firstName=Mike
+    free(outputString);
+    
+    // delete that property
+    AS3::local::internal::_delete(o, AS3::local::internal::new_String("firstName"));
+    
+    // show that the firstName property no longer exists
+    outputString = internal::utf8_toString(o["firstName"]);
+    printf("firstName=%s\n", outputString); // output: firstName=undefined
+    free(outputString);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>_throw</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="_throw"></div> 
+                </td>
+				<td><p><code>void _throw(var val);</code></p>
+				  <p>Throws the var as an AS3 exception.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">val</span> - var to be thrown as an AS3 exception.</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::Error e = AS3::local::Error::_new();
+    e-&gt;message = AS3::local::internal::new_String("My Error");
+    
+    AS3::local::internal::_throw(e);
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>utf8_toString</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="utf8_toString"></div> 
+                </td>
+				<td><p><code>char* utf8_toString(var val);</code></p>
+				  <p>Calls toString() on the AS3 object and copies the string into a malloc'ed buffer. You are responsible for freeing the returned string.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">val</span> - var containing the AS3 object to be converted to a string.</li>
+				  </ul>
+				  <p><strong>Example Usage:</strong>
+                <pre>
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+using namespace AS3::local;
+
+int main() {
+    Date myDate = Date::_new();
+    char* str = internal::utf8_toString(myDate);<br>    printf(&quot;%s\n&quot;,str); // output: Sat Nov 10 10:14:26 GMT-0800 2012
+    free(str);
+}</pre>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>bool_valueOf</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="bool_valueOf"></div> 
+                </td>
+				<td><p><code>bool bool_valueOf(var val);</code></p>
+				  <p>Cast the var to a boolean.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">val</span> - var to be cast to boolean.</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var x = AS3::local::internal::new_String("3.1415");
+    bool b = AS3::local::internal::bool_valueOf(x);
+    
+    if (b)
+        printf("b == true"); // output: b == true
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>int_valueOf</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="int_valueOf"></div> 
+                </td>
+				<td><p><code>int int_valueOf(var val);</code></p>
+				  <p>Cast the var to an int.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">val</span> - var to be cast to int.</li>
+				  </ul>
+                  <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var x = AS3::local::internal::new_String("3.1415");
+    int i = AS3::local::internal::int_valueOf(x);
+    
+    printf("i=%d\n", i); // output: i=3
+}</pre>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>uns_valueOf</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="uns_valueOf"></div> 
+                </td>
+			    <td><p><code>unsigned uns_valueOf(var val);</code></p>
+				  <p>Cast the var to an unsigned int.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">val</span> - var to be cast to unsigned int.</li>
+				  </ul>
+                  <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var x = AS3::local::internal::new_String("3.1415");
+    unsigned u = AS3::local::internal::uns_valueOf(x);
+    
+    printf("u=%d\n", u); // output: u=3
+}</pre>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>double_valueOf</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="double_valueOf"></div> 
+                </td>
+				<td><p><code>double double_valueOf(var val);</code></p>
+				  <p>Cast the var to a double.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">val</span> - var to be cast to double.</li>
+				  </ul>
+                  <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var x = AS3::local::internal::new_String("3.1415");
+    double d = AS3::local::internal::double_valueOf(x);
+    
+    printf("d=%f\n", d); // output: d=3.1415
+}</pre>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>is</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="is"></div> 
+                </td>
+				<td><p><code>bool is(var a, var b);</code></p>
+				  <p>Equivalent to the <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/operators.html#is">AS3 is operator</a>. Returns true when <span class="parameterName">a</span> is compatible with a specific data type, class, or interface <span class="parameterName">b</span>. Use the is operator instead of the <a href="#instanceof">instanceof</a> operator for type comparisons. You can also use the is operator to check whether an object implements an interface.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">a</span> - var containing a data type, class, or interface.</li>
+				    <li><span class="parameterName">b</span> - var containing a data type, class, or interface.				  </li>
+			      </ul>
+				  <p><strong>Example Usage:</strong></p>
+                  <pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var s = AS3::local::internal::new_String("hello");
+    AS3::local::var n = AS3::local::internal::new_int(5);
+    
+    // create a class closure that represents the String class
+    AS3::local::var className = AS3::local::internal::new_String("String");
+    AS3::local::var cc = AS3::local::internal::getlex(className);
+        
+    if (AS3::local::internal::is(s, cc))
+        printf("s is a String"); // output: s is a String
+    else
+        printf("s is not a String");
+    
+    if (AS3::local::internal::is(n, cc))
+        printf("n is a String");
+    else
+        printf("n is not a String"); // output: n is not a String
+    
+}</pre>
+<p></p>
+				</td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>as</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="as"></div> 
+                </td>
+				<td><p><code>var as(var a, var b);</code></p>
+				  <p>Equivalent to the <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/operators.html#as">AS3 as operator</a>. Returns <span class="parameterName">a</span> casted to <span class="parameterName">b</span> or _null if <span class="parameterName">a</span> cannot be casted to <span class="parameterName">b</span>. </p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">a</span> - var containing the value to check against the data type specified by <span class="parameterName">b</span>.</li>
+				    <li><span class="parameterName">b</span> - var containing the data type used to evaluate <span class="parameterName">a</span>. </li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+                <pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var s = AS3::local::internal::new_String("hello");
+    AS3::local::var n = AS3::local::internal::new_int(5);
+    
+    // create a class closure that represents the String class
+    AS3::local::var className = AS3::local::internal::new_String("String");
+    AS3::local::var cc = AS3::local::internal::getlex(className);
+    
+    // cast using as
+    AS3::local::var sAsString = AS3::local::internal::as(s, cc);
+    AS3::local::var nAsString = AS3::local::internal::as(n, cc);
+
+    if (sAsString != AS3::local::internal::_null)
+        printf("s was successfully casted to a String\n"); // output: s was...
+    
+    if (nAsString == AS3::local::internal::_null)
+        printf("n could not be casted to a String\n"); // output: n could not...
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>instanceof</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="instanceof"></div> 
+                </td>
+				<td><p><code>bool instanceof(var a, var b);</code></p>
+				  <p>Equivalent to the <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/operators.html#instanceof">AS3 instanceof operator</a>. Returns whether <span class="parameterName">a</span> is a property of the object represented by <span class="parameterName">b</span>.				  To check whether an object is a member of a specific data type, use the is operator. The instanceof operator always returns false with interfaces, whereas the is operator results in true if an object belongs to a class that implements the specified interface. </p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">a</span> - var containing the object that contains the prototype chain to evaluate.</li>
+				    <li><span class="parameterName">b</span> - var containing a function object (or class).</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+                <pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var s = AS3::local::internal::new_String("hello");
+    AS3::local::var n = AS3::local::internal::new_int(5);
+    
+    // create a class closure that represents the String class
+    AS3::local::var className = AS3::local::internal::new_String("String");
+    AS3::local::var cc = AS3::local::internal::getlex(className);
+    
+    if (AS3::local::internal::instanceof(s, cc))
+        printf("s is an instance of String\n"); // output: s is ...
+    
+    if (!AS3::local::internal::instanceof(n, cc))
+        printf("n is not an instance of String\n"); // output: n is not ...
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>in</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="in"></div> 
+                </td>
+				<td><p><code>bool in(var a, var b);</code></p>
+				  <p>Equivalent to the <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/operators.html#in">AS3 in operator</a>. Returns true if <span class="parameterName">a</span> is a member of the data type specified by <span class="parameterName">b</span>.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">a</span> - var containing a property name.</li>
+				    <li><span class="parameterName">b</span> - var containing a data type or instance.				  </li>
+			      </ul>
+				  <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+#include &lt;stdio.h&gt;
+
+int main() {
+    AS3::local::var property = AS3::local::internal::new_String("length");
+    AS3::local::var myString = AS3::local::internal::new_String("hello");
+    
+    bool x = AS3::local::internal::in(property, myString);
+    
+    if (x)
+        printf("var myString has a length property"); // output: var myString...
+}</pre></td>
+			  </tr>
+			  <tr>
+				<td>
+                	<p>trace</p>
+                    <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+   	                <div style="margin-top:-80px" id="trace"></div> 
+                </td>
+				<td><p><code>void trace(var val);</code></p>
+				  <p>Trace a var to the <a href="http://help.adobe.com/en_US/flex/using/WS2db454920e96a9e51e63e3d11c0bf69084-7fc9.html">Flash log file</a>, if enabled.</p>
+				  <p><strong>Parameters:</strong></p>
+				  <ul>
+				    <li><span class="parameterName">val</span> - var to be written to the Flash log file.</li>
+			      </ul>
+			    <p><strong>Example Usage:</strong></p>
+<pre>#include &lt;AS3/AS3++.h&gt;
+
+int main() {
+    AS3::local::var s = AS3::local::internal::new_String("Hello World");
+    AS3::local::internal::trace(s);
+}</pre></td>
+			  </tr>
+			</table>
+			<p>&nbsp;</p>
+			<h4>Namespace: <code>AS3::ui::internal</code></h4>
+            <table class="table">
+              <tr>
+                <th class="span2">Function</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td><p>get_Stage</p>
+                  <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                  <div style="margin-top:-80px" id="sz2stringAndFree2"></div></td>
+                <td><p><code>var get_Stage();</code></p>
+                  <p> Get a reference to the Flash <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/Stage.html" target="_blank">Stage</a> object.</p>
+                  <p><strong>Example Usage:</strong>
+                  <pre>
+#include &lt;stdio.h&gt;
+#include &lt;Flash++.h&gt;
+
+using namespace AS3::ui;
+
+int main()
+{
+    flash::display::Stage stage = AS3::ui::internal::get_Stage();
+    
+    flash::display::Sprite mySprite = flash::display::Sprite::_new();
+    flash::display::Graphics graphics = mySprite-&gt;graphics;
+    graphics-&gt;beginFill(0x0000ff, 1.0);
+    graphics-&gt;drawCircle(50.0, 50.0, 50.0);
+    graphics-&gt;endFill();
+    
+    stage->addChild(mySprite);
+}</pre></td>
+              </tr>
+            </table>
+            <p></p>
+      </div>
+	</section>
+  </div>
+
+  <footer class="footer">
+
+  </footer>
+
+</body>
+</html>

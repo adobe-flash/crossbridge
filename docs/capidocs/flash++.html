@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Crossbridge - Flash++.h API Reference</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="../bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="../bootstrap/css/docs.css" rel="stylesheet">
+    <link href="../bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+  </head>
+  <body data-spy="scroll" data-target=".subnav" data-offset="50">
+
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="http://www.github.com/adobe/crossbridge" target="_blank"><span>Crossbridge</span></a>
+        <div>
+          <ul class="nav">
+            <li class="">
+              <a href="../../README.html">Readme</a>
+            </li>
+            <li class="">
+              <a href="../Reference.html">Reference</a>
+            </li>
+            <li class="">
+              <a href="../samples.html">Samples</a>
+            </li>
+            <li class="active">
+              <a href="./index.html">C/C++ API Reference</a>
+            </li>
+            <li class="">
+              <a href="../apidocs/index.html">AS3 API Reference</a>
+            </li>
+            <li class="">
+              <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/">Flash API Reference</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container">
+
+	<header class="jumbotron subhead" id="overview">
+      <h1>Crossbridge</h1>
+      <p class="lead">A complete BSD-like C/C++ development environment with a GCC based cross-compiler capable of targeting the Adobe Flash Runtime.</p>
+    </header>
+
+    <section>
+      <div class="page-header">
+        <h2>C/C++ API Reference</h2>
+      </div>
+      <div>
+
+		<h3>Flash++.h</h3>
+		<p>Flash++.h is designed for C++ developers who want to interface with the Flash Runtime API without writing inline ActionScript. This library exposes access to the classes and methods of the <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/" target="_blank">Flash Runtime API</a>. Read more about how Flash++.h works in the <a href="../Reference.html#section_interop">Crossbridge reference guide</a>.</p>
+		<p>In order to use the Flash++ library you will need to <code>#include &lt;Flash++.h&gt;</code> and pass the <code> -lFlash++ -lAS3++</code> compiler arguments to g++, for example:</p>
+		<pre>/Crossbridge/sdk/usr/bin/g++ sample.cpp -emit-swf -o sample.swf -lFlash++ -lAS3++</pre>
+<h3>Examples</h3>
+		<p>This section lists a series of  ActionScript sample applications from Flash Runtime API pages. Click the link to learn about the ActionScript API and see how you would write this code in a pure ActionScript application. Then look at the second column of this table to see how that same sample can be accomplished in C++ using Flash++.</p>
+		<table class="table">
+		  <tr>
+			<th>ActionScript Example</th>
+			<th>C++ Equivalent Using Flash++</th>
+		  </tr>
+          <tr>
+			<td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/Capabilities.html" target="_blank">Accessing System Capabilities</a></td>
+			<td><pre>
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+// use the UI worker reference (see sample 2 for more info)
+using namespace AS3::ui;
+
+int main()
+{
+    // number
+    int sx = flash::system::Capabilities::screenResolutionX;
+    int sy = flash::system::Capabilities::screenResolutionY;
+    printf("Resolution: %dx%d\n", sx, sy);
+    
+    // boolean
+    bool d = flash::system::Capabilities::isDebugger;
+    printf("Debugger: %s\n", d ? "true" : "false");
+    
+    // string
+    String cpu = flash::system::Capabilities::cpuArchitecture;
+    char* cpuStr = internal::utf8_toString(cpu);
+    printf("CPU: %s\n", cpuStr);
+    free(cpuStr);
+    
+    return 0;
+}</pre></td>
+		  </tr>
+          
+		  <tr>
+			<td class="span3"><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/Graphics.html" target="_blank">Drawing Shapes</a></td>
+			<td>
+			  <pre>
+#include &lt;Flash++.h&gt;
+
+// use the UI worker reference (see sample 2 for more info)
+using namespace AS3::ui;
+
+int main()
+{
+    // Setup the stage
+    flash::display::Stage stage = internal::get_Stage();
+    stage-&gt;scaleMode = flash::display::StageScaleMode::NO_SCALE;
+    stage-&gt;align = flash::display::StageAlign::TOP_LEFT;
+    stage-&gt;frameRate = 60;
+
+    flash::display::Sprite mySprite = flash::display::Sprite::_new();
+    stage-&gt;addChild(mySprite);
+
+    flash::display::Graphics graphics = mySprite-&gt;graphics;
+    // draw  simple filled circle
+    graphics-&gt;beginFill(0x0000ff, 1.0);
+    graphics-&gt;drawCircle(50.0, 50.0, 50.0);
+    graphics-&gt;endFill();
+}</pre></td>
+		  </tr>
+		  <tr>
+			<td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/events/MouseEvent.html" target="_blank">Handling Mouse Input</a></td>
+			<td><pre>
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+// use the UI worker reference (see sample 2 for more info)
+using namespace AS3::ui;
+
+var mouseDownHandler(void *arg, var as3Args){
+    printf("mouseDown!\n");
+    return internal::_undefined;
+}
+
+var mouseUpHandler(void *arg, var as3Args){
+    printf("mouseUp!\n");
+    return internal::_undefined;
+}
+
+int main()
+{
+    flash::display::Stage stage = internal::get_Stage();
+    stage-&gt;scaleMode = flash::display::StageScaleMode::NO_SCALE;
+    stage-&gt;align = flash::display::StageAlign::TOP_LEFT;
+    
+    flash::display::Sprite mySprite = flash::display::Sprite::_new();
+    flash::display::Graphics graphics = mySprite-&gt;graphics;
+    graphics-&gt;beginFill(0x0000ff, 1.0);
+    graphics-&gt;drawCircle(50.0, 50.0, 50.0);
+    graphics-&gt;endFill();
+    
+    stage-&gt;addChild(mySprite);
+    
+    // assign handlers to the mouseDown and mouseUp events
+    mySprite-&gt;addEventListener(flash::events::MouseEvent::MOUSE_DOWN, 
+                               Function::_new(mouseDownHandler, NULL));
+    
+    mySprite-&gt;addEventListener(flash::events::MouseEvent::MOUSE_UP, 
+                               Function::_new(mouseUpHandler, NULL));
+    
+    // Throw an exception so main does not return normally
+    // and cause the static destructors to be executed.
+    AS3_GoAsync();
+}</pre></td>
+		  </tr>
+			  <tr>
+			<td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/events/KeyboardEvent.html" target="_blank">Handling Keyboard Input</a></td>
+			<td><pre>
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+// use the UI worker reference (see sample 2 for more info)
+using namespace AS3::ui;
+
+var keyHandler(void *arg, var as3Args){
+    // get the event object
+    flash::events::KeyboardEvent event = (flash::events::KeyboardEvent) as3Args[0];
+    
+    // pull some information out of it
+    String type = event-&gt;type;
+    Object target = event-&gt;target;
+    int keyCode = event-&gt;keyCode;
+    
+    // convert to std::string
+    std::string typeStr = AS3::sz2stringAndFree(internal::utf8_toString(type));
+    std::string targetStr = AS3::sz2stringAndFree(internal::utf8_toString(target));
+
+    printf("Keyboard Event [%s, %s, %d]\n", targetStr.c_str(), typeStr.c_str(), keyCode);
+    
+    return internal::_undefined;
+}
+
+int main()
+{
+    flash::display::Stage stage = internal::get_Stage();
+    stage-&gt;scaleMode = flash::display::StageScaleMode::NO_SCALE;
+    stage-&gt;align = flash::display::StageAlign::TOP_LEFT;
+    stage-&gt;frameRate = 60;
+    
+    flash::display::Sprite mySprite = flash::display::Sprite::_new();
+    flash::display::Graphics graphics = mySprite-&gt;graphics;
+    graphics-&gt;beginFill(0x0000ff, 1.0);
+    graphics-&gt;drawCircle(100.0, 50.0, 50.0);
+    graphics-&gt;endFill();
+    
+    stage-&gt;addChild(mySprite);
+    
+    // handle keyboard events
+    stage-&gt;addEventListener(flash::events::KeyboardEvent::KEY_DOWN, 
+                            Function::_new(keyHandler, NULL));
+    
+    // Throw an exception so main does not return normally
+    // and cause the static destructors to be executed.
+    AS3_GoAsync();
+}</pre></td>
+		  </tr>
+           <tr>
+			<td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/media/Sound.html" target="_blank">Playing Sound</a></td>
+			<td><pre>
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+// use the UI worker reference (see sample 2 for more info)
+using namespace AS3::ui;
+
+var soundEventHandler(void *arg, var as3Args){
+    flash::events::Event event = (flash::events::Event) as3Args[0];
+    String type = event-&gt;type;
+    
+    // convert to std::string
+    std::string typeStr = AS3::sz2stringAndFree(internal::utf8_toString(type));
+
+    printf("Event [%s]\n", typeStr.c_str());
+    
+    return internal::_undefined;
+}
+
+int main()
+{
+    flash::display::Stage stage = internal::get_Stage();
+    stage-&gt;scaleMode = flash::display::StageScaleMode::NO_SCALE;
+    stage-&gt;align = flash::display::StageAlign::TOP_LEFT;
+    stage-&gt;frameRate = 60;
+    
+    String url = "song.mp3";
+    
+    flash::net::URLRequest request = flash::net::URLRequest::_new(url);
+    flash::media::Sound soundFactory = flash::media::Sound::_new();
+    flash::media::SoundChannel song = flash::media::SoundChannel::_new();
+    
+    soundFactory-&gt;addEventListener(flash::events::Event::COMPLETE,
+                                   Function::_new(soundEventHandler, NULL));
+    soundFactory-&gt;addEventListener(flash::events::Event::ID3,
+                                   Function::_new(soundEventHandler, NULL));
+    soundFactory-&gt;addEventListener(flash::events::IOErrorEvent::IO_ERROR,
+                                   Function::_new(soundEventHandler, NULL));
+    soundFactory-&gt;addEventListener(flash::events::ProgressEvent::PROGRESS,
+                                   Function::_new(soundEventHandler, NULL));
+    
+    soundFactory-&gt;load(request);
+    
+    song = soundFactory-&gt;play();
+    
+    // Throw an exception so main does not return normally
+    // and cause the static destructors to be executed.
+    AS3_GoAsync();
+}</pre></td>
+		  </tr>
+          <tr>
+			<td class="span3"><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Date.html" target="_blank">Working with the Date Object</a></td>
+			<td>
+			  <pre>
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+// use the UI worker reference (see sample 2 for more info)
+using namespace AS3::ui;
+
+int main()
+{
+    flash::display::Stage stage = internal::get_Stage();
+    stage-&gt;scaleMode = flash::display::StageScaleMode::NO_SCALE;
+    stage-&gt;align = flash::display::StageAlign::TOP_LEFT;
+    stage-&gt;frameRate = 60;
+    
+    Date myDate1 = Date::_new();
+    std::string myDate1Str = AS3::sz2stringAndFree(internal::utf8_toString(myDate1));
+    printf("%s\n", myDate1Str.c_str());
+    
+    // notice the Date constructor takes var objects 
+    // (new_int is documented in the AS3++.h documentation page)
+    Date myDate2 = Date::_new(internal::new_int(2000), 
+                              internal::new_int(0), 
+                              internal::new_int(1));
+    
+    std::string myDate2Str = AS3::sz2stringAndFree(internal::utf8_toString(myDate2));
+    printf("%s\n", myDate2Str.c_str());
+}</pre></td>
+		  </tr>
+          <tr>
+			<td class="span3"><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/media/Camera.html" target="_blank">Accessing the Camera </a></td>
+			<td>
+			  <pre>
+#include &lt;Flash++.h&gt;
+#include &lt;stdio.h&gt;
+
+// use the UI worker reference (see sample 2 for more info)
+using namespace AS3::ui;
+
+int main()
+{
+    flash::display::Stage stage = internal::get_Stage();
+    stage-&gt;scaleMode = flash::display::StageScaleMode::NO_SCALE;
+    stage-&gt;align = flash::display::StageAlign::TOP_LEFT;
+    stage-&gt;frameRate = 60;
+    
+    flash::media::Camera camera = flash::media::Camera::getCamera();
+    flash::media::Video video;    
+    
+    if (camera != AS3::ui::internal::_null){
+        
+        int w = camera-&gt;width * 2;
+        int h = camera-&gt;height * 2;
+        
+        video = flash::media::Video::_new(w, h);
+        video-&gt;attachCamera(camera);
+        stage-&gt;addChild(video);
+        
+        printf("camera added\n");
+    } else {
+        printf("no camera found\n");
+    } 
+}</pre></td>
+		  </tr>
+		</table>
+
+	  </div>
+	 </section>
+</div>
+
+  <footer class="footer">
+
+  </footer>
+</body>
+</html>

@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Crossbridge - Reference Guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="bootstrap/css/docs.css" rel="stylesheet">
+    <link href="bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+  </head>
+  <body data-spy="scroll" data-target=".subnav" data-offset="50">
+
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="http://www.github.com/adobe/crossbridge" target="_blank"><span>Crossbridge</span></a>
+        <div>
+          <ul class="nav">
+            <li class="">
+              <a href="../README.html">Readme</a>
+            </li>
+            <li class="active">
+              <a href="./Reference.html">Reference</a>
+            </li>
+            <li class="">
+              <a href="./samples.html">Samples</a>
+            </li>
+            <li class="">
+              <a href="./capidocs/index.html">C/C++ API Reference</a>
+            </li>
+            <li class="">
+              <a href="./apidocs/index.html">AS3 API Reference</a>
+            </li>
+            <li class="">
+              <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/">Flash API Reference</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header class="jumbotron subhead" id="overview">
+      <h1>Crossbridge</h1>
+      <p class="lead">A complete BSD-like C/C++ development environment with a GCC based cross-compiler capable of targeting the Adobe Flash Runtime.</p>
+    </header>
+
+    <section>
+      <div class="page-header">
+        <h1>Reference Guide</h1>
+      </div>
+      <div>
+        <p>This reference guide contains detailed information about all aspects of the Crossbridge toolchain. The sections are laid out roughly in the order in which it makes most sense to learn about, but it is probably a good idea to have one or two of the samples open while reading this through so you can see how things work in practice as well.</p>
+        <ol>
+        <li><a href="#section_gcc">Compiling With GCC</a>
+          <ul>
+            <li>Executable Formats</li>
+            <li>Using Crossbridge With Existing Codebases</li>
+            <li>Building SWCs</li>
+            <li>Crossbridge-Specific GCC Command Line Options</li>
+            <li>Crossbridge-Specific Preprocessor Macros</li>
+            <li>Optimizing SWFs and SWCs</li>
+            <li>Behind The Scenes: LLVM Bitcode</li>
+            <li>Obfuscation</li>
+            <li>Other Tools</li>
+          </ul>
+        </li>
+        <li><a href="#section_interop">Interop between C/C++ and ActionScript</a>
+          <ul>
+            <li>Flash++</li>
+          </ul>
+        </li>
+        <li><a href="#section_console">Implementing a Console</a></li>
+        <li><a href="#section_preloader">Implementing a Preloader</a></li>
+        <li><a href="#section_vfs">Implementing a Virtual File System</a>
+          <ul>
+            <li>Embedded / Zipped VFS</li>
+            <li>HTTP VFS</li>
+            <li>LSO VFS</li>
+            <li>The VFS API</li>
+          </ul>
+        </li>
+        <li><a href="#section_ikernel">The IKernel Interface</a></li>
+        <li><a href="#section_concurrency">Concurrency in Flash Player 11.5</a>
+          <ul>
+            <li>APIs unsupported in background Workers</li>
+            <li>APIs with behavioral changes in background Workers</li>
+          </ul>
+        </li>
+        <li><a href="#section_swig">Creating SWCs with SWIG</a>
+          <ul>
+            <li>The SWIG Workflow</li>
+            <li>Creating a SWIG Interface File</li>
+            <li>C++ Operator Overloading</li>
+            <li>C++ Function/Method Overloading</li>
+            <li>C++ Constructors and Destructors</li>
+            <li>Typemaps</li>
+            <li>AS3 SWIG Directives</li>
+            <li>LTO and SWIG</li>
+          </ul>
+        </li>
+        <li><a href="#section_gdb">Debugging with GDB</a>
+          <ul>
+            <li>Setting Up GDB</li>
+            <li>Compiling a Debug SWF</li>
+            <li>Running a SWF</li>
+            <li>Stepping Through Code</li>
+            <li>Inspecting Data</li>
+            <li>Evaluating Expressions And Calling C/C++ Functions</li>
+            <li>ActionScript Specific Commands</li>
+            <li>Debugging SWFs Built From Crossbridge SWCs</li>
+            <li>Debugging Multi-threaded Applications with GDB</li>
+          </ul>
+        </li>
+        <li><a href="#section_profiling">Profiling with Adobe Scout</a></li>
+        <li><a href="#section_libs">Included Libraries</a></li>
+      	</ol>
+      </div>
+    </section>
+
+    <section id="section_gcc">
+      <div class="page-header">
+        <h1>Compiling With GCC</h1>
+      </div>
+      <div>
+        <p>Crossbridge uses a version of <a href="http://gcc.gnu.org/onlinedocs/gcc-4.2.1/gcc/">LLVM-GCC 4.2</a> with a custom LLVM backend that generates ActionScript bytecode capable of running within the Flash Runtime. More specifically, the bytecode runs in the ActionScript virtual machine (AVM). This lets you compile arbitrary C/C++ code  into a managed bytecode format capable of high performance execution within the Flash Runtime on Mac, Windows, or Linux in <a href="http://www.adobe.com/software/flash/about/">any supported browser</a>.</p>
+
+        <p><strong>Tip</strong>: Think of Crossbridge as you would any cross compiler toolchain that targets an architecture that isn't your native system architecture. All of the concepts are the same.</p>
+
+        <p>When using GCC to compile a single source file into an object file, you usually only have one choice of object file format: the native format supported by the target architecture. But with LLVM-GCC you have two formats: the native format, and LLVM bitcode.</p>
+
+        <p>The native format is used when you want to perform short incremental compiles without any cross-object optimization. Use LLVM bitcode when you want to perform an expensive <i>Link Time Optimized (LTO)</i> build where the majority of the optimization occurs during the final link step.</p>
+
+        <p>With Crossbridge, the "native" object format is ActionScript bytecode (ABC). Object files generated as ABC or LLVM bitcode are interchangeable and won't affect your build process, but typically you will either want to perform a quick un-optimized build with all object files compiled to ABC or a final fully-optimized build with everything compiled as LLVM bitcode.</p>
+
+        <p>By default the Crossbridge version of GCC will produce ABC:</p>
+
+<pre>
+# test.o will be ABC
+gcc test.c -c -o test.o</pre>
+
+        <p>To generate LLVM bitcode, specify either <i>-emit-llvm</i> or <i>-O4</i> when invoking GCC:
+
+<pre>
+# test.o will be LLVM bitcode
+gcc test.c -emit-llvm -c -o test.o
+gcc test.c -O4 -c -o test.o</pre>
+        <p>The whole Crossbridge toolchain understands these object file formats so the standard <code>nm</code>, <code>ar</code> and <code>ranlib</code> tools for inspecting and archiving object files will work on them just as they would work on native object files in a native toolchain.</p>
+
+        <p>When performing the final link step you must also specify <i>-emit-llvm</i> or <i>-O4</i> if you want an LTO build, otherwise the ABC versions of the system libraries (libc, libstdc++, etc) will be used instead of the LLVM bitcode versions.</p>
+
+        <h4>Executable Formats</h4>
+
+        <p>With a native toolchain the final output of GCC, when linking your object files together, is typically an executable program suitable for running on the target architecture. With Crossbridge there are two different output formats: </p>
+        <ul>
+        <li>Projectors</li>
+        <li>SWFs</li>
+        </ul>
+
+        <p>For example, compile a simple hello world example using the following command:</p>
+
+        <pre>~/crossbridge/sdk/usr/bin/gcc hello.c -o hello</pre>
+
+        <p>If you inspect the resulting executable, or attempt to run it, you might be surprised to see it execute; Wasn't Crossbridge supposed to be producing something that doesn't execute natively? By default Crossbridge compiles the program into ABC format and embeds it within a copy of the AVM runtime so that it can run as a native command-line program.</p>
+
+        <p>Crossbridge works this way because build systems often try to compile and execute small programs as part of the configure step of their build process to determine certain facts about the environment they are running in. By producing native Projector executables by default, Crossbridge is able to seamlessly work with almost any build system, just include the <b>sdk/usr/bin</b> directory in your shell's <code>PATH</code> variable.</p>
+
+        <p>To generate a SWF, the executable format suitable for use in the Flash Runtime, you  pass  the <em>-emit-swf</em> argument to GCC:</p>
+
+        <pre>gcc -emit-swf hello.c -o hello.swf</pre>
+
+        <p>The resulting SWF can  run inside your web browser or within the standalone version of the Flash Runtime, and will be significantly smaller than the projector version as it does not include the AVM.</p>
+
+        <h4>Using Crossbridge With Existing Codebases</h4>
+
+        <p>To use Crossbridge to compile a codebase that uses a command-line build system like AutoConf, CMake or Make, all you have to do is ensure that the Crossbridge SDK's <b>bin</b> directory appears first in your <code>PATH</code> environment variable when invoking the build command.</p>
+
+        <p>The real world examples in the samples directory show this being done for a variety of build systems including CMake (Bullet Physics example) and Make (Lua example). The usual way to invoke a Make file to target Crossbridge is as follows:</p>
+
+        <pre>PATH="~/crossbridge/sdk/usr/bin":$PATH make</pre>
+
+        <p>Crossbridge's tools will be chosen in preference to any native tools on your path, but only for the invocation of <i>make</i>, after that your <code>PATH</code> will return to normal.</p>
+
+        <h4>Building SWCs</h4>
+
+        <p>A SWC is the Flash Runtime equivalent of a shared library. You can link a SWC into a pure ActionScript project either with an IDE (<a href="http://www.adobe.com/products/flash-builder.html" target="_blank">Flash Builder</a>, for example), or via the command-line ActionScript compiler (named mxmlc). A SWC contains the compiled ActionScript bytecode, along with an API catalog so that Flash Builder can perform code hinting while a developer writes ActionScript that uses the API exposed by a SWC.</p>
+
+        <p>When you generate a SWC you must specify an AS3 package name to contain the generated code, and the internal Crossbridge boilerplate code. This lets you link multiple Crossbridge-generated SWCs into one SWF without any function or class collisions. Anywhere you would have previously seen a name starting with <code>com.adobe.flascc</code> this namespace will be replaced with  the string passed in the gcc/g++ <code>-emit-swc=...</code> argument.</p>
+
+        <h4>Crossbridge-Specific GCC Command Line Options</h4>
+
+        <p>The version of gcc that comes with Crossbridge has several custom options for controlling the generated code. You can see a list of them by running <code>gcc --target-help</code>. The table below gives an explanation of what each option does, and how it can be used.</p>
+        <table class="table">
+          <tr><th class="span3">Option</th><th>Explanation</th></tr>
+          <tr><td><code>-disable-telemetry</code></td>
+          <td>By default Crossbridge generates SWFs that support Adobe Scout's advanced metrics. This means that stack trace information will be visible to anybody profiling the SWF.</td></tr>
+
+          <tr><td><code>-emit-swc=</code></td>
+          <td>Emits a SWC that can be linked into a Flash Builder project or distributed for others to link into their own projects. You must specify the namespace that you want to use to replace the default <code>com.adobe.flascc</code> namespace, this lets you link multiple Crossbridge-generated SWCs into a single project.</td></tr>
+          <tr><td><code>-emit-swf</code></td><td>Emit a SWF that can be executed by the Flash Runtime.</td></tr>
+          <tr><td><code>-enable-debugger</code></td>
+          <td>Generate SWF debug information and include it within the SWF. It isn't necessary to specify this option if you already compile your code with <i>-g</i>.</td></tr>
+          <tr><td><code>-fllvm-llc-opt=</code></td><td>Pass an argument through to the final invocation of <code>llc</code> (LLVM-IR->ABC codegen). For more information on what options <code>llc</code> accepts read the <a href="http://llvm.org/releases/2.9/docs/index.html">LLVM documentation</a>.</td></tr>
+          <tr><td><code>-fllvm-opt-opt=</code></td>
+          <td>Pass an argument through to the final invocation of <code>opt</code> (LLVM-IR->LLVM-IR optimization). For more information on what options <code>opt</code> accepts read the <a href="http://llvm.org/releases/2.9/docs/index.html">LLVM documentation</a>.</td></tr>
+          <tr><td><code>-flto-api=</code></td><td>Specifies a file containing the public API LLVM should preserve (implies that the optimizer is free to strip any symbols not mentioned in this file that aren't referenced by the symbols mentioned in this file)</td></tr>
+          <tr><td><code>-no-swf-preloader </code></td>
+          <td>By default Crossbridge  injects a simple preloader into your SWF, which  displays a loading bar until the SWF has downloaded. Use this option to disable the preloader.</td></tr>
+          <tr><td><code>-swf-ns=</code></td><td>Performs the same namespace re-writing as the <i>-emit-swc=</i> option when generating a SWF, by default no namespace rewriting takes place when generating a SWF.</td></tr>
+          <tr><td><code>-swf-preloader=</code></td>
+          <td>Lets you use a custom SWF as the preloader. All of the SWF tags within the specified SWF will be included at the beginning of the generated SWF. To see a sample preloader, review <b>sdk/usr/share/DefaultPreloader.as</b>.</td></tr>
+          <tr><td><code>-swf-size=WxH</code></td>
+          <td>Specifies the initial width and height of the generated SWF.</td></tr>
+          <tr><td><code>-swf-version=</code></td>
+          <td>Specifies the SWF version of the generated SWF. Remember that certain APIs will only be available to your code if your SWF version is high enough. By default the SWF version is 18.</td></tr>
+          <tr><td><code>-symbol-abc=</code></td>
+          <td>If you have compiled a custom Console.as you must point to the location of the ABC so that it can be used as the root sprite within the generated SWF.</td></tr>
+          <tr><td><code>-symbol-class=</code></td>
+          <td>If you have changed the namespace or name of the class within your Console.as implementation you must specify it here in the form ":0:com.adobe.flascc::Console" where "com.adobe.flascc" is the package name and "Console" is the class name.</td></tr>
+        </table>
+
+        <h4>Crossbridge-Specific Preprocessor Macros</h4>
+
+        <p>Crossbridge exposes some non-standard preprocessor macros that you can use to conditionally compile code:</p>
+
+        <table class="table">
+          <tr><th class="span4">Macro</th><th>Value</th></tr>
+          <tr><td><code>__AVM2</code>, <code>__AVM2__</code></td><td>1</td></tr>
+          <tr><td><code>__FLASHPLAYER</code>, <code>__FLASHPLAYER__</code></td><td>1</td></tr>
+          <tr><td><code>__SWF_VER</code>, <code>__SWF_VER__</code></td><td>default: 18, or whatever was passed to GCC via <i>-swf-version=</i></td></tr>
+        </table>
+
+        <h4>Optimizing SWFs and SWCs</h4>
+
+        <p>By default gcc/g++  compiles individual source files into ABC files. All the
+        tools in the toolchain understand ABC as a native object file format. When
+        it comes to link time the linker understands how to link multiple ABCs together
+        to produce a SWF/SWC. This is equivalent to most typical native gcc/g++ workflows,
+        and supports a fast turn around time.</p>
+
+        <p>Although this workflow is great for iterative development it omits
+        optimizations that require cross-compilation-unit knowledge. To produce more
+        optimal code we must perform <i>Whole Program Optimization</i> by compiling to LLVM
+        bitcode instead of ABC and then optimizing the code during the link step when
+        all the code is available to the optimizer.</p>
+
+        <p>Setting the gcc/g++ optimization level to <i>-O4</i> causes it to produce LLVM
+        bitcode instead of ABC. This is also a fully supported object file format in the Crossbridge
+        toolchain. When multiple LLVM bitcode files are given to the linker they are
+        merged and optimized together, producing more optimal code.</p>
+
+        <p>To allow LLVM to optimize your code as much as possible, you must provide a
+        list of C/C++ symbols that you want to preserve. By doing this, LLVM can choose
+        to remove unused functions or even rewrite function prototypes in cases where
+        it thinks that would result in more optimal code. By providing a minimal list
+        of symbols that must remain with their current name and prototype intact, LLVM
+        knows how far it can take these kinds of optimizations without breaking your
+        code.</p>
+
+        <p>The Quake1 example uses this kind of optimization to get the best possible
+        performance. To enable this level of optimization create
+        a text file with the names of the symbols you want to preserve and pass it to
+        gcc/g++ using the <i>-flto-api=</i> argument. Any symbol within the Crossbridge generated
+        code that is referenced from ActionScript must be listed in this file or it might be removed or renamed by LLVM.</p>
+
+        <p>A sample for what you need to include in most <b>exports.txt</b> files:</p>
+
+<pre>
+# built in symbols that must always be preserved
+_start1
+malloc
+free
+memcpy
+memmove
+flascc_uiTickProc
+_sync_synchronize
+
+# symbols for C++ exception handling
+_Unwind_SjLj_Register
+_Unwind_SjLj_Resume
+_Unwind_SjLj_Unregister
+_Unwind_SjLj_RaiseException</pre>
+
+        <p>Any symbols referenced by your ActionScript must also be listed here. For more examples of <b>exports.txt</b> being used refer to <a href="samples.html#T9">sample 9</a>, <a href="samples.html#T11">sample 11</a>, <a href="samples.html#T12">sample 12</a>,  and also the Bullet Physics and Quake 1 examples.</p>
+
+        <h4>Behind The Scenes: LLVM Bitcode</h4>
+
+        <p>Using the <i>-O4</i> option to get whole program optimization should satisfy most use
+        cases. However if you want to get your hands dirty and explore the possibilities of
+        some of the more exotic bitcode optimizations and transformations you can
+        try out some of the llvm tools included in the SDK. Crossbridge is currently based on
+        <a href="http://llvm.org/releases/2.9/docs/Passes.html" target="_blank">LLVM 2.9</a>.</p>
+
+        <p>To perform a manual whole program optimized build with special optimizations,
+        first compile individual source files with <i>-O4</i> to produce bitcode.
+        After you have bitcode object files you can merge them into one bitcode file
+        using <code>llvm-link</code>, optimize the resulting binary with <code>opt</code> and then pass it to
+        <code>gcc</code> for the final link step.</p>
+
+        <p>Crossbridge isn't limited to C and C++; you can use any front end capable of generating LLVM
+        bitcode. As long as the bitcode doesn't have native dependencies,
+        simply pass it to the Crossbridge <code>gcc</code> to perform the final codegen and link step.
+        If you do experiment with other frontends the Crossbridge team would love to hear about your
+        experience.</p>
+
+        <h4>Obfuscation</h4>
+
+        <p>Crossbridge is not designed to be an obfuscator for either ActionScript or C/C++ code. Although the generated ActionScript bytecode should be no easier to reverse engineer than natively compiled machine code the Crossbridge engineering team makes no strong claims about this, nor do they test whether this is true.</p>
+
+        <p>By default the mangled C++ name of every source function will be trivially visible in both the decompiled output and also in ActionScript debugger and profilers. To hide the names of any generated C/C++ functions you can pass <code>-fllvm-opt-opt=-strip</code> to gcc so that any function names not listed in your exports.txt file will be renamed to a symbol of the form <code>__unnamed_N</code>. Functions that need to be called from ActionScript, which you must protect by listing in exports.txt, will not be renamed.</p>
+
+        <p>For true obfuscation you will need to find a third party solution that either obfuscates the LLVM bitcode or the ActionScript bytecode in the final SWF. A search on the web should yield plenty of results for SWF obfuscators, but the Crossbridge engineering team has not investigated which ones are reliable.</p>
+
+        <p>To understand the problem from the other side you might want to play around with various SWF decompilers and ActionScript bytecode disassemblers to get a better understanding of what exactly is in a SWF and how easy/hard it is to extract the various components from it.</p>
+
+        <h4>Other Tools</h4>
+
+        <p>Many build systems use a tool called <code>pkg-config</code> as part of their configure step to determine what libraries have been installed on a system, so that dependencies can be validated and compiler options can be setup. Crossbridge ships with a version of <code>pkg-config</code> so that build systems will find the Crossbridge versions of the included libraries rather than the native system libs. The directory for <code>pkg-config</code> files is <b>sdk/usr/lib/pkgconfig/</b> and you use the variable <code>flascc_sdk_root</code> to make pkg-config paths aware of the actual location of the Crossbridge SDK without having to hardcode the path.</p>
+
+        <p>Crossbridge ships with several small python utilities in the <b>sdk/usr/bin</b> directory, which you can use for debugging and inspecting SWFs:</p>
+
+        <table class="table">
+          <tr><th class="span4">Utility</th><th>Description</th></tr>
+          <tr><td>swf-info.py</td>
+          <td>Dumps  information about the structure of a SWF file including the various tags, SWF version, SWF size, etc.</td></tr>
+          <tr><td>swfdink.py</td><td>Lets you change the SWF version and make the SWF compressed or uncompressed.</td></tr>
+          <tr><td>projector-dis.py</td><td>Breaks apart a shell projector executable into its components.</td></tr>
+        </table>
+
+      </div>
+    </section>
+
+    <section id="section_interop">
+      <div class="page-header">
+        <h1>Interop between C/C++ and ActionScript</h1>
+      </div>
+      <div>
+        <p>The interop between AS3 and C/C++ in Crossbridge is based around the concept of inline assembly. In a native C/C++ workflow you would use inline assembly statements to allow you to pass arbitrary strings containing platform specific instructions to the assembler to be included in your final executable. With Crossbridge the underlying system is the Flash Runtime, and the language it supports natively is AS3, so these inline assembly statements let you  talk to the native Flash API set in the language it was designed with.</p>
+
+        <p>The GCC syntax for inline assembly allows for a simple form of pattern matching substitution so that C variables can be used by the AS3 code. This mechanism is powerful enough to express all of the interop you would want to do, but it is tedious to write and not type-safe. Here is an example of how you can pass a C variable into ActionScript and return a value back to C using the <code><a href="capidocs/as3.html#inline_as3">inline_as3</a></code> macro:</p>
+
+<pre>
+#include &lt;AS3/AS3.h&gt;
+
+// Use AS3 to sqrt a double!
+double somenumber = 45.0;
+double result = 0.0;
+inline_as3(
+    "%0 = Math.sqrt(%1);\n"
+    : "=r"(result) : "r"(somenumber)
+);
+
+// Back in C we can take the result and print it out:
+printf("sqrt of %f is %f\n", somenumber, result);
+</pre>
+        
+        <p>To see a fully working example of the basic interop layer in action look at the helloworld.c file in <a href="./samples.html#T2">sample 2</a>. Or for a more complete description of the syntax for GCC's inline asm blocks see <a href="http://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html" target="_new">http://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html</a> or <a href="http://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html" target="_new">http://www.ibiblio.org/gferg/ldp/GCC-Inline-Assembly-HOWTO.html</a>.</p>
+
+        <p>To better understand how to use inline assembly with Crossbridge you will need to have a basic understanding of how the code generation strategy works. Lets take a look at the ActionScript generated for some C and C++ code (simplified for clarity):</p>
+
+<pre>
+// Test.cpp
+class TestClass
+{
+public:
+  void testmethod();
+};
+
+static void somePrivateFunction() {
+  //contents
+}
+
+extern "C" void someCFunction() {
+  //contents
+}
+
+void TestClass::testmethod() {
+  somePrivateFunction();
+}</pre>
+
+<pre>
+// Test.as
+package C_Run {
+  import C_Run_test_2E_s_3A_49A4F40E_2D_3219_2D_4479_2D_9E8F_2D_BCF50DA75E9E.*
+  import avm2.intrinsics.memory.*
+  import com.adobe.flascc.CModule
+  public function F_someCFunction():void {
+    // contents
+  }
+}
+package C_Run_test_2E_s_3A_49A4F40E_2D_3219_2D_4479_2D_9E8F_2D_BCF50DA75E9E {
+  import C_Run.*
+  import avm2.intrinsics.memory.*
+  import com.adobe.flascc.CModule
+  public function F__ZL19somePrivateFunctionv():void {
+    // contents
+  }
+}
+
+package C_Run {
+  import C_Run_test_2E_s_3A_49A4F40E_2D_3219_2D_4479_2D_9E8F_2D_BCF50DA75E9E.*
+  import avm2.intrinsics.memory.*
+  import com.adobe.flascc.CModule
+  public function F__ZN9TestClass10testmethodEv():void {
+    // contents
+  }
+}</pre>
+
+        <p>The two important things to note about this code generation strategy are that Crossbridge doesn't attempt to synthesize ActionScript classes from C++ classes and there are two different namespaces used during code generation: C_Run (the public package) and a much longer one that contains a globally unique identifier (the private package).</p>
+        <p>These public and private packages are used to differentiate between functions that should only be visible to other functions within the same compilation unit and functions that should be visible to the rest of the codebase. Because the private package name is unique no other compilation unit will import it and so anything defined within it will be invisible to the rest of the codebase.</p>
+        <p>When using inline assembly to inject additional ActionScript into the generated code you have a choice between the <code><a href="capidocs/as3.html#inline_as3">inline_as3</a></code> and <code><a href="capidocs/as3.html#package_as3">package_as3</a></code> macros. The former injects code into the body of a generated function and so it can only be used for injecting additional statements and expressions whereas <code><a href="capidocs/as3.html#package_as3">package_as3</a></code> can be used to inject global package-level variables, classes, interfaces, etc.</p>
+        <p>The <code><a href="capidocs/as3.html#package_as3"> package_as3</a></code> macro will inject its contents into the private package by default, but this can be changed using the "#package" directive within the inline asm:</p>
+
+        <pre>
+package_as3("#package public\n var somepublicvar:int = 42;");
+package_as3("#package private\n var someprivatevar:int = 42;");
+package_as3("#package com.example.yourpackage\n var somespecialvar:int = 42;");     </pre>
+
+        <p>Although you can define almost anything at package-level scope such as additional ActionScript classes and interfaces you will probably find it best to use it just for things local to the current compilation unit.</p>
+
+        <h4>Flash++</h4>
+        <p>To make life easier for C++ developers Crossbridge includes the AS3 wrapper interface generator (<b>as3wig.jar</b>), which can generate C++ bindings for any AS3 classes. </p>
+        <p>The Crossbridge team has applied this tool on the internal AS3 classes in the Flash Runtime to generate a C++ library called Flash++, which  exposes all of the <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/" target="_blank">Flash APIs</a> as strongly typed C++ classes.</p>
+
+        <p>Here is a  snippet of C++ code using the Flash++ classes to construct a new sprite and draw a circle into it. If you are familiar with AS3 this should look just like what you would write in AS3 only with C++ syntax. The <code>mySprite</code> and <code>graphics</code> object in this example are both reference-counted wrappers around the actual AS3 objects; they can be stored on the stack or in the heap without fear of their underlying AS3 object being garbage collected.</p>
+
+<pre>
+flash::display::Sprite mySprite = flash::display::Sprite::_new();
+flash::display::Graphics graphics = mySprite->graphics;
+// draw  simple filled circle
+graphics->beginFill(0xff00ff, 1.0);
+graphics->drawCircle(0.0, 0.0, 50.0);
+graphics->endFill();
+</pre>
+
+        <p>In order to use the Flash++ library you will need to <code>#include &lt;Flash++.h&gt;</code> and pass the <code> -lFlash++ -lAS3++</code> compiler arguments to g++. To see a fully working example of the Flash++ interop layer in action look at the c++interop.cpp file in <a href="./samples.html#T2">sample 2</a>, the pthreads.cpp file in <a href="./samples.html#T9">sample 9</a> and the <a href="./capidocs/flash++.html">Flash++ examples page</a>.</p>
+
+        <p>The as3wig tool is included with the Crossbridge SDK so that you can generate bindings for your own ActionScript code. Sample 12 uses as3wig to generate bindings for the AGALAssembler ActionScript codebase and then uses those bindings from C++ at runtime to compile AGAL assembly into AGAL bytecode for use with Stage3D. Take a look at the Makefile for <a href="./samples.html#T12">sample 12</a> to see how to invoke as3wig and how to compile the resulting wrapper code.</p>
+      </div>
+    </section>
+
+    <section id="section_console">
+      <div class="page-header">
+        <h1>Implementing a Console</h1>
+      </div>
+      <div>
+        <div class="alert alert-info pull-right span3">
+          When running a SWF with the debugger version of the Flash Runtime debug output generated by the ActionScript <code>trace()</code> function can be sent to a file known as the flash log file (flashlog.txt). Information on how to enable this, and where to find the flash log file <a href="http://livedocs.adobe.com/flex/3/html/help.html?content=logging_04.html">can be found here</a>.
+        </div>
+        <p>The <code><a href="apidocs/com/adobe/flascc/Console.html">Console</a></code> class is the first class that is created and executed when your SWF loads. It controls when and how the Crossbridge compiled code is initialized. It is also used by the underlying Crossbridge virtual kernel implementation as the object that handles <code>read</code> and <code>write</code> requests to the various standard input, output and error terminal streams. It also handles all <code>fcntl</code> and <code>ioctl</code> calls. If you aren't familiar with all of these system calls then don't worry, the default implementation is setup to redirect console output to the flash log file and also to a console on screen.</p>
+
+        <p>The source code for the default <code><a href="apidocs/com/adobe/flascc/Console.html">Console</a></code> implementation can be found in <b>sdk/usr/share/Console.as</b>. If you include a modified version of this in your project you will need to compile it into an ABC and also use the gcc option <code>-symbol-abc=foo.abc</code> in your final link step to instruct gcc to use your version instead of the default. If you also modify the name of the class in this file you will also need to give gcc this information <code>-symbol-class=:0:com.adobe.flascc::Console</code> where "com.adobe.flascc" is the package name and "Console" is the class name.</p>
+
+        <p>Take a look at the default implementation of the console, the most important things to notice are as follows:</p>
+        <ul>
+          <li>It implements the <code><a href="apidocs/com/adobe/flascc/vfs/ISpecialFile.html" target="_blank">ISpecialFile</a></code> interface (<code>read</code>, <code>write</code>, <code>fcntl</code> and <code>ioctl</code> methods)</li>
+          <li>It bails out of its constructor when running in a background worker (This is explained in <a href="#section_concurrency">the section on concurrency</a>)</li>
+          <li>It decides whether to run in the background or foreground based on whether the player supports multi-threading</li>
+          <li>The enterFrame handler calls <code><a href="apidocs/com/adobe/flascc/CModule.html#serviceUIRequests()" target="_blank">CModule.serviceUIRequests</a></code> to ensure any background thread delegation requests are serviced</li>
+        </ul>
+
+        <p>How much more code you add to the <code><a href="apidocs/com/adobe/flascc/Console.html">Console</a></code> beyond handling console output and starting the Crossbridge code is up to you. As you will see in the section on interop, it is possible to interact with all of the Flash APIs using the C++ wrappers included in <b>Flash++.h</b>, but you might prefer to write it in pure AS3 in your <code><a href="apidocs/com/adobe/flascc/Console.html">Console</a></code> implementation.</p>
+
+        <p>You will see in the <code><a href="apidocs/com/adobe/flascc/Console.html#init()" target="_blank">init</a></code> method that there are a few different ways of starting the Crossbridge generated content, depending on whether you want the code to run in the foreground or the background. This is explained in more detail in the  documentation of <code><a href="apidocs/com/adobe/flascc/CModule.html#startAsync()">CModule.startAsync</a></code>, <code><a href="apidocs/com/adobe/flascc/CModule.html#startBackground()">CModule.startBackground</a></code>, and <a href="#section_concurrency">the section on concurrency</a>.</p>
+
+        <p>When your SWF uses a preloader it actually won't be the first class created. To handle this case the Console class constructor takes an argument to specify a <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/DisplayObjectContainer.html" target="_blank">DisplayObjectContainer</a></code> that you can add the <code><a href="apidocs/com/adobe/flascc/Console.html">Console</a></code> to in order to put the <code><a href="apidocs/com/adobe/flascc/Console.html">Console</a></code> on the Flash Runtime <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/Stage.html" target="_blank">Stage</a></code>. You will see the code to handle this case in the default preloader's constructor.</p>
+
+        <p>The call to <code><a href="apidocs/com/adobe/flascc/CModule.html#serviceUIRequests()" target="_blank">CModule.serviceUIRequests</a></code> is explained more in the <a href="#section_concurrency">multi-threading section</a>, but essentially if your code is running in a background worker and needs to perform an operation that requires access to APIs that only the foreground thread (on which the Console is running) has access to, it must block and delegate the code to the foreground thread. Calling this method services any pending requests from background threads.</p>
+
+        <p>Within the AS3 functions that Crossbridge generates for your code, certain AS3 variable names are considered reserved and are used by the code generator to maintain internal Crossbridge state within a function. However, C/C++ local variables will not conflict with these variables as they are renamed by the code generator when the final AS3 is generated. But you must ensure that any AS3 variables you declare using the <code><a href="capidocs/as3.html#AS3_DeclareVar" target="_blank">AS3_DeclareVar</a></code> macro from <b>AS3.h</b> don't conflict with these names. The reserved AS3 variables are <code>esp</code>,<code>ESP</code>,<code>ebp</code>,<code>eax</code>,<code>edx</code>,<code>st0</code>,<code>ram</code>,<code>sjid</code>,<code>tsjid</code>,<code>tcbp</code>,<code>_as3ReturnValue</code> and also <code>iN</code> <code>fN</code> where N can be any integer</p>
+
+      </div>
+    </section>
+
+    <section id="section_preloader">
+      <div class="page-header">
+        <h1>Implementing a Preloader</h1>
+      </div>
+      <div>
+        <p>Your Crossbridge compiled code  starts executing when the whole SWF file has been loaded in the browser, but it's a best practice to show some kind of loading screen before then, so the user knows that something is happening. SWF files are designed to be streamed and make it easy to embed a small animation at the start that can play while the rest of the file is loading.</p>
+
+        <div class="pull-right">
+          <div class="well">
+            <img src="images/default-preloader.png"/><br/>
+            <span>The default preloader in action</span>
+          </div>
+        </div>
+
+        <p>By default Crossbridge  injects a simple preloader into every SWF it produces. This default preloader shows a black screen with a white loading bar that progresses across the screen as the SWF loads. If an HTTP VFS is being used, it can easily be hooked up to the progress bar to show the progress of the VFS as it is downloaded in parallel with the main SWF. You can see an example of this preloader in action in <a href="http://www.cmodule.org/neverball" target="_blank">this Neverball demo</a>.</p>
+
+        <p>If you  don't want a preloader in your SWF (for example if it is loaded via a different SWF and doesn't need to show a UI while loading), you can disable it via the gcc option <code>-no-swf-preloader</code>.</p>
+
+        <p>The source code for the default preloader ships with the SDK and can be found in <b>sdk/usr/share/DefaultPreloader.as</b>. This should give you a good template to start with as you develop your own preloader. Once you have compiled your modified version to a SWF you can tell gcc to use this instead of the default preloader by passing it the option <code>-swf-preloader=foo.swf</code>.</p>
+
+        <p>The contents of the preloader SWF are injected into the Crossbridge SWF at the very beginning, followed by a <code>ShowFrame</code> tag, which causes the preloader to execute even before the rest of the file has loaded. Once the preloader receives the event indicating that the SWF has loaded, it calls <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/MovieClip.html#gotoAndStop()" target="_blank">gotoAndStop</a></code> to initialize the rest of the SWF, and it then calls the constructor for the <code><a href="apidocs/com/adobe/flascc/Console.html">Console</a></code> class, which then takes  control of the screen.</p>
+
+        <p>The preloader SWF can be created in a graphical tool such as Flash Pro if you want to make something more attractive, possibly with embedded images, sounds and fonts. As long as the SWF contains some ActionScript code that achieves the same effect as the default preloader with regards to handling the <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/events/Event.html#COMPLETE" target="_blank">Event.COMPLETE</a></code> event.</p>
+
+        <p>More information about the SWF file format can be found in the <a href="http://www.adobe.com/content/dam/Adobe/en/devnet/swf/pdf/swf_file_format_spec_v10.pdf">SWF specification</a>, but it isn't necessary to understand things at this low level to be able to understand how preloaders work.</p>
+      </div>
+    </section>
+
+  <section id="section_vfs">
+    <div class="page-header">
+      <h1>Implementing a Virtual File System</h1>
+    </div>
+    <div>
+      <p>Any time your C/C++ code performs file IO, no matter what framework is being used, at some point it will use the low level <code>libc</code> API for opening, reading and writing files. Crossbridge implements these low level APIs, but also exposes a high-level ActionScript interface that makes it easy to populate the virtual filesystem with files and directories.</p>
+
+      <p>By default the filesystem has one root directory "/" and contains no files or directories. An object implementing <code><a href="apidocs/com/adobe/flascc/vfs/IBackingStore.html">IBackingStore</a></code> is responsible for handling file listing, reading and writing for the files and directories within a sub tree of the global filesystem.</p>
+
+      <p>Using multiple BackingStores at the same time is supported. For example, you could provide some fixed data in an embedded VFS mounted at "/data" and implement a read-write BackingStore for user data in "/user" that perhaps saves updated files back to a web-server.</p>
+
+      <p>Several built-in VFS types are supported but the interfaces can be implemented to provide completely custom types. Here are the supported builtin types of VFS, which can also be seen by running <code>genfs --help</code>:</p>
+
+      <ul>
+        <li>Embedded</li>
+        <li>Embedded + Zipped</li>
+        <li>HTTP</li>
+        <li>Local Shared Object</li>
+      </ul>
+
+      <h4>Embedded / Zipped VFS</h4>
+
+      <p>The simplest way to provide a filesystem for your SWF is to embed it within the SWF itself. Crossbridge provides a tool called <code>genfs</code>, which converts a directory structure on your real filesystem into a set of ActionScript classes that can be compiled into your SWF and instantiated at runtime.</p>
+
+      <p>To create an embedded VFS called "myvfs" from the contents of the folder called "sourcedirectory" you would use the following command:</p>
+<pre>
+~/crossbridge/sdk/usr/bin/genfs --type=embed --name=myvfs sourcedirectory vfsprefix
+</pre>
+
+      <p>The output consists of multiple ActionScript files prefixed with "vfsprefix" and a file called vfsprefix.rules, which contains a makefile rule file that could be included in your makefile to compile the files (this is optional).</p>
+
+      <p>To compile all of the VFS files into one ABC file suitable for linking into your final SWF you can use ASC2:</p>
+
+<pre>
+java -jar ~/crossbridge/usr/lib/asc2.jar -merge -md -AS3 -strict -optimize \
+  -import ~/crossbridge/usr/lib/builtin.abc \
+  -import ~/crossbridge/usr/lib/playerglobal.abc \
+  -import ~/crossbridge/usr/lib/BinaryData.abc \
+  -import ~/crossbridge/usr/lib/ISpecialFile.abc \
+  -import ~/crossbridge/usr/lib/IBackingStore.aBC \
+  -import ~/crossbridge/usr/lib/IVFS.abc \
+  -import ~/crossbridge/usr/lib/InMemoryBackingStore.abc \
+  -import ~/crossbridge/usr/lib/PlayerKernel.abc \
+  vfsprefix*.as -outdir . -out myvfs</pre>
+
+      <p>This creates a file called myvfs.abc in the current directory, which you pass to gcc in the final link step of your project. To instantiate the VFS at runtime you can construct it like this:</p>
+
+<pre>
+import com.adobe.flascc.vfs.myvfs;
+myvfs();</pre>
+
+    <p>If you didn't specify a class name with the "--name" argument the default class name is "RootFSBackingStore".</p>
+
+    <p>Switching to an embedded and compressed VFS is as simple as changing the value of the "--type" switch to "compressed". This will produce only one ActionScript source file that contains your VFS as an embedded zip file. All of the previous commands should work just the same for this type of VFS.</p>
+
+    <h4>HTTP VFS</h4>
+
+    <p><code>genfs</code> supports another type of VFS that can load a predetermined set of files via relative URLs. As with the embedded example, the first step is to run <code>genfs</code> on the local directory you want to make available as a VFS:</p>
+
+<pre>
+~/crossbridge/sdk/usr/bin/genfs --type=http --name=myvfs sourcedirectory vfsprefix
+</pre>
+
+    <p>This time <code>genfs</code> generates  files named vfsprefix_file<em>N</em>chunk<em>M</em> where <em>N</em> and <em>M</em> are integers. Most files will fit into one file but files over 10 megabytes will be split into smaller chunks so that browsers are more likely to cache the files.</p>
+
+    <p>A manifest file will also be generated that lists all of the chunks and is designed to be included by the HTTP VFS ActionScript implementation. To compile this, you must copy the file <b>sdk/usr/share/HTTPBackingStore.as</b> to the current directory and run the following command:</p>
+
+<pre>
+java -jar ~/crossbridge/usr/lib/asc2.jar -merge -md -AS3 -strict -optimize \
+  -import ~/crossbridge/usr/lib/builtin.abc \
+  -import ~/crossbridge/usr/lib/playerglobal.abc \
+  -import ~/crossbridge/usr/lib/BinaryData.abc \
+  -import ~/crossbridge/usr/lib/ISpecialFile.abc \
+  -import ~/crossbridge/usr/lib/IBackingStore.aBC \
+  -import ~/crossbridge/usr/lib/IVFS.abc \
+  -import ~/crossbridge/usr/lib/InMemoryBackingStore.abc \
+  -import ~/crossbridge/usr/lib/PlayerKernel.abc \
+  HTTPBackingStore.as -outdir . -out myvfs</pre>
+
+    <p>Using the resulting class is slightly more complex than the embedded VFS because it isn't usable until the files have downloaded. The resulting class dispatches several events so that you can handle progress, failure and completion. The events are the same as those dispatched by the <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/URLLoader.html" target="_blank">URLLoader</a></code>.</p>
+
+    <p>If you look in the default preloader implementation you will see that it has code that handles the web VFS for you. To make use of this you must compile your web VFS into the preloader. A working example of this can be found in the <a href="https://github.com/alexmac/alcexamples/tree/master/neverball-1.5.4" target="_blank">Neverball sample</a>.</p>
+
+    <h4>LSO VFS</h4>
+
+    <p>Flash has a feature known as <a href="http://www.adobe.com/security/flashplayer/articles/lso/">Local Shared Objects</a>. LSOs provide domain-specific structured data storage outside the browser cache. A working implementation of the VFS API that supports loading and saving to an LSO can be found in <b>sdk/usr/share/LSOBackingStore.as</b>.</p>
+
+    <p>By default every domain is allowed 100Kb of LSO storage space, but more can be requested by using the <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/SharedObject.html">SharedObject API</a> to request permission from the user.</p>
+
+    <h4>The VFS API</h4>
+
+    <p>All of these VFS implementations are implemented on top of the <a href="apidocs/com/adobe/flascc/vfs/package-detail.html" target="_blank">VFS ActionScript API</a>. To implement a minimal filesystem you only need to implement the <code><a href="apidocs/com/adobe/flascc/vfs/IBackingStore.html" target="_blank">IBackingStore</a></code> interface.</p>
+    </div>
+  </section>
+
+  <section id="section_ikernel">
+    <div class="page-header">
+      <h1>The IKernel Interface</h1>
+    </div>
+    <div>
+      <p>The libc implementation provided with Crossbridge is compiled from the source code for the FreeBSD 8.1 libc implementation. libc is usually the lowest dependency in any software stack before you reach the operating system kernel and therefore makes assumptions about the environment in which it is running. In the FreeBSD implementation of libc these assumptions manifest as function calls whose implementations are defined within the FreeBSD kernel itself. To satisfy these "syscalls" Crossbridge provides an ActionScript interface and a default implementation that implements each of these syscalls.</p>
+
+      <p>For most users, the default implementation will be sufficient, but advanced users might want to customize the behavior or provide implementations of some of the more exotic syscalls that Crossbridge has left undefined.</p>
+
+      <p>The <code><a href="apidocs/com/adobe/flascc/kernel/IKernel.html" target="_blank">IKernel</a></code> interface does not try to hide the fact that it is a low level API. To understand how each syscall works you should read the <a href="http://www.freebsd.org/docs.html" target="_blank">FreeBSD documentation</a> and  possibly even the FreeBSD kernel source code to see what the expected behavior is. You can read the <a href="apidocs/com/adobe/flascc/kernel/IKernel.html" target="_blank">ActionScript interface description here</a>.</p>
+
+      <p>Once you have implemented this interface you can instruct Crossbridge to use your implementation by setting <code><a href="apidocs/com/adobe/flascc/CModule.html#kernel" target="_blank">CModule.kernel</a></code> in your Console implementation, as shown below:</p>
+<pre>
+CModule.kernel = new YourIKernelImpl()
+</pre>
+    </div>
+  </section>
+  
+
+  <section id="section_concurrency">
+    <div class="page-header">
+      <h1>Concurrency in Flash Player 11.5</h1>
+    </div>
+    <div>
+      <p>
+        Before diving into multi-threading it is important to understand how this is implemented in the Flash Player, as it will affect the way you think about writing your AS3 interop code.
+      </p>
+      <p>
+        From an ActionScript developers point of view Flash player 11.4 introduces a simple <i>Worker</i> based model of shared-nothing multi threading where each Worker (sometimes called an Isolate) is fully separated from the others and cannot share references to any ActionScript objects. Communication between Workers is done by an API called the <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/MessageChannel.html" target="_blank">MessageChannel</a></code> that allows copies of objects to be sent between threads. This allows for high-level concurrent programming in AS3 without having to worry about low level issues around locking and synchronization.
+      </p>
+      <p>
+        To enable developers to also program with a more powerful low-level shared-memory multi-threading model Flash Player 11.5 allows <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html" target="_blank">ByteArray</a></code> objects to be shared between workers. Various concurrency primitives (Mutex/CAS/Fence/Condition) are also available to help synchronize access to <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html" target="_blank">ByteArrays</a></code> that are being operated on by multiple Workers. Crossbridge implements all of the necessary low level thread synchronization primitives needed to enable us to support the industry standard pthreads library. When calling <code>pthread_create</code> to create a new C thread a new Flash Worker is setup that shares the Crossbridge <code>domainMemory</code> <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html" target="_blank">ByteArray</a></code>. Using this shared access to the Crossbridge <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/utils/ByteArray.html" target="_blank">ByteArray</a></code> and the low level primitives to ensure correct synchronization Crossbridge is able to faithfully implement pthreads in the Flash player. This makes it possible to compile and run existing C/C++ based multi-threaded code within the Flash Player without needing to modify the code.
+      </p>
+      <p>
+        The first SWF that the Flash player runs is known as the primordial Worker; Because it runs on the UI thread in the runtime it has access to the full set of APIs that Flash exposes. Subsequently created workers are all considered children of this primordial worker and have access to most, but not all, of the APIs the primordial worker can use. Because of this it might be necessary for background Workers to communicate with the primordial Worker to get it to perform actions on the child worker's behalf.
+      </p>
+      <p>
+      What this means for Pthreads is that it is occasionally desirable for a C thread to be run on the main Flash Worker instead of the Worker that was created to run that thread. Crossbridge includes functionality that allows you to very easily block a background thread until the main worker is in a position to service it by running a C function on the main thread whilst maintaining any thread-local state from the background thread. These requests are serviced when <code><a href="apidocs/com/adobe/flascc/CModule.html#serviceUIRequests()" target="_blank">CModule.serviceUIRequests</a></code> is invoked from the main worker. The default Console calls<code><a href="apidocs/com/adobe/flascc/CModule.html#serviceUIRequests()" target="_blank">CModule.serviceUIRequests</a></code> every <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/events/Event.html#ENTER_FRAME" target="_blank">ENTER_FRAME</a></code> event. To ensure things work as expected the primordial Worker can only impersonate another C thread when that thread has been put to sleep using the <code><a href="capidocs/avm2.html#avm2_self_msleep">avm2_self_msleep</a></code> function. To wake up a thread that was being impersonated the impersonator must end with a call to <code><a href="capidocs/avm2.html#avm2_wake">avm2_wake</a></code>. This is demonstrated in <a href="samples.html#T9">sample 9</a>. </p>
+      <h4>APIs unsupported in background Workers</h4>
+      <p>The following APIs will not be available from within a background worker. Any attempt to construct an instance of any of these will throw an <code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/errors/IllegalOperationError.html" target="_blank">IllegalOperationError</a></code> with the message "This feature is not available within this context," the errorID <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/runtimeErrors.html#3731">3731</a> will be the same in all instances, allowing developers to key off of this value.</p>
+      <ul>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/desktop/Clipboard.html" target="_blank">flash.desktop.Clipboard</a></code> calling constructor will throw; calling generalClipboard will return null</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/desktop/NativeDragManager.html" target="_blank">flash.desktop.NativeDragManager</a></code> isSupported returns false</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/desktop/Updater.html" target="_blank">flash.desktop.Updater</a></code> isSupported returns false</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/NativeMenu.html" target="_blank">flash.display.NativeMenu</a></code> isSupported returns false</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/NativeWindow.html" target="_blank">flash.display.NativeWindow</a></code> isSupported returns false; ctor will throw; supportsMenu property false; supportsNotification property is false; supportsTransparency is false; systemMinSize is null; systemMaxSize is null;</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/external/ExtensionContext.html" target="_blank">flash.external.ExtensionContext</a></code> createExtensionContext() will throw; getExtensionDirectory will throw;</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/external/ExternalInterface.html" target="_blank">flash.external.ExternalInterface</a></code> available returns false; objectID property is null;</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/html/package-detail.html" target="_blank">flash.html.*</a></code> HTMLLoader.isSupported returns false</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/media/Camera.html" target="_blank">flash.media.Camera</a></code> isSupported returns false; getCamera returns null; names property is null;</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/media/CameraRoll.html" target="_blank">flash.media.CameraRoll</a></code> Mobile only. No changes made here for this version as workers are not supported on mobile.</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/media/CameraUI.html" target="_blank">flash.media.CameraUI</a></code> Mobile only. No changes made here for this version as workers are not supported on mobile.</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/media/StageWebView.html" target="_blank">flash.media.StageWebView</a></code> isSupported returns false; constructor will throw;</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/drm/package-detail.html" target="_blank">flash.net.drm.*</a></code> DRMManager.isSupported returns false; getDRMManager() returns null;</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/printing/package-detail.html" target="_blank">flash.printing.*</a></code> PrintJob.isSupported returns false; constructor will throw; active is always false; printers is null; supportsPageSetupDialog is false;</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/security/XMLSignatureValidator.html" target="_blank">flash.security.XMLSignatureValidator</a></code> isSupported returns false; calling constructor will throw.</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/IME.html" target="_blank">flash.system.IME</a></code> isSupported returns false; get conversionMode returns null; set conversionMode is a no op; get enabled returns false; set enabled is a no op; doConversion() is a no op; setCompositionString() is a no op.</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/SystemUpdater.html" target="_blank">flash.system.SystemUpdater</a></code> calling constructor throws</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/text/StageText.html" target="_blank">flash.text.StageText</a></code> calling constructor throws</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/ui/ContextMenu.html" target="_blank">flash.ui.ContextMenu</a></code> isSupported returns false; calling constructor will throw</li>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/ui/Mouse.html" target="_blank">flash.ui.Mouse</a></code> all methods are no-ops; setting 'cursor' property is a no-op</li>
+      </ul>
+
+      <h4>APIs with behavioral changes in background Workers</h4>
+      <p>The following APIs have modified behavior when running from within a background worker. Some calls on methods are no-ops, while others will throw an IllegalOperationError or equivalent as is consistent with the documented API. Return values should be consistent with the documentation to the extent possible. For example, if a method returns an Array with elements in it under normal conditions, when executing from within a background worker, it will return an empty Array. Some of the drawing APIs spawn multiple threads based on the number of CPUs on the host system. Filters, blitting, and rasterizing will create threads to perform these operations. When running in a background worker these threaded operations are turned off.</p>
+
+      <ul>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/accessibility/Accessibility.html" target="_blank">flash.accessibility.Accessibility</a></code>
+        <ul>
+          <li>active &mdash; always returns false
+          <li>updateProperties(); &mdash; no-op
+        </ul>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/desktop/NativeApplication.html" target="_blank">flash.desktop.NativeApplication</a></code>
+          <ul>
+        <li>properties
+          <ul>
+          <li>supportsDefaultApplication, supportsDockIcon, supportsMenu, supportsStartAtLogin, supportsSystemTrayIcon &mdash; all return false
+          <li>activeWindow &mdash; returns null
+          <li>autoExit &mdash; setter is a no-op
+          <li>idleThreshold &mdash; setter is a no-op
+          <li>openedWindows &mdash; returns an empty Array []
+          <li>systemIdleMode &mdash; setter is no-op
+          </ul>
+        <li>methods
+          <ul>
+          <li>activate(), clear(), copy(), cut(), paste(), selectAll() &mdash; no-op
+          <li>exit() &mdash; forces this background worker to stop and shutdown
+          </ul>
+        <li>events
+          <ul>
+            <li>no events are supported &mdash; background workers will not receive any NativeApplication events.
+          </ul>
+        </ul>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display/Stage.html" target="_blank">flash.display.Stage</a></code>
+          <ul>
+          <li>allowsFullScreen &mdash; always returns false
+          <li>stage3Ds &mdash; always returns empty Vector
+          <li>stageVideos &mdash; always returns empty Vector
+          <li>supportsOrientationChange &mdash; always returns false
+          <li>wmodeGPU &mdash; always returns false
+          </ul>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/filesystem/File.html" target="_blank">flash.filesystem.File</a></code>
+          <ul>
+          <li>browseForDirectory(), browseForOpen(), browseForOpenMultiple(), browseForSave() &mdash; no-op
+          </ul>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/FileReference.html" target="_blank">flash.net.FileReference</a></code>
+          <ul>
+          <li>browse(), download(), save() &mdash; no-op; always returns false
+          </ul>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/net/FileReferenceList.html" target="_blank">flash.net.FileReferenceList</a></code>
+          <ul>
+          <li>browse() &mdash; no-op; always returns false
+          </ul>
+        <li><code><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/system/System.html" target="_blank">flash.system.System</a></code>
+          <ul>
+          <li>ime &mdash; always returns null
+          <li>exit() &mdash; forces this background worker to stop and shutdown
+          <li>setClipboard() &mdash; no-op
+          </ul>
+      </ul>
+    </div>
+  </section>
+
+    <section id="section_swig">
+      <div class="page-header">
+        <h1>Creating SWCs with SWIG</h1>
+      </div>
+      <div>
+        <p>The <a href="http://www.swig.org/" target="_blank">Simplified Wrapper and Interface Generator (SWIG)</a> is a tool that parses C/C++ header files and automatically generates the interop glue code required to expose that C/C++ library to a different target language. Crossbridge extends SWIG with a backend that targets the Crossbridge environment so that SWIG can automatically generate wrappers using the <a href="#section_interop">interop functionality introduced earlier on this page</a>. This is ideal when you have a large codebase that you want to expose to ActionScript without writing lots of interop code by hand.</p>
+
+        <p>SWIG is not perfect. It is able to interpret enough C/C++ to be extremely useful, but occasionally you will run into code that its parser cannot understand. In these situations you must provide workarounds, typically hiding the misinterpreted code from SWIG and exposing the functionality to ActionScript via a custom wrapper.</p>
+
+        <p>There are also situations where the source language (C/C++) supports constructs that the target language (AS3 for Crossbridge) does not support. Some relevant examples include overloaded functions and operator overloading, neither of which are supported in ActionScript. To work around these limitations SWIG has support for detecting and renaming functions, but some manual work is required to tell SWIG which functions to rename and what they should be called.</p>
+
+        <p>The <a href="http://www.swig.org/" target="_blank">SWIG website</a> has documentation and examples of how to use SWIG. The majority of this is applicable, regardless of the target language, so it is a valuable resource even when using SWIG to target ActionScript.</p>
+
+        <h4>The SWIG Workflow</h4>
+
+        <p>To use SWIG, perform the following steps:</p>
+
+        <ol>
+          <li>Write a SWIG interface file</li>
+          <li>Process the interface file with SWIG to produce the ActionScript and C/C++ wrapper implementations</li>
+          <li>Compile the ActionScript wrapper implementation into an ABC file.</li>
+          <li>Compile the C/C++ wrapper implementation into an LLVM bitcode or ABC object file.</li>
+          <li>Perform your final link including both of the compiled wrapper implementations.</li>
+        </ol>
+
+        <h4>Creating a SWIG Interface File</h4>
+
+        <p>The SWIG interface file contains all of the directives used to control SWIG's behavior. Use it to specify which header files from your codebase SWIG should parse and any custom rules needed to alter how SWIG wraps the C/C++ types that it finds in those headers.</p>
+
+        <p>From this interface file, SWIG generates the resulting interop API in two parts. </p>
+        <ul>
+        <li><strong>ActionScript interface</strong> - Defines the packages, functions, and classes that an ActionScript developer using the final SWC will be expected to use. </li>
+        <li><strong>C/C++ layer</strong> - Contains  code that helps to bridge the gap between the ActionScript interface and the actual codebase. Typically this includes functions that perform the actual type conversion between C++ and ActionScript objects. This code is not part of the public API and is used internally by the glue code SWIG generates.</li>
+    </ul>
+        <p>Within your interface file you can add custom code to either half of the resulting interface. This allows you to generate simple helper C++ functions and expose them via ActionScript without having to modify your actual codebase. You might want to add custom code when you find that a common idiom in your C++ code is better exposed to ActionScript via a simpler high-level API.</p>
+
+        <p>Here is an example of a simple interface file which we'll assume is called <b>MyAPI.i</b>:</p>
+<pre>
+%module MyAPI
+%include "MyAPI.h"
+</pre>
+        <p>To process this interface file, you invoke SWIG like this:</p>
+<pre>
+~/crossbridge/sdk/usr/bin/swig -as3 -outdir . -includeall -ignoremissing -o MyAPI_wrapper.c MyAPI.i
+</pre>
+        <p>The argument <i>-includeall</i> instructs SWIG to follow all <code>#include</code> statements and the <i>-ignoremissing</i> argument instructs SWIG that it should not stop when it is unable to locate an include file. Neither is required and you should consult the SWIG documentation for more information about other available options.</p>
+
+        <p>This produces two output files <b>MyAPI.as</b> and <b>MyAPI_wrapper.c</b> that represent the two halves of the SWIG interface. </p>
+
+        <p>To add code into the generated C/C++ half of the wrapper you can do so like this in your interface file:</p>
+<pre>
+%{
+  #include &lt;stdio.h&gt;
+  int someHelperFunction(int x) {
+    printf("someHelperFunction called!\n");
+    return somethingUseful(x);
+  }
+%}</pre>
+
+        <p>To hide certain types from appearing in the final API you can use the ignore directive, to rename a type you can use the rename directive. For an example of the ignore directive in use look at <b>samples/Example_Bullet/bullet.i</b>.</p>
+<pre>
+%ignore functionToHide(int arg1, int arg2);
+
+%rename oldFunctionName newFunctionName;</pre>
+
+        <h4>C++ Operator Overloading</h4>
+
+        <p>AS3 does not support operator overloading so to be able to handle classes that use overloaded operators you need to use SWIG's rename directives to expose the operators as normal AS3 methods. In the following example the plus operator will be renamed to a method called <code>add</code>:</p>
+
+<pre>
+%rename (add) Foo::operator+;
+
+class Foo
+{
+public:
+  const Foo& operator+(const Foo &rhs);
+};</pre>
+
+        <h4>C++ Function/Method Overloading</h4>
+
+        <p>AS3 does not support function or method overloading so if you do need to expose overloaded functions or methods in your AS3 interface you will need to use the SWIG rename directive to map them to uniquely named methods in AS3. In the following example the overloaded <code>add</code> method is renamed to avoid conflicts:</p>
+
+<pre>
+%rename (addInteger) Foo::add(int);
+%rename (addNumber) Foo::add(double);
+
+class Foo
+{
+public:
+  const int add(int rhs);
+  const int add(double rhs);
+};</pre>
+
+        <h4>C++ Constructors and Destructors</h4>
+
+        <p>The rules around C++ copy constructors, default constructors and implicit destructors are complex. SWIG will attempt to create wrappers for these methods wherever possible, but there are cases where it might not generate the wrapper you want, or conversely might generate wrappers you don't want.</p>
+
+        <p>The SWIG documentation has a whole section on the various directives that can be used to control the behavior of wrapper generation for constructors and destructors <a href="http://www.swig.org/Doc1.3/SWIGPlus.html#SWIGPlus_nn8">that can be found here</a>.</p>
+
+        <h4>Typemaps</h4>
+
+        <p>SWIG uses a concept called <i>typemaps</i> where each language backend is able to specify how to map C/C++ types into the target language. The Crossbridge version of SWIG ships with a set of default typemaps for ActionScript that map the basic C/C++ types into equivalent ActionScript types:</p>
+
+        <table class="table">
+          <tr><th class="span3">C Type</th><th class="span3">ActionScript Type</th><th>Notes</th></tr>
+          <tr><td>char</td><td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/String.html" target="_blank">String</a></td><td>AS3 has no char type.</td></tr>
+          <tr><td>int</td><td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/int.html" target="_blank">int</a></td><td></td></tr>
+          <tr><td>float</td><td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Number.html" target="_blank">Number</a></td><td>AS3 has no float type so all floats are promoted to double.</td></tr>
+          <tr><td>double</td><td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Number.html" target="_blank">Number</a></td><td></td></tr>
+          <tr><td>char *</td><td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/String.html" target="_blank">String</a></td>
+          <td>By default Crossbridge assumes that char* means a null terminated string, but this can be overridden globally or locally for a particular function in your project if necessary.</td></tr>
+          <tr><td>unsigned char</td><td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/String.html" target="_blank">String</a></td><td></td></tr>
+          <tr><td>bool</td><td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Boolean.html" target="_blank">Boolean</a></td><td></td></tr>
+          <tr><td>void</td><td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/specialTypes.html#void" target="_blank">void</a></td><td></td></tr>
+          <tr><td>function pointer</td><td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/Function.html" target="_blank">Function</a></td><td></td></tr>
+          <tr><td>regular pointer</td><td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/int.html" target="_blank">int</a></td><td></td></tr>
+          <tr><td>any other type</td><td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/specialTypes.html#*" target="_blank">*</a></td><td></td></tr>
+        </table>
+
+        <p>All of the default SWIG typemaps for ActionScript can be found in <b>sdk/usr/share/swig/2.0.4/as3</b>. By re-declaring typemaps in your SWIG interface file you can override the defaults without having to modify the typemaps in the SDK.</p>
+
+        <h4>AS3 SWIG Directives</h4>
+
+        <p>A few custom AS3 specific SWIG directives have been exposed to control some aspects of the wrapper generation. When a derived C++ class implements a virtual function as public that was declared protected/private in the base class you will need to suppress the usual use of the "override" keyword as you can see in this example:</p>
+
+<pre>
+/* File : example.c */
+
+class base { 
+protected: 
+virtual ~base(){} 
+}; 
+
+class derived : public base { 
+public: 
+virtual ~derived() {} 
+};
+
+/* File : example.i */
+
+%module ExampleModule
+%as3suppressoverride derived::~derived;</pre>
+
+        <p>When using typemaps that require custom ActionScript types to be used in the generated AS3 wrappers you may need to import classes from custom packages. This can be achieved with the as3import directive that allows you to inject as3import annotations into the method declarations in the generated C/C++ wrapper code.</p>
+
+<pre>
+/* File : example.i */
+%module ExampleModule
+
+// When the generated wrapper for a function needs custom imports
+// You can add them via the as3import directive. Multiple namespaces
+// should be comma delimited.
+
+%as3import("com.foo.test1") bar1;
+%as3import("com.foo.test1,com.bar.test2") bar2;
+
+/* File : example.cpp */
+void bar1() {
+
+}
+
+void bar2() {
+
+}</pre>
+        <h4>LTO and SWIG</h4>
+
+        <p>As mentioned in the section on compiling code with GCC, the most optimal way to compile code is with <i>-O4 -flto-api=...</i>. When using SWIG the <b>exports.txt</b> file that you use to preserve symbol names must include all of the wrapper functions generated by SWIG.</p>
+
+        <p>To preserve the wrappers generated by SWIG, use the <i>nm</i> tool to generate a list of all of the defined symbols within the C++ half of the SWIG wrapper. To convert the output of the list into a format suitable for inclusion in the exports file, you can use the common unix utilities <i>sed</i> and <i>awk</i> to process the resulting list:</p>
+<pre>
+# First we generate the C and AS3 wrappers
+swig -as3 -module MyLib swig.i -o MyAPI_wrapper.c
+
+# Second we compile the C wrappers to bitcode
+g++ -O4 -c MyLib_wrapper.c
+
+# The final command consists of several steps:
+# 1) Run nm on the bitcode to generate a list of symbols
+# 2) Filter the symbol list using grep to only show defined ("T") symbols
+# 3) Use awk to select just the symbol name
+# 4) replace the "__" prefix with a single underscore
+# 5) append the output to an existing exports.txt file
+nm MyLib_wrapper.o | grep " T " | awk '{print $3}' | sed 's/__/_/' >> exports.txt
+</pre>
+
+        <p>The Bullet Physics example uses this technique when compiling Bullet into a SWC for optimal performance. Take a look in the makefile to see it being used in practice <b>samples/Example_BulletPhysicsLibrary/Makefile</b>.</p>
+
+      </div>
+    </section>
+
+    <section id="section_gdb">
+      <div class="page-header">
+        <h1>Debugging With GDB</h1>
+      </div>
+      <div>
+
+        <p>Like most GCC-based toolchains Crossbridge uses GDB as its debugger. Crossbridge provides a modified version of GDB that can debug your Crossbridge compiled C/C++ code while it is running within the Flash Runtime. GDB can be used from the command line or from within IDEs that provide support for GDB like Eclipse CDT. Crossbridge does not currently offer official support for debugging within an IDE.</p>
+        <h4>Setting Up GDB</h4>
+        <p>In order to use GDB on your system you will need to set a couple of variables:</p>
+        <ol>
+          <li><strong>Set the FLASCC_GDB_RUNTIME environment variable</strong><br>
+            This is a path to the program that will launch the SWF that is being debugged. This path can either point to the standalone Flash Player Debugger or a web browser which has the  <a href="http://www.adobe.com/support/flashplayer/downloads.html" target="_blank">Flash Player Debugger plugin</a> installed.<br>
+            <br>
+            This is an example of setting the path to a standalone Flash Player Debugger:
+<br>
+<pre>
+Mac&gt; export FLASCC_GDB_RUNTIME=&quot;/Users/path/to/Flash Player.app&quot;
+Win&gt; export FLASCC_GDB_RUNTIME=&quot;/cygdrive/path/to/FlashPlayerDebugger.exe&quot;</pre>
+            This is an example of setting the path to a web browser:<br>
+            <pre>Mac&gt; export FLASCC_GDB_RUNTIME=&quot;/Applications/Safari.app&quot;
+Win&gt; export FLASCC_GDB_RUNTIME=&quot;/cygdrive/path/to/iexplore.exe&quot;</pre>
+Note: If you are using Firefox you might want to extend or <a href="http://kb.mozillazine.org/Plugin-container_and_out-of-process_plugins#Plugin_hang_detector" target="_blank">disable the plugin hang detection time</a> to avoid the browser prematurely killing the SWF while you are debugging. <br>
+<br>
+          </li>
+          <li><strong>Set the ScriptStuckTimeout variable in mms.cfg</strong><br>
+          The Flash Player stops running programs if they take too long. This feature can interfere with the debugger. To ensure reliable operation of the debugger edit your mms.cfg file to include the ScriptStuckTimeout parameter.<br>
+          <br>
+          <table class="table">
+            <tr>
+              <th>Platform</th>
+              <th>Location of mms.cfg</th>
+            </tr>
+            <tr>
+              <td>Windows 7 (64-bit)</td>
+              <td>C:\Windows\SysWow64\Macromed\Flash </td>
+            </tr>
+            <tr>
+              <td>Windows 7 (32-bit)</td>
+              <td>C:\Windows\System32\Macromed\Flash</td>
+            </tr>
+            <tr>
+              <td>Mac OSX</td>
+              <td>/Library/Application Support/Macromedia</td>
+            </tr>
+          </table>
+          This sample <strong>mms.cfg</strong> file sets the timeout to 10 minutes:<br>
+          <pre>ScriptStuckTimeout=600</pre>
+          See the <a href="http://www.adobe.com/devnet/flashplayer/articles/flash_player_admin_guide.html" target="_blank">Flash Player Administration Guide</a> (Chapter 4) for more information about setting up an mms.cfg file.</li>
+        </ol>
+
+        <h4>Compiling a Debug SWF</h4>
+        <p>To be able to debug your code you must compile it with debug info. Using the previous hello world example we compile with the -g -O0 options:</p>
+        <pre>
+Mac&gt; ~/crossbridge/sdk/usr/bin/gcc -g -O0 hello.c -emit-swf -o hello.swf
+Win&gt; /cygdrive/c/crossbridge/sdk/usr/bin/gcc.exe -g -O0 hello.c -emit-swf -o hello.swf
+        </pre>
+        <p>This produces un-optimized code with full debug info so that GDB is able to fully inspect your data structures and understand where it is within the code while you step through it.</p>
+<h4>Running a SWF</h4>
+      <p>Now that your environment is set up, you can run GDB by passing it the path to the file
+        that you want to debug. If your using the standalone Flash Player Debugger then this would be the path to the SWF file. If you are using a browser then the path could be either directly to the SWF file or to the HTML file that embeds the SWF.</p>
+      <p>This example uses the standalone player to launch the SWF directly:</p>
+
+<pre>
+Mac&gt; ~/crossbridge/sdk/usr/bin/gdb hello.swf
+Win&gt; /cygdrive/c/crossbridge/sdk/usr/bin/gdb.exe hello.swf
+</pre>
+
+      <p>You should now be in a normal GDB console that looks like this:</p>
+
+<pre>
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=x86_64-apple-darwin10 --target=avm2-elf".
+For bug reporting instructions, please see:
+&lt;http://www.gnu.org/software/gdb/bugs/&gt;...
+(gdb)</pre>
+
+      <p>Set a breakpoint by issuing the <i>break main</i> command and answering <i>y</i> when asked to make breakpoint pending on future shared library load. This warning is harmless and simply means that because the SWF has not started running GDB doesn't yet know where to set the breakpoint; once the SWF has started executing GDB will get the information it needs and place the breakpoint appropriately.</p>
+
+      <p>To start the content issue the <i>run</i> command. GDB will launch the content and attach
+        to the Flash Runtime. You should see the following output in the GDB console:</p>
+
+<pre>
+(gdb) run
+Starting program: helloWorld.swf
+0xdddddddd in ?? ()
+
+Breakpoint 1, 0xf0000030 in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+20      int s = 2;
+(gdb)</pre>
+
+      <p>You are now ready to debug your SWF; normal GDB commands to set breakpoints and
+        step through the code should work as you would expect.</p>
+
+      <h4>Stepping Through Code</h4>
+
+      <p>All of the normal GDB commands for stepping through code are available to you, try using <i>step</i> or <i>next</i> to step over or into code:</p>
+
+<pre>
+Breakpoint 1, 0xf000007b in main (argc=0, argv=0x200ff0) at debuggingexample.c:28
+28      int s = 2;
+(gdb) step
+29      int t = 1;
+(gdb) next
+32      for (i = 0; i < 8; i++){
+(gdb)</pre>
+
+      <p>A great reference for GDB <a href="http://www.stanford.edu/class/cs107/other/gdbrefcard.pdf">is this quick reference</a> that lists the syntax for all of the commonly used commands.</p>
+
+      <h4>Inspecting Data</h4>
+
+      <p><i>info locals</i> will show you the values of all the C/C++ local variables and <i>info args</i> will show you the arguments to the current function:</p>
+
+<pre>
+#0  0xf0000086 in main (argc=0, argv=0x200ff0) at debuggingexample.c:33
+33          t *= 2;
+(gdb) info locals
+s = 2
+t = 2
+i = 1
+(gdb) info args
+argc = 0
+argv = 0x200ff0</pre>
+
+        <p></p>
+
+      <h4>Evaluating Expressions And Calling C/C++ Functions</h4>
+
+      <p>GDB has a basic C/C++ expression parser that can be used to evaluate the value of simple expressions while debugging without having to recompile any code. This expression parser also handles function calls as the following example based on the code in <b>samples/08_GDB/debuggingexample.c</b> demonstrates:</p>
+
+<pre>
+Breakpoint 1, 0xf000007b in main (argc=0, argv=0x200ff0) at debuggingexample.c:28
+28      int s = 2;
+(gdb) step
+29      int t = 1;
+(gdb) call square(4)
+$1 = 16
+(gdb) call square(s)
+$2 = 4</pre>
+
+      <h4>ActionScript Specific Commands</h4>
+
+      <p>As far as GDB knows, it is remotely debugging a real native C/C++ application, so
+        when it prints out information about the current call stack or local variables, it
+        prints out the current C/C++ call stack or the current C/C++ local variables.
+        To see further up the callstack into ActionScript code, or to inspect the values of ActionScript local variables, Crossbridge implements several AS3-specific versions of the regular GDB commands, prefixed with <i>as3</i>.</p>
+
+        <table class="table">
+          <tr><th class="span3">AS3 Specific command</th><th>Description</th></tr>
+          <tr><td><i>as3bt</i></td>
+          <td>Shows the backtrace of the entire ActionScript stack. This displays mangled names for all of the currently executing C/C++ code along with the names of any ActionScript functions above them on the callstack.</td></tr>
+          <tr><td><i>as3locals</i></td><td>Displays the values of ActionScript local variables. Within the stack frame for a C/C++ function you will see internal mangled variable names along with any AS3 variables defined using the <code><a href="capidocs/as3.html#AS3_DeclareVar">AS3_DeclareVar</a></code> macro.</td></tr>
+          <tr><td><i>as3args</i></td>
+          <td>Displays the ActionScript arguments to the function. For a normal C/C++ function this  displays nothing, but if you are within a function that was annotated using the AS3 interop function annotation syntax, it lists  the arguments specified in the ActionScript signature for the function.</td></tr>
+          <tr><td><i>set as3namespace</i></td>
+          <td>When debugging a SWC (or a SWF compiled with <code>-swf-ns</code>) you must inform GDB what namespace you wish to debug, the default is com.adobe.flascc. This must be done before the run command is used.</td></tr>
+          <tr><td><i>show as3namespace</i></td>
+          <td>Shows the namespace GDB is using to debug, the default is com.adobe.flascc.</td></tr>
+          <tr><td><i>as3sync</i></td><td>Causes GDB to re-read all information about the state of the program without stepping.</td></tr>
+          <tr><td><i>as3up</i></td>
+          <td>Switches to a higher ActionScript stack frame, which lets you inspect stack frames that might not be part of the compiled C/C++ code; for example the code within Console.as.</td></tr>
+          <tr><td><i>as3down</i></td>
+          <td>Switches to a lower stack frame, this lets you inspect stack frames that might not be part of the compiled C/C++ code; for example the code within Console.as</td></tr>
+          <tr><td><i>as3finish</i></td>
+          <td>Runs until the current ActionScript function exits.</td></tr>
+          <tr><td><i>as3step</i></td>
+          <td>Steps over the currently executing instruction, but follows function calls. This might correspond to one C/C++ step or within an AS3 stack frame it might correspond to one ActionScript expression.</td></tr>
+          <tr><td><i>as3next</i></td>
+          <td>Steps over the currently executing instruction without following function calls. This might correspond to one C/C++ step or within an AS3 stack frame it might correspond with one ActionScript expression.</td></tr>
+        </table>
+
+      <p>Here is example output from the <i>as3bt</i> command:</p>
+
+<pre>
+(gdb) as3bt
+(*)global/C_Run::F_main()[M__2F_var_2F_folders_2F_i4_2F_i45TNQjSGBi1tjLCAp7gh_2B__2B__2B__2B_TI_2F__2D_Tmp_2D__2F__2F_ccPpenxF_2E_o_3A_9ED146A0_2D_11AC_2D_435C_2D_A296_2D_2A134CDD921E:27]
+   global/C_Run::F__start1()[M__2F_p4_2F_sb_2F_alcmain_2F_mainline_2F_sdk_2F_usr_2F_lib_2F_crt1_c_2E_o_3A_7A5FAA4B_2D_E8B6_2D_45F6_2D_97F5_2D_1FB6A080CB53:18]
+   flascc::CModule$/callFun()
+   flascc::CModule$/start()
+   flascc::CModule$/_initLib()
+   global/C_Run::initLib()
+   flascc::Console/initG()
+(gdb)</pre>
+
+      <h4>Debugging SWFs Built From Crossbridge SWCs</h4>
+      <p>When you compile code into a SWC using the <code>-emit-swc</code> option, all of your code will be placed within the namespace you specify rather than the default <code>com.adobe.flascc</code> namespace. Because your SWF could contain classes within any number of namespaces GDB needs to be told which namespace you want to use.</p>
+
+      <p>To see what namespace GDB is currently working with use the <i>show as3namespace</i> command:</p>
+
+<pre>
+(gdb) show as3namespace
+The AS3 namespace of the inferior is "com.adobe.flascc".
+</pre>
+
+      <p>To select the namespace use the command <i>set as3namespace</i> before running the SWF:</p>
+
+<pre>
+(gdb) set as3namespace com.your.lib
+(gdb)</pre>
+
+      <p>You must also use this command if you have implemented the optional namespace re-writing argument for SWFs using the <code>-swf-ns</code> option.</p>
+
+      <h4>Debugging Multi-threaded Applications with GDB</h4>
+      <p>Multi-threaded C/C++ applications that use the pthread library can be compiled with Crossbridge to run in Flash Player 11.5 (or newer). <a href="gdb_nonstop.html">This page</a> describes  how to get started using GDB with multi-threaded applications.</p>
+</div>
+  </section>
+
+    <section id="section_profiling">
+      <div class="page-header">
+        <h1>Profiling with Adobe Scout</h1>
+      </div>
+
+      <div class="pull-right">
+        <div class="well">
+          <img src="images/profiling.png"/><br/>
+          <span>Profiling the code from sample 4 using Adobe Scout.</span>
+        </div>
+      </div>
+
+      <div>
+        <p>SWFs generated with Crossbridge can be profiled using Adobe Scout, a tool for performance profiling Flash content. Scout gives you a sampling code profiler and exposes information that lets you diagnose problems with your usage of the Stage3D APIs.</p>
+
+        <p>Scout understands the mangling scheme used by Crossbridge and GCC and will show your C/C++ functions in the ActionScript sampler window as they appear in your C/C++ codebase. This makes it easy to identify performance bottlenecks in your C/C++ code when running as a SWF.</p>
+
+        <p>Profiling multi-threaded SWFs is currently an experimental feature in Scout that is disabled by default. To enable it select "preferences" from the main menu then click on the "Beta Features" tab. In this tab ensure that the "Start sessions for ActionScript Workers" checkbox is ticked. When using this experimental feature each worker will show up as though it were a separate SWF being profiled within Scout's UI.</p>
+      </div>
+    </section>
+
+    <section id="section_libs">
+      <div class="page-header">
+        <h1>Included Libraries</h1>
+      </div>
+      <div>
+        <p>To help you get started, Crossbridge includes several commonly used open-source libraries already compiled and ready for use within your own projects.</p>
+
+        <div class="alert alert-warning">
+          Linking in any of these libraries will require you to satisfy the terms of their licenses. Read their licenses carefully!
+        </div>
+
+        <table class="table">
+          <tr><th  class="span3">Library Name</th><th>Description</th></tr>
+          <tr><td>libjpeg</td><td><p>Library for decoding JPEG images. <br>
+            <a href="http://libjpeg.sourceforge.net/">http://libjpeg.sourceforge.net/</a></p></td></tr>
+          <tr><td>libpng</td>
+          <td>Library for decoding PNG images.<br>            <a href="http://www.libpng.org/pub/png/libpng.html">http://www.libpng.org/pub/png/libpng.html</a></td></tr>
+          <tr><td>zlib</td><td><p>zlib de/compression library. <br>
+            <a href="http://www.zlib.net/">http://www.zlib.net/</a></p></td></tr>
+          <tr><td>dmalloc</td>
+          <td>Debug malloc implementation (for tracking down memory leaks/smashes).<br>            <a href="http://dmalloc.com/">http://dmalloc.com/</a></td></tr>
+          <tr><td>libffi</td><td>Helps create interop layers between languages. <br>            <a href="http://sourceware.org/libffi/">http://sourceware.org/libffi/</a></td></tr>
+          <tr><td>libSDL</td>
+          <td>Simple DirectMedia Layer. This library exposes a cross-platform API for handling input, sound and video. It was compiled with experimental support for the included Flash-based version of libvgl. <br>            
+          <a href="http://www.libsdl.org/">http://www.libsdl.org/</a></td></tr>
+          <tr><td>libvgl</td>
+          <td>BSD's low level framebuffer and input handling library. Crossbridge includes a version with an experimental backend for Flash that is used in the Quake1 example.<a href="http://www.freebsd.org/cgi/man.cgi?query=vgl"><br>
+          http://www.freebsd.org/cgi/man.cgi?query=vgl</a></td></tr>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p class="pull-right"><a href="#">Back to top</a></p>
+      <p>More info about Adobe's Flash development tools <a href="http://gaming.adobe.com">can be found here</a>.</p>
+      <p>&copy; 2012 Adobe Systems Incorporated. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script type="text/javascript" src="bootstrap/js/widgets.js"></script>
+  <script type="text/javascript" src="bootstrap/js/jquery.min.js"></script>
+  <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="bootstrap/js/bootstrap-tab.js"></script>
+</body>
+</html>

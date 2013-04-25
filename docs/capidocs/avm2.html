@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Crossbridge - AVM2.h API Reference</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="../bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="../bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="../bootstrap/css/docs.css" rel="stylesheet">
+    <link href="../bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+    <style type="text/css">
+		.parameterName {
+			font-family: monospace;
+		}
+	</style>
+  </head>
+  <body data-spy="scroll" data-target=".subnav" data-offset="50">
+
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="http://www.github.com/adobe/crossbridge" target="_blank"><span>Crossbridge</span></a>
+        <div>
+          <ul class="nav">
+            <li class="">
+              <a href="../../README.html">Readme</a>
+            </li>
+            <li class="">
+              <a href="../Reference.html">Reference</a>
+            </li>
+            <li class="">
+              <a href="../samples.html">Samples</a>
+            </li>
+            <li class="active">
+              <a href="./index.html">C/C++ API Reference</a>
+            </li>
+            <li class="">
+              <a href="../apidocs/index.html">AS3 API Reference</a>
+            </li>
+            <li class="">
+              <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/">Flash API Reference</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="container">
+
+	<header class="jumbotron subhead" id="overview">
+      <h1>Crossbridge</h1>
+      <p class="lead">A complete BSD-like C/C++ development environment with a GCC based cross-compiler capable of targeting the Adobe Flash Runtime.</p>
+    </header>
+
+		<section>
+		  <div class="page-header">
+			<h2>C/C++ API Reference</h2>
+		  </div>
+		  <div>
+
+			<h3>AVM2.h</h3>
+			<p>The AVM2.h header file contains various low-level Crossbridge-specific utility functions and macros.</p>
+
+			<table class="table">
+			  <tr>
+				<th>Function</th>
+				<th>Description</th>
+			  </tr>
+
+				<tr>
+                    <td>
+                        <p>__avm2_apply_args</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="__avm2_apply_args"></div> 
+                    </td>
+					<td>
+						<p><code>#define __avm2_apply_args()</code></p>
+						<p>Returns a pointer to data describing how to perform a call with the same arguments as were passed to the current function.</p>
+						<p>For more information, see <a href="http://tigcc.ticalc.org/doc/gnuexts.html#SEC67" target="_new">http://tigcc.ticalc.org/doc/gnuexts.html#SEC67</a></p>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>__avm2_apply</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="__avm2_apply"></div> 
+                    </td>
+					<td>
+						<p><code>#define __avm2_apply(function, arguments, size)</code></p>
+						<p>Invokes <span class="parameterName">function</span> with a copy of the parameters described by <span class="parameterName">arguments</span> and <span class="parameterName">size</span><em>.</em></p>
+						<p>For more information, see <a href="http://tigcc.ticalc.org/doc/gnuexts.html#SEC67" target="_new">http://tigcc.ticalc.org/doc/gnuexts.html#SEC67</a></p>
+					    <p><strong>Parameters</strong>:</p>
+					    <ul>
+					      <li><span class="parameterName">function</span> - The function to be invoked.</li>
+					      <li><span class="parameterName">arguments</span> - The arguments to be passed. This should be the value returned by <code>__avm2_apply_args()</code>.</li>
+					      <li><span class="parameterName">size</span> - The number of bytes in the stack argument data.</li>
+					    </ul>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>__avm2_return</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="__avm2_return"></div> 
+                    </td>
+					<td>
+						<p><code>#define __avm2_return(result)</code></p>
+						<p>Returns the value described by <span class="parameterName">result</span> from the containing function. </p>
+					    <p><strong>Parameters</strong>:</p>
+					    <ul>
+					      <li><span class="parameterName">result</span> - The value returned by <code>__avm2_apply</code>.</li>
+					    </ul>
+
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>__builtin_va_arg_pack</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="__builtin_va_arg_pack"></div> 
+                    </td>
+                	<td>
+						<p><code>#define __builtin_va_arg_pack</code></p>
+						<p>Error. Not supported in Crossbridge.</p>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>__builtin_va_arg_pack_len</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="__builtin_va_arg_pack_len"></div> 
+                    </td>
+					<td>
+						<p><code>#define __builtin_va_arg_pack_len</code></p>
+						<p>Error. Not supported in Crossbridge.</p>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>__builtin_apply_args</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="__builtin_apply_args"></div> 
+                    </td>
+					<td>
+						<p><code>__avm2_apply_args</code> overrides <code>__builtin_apply_args</code>.</p>
+						<p>For more information, see <a href="http://tigcc.ticalc.org/doc/gnuexts.html#SEC67" target="_new">http://tigcc.ticalc.org/doc/gnuexts.html#SEC67</a>.</p>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>__builtin_apply</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="__builtin_apply"></div> 
+                    </td>
+
+					<td>
+						<p><code>__avm2_apply</code> overrides <code>__builtin_apply</code>.</p>
+						<p>For more information, see <a href="http://tigcc.ticalc.org/doc/gnuexts.html#SEC67" target="_new">http://tigcc.ticalc.org/doc/gnuexts.html#SEC67</a>.</p>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>__builtin_return</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="__builtin_return"></div> 
+                    </td>
+
+					<td>
+						<p><code>__avm2_return</code> overrides <code>__builtin_return</code>.</p>
+						<p> For more information, see <a href="http://tigcc.ticalc.org/doc/gnuexts.html#SEC67" target="_new">http://tigcc.ticalc.org/doc/gnuexts.html#SEC67</a>.</p>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_locked_id</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_locked_id"></div> 
+                    </td>
+
+					<td>
+						<p><code>unsigned avm2_locked_id(unsigned *mtx);</code></p>
+				      <p>Returns the id of the lock owner. Low-level concurrency primitives -- expect hangs or worse if not used properly.
+							Non-recursive mutexes. </p>
+				      <p><strong>Parameters:</strong></p>
+					    <ul>
+					      <li><span class="parameterName">mtx</span> - ID of lock owner or 0.</li>
+					    </ul>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_lock</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_lock"></div> 
+                    </td>
+
+					<td>
+						<p><code>void avm2_lock(unsigned *mtx);</code></p>
+						<p>Low-level concurrency primitives -- expect hangs or worse if not used properly.
+							Non-recursive mutexes.</p>
+					    <p><strong>Parameters</strong>:</p>
+					    <ul>
+					      <li><span class="parameterName">mtx</span> - lock with thread id. </li>
+					    </ul>
+					</td>
+				 </tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_lock_id</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_lock_id"></div> 
+                    </td>
+
+					<td>
+						<p><code>void avm2_lock_id(unsigned *mtx, unsigned id);</code></p>
+						<p>Low-level concurrency primitives -- expect hangs or worse if not used properly.
+							Non-recursive mutexes.</p>
+					    <p><strong>Parameters</strong>:</p>
+						<ul>
+						  <li><span class="parameterName">mtx</span> - lock with any non-0 value.</li>
+						  <li><span class="parameterName">id</span> - lock owner id.</li>
+						</ul>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_unlock</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_unlock"></div> 
+                    </td>
+
+					<td>
+						<p><code>void avm2_unlock(unsigned *mtx);</code></p>
+						<p>Super low-level concurrency primitives -- expect hangs or worse if not used properly.
+							Non-recursive mutexes.</p>
+					    <p><strong>Parameters</strong>:</p>
+					    <ul>
+					      <li><span class="parameterName">mtx</span> - unlock.</li>
+					    </ul>
+
+					</td>
+				</tr>
+
+				<tr>
+					<td colspan="2"><strong>Address token-based conditions</strong></td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_msleep</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_msleep"></div> 
+                    </td>
+
+					<td>
+						<p><code>int avm2_msleep(void *addr, unsigned *mtx, int timo);</code></p>
+						<p>Waits for <span class="parameterName">addr</span> to be woken for <span class="parameterName">timo</span> milliseconds (or forever if <span class="parameterName">timo</span>==0).
+							Releases mutex on entry, re-acquired before return 0 on timeout, non-zero on wake.</p>
+					    <p><strong>Parameters</strong>:</p>
+						<ul>
+							<li><span class="parameterName">addr</span> - Sleep on address. </li>
+							<li><span class="parameterName">mtx</span> - Must be locked on entry. </li>
+							<li><span class="parameterName">timo</span> - Number of milliseconds this function waits for addr to be woken (forever if <span class="parameterName">timo</span>==0).</li>
+						</ul>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_wake</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_wake"></div> 
+                    </td>
+
+					<td>
+						<p><code>int avm2_wake(void *addr);</code></p>
+						<p>Wake any threads msleeping on <span class="parameterName">addr</span>, returns non-zero if a thread was woken.</p>
+					    <p><strong>Parameters</strong>:</p>
+					    <ul>
+					      <li><span class="parameterName">addr</span> - Address pointing to sleeping threads.				    </li>
+					    </ul>
+				      <p><strong>Example Usage:</strong></p>
+                    <p>See the <a href="../samples.html#T9">09_pthreads</a> sample</p></td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_wake_one</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_wake_one"></div> 
+                    </td>
+
+					<td>
+						<p><code>int avm2_wake_one(void *addr);</code></p>
+						<p>Wake zero (if none msleeping on <span class="parameterName">addr</span>) or one threads msleeping on <span class="parameterName">addr</span>, returns non-zero if any thread was woken.</p>
+					    <p><strong>Parameters</strong>:</p>
+					    <ul>
+					      <li><span class="parameterName">addr</span> - Address pointing to sleeping threads.</li>
+					    </ul>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_thr_impersonate</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_thr_impersonate"></div> 
+                    </td>
+
+					<td>
+						<p><code>void *avm2_thr_impersonate(long tid, void *(*proc)(void *), void *arg);</code></p>
+						<p>Call <span class="parameterName">proc(arg)</span> while impersonating the thread specified by <span class="parameterName">tid</span>.</p>
+					    <p><strong>Parameters</strong>:</p>
+					    <ul>
+					      <li><span class="parameterName">tid</span> - Long containing the thread to impersonate.</li>
+					      <li><span class="parameterName">proc</span> - The function pointer.</li>
+					      <li><span class="parameterName">arg</span> - The data to pass to the function pointer.</li>
+					    </ul>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_ui_thunk</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_ui_thunk"></div> 
+                    </td>
+
+					<td>
+						<p><code>void *avm2_ui_thunk(void *(*proc)(void *), void *arg);</code></p>
+						<p>Call <span class="parameterName">proc(arg)</span> on the UI Worker as calling thread.</p>
+					    <p><strong>Parameters</strong>:</p>
+					    <ul>
+					      <li><span class="parameterName">proc</span> - The function pointer.</li>
+					      <li><span class="parameterName">arg</span> - The data to pass to the function pointer.</li>
+					    </ul>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_is_ui_worker</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_is_ui_worker"></div> 
+                    </td>
+
+					<td>
+						<p><code>int avm2_is_ui_worker();</code></p>
+						<p>Returns non-zero if running on the UI Worker. </p>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_wait_for_ui_frame</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_wait_for_ui_frame"></div> 
+                    </td>
+
+					<td>
+						<p><code>int avm2_wait_for_ui_frame(int timo);</code></p>
+						<p>Wait for a frame event or until timeout. Returns 0 on timeout.</p>
+					    <p><strong>Parameters</strong>:</p>
+					    <ul>
+					      <li><span class="parameterName">timo</span> - A timeout interval, in milliseconds.</li>
+					    </ul>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_self_lock</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_self_lock"></div> 
+                    </td>
+
+					<td>
+						<p><code>void avm2_self_lock();</code></p>
+						<p>Lock this thread to this Worker -- recursive OK. </p>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_self_unlock</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_self_unlock"></div> 
+                    </td>
+
+					<td>
+						<p><code>void avm2_self_unlock();</code></p>
+						<p>Unlock this thread.</p>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_self_msleep</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_self_msleep"></div> 
+                    </td>
+
+					<td>
+						<p><code>int avm2_self_msleep(void *addr, int timo);</code></p>
+						<p>Works like <code>avm2_msleep</code> with mtx being "self" -- "self" must be locked using <code>avm2_self_lock</code>.</p>
+				      <p><strong>Parameters</strong>:</p>
+					    <ul>
+					      <li><span class="parameterName">addr</span> - Sleep on address.</li>
+                          <li><span class="parameterName">timo</span> - Number of milliseconds this function waits for addr to be woken (forever if <span class="parameterName">timo</span>==0).</li>
+                        </ul>
+				    <p><strong>Example Usage:</strong></p>
+                    <p>See the <a href="../samples.html#T9">09_pthreads</a> sample</p></td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_tramp_alloc</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_tramp_alloc"></div> 
+                    </td>
+
+					<td>
+						<p><code>void *avm2_tramp_alloc(void *funPtr, int sret, void *arg0, void *arg1);</code></p>
+						<p>Trampoline support. For more information, see sdk/usr/share/avm2_tramp.cpp.</p>
+					    <p><strong>Parameters</strong>:</p>
+					    <ul>
+					      <li><span class="parameterName">funPtr</span> - Function pointer.</li>
+					      <li><span class="parameterName">sret</span> - Size of the structure return type for POD or the negative size of the structure for non-POD.
+					         Must be zero for a non-structure return type.</li>
+					      <li><span class="parameterName">arg0</span> - First argument.</li>
+					      <li><span class="parameterName">arg1</span> - Second argument.</li>
+					    </ul>
+					</td>
+				</tr>
+
+				<tr>
+                    <td>
+                        <p>avm2_tramp_free</p>
+                        <!-- Ensure this section isn't partially hidden under the top nav when coming here via # URL -->
+                        <div style="margin-top:-80px" id="avm2_tramp_free"></div> 
+                    </td>
+
+					<td>
+						<p><code>void avm2_tramp_free(void *trampFunPtr);</code></p>
+						<p>Trampoline support. For more information, see sdk/usr/share/avm2_tramp.cpp. </p>
+					    <p><strong>Parameters:</strong></p>
+					    <ul>
+					      <li><span class="parameterName">trampFunPtr</span> - Function pointer to be freed.</li>
+					    </ul>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</section>
+  </div>
+
+  <footer class="footer">
+
+  </footer>
+</body>
+</html>

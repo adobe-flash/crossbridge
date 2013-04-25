@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Crossbridge - Readme</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="docs/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="docs/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="docs/bootstrap/css/docs.css" rel="stylesheet">
+    <link href="docs/bootstrap/js/google-code-prettify/prettify.css" rel="stylesheet">
+  </head>
+  <body data-spy="scroll" data-target=".subnav" data-offset="50">
+
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="http://www.github.com/adobe/crossbridge" target="_blank"><span>Crossbridge</span></a>
+        <div>
+          <ul class="nav">
+            <li class="active">
+              <a href="README.html">Readme</a>
+            </li>
+            <li class="">
+              <a href="docs/Reference.html">Reference</a>
+            </li>
+            <li class="">
+              <a href="docs/samples.html">Samples</a>
+            </li>
+            <li class="">
+              <a href="docs/capidocs/index.html">C/C++ API Reference</a>
+            </li>
+            <li class="">
+              <a href="docs/apidocs/index.html">AS3 API Reference</a>
+            </li>
+            <li class="">
+              <a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/">Adobe Flash API Reference</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header class="jumbotron subhead" id="overview">
+      <h1>Crossbridge</h1>
+      <p class="lead">A complete BSD-like C/C++ development environment with a GCC based cross-compiler capable of targeting the Adobe Flash Runtime.</p>
+    </header>
+
+    <section>
+      <div class="page-header">
+        <h1>Installation (Windows)</h1>
+      </div>
+      <div>
+        <p>The Windows version of Crossbridge was compiled to run within the <a href="http://www.cygwin.com/">Cygwin</a> environment. Cygwin is a Linux-like environment for Windows making it possible to port software running on POSIX systems (such as Linux, BSD, and Unix systems) to Windows. Cygwin is required to use Crossbridge on Windows. Crossbridge bundles a version of Cygwin that you can access by launching the <b>run.bat</b> file. Advanced users can <a href="#separate_cygwin">use a separate Cygwin installation</a> if desired. </p>
+        <ol>
+          <li>Extract the contents of the ZIP file onto your hard drive. This can be extracted to anywhere on your hard drive, but this readme will assume it is located at C:\crossbridge\</li>
+          <li>Ensure <a href="http://www.java.com/getjava" target="_blank">64-bit Java</a> is installed</li>
+          <li>Ensure <a href="http://www.java.com/en/download/help/path.xml" target="_blank">Java is on your PATH</a></li>
+          <li>Download the <a href="http://www.adobe.com/devnet/flex/flex-sdk-download-all.html">Flex SDK</a> (some of the samples require Flex 4.6 or higher in order to be compiled.) This can be extracted to anywhere on your hard drive, but this readme will assume it is located at C:\flex_sdk\</li>
+          <li>Download a debugger version of the <a href="http://www.adobe.com/support/flashplayer/downloads.html">Flash Player</a> (only needed if you want to use GDB to debug your code)</li>
+          <li>Double click the run.bat file</li>
+          <li>Check that Crossbridge is working by compiling the first sample:
+            <ol>
+              <li>cd 01_HelloWorld</li>
+              <li>make FLASCC=/cygdrive/c/crossbridge/sdk FLEX=/cygdrive/c/flex_sdk</li>
+              <li>Launch the hello.swf file</li>
+            </ol>
+          </li>
+        </ol>
+
+        <h4 id="separate_cygwin">Using a Separate Cygwin Installation</h4>
+
+        <p>If you don't want to use the installation of Cygwin that is bundled with Crossbridge you can use a separate Cygwin installation as long as it is up to date and has at least these packages:</p>
+        <ul>
+          <li>make</li>
+          <li>libuuid1</li>
+          <li>python</li>
+          <li>cmake</li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <div class="page-header">
+        <h1>Installation (Mac)</h1>
+      </div>
+      <div>
+        <ol>
+          <li>Extract the contents of the DMG file onto your hard drive. This can be extracted to anywhere on your hard drive, but this readme will assume it is located at ~/crossbridge/</li>
+          <li>Ensure 64-bit Java is installed (Mac users should already have Java installed, but make sure to run Software Update to ensure you have the latest version)</li>
+          <li>Download the <a href="http://www.adobe.com/devnet/flex/flex-sdk-download-all.html">Flex SDK</a> (some of the samples require Flex 4.6 or higher in order to be compiled.) This can be extracted to anywhere on your hard drive, but this readme will assume it is located at ~/flex_sdk/</li>
+          <li>Download a debugger version of the <a href="http://www.adobe.com/support/flashplayer/downloads.html">Flash Player</a> (only needed if you want to use GDB to debug your code)</li>
+          <li>Check that Crossbridge is working by compiling the first sample:
+              <ol>
+                <li>cd ~/crossbridge/sample/01_HelloWorld</li>
+                <li>PATH=~/crossbridge/sdk/usr/bin:$PATH make FLASCC=~/crossbridge/sdk FLEX=~/flex_sdk</li>
+                <li>Launch the hello.swf file </li>
+              </ol>
+          </li>
+        </ol>
+</div>
+    </section>
+
+    <section>
+      <div class="page-header">
+        <h1>Compiling Hello World</h1>
+      </div>
+      <div>
+        <p>Let's try a really simple example to see how Crossbridge works. Put the following code into a file called <b>hello.c</b></p>
+<pre>
+#include &lt;stdio.h&gt;
+int main()
+{
+    printf("Hello World!\n");
+}</pre>
+
+        <p>And compile it like this:</p>
+
+<pre>
+Mac> ~/crossbridge/sdk/usr/bin/gcc hello.c -o hello
+Win> /cygdrive/c/crossbridge/sdk/usr/bin/gcc.exe hello.c -o hello.exe
+</pre>
+
+        <p>The compiler may produce warnings about dropped arguments; these can safely be
+        ignored. Running the resulting binary will print the string "Hello World!" to
+        your console. By default the gcc and g++ compilers in the Crossbridge toolchain will
+        produce <i>projector</i> binaries. These are native executables that contain your
+        application compiled to ActionScript bytecode and a captive copy of the
+        ActionScript Virtual Machine (the virtual machine used in the Flash Runtime).
+        Executing this projector binary will run your program.</p>
+
+        <p>To target the Flash player we will need to tell gcc/g++ to produce a SWF file
+        instead of a projector binary. This can be done as follows:</p>
+
+<pre>
+Mac&gt; ~/crossbridge/sdk/usr/bin/gcc hello.c -emit-swf -o hello.swf
+Win&gt; /cygdrive/c/crossbridge/sdk/usr/bin/gcc.exe hello.c -emit-swf -o hello.swf
+</pre>
+
+        <p>If you load the resulting SWF into the standalone Flash player you should see
+        "Hello World" on screen.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="page-header">
+        <h1>Compiling a Larger Project</h1>
+      </div>
+      <div>
+        <p>If you have a project with standard *nix-style makefiles and you want to use
+        them as is, you can add the <b>sdk/usr/bin</b> folder to the head of your path like
+        this:</p>
+
+<pre>
+Mac> export PATH=~/crossbridge/sdk/usr/bin:$PATH
+Win> export PATH=/cygdrive/c/crossbridge/sdk/usr/bin:$PATH
+</pre>
+
+        <p>This path contains replacements for the standard gcc/make toolchain which will
+        do the Crossbridge equivalent code transformations.</p>
+        <p>Note: Calling this command from a terminal will only update the PATH for the lifetime of that terminal window. To have this automatically set every time you launch a new terminal window consider adding the command to a .profile file.</p>
+        <p>Another way of setting the path is to pass it as a parameter to make. See the make file in the Example_BulletPhysicsLibrary example to see how this is done.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="page-header">
+        <h1>Documentation</h1>
+      </div>
+      <div>
+        <p>Now that you have Crossbridge setup these resources and documentation should help you get started:</p>
+        <p>&nbsp;</p>
+        <table class="table">
+          <tr>
+            <td class="span2"><a href="docs/samples.html">Samples</a></td>
+            <td>Crossbridge comes with a set of sample applications that demonstrate features of the  SDK. You can find these examples in the samples folder. <a href="docs/samples.html">This page</a> describes the features being demonstrated in more detail and includes links to the relevant sections of the reference guide for more information.</td>
+          </tr>
+          <tr>
+            <td><a href="docs/Reference.html">Reference Guide</a></td>
+            <td>Describes each feature of the Crossbridge SDK.</td>
+          </tr>
+          <tr>
+            <td><a href="docs/capidocs/index.html">C/C++ API</a></td>
+            <td>A reference showing all of the C/C++ APIs that are part of Crossbridge.</td>
+          </tr>
+          <tr>
+            <td><a href="docs/apidocs/index.html"> ActionScript3 API</a></td>
+            <td>A reference showing all of the ActionScript3 APIs that are part of Crossbridge. The reference guide provides a high level explanation of these APIs with links into this API reference for more details.</td>
+          </tr>
+          <tr>
+            <td><a href="http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/" target="_blank">Flash Runtime API</a></td>
+            <td><p>To interact with the Flash Runtime in your Crossbridge compiled code you will need to use the ActionScript API exposed by the Flash Player. This reference lists all of the available APIs in the latest version of the Flash Player.
+</p>
+            <p> For more information on how to interop between C/C++ and the Flash API see <a href="docs/Reference.html#section_interop">this section</a> of the reference guide.</p></td>
+          </tr>
+        </table>
+        <p>&nbsp;</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="page-header">
+        <h1>Supported Flash players</h1>
+      </div>
+      <div>
+        <p>Crossbridge generated SWFs are supported by Flash player 11.0 and AIR 3.0 and higher. SWCs generated by Crossbridge are supported by Flex Builder 4.6 and Flex SDK 4.6 or higher. Running Crossbridge generated SWFs in Flash player 10.x is not guaranteed to work and Adobe does not provide any support for that use-case.</p>
+
+        <p>Support for concurrency is only available in Flash 11.5 and higher when targeting SWF version 18. Use of other player APIs within inline-asm statements or via the Flash++ interop mechanism might also require a specific version of the Flash player. Performing runtime checks for available APIs will allow you to produce content that supports older Flash player versions with reduced functionality whilst being able to use the latest APIs when running in a recent version of the Flash player.</p>
+
+        <p>For a complete list of what APIs were exposed in each version of Flash <a href="http://www.adobe.com/devnet/articles/flashplayer-air-feature-list.html">visit the Flash Player feature list</a> on the Adobe Developer Connection website.</p>
+      </div>
+    </section>
+  </div>
+
+  <footer class="footer">
+  </footer>
+
+  <script type="text/javascript" src="docs/bootstrap/js/widgets.js"></script>
+  <script type="text/javascript" src="docs/bootstrap/js/jquery.min.js"></script>
+  <script type="text/javascript" src="docs/bootstrap/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="docs/bootstrap/js/bootstrap-tab.js"></script>
+</body>
+</html>
