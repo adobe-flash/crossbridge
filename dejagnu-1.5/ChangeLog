@@ -1,0 +1,1382 @@
+2011-03-09  Ben Elliston  <bje@gnu.org>
+
+	* DejaGnu 1.5 released.
+
+2011-03-09  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (DISTCLEANFILES): Define.
+	* Makefile.in: Regenerate.
+	* testsuite/runtest.all/libs.exp: Clean up temp files on exit.
+	* testsuite/runtest.all/options.exp: Likewise for dbg.log.
+	* testsuite/runtest.all/stats.exp: Likewise for tmpdir. Use "file
+	mkdir" instead of exec'ing mkdir(1).
+
+2011-03-07  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (doc/dejagnu.texi): Conditional on MAINTAINER_MODE.
+	* Makefile.in: Regenerate.
+
+2011-03-06  Ben Elliston  <bje@gnu.org>
+
+	* configure.ac (AC_INIT): Set version to 1.5.
+	* configure: Regenerate.
+	* runtest.exp (frame_version): Set to 1.5.
+	* doc/dejagnu.texi: Regenerate.
+
+2011-03-04  Ben Elliston  <bje@gnu.org>
+
+	* texinfo.tex: Import latest version from ftp://tug.org/tex.
+
+2011-03-04  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (EXTRA_DIST): Correct name of historical ChangeLog.
+	* Makefile.in: Regenerate.
+
+2011-03-03  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am: Bump to GPL version 3.
+	* configure.ac: Likewise.
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Likewise.
+	* configure: Likewise.
+
+2011-03-03  Ben Elliston  <bje@gnu.org>
+
+	* config.guess: Update to most recent version.
+	* config.sub: Likewise.
+
+2011-03-03  Ben Elliston  <bje@gnu.org>
+
+	* lib/framework.exp (unknown): Rename the native Tcl ::unknown
+	proc to ::tcl_unknown.  If ::tcl_unknown returns a failure result,
+	then fall back to the conventional DejaGnu handling.  Report from
+	David Byron <dbyron@dbyron.com>.
+
+2011-03-03  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* lib/remote.exp (remote_expect): Pass all exception conditions up
+	to the caller.
+
+2011-03-01  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* lib/dg.exp (dg-test): Support nested calls.
+
+2010-04-13  Ben Elliston  <bje@gnu.org>
+
+	* testglue.c: Remove duplicated prototypes for abort and exit.
+
+2010-03-26  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* doc/user.xml (Tcl Variables For Command Line Options): Correct
+	column count.
+
+2010-01-21  Jie Zhang  <jie.zhang@analog.com>
+
+	* config/gdb-comm.exp (gdb_comm_load): Set breakpoints after load.
+
+2010-01-15  Anthony Green  <green@moxielogic.com>
+
+	* baseboards/moxie-sim.exp: New baseboard.
+
+2009-12-10  DJ Delorie  <dj@redhat.com>
+
+	* baseboards/rx-sim.exp: New baseboard.
+
+2009-10-15  Ben Elliston  <bje@gnu.org>
+
+	* MAINTAINERS: Remove refererence to Tom Tromey's Tcl style guide.
+	This web page has disappeared.
+
+2009-07-06  Ben Elliston  <bje@gnu.org>
+
+	* doc/dejagnu.xml, doc/ref.xml, doc/user.xml: Mark up options with
+	<option> not <emphasis>.  Apply other grammatical fixes from
+	Reuben Thomas.
+	* doc/dejagnu.texi: Regenerate.
+
+2009-07-06  Ben Elliston  <bje@gnu.org>
+
+	* configure.ac: Check for docbook2x-texi.
+	* configure: Regenerate.
+
+2009-07-06  Ben Elliston  <bje@gnu.org>
+
+	From Reuben Thomas  <rrt@sc3d.org>:
+	* doc/runtest.1: Fix some formatting issues.
+
+2009-06-16  Ben Elliston  <bje@gnu.org>
+
+	* config.guess: Update to most recent version.
+	* config.sub: Likewise.
+
+2009-06-16  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (rpm, deb, solpkg, hpdepot): Remove targets.
+	* Makefile.in: Regenerate.
+	* packaging: Remove directory and its contents.
+
+2009-06-10  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	* config/gdb-comm.exp (gdb_comm_add_breakpoint): Handle pending
+	breakpoints.
+
+2008-12-03  Ben Elliston  <bje@gnu.org>
+
+	* COPYING: Update to GPL version 3.
+
+2008-04-07  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	* doc/ref.xml, doc/user.xml: Fix typos.
+	* doc/dejagnu.texi: Regenerate.
+
+2008-04-06  Daniel Jacobowitz  <drow@false.org>
+
+	* Makefile.am (RUNTESTDEFAULTFLAGS): Add RUNTEST=$(RUNTEST).
+	* Makefile.in: Regenerate.
+	* dejagnu.exp (host_execute): Improve regexp matching.
+	* testsuite/libdejagnu/unit.cc: C++ fixes.
+
+2008-04-06  Daniel Jacobowitz  <drow@false.org>
+
+	* lib/utils.exp (diff): Open both files as binary.
+
+2008-04-06  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* dejagnu.h (totals): Correct typos.
+
+2008-04-06  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* doc/user.xml (Adding a New Tool, Adding a New Target): Fix typos.
+	* doc/dejagnu.texi: Regenerate.
+
+2008-02-25  Ben Elliston  <bje@gnu.org>
+
+	* doc/runtest.1: Update date of last revision.
+
+2008-02-11  Hans-Peter Nilsson  <hp@axis.com>
+
+	* baseboards/h8300.exp: Use -- before switch argument that may
+	begin with "-".
+	* baseboards/cris-sim.exp: Ditto.
+
+2008-02-11  Hans-Peter Nilsson  <hp@axis.com>
+
+	* Makefile.am (baseboard_SCRIPTS): Add scripts cris-sim.exp,
+	iq2000-sim.exp and m32r-linux-sim.exp.
+	* Makefile.in: Regenerate.
+
+2008-02-08  Ben Elliston  <bje@gnu.org>
+
+	* baseboards/cris-sim.exp: Fix MS-DOS line termination.
+
+2007-12-28  Joseph Myers  <joseph@codesourcery.com>
+
+        * lib/target.exp (default_link): Initialize nobjects before use.
+
+2007-12-06  Ben Elliston  <bje@gnu.org>
+
+	* lib/dg.exp (dg_bogus): Comment fix.
+
+2007-10-31  DJ Delorie  <dj@redhat.com>
+
+	* lib/framework.exp (open_logs): Line buffer the .sum file.
+
+2007-09-04  Matt Kraai  <kraai@ftbfs.org>
+
+	* doc/user.xml (Configuration): Fix typos.
+	* doc/dejagnu.texi: Regenerate.
+
+2007-08-28  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* lib/remote.exp (standard_send): Correct quoting.
+
+2007-05-17  Ben Elliston  <bje@gnu.org>
+
+	* doc/user.xml: Correct the syntax for running apt-get on a Debian
+	GNU/Linux system. From Peter Welte <weltepe@gmail.com>.
+
+2007-04-30  Bob Wilson  <bob.wilson@acm.org>
+
+	* baseboards/xtensa-sim.exp: Set target_install.  Stop using
+	basic-sim.exp.  Run the simulator with --turbo option.  Replace
+	needs_status_wrapper with the simulator's --exit_with_target_code
+	option. 
+
+2006-10-15  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* dejagnu.h: Add support for for expected failures and
+	unexpected successes.
+
+2005-05-06  Andrew Fyfe <a.fyfe@tiscali.co.uk>
+
+	* doc/Makefile.am: Fix install path for man page.
+	* Makefiles: Regenerated.
+
+2006-08-29  Ben Elliston  <bje@gnu.org>
+
+	* runtest.exp (usage): Use "triplet" instead of "config name".
+
+2006-07-13  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* Makefile.am (DOCBOOK2RTF): Fix typo.
+	* Makefile.in: Regenerated.
+	* lib/libgloss.exp (process_multilib_options): Use -- to handle
+	options starting with hyphens.
+
+2006-06-23  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* libgloss.exp (find_gnatmake): Rewrite.
+
+2006-03-30  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* rsh.exp (rsh_exec): Handle inp and outp arguments.  Use
+	local_exec to run rsh.  Return failure if rsh times out.
+	* remote.exp (local_exec): Handle "|& cat" we added when deciding
+	whether to return output.
+
+2006-06-09  Ben Elliston  <bje@gnu.org>
+
+	* baseboards/cris-sim.exp: Use Tcl fall-through syntax for
+	multiple cases, not a list (case uses lists, switch does not).
+	Pass -glob to switch where applicable to emulate case behaviour.
+	* baseboards/h8300.exp: Likewise.
+	* lib/framework.exp (clone_output): Likewise.
+	(clear_xfail): Likewise.
+	(clear_kfail): Likewise.
+	* lib/libgloss.exp (process_multilib_options): Likewise.
+	* runtest.exp: Likewise.
+
+2006-06-06  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (CONTRIB): New.
+	(EXTRA_DIST): Add $(CONTRIB).
+	(doc/dejagnu.texi): Set directory-category param to docbook2texi.
+	* Makefile.in: Regenerate.
+	* doc/dejagnu.texi: Likewise.
+
+2006-06-06  Ben Elliston  <bje@gnu.org>
+
+	* runtest.exp (load_lib): Typo fix.
+
+2006-06-06  Ben Elliston  <bje@gnu.org>
+
+	* dejagnu.h: Tidy comments.
+	(_BUFFER_SIZE_): Remove to minimise namespace pollution.
+	(wait): Define this function unconditionally.  Conditionally
+	compile the function body if _DEJAGNU_WAIT_ is defined.
+	(buffer): Set the buffer size explicitly.
+	(pass): Use sizeof (buffer).  Call wait() unconditionally.
+	(fail, untested, unresolved, note): Likewise.
+	(enum teststate): Tidy whitespace.
+
+2006-06-06  Ben Elliston  <bje@gnu.org>
+
+	* doc/dejagnu.xml, doc/ref.xml, doc/user.xml: Edits.
+	* doc/dejagnu.texi: Regenerate.
+
+2006-06-06  Ben Elliston  <bje@gnu.org>
+
+	Import from GCC tree:
+	2006-06-02  Richard Earnshaw  <rearnsha@arm.com>
+		    Mike Stump  <mrs@apple.com>
+
+	* compare_tests: Handle multilibs better.
+
+2006-06-06  Ben Elliston  <bje@gnu.org>
+
+	* doc/dejagnu.texi: Regnerate using Docbook2X 0.8.7.
+
+	* configure.ac: Check for docbook2texi, not docbook2x-texi.  The
+	wrapper script changed its name again in the latest release.
+	* configure: Regenerate.
+	* Makefile.am (DOCBOOK2X_TEXI): Rename from this ..
+	(DOCBOOK2TEXI): .. to this.
+	(doc/dejagnu.texi): Do not use output-file parameter to deposit
+	the .texi file into the source directory; use mv(1) instead. Set
+	directory-description parameter.
+	* Makefile.in: Likewise.
+
+2006-06-02  Ben Elliston  <bje@gnu.org>
+
+	* config/sim.exp (sim_upload): Match up argument names.
+
+2006-06-02  Ben Elliston  <bje@gnu.org>
+
+	* config.guess: Update to most recent version.
+	* config.sub: Likewise.
+
+2006-06-02  Ben Elliston  <bje@gnu.org>
+
+	* config/dos.exp (dos_open): Only run global board_info once at
+	the beginning of the proc; remove duplicates.
+	(dos_load): Use file join to separate path components.
+	(dos_copy_upload): Likewise.
+	* lib/remote.exp (call_remote): Use error, not "blooie" to trigger
+	an error.
+
+2006-06-02  Ben Elliston  <bje@gnu.org>
+
+	* contrib/compare_tests: Import from the GCC contrib directory.
+
+2006-05-24  Ben Elliston  <bje@gnu.org>
+
+	* runtest.exp (verbose): Brace some expressions.
+	(load_file, search_and_load_file): Likewise.
+	(runtest): Likewise.
+
+2006-05-23  Ben Elliston  <bje@gnu.org>
+
+	* config/gdb-comm.exp (gdb_comm_load): Brace some expressions.
+	* config/i960.exp (i960_spawn): Initialise status.
+	* config/netware.exp (${board}_init): Brace some if expressions.
+	* lib/dg.exp (dg-test): Brace some expressions.
+	* lib/framework.exp (clone_output, log_and_exit, log_summary,
+	record_test, pass, fail): Likewise.
+	* lib/libgloss.exp (get_multilibs): Likewise.
+	* lib/remote.exp (standard_transmit, unix_clean_filename,
+	remote_load, check_for_board_status, remote_expect): Likewise.
+	* lib/rsh.exp (rsh_exec): Likewise.
+
+2006-05-22  Ben Elliston  <bje@gnu.org>
+
+	* baseboards/cris-sim.exp: Use switch, not case.
+	* baseboards/h8300.exp: Likewise.
+	* config/base68k.exp (base68k_ld): Brace an if expression.
+
+2006-05-22  Ben Elliston  <bje@gnu.org>
+
+	* runtest.exp, baseboards/basic-sim.exp, baseboards/cf.exp,
+	baseboards/cris-sim.exp, baseboards/i960-cyclone.exp,
+	baseboards/mcore-moto-sim.exp, baseboards/mips64vr4100-sim.exp,
+	baseboards/mmixware-sim.exp, baseboards/op50n.exp,
+	baseboards/rom68k-idp.exp, baseboards/sparclite-sim-le.exp,
+	baseboards/usparc-cygmon.exp, config/base-config.exp,
+	config/base68k.exp, config/ddb-ether.exp, config/ddb.exp,
+	config/dos.exp, config/gdb-comm.exp, config/gdb_stub.exp,
+	config/i386-bozo.exp, config/i960.exp, config/m68k-emc.exp,
+	config/netware.exp, config/sid.exp, config/sim.exp,
+	config/tic80.exp, config/unix.exp, config/vxworks.exp,
+	lib/debugger.exp, lib/dejagnu.exp, lib/dg.exp, lib/framework.exp,
+	lib/ftp.exp, lib/kermit.exp, lib/libgloss.exp, lib/remote.exp,
+	lib/rlogin.exp, lib/rsh.exp, lib/target.exp, lib/targetdb.exp,
+	lib/telnet.exp, lib/tip.exp, lib/utils.exp: Put braces around if
+	expressions throughout.
+
+2006-05-22  Ben Elliston  <bje@gnu.org>
+
+	* lib/framework.exp (open_logs): Use file join where applicable.
+	* lib/libgloss.exp (libgloss_link_flags, newlib_link_flags,
+	newlib_include_flags, g++_link_flags, libstdc++_link_flags,
+	get_multilibs, winsup_include_flags, winsup_link_flags): Likewise.
+	* lib/utils.exp (which): Likewise.
+	* runtest.exp (search_and_load_file, lookfor_file,
+	load_tool_init): Likewise.
+
+	* lib/debugger.exp (watcharray): Add `array' parameter.  Rename
+	`type' parameter to `op' and update all uses in the proc.
+	(watchvar): Add `ignore' parameter for scalar variables.
+	Likewise, rename `type' to `op' and update throughout the proc.
+	
+	* runtest.exp: Use switch, not case.
+	* lib/framework.exp (clone_output): Likewise.
+	(clear_xfail): Likewise.
+	(clear_kfail): Likewise.
+	(set_warning_threshold): Make warning_threshold global.
+	(get_warning_threshold): Likewise.
+	* lib/libgloss.exp (process_multilib_options): Use switch, not
+	case.
+	* lib/remote.exp (local_exec): Only run global errorInfo once.
+	(standard_upload): Fix error in variable use ($file -> $srcfile).
+	* lib/utils.exp (grep): Use switch, not case.
+	(slay): Fix mismatched bracket.
+
+	* lib/debugger.exp (watcharray): Use switch, not case.
+	(watchvar): Likewise.
+	(bt): Add an explanatory comment.
+
+2006-04-03  Ben Elliston  <bje@gnu.org>
+
+	* lib/debugger.exp, lib/dejagnu.exp, lib/dg.exp,
+	lib/framework.exp, lib/libgloss.exp, lib/remote.exp,
+	lib/rlogin.exp, lib/target.exp, lib/telnet.exp: Formatting.
+
+2006-01-02  Ben Elliston  <bje@gnu.org>
+
+	* configure.ac (AC_INIT): Set version to 1.4.99.
+	* configure: Regenerate.
+
+2006-01-01  Ben Elliston  <bje@gnu.org>
+
+	* testsuite/runtest.all/utils.test: Add runtest_file_p.
+
+2006-01-01  Ben Elliston  <bje@gnu.org>
+
+	* runtest.exp (frame_version): Set to 1.4.99.
+
+2006-01-01  Ben Elliston  <bje@gnu.org>
+
+	* dejagnu.h: Update copyright notice.  Use C-style /* .. */
+	comments for portability with ISO C compilers.
+	* testsuite/libdejagnu/unit.cc: Likewise, update copyright notice.
+
+2006-01-01  Ben Elliston  <bje@gnu.org>
+
+	* runtest.exp: Update copyright notice.
+	* example/calc/testsuite/calc.test/calc.exp: Likewise.
+	* example/calc/testsuite/config/unix.exp: Likewise.
+	* testsuite/libdejagnu/tunit.exp: Likewise.
+	* testsuite/runtest.all/libs.exp: Likewise.
+	* testsuite/runtest.all/options.exp: Likewise.
+	* testsuite/runtest.all/stats-sub.exp: Likewise.
+	* testsuite/runtest.all/stats.exp: Likewise.
+
+2006-01-01  Ben Elliston  <bje@gnu.org>
+
+	* config/default.exp, config/unix.exp, config/vxworks.exp,
+	lib/debugger.exp, lib/dejagnu.exp, lib/framework.exp,
+	lib/libgloss.exp, lib/remote.exp, testsuite/lib/util-defs.exp:
+	Formatting fixes.
+	* dejagnu.h, testsuite/config/default.exp,
+	testsuite/lib/libsup.exp, testsuite/libdejagnu/tunit.exp,
+	testsuite/libdejagnu/unit.cc, testsuite/runtest.all/libs.exp,
+	testsuite/runtest.all/options.exp,
+	testsuite/runtest.all/stats-sub.exp,
+	testsuite/runtest.all/stats.exp: Update copyright notice and FSF
+	office address. Remove bug reporting address, as it is now
+	maintained centrally in the README file.
+
+2005-12-31  Ben Elliston  <bje@gnu.org>
+
+	* testsuite/runtest.all/utils.test: Don't bother mentioning
+	absolute, psource, prune and slay as untested procedures.
+
+2005-12-31  Ben Elliston  <bje@gnu.org>
+
+	* doc/ref.xml (Utility Procedures): Note that the following
+	procedures are deprecated: absolute, psource, prune, slay.
+	* NEWS: Likewise.
+	* doc/dejagnu.texi: Regenerate.
+
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (doc/dejagnu.texi): Don't use shell redirection, in
+	case the command fails and zeroes the Texinfo source file.  Move
+	the output (if successful) by its default filename using mv(1).
+	* Makefile.in: Regenerate.
+
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* configure.ac (DOCBOOK2X_TEXI): Add search for this program.
+	* configure: Regenerate.
+	* Makefile.am (DOCBOOK2PDF, DOCBOOK2RTF, DOCBOOK2PS): New.
+	(DOCBOOK2HTML, DOCBOOK2X_TEXI): Likewise.
+	(dejagnu.pdf): Use $(DOCBOOK2PDF).
+	(dejagnu.ps): Likewise, use $(DOCBOOK2PS).
+	(dejagnu.rtf): Likewise, use $(DOCBOOK2RTF).
+	(html): Likewise, use $(DOCBOOK2HTML).
+	(doc/dejagnu.texi): Produce using the docbook2x-texi wrapper,
+	which is much simpler. Likewise, use $(DOCBOOK2X_TEXI).
+	* Makefile.in: Regenerate.
+
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (EXTRA_DIST): Remove $(PACKAGING_METAFILES).
+	(XML): Remove $(srcdir) from each filename; VPATH suffices.
+	(PACKAGING_METAFILES): Remove.
+	* Makefile.in: Regenerate.
+
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* README: Rewrite.
+
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* COPYING: Update.
+
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* testsuite/libdejagnu/tunit.exp: Don't change to a non-existent
+	subdirectory.
+
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (RUNTEST): Simplify, as Automake already generates
+	similar logic in Makefile.in.
+	* Makefile.in: Regenerate.
+	
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (RUNTESTDEFAULTFLAGS): Omit --tool so that
+	libdejagnu tests are run too.
+	* Makefile.in: Regenerate.
+
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* configure: Regenerate.
+
+	* lib/remote.exp: Tidy.
+	* lib/targetdb.exp: Likewise.
+	* lib/target.exp (prune_warnings): Improve comments.
+	* lib/dejagnu.exp: Likewise.
+	* lib/utils.exp: Likewise.
+
+	* NEWS: Update.
+
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* doc/dejagnu.xml: Don't use apostrophes in section titles.
+	* doc/dejagnu.texi: Regenerate.
+
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (XML): Include $(srcdir) in filenames.
+	* Makefile.in: Regenerate.
+
+2005-12-24  Ben Elliston  <bje@gnu.org>
+
+	* doc/C/Makefile.am: Remove.
+	* doc/C/Makefile.in: Likewise.
+
+	* Makefile.am (SUBDIRS): Remove.
+	(EXTRA_DIST): Append $(XML).
+	(dist_man_MANS): Define.
+	(info_TEXINFOS): Likewise.
+	(XML): List XML source files.
+	(dejagnu.pdf): New target.
+	(dejagnu.ps): Likewise.
+	(dejagnu.rtf): Likewise.
+	(html): Likewise.
+	(dejagnu.texi): Special rule to build Texinfo source.
+	* Makefile.in: Regenerate.
+	* configure.ac: Don't search for docbook2dvi.
+	Search for docbook2rtf and docbook2pdf.
+	Don't output doc/Makefile or doc/C/Makefile.
+	* configure: Regenerate.
+	* doc/texinfo.tex: Move from here ..
+	* texinfo.tex: .. to here.
+	* doc/Makefile.am: Remove.
+	* doc/Makefile.in: Likewise.
+	* doc/C/dejagnu.omf: Likewise.
+	* doc/C/topic.dat: Likewise.
+	* doc/C/dejagnu.xml: Move from here ..
+	* doc/dejagnu.xml: .. to here.
+	* doc/C/legal.xml: Move from here ..
+	* doc/legal.xml: .. to here.
+	* doc/C/ref.xml: Move from here ..
+	* doc/ref.xml: .. to here.
+	* doc/C/user.xml: Move from here ..
+	* doc/user.xml: .. to here.
+	* doc/dejagnu.texi: Rebuild from XML source.
+
+2005-12-23  Ben Elliston  <bje@gnu.org>
+
+	* doc/runtest.1: Update manual page.
+
+2005-12-23  Ben Elliston  <bje@gnu.org>
+
+	* doc/overview.sgml: Remove in favour of XML versions.
+	* doc/ref.sgml: Ditto.
+	* doc/user.sgml: Ditto.
+	* doc/texinfo.tex: Import new version.
+
+2005-12-20  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (SUBDIRS): Remove testsuite, example.
+	(EXTRA_DIST): Add $(TESTSUITE_FILES).
+	(TESTSUITE_FILES): New.
+	(RUNTEST, RUNTESTDEFAULTFLAGS): New.
+	(AM_CXXFLAGS): Set.
+	(check_PROGRAMS): New.
+	(unit_SOURCES): New.
+	* Makefile.in: Regenerate.
+	* configure.ac (AC_OUTPUT): Don't output example/Makefile,
+	testsuite/Makefile or testsuite/libdejagnu/Makefile.
+	* configure: Regenerate.
+	* testsuite/Makefile.am: Remove.
+	* testsuite/Makefile.in: Likewise.
+	* testsuite/libdejagnu/Makefile.am: Likewise.
+	* testsuite/libdejagnu/Makefile.in: Likewise.
+
+2005-12-20  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (baseboard_SCRIPTS): Rename ms1->mt.
+	* Makefile.in: Regenerate.
+
+2005-12-20  Ben Elliston  <bje@gnu.org>
+
+	* configure: Regenerate with autoconf 2.59.
+	* aclocal.m4: Regenerate with aclocal 1.9.6.
+	* Makefile.in: Regenerate with automake 1.9.6.
+	* doc/Makefile.in: Likewise.
+	* doc/C/Makefile.in: Likewise.
+	* example/Makefile.in: Likewise.
+	* testsuite/Makefile.in: Likewise.
+	* testsuite/libdejagnu/Makefile.in: Likewise.
+
+2005-12-20  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* baseboards/ms1-sid.exp: Rename from this ..
+	* baseboards/mt1-sid.exp: .. to this. Update ms1->mt within.
+
+2005-12-20  Ben Elliston  <bje@gnu.org>
+
+	* config.guess: Update to most recent version.
+	* config.sub: Likewise.
+
+2005-09-24  Ben Elliston  <bje@gnu.org>
+
+	* packaging/pkg/pkginfo (EMAIL): Update mail address.
+
+	* lib/rsh.exp: Tidy comments.
+
+2005-07-07  Ben Elliston  <bje@gnu.org>
+
+	* lib/telnet.exp (telnet_transmit): Remove; use standard method.
+
+2005-07-07  Ben Elliston  <bje@gnu.org>
+
+	* Makefile.am (baseboard_SCRIPTS): Add ms1-sid.exp.
+	* Makefile.in: Regenerate.
+
+2005-07-06  Ben Elliston  <bje@gnu.org>
+
+	* lib/tip.exp (tip_open): Improve comments.
+	(tip_download): Likewise.
+
+2005-07-06  Ben Elliston  <bje@gnu.org>
+
+	* lib/telnet.exp (telnet_open): Improve option handling.  Clarify
+	documentation for each proc.
+
+2005-07-06  Ben Elliston  <bje@gnu.org>
+
+	* aclocal.m4: Regenerate with aclocal 1.9.
+	* configure: Regenerate with autoconf 2.59.
+	* doc/C/Makefile.am: Remove stray include.
+	* Makefile.in, doc/Makefile.in, doc/C/Makefile.in,
+	example/Makefile.in, testsuite/Makefile.in,
+	testsuite/libdejagnu/Makefile.in: Regenerate with automake 1.9.
+
+2005-07-06  Ben Elliston  <bje@gnu.org>
+
+	Import some missing hunks from this patch on sourceware:
+
+	2004-11-11  Nick Clifton  <nickc@redhat.com>
+
+	* lib/libgloss.exp (libio_include_flags, g++_include_flags,
+	winsup_include_flags): Revert previous patch, restoring the use of
+	-I, for all libraries except newlib.  Newlib needs -isystem to
+	avoid the problems with <limits.h> but the C++ and winsup
+	libraries need -I because -isystem generates an implicit 'extern
+	"C"' which may not be appropriate for certain targets.
+
+2005-07-06  Aldy Hernandez  <aldyh@redhat.com>
+
+	* baseboards/ms1-sid.exp: New.
+
+2005-07-01  Ben Elliston  <bje@gnu.org>
+
+	Unify some changes with the 1.4 branch:
+
+	2004-10-28  Nick Clifton  <nickc@redhat.com>
+	* baseboards/iq2000-sim.exp: New file.
+
+	2004-06-08  Alexandre Oliva  <aoliva@redhat.com>
+	* baseboards/mn10300-sim.exp: Set needs_status_wrapper and
+	noresults to zero.
+
+	2004-05-13  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
+	* baseboards/m32r-linux-sim.exp: Add New file.
+
+2005-06-24  Ben Elliston  <bje@gnu.org>
+
+	* MAINTAINERS: Update my email address.
+
+2005-06-24  Ben Elliston  <bje@gnu.org>
+
+	* Update the FSF's physical address throughout.
+
+2005-06-22  Ben Elliston  <bje@gnu.org>
+
+	* config.guess: Update to most recent version.
+	* config.sub: Likewise.
+
+2005-04-28  Mark Kettenis  <kettenis@gnu.org>
+
+	* lib/target.exp (prune_warnings): Add a few more linker
+	warning patterns for OpenBSD.
+
+2005-03-20  Mark Kettenis  <kettenis@gnu.org>
+
+	* lib/target.exp (prune_warnings): Add linker warning patterns for
+	OpenBSD.
+
+2005-01-29  Hans-Peter Nilsson  <hp@axis.com>
+
+	* baseboards/cris-sim.exp: New file.
+
+2004-11-19  Nick Clifton  <nickc@redhat.com>
+
+	* lib/libgloss.exp (newlib_include_flags): Document why -isystem
+	is used instead of -I.
+	(libio_include_flags): Use -I instead of -isystem and
+	document why.
+	(g++_include_flags): Use -I instead of -isystem.
+	(libstdc++_include_flags): Likewise. 
+
+2004-11-04  Ben Elliston  <bje@gnu.org>
+
+	* lib/dg.exp (dg-test): If a `dg-do run' test fails to compile,
+	mark the test as unresolved, rather than warning.
+
+2004-10-27  Nick Clifton  <nickc@redhat.com>
+
+	* baseboards/iq2000-sim.exp: New file.
+
+2004-08-20  Daniel Jacobowitz  <dan@debian.org>
+
+	* testglue.c: Prototype abort(3) and exit(3).
+
+2004-08-14  Paul Brook  <paul@codesourcery.com>
+
+	* config/sim.exp (sim_download, sim_upload): New procs.
+
+2004-06-30  Ben Elliston  <bje@gnu.org>
+
+	* config.guess: Update to current revision.
+	* config.sub: Likewise.
+
+2004-06-12  Ben Elliston  <bje@gnu.org>
+
+	* config.guess: Update to current revision.
+	* config.sub: Likewise.
+
+2004-06-08  Alexandre Oliva  <aoliva@redhat.com>
+
+	* testglue.c: Prototype abort and exit.
+
+2004-06-08  Alexandre Oliva  <aoliva@redhat.com>
+	
+        * baseboards/mn10300-sim.exp: Set needs_status_wrapper to empty
+        string.
+                                                                                
+Tue Feb 25 05:19:57 UTC 2003  Brendan Conoboy  <blc@@redhat.com>
+
+        * lib/remote.exp (call_remote): Remove multilibs from the board
+	name when rebooting a board.
+
+2004-06-03  Alexandre Oliva  <aoliva@redhat.com>
+
+       * baseboards/mn10300-sim.exp: Set needs_status_wrapper and
+       noresults to zero.
+
+2004-06-07  Ben Elliston  <bje@gnu.org>
+
+	* lib/libgloss.exp (build_wrapper): Remove redundant set command.
+
+2004-03-29  Joel Brobecker  <brobecker@gnat.com>
+
+	* lib/libgloss.exp (find_gnatmake): New procedure.
+	* lib/target.exp (default_target_compile): Add support for Ada.
+
+2004-04-16  Kazuhiro Inaoka  <inaoka dot kazuhiro at renesas dot com>
+                                                                                
+        * baseboards/m32r-linux-sim.exp: Add New file.
+	
+2004-04-02  Rob Savoye  <rob@direwolf.welcomehome.org>
+
+	* configure.ac, example/Makefile.am: Add example/mathhelper.
+	* configure, alocal.m4, example/Makefile.in: Regenerated.
+
+2004-04-02 Joel Sherrill <joel@OARcorp.com>
+
+	* example/mathhelper: New example for using the unit testing API.
+
+2004-03-05  Daniel Jacobowitz  <drow@mvista.com>
+                                                                                
+        * lib/remote.exp (standard_spawn): Fix rsh username support.
+
+2004-03-06  Rob Savoye  <rob@althea.welcomehome.org>
+
+	* doc/C: New directory for DocBook XML files.
+	* doc/C/dejagnu.omf: New config file for scrollkeeper.
+	* doc/C/topic.dat: New config file for the GNOME help system.
+	* doc/C/dejagnu.xml: DocBook XML formatted verion of what was
+	overview.sgml.
+	* doc/C/ref.xml: DocBook XML formatted verion of what was
+	ref.sgml.
+	* doc/C/user.xml: DocBook XML formatted verion of what was
+	user.sgml.
+	
+2004-02-17  Ben Elliston  <bje@wasabisystems.com>
+
+	* runtest.exp: Do not trap SIGSEGV.
+
+2004-02-16  Ben Elliston  <bje@wasabisystems.com>
+
+	* configure.ac: Update AC_INIT and AM_INIT_AUTOMAKE invocations.
+	* configure: Regenerate.
+
+2004-02-09  Ben Elliston  <bje@wasabisystems.com>
+
+	* doc/runtest.1: Improve some wording. Update last revision date.
+
+2004-02-09  Ben Elliston  <bje@wasabisystems.com>
+
+	* NEWS: Document yesterday's work.
+
+	* runtest: Improve comments.
+
+2004-02-09  Ben Elliston  <bje@wasabisystems.com>
+
+	* TODO: Update.
+
+	* testsuite/libdejagnu/unit.cc: Conform with GNU coding standard.
+
+2004-02-08  Ben Elliston  <bje@wasabisystems.com>
+
+	* configure.ac: Quote strings throughout in good Autoconf style.
+	Remove AC_PROG_YACC invocation. Search for docbook2dvi, et al and
+	expect using AC_PATH_PROG. Remove DJ_AC_PATH_DOCBOOK in favour of
+	existing macros. Remove stale BOARDS and CONFIG substs. Ensure Tcl
+	is at version 8.3 or greater.
+	* configure: Regenerate.
+	* acinclude.m4: Remove.
+	* aclocal.m4: Regenerate.
+	* Makefile.in: Likewise.
+	* doc/Makefile.am (%.pdf: %.sgml): Use $(DOCBOOK2PDF).
+	(%.dvi: %.sgml): Use $(DOCBOOK2DVI).
+	(%.html: %.sgml): Use $(DOCBOOK2HTML).
+	* doc/Makefile.in: Regenerate.
+	* example/Makefile.in: Likewise.
+	* testsuite/Makefile.in: Likewise.
+	* testsuite/libdejagnu/Makefile.in: Likewise.
+	* TODO: Update.
+
+2004-02-08  Daniel Jacobowitz  <drow@mvista.com>
+
+	* baseboards/cf.exp: Use -T instead of -Wl,-T for ldscript.
+	* baseboards/fr30-elf.exp, baseboards/frv-elf.exp,
+	baseboards/h8300.exp, baseboards/i960-cyclone.exp,
+	baseboards/i960-sim.exp, baseboards/m32r-elf.exp,
+	baseboards/mips-idt.exp, baseboards/mips-lnews-sim.exp,
+	baseboards/mips-lsi-sim.exp, baseboards/mips64vr4100-sim.exp,
+	baseboards/op50n.exp, baseboards/rom68k-idp.exp,
+	baseboards/sh-hms.exp, baseboards/tx39-dve.exp,
+	baseboards/vr4100-ddb.exp, baseboards/vr4100-sim.exp,
+	baseboards/vr4111-sim.exp, baseboards/vr4300-ddb.exp,
+	baseboards/vr4300-sim.exp, baseboards/vr4300.exp,
+	baseboards/vr5000-ddb.exp: Likewise.
+
+2004-02-08  Ben Elliston  <bje@wasabisystems.com>
+
+	* runtest: Terminate with an error if expect cannot be found.
+	* TODO: Update.
+
+2004-02-08  Ben Elliston  <bje@wasabisystems.com>
+
+	* configure.ac: Use AC_PATH_PROG to find expect(1).
+	(DJ_AC_PATH_TCLSH): Remove unneeded invocation.
+	* acinclude.m4 (DJ_AC_PATH_TCLSH): Remove.
+	(DJ_AC_STL): Likewise.
+	* configure: Regenerate.
+	* aclocal.m4: Likewise.
+	* configure: Likewise.
+	* Makefile.in: Likewise.
+	* doc/Makefile.in: Likewise.
+	* example/Makefile.in: Likewise.
+	* testsuite/Makefile.in: Likewise.
+	* testsuite/libdejagnu/Makefile.in: Likewise.
+	* TODO: Update.
+
+2004-02-08  Ben Elliston  <bje@wasabisystems.com>
+
+	* runtest.1: Remove any mention of mondfe.
+	
+2004-02-08  Ben Elliston  <bje@wasabisystems.com>
+
+	* TODO: Add an item about timeouts.
+
+2004-02-08  Daniel Jacobowitz  <drow@mvista.com>
+
+	* baseboards/basic-sim.exp: Set gdb,do_reload_on_run.
+
+2004-02-08  Ben Elliston  <bje@wasabisystems.com>
+
+	* lib/standard.exp: Tidy.
+
+2004-02-07  Ben Elliston  <bje@wasabisystems.com>
+
+	* Makefile.am (pkgdata_SCRIPTS): Remove lib/mondfe, lib/xsh.exp.
+	(config_SCRIPTS): Remove udi.exp, vrtx.exp.
+	(baseboard_SCRIPTS): Remove a29k-udi.exp.
+	* Makefile.in: Regenerate.
+	* baseboards/a29k-udi.exp: Remove.
+	* baseboards/dos.exp: Update comments.
+	* config/udi.exp: Remove.
+	* config/vrtx.exp: Remove.
+	* doc/overview.sgml: Update. Don't mention mondfe and xsh support.
+	* doc/ref.sgml: Likewise.
+	* doc/user.sgml: Likewise.
+	* lib/mondfe.exp: Remove.
+	* lib/xsh.exp: Likewise.
+	* lib/remote.exp: Don't load mondfe.exp or xsh.exp.
+	* packaging/pkg/prototype: Update.
+	* NEWS: Update.
+	
+2004-02-07  Ben Elliston  <bje@wasabisystems.com>
+	
+	* Makefile.am (rpmspec): Remove.
+	(rpm): Additionally depend on dejagnu.spec.
+	($(PKGDIR)/dejagnu): New target that installs DejaGnu into this
+	directory.  This saves duplicated code in the solpkg and hpdepot
+	targets.
+	(solpkg): Depend on $(PKGDIR)/dejagnu.
+	(hpdepot): Likewise.
+	* Makefile.in: Regenerate.
+
+2004-02-07  Ben Elliston  <bje@wasabisystems.com>
+
+	* Makefile.am (RUNTEST, RUNTESTDEFAULTFLAGS): Remove.
+	* Makefile.in: Regenerate.
+	* testsuite/Makefile.am (CLEANFILES): Remove.
+	(RUNTESTDEFAULTFLATS): Pass --srcdir and RUNTEST=$(RUNTEST).
+	* testsuite/Makefile.in: Regenerate.
+	
+2004-02-07  Ben Elliston  <bje@wasabisystems.com>
+
+	* lib/util-defs.exp: Move from here ..
+	* testsuite/lib/util-defs.exp: .. to here.
+	* Makefile.am (EXTRA_DIST): Remove lib/util-defs.exp.
+	* Makefile.in: Regenerate.
+	* testsuite/Makefile.am (EXTRA_DIST): Add lib/util-defs.exp.
+	* testsuite/Makefile.in: Regenerate.
+	* doc/ref.sgml (File Map): Remove util-defs.exp.
+	* packaging/pkg/prototype: Update file list.
+
+2004-02-07  Ben Elliston  <bje@wasabisystems.com>
+
+	* NEWS: Document changes since 1.4.4.
+
+2004-02-07  Ben Elliston  <bje@wasabisystems.com>
+
+	* example/Makefile.am (check-recursive): Remove target.
+	* example/Makefile.in: Regenerate.
+
+2004-02-07  Ben Elliston  <bje@wasabisystems.com>
+
+	* dejagnu.h: Conform with GNU coding standard.
+
+2004-02-07  Ben Elliston  <bje@wasabisystems.com>
+
+	* Makefile.am (PKGING): Remove.
+	(PACKAGING_METAFILES): Update accordingly.
+	(CLEANFILES, check-DEJAGNU): Remove.
+	(tarball): Remove; use `dist'.
+	(deb): Update target recipe to use `make dist'.
+
+2004-02-07  Ben Elliston  <bje@wasabisystems.com>
+
+	* Clean.tcl: Remove.
+
+	* Makefile.am (SUBDIRS): Add testsuite, example directories.
+	(EXTRA_DIST): Define.
+	(pkgdata_SCRIPTS): Add lib/*.exp files.
+	(DATE, TCLSH): Remove.
+	(configdir, config_DATA, config_SCRIPTS): Define.
+	(baseboarddir, baseboard_DATA, baseboard_SCRIPTS): Likewise.
+	(pkgdata_DATA): Likewise.
+	(djlibexecdir, djlibexec_SCRIPTS): Likewise.
+	(PKGING, PACKAGING_METAFILES): New macros.
+	(clean-local): Remove.
+	(rpm): Depend on dist.
+	(deb): Likewise.
+	(dist-hook): Remove.
+	(lib_dest, lib_files): Likewise.
+	(baseboard_dest, baseboard_files): Likewise.
+	(include_dest, config_dest, config_files): Likewise.
+	(install-data-local): Likewise.
+	(uninstall-local): Likewise.
+	(site.exp): Likewise.
+	* Makefile.in: Regenerate.
+	
+	* testsuite/Makefile.am (all, all-am, etcetera): Remove.
+	(force): Likewise.
+	(EXTRA_DIST): Define.
+	(site.exp): Remove target.
+	* testsuite/Makefile.in: Regenerate.
+	* testsuite/libdejagnu/Makefile.am (EXTRA_DIST): Define.
+	(noinst_PROGRAMS): Rename from this ..
+	(check_PROGRAMS): .. to this.
+	* testsuite/libdejagnu/Makefile.in: Regenerate.
+
+	* doc/Makefile.am (man_MANS): Rename from this ..
+	(dist_man_MANS): .. to this.
+	(info_TEXINFOS): Define.
+	(TARGETS): Remove overview.rtf.
+	(EXTRA_DIST): Define.
+	(%.rtf: %.sgml): Remove rule.
+	(%.gif: %.fig): Likewise.
+	(%.epsi: %.eps): Likewise.
+	(%.eps: %.fig): Likewise.
+	(clean, realclean, distclean): Remove.
+	(install-docs): Don't install overview.rtf.
+	* doc/Makefile.in: Regenerate.
+	* doc/texinfo.tex: New file.
+
+	* example/calc/Makefile.am (noinst_PROGRAMS): Rename from this ..
+	(check_PROGRAMS): .. to this.
+	(EXTRA_DIST): Add test cases and calc.1 man page.
+	* example/calc/Makefile.in: Regenerate.
+	* example/calc/aclocal.m4: Likewise.
+	* example/calc/configure: Likewise.
+	* example/calc/stamp-h.in: Remove.
+	* example/hello/Makefile.am (bin_PROGRAMS): Rename from this ..
+	(check_PROGRAMS): .. to this.
+	(EXTRA_DIST): Define.
+	* example/hello/Makefile.in: Regenerate.
+	* example/hello/aclocal.m4: Likewise.
+	* example/hello/configure: Likewise.
+	* example/hello/testsuite/Makefile.am (EXTRA_DIST): Define.
+	* example/hello/testsuite/Makefile.in: Regenerate.
+
+2004-02-07  Ben Elliston  <bje@wasabisystems.com>
+
+	* configure.ac: Remove commented out code.
+	* configure: Regenerate.
+
+2004-02-06  Ben Elliston  <bje@wasabisystems.com>	
+
+	* site.tmpl: Tidy.
+
+2004-02-06  Ben Elliston  <bje@wasabisystems.com>
+
+	* INSTALL: Import latest version.
+	* depcomp: Likewise.
+	* install-sh: Likewise.
+	* missing: Likewise.
+
+2004-02-06  Ben Elliston  <bje@wasabisystems.com>
+
+	* configure.in: Rename from this ..
+	* configure.ac: .. to this.  Require Autoconf 2.50.
+	* Makefile.in: Regenerate.
+	* doc/Makefile.in: Likewise.
+	* example/Makefile.in: Likewise.
+	* testsuite/Makefile.in: Likewise.
+	* testsuite/libdejagnu/Makefile.in: Likewise.
+
+2004-02-06  Ben Elliston  <bje@wasabisystems.com>
+
+	* lib/target.exp (prune_warnings): Add spaces where required in
+	NetBSD warnings.  Supersedes a patch in pkgsrc's devel/dejagnu.
+
+2004-02-05  Ben Elliston  <bje@wasabisystems.com>
+
+	* config.guess: Update to current revision.
+	* config.sub: Likewise.
+
+2004-02-04  Ben Elliston  <bje@wasabisystems.com>
+
+	* configure.in (AC_NO_EXECUTABLES): Remove.
+	* configure: Rebuild with Autoconf 2.59.
+	* acinclude.m4 (DJ_AC_STL): Quote macro name to appease aclocal.
+	(DJ_AC_PATH_TCLSH): Likewise.
+	(DJ_AC_PATH_DOCBOOK): Likewise.
+	* aclocal.m4: Rebuild.
+	* Makefile.in: Rebuild with Automake 1.8.2.
+	* doc/Makefile.in: Likewise.
+	* example/Makefile.in: Likewise.
+	* testsuite/Makefile.in: Likewise.
+	* testsuite/libdejagnu/Makefile.in: Likewise.
+
+2004-01-30  Ben Elliston  <bje@wasabisystems.com>
+
+	Import orphaned patches from sources.redhat.com:
+
+	2002-05-02  Fernando Nasser  <fnasser@redhat.com>
+	* doc/dejagnu.texi: Document KFAIL and KPASS.
+
+	2002-02-20  Richard Henderson  <rth@redhat.com>
+	* lib/target.exp (prune_warnings): Revert early "In function"
+	strip, as this breaks g++.dg tests.  Match dangerous regexp
+	without the "In function" header.
+
+	2002-02-09  Richard Henderson  <rth@redhat.com>
+	* lib/target.exp (prune_warnings): Strip "In function" etc early.
+	Adjust "dangerous" regexp for glibc's tmpnam warning.
+
+	2001-09-10  Jim Blandy  <jimb@redhat.com>
+	* baseboards/rom68k-idp.exp: Use -Tidpgdb.ld as the linker script,
+	so we get the version of the `outbyte' function that does console
+	output in a way that GDB's rom68k target recognizes.  Note that
+	the board can now do output.
+
+	2000-04-25  Felix Lee  <flee@cygnus.com>
+	* baseboards/tx39-sim.exp: Use idt, not dve linker script.  Delete
+ 	misleading comments and null statements.
+	
+2004-01-30  Ben Elliston  <bje@wasabisystems.com>
+
+	* DejaGnu 1.4.4 released.
+
+2004-01-27  Ben Elliston  <bje@wasabisystems.com>
+
+	* Makefile.am (tarball): Depend on book1.html, not overview.html.
+	Don't echo needless messages. Portably copy the source tree to
+	dejagnu-${VERSION}.  Portably copy documentation files from the
+	source tree to the distribution directory.  Don't copy RPM-related
+	files -- leave that to the rpm target.
+	(snapshot): Remove target.
+	(overview.html): Rename target from this ..
+	(book1.htm): .. to this.
+	(rpm): Portably copy tar file to SOURCES directory.
+	(deb): Depend on book1.html, not overview.html.
+	(dist-hook): Depend on book1.html, not overview.html.
+	* Makefile.in: Rebuild.
+	* doc/Makefile.am (TARGETS): Depend on book1.html.
+	(book1.html): Depend on html/book1.html.
+	(overview.dvi): Remove target.
+	* doc/Makefile.in: Rebuild.
+
+2004-01-27  Ben Elliston  <bje@wasabisystems.com>
+
+	* Clean.tcl: Run tclsh via /usr/bin/env for portability.
+	(cleanfiles): Concatenate regular filenames that match .*.
+
+2004-01-12  Ben Elliston  <bje@wasabisystems.com>
+
+	* baseboards/frv-sim.exp: Remove reference to devo/sim.
+
+2004-01-27  Ben Elliston  <bje@wasabisystems.com>
+
+	* doc/overview: Remove all files.
+
+2003-12-03  Ben Elliston  <bje@wasabisystems.com>
+
+	* testsuite/runtest.all/utils.test: Fix a test for proc find which
+	assumed that "subsubfile1" would appear at the end of the returned
+	list.  Adjust to use a more robust regular expression.
+
+2003-11-26  Ben Elliston  <bje@wasabisystems.com>
+
+	* doc/overview.sgml (version): Update.
+	* doc/overview/installation.html: Likewise.
+
+	* packaging/rpm/dejagnu.spec: Update version numbers throughout.
+	* packaging/pkg/pkginfo: Likewise.
+	* packaging/depot/dejagnu.psf: Likewise.
+	
+2003-10-25  Ben Elliston  <bje@wasabisystems.com>
+
+	* runtest.exp (frame_version): Bump version.	
+	* configure.in (AM_INIT_AUTOMAKE): Likewise.
+	* configure: Regenerate.
+
+2003-10-16  Rob Savoye   <rob@welcomehome.org>
+
+	* packaging/prototype: Remove sh-hms-sim.exp, add sh-sim.
+
+2003-10-13  Ben Elliston  <bje@wasabisystems.com>
+
+	* baseboards/sh-hms-sim.exp: Remove. Replaced by sh-sim.exp.
+
+2003-10-11  Corinna Vinschen  <vinschen@redhat.com>
+
+	* baseboards/sh-sim.exp: New file.
+
+2003-10-11  Ben Elliston  <bje@wasabisystems.com>
+
+	* NEWS: Tidy.
+	* AUTHORS: Don't list maintainers, reference MAINTAINERS instead.
+
+2003-10-08  Ben Elliston  <bje@wasabisystems.com>
+
+	* i960glue.c: Remove.
+	* packaging/pkg/prototype: Remove i960glue.c.
+
+2003-10-07  Ben Elliston  <bje@wasabisystems.com>
+
+	* contrib/README: Remove.
+	* contrib/testit: Remove bitrotten script.
+	* contrib/test-g++: Likewise.
+	* contrib/test-tool: Likewise.
+
+2003-08-23  Ben Elliston  <bje@wasabisystems.com>
+
+	* TODO: Tidy.
+	* contrib/README: Bring up to date.
+
+2003-08-23  Corinna Vinschen  <vinschen@redhat.com>
+
+	* config/sid.exp: Add gdb settings to use no hardware watchpoints.
+
+2003-08-23  Ben Elliston  <bje@wasabisystems.com>
+
+	* README: Update section on reporting bugs.
+
+2003-08-22  Ben Elliston  <bje@wasabisystems.com>
+
+	* lib/kermit.exp: Document procs.
+	* lib/ftp.exp: Likewise.
+
+2003-08-19  Ben Elliston  <bje@wasabisystems.com>
+
+	* contrib/testit: Run wish via /usr/bin/env for portability.
+
+2003-08-18  Ben Elliston  <bje@wasabisystems.com>
+
+	* Makefile.am: Tidy comments and unused command lines.
+	* Makefile.in: Regenerate.
+	* testsuite/libdejagnu/Makefile.in: Likewise.
+
+	* contrib/bluegnu2.0.3: Remove unsupported subtree.
+
+2003-08-18  Ben Elliston  <bje@wasabisystems.com>
+
+	* MAINTAINERS: New file.
+
+2003-08-17  Ben Elliston  <bje@wasabisystems.com>
+
+	* doc/Makefile.am (AUTOMAKE_OPTIONS): Remove empty variable.
+	* doc/Makefile.in: Regenerate.
+	
+2003-08-16  Ben Elliston  <bje@wasabisystems.com>
+
+	* doc/overview.sgml (overview): Start overhauling chapter.
+	
+	* doc/README.Writers: New document on style conventions.
+	* doc/ref.sgml: Replace "test suite" with "testsuite" throughout.
+	* doc/user.sgml: Likewise.
+	* doc/overview.sgml: Likewise.
+	* doc/dejagnu.texi (Design Goals): Change "Deja Gnu" to "DejaGnu".
+
+2003-08-12  Ben Elliston  <bje@wasabisystems.com>
+
+	* Makefile.am (tarball): Update path to dejagnu.spec.
+	(rpmspec): Likewise.
+	(deb): Likewise, update path to package metafiles.
+	(solpkg): Likewise.
+	(hpdepot): Likewise.
+	* Makefile.in: Regenerate.
+	* aclocal.m4: Likewise.
+	* configure: Likewise.
+	* doc/Makefile.in: Likewise.
+	* example/Makefile.in: Likewise.
+	* testsuite/Makefile.in: Likewise.
+	* deb: Move from here ..
+	* packaging/deb: .. to here.
+	* redhat: Move from here ..
+	* packaging/rpm: .. to here.
+	* depot: Move from here ..
+	* packaging/depot: .. to here.
+	* pkg: Move from here ..
+	* packaging/pkg: .. to here.
+
+	* testsuite/libdejagnu/Makefile.am (CXXFLAGS): Rename from this ..
+	(AM_CXXFLAGS): .. to this, in order to suppress Automake warning.
+	* testsuite/libdejagnu/Makefile.in: Regenerate.
+
+2003-08-07  Ben Elliston  <bje@wasabisystems.com>
+
+	* config/ddb.exp (${board}_init): Fix thinko: use Tcl incr command
+	to increment count rather than count++ as in C.
+
+2003-08-06  Ben Elliston  <bje@wasabisystems.com>
+
+	* lib/remote.exp: Replace "TCL" with "Tcl".
+
+2003-07-30  Ben Elliston  <bje@wasabisystems.com>
+
+	* doc/runtest.1: Replace "TCL" with "Tcl".
+	Make last revision date current.
+
+2003-07-29  Ben Elliston  <bje@wasabisystems.com>
+
+	* doc/overview.sgml: Replace "NT" with "Windows", correct Cygwin
+	URLs and other stylistic improvements.
+	* doc/ref.sgml: Likewise.
+	* doc/user.sgml: Likewise.
+
+2003-07-25  Mike Stump  <mrs@apple.com>
+
+	* lib/target.exp (prune_warnings): Handle "nfs server .* not
+	responding" and "nfs server .* is alive again".
+
+2003-07-20  Ben Elliston  <bje@wasabisystems.com>
+
+	* config.guess: Update to most recent version.
+	* config.sub: Ditto.
+	* AUTHORS: Add self to list of maintainers.
+
+2003-07-25  Jim Dein  <jdein@deinji5.apple.com> (RIP)
+
+	* lib/utils.exp (find): Fix double recursion bug.
+
+2002-02-25  Jackie Smith Cashion  <jsmith@redhat.com>
+
+        * baseboards/am33_2.0-libremote.exp: New file.
+
+2000-11-21  Drew Moseley  <dmoseley@redhat.com>
+
+        * baseboards/mn10300-cygmon.exp: Use the am33-2 flag for the
+        ASB2303 board.
+
+2000-08-10  Drew Moseley  <dmoseley@cygnus.com>
+
+        * baseboards/mn10300-cygmon.exp: Added support for Cygmon based
+	ASB2303 board.
+
+2003-06-13  Phil Edwards <pme@devphil.com>
+
+	* baseboards/mips64-sim.exp, baseboards/mips-sim.exp,
+	baseboards/mips-sim-idt32.exp, baseboards/mips-sim-idt64.exp: Use
+	only -T[linker] instead of -Wl,-T[linker].
+	
+2003-06-13  Jason Thorpe  <thorpej@wasabisystems.com>
+
+	* lib/target.exp (prune_warnings): Add two more linker
+	warning patterns for warnings generated by modern verions
+	of NetBSD.
+
+2003-05-12  H.J. Lu <hongjiu.lu@intel.com>
+
+        * lib/libgloss.exp (build_wrapper): Add -Wl,-wrap,_exit.
+
+2003-05-09  H.J. Lu <hongjiu.lu@intel.com>
+
+        * runtest: Fix a typo.
+
+2003-05-03  Nitin Dhavale <nitinpdhavale@indiatimes.com>
+
+	* doc/user.sgml: Clarify how to set the verbose option.
+
+2003-03-28 Chris Demetriou <cgd@broadcom.com>
+
+        * lib/framework.exp (check_conditional_xfail): Adjust so that
+        an empty 'includes' list matches all sets of flags.
+        * doc/dejagnu.texi: Document the above.
+        * doc/ref.sgml: Likewise.
+
+2003-03-27  David Heine <dlheine@tensilica.com>
+
+        * baseboards/xtensa-sim.exp: Fix a syntax error.
+
+2003-03-16  Rob Savoye  <rob@direwolf.welcomehome.org>
+
+	* lib/unix.exp: Preserve the value of LD_LIBRARY_PATH, rather
+	than stomp on it. This is based on a patch from Brendan Conoboy
+	<blc@redhat.com>.
+	* Most files: Update copyright dates.
+
+2003-03-13  Mike Stump  <mrs@apple.com>
+
+        * lib/dg.exp(dg-test): Add compiler flags to testcase name, to
+	help ensure uniqueness.
+
+2003-03-05  Alexandre Oliva  <aoliva@redhat.com>
+
+        * lib/remote.exp (standard_download, standard_upload): Support
+        nfsdir and nfsroot_server.
+
+See ChangeLog-1992 for earlier changes.

@@ -1,0 +1,4761 @@
+
+<sect1 id="reference">
+  <title>Reference</title>
+
+  <sect2 id="obtaining" xreflabel="Obtaining DejaGnu">
+    <title>Obtaining &dj;</title>
+
+    <para>You can obtain &dj; from the &dj; web site at the
+    <ulink url="http://www.gnu.org">Free Software Foundation</ulink>,
+    which is at <ulink
+    url="http://www.gnu.org/software/dejagnu/">www.gnu.org/software/dejagnu/
+    </ulink></para>
+
+  </sect2>
+
+  <sect2 id="installation" xreflabel="Installation">
+    <title>Installation</title>
+
+    <para>Once you have the &dj; source unpacked and available, you must
+    first configure the software to specify where it is to run (and the
+    associated defaults); then you can proceed to installing it.</para>
+
+    <sect3 id="configuring" xreflabel="Configuring DejaGnu">
+      <title>Configuring &dj;</title>
+
+      <para>It is usually best to configure in a directory separate from the
+      source tree, specifying where to find the source with the optional
+      <option>--srcdir</option> option to
+      <emphasis>configure</emphasis>. &dj; uses the GNU
+      <emphasis>autoconf</emphasis> to configure itself. For more info on using
+      autoconf, read the GNU autoconf manual. To configure, execute the
+      <filename>configure</filename> program, no other options are
+      required. For an example, to configure in a separate tree for objects,
+      execute the configure script from the source tree like this:</para>
+
+      <screen>
+        ../dejagnu-&version;/configure
+      </screen>
+
+      <para>&dj; doesn't care at config time if it's for testing a native
+      system or a cross system. That is determined at runtime by using the
+      config files.</para>
+
+      <para>You may also want to use the <command>configure</command> option
+      <option>--prefix</option> to specify where you want &dj; and its
+      supporting code installed.  By default, installation is in subdirectories
+      of <filename>/usr/local</filename>, but you can select any alternate
+      directory <symbol>altdir</symbol> by including
+      <option>--prefix</option>{altdir}} on the
+      <command>configure</command> command line. (This value is captured in
+      the Makefile variables <emphasis>prefix</emphasis> and
+      <emphasis>exec</emphasis>prefix}.)</para>
+
+      <para>Save for a small number of example tests, the &dj; distribution
+      itself does not include any testsuites; these are available
+      separately. Testsuites for the GNU development tools are included in
+      those releases. After configuring the top-level &dj; directory, unpack
+      and configure the test directories for the tools you want to test; then,
+      in each test directory, run <emphasis>make check</emphasis> to build
+      auxiliary programs required by some of the tests, and run the test
+      suites.</para>
+
+    </sect3>
+
+    <sect3 id="installing"  xreflabel="Installing DejaGnu">
+      <title>Installing &dj;</title>
+
+      <para>To install &dj; in your filesystem (either in
+      <filename>/usr/local</filename>, or as specified by your
+      <option>--prefix</option> option to <emphasis>configure</emphasis>),
+      execute.</para>
+
+      <screen>
+        eg$ make install
+      </screen>
+
+      <para><emphasis>make install</emphasis>does these things for
+      &dj;:</para>
+
+      <itemizedlist mark="bullet">
+        <listitem><para>Look in the path specified for executables
+          <symbol>$exec_prefix</symbol>) for directories called
+          <filename>lib</filename> and <filename>bin</filename>. If these
+          directories do not exist, <emphasis>make install</emphasis> creates
+          them.</para></listitem>
+
+        <listitem><para>Create another directory in the
+        <filename>share</filename> directory, called
+        <filename>dejagnu</filename>, and copy all the library files into
+        it.</para></listitem>
+
+        <listitem><para>Create a directory in the
+        <filename>dejagnu/share</filename> directory, called
+        <filename>config</filename>, and copy all the configuration files into
+        it.</para></listitem>
+
+	<listitem><para>Copy the <emphasis>runtest</emphasis> shell script into
+	<filename>$exec_prefix/bin</filename>.</para></listitem>
+
+	<listitem><para>Copy <filename>runtest.exp</filename> into
+	<filename>$exec_prefix/lib/dejagnu</filename>. This is the main Tcl
+	code implementing &dj;.</para></listitem>
+
+      </itemizedlist>
+  </sect3>
+  </sect2>
+
+  <sect2 id="builtins" xreflabel="Builtin Procedures">
+    <title>Builtin Procedures</title>
+
+    <para>&dj; provides these Tcl procedures.</para>
+
+    <sect3 id="coreprocs" xreflabel="Core Internal Procedures">
+      <title>Core Internal Procedures</title>
+
+      <sect4 id="mailfile" xreflabel="mail_file procedure">
+        <title>Mail_file Procedure</title>
+
+	<funcsynopsis role="tcl">
+           <funcprototype>
+             <funcdef><function>mail_file</function></funcdef>
+	     <paramdef><parameter>file to
+	     subject</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter></parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+      <sect4 id="openlogs" xreflabel="open_logs procedure">
+        <title>Open_logs Procedure</title>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>open_logs</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="closelogs" xreflabel="close_logs procedure">
+	  <title>Close_logs Procedure</title>
+
+	  <para></para>	
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>close_logs</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="isbuild" xreflabel="isbuild procedure">
+	  <title>Isbuild Procedure</title>
+
+	  <para>Tests for a particular build host environment.  If the
+	  currently configured host matches the argument string, the result is
+	  <emphasis>1</emphasis>; otherwise the result is
+	  <emphasis>0</emphasis>.  <emphasis>host</emphasis> must be a full
+	  three-part configure host name; in particular, you may not use the
+	  shorter nicknames supported by configure (but you can use wildcard
+	  characters, using shell syntax, to specify sets of names). If it is
+	  passed a NULL string, then it returns the name of the build canonical
+	  configuration.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>isbuild</function></funcdef>
+	    <paramdef><parameter>pattern</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>pattern</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="isremote" xreflabel="is_remote procedure">
+	  <title>Is_remote Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>is_remote</function></funcdef>
+	    <paramdef><parameter>board</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter></parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="is3way" xreflabel="is3way procedure">
+	  <title>is3way Procedure</title>
+
+	  <para>Tests for a canadian cross. This is when the tests will be run
+	  on a remotely hosted cross compiler. If it is a canadian cross, then
+	  the result is <emphasis>1</emphasis>; otherwise the result is
+	  <emphasis>0</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>is3way</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>	
+
+	<sect4 id="ishost" xreflabel="ishost procedure">
+	  <title>Ishost Procedure</title>
+
+	  <para>Tests for a particular host environment.  If the currently
+	  configured host matches the argument string, the result is
+	  <emphasis>1</emphasis>; otherwise the result is
+	  <emphasis>0</emphasis>. <emphasis>host</emphasis> must be a full
+	  three-part configure host name; in particular, you may not use the
+	  shorter nicknames supported by configure (but you can use wildcard
+	  characters, using shell syntax, to specify sets of names).</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>ishost</function></funcdef>
+	    <paramdef><parameter>pattern</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter></parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="istarget" xreflabel="istarget procedure">
+	  <title>Istarget Procedure</title>
+
+ 	  <para>Tests for a particular target environment.  If the currently
+	  configured target matches the argument string, the result is
+	  <emphasis>1</emphasis> ; otherwise the result is
+	  <emphasis>0</emphasis>.  target must be a full three-part configure
+	  target name; in particular, you may not use the shorter nicknames
+	  supported by configure (but you can use wildcard characters, using
+	  shell syntax, to specify sets of names). If it is passed a
+	  <emphasis>NULL</emphasis> string, then it returns the name of the
+	  build canonical configuration.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>istarget</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter></parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="isnative" xreflabel="isnative procedure">
+	  <title>Isnative Procedure</title>
+
+	  <para>Tests whether the current configuration has the same host and
+	  target. When it runs in a native configuration this procedure returns
+	  a <emphasis>1</emphasis>; otherwise it returns a
+	  <emphasis>0</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>isnative</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="unknown" xreflabel="unknown procedure">
+	  <title>Unknown Procedure</title>
+
+	  <para></para>	
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>unknown</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="cloneoutput" xreflabel="clone_output procedure">
+	  <title>Clone_output Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>clone_output</function></funcdef>
+	    <paramdef><parameter>message</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>message</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="resetvars" xreflabel="reset_vars procedure">
+	  <title>Reset_vars Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>reset_vars</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>	
+
+	<sect4 id="logandexit" xreflabel="log_and_exit procedure">
+	  <title>Log_and_exit Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>log_and_exit</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>	
+
+	<sect4 id="logsummary" xreflabel="log_summary procedure">
+	  <title>Log_summary Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>log_summary</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>	
+
+	<sect4 id="cleanup" xreflabel="cleanup procedure">
+	  <title>Cleanup Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>cleanup</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="setupxfail" xreflabel="setup_xfail procedure">
+	  <title>Setup_xfail Procedure</title>
+
+	  <para>Declares that the test is expected to fail on a particular set
+	  of configurations.  The config argument must be a list of full
+	  three-part configure target name; in particular, you may not use the
+	  shorter nicknames supported by configure (but you can use the common
+	  shell wildcard characters to specify sets of names).  The
+	  <emphasis>bugid</emphasis> argument is optional, and used only in the
+	  logging file output; use it as a link to a bug-tracking system such
+	  as <productname>GNATS</productname>.</para>
+
+	  <para>Once you use <function>setup_xfail</function>, the
+	  <function>fail</function> and <function>pass</function> procedures
+	  produce the messages <emphasis>XFAIL</emphasis> and
+	  <emphasis>XPASS</emphasis> respectively, allowing you to distinguish
+	  expected failures (and unexpected success!) from other test
+	  outcomes.</para>
+
+	  <warning><para>Warning you must clear the expected failure after
+	  using setup_xfail in a test case.  Any call to <function>pass
+	  </function>or <function>fail</function> clears the expected failure
+	  implicitly; if the test has some other outcome, e.g. an error, you
+	  can call <function>clear_xfail</function> to clear the expected
+	  failure explicitly.  Otherwise, the expected-failure declaration
+	  applies to whatever test runs next, leading to surprising
+	  results.</para></warning>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>setup_xfail</function></funcdef>
+	    <paramdef><parameter>config</parameter>
+	    <parameter>bugid</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>config</parameter></term>
+	    <listitem><para>The config triplet to trigger whether this is an
+	    unexpected or expect failure.</para></listitem>
+          </varlistentry>
+	  <varlistentry>
+	    <term><parameter>bugid</parameter></term>
+	    <listitem><para>The optional bugid, used to tie this test case
+	    to a bug tracking system.</para></listitem>
+          </varlistentry>
+	</variablelist>
+      </sect4>
+
+	<sect4 id="recordtest" xreflabel="record_test procedure">
+	  <title>Record_test Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>record_test</function></funcdef>
+	    <paramdef><parameter>type</parameter>
+		<parameter>message</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>type</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>message</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="pass" xreflabel="pass procedure">
+          <title>Pass Procedure</title>
+
+	  <para>Declares a test to have passed. <function>pass</function>
+	  writes in the log files a message beginning with
+	  <emphasis>PASS</emphasis> (or <emphasis>XPASS</emphasis>, if failure
+	  was expected), appending the argument
+	  <parameter>string</parameter>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>pass</function></funcdef>
+	    <paramdef><parameter>string</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para>The string to use for this PASS
+	    message.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="fail" xreflabel="fail procedure">
+          <title>Fail Procedure</title>
+
+	  <para>Declares a test to have failed.  <function>fail</function>
+	  writes in the log files a message beginning with
+	  <emphasis>FAIL</emphasis> (or <emphasis>XFAIL</emphasis>, if failure
+	  was expected), appending the argument
+	  <parameter>string</parameter>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>fail</function></funcdef>
+	    <paramdef><parameter>string</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para>The string to use for this FAIL
+	    message.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="xpass" xreflabel="xpass procedure">
+          <title>Xpass Procedure</title>
+
+	  <para>Declares a test to have unexpectably passed, when it was
+	  expected to be a failure.  <function>xpass</function>
+	  writes in the log files a message beginning with
+	  <emphasis>XPASS</emphasis> (or <emphasis>XFAIL</emphasis>, if failure
+	  was expected), appending the argument
+	  <parameter>string</parameter>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>xpass</function></funcdef>
+	    <paramdef><parameter>string</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para>The string to use for this output
+	    state.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="xfail" xreflabel="xfail procedure">
+          <title>Xfail Procedure</title>
+
+	  <para>Declares a test to have expectably
+	  failed. <function>xfail</function>
+	  writes in the log files a message beginning with
+	  <emphasis>XFAIL</emphasis> (or <emphasis>PASS</emphasis>, if success
+	  was expected), appending the argument
+	  <parameter>string</parameter>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>xpass</function></funcdef>
+	    <paramdef><parameter>string</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para>The string to use for this output
+	    state.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="setwarningthreshold" xreflabel="set_warning_threshold procedure">
+          <title>Set_warning_threshold Procedure</title>
+
+	  <para>Sets the value of <symbol>warning_threshold</symbol>. A value
+	  of <emphasis>0</emphasis> disables it: calls to
+	  <function>warning</function> will not turn a
+	  <emphasis>PASS</emphasis> or <emphasis>FAIL</emphasis> into an
+	  <emphasis>UNRESOLVED</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>set_warning_threshold</function></funcdef>
+	    <paramdef><parameter>threshold</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>threshold</parameter></term>
+	    <listitem><para>This is the value of the new warning
+	    threshold.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="getwarningthreshold" xreflabel="get_warning_threshold procedure">
+          <title>Get_warning_threshold Procedure</title>
+
+	  <para>Returns the current value of
+	  <symbol>{warning_threshold</symbol>. The default value is 3. This
+	  value controls how many <function>warning</function> procedures can
+	  be called before becoming <emphasis>UNRESOLVED</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>get_warning_threshold</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+
+      </sect4>
+      <sect4 id="warning" xreflabel="warning procedure">
+        <title>Warning Procedure</title>
+
+	<para>Declares detection of a minor error in the test case
+	itself. <function>warning</function> writes in the log files a message
+	beginning with <emphasis>WARNING</emphasis>, appending the argument
+	<parameter>string</parameter>.  Use <function>warning</function> rather
+	than <function>perror</function> for cases (such as communication
+	failure to be followed by a retry) where the test case can recover from
+	the error. If the optional <parameter>number</parameter> is supplied,
+	then this is used to set the internal count of warnings to that
+	value.</para>
+
+	<para>As a side effect, <symbol>warning_threshold</symbol> or more
+	calls to warning in a single test case also changes the effect of the
+	next <function>pass</function> or <function>fail</function> command:
+	the test outcome becomes <emphasis>UNRESOLVED</emphasis> since an
+	automatic <emphasis>PASS</emphasis> or <emphasis>FAIL</emphasis> may
+	not be trustworthy after many warnings.  If the optional numeric value
+	is <emphasis>0</emphasis>, then there are no further side effects to
+	calling this function, and the following test outcome doesn't become
+	<emphasis>UNRESOLVED</emphasis>. This can be used for errors with no
+	known side effects.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>warning</function></funcdef>
+	    <paramdef><parameter>string</parameter>
+	    <parameter>number</parameter>
+	    </paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>number</parameter></term>
+	    <listitem><para>The optional number to set the error counter. This
+	    is only used to fake out the counter when using the
+	    <function>xfail</function> procedure to control when it flips the
+	    output over to <emphasis>UNRESOLVED</emphasis>
+	    state.</para></listitem>
+          </varlistentry>
+	</variablelist>
+
+      </sect4>
+      <sect4 id="perror" xreflabel="perror procedure">
+        <title>Perror Procedure</title>
+
+	<para>Declares a severe error in the testing framework
+	itself. <function>perror</function> writes in the log files a message
+	beginning with <emphasis>ERROR</emphasis>, appending the argument
+	<parameter>string</parameter>.</para>
+
+	<para>As a side effect, perror also changes the effect of the next
+	<function>pass</function> or <function>fail</function> command: the
+	test outcome becomes <emphasis>UNRESOLVED</emphasis>, since an
+	automatic <emphasis>PASS</emphasis> or <emphasis>FAIL</emphasis> cannot
+	be trusted after a severe error in the test framework.  If the optional
+	numeric value is <emphasis>0</emphasis>, then there are no further side
+	effects to calling this function, and the following test outcome
+	doesn't become <emphasis>UNRESOLVED</emphasis>. This can be used for
+	errors with no known side effects.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>perror</function></funcdef>
+	    <paramdef><parameter>string</parameter>
+	    <parameter>number</parameter>
+	    </paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>number</parameter></term>
+	    <listitem><para>The optional number to set the error counter. This
+	    is only used to fake out the counter when using the
+	    <function>xfail</function> procedure to control when it flips the
+	    output over to <emphasis>UNRESOLVED</emphasis>
+	    state.</para></listitem>
+          </varlistentry>
+	</variablelist>
+
+      </sect4>
+       <sect4 id="note" xreflabel="note procedure">
+        <title>Note Procedure</title>
+
+	<para>Appends an informational message to the log
+	file. <function>note</function> writes in the log files a message
+	beginning with <emphasis>NOTE</emphasis>, appending the argument
+	<parameter>string</parameter>.  Use <function>note</function>
+	sparingly. The <function>verbose</function> should be used for most
+	such messages, but in cases where a message is needed in the log file
+	regardless of the verbosity level use <function>note</function>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>note</function></funcdef>
+	    <paramdef><parameter>string</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para>The string to use for this note.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+       <sect4 id="untested" xreflabel="untested procedure">
+        <title>Untested Procedure</title>
+
+	<para>Declares a test was not run. <function>untested</function> writes
+	in the log file a message beginning with <emphasis>UNTESTED</emphasis>,
+	appending the argument <emphasis>string</emphasis>. For example, you
+	might use this in a dummy test whose only role is to record that a test
+	does not yet exist for some feature.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>untested</function></funcdef>
+	    <paramdef><parameter>string</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para>The string to use for this output
+	    state.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+       <sect4 id="unresolved" xreflabel="unresolved procedure">
+        <title>Unresolved Procedure</title>
+
+	<para>Declares a test to have an unresolved
+	outcome. <function>unresolved</function> writes in the log file a
+	message beginning with <emphasis>UNRESOLVED</emphasis>, appending the
+	argument <emphasis>string</emphasis>.  This usually means the test did
+	not execute as expected, and a human being must go over results to
+	determine if it passed or failed (and to improve the test case).</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>unresolved</function></funcdef>
+	    <paramdef><parameter>string</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para>The string to use for this output
+	    state.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+       <sect4 id="unsupported" xreflabel="unsupported procedure">
+        <title>Unsupported Procedure</title>
+
+	<para>Declares that a test case depends on some facility that does not
+	exist in the testing environment. <function>unsupported</function>
+	writes in the log file a message beginning with
+	<emphasis>UNSUPPORTED</emphasis>, appending the argument string.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>unsupported</function></funcdef>
+	    <paramdef><parameter>string</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para>The string to use for this output
+	    state.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="inittestcounts" xreflabel="init_testcounts procedure">
+	  <title>Init_testcounts Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>init_testcounts</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="incrcount" xreflabel="incr_count procedure">
+	  <title>Incr_count Procedure</title>
+
+	  <para></para>	
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>incr_count</function></funcdef>
+	    <paramdef><parameter>name</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>name</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="transform" xreflabel="transform procedure">
+	  <title>transform Procedure</title>
+
+	  <para>Generates a string for the name of a tool as it was configured
+	  and installed, given its native name (as the argument
+	  <parameter>toolname</parameter>). This makes the assumption that all
+	  tools are installed using the same naming conventions: For example,
+	  for a cross compiler supporting the <emphasis>m68k-vxworks</emphasis>
+	  configuration, the result of transform <command>gcc</command> is
+	  <command>m68k-vxworks-gcc</command>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>transform</function></funcdef>
+	    <paramdef><parameter>toolname</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>toolname</parameter></term>
+	    <listitem><para>The name of the cross-development program to
+	    transform.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+
+	<sect4 id="checkconditionalxfail" xreflabel="check_conditional_xfail procedure">
+	  <title>Check_conditional_xfail Procedure</title>
+
+	  <para>This procedure adds a conditional xfail, based on compiler
+	  options used to create a test case executable. If an include options
+	  is found in the compiler flags, and it's the right architecture,
+	  it'll trigger an <emphasis>XFAIL</emphasis>. Otherwise it'll produce
+	  an ordinary <emphasis>FAIL</emphasis>. You can also specify flags to
+	  exclude. This makes a result be a <emphasis>FAIL</emphasis>, even if
+	  the included options are found. To set the conditional, set
+	  the variable <symbol>compiler_conditional_xfail_data</symbol> to the
+	  fields <programlisting>"[message string] [targets list] [includes
+	  list] [excludes list]"</programlisting> (descriptions below). This is
+	  the checked at pass/fail decision time, so there is no need to call
+	  the procedure yourself, unless you wish to know if it gets
+	  triggered. After a pass/fail, the variable is reset, so it doesn't
+	  effect other tests. It returns <emphasis>1</emphasis> if the
+	  conditional is true, or <emphasis>0</emphasis> if the conditional is
+	  false.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>check_conditional_xfail</function></funcdef>
+	    <paramdef><parameter>message</parameter>
+	    <parameter>targets</parameter>
+	    <parameter>includes</parameter>
+	    <parameter>excludes</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>message</parameter></term>
+	    <listitem><para>This is the message to print with the normal test
+	    result.</para></listitem>
+          </varlistentry>
+         <varlistentry>
+	    <term><parameter>targets</parameter></term>
+	    <listitem><para>This is a string with the list targets to activate
+	    this conditional on.</para></listitem>
+          </varlistentry>
+         <varlistentry>
+	    <term><parameter>includes</parameter></term>
+	    <listitem><para>This is a list of sets of options to search for in
+	    the compiler options to activate this conditional.  If the list of
+	    sets of options is empty or if any set of the options matches,
+	    then this conditional is true.  (It may be useful to specify an
+	    empty list of include sets if the conditional is always true
+	    unless one of the exclude sets matches.)</para></listitem>
+          </varlistentry>
+         <varlistentry>
+	    <term><parameter>excludes</parameter></term>
+	    <listitem><para>This is a list of sets of options to search for in
+	    the compiler options to activate this conditional. If any set of
+	    the options matches, (regardless of whether any of the include sets
+	    match) then this conditional is de-activated.</para></listitem>
+          </varlistentry>
+	</variablelist>
+
+	<example>
+	  <title>Specifying the conditional xfail data</title>
+
+	  <programlisting>
+	  set compiler_conditional_xfail_data { \
+	       "I sure wish I knew why this was hosed" \
+               "sparc*-sun*-* *-pc-*-*" \
+               {"-Wall -v" "-O3"} \
+               {"-O1" "-Map"} \
+          }
+	  </programlisting>
+
+	  </example>
+
+	  <para>What this does is it matches only for these two targets if
+	  "-Wall -v" or  "-O3" is set, but neither "-O1" or "-Map" is set. For
+	  a set to match, the options specified are searched for independently
+	  of each other, so a "-Wall -v" matches either "-Wall -v" or "-v
+	  -Wall". A space separates the options in the string. Glob-style
+	  regular expressions are also permitted.</para>
+
+	</sect4>
+
+	<sect4 id="clearxfail" xreflabel="clear_xfail procedure">
+	  <title>Clear_xfail Procedure</title>
+
+	  <para>Cancel an expected failure (previously declared with
+	  <command>setup_xfail</command>) for a particular set of
+	  configurations.  The <parameter>config</parameter> argument is a list
+	  of configuration target names.  It is only necessary to call
+	  <command>clear_xfail</command> if a test case ends without calling
+	  either <command>pass</command> or <command>fail</command>, after
+	  calling <command>setup_xfail</command>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>clear_xfail</function></funcdef>
+	    <paramdef><parameter>config</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>config</parameter></term>
+ 	    <listitem><para>The configuration triplets to
+ 	    clear.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="verbose" xreflabel="verbose procedure">
+	  <title>Verbose Procedure</title>
+
+	  <para>Test cases can use this function to issue helpful messages
+	  depending on the number of <option>--verbose</option> options on the
+	  runtest command line.  It prints string if the value of the variable
+	  <symbol>verbose</symbol> is higher than or equal to the optional
+	  number. The default value for number is <emphasis>1</emphasis>.  Use
+	  the optional <option>-log</option> argument to cause string to always
+          be added to the log file, even if it won't be printed.  Use the
+          optional <option>-x</option> argument to log the test results into
+          a parsable XML file.  Use the optional <option>-n</option> argument
+          to print string without a trailing newline.  Use the optional
+          <option>--</option> argument if string begins with "-".</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>verbose</function></funcdef>
+	    <paramdef><parameter>-log</parameter>
+            <parameter>-x</parameter>
+	    <parameter>-n</parameter>
+	    <parameter>-r</parameter>
+	    <parameter>string</parameter>
+	    <parameter>number</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+            <term><parameter>-x</parameter></term>
+            <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>-log</parameter></term>
+ 	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>-n</parameter></term>
+ 	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>--</parameter></term>
+ 	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+ 	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>number</parameter></term>
+ 	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="loadlib" xreflabel="load_lib procedure">
+	  <title>Load_lib Procedure</title>
+
+	  <para>Loads a &dj; library file by searching a fixed path built
+	  into &dj;. If &dj; has been installed, it looks in a path
+	  starting with the installed library directory.  If you are running
+	  &dj; directly from a source directory, without first running
+	  <command>make install</command>, this path defaults to the current
+	  directory.  In either case, it then looks in the current directory
+	  for a directory called <filename>lib</filename>.  If there are
+	  duplicate definitions, the last one loaded takes precedence over the
+	  earlier ones.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>load_lib</function></funcdef>
+	    <paramdef><parameter>filespec</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>filespec</parameter></term>
+ 	    <listitem><para>The name of the &dj; library file to
+	    load.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+    </sect3>
+
+    <sect3 id="remoteprocs">
+      <title>Procedures For Remote Communication</title>
+
+      <para><filename>lib/remote.exp</filename> defines these
+	functions, for establishing and managing communications. Each
+	of these procedures tries to establish the connection up to
+	three times before returning. Warnings (if retries will
+	continue) or errors (if the attempt is abandoned) report on
+	communication failures.  The result for any of these
+	procedures is either <emphasis>-1</emphasis>, when the
+	connection cannot be established, or the spawn ID returned by
+	the <productname>Expect</productname> command
+	<command>spawn</command>.</para>
+	
+	<para>It use the value of the <symbol>connect</symbol> field
+	in the <symbol>target_info</symbol> array (was
+	<symbol>connectmode</symbol> as the type of connection to
+	make. Current supported connection types are tip, kermit,
+	telnet, rsh, rlogin, and netdata. If the <option>--reboot</option>
+	option was used on the runtest command line, then the target
+	is rebooted before the connection is made.</para>
+
+	<sect4 id="callremote" xreflabel="call_remote procedure">
+	  <title>Call_remote Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>call_remote</function></funcdef>
+	    <paramdef><parameter>type</parameter>
+		<parameter>proc</parameter>
+		<parameter>dest</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+           <varlistentry>
+	     <term><parameter>proc</parameter></term>
+	     <listitem><para></para></listitem>
+           </varlistentry>
+           <varlistentry>
+	     <term><parameter>dest</parameter></term>
+	     <listitem><para></para></listitem>
+           </varlistentry>
+           <varlistentry>
+	     <term><parameter>args</parameter></term>
+	     <listitem><para></para></listitem>
+           </varlistentry>
+         </variablelist>
+	 </sect4>
+
+	 <sect4 id="checkforboardstatus" xreflabel="check_for_board_status
+	 procedure">
+	   <title>Check_for_board_status Procedure</title>
+
+	   <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>check_for_board_status</function></funcdef>
+	    <paramdef><parameter>variable</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+             <varlistentry>
+	       <term><parameter>variable</parameter></term>
+	        <listitem><para></para></listitem>
+         </varlistentry>
+         </variablelist>
+	 </sect4>
+
+	 <sect4 id="fileonbuild" xreflabel="file_on_build procedure">
+	   <title>File_on_build Procedure</title>
+
+	   <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>file_on_build</function></funcdef>
+	    <paramdef><parameter>op</parameter>
+		<parameter>file</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+           <varlistentry>
+	     <term><parameter>op</parameter></term>
+	     <listitem><para></para></listitem>
+           </varlistentry>
+           <varlistentry>
+	     <term><parameter>file</parameter></term>
+	     <listitem><para></para></listitem>
+           </varlistentry>
+           <varlistentry>
+	     <term><parameter>args</parameter></term>
+	     <listitem><para></para></listitem>
+           </varlistentry>
+         </variablelist>
+	 </sect4>
+
+	 <sect4 id="fileonhost" xreflabel="file_on_host procedure">
+	   <title>File_on_host Procedure</title>
+
+	   <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>file_on_host</function></funcdef>
+	    <paramdef><parameter>op</parameter>
+		<parameter>file</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+           <varlistentry>
+	     <term><parameter>op</parameter></term>
+	     <listitem><para></para></listitem>
+           </varlistentry>
+           <varlistentry>
+	     <term><parameter>file</parameter></term>
+	     <listitem><para></para></listitem>
+           </varlistentry>
+           <varlistentry>
+	     <term><parameter>args</parameter></term>
+	     <listitem><para></para></listitem>
+           </varlistentry>
+         </variablelist>
+	 </sect4>
+
+	 <sect4 id="localexec" xreflabel="local_exec procedure">
+	   <title>Local_exec Procedure</title>
+
+	   <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>local_exec</function></funcdef>
+	    <paramdef><parameter>commandline</parameter>
+		<parameter>inp</parameter>
+		<parameter>outp</parameter>
+		<parameter>timeout</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+           <varlistentry>
+	       <term><parameter>inp</parameter></term>
+	        <listitem><para></para></listitem>
+           </varlistentry>
+           <varlistentry>
+	       <term><parameter>outp</parameter></term>
+	        <listitem><para></para></listitem>
+           </varlistentry>
+           <varlistentry>
+	       <term><parameter>timeout</parameter></term>
+	        <listitem><para></para></listitem>
+           </varlistentry>
+         </variablelist>
+	 </sect4>
+
+	 <sect4 id="remotebinary" xreflabel="remote_binary procedure">
+	   <title>Remote_binary Procedure</title>
+
+	   <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_binary</function></funcdef>
+	    <paramdef><parameter>host</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	     <term><parameter>host</parameter></term>
+	     <listitem><para></para></listitem>
+           </varlistentry>
+         </variablelist>
+	 </sect4>
+
+	 <sect4 id="remoteclose" xreflabel="remote_close procedure">
+	   <title>Remote_close Procedure</title>
+
+	   <para></para>	
+
+	  <funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_close</function></funcdef>
+	    <paramdef><parameter>shellid</parameter></paramdef>
+           </funcprototype>
+          </funcsynopsis>
+	  <variablelist>
+             <varlistentry>
+	       <term><parameter>shellid</parameter></term>
+	        <listitem><para>This is the value returned by a call
+	        to <function>remote_open</function>. This closes the
+	        connection to the target so resources can be used by
+	        others. This parameter can be left off if the
+	        <symbol>fileid</symbol> field in the
+	        <symbol>target_info</symbol> array is set.</para></listitem>
+           </varlistentry>
+         </variablelist>
+	 </sect4>
+
+	 <sect4 id="remotedownload" xreflabel="remote_download procedure">
+	   <title>Remote_download Procedure</title>
+
+	   <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+          <funcdef><function>remote_download</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>file</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>file</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoteexec" xreflabel="remote_exec procedure">
+	  <title>Remote_exec Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_exec</function></funcdef>
+	    <paramdef><parameter>hostname</parameter>
+		<parameter>program</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>hostname</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>program</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoteexpect" xreflabel="remote_expect procedure">
+	  <title>Remote_expect Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_expect</function></funcdef>
+	    <paramdef><parameter>board</parameter>
+		<parameter>timeout</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>board</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>timeout</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remotefile" xreflabel="remote_file procedure">
+	  <title>Remote_file Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_file</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoteld" xreflabel="remote_ld procedure">
+	  <title>Remote_ld Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_ld</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>prog</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>prog</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoteload" xreflabel="remote_load procedure">
+	  <title>Remote_load Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_load</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>prog</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>prog</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoteopen" xreflabel="remote_open procedure">
+	  <title>Remote_open Procedure</title>
+
+	  <para></para>
+
+	  <funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_open</function></funcdef>
+	      <paramdef><parameter>type</parameter></paramdef>
+           </funcprototype>
+            </funcsynopsis>
+            <variablelist>
+              <varlistentry>
+		<term><parameter>type</parameter></term>
+	        <listitem><para>This is passed <option>host</option> or
+                <option>target</option>. Host or target refers to
+	      whether it is a connection to a remote target, or a
+	      remote host. This opens the connection to the desired
+	      target or host using the default values in the
+	      configuration system. It returns that
+	      <symbol>spawn_id</symbol> of the process that manages
+	      the connection. This value can be used in
+	      <productname>Expect</productname> or
+	      <command>exp_send</command> statements, or passed to
+	      other procedures that need the connection process's
+	      id. This also sets the <symbol>fileid</symbol> field in
+	      the <symbol>target_info</symbol> array.</para></listitem>
+         </varlistentry>
+         </variablelist>
+	 </sect4>
+
+	 <sect4 id="remotepopconn" xreflabel="remote_pop_conn procedure">
+	   <title>Remote_pop_conn Procedure</title>
+
+	   <para></para>	
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_pop_conn</function></funcdef>
+	    <paramdef><parameter>host</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>host</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remotepushconn" xreflabel="remote_push_conn procedure">
+	  <title>Remote_push_conn Procedure</title>
+
+	  <para></para>	
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_push_conn</function></funcdef>
+	    <paramdef><parameter>host</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>host</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoterawbinary" xreflabel="remote_raw_binary procedure">
+	  <title>Remote_raw_binary Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_raw_binary</function></funcdef>
+	    <paramdef><parameter>host</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>host</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoterawclose" xreflabel="remote_raw_close procedure">
+	  <title>Remote_raw_close Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_raw_close</function></funcdef>
+	    <paramdef><parameter>host</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>host</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoterawfile" xreflabel="remote_raw_file procedure">
+	  <title>Remote_raw_file Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_raw_file</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoterawld" xreflabel="remote_raw_ld procedure">
+	  <title>remote_raw_ld Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_raw_ld</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>prog</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>prog</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoterawload" xreflabel="remote_raw_load procedure">
+	  <title>Remote_raw_load Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_raw_load</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>prog</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>prog</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoterawopen" xreflabel="remote_raw_open procedure">
+	  <title>Remote_raw_open Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_raw_open</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoterawsend" xreflabel="remote_raw_send procedure">
+	  <title>Remote_raw_send Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_raw_send</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>string</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoterawspawn" xreflabel="remote_raw_spawn procedure">
+	  <title>Remote_raw_spawn Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_raw_spawn</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>commandline</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>commandline</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoterawtransmit" xreflabel="remote_raw_transmit
+	procedure">
+	  <title>Remote_raw_transmit Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_raw_transmit</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>file</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>file</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoterawwait" xreflabel="remote_raw_wait procedure">
+	  <title>Remote_raw_wait Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_raw_wait</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>timeout</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>timeout</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remotereboot" xreflabel="remote_reboot procedure">
+	  <title>Remote_reboot Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_reboot</function></funcdef>
+	    <paramdef><parameter>host</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>host</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remotesend" xreflabel="remote_send procedure">
+	  <title>Remote_send Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_send</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>string</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remotespawn" xreflabel="remote_spawn procedure">
+	  <title>Remote_spawn Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_spawn</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>commandline</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>commandline</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoteswapconn" xreflabel="remote_swap_conn procedure">
+	  <title>Remote_swap_conn Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_swap_conn</function></funcdef>
+	    <paramdef><parameter>host</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter></parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remotetransmit" xreflabel="remote_transmit procedure">
+	  <title>Remote_transmit Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_transmit</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>file</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>file</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remoteupload" xreflabel="remote_upload procedure">
+	  <title>Remote_upload Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_upload</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>srcfile</parameter>
+		<parameter>arg</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>srcfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>arg</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="remotewait" xreflabel="remote_wait procedure">
+	  <title>Remote_wait Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>remote_wait</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>timeout</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>timeout</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="standardclose" xreflabel="standard_close procedure">
+	  <title>Standard_close Procedure</title>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>standard_close</function></funcdef>
+	    <paramdef><parameter>host</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>host</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="standarddownload" xreflabel="standard_download procedure">
+	  <title>Standard_download Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>standard_download</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>file</parameter>
+		<parameter>destfile</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>file</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>destfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="standardexec" xreflabel="standard_exec procedure">
+	  <title>Standard_exec Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>standard_exec</function></funcdef>
+	    <paramdef><parameter>hostname</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>hostname</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="standardfile" xreflabel="standard_file procedure">
+	  <title>Standard_file Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>standard_file</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>op</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter></parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="standardload" xreflabel="standard_load procedure">
+	  <title>Standard_load Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>standard_load</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>prog</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>prog</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="standardreboot" xreflabel="standard_reboot procedure">
+	  <title>Standard_reboot Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>standard_reboot</function></funcdef>
+	    <paramdef><parameter>host</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>host</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="standardsend" xreflabel="standard_send procedure">
+	  <title>Standard_send Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>standard_send</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>string</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="standardspawn" xreflabel="standard_spawn procedure">
+	  <title>Standard_spawn Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>standard_spawn</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>commandline</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>commandline</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="standardtransmit" xreflabel="standard_transmit procedure">
+	  <title>Standard_transmit Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>standard_transmit</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>file</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>file</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="standardupload" xreflabel="standard_upload procedure">
+	  <title>Standard_upload Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>standard_upload</function></funcdef>
+	    <paramdef><parameter>dest srcfile destfile</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>srcfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>destfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="standardwait" xreflabel="standard_wait procedure">
+	  <title>Standard_wait Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>standard_wait</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>timeout</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>timeout</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="unixcleanfilename" xreflabel="unix_clean_filename
+	procedure">
+	  <title>Unix_clean_filename Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>unix_clean_filename</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>file</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>file</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+<!-- FIXME: this doesn't seem to exist anymore
+	<sect4 id="exitremoteshell" xreflabel="exit_remote_shell procedure">
+	  <title>exit_remote_shell Procedure</title>
+
+	  <para></para>
+
+          <funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>exit_remote_shell</function></funcdef>
+              <paramdef><parameter>spawnid</parameter></paramdef>
+           </funcprototype>
+            </funcsynopsis>
+            <variablelist>
+              <varlistentry>
+                <term><parameter>spawnid</parameter></term>
+                <listitem><para>Exits a remote process started by any
+                of the connection procedures. <symbol>spawnid</symbol>
+                is the result of the connection procedure that started
+                the remote process.</para></listitem>
+           </varlistentry>
+         </variablelist>
+	 </sect4>
+-->
+
+    </sect3>
+
+    <sect3 id="connprocs" xreflabel="connprocs">
+      <title>Procedures For Using Utilities to Connect</title>
+
+      <para>telnet, rsh, tip, kermit</para>
+
+      <sect4 id="telnet" xreflabel="telnet procedure">
+        <title>telnet Procedure</title>
+
+	<para></para>
+
+	  <funcsynopsis role="tcl">
+          <funcprototype>
+	    <funcdef><function>telnet</function></funcdef>
+	    <paramdef><parameter>hostname</parameter>
+	    <parameter>port</parameter></paramdef>
+           </funcprototype>
+          </funcsynopsis>
+          <funcsynopsis role="tcl">
+          <funcprototype>
+	    <funcdef><function>rlogin</function></funcdef>
+	    <paramdef><parameter>hostname</parameter></paramdef>
+           </funcprototype>
+          </funcsynopsis>
+	  </sect4>
+
+	  <sect4 id="rsh" xreflabel="rsh procedure">
+	    <title>rsh Procedure</title>
+
+	    <para></para>
+
+          <funcsynopsis role="tcl">
+          <funcprototype>
+	    <funcdef><function>rsh</function></funcdef>
+	    <paramdef><parameter>hostname</parameter></paramdef>
+           </funcprototype>
+          </funcsynopsis>
+	  <variablelist>
+             <varlistentry>
+	       <term><parameter>hostname</parameter></term>
+	       <listitem><para>This refers to the IP address or name
+	        (for example, an entry in
+	        <filename>/etc/hosts</filename>) for this target. The
+	        procedure names reflect the Unix utility used to
+	        establish a connection. The optional
+	        <parameter>port</parameter> is used to specify the IP
+	        port number. The value of the
+	        <parameter>netport</parameter> field in the
+	        <symbol>target_info</symbol> array is used. (was
+	        <symbol>$netport</symbol>) This value has two parts,
+	        the hostname and the port number, separated by a
+	        <emphasis>:</emphasis>. If host or target is used in
+	        the <symbol>hostname</symbol> field, than the
+	        config array is used for all information.</para></listitem>
+         </varlistentry>
+         </variablelist>
+	 </sect4>
+
+	 <sect4 id="tip" xreflabel="tip procedure">
+	   <title>Tip Procedure</title>
+
+	   <para></para>
+
+	 <funcsynopsis role="tcl">
+          <funcprototype>
+           <funcdef><function>tip</function></funcdef>
+            <paramdef><parameter>port</parameter></paramdef>
+           </funcprototype>
+          </funcsynopsis>
+          <variablelist>
+             <varlistentry>
+               <term><parameter>port</parameter></term>
+               <listitem><para>Connect using the Unix utility
+               <command>tip</command>. <parameter>Port</parameter>must
+               be a name from the <productname>tip</productname>
+               configuration file
+               <filename>/etc/remote</filename>. Often, this is called
+               <symbol>hardwire</symbol>, or something like
+               <symbol>ttya</symbol>. This file holds all the
+               configuration data for the serial port. The value of
+               the <symbol>serial</symbol> field in the
+               <symbol>target_info</symbol> array is used. (was
+               <symbol>$serialport</symbol>) If <option>host</option>
+               or <option>target</option> is used in the
+               <parameter>port</parameter> field, than the config
+               array is used for all information. the
+	       config array is used for all information.</para></listitem>
+         </varlistentry>
+         </variablelist>
+	 </sect4>
+
+	 <sect4 id="kermit" xreflabel="kermit procedure">
+	   <title>Kermit Procedure</title>
+
+	   <para></para>
+
+          <funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>kermit</function></funcdef>
+            <paramdef><parameter>port</parameter>
+	    <parameter>bps</parameter></paramdef>
+           </funcprototype>
+          </funcsynopsis>
+          <variablelist>
+             <varlistentry>
+               <term><parameter>port</parameter></term>
+               <listitem><para>Connect using the program
+               <command>kermit</command>. <parameter>Port</parameter>
+               is the device name,
+               e.g. <filename>/dev/ttyb</filename>.
+	       </para></listitem>
+             </varlistentry>
+             <varlistentry>
+               <term><parameter>bps</parameter></term>
+               <listitem><para><parameter>bps</parameter> is the line
+               speed to use (in its per second) for the
+               connection. The value of the <symbol>serial</symbol>
+               field in the <symbol>target_info</symbol> array is
+               used.  (was <symbol>$serialport</symbol>) If
+               <option>host</option> or <option>target</option> is
+               used in the <parameter>port</parameter> field, than the
+               config array is used for all information. the
+	       config array is used for all information.</para></listitem>
+           </varlistentry>
+         </variablelist>
+	 </sect4>
+
+	 <sect4 id="kermitopen" xreflabel="kermit_open procedure">
+	   <title>kermit_open Procedure</title>
+
+	   <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>kermit_open</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="kermitcommand" xreflabel="kermit_command procedure">
+	  <title>Kermit_command Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>kermit_command</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="kermitsend" xreflabel="kermit_send procedure">
+	  <title>Kermit_send Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>kermit_send</function></funcdef>
+	    <paramdef><parameter>dest string args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>string</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="kermittransmit" xreflabel="kermit_transmit procedure">
+	  <title>Kermit_transmit Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>kermit_transmit</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>file</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>file</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="telnetopen" xreflabel="telnet_open procedure">
+	  <title>Telnet_open Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>telnet_open</function></funcdef>
+	    <paramdef><parameter>hostname</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>hostname</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="telnetbinary" xreflabel="telnet_binary procedure">
+	  <title>Telnet_binary Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>telnet_binary</function></funcdef>
+	    <paramdef><parameter>hostname</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>hostname</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="telnettransmit" xreflabel="telnet_transmit procedure">
+	  <title>Telnet_transmit Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>telnet_transmit</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>file</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>file</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="tipopen" xreflabel="tip_open procedure">
+	  <title>Tip_open Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>tip_open</function></funcdef>
+	    <paramdef><parameter>hostname</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>hostname</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="rloginopen" xreflabel="rlogin_open procedure">
+	  <title>Rlogin_open Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>rlogin_open</function></funcdef>
+	    <paramdef><parameter>arg</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>arg</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="rloginspawn" xreflabel="rlogin_spawn procedure">
+	  <title>Rlogin_spawn Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>rlogin_spawn</function></funcdef>
+	    <paramdef><parameter>dest</parameter>
+		<parameter>cmdline</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>dest</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>cmdline</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="rshopen" xreflabel="rsh_open procedure">
+	  <title>Rsh_open Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>rsh_open</function></funcdef>
+	    <paramdef><parameter>hostname</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>hostname</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="rshdownload" xreflabel="rsh_download procedure">
+	  <title>Rsh_download Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>rsh_download</function></funcdef>
+	    <paramdef><parameter>desthost</parameter>
+		<parameter>srcfile</parameter>
+		<parameter>destfile</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>desthost</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>srcfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>destfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="rshupload" xreflabel="rsh_upload procedure">
+	  <title>Rsh_upload Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>rsh_upload</function></funcdef>
+	    <paramdef><parameter>desthost</parameter>
+		<parameter>srcfile</parameter>
+		<parameter>destfile</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>desthost</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>srcfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>destfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="rshexec" xreflabel="rsh_exec procedure">
+	  <title>Rsh_exec Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>rsh_exec</function></funcdef>
+	    <paramdef><parameter>boardname</parameter>
+		<parameter>cmd</parameter>
+		<parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>boardname</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>cmd</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="ftpopen" xreflabel="ftp_open procedure">
+	  <title>Ftp_open Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>ftp_open</function></funcdef>
+	    <paramdef><parameter>host</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>host</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="ftpupload" xreflabel="ftp_upload procedure">
+	  <title>Ftp_upload Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>ftp_upload</function></funcdef>
+	    <paramdef><parameter>host</parameter>
+		<parameter>remotefile</parameter>
+		<parameter>localfile</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>host</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>remotefile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>localfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="ftpdownload" xreflabel="ftp_download procedure">
+	  <title>Ftp_download Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>ftp_download</function></funcdef>
+	    <paramdef><parameter>host</parameter>
+		<parameter>localfile</parameter>
+		<parameter>remotefile</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>host</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>localfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>remotefile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="ftpclose" xreflabel="ftp_close procedure">
+	  <title>Ftp_close Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>ftp_close</function></funcdef>
+	    <paramdef><parameter>host</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>host</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="tipdownload" xreflabel="tip_download procedure">
+	  <title>Tip_download Procedure</title>
+
+	  <para></para>
+
+          <funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>tip_download</function></funcdef>
+              <paramdef><parameter>spawnid</parameter>
+              <parameter>file</parameter></paramdef>
+           </funcprototype>
+            </funcsynopsis>
+            <variablelist>
+              <varlistentry>
+                <term><parameter>spawnid</parameter></term>
+                <listitem><para>Download <option>file</option> to the
+                process <symbol>spawnid</symbol> (the value returned
+                when the connection was established), using the
+                <command>~put</command> command under
+                <productname>tip</productname>.  Most often used for
+                single board computers that require downloading
+                programs in ASCII S-records.  Returns
+                <emphasis>1</emphasis> if an error occurs,
+                <emphasis>0</emphasis> otherwise.</para></listitem>
+               </varlistentry>
+              <varlistentry>
+                 <term><parameter>file</parameter></term>
+                <listitem><para>This is the filename to
+                download.</para></listitem>
+           </varlistentry>
+         </variablelist>
+       </sect4>
+    </sect3>
+
+    <sect3 id="targetprocs">
+      <title>Procedures For Target Boards</title>
+
+      <para></para>
+
+      <sect4 id="defaultlink" xreflabel="default_link procedure">
+        <title>Default_link Procedure</title>
+
+	<para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>default_link</function></funcdef>
+	    <paramdef><parameter>board</parameter>
+	    <parameter>objects</parameter>
+	    <parameter>destfile</parameter>
+	    <parameter>flags</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>board</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>objects</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>destfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>flags</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="defaulttargetassemble" xreflabel="default_target_assemble
+	procedure">
+	  <title>Default_target_assemble Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>default_target_assemble</function></funcdef>
+	    <paramdef><parameter>source</parameter>
+	    <parameter>destfile</parameter>
+	    <parameter>flags</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>source</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>destfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>flags</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="defaulttargetcompile" xreflabel="default_target_compile
+	procedure">
+	  <title>default_target_compile Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>default_target_compile</function></funcdef>
+	    <paramdef><parameter>source</parameter>
+	    <parameter>destfile</parameter>
+	    <parameter>type</parameter>
+	    <parameter>options</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>source</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>destfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>type</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>options</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="popconfig" xreflabel="pop_config procedure">
+	  <title>Pop_config Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>pop_config</function></funcdef>
+	    <paramdef><parameter>type</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>type</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="prunewarnings" xreflabel="prune_warnings procedure">
+	  <title>Prune_warnings Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>prune_warnings</function></funcdef>
+	    <paramdef><parameter>text</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>text</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="pushbuild" xreflabel="push_build procedure">
+	  <title>Push_build Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>push_build</function></funcdef>
+	    <paramdef><parameter>name</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>name</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="pushconfig" xreflabel="push_config procedure">
+	  <title>push_config Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>push_config</function></funcdef>
+	    <paramdef><parameter>type</parameter>
+	    <parameter>name</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>type</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>name</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="reboottarget" xreflabel="reboot_target procedure">
+	  <title>Reboot_target Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>reboot_target</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="targetassemble" xreflabel="target_assemble procedure">
+	  <title>Target_assemble Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>target_assemble</function></funcdef>
+	    <paramdef><parameter>source destfile flags</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>source</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>destfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>flags</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="targetcompile" xreflabel="target_compile procedure">
+	  <title>Target_compile Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>target_compile</function></funcdef>
+	    <paramdef><parameter>source</parameter>
+	    <parameter>destfile</parameter>
+	    <parameter>type</parameter>
+	    <parameter>options</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>source</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>destfile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>type</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>options</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+	</sect3>
+
+	<sect3 id="targetdb" xreflabel="target database library file ">
+	  <title>Target Database Procedures</title>
+
+	  <sect4 id="boardinfo" xreflabel="board_info procedure">
+	    <title>Board_info Procedure</title>
+
+	    <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>board_info</function></funcdef>
+	    <paramdef><parameter>machine</parameter>
+	    <parameter>op</parameter>
+	    <parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>machine</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>op</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="hostinfo" xreflabel="host_info procedure">
+	  <title>Host_info Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>host_info</function></funcdef>
+	    <paramdef><parameter>op</parameter>
+	    <parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>op</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="setboardinfo" xreflabel="set_board_info procedure">
+	  <title>Set_board_info Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>set_board_info</function></funcdef>
+	    <paramdef><parameter>entry</parameter>
+	    <parameter>value</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>entry</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>value</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="setcurrtargetinfo" xreflabel="set_currtarget_info
+	procedure">
+	  <title>Set_currtarget_info Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>set_currtarget_info</function></funcdef>
+	    <paramdef><parameter>entry</parameter>
+	    <parameter>value</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>entry</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>value</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="targetinfo" xreflabel="target_info procedure">
+	  <title>Target_info Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>target_info</function></funcdef>
+	    <paramdef><parameter>op</parameter>
+	    <parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>op</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="unsetboardinfo" xreflabel="unset_board_info procedure">
+	  <title>Unset_board_info Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>unset_board_info</function></funcdef>
+	    <paramdef><parameter>entry</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>entry</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="unsetcurrtargetinfo" xreflabel="unset_currtarget_info
+	procedure">
+	  <title>Unset_currtarget_info Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>unset_currtarget_info</function></funcdef>
+	    <paramdef><parameter>entry</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>entry</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="pushtarget" xreflabel="push_target procedure">
+	  <title>Push_target Procedure</title>
+
+	  <para>This makes the target named <emphasis>name</emphasis> be the
+	  current target connection. The value of <emphasis>name</emphasis> is
+	  an index into the <symbol>target_info</symbol> array and is set in
+	  the global config file.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>push_target</function></funcdef>
+	    <paramdef><parameter>name</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>name</parameter></term>
+	    <listitem><para>The name of the target to make current
+	    connection.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="poptarget" xreflabel="poptarget procedure">
+	  <title>Pop_target Procedure</title>
+
+	  <para>This unsets the current target connection.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>pop_target</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="listtargets" xreflabel="list_targets procedure">
+	  <title>List_targets Procedure</title>
+
+	  <para>This lists all the supported targets for this
+	  architecture.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>list_targets</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="pushhost" xreflabel="push_host	procedure">
+	  <title>Push_host Procedure</title>
+
+	  <para>This makes the host named <emphasis>name</emphasis> be the
+	  current remote host connection. The value of
+	  <emphasis>name</emphasis> is an index into the
+	  <symbol>target_info</symbol> array and is set in the global config
+	  file.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>push_host</function></funcdef>
+	    <paramdef><parameter>name</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>name</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="pophost" xreflabel="pop_host procedure">
+	  <title>Pop_host Procedure</title>
+
+	  <para>This unsets the current host connection.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>pop_host</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+	 </funcsynopsis>
+	</sect4>
+
+	<sect4 id="compile" xreflabel="compile procedure">
+	  <title>Compile Procedure</title>
+
+	  <para>This invokes the compiler as set by CC to compile the
+	  file <filename>file</filename>. The default options for many cross
+	  compilation targets are <emphasis>guessed</emphasis> by &dj;, and
+	  these options can be added to by passing in more parameters as
+	  arguments to <command>compile</command>. Optionally, this will also
+	  use the value of the <emphasis>cflags</emphasis> field in the target
+	  config array. If the host is not the same as the build machines, then
+	  then compiler is run on the remote host using
+	  <command>execute_anywhere</command>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>compile</function></funcdef>
+	    <paramdef><parameter>file</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>file</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="archive" xreflabel="archive procedure">
+	  <title>Archive Procedure</title>
+
+	  <para>This produces an archive file. Any parameters passed to
+	  <command>archive</command> are used in addition to the default
+	  flags. Optionally, this will also use the value of the
+	  <emphasis>arflags</emphasis> field in the target config array. If the
+	  host is not the same as the build machines, then then archiver is run
+	  on the remote host using <command>execute_anywhere</command>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>archive</function></funcdef>
+	    <paramdef><parameter>file</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>file</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="ranlib" xreflabel="ranlib procedure">
+	  <title>Ranlib Procedure</title>
+
+	  <para>This generates an index for the archive file for systems that
+	  aren't POSIX yet. Any parameters passed to <command>ranlib</command>
+	  are used in for the flags.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>ranlib</function></funcdef>
+	    <paramdef><parameter>file</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>file</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="executeanywhere" xreflabel="execute_anywhere procedure">
+	  <title>Execute_anywhere Procedure</title>
+
+	  <para>This executes the <emphasis>cmdline</emphasis> on the proper
+	  host. This should be used as a replacement for the Tcl command
+	  <command>exec</command> as this version utilizes the target config
+	  info to execute this command on the build machine or a remote
+	  host. All config information for the remote host must be setup to
+	  have this command work. If this is a canadian cross, (where we test a
+	  cross compiler that runs on a different host then where &dj; is
+	  running) then a connection is made to the remote host and the command
+	  is executed there. It returns either REMOTERROR (for an error) or the
+	  output produced when the command was executed. This is used for
+	  running the tool to be tested, not a test case.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>execute_anywhere</function></funcdef>
+	    <paramdef><parameter>cmdline</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>cmdline</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+    </sect3>
+    <sect3 id="platformprocs" xreflabel="platform dependent procedures">
+      <title>Platform Dependent Procedures</title>
+
+      <para>Each combination of target and tool requires some
+      target-dependent procedures.  The names of these procedures have
+      a common form: the tool name, followed by an underbar
+      <emphasis>_</emphasis>, and finally a suffix describing the
+      procedure's purpose.  For example, a procedure to extract the
+      version from <productname>GDB</productname> is called
+      <symbol>gdb_version</symbol>.</para>
+
+      <para><command>runtest</command> itself calls only two of these
+      procedures, <symbol>${tool}_exit</symbol> and
+      <symbol>${tool}_version</symbol>; these procedures use no
+      arguments.</para>
+
+      <para>The other two procedures, <symbol>${tool}_start</symbol>
+      and <symbol>${tool}_load</symbol>}, are only called by the test
+      suites themselves (or by testsuite-specific initialization
+      code); they may take arguments  or not, depending on the
+      conventions used within each testsuite.</para>
+
+      <para>The usual convention for return codes from any of these
+      procedures (although it is not required by
+      <command>runtest</command>) is to return <emphasis>0</emphasis>
+      if the procedure succeeded, <emphasis>1</emphasis> if it failed,
+      and <emphasis>-1</emphasis> if there was a communication error.</para>
+	
+      	<sect4 id="toolstart" xreflabel="${tool}_start procedure">
+	  <title>${tool}_start Procedure</title>
+
+	  <para>Starts a particular tool.  For an interactive tool,
+	  <function>${tool}_start</function> starts and initializes the
+	  tool, leaving the tool up and running for the test cases; an
+	  example is <function>gdb_start</function>, the start function
+	  for GDB. For a batch oriented tool,
+	  <function>${tool}_start</function> is optional; the recommended
+	  convention is to let <function>${tool}_start</function> run the
+	  tool, leaving the output in a variable called
+	  <function>comp_output</function>.  Test scripts can then analyze
+	  <function>$comp_output</function> to determine the test results.
+	  An example of this second kind of start function is
+	  <function>gcc_start</function>, the start function for GCC.</para>
+
+	  <para>&dj; itself does not call
+	  <function>${tool}_start</function>.  The initialization
+	  module <function>${tool}_init.exp</function> must call
+	  <function>${tool}_start</function> for interactive tools;
+	  for batch-oriented tools, each individual test script calls
+	  <function>${tool}_start</function> (or makes other
+	  arrangements to run the tool).</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>${tool}_start</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="toolload" xreflabel="${tool}_load procedure">
+	  <title>${tool}_load Procedure</title>
+
+	  <para>Loads something into a tool. For an interactive tool,
+	  this conditions the tool for a particular test case; for
+	  example, <function>gdb_load</function> loads a new
+	  executable file into the debugger. For batch oriented tools,
+	  <function>${tool}_load</function> may do nothing---though,
+	  for example, the GCC support uses
+	  <function>gcc_load</function> to load and run a binary on
+	  the target environment.  Conventionally,
+	  <function>${tool}_load</function> leaves the output of any
+	  program it runs in a variable called
+	  <symbol>$exec_output</symbol>. Writing
+	  <function>${tool}_load</function> can be the most complex
+	  part of extending &dj; to a new tool or a new target, if
+	  it requires much communication coding or file
+	  downloading. Test scripts call
+	  <function>${tool}_load</function>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>${tool}_load</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="toolexit" xreflabel="${tool}_exit procedure">
+	  <title>${tool}_exit Procedure</title>
+
+	  <para>Cleans up (if necessary) before &dj; exits. For
+	  interactive tools, this usually ends the interactive
+	  session.  You can also use <function>${tool}_exit</function>
+	  to remove any temporary files left over from the
+	  tests. <command>runtest</command> calls
+	  <function>${tool}_exit</function>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>${tool}_exit</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="toolversion" xreflabel="${tool}_version procedure">
+	  <title>${tool}_version Procedure</title>
+
+	  <para>Prints the version label and number for
+	  <symbol>${tool}</symbol>.  This is called by the &dj;
+	  procedure that prints the final summary report.  The output
+	  should consist of the full path name used for the tested
+	  tool, and its version number.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>${tool}_version</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+    </sect3>
+
+    <sect3 id="utilprocs">
+      <title>Utility Procedures</title>
+
+      <sect4 id="getdirs" xreflabel="getdirs procedure">
+        <title>Getdirs Procedure</title>
+
+      <para>Returns a list of all the directories in the single
+	directory a single directory that match an optional
+	pattern. </para>
+	
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>getdirs</function></funcdef>
+	    <paramdef><parameter>rootdir</parameter>
+		<parameter>pattern</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>pattern</parameter></term>
+	    <listitem><para>If you do not specify
+	    <parameter>pattern</parameter>,
+	    <function>Getdirs</function> assumes a default pattern of
+	    <emphasis>*</emphasis>. You may use the common shell
+	    wildcard characters in the pattern. If no directories
+	    match the pattern, then a NULL string is
+	    returned.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+      <sect4 id="find" xreflabel="find procedure">
+        <title>Find Procedure</title>
+
+	<para>Search for files whose names match <emphasis>pattern</emphasis>
+	(using shell wildcard characters for filename expansion).  Search
+	subdirectories recursively, starting at
+	<emphasis>rootdir</emphasis>. The result is the list of files whose
+	names match; if no files match, the result is empty.  Filenames in the
+	result include all intervening subdirectory names. If no files match
+	the pattern, then a NULL string is returned.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>find</function></funcdef>
+	    <paramdef><parameter>rootdir</parameter>
+	    <parameter>pattern</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>rootdir</parameter></term>
+	    <listitem><para>The top level directory to search the search
+	    from.</para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>pattern</parameter></term>
+	    <listitem><para>A csh "glob" style regular expression representing
+	    the files to find.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+        <sect4 id="which" xreflabel="which procedure">
+        <title>Which Procedure</title>
+
+	<para>Searches the execution path for an executable file
+	<emphasis>binary</emphasis>, like the BSD <command>which</command>
+	utility.  This procedure uses the shell environment variable
+	<emphasis>PATH</emphasis>. It returns <emphasis>0</emphasis> if the
+	binary is not in the path, or if there is no <emphasis>PATH</emphasis>
+	environment variable. If <command>binary</command> is in the path, it
+	returns the full path to <command>binary</command>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>which</function></funcdef>
+	    <paramdef><parameter>file</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>binary</parameter></term>
+	    <listitem><para>The executable program or shell script to look
+	    for.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+        <sect4 id="grep" xreflabel="grep procedure">
+        <title>Grep Procedure</title>
+
+	<para>Search the file called <filename>filename</filename> (a fully
+	specified path) for lines that contain a match for regular expression
+	<emphasis>regexp</emphasis>. The result is a list of all the lines that
+	match.  If no lines match, the result is an empty string.  Specify
+	<emphasis>regexp</emphasis> using the standard regular expression style
+	used by the Unix utility program grep.</para>
+
+	<para>Use the optional third argument <emphasis>line</emphasis> to
+	start lines in the result with the line number in
+	<filename>filename</filename>.  (This argument is simply an option
+	flag; type it just as shown <option>--line</option>.)</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>grep</function></funcdef>
+	    <paramdef><parameter>filename</parameter>
+	    <parameter>regexp</parameter>
+	    <parameter>--line</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>filename</parameter></term>
+	    <listitem><para>The file to search.</para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>regexp</parameter></term>
+	    <listitem><para>The Unix style regular expression (as used by the
+	    <command>grep</command> Unix utility) to search
+	    for.</para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>--line</parameter></term>
+	    <listitem><para>Prefix the line number to each line where the
+	    regexp matches.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="prune" xreflabel="prune procedure">
+	  <title>Prune Procedure</title>
+	  <para>This procedure is deprecated and will be removed in
+	  the next release of &dj;.  If a testsuite uses this
+	  procedure, a copy of the procedure should be made and placed
+	  in the lib directory of the testsuite.</para>
+	</sect4>
+
+	<sect4 id="slay" xreflabel="slay procedure">
+	  <title>Slay Procedure</title>
+	  <para>This procedure is deprecated and will be removed in
+	  the next release of &dj;.  If a testsuite uses this
+	  procedure, a copy of the procedure should be made and placed
+	  in the lib directory of the testsuite.</para>
+	</sect4>
+
+	<sect4 id="absolute" xreflabel="absolute procedure">
+	  <title>Absolute Procedure</title>
+	  <para>This procedure is deprecated and will be removed in
+	  the next release of &dj;.  If a testsuite uses this
+	  procedure, a copy of the procedure should be made and placed
+	  in the lib directory of the testsuite.</para>
+	</sect4>
+
+	<sect4 id="psource" xreflabel="psource procedure">
+	  <title>Psource Procedure</title>
+	  <para>This procedure is deprecated and will be removed in
+	  the next release of &dj;.  If a testsuite uses this
+	  procedure, a copy of the procedure should be made and placed
+	  in the lib directory of the testsuite.</para>
+	</sect4>
+
+	<sect4 id="runtestfilep" xreflabel="runtest_file_p procedure">
+	  <title>Runtest_file_p Procedure</title>
+
+	  <para>Search <emphasis>runtest</emphasis>s for
+	  <emphasis>testcase</emphasis> and return <emphasis>1</emphasis> if
+	  found, <emphasis>0</emphasis> if not. <emphasis>runtests</emphasis>
+	  is a list of two elements.  The first is a copy of what was on
+	  the right side of the <emphasis>=</emphasis> if	
+	  <programlisting>foo.exp="..."</programlisting>" was specified, or
+	  an empty string if no such argument is present. The second is the
+	  pathname of the current testcase under consideration. This is used
+	  by tools like compilers where each testcase is a file.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>runtest_file_p</function></funcdef>
+	    <paramdef><parameter>runtests</parameter>
+	    <parameter>testcase</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>runtests</parameter></term>
+	    <listitem><para>The list of patterns to compare against.
+              </para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>testcase</parameter></term>
+	    <listitem><para>The test case filename.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="diff" xreflabel="diff procedure">
+	  <title>Diff Procedure</title>
+
+	  <para>Compares the two files and returns a <emphasis>1</emphasis> if
+	  they match, or a <emphasis>0</emphasis> if they don't. If
+	  <symbol>verbose</symbol> is set, then it'll print the differences to
+	  the screen.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>diff</function></funcdef>
+	    <paramdef><parameter>file_1</parameter>
+	    <parameter>file_2</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>file_1</parameter></term>
+	    <listitem><para>The first file to compare.</para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>file_2</parameter></term>
+	    <listitem><para>The second file to compare.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="setenv" xreflabel="setenv procedure">
+	  <title>Setenv Procedure</title>
+
+	  <para>Sets the environment variable <emphasis>var</emphasis> to the
+	  value <emphasis>val</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>setenv</function></funcdef>
+	    <paramdef><parameter>var</parameter>
+   	    <parameter>val</parameter></paramdef>
+           </funcprototype>
+	 </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>var</parameter></term>
+	    <listitem><para>The environment variable to set.</para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>val</parameter></term>
+	    <listitem><para>The value to set the variable to.</para></listitem>
+          </varlistentry>
+	</variablelist>
+
+        </sect4>
+	<sect4 id="unsetenv" xreflabel="unsetenv procedure">
+	  <title>unsetenv Procedure</title>
+
+	  <para>Unsets the environment variable
+	  <emphasis>var</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>unsetenv</function></funcdef>
+	    <paramdef><parameter>var</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>var</parameter></term>
+	    <listitem><para>The environment variable to
+	    unset.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="getenv" xreflabel="getenv procedure">
+	  <title>Getenv Procedure</title>
+
+	  <para>Returns the value of <emphasis>var</emphasis> in the
+	  environment if it exists, otherwise it returns NULL.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>getenv</function></funcdef>
+	    <paramdef><parameter>var</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>var</parameter></term>
+	    <listitem><para>The environment variable to get the value
+	    of.</para></listitem>
+          </varlistentry>
+	</variablelist>
+
+      </sect4>
+	<sect4 id="prunesystemcrud" xreflabel="prune_system_crud procedure">
+	  <title>Prune_system_crud Procedure</title>
+
+	  <para>For system <emphasis>system</emphasis>, delete text the host or
+	  target operating system might issue that will interfere with pattern
+	  matching of program output in <emphasis>text</emphasis>.  An example
+	  is the message that is printed if a shared library is out of
+	  date.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>prune_system_crud</function></funcdef>
+	    <paramdef><parameter>system</parameter>
+	    <parameter>test</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>system</parameter></term>
+	    <listitem><para>The system error messages to look for to screen out
+	   .</para></listitem>
+          </varlistentry>
+          <varlistentry>
+	    <term><parameter>text</parameter></term>
+	    <listitem><para>The Tcl variable containing the
+	    text.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+	
+    </sect3>
+
+    <sect3 id="libgloss" xreflabel="Libgloss">
+      <title>Libgloss, A Free BSP</title>
+
+      <para>Libgloss is a free <firstterm>BSP</firstterm> (Board Support
+      Package) commonly used with GCC and G++ to produce a fully linked
+      executable image for an embedded systems.</para>
+
+      <sect4 id="libglosslinkflags" xreflabel="libgloss_link_flags procedure">
+        <title>Libgloss_link_flags Procedure</title>
+
+	<para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>libgloss_link_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="libglossincludeflags" xreflabel="libgloss_include_flags
+	procedure">
+	  <title>Libgloss_include_flags Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>libgloss_include_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="newliblinkflags" xreflabel="newlib_link_flags procedure">
+	  <title>Newlib_link_flags Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>newlib_link_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="newlibincludeflags" xreflabel="newlib_include_flags
+	procedure">
+	  <title>Newlib_include_flags Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>newlib_include_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="libioincludeflags" xreflabel="libio_include_flags
+	procedure">
+	  <title>Libio_include_flags Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>libio_include_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="libiolinkflags" xreflabel="libio_link_flags procedure">
+	  <title>Libio_link_flags Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>libio_link_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="gxxincludeflags" xreflabel="g++_include_flags procedure">
+	  <title>G++_include_flags Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>g++_include_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="gxxlinkflags" xreflabel="g++_link_flags procedure">
+	  <title>G++_link_flags Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>g++_link_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="libstdcxxincludeflags" xreflabel="libstdc++_include_flags
+	procedure">
+	  <title>Libstdc++_include_flags Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>libstdc++_include_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="libstdcxxlinkflags" xreflabel="libstdc++_link_flags
+	procedure">
+	  <title>Libstdc++_link_flags Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>libstdc++_link_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="getmultilibs" xreflabel="get_multilibs procedure">
+	  <title>Get_multilibs Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>get_multilibs</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="findbinutilsprog" xreflabel="find_binutils_prog procedure">
+	  <title>Find_binutils_prog Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>find_binutils_prog</function></funcdef>
+	    <paramdef><parameter>name</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>name</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="findgcc" xreflabel="find_gcc procedure">
+	  <title>Find_gcc Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>find_gcc</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="findgcj" xreflabel="find_gcj procedure">
+	  <title>Find_gcj Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>find_gcj</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="findgxx" xreflabel="find_g++ procedure">
+	  <title>Find_g++ Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>find_g++</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="findg77" xreflabel="find_g77 procedure">
+	  <title>Find_g77 Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>find_g77</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="processmultiliboptions" xreflabel="process_multilib_options
+	procedure">
+	  <title>Process_multilib_options Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>process_multilib_options</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="addmultiliboption" xreflabel="add_multilib_option
+	procedure">
+	  <title>Add_multilib_option Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>add_multilib_option</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="findgas" xreflabel="find_gas procedure">
+	  <title>Find_gas Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>find_gas</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="findld" xreflabel="find_ld procedure">
+	  <title>Find_ld Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>find_ld</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect4>
+
+	<sect4 id="buildwrapper" xreflabel="build_wrapper procedure">
+	  <title>Build_wrapper Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>build_wrapper</function></funcdef>
+	    <paramdef><parameter>gluefile</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>gluefile</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="winsupincludeflags" xreflabel="winsup_include_flags
+	procedure">
+	  <title>Winsup_include_flags Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>winsup_include_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="winsuplinkflags" xreflabel="winsup_link_flags procedure">
+	  <title>Winsup_link_flags Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>winsup_link_flags</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+    </sect3>
+
+    <sect3 id="debugprocs" xreflabel="Debugging Procedures">
+      <title>Procedures for debugging your Tcl code.</title>
+
+      <para><filename>lib/debugger.exp</filename>defines these utility
+      procedures:</para>
+
+      <sect4 id="dumpvars" xreflabel="dumpvars procedure">
+        <title>Dumpvars Procedure</title>
+
+	<para>This takes a csh style regular expression (glob rules) and prints
+	the values of the global variable names that match.  It is abbreviated
+	as <emphasis>dv</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>dumpvars</function></funcdef>
+	    <paramdef><parameter>vars</parameter></paramdef>
+           </funcprototype>
+	   </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>vars</parameter></term>
+	    <listitem><para>The variables to dump.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="dumplocals" xreflabel="dumplocals procedure">
+	  <title>Dumplocals Procedure</title>
+
+	  <para>This takes a csh style regular expression (glob rules) and
+	  prints the values of the local variable names that match. It is
+	  abbreviated as <emphasis>dl</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>dumplocals</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="dumprocs" xreflabel="dumprocs procedure">
+	  <title>Dumprocs Procedure</title>
+
+	  <para>This takes a csh style regular expression (glob rules) and
+	  prints the body of all procs that match. It is abbreviated as
+	  <emphasis>dp</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>dumprocs</function></funcdef>
+	    <paramdef><parameter>pattern</parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>pattern</parameter></term>
+	    <listitem><para>The csh "glob" style pattern to look
+	    for.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="dumpwatch" xreflabel="dumpwatch procedure">
+	  <title>Dumpwatch Procedure</title>
+
+	  <para>This takes a csh style regular expression (glob rules) and
+	  prints all the watchpoints. It is abbreviated as
+	  <emphasis>dw</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>dumpwatch</function></funcdef>
+	    <paramdef><parameter>pattern</parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>pattern</parameter></term>
+	    <listitem><para>The csh "glob" style pattern to look
+	    for.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="watcharray" xreflabel="watcharray procedure">
+	  <title>Watcharray Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+           <funcprototype>
+            <funcdef><function>watcharray</function></funcdef>
+	    <paramdef><parameter>element</parameter>
+		<parameter>type</parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>type</parameter></term>
+	    <listitem><para>The csh "glob" style pattern to look
+	    for.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="watchvar" xreflabel="watchvar procedure">
+	  <title>Watchvar Procedure</title>
+
+	  <para></para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>watchvar</function></funcdef>
+	    <paramdef><parameter>var</parameter>
+		<parameter>type</parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter></parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="watchunset" xreflabel="watchunset procedure">
+	  <title>Watchunset Procedure</title>
+
+	  <para>This breaks program execution when the variable
+	  <symbol>var</symbol> is unset. It is abbreviated as
+	  <emphasis>wu</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>watchunset</function></funcdef>
+	    <paramdef><parameter>arg</parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="watchwrite" xreflabel="watchwrite procedure">
+	  <title>Watchwrite Procedure</title>
+
+	  <para>This breaks program execution when the variable
+	  <symbol>var</symbol> is written. It is abbreviated as
+	  <emphasis>ww</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>watchwrite</function></funcdef>
+	    <paramdef><parameter>var</parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>var</parameter></term>
+	    <listitem><para>The variable to watch.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>	
+
+	<sect4 id="watchread" xreflabel="watchread procedure">
+	  <title>Watchread Procedure</title>
+
+	  <para>This breaks program execution when the variable
+	  <symbol>var</symbol> is read. It is abbreviated as
+	  <emphasis>wr</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>watchread</function></funcdef>
+	    <paramdef><parameter>var</parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>var</parameter></term>
+	    <listitem><para>The variable to watch.</para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="watchdel" xreflabel="watchdel procedure">
+	  <title>Watchdel Procedure</title>
+
+	  <para>This deletes a watchpoint from the watch list. It is
+	  abbreviated as <emphasis>wd</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>watchdel</function></funcdef>
+	    <paramdef><parameter>args</parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>args</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="print" xreflabel="print procedure">
+	  <title>Print Procedure</title>
+
+	  <para>This prints the value of the variable
+	  <parameter>var</parameter>. It is abbreviated as
+	  <emphasis>p</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>print</function></funcdef>
+	    <paramdef><parameter>var</parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter>var</parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+	<sect4 id="quit" xreflabel="quit procedure">
+	  <title>Quit Procedure</title>
+
+	  <para>This makes runtest exit. It is abbreviated as
+	  <emphasis>q</emphasis>.</para>
+
+	<funcsynopsis role="tcl">
+          <funcprototype>
+            <funcdef><function>quit</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	<variablelist>
+          <varlistentry>
+	    <term><parameter></parameter></term>
+	    <listitem><para></para></listitem>
+          </varlistentry>
+	</variablelist>
+	</sect4>
+
+    </sect3>
+
+  </sect2>
+
+   <sect2 id="filemap">
+    <title>File Map</title>
+
+    <para>This is a map of the files in &dj;.</para>
+
+    <itemizedlist>
+      <listitem><para>runtest</para></listitem>
+      <listitem><para>runtest.exp</para></listitem>
+      <listitem><para>stub-loader.c</para></listitem>
+      <listitem><para>testglue.c</para></listitem>
+      <listitem><para>config</para></listitem>
+      <listitem><para>baseboards</para></listitem>
+      <listitem><para>lib/debugger.exp</para></listitem>
+      <listitem><para>lib/dg.exp</para></listitem>
+      <listitem><para>lib/framework.exp</para></listitem>
+      <listitem><para>lib/ftp.exp</para></listitem>
+      <listitem><para>lib/kermit.exp</para></listitem>
+      <listitem><para>lib/libgloss.exp</para></listitem>
+      <listitem><para>lib/mondfe.exp</para></listitem>
+      <listitem><para>lib/remote.exp</para></listitem>
+      <listitem><para>lib/rlogin.exp</para></listitem>
+      <listitem><para>lib/rsh.exp</para></listitem>
+      <listitem><para>lib/standard.exp</para></listitem>
+      <listitem><para>lib/target.exp</para></listitem>
+      <listitem><para>lib/targetdb.exp</para></listitem>
+      <listitem><para>lib/telnet.exp</para></listitem>
+      <listitem><para>lib/tip.exp</para></listitem>
+      <listitem><para>lib/util-defs.exp</para></listitem>
+      <listitem><para>lib/utils.exp</para></listitem>
+      <listitem><para>lib/xsh.exp</para></listitem>
+      <listitem><para>lib/dejagnu.exp</para></listitem>
+    </itemizedlist>
+
+  </sect2>
+
+</sect1>
+
+<sect1 id="unittestapi" xreflabel="Unit Testing API">
+  <title>Unit Testing API</title>
+
+    <sect2 id="cunit" xreflabel="C Unit Testing API">
+    <title>C Unit Testing API</title>
+
+    <para>All of the functions that take a
+    <parameter>msg</parameter> parameter use a C char * that is
+    the message to be displayed. There currently is no support for
+    variable length arguments.</para>
+
+
+    <sect3 id="passfunc" xreflabel="pass function">
+    <title>Pass Function</title>
+
+	  <para>This prints a message for a successful test
+	  completion.</para>
+
+	  <funcsynopsis role="C">
+          <funcprototype>
+	  <funcdef><function>pass</function></funcdef>
+	  <paramdef><parameter>msg</parameter></paramdef>
+           </funcprototype>
+	  </funcsynopsis>
+
+    </sect3>
+
+    <sect3 id="failfunc" xreflabel="fail function">
+    <title>Fail Function</title>
+
+	  <para>This prints a message for an unsuccessful test
+	  completion.</para>
+
+	  <funcsynopsis role="C">
+          <funcprototype>
+	  <funcdef><function>fail</function></funcdef>
+	  <paramdef><parameter>msg</parameter></paramdef>
+           </funcprototype>
+	  </funcsynopsis>
+
+    </sect3>
+
+	<sect3 id="untestedfunc" xreflabel="untested function">
+	  <title>Untested Function</title>
+
+	  <para>This prints a message for an test case that isn't run
+	  for some technical reason.</para>
+
+	<funcsynopsis role="C">
+          <funcprototype>
+            <funcdef><function>untested</function></funcdef>
+	    <paramdef><parameter>msg</parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	</sect3>
+
+	<sect3 id="unresolvedfunc" xreflabel="unresolved function">
+	  <title>Unresolved Function</title>
+
+	  <para>This prints a message for an test case that is run,
+	  but there is no clear result. These output states require a
+	  human to look over the results to determine what happened.
+	  </para>
+
+	<funcsynopsis role="C">
+          <funcprototype>
+            <funcdef><function>unresolved</function></funcdef>
+	    <paramdef><parameter>msg</parameter></paramdef>
+           </funcprototype>
+	        </funcsynopsis>
+	</sect3>
+
+	<sect3 id="totalsfunc" xreflabel="totals function">
+	  <title>Totals Function</title>
+
+	  <para>This prints out the total numbers of all the test
+	  state outputs.</para>
+
+	<funcsynopsis role="C">
+          <funcprototype>
+            <funcdef><function>totals</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect3>
+
+    </sect2>
+
+    <sect2 id="cppunit" xreflabel="C++ Unit Testing API">
+	   <title>C++ Unit Testing API</title>
+
+	   <para>All of the methods that take a
+	   	  <parameter>msg</parameter> parameter use a C char *
+		  or STL string, that is the message to be
+		  displayed. There currently is no support for variable
+	   	  length arguments.</para>
+
+	   <sect3 id="passmeth" xreflabel="pass method">
+	   <title>Pass Method</title>
+
+	  <para>This prints a message for a successful test
+	  completion.</para>
+
+	<funcsynopsis role="C++">
+          <funcprototype>
+            <funcdef><function>TestState::pass</function></funcdef>
+	    <paramdef><parameter>msg</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	</sect3>
+
+	<sect3 id="failmeth" xreflabel="fail method">
+	  <title>Fail Method</title>
+
+	  <para>This prints a message for an unsuccessful test
+	  completion.</para>
+
+	<funcsynopsis role="C++">
+          <funcprototype>
+            <funcdef><function>TestState::fail</function></funcdef>
+	    <paramdef><parameter>msg</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	</sect3>
+
+	<sect3 id="untestedmeth" xreflabel="untested method">
+	  <title>Untested Method</title>
+
+	  <para>This prints a message for an test case that isn't run
+	  for some technical reason.</para>
+
+	<funcsynopsis role="C++">
+          <funcprototype>
+            <funcdef><function>TestState::untested</function></funcdef>
+	    <paramdef><parameter>msg</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	</sect3>
+
+	<sect3 id="unresolvedmeth" xreflabel="unresolved method">
+	  <title>Unresolved Method</title>
+
+	  <para>This prints a message for an test case that is run,
+	  but there is no clear result. These output states require a
+	  human to look over the results to determine what happened.
+	  </para>
+
+	<funcsynopsis role="C++">
+          <funcprototype>
+            <funcdef><function>TestState::unresolved</function></funcdef>
+	    <paramdef><parameter>msg</parameter></paramdef>
+           </funcprototype>
+	</funcsynopsis>
+	</sect3>
+
+	<sect3 id="totalsmeth" xreflabel="totals method">
+	  <title>Totals Method</title>
+
+	  <para>This prints out the total numbers of all the test
+	  state outputs.</para>
+
+	<funcsynopsis role="C++">
+          <funcprototype>
+            <funcdef><function>TestState::totals</function></funcdef>
+	    <paramdef><parameter></parameter></paramdef>
+           </funcprototype>
+        </funcsynopsis>
+	</sect3>
+
+     </sect2>
+
+</sect1>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-namecase-general:t
+sgml-general-insert-case:lower
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:1
+sgml-indent-data:nil
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

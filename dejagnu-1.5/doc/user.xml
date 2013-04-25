@@ -1,0 +1,3180 @@
+
+ <sect1 id="gettingup">
+    <title>Getting &dj; up and running</title>
+
+<para>This chapter was originally written by Niklaus Giger
+ (ngiger@mus.ch) because he lost a week to figure out how &dj; works
+ and how to write a first test.
+</para> 
+
+<para>Follow these instructions as closely a possible in order get a
+good insight into how &dj; works, else you might run into a lot of
+subtle problems. You have been warned.</para> 
+
+<para>It should be no big problems installing &dj; using your
+package manager or from the source code. Under a Debian/GNU/Linux
+systems just type (as root) <programlisting>apt-get install
+dejagnu</programlisting>. These examples were run on a primary machine
+with a AMD K6 and a Mac Powerbook G3 serving as a remote
+target.</para> 
+
+<para> The tests for Windows were run under Windows using the actual
+Cygwin version (1.3.x as of October 2001). Its target system was a PPC
+embedded system running vxWorks.  </para>
+
+<sect2>
+<title>Test your installation</title>
+
+<para>Create a new user called "dgt" (&dj;Test), which uses bash as
+it login shell. PS1 must be set to '\u:\w\$ ' in its ~/.bashrc. Login
+as this user, create an empty directory and change the working
+directory to it. e.g</para> 
+
+<programlisting>
+dgt:~$ mkdir ~/dejagnu.test
+dgt:~$ cd ~/dejagnu.test
+</programlisting>
+
+<para>Now you are ready to test &dj;'s main program called
+runtest. The expected output is shown</para>
+
+<example>
+<title>Runtest output in a empty directory
+</title>
+
+<programlisting>
+dgt:~/dejagnu.test$ runtest
+WARNING: Couldn't find the global config file.
+WARNING: No tool specified Test
+Run By dgt on Sun Nov 25 17:07:03 2001 Native configuration is i586-pc-linux-gnu
+=== tests ===
+Schedule of variations: unix
+Running target unix Using /usr/share/dejagnu/baseboards/unix.exp as board description file for target.
+Using /usr/share/dejagnu/config/unix.exp as generic interface file for target.
+ERROR: Couldn't find tool config file for unix.
+=== Summary ===</programlisting>
+
+<para>We will show you later how to get rid of all the WARNING- and
+ERROR-messages. The files testrun.sum and testrun.log have been
+created, which do not interest us at this point. Let's remove
+them.</para> 
+
+<programlisting>:~/dejagnu.test$ rm testrun.sum testrun.log
+</programlisting>
+</example>
+
+<sect3>
+<title>Windows</title>
+
+<para>On Windows systems &dj; is part of a port of a lot of Unix
+tools to the Windows OS, called Cygwin. Cygwin may be downloaded and
+installed from a mirror of http://www.cygwin.com/. All examples were
+also run on Windows. If nothing is said, you can assume that you
+should get the same output as on a Unix system.</para> 
+
+<para>You will need a telnet daemon if you want to use a Windows box
+as a remote target. There seems to be a freeware telnet daemon at
+http://www.fictional.net/.</para>
+</sect3>
+
+<sect3>
+<title>Getting the source code for the calc example</title>
+
+<para>If you are running a Debian distribution you can find the
+examples under /usr/share/doc/dejagnu/examples. These examples seem to
+be missing in Red Hat's RPM. In this case download the sources of
+&dj; and adjust the paths to the &dj; examples
+accordingly.</para>
+</sect3>
+</sect2>
+
+<sect2>
+<title>Create a minimal project, e.g. calc</title>
+
+<para>In this section you will to start a small project,
+using the sample application calc, which is part of your &dj;
+distribution</para> 
+
+<sect3><title>A simple project without the GNU autotools</title>
+
+<para>The runtest program can be run standalone. All the
+autoconf/automake support is just cause those programs are commonly
+used for other GNU applications. The key to running runtest standalone
+is having the local site.exp file setup correctly, which automake
+does.</para> 
+
+<para>The generated site.exp should like like:</para>
+<programlisting>
+set tool calc
+set srcdir .
+set objdir /home/dgt/dejagnu.test
+</programlisting></sect3>
+
+<sect3>
+<title>Using autoconf/autoheader/automake</title>
+
+<para>We have to prepare some input file in order to run autoconf and
+automake. There is book &quot;GNU autoconf, automake and
+libtool&quot; by Garry V. Vaughan, et al. NewRider, ISBN
+1-57870-190-2 which describes this process thoroughly.</para> 
+
+<para>From the calc example distributed with the &dj; documentation
+you should copy the program file itself (calc.c) and some additional
+files, which you might examine a little bit close to derive their
+meanings.</para> 
+
+<programlisting>
+dgt:~/dejagnu.test$ cp -r /usr/share/doc/dejagnu/examples/calc/\
+{configure.in,Makefile.am,calc.c,testsuite} .
+</programlisting>
+
+<para>In Makemake.am note the presence of the AUTOMAKE_OPTIONS = dejagnu. This option is needed.</para>
+
+<para>Run aclocal to generate aclocal.m4, which is a collection of
+macros needed by configure.in</para> 
+
+<programlisting>
+dgt:~/dejagnu.test$ aclocal
+</programlisting>
+
+<para>autoconf is another part of the auto-tools. Run it to generate
+configure based on information contained in configure.in.</para>
+
+<programlisting>
+dgt:~/dejagnu.test$ autoconf
+</programlisting>
+
+<para>autoheader is another part of the auto-tools.
+Run it to generate calc.h.in. </para>
+
+<programlisting>
+dgt:~/dejagnu.test$ autoheader
+</programlisting>
+
+<para>The Makefile.am of this example was developed as port of the &dj;
+distribution.
+Adapt Makefile.am for this test. Replace the line
+&quot;#noinst_PROGRAMS = calc&quot; to
+&quot;bin_PROGRAMS = calc&quot;.
+Change the RUNTESTDEFAULTFLAGS from
+&quot;$$srcdir/testsuite&quot; to
+&quot;./testsuite&quot;.</para>
+
+<para>Running automake at this point contains a series of warning in
+its output as shown in the following example:</para>
+
+<example>
+<title>Sample output of automake with missing files</title>
+<programlisting>
+dgt:~/dejagnu.test$ automake --add-missing
+automake: configure.in: installing `./install-sh'
+automake: configure.in: installing `./mkinstalldirs'
+automake: configure.in: installing `./missing'
+automake: Makefile.am: installing `./INSTALL'
+automake: Makefile.am: required file `./NEWS' not found
+automake: Makefile.am: required file `./README' not found
+automake: Makefile.am: installing `./COPYING'
+automake: Makefile.am: required file `./AUTHORS' not found
+automake: Makefile.am: required file `./ChangeLog' not found
+configure.in: 4: required file `./calc.h.in' not found
+Makefile.am:6: required directory ./doc does not exist
+</programlisting>
+</example>
+
+<para>Create a empty directory doc and empty files
+INSTALL, NEWS, README, AUTHORS, ChangeLog and COPYING.
+The default COPYING will point to the GNU Public License (GPL).
+In a real project it would be time to add some meaningful text in each file.
+</para>
+
+<para>Adapt calc to your environment by calling configure.</para>
+<example>
+<title>Sample output of configure
+</title>
+<programlisting>
+dgt:~/dejagnu.test$ ./configure
+creating cache ./config.cache
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking for a BSD compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking whether make sets ${MAKE}... yes
+checking for working aclocal... found
+checking for working autoconf... found
+checking for working automake... found
+checking for working autoheader... found
+checking for working makeinfo... found
+checking for gcc... gcc checking whether the C compiler (gcc ) works... yes
+checking whether the C compiler (gcc ) is a cross-compiler... no
+checking whether we are using GNU C... yes
+checking whether gcc accepts -g... yes
+checking for a BSD compatible install... /usr/bin/install -c
+checking how to run the C preprocessor... gcc -E
+checking for stdlib.h... yes
+checking for strcmp... yes
+updating cache ./config.cache
+creating ./config.status
+creating Makefile creating calc.h
+</programlisting>
+</example>
+
+<para>If you are familiar with GNU software,
+this output should not contain any surprise to you.
+Any errors should be easy to fix for such a simple program.</para>
+
+<para>Build the calc executable:</para>
+
+<example>
+<title>Sample output building calc
+</title>
+<programlisting>
+dgt:~/dejagnu.test$ make
+gcc -DHAVE_CONFIG_H -I. -I. -I. -g -O2 -c calc.c
+gcc -g -O2 -o calc calc.o
+</programlisting>
+</example>
+
+<para>You prepared a few files and then called some
+commands. Respecting the right order assures a automatic and correctly
+compiled calc program. The following example resumes the correct
+order.</para>
+
+<example>
+<title>Creating the calc program using the GNU autotools</title>
+<programlisting>
+dgt:~/dejagnu.test$ aclocal
+dgt:~/dejagnu.test$ autoconf
+dgt:~/dejagnu.test$ autoheader
+dgt:~/dejagnu.test$ automake --add-missing
+dgt:~/dejagnu.test$ ./configure
+dgt:~/dejagnu.test$ make
+
+</programlisting>
+</example>
+
+<para>Play with calc and verify whether it works correctly.
+A sample session might look like this:</para>
+
+<programlisting>
+dgt:~/dejagnu.test$ ./calc
+calc: version
+Version: 1.1
+calc:<emphasis> </emphasis>add 3 4
+7
+calc: multiply 3 4<emphasis> </emphasis>
+12
+calc: multiply 2 4<emphasis> </emphasis>
+12
+calc: quit
+
+</programlisting>
+
+<para>Look at the intentional bug that 2 times 4 equals 12.</para>
+
+<para>The tests run by &dj; need a file called site.exp,
+which is automatically generated if we call &quot;make
+site.exp&quot;. This was the purpose of the &quot;AUTOMAKE_OPTIONS =
+dejagnu&quot; in Makefile.am.</para>
+
+<example>
+<title>Sample output generating a site.exp</title>
+<programlisting>
+dgt: make site.exp
+dgt:~/dejagnu.test$ make site.exp
+Making a new site.exp file...
+</programlisting>
+</example>
+
+
+</sect3>
+</sect2>
+
+<sect2>
+<title>Our first automated tests</title>
+<sect3><title>Running the test for the calc example</title>
+
+<para>Now we are ready to call the automated tests </para>
+
+<example>
+<title>Sample output of runtest in a configured directory</title>
+
+<programlisting>
+dgt:~/dejagnu.test$ make check
+make check-DEJAGNU
+make[1]: Entering directory `/home/dgt/dejagnu.test' srcdir=`cd . &amp;&amp; pwd`; export srcdir; \
+EXPECT=expect; export EXPECT; \ runtest=runtest; \
+if /bin/sh -c "$runtest --version" > /dev/null 2>&amp;1; then \
+$runtest --tool calc CALC=`pwd`/calc --srcdir ./testsuite ; \
+else echo "WARNING: could not find \`runtest'" 1>&amp;2; :;\
+fi
+WARNING: Couldn't find the global config file.
+WARNING: Couldn't find tool init file
+Test Run By dgt on Sun Nov 25 21:42:21 2001
+Native configuration is i586-pc-linux-gnu
+
+       === calc tests ===
+
+Schedule of variations:
+   unix
+
+Running target unix
+Using /usr/share/dejagnu/baseboards/unix.exp as board description file for target.
+Using /usr/share/dejagnu/config/unix.exp as generic interface file for target.
+Using ./testsuite/config/unix.exp as tool-and-target-specific interface file.
+Running ./testsuite/calc.test/calc.exp ...
+FAIL: multiply2 (bad match)
+
+=== calc Summary ===
+
+# of expected passes 5
+# of unexpected failures 1
+/home/Dgt/dejagnu.test/calc version Version: 1.1
+make[1]: *** [check-DEJAGNU] Fehler 1
+make[1]: Leaving directory `/home/Dgt/dejagnu.test' make: *** [check-am] Fehler 2
+</programlisting>
+</example>
+
+<para>Did you see the  line &quot;FAIL:&quot;? The test cases for calc catch the bug in the calc.c file. Fix the error in calc.c later as the following examples assume a unchanged calc.c.</para>
+
+<para>Examine the output files calc.sum and calc.log. Try to
+understand the testcases written in
+~/dejagnu.test/testsuite/calc.test/calc.exp. To understand Expect you
+might take a look at the book &quot;Exploring Expect&quot;, which is
+an excellent resource for learning and using Expect. (Pub: O'Reilly,
+ISBN 1-56592-090-2) The book contains hundreds of examples and also
+includes a tutorial on Tcl. Exploring Expect is 602 pages
+long.</para>
+
+</sect3>
+
+
+<sect3><title>The various config files or how to avoid warnings</title>
+
+<para>&dj; may be customized by each user. It first searches for a
+file called ~/.dejagnurc. Create the file ~/.dejagnurc and insert the
+following line:</para>
+
+<programlisting>
+puts "I am ~/.dejagnurc"
+</programlisting>
+
+<para>Rerun make check. Test whether the output contains "I am ~/.dejagnurc".
+Create ~/my_dejagnu.exp and insert the following line:</para>
+
+<programlisting>
+puts "I am ~/my_dejagnu.exp"
+</programlisting>
+
+<para>In a Bash-Shell enter</para>
+
+<programlisting>
+dgt:~/dejagnu.test$ export DEJAGNU=~/my_dejagnu.exp
+</programlisting>
+
+<para>Run &quot;make check&quot; again. The output should not contain
+&quot;WARNING: Couldn't find the global config file.&quot;.
+Create the sub-directory lib. Create the file &quot;calc.exp&quot; in it and insert the following line:</para>
+
+<programlisting>
+puts "I am lib/calc.exp"
+</programlisting>
+
+<para>The last warning &quot;WARNING: Couldn't find tool init file&quot;
+should not be part of the output of make check.
+Create the directory ~/boards. Create the file ~/boards/standard.exp and insert the following line:</para>
+
+<programlisting>
+puts "I am boards/standard.exp"
+</programlisting>
+
+<para>If the variable DEJAGNU is still not empty then the (abbreviated) output of &quot;make check&quot; should look like this:</para>
+
+<example>
+<title>Sample output of runtest with the usual configuration files</title>
+<programlisting>
+dgt:~/dejagnu.test$ make check
+&lt;...&gt;
+fi
+I am ~/.dejagnurc
+I am ~/my_dejagnu.exp
+I am lib/calc.exp
+Test Run By dgt on Sun Nov 25 22:19:14 2001
+Native configuration is i586-pc-linux-gnu
+
+     === calc tests ===
+Using /home/Dgt/boards/standard.exp as standard board description\
+file for build.
+I am ~/boards/standard.exp
+Using /home/Dgt/boards/standard.exp as standard board description\
+ file for host.
+I am ~/boards/standard.exp
+
+Schedule of variations:
+  unix
+
+Running target unix
+Using /home/Dgt/boards/standard.exp as standard board description\
+ file for target.
+I am ~/boards/standard.exp
+Using /usr/share/dejagnu/baseboards/unix.exp as board description file\
+for target.
+&lt;...&gt;
+</programlisting>
+</example>
+
+<para>It is up to you to decide when and where to use any of the above
+mentioned config files for customizing.
+This chapters showed you where and in which order the different config
+files are run.</para>
+</sect3>
+
+<sect3>
+<title>When trouble strikes</title>
+
+<para>Calling runtest with the '-v'-flag shows you in even more details which files are searched in which order. Passing it several times gives more and more details. </para>
+<example>
+<title>Displaying details about runtest execution</title>
+<programlisting>
+runtest -v -v -v --tool calc CALC=`pwd`/calc --srcdir ./testsuite
+</programlisting>
+</example>
+
+<para>Calling runtest with the '--debug'-flag logs a lot of details to dbg.log where you can analyse it afterwards. </para>
+
+<para>In all test cases you can temporary adjust the verbosity of information by adding the following Tcl-command to any tcl file that gets loaded by
+dejagnu, for instance, ~/.dejagnurc:</para>
+
+<programlisting>
+set verbose 9
+</programlisting>
+
+</sect3>
+
+<sect3>
+<title>Testing &quot;Hello world&quot; locally</title>
+
+<para>This test checks, whether the built-in shell command &quot;echo Hello world&quot;
+ will really write &quot;Hello world&quot; on the console.
+Create the file ~/dejagnu.test/testsuite/calc.test/local_echo.exp.
+It should contain the following lines</para>
+
+<example>
+<title>A first (local) test case</title>
+<programlisting>
+set test "Local Hello World"
+send "echo Hello World"
+expect {
+   -re "Hello World"  { pass "$test" }
+}
+</programlisting>
+</example>
+
+<para>Run runtest again and verify the output &quot;calc.log&quot;</para>
+</sect3>
+</sect2>
+
+<sect2>
+<title>A first remote test</title>
+
+<para>Testing remote targets is a lot trickier especially if you are using an
+ embedded target
+which has no built in support for things like a compiler, ftp server or a Bash-shell.
+Before you can test calc on a remote target you have to acquire a few basics skills.</para>
+
+<sect3>
+<title>Setup telnet to your own host</title>
+<para>The easiest remote host is usually the host you are working on.
+In this example we will use telnet to login in your own workstation.
+For security reasons you should never have a telnet daemon running on
+machine connected on the internet, as password and usernames are transmitted
+ in clear text.
+We assume you know how to setup your machine for a telnet daemon.</para>
+
+<para>Next try whether you may login in your own host by issuing the
+command &quot;telnet localhost.1&quot;. In order to be able to
+distinguish between a normal session and a telnet login add the following lines to /home/dgt/.bashrc.</para>
+
+<programlisting>
+if [ "$REMOTEHOST" ]
+then
+   PS1='remote:\w\$ '
+fi
+</programlisting>
+
+<para>Now on the machine a &quot;remote&quot; login looks like this:</para>
+
+<example>
+<title>Sample log of a telnet login to localhost</title>
+<programlisting>
+dgt:~/dejagnu.test$ telnet localhost
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+Debian GNU/Linux testing/unstable Linux
+K6Linux login: dgt
+Password:
+Last login: Sun Nov 25 22:46:34 2001 from localhost on pts/4
+Linux K6Linux 2.4.14 #1 Fre Nov 16 19:28:25 CET 2001 i586 unknown
+No mail.
+remote:~$ exit
+logout
+Connection closed by foreign host.
+</programlisting>
+</example>
+</sect3>
+
+<sect3>
+<title>A test case for login via telnet</title>
+<para>In order to define a correct setup we have add a line containing
+&quot;set target unix&quot; either to ~/.dejagnurc or to ~/my_dejagnu.exp.
+In ~/boards/standard.exp add the following four lines to define a few patterns for the &dj; telnet login procedure.</para>
+
+<example>
+<title>Defining a remote target board</title>
+<programlisting>
+set_board_info shell_prompt    "remote:"
+set_board_info telnet_username "dgt"
+set_board_info telnet_password "top_secret"
+set_board_info hostname        "localhost"
+
+</programlisting>
+</example>
+
+<para>As &dj; will be parsing the telnet session output for some well
+known pattern the output there are a lot of things that can go wrong.
+If you have any problems verify your setup:</para>
+<itemizedlist>
+
+<listitem>
+<para>Is <filename>/etc/motd</filename> empty?</para></listitem>
+
+<listitem>
+<para>Is <filename>/etc/issue.net</filename> empty?</para></listitem>
+
+<listitem>
+<para>Exists a empty <filename>~/.hushlogin</filename>?</para></listitem>
+
+<listitem>
+<para>The LANG environment variable must be either empty or set to &quot;C&quot;. </para></listitem>
+
+</itemizedlist>
+<para>To test the login via telnet write a sample test case.
+Create the file ~/dejagnu.test/testsuite/calc.test/remote_echo.exp and
+add the following few lines:</para>
+
+<example>
+<title>&dj; script for logging in into a remote target</title>
+<programlisting>
+puts "this is remote_echo.exp target for $target "
+target_info $target
+#set verbose 9
+set shell_id [remote_open $target]
+set test "Remote login to $target"
+#set verbose 0
+puts "Spawn id for remote shell is $shell_id"
+if { $shell_id > 0 } {
+   pass "$test"
+} else {
+   fail "Remote open to $target"
+}
+</programlisting>
+</example>
+
+<para>In the runtest output you should find something like:</para>
+
+<programlisting>
+Running ./testsuite/calc.test/local_echo.exp ...
+Running ./testsuite/calc.test/remote_echo.exp ...
+this is remote_echo.exp target is unix
+Spawn id for remote shell is exp7
+</programlisting>
+
+<para>Have again a look at calc.log to get a feeling how &dj; and expect
+parse the input. </para></sect3>
+
+<sect3>
+<title>Remote testing &quot;Hello world&quot;</title>
+
+<para>Next you will transform the above &quot;hello world&quot; example to
+its remote equivalent.
+This can be done by adding the following lines to our file remote_echo.exp.</para>
+
+<example>
+<title>A first (local) remote "Hello world" test</title>
+<programlisting>
+set test "Remote_send Hello World"
+set status [remote_send $target "echo \"Hello\" \"World\"\n" ]
+pass "$test"
+set test "Remote_expect Hello World"
+remote_expect $target 5 {
+   -re "Hello World"  { pass "$test" }
+}
+</programlisting>
+</example>
+
+<para>Call make check. The output should contain
+&quot;# of expected passes 9&quot; and &quot;# of unexpected failures 1&quot;.</para>
+
+<para>Have a look at the procedures in /usr/share/dejagnu/remote.exp to have an overview of the offered procedures and their features. </para>
+
+<para>Now setup a real target.
+In the following example we assume as target a PowerBook running Debian.
+As above add a test user "dgt", install telnet and FTP servers.
+In order to distinguish it from the host add the line
+<programlisting>PS1='test:>'</programlisting> to /home/dgt/.bash_profile.
+Also add a corresponding entry "powerbook" to /etc/hosts and verify that you
+are able to ping, telnet and ftp to the target "powerbook".</para>
+
+<para>In order to let runtest run its test on the "powerbook" target change the following lines in ~/boards/standard.exp:</para>
+
+<example>
+<title>Board definition for a remote target</title>
+<programlisting>
+set_board_info protocol        "telnet"
+set_board_info telnet_username "dgt"
+set_board_info telnet_password "top_secret"
+set_board_info shell_prompt    "test:> "
+set_board_info hostname        "powerbook"
+</programlisting>
+</example>
+
+<para>Now call runtest again with the same arguments and verify whether all went okay by taking a close look at calc.log.</para>
+</sect3>
+
+
+<sect3>
+<title>Transferring files from/to the target</title>
+
+<para>A simple procedure like this will do the job for you:</para>
+
+<example>
+<title>Test script to transfer a file to a remote target</title>
+<programlisting>
+set test "Remote_download"
+puts "Running Remote_download"
+# set verbose 9
+set remfile /home/dgt/dejagnu2
+
+set status [remote_download $target /home/dgt/.dejagnurc $remfile]
+if { "$status" == "" } {
+     fail "Remote download to $remfile on $target"
+} else {
+   pass "$test"
+}
+
+puts "status of remote_download ist $status"
+# set verbose 0
+</programlisting>
+</example>
+
+<para>After running runtest again, check whether the file dejagnu2 exists on the target.
+
+This example will only work if the rcp command works with your target.
+
+If you have a working FTP-server on the target you can use it by adding the
+following lines to ~/boards/standard.exp:</para>
+
+<example>
+<title>Defining a board to use FTP as file transport</title>
+<programlisting>
+set_board_info file_transfer   "ftp"
+set_board_info ftp_username    "dgt"
+set_board_info ftp_password    "1234"
+</programlisting>
+</example>
+
+</sect3>
+
+<sect3>
+<title>Preparing for crosscompilation</title>
+
+<para>For crosscompiling you need working binutils, gcc and a base library like
+libc or glib for your target.
+It is beyond the scope of this document to describe how to get it working.
+The following examples assume a cross compiler for PowerPC which is called linux-powerpc-gcc.
+</para>
+
+<para>Add AC_CANONICAL_TARGET in dejagnu.test/configure.in at the following location. Copy config.guess from /usr/share/automake to dejagnu.test.</para>
+
+<programlisting>
+AM_CONFIG_HEADER(calc.h)
+AC_CANONICAL_TARGET([])
+AM_INIT_AUTOMAKE(calc, 1.1)
+</programlisting>
+
+<para>You need to run automake 2.5 or later.
+Depending on your installation calling autoconf2.5 instead of autoconf is not needed.
+The sequence to regenerate all files is:</para>
+
+<example>
+<title>Using autotools for cross development</title>
+<programlisting>
+$ autoconf2.5
+$ autoheader
+$ automake
+$ ./configure --host=powerpc-linux --target=powerpc-linux
+configure: WARNING: If you wanted to set the --build type, don't use --host.
+    If a cross compiler is detected then cross compile mode will be used.
+checking build system type... ./config.guess: ./config.guess: No such file or directory
+configure: error: cannot guess build type; you must specify one
+$ cp /usr/share/automake/config.guess .
+$ ./configure --host=powerpc-linux --target=powerpc-linux
+configure: WARNING: If you wanted to set the --build type, don't use --host.
+If a cross compiler is detected then cross compile mode will be used. \
+checking build system type... i586-pc-linux-gnu
+checking host system type... powerpc-unknown-linux-gnu
+&lt;...&gt;
+checking whether we are cross compiling... yes
+&lt;...&gt;
+Configuration:
+Source code location: .
+C Compiler: powerpc-linux-gcc
+C Compiler flags: -g -O2
+
+</programlisting>
+</example>
+
+<para>Everything should be ready to recompile for the target:</para>
+
+<programlisting>$ make
+powerpc-linux-gcc -DHAVE_CONFIG_H -I. -I. -I. -g -O2 -c calc.c
+powerpc-linux-gcc -g -O2 -o calc calc.o
+
+</programlisting>
+</sect3>
+
+<sect3>
+<title>Remote testing of calc</title>
+<para>Not yet written, as I have problem getting libc6-dev-powerpc to work. Probably I first have to build my cross compiler. </para>
+</sect3>
+
+<sect3>
+<title>Using Windows as host and vxWorks as target</title>
+
+<para>A more thorough walk-through will be written in a few weeks.</para>
+
+<para>In order to test the vxWorks as a target I changed boards/standards.exp to reflect my settings (IP, username, password). Then I reconfigured vxWorks to include a FTP and telnet server (using the same username/password combination ad in boards/standard.exp).</para>
+
+<para>With this setup and some minor modification (e.g. replacing echo by printf) in my test cases I could test my vxWorks system. It sure does not seem to be a correct setup by &dj; standard. For instance, it still loading /usr/share/dejagnu/baseboards/unix.exp instead of vxWorks. In any case I found that (at least under Windows) I did not find out how the command line would let me override settings in my personal config files.</para>
+
+</sect3>
+</sect2>
+</sect1>
+ <sect1 id="runningtests">
+    <title>Running Tests</title>
+
+    <para>There are two ways to execute a testsuite. The most
+    common way is when there is existing support in the
+    <filename>Makefile</filename>. This support consists of a
+    <emphasis>check</emphasis> target. The other way is to execute the
+    <command>runtest</command> program directly. To run
+    <command>runtest</command> directly from the command line requires
+    either all the correct options, or the <xref linkend="local"/> must be setup
+    correctly.</para>
+
+    <sect2 id="makecheck" xreflabel="Make Check">
+      <title>Make check</title>
+
+      <para>To run tests from an existing collection, first use
+      <command>configure</command> as usual to set up the
+      build directory. Then try typing:</para>
+
+      <screen>
+      make check
+      </screen>
+
+      <para>If the <emphasis>check</emphasis> target exists, it
+      usually saves you some trouble. For instance, it can set up any
+      auxiliary programs or other files needed by the tests. The most
+      common file the check builds is the
+      <emphasis>site.exp</emphasis>. The site.exp file contains
+      various variables that &dj; used to determine the
+      configuration of the program being tested. This is mostly for
+      supporting remote testing.</para>
+
+      <para>The <emphasis>check</emphasis> target is supported by GNU
+      <productname>Automake</productname>. To have &dj; support added to your
+      generated <filename>Makefile.in</filename>, just add the keyword
+      dejagnu to the AUTOMAKE_OPTIONS variable in your
+      <filename>Makefile.am</filename> file.</para>
+
+      <para>Once you have run <emphasis>make check</emphasis> to build
+      any auxiliary files, you can invoke the test driver
+      <command>runtest</command> directly to repeat the tests.
+      You will also have to execute <command>runtest</command>
+      directly for test collections with no
+      <emphasis>check</emphasis> target in the
+      <filename>Makefile</filename>.</para>
+
+    </sect2>
+
+    <sect2 id="runtest" xreflabel="Runtest">
+      <title>Runtest</title>
+
+      <para><command>runtest</command> is the executable test driver
+      for &dj;. You can specify two kinds of things on the
+      <command>runtest</command> command line: command line options,
+      and Tcl variables for the test scripts. The options are listed
+      alphabetically below.</para>
+
+      <para><command>runtest</command> returns an exit code of
+      <emphasis>1</emphasis> if any test has an unexpected result; otherwise
+      (if all tests pass or fail as expected) it returns <emphasis>0</emphasis>
+      as the exit code.</para>
+
+      <sect3 id="outputs" xreflabel="Output States">
+        <title>Output States</title>
+
+	<para><filename>runtest</filename> flags the outcome of each
+	test as one of these cases. <xref linkend="posix"/> for a
+	discussion of how POSIX specifies the meanings of these
+	cases.</para>
+
+        <variablelist>
+        <varlistentry>
+          <term>PASS</term>
+          <listitem><para>The most desirable outcome: the test succeeded, and
+          was expected to succeed.</para></listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>XPASS</term>
+          <listitem><para>A pleasant kind of failure: a test was expected to
+          fail, but succeeded. This may indicate progress; inspect the test
+          case to determine whether you should amend it to stop expecting
+          failure.</para></listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>FAIL</term>
+          <listitem><para>A test failed, although it was expected to succeed.
+          This may indicate regress; inspect the test case and the failing
+          software to locate the bug.</para></listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>XFAIL</term>
+          <listitem><para>A test failed, but it was expected to fail.  This
+          result indicates no change in a known bug.  If a test fails because
+          the operating system where the test runs lacks some facility required
+          by the test, the outcome is <emphasis>UNSUPPORTED</emphasis>
+          instead.</para></listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>UNRESOLVED</term>
+          <listitem><para>Output from a test requires manual inspection; the
+          testsuite could not automatically determine the outcome.  For
+          example, your tests can report this outcome is when a test does not
+          complete as expected.</para></listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>UNTESTED</term>
+          <listitem><para>A test case is not yet complete, and in particular
+          cannot yet produce a <emphasis>PASS</emphasis> or
+          <emphasis>FAIL</emphasis>. You can also use this outcome in dummy
+          ``tests'' that note explicitly the absence of a real test case for a
+          particular property.</para></listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>UNSUPPORTED</term>
+          <listitem><para>A test depends on a conditionally available feature
+          that does not exist (in the configured testing environment).  For
+          example, you can use this outcome to report on a test case that does
+          not work on a particular target because its operating system support
+          does not include a required subroutine.</para></listitem>
+	</varlistentry>
+      </variablelist>
+
+      <para>runtest may also display the following messages:</para>
+
+      <variablelist>
+        <varlistentry>
+          <term>ERROR</term>
+          <listitem><para>Indicates a major problem (detected by the test case
+          itself) in running the test. This is usually an unrecoverable error,
+          such as a missing file or loss of communication to the target. (POSIX
+          testsuites should not emit this message; use
+          <emphasis>UNSUPPORTED</emphasis>, <emphasis>UNTESTED</emphasis>, or
+          <emphasis>UNRESOLVED</emphasis> instead, as
+          appropriate.)</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term>WARNING</term>
+          <listitem><para>Indicates a possible problem in running the
+          test. Usually warnings correspond to recoverable errors, or display
+          an important message about the following tests.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+        <term>NOTE</term>
+        <listitem><para>An informational message about the test
+        case.</para></listitem>
+	</varlistentry>
+      </variablelist>
+
+    </sect3>
+
+    <sect3 id="invoking" xreflabel="Invoking Runtest">
+      <title>Invoking Runtest</title>
+
+      <para>This is the full set of command line options that
+      <filename>runtest</filename> recognizes. Arguments may be
+      abbreviated to the shortest unique string.</para>
+
+      <variablelist>
+        <varlistentry>
+          <term><option>--all</option> (-a)</term>
+	  <listitem><para>Display all test output. By default,
+	  <emphasis>runtest</emphasis> shows only the output of tests that
+	  produce unexpected results; that is, tests with status
+	  <emphasis>FAIL</emphasis> (unexpected failure),
+	  <emphasis>XPASS</emphasis> (unexpected success), or
+	  <emphasis>ERROR</emphasis> (a severe error in the test case
+	  itself). Specify <option>--all</option> to see output for tests
+	  with status <emphasis>PASS</emphasis> (success, as expected)
+	  <emphasis>XFAIL</emphasis> (failure, as expected), or
+	  <emphasis>WARNING</emphasis> (minor error in the test case
+	  itself).</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--build [string]</option></term>
+	  <listitem><para><emphasis>string</emphasis> is a full configuration
+	  ``triple'' name as used by <command>configure</command>. This
+	  is the type of machine &dj; and the tools to be tested are built
+	  on. For a normal cross this is the same as the host, but for a
+	  canadian cross, they are separate.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--host [string]</option></term>
+	  <listitem><para><symbol>string</symbol> is a full configuration
+	  ``triple'' name as used by <emphasis>configure</emphasis>.  Use this
+	  option to override the default string recorded by your
+	  configuration's choice of host.  This choice does not change how
+	  anything is actually configured unless --build is also specified; it
+	  affects <emphasis>only</emphasis> &dj; procedures that compare the
+	  host string with particular values.  The procedures
+	  <emphasis>ishost</emphasis>, <emphasis>istarget</emphasis>,
+	  <emphasis>isnative</emphasis>, and <emphasis>setup</emphasis>xfail}
+	  are affected by <option>--host</option>. In this usage,
+	  <emphasis>host</emphasis> refers to the machine that the tests are to
+	  be run on, which may not be the same as the
+	  <emphasis>build</emphasis> machine. If <option>--build</option>
+	  is also specified, then <option>--host</option> refers to the
+	  machine that the tests wil, be run on, not the machine &dj; is run
+	  on.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--host_board [name]</option></term>
+	  <listitem><para>The host board to use.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--target [string]</option></term>
+	  <listitem><para>Use this option to override the default setting
+	  (running native tests). <emphasis>string</emphasis> is a full
+	  configuration ``triple'' name of the form
+	  <emphasis>cpu-vendor-os</emphasis> as used by
+	  <command>configure</command>. This option changes the
+	  configuration <emphasis>runtest</emphasis> uses for the default tool
+	  names, and other setup information.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--debug</option> (-de)</term>
+	  <listitem><para>Turns on the <emphasis>expect</emphasis> internal
+	  debugging output. Debugging output is displayed as part of the
+	  <emphasis>runtest</emphasis> output, and logged to a file called
+	  <filename>dbg.log</filename>. The extra debugging output does
+	  <emphasis>not</emphasis> appear on standard output, unless the
+	  verbose level is greater than 2 (for instance, to see debug output
+	  immediately, specify <option>--debug</option>-v -v}). The
+	  debugging output shows all attempts at matching the test output of
+	  the tool with the scripted patterns describing expected output.  The
+	  output generated with <option>--strace</option> also goes into
+	  <filename>dbg.log</filename>.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--help</option> (-he)</term>
+	  <listitem><para>Prints out a short summary of the
+	  <emphasis>runtest</emphasis> options, then exits (even if you also
+	  specify other options).</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--ignore [name(s)] </option></term>
+	  <listitem><para>The names of specific tests to
+	  ignore.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--objdir [path]</option></term>
+	  <listitem><para>Use <emphasis>path</emphasis> as the top directory
+	  containing any auxiliary compiled test code. This defaults to
+	  <filename>.</filename>.  Use this option to locate pre-compiled test
+	  code.  You can normally prepare any auxiliary files needed with
+	  <emphasis>make</emphasis>.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--outdir [path]</option></term>
+	  <listitem><para>Write output logs in directory
+	  <filename>path</filename>.  The default is <emphasis>.},
+	  the</emphasis> directory where you start
+	  <emphasis>runtest</emphasis>. This option affects only the summary
+	  and the detailed log files
+	  <filename>tool.sum</filename> and
+	  <filename>tool.log</filename>. The &dj; debug
+	  log <filename>dbg.log</filename> always appears (when requested) in
+	  the local directory.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--reboot [name]</option></term>
+	  <listitem><para>Reboot the target board when
+	  <emphasis>runtest</emphasis> initializes. Usually, when running tests
+	  on a separate target board, it is safer to reboot the target to be
+	  certain of its state.  However, when developing test scripts,
+	  rebooting takes a lot of time.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--srcdir [path]</option></term>
+	  <listitem><para>Use <filename>path</filename> as the top directory
+	  for test scripts to run. <emphasis>runtest</emphasis> looks in this
+	  directory for any subdirectory whose name begins with the toolname
+	  (specified with <option>--tool</option>). For instance, with
+	  <option>--tool</option>gdb}, <emphasis>runtest</emphasis> uses
+	  tests in subdirectories <filename>gdb.*</filename> (with the usual
+	  shell-like filename expansion).  If you do not use
+	  <option>--srcdir</option>, <emphasis>runtest</emphasis> looks for
+	  test directories under the current working
+	  directory.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--strace [number]</option></term>
+	  <listitem><para>Turn on internal tracing for
+	  <emphasis>expect</emphasis>, to n levels deep. By adjusting the
+	  level, you can control the extent to which your output expands
+	  multi-level Tcl statements.  This allows you to ignore some levels of
+	  <emphasis>case</emphasis> or <emphasis>if</emphasis> statements.
+	  Each procedure call or control structure counts as one ``level''. The
+	  output is recorded in the same file, <filename>dbg.log</filename>,
+	  used for output from <option>--debug</option>.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--connect [program]</option></term>
+	  <listitem><para>Connect to a target testing environment as specified
+	  by <emphasis>type</emphasis>, if the target is not the computer
+	  running <emphasis>runtest</emphasis>.  For example, use
+	  <option>--connect</option> to change the program used to connect
+	  to a ``bare board'' boot monitor.  The choices for
+	  <emphasis>type</emphasis> in the &dj; 1.4 distribution are
+	  <emphasis>rlogin</emphasis>, <emphasis>telnet</emphasis>,
+	  <emphasis>rsh</emphasis>, <emphasis>tip</emphasis>,
+	  <emphasis>kermit</emphasis>, and <emphasis>mondfe</emphasis>.</para>
+
+	  <para>The default for this option depends on the configuration most
+	  convenient communication method available, but often other
+	  alternatives work as well; you may find it useful to try alternative
+	  connect methods if you suspect a communication problem with your
+	  testing target.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--baud [number]</option></term>
+	  <listitem><para>Set the default baud rate to something other than
+	  9600. (Some serial interface programs, like <emphasis>tip</emphasis>,
+	  use a separate initialization file instead of this
+	  value.)</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--target_board [name(s)]</option></term>
+	  <listitem><para>The list of target boards to run tests
+	  on.</para></listitem>
+	</varlistentry>
+	
+        <varlistentry id="tool-opt">
+          <term><option>--tool[name(s)]</option></term>
+	  <listitem><para>Specifies which testsuite to run, and what
+	  initialization module to use. <option>--tool</option> is used
+	  <emphasis>only</emphasis> for these two purposes. It is
+	  <emphasis>not</emphasis> used to name the executable program to
+	  test. Executable tool names (and paths) are recorded in
+	  <filename>site.exp</filename> and you can override them by specifying
+	  Tcl variables on the command line.</para>
+
+	  <para>For example, including "<option>--tool</option> gcc" on the
+	  <emphasis>runtest</emphasis> command line runs tests from all test
+	  subdirectories whose names match <filename>gcc.*</filename>, and uses
+	  one of the initialization modules named
+	  <filename>config/*-gcc.exp</filename>. To specify the name of the
+	  compiler (perhaps as an alternative path to what
+	  <emphasis>runtest</emphasis> would use by default), use
+	  <emphasis>GCC=binname</emphasis> on the <emphasis>runtest</emphasis>
+	  command line.</para></listitem>
+	</varlistentry>
+
+	<varlistentry>
+          <term><option>--tool_exec [name]</option></term>
+	  <listitem><para>The path to the tool executable to
+	  test.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--tool_opts [options]</option></term>
+	  <listitem><para>A list of additional options to pass to the
+	  tool.</para></listitem>
+	</varlistentry>
+
+	<varlistentry>
+          <term><option>--verbose</option> (-v)</term>
+	  <listitem><para>Turns on more output. Repeating this option increases
+          the amount of output displayed. Level one (<emphasis>-v</emphasis>)
+          is simply test output. Level two (<emphasis>-v</emphasis>-v}) shows
+          messages on options, configuration, and process control.  Verbose
+          messages appear in the detailed (<filename>*.log</filename>) log
+          file, but not in the summary (<filename>*.sum</filename>) log
+          file.</para></listitem>
+	</varlistentry>
+
+	<varlistentry>
+          <term><option>--version</option> (-V)</term>
+	  <listitem><para>Prints out the version numbers of &dj;,
+	  <emphasis>expect</emphasis> and Tcl, and exits without running any
+	  tests.</para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><option>--D[0-1]</option></term>
+	  <listitem><para>Start the internal Tcl debugger. The Tcl debugger
+	  supports breakpoints, single stepping, and other common debugging
+	  activities. See the document "Debugger for Tcl Applications" by Don
+	  Libes. (Distributed in PostScript form with
+	  <emphasis>expect</emphasis> as the file
+	  <filename>expect/tcl-debug.ps.</filename>. If you specify
+	  <emphasis>-D1</emphasis>, the <emphasis>expect</emphasis> shell stops
+	  at a breakpoint as soon as &dj; invokes it. If you specify
+	  <emphasis>-D0</emphasis>, &dj; starts as usual, but you can enter
+	  the debugger by sending an interrupt (e.g. by typing
+	  <keycombo><keycap>C</keycap><keycap>c</keycap></keycombo>).
+	  </para></listitem>
+	</varlistentry>
+
+        <varlistentry>
+          <term><filename>testfile</filename>.exp[=arg(s)]</term>
+	  <listitem><para>Specify the names of testsuites to run. By default,
+	  <emphasis>runtest</emphasis> runs all tests for the tool, but you can
+	  restrict it to particular testsuites by giving the names of the
+	  <emphasis>.exp expect</emphasis> scripts that control
+	  them. <emphasis>testsuite</emphasis>.exp may not include path
+	  information; use plain filenames.</para></listitem>
+	</varlistentry>
+
+	<varlistentry>
+          <term><filename>testfile</filename>.exp="testfile1 ..."</term>
+	  <listitem><para>Specify a subset of tests in a suite to run. For
+	  compiler or assembler tests, which often use a single
+	  <emphasis>.exp</emphasis> script covering many different source
+	  files, this option allows you to further restrict the tests by
+	  listing particular source files to compile. Some tools even support
+	  wildcards here.  The wildcards supported depend upon the tool, but
+	  typically they are <emphasis>?</emphasis>, <emphasis>*</emphasis>,
+	  and <emphasis>[chars]</emphasis>.</para></listitem>
+	</varlistentry>
+
+	<varlistentry>
+          <term><symbol>tclvar</symbol>=value</term>
+	  <listitem><para>You can define Tcl variables for use by your test
+	  scripts in the same style used with <emphasis>make</emphasis> for
+	  environment variables.  For example, <emphasis>runtest
+	  GDB=gdb.old</emphasis> defines a variable called
+	  <command>GDB</command>; when your scripts refer to
+	  <symbol>$GDB</symbol> in this run, they use the value
+	  <emphasis>gdb.old</emphasis>.</para>
+
+	  <para>The default Tcl variables used for most tools are defined in
+	  the main &dj; <emphasis>Makefile</emphasis>; their values are
+	  captured in the <filename>site.exp</filename> file.</para></listitem>
+	</varlistentry>
+      </variablelist>
+    </sect3>
+
+       <sect3 id="common" xreflabel="Common Operations">
+        <title>Common Options</title>
+	
+	<para>Typically, you don't need must to use any command-line options.
+	<option>--tool</option> used is only required when there are more than
+	one testsuite in the same directory. The default options are in the
+	local site.exp file, created by "make site.exp".</para>
+
+	<para>For example, if the directory <filename>gdb/testsuite</filename>
+	contains a collection of &dj; tests for GDB, you can run them like
+	this:</para>
+
+        <screen>
+	  eg$ cd gdb/testsuite
+	  eg$ runtest --tool gdb
+	</screen>
+
+	<para>Test output follows, ending with:</para>
+
+	<screen>
+		=== gdb Summary ===
+
+		# of expected passes 508
+		# of expected failures 103
+		/usr/latest/bin/gdb version 4.14.4 -nx
+	</screen>
+
+	<para>You can use the option <option>--srcdir</option> to point to
+	some other directory containing a collection of tests:</para>
+
+	<screen>
+	  eg$ runtest--srcdir /devo/gdb/testsuite
+	</screen>
+
+	<para>By default, <command>runtest</command> prints only the
+	names of the tests it runs, output from any tests that have unexpected
+	results, and a summary showing how many tests passed and how many
+	failed.  To display output from all tests (whether or not they behave
+	as expected), use the <option>--all</option> option.  For more
+	verbose output about processes being run, communication, and so on, use
+	<option>--verbose</option>. To see even more output, use multiple
+	<option>--verbose</option> options. for a more detailed explanation
+	of each <command>runtest</command> option.</para>
+
+	<para>Test output goes into two files in your current directory:
+	summary output in <filename>tool.sum</filename>,
+	and detailed output in <filename>
+	tool.log</filename>. (<emphasis>tool</emphasis>
+	refers to the collection of tests; for example, after a run with
+	<option>--tool</option> gdb, look for output files
+	<filename>gdb.sum</filename> and
+	<filename>gdb.log</filename>.)</para>
+      </sect3>
+    </sect2>
+
+    <sect2 id="outputfiles" xreflabel="Output Files">
+
+    <title>The files &dj; produces.</title>
+
+    <para>&dj; always writes two kinds of output files: summary
+    logs and detailed logs.  The contents of both of these are
+    determined by your tests.</para>
+
+    <para>For troubleshooting, a third kind of output file is useful:
+    use <option>--debug</option> to request an output file showing
+    details of what <productname>Expect</productname> is doing
+    internally.</para>
+
+    <sect3 id="sum" xreflabel="Summary File">
+      <title>Summary File</title>
+
+      <para>&dj; always produces a summary output file
+      <filename>tool.sum</filename>. This summary shows the names of
+      all test files run; for each test file, one line of output from
+      each <command>pass</command> command (showing status
+      <emphasis>PASS</emphasis> or <emphasis>XPASS</emphasis>) or
+      <command>fail</command> command (status
+      <emphasis>FAIL</emphasis> or <emphasis>XFAIL</emphasis>);
+      trailing summary statistics that count passing and failing tests
+      (expected and unexpected); and the full pathname and version
+      number of the tool tested.  (All possible outcomes, and all
+      errors, are always reflected in the summary output file,
+      regardless of whether or not you specify
+      <option>--all</option>.)</para>
+
+      <para>If any of your tests use the procedures
+      <command>unresolved</command>, <command>unsupported</command>,
+      or <command>runtested</command>, the summary output also
+      tabulates the corresponding outcomes.</para>
+
+      <para>For example, after <command>runtest --tool
+      binutils</command>, look for a summary log in
+      <filename>binutils.sum</filename>. Normally, &dj; writes this
+      file in your current working directory; use the
+      <option>--outdir</option> option to select a different
+      directory.</para>
+
+      <example>
+        <title>Here is a short sample summary log</title>
+
+	<screen>
+	Test Run By rob on Mon May 25 21:40:57 PDT 1992
+		 === gdb tests ===
+	Running ./gdb.t00/echo.exp ...
+	PASS:   Echo test
+	Running ./gdb.all/help.exp ...
+	PASS:   help add-symbol-file
+	PASS:   help aliases
+	PASS:   help breakpoint "bre" abbreviation
+	FAIL:   help run "r" abbreviation
+	Running ./gdb.t10/crossload.exp ...
+	PASS:   m68k-elf (elf-big) explicit format; loaded
+	XFAIL:  mips-ecoff (ecoff-bigmips) "ptype v_signed_char" signed C types
+                === gdb Summary ===
+	# of expected passes 5
+	# of expected failures 1
+	# of unexpected failures 1
+	/usr/latest/bin/gdb version 4.6.5 -q
+      </screen>
+    </example>
+
+    </sect3>
+
+    <sect3 id="log" xreflabel="Log File">
+      <title>Log File</title>
+
+      <para>&dj; also saves a detailed log file
+      <filename>tool.log</filename>, showing any output generated by
+      tests as well as the summary output. For example, after
+      <command>runtest --tool binutils</command>, look for a detailed
+      log in <filename>binutils.log</filename>. Normally, &dj;
+      writes this file in your current working directory; use the
+      <option>--outdir</option> option to select a different
+      directory.</para>
+
+
+      <example>
+        <title>Here is a brief example showing a detailed log for
+        <productname>G++</productname> tests</title>
+
+	<screen>
+	Test Run By rob on Mon May 25 21:40:43 PDT 1992
+
+                === g++ tests ===
+
+	--- Running ./g++.other/t01-1.exp ---
+        PASS:   operate delete
+
+	--- Running ./g++.other/t01-2.exp ---
+        FAIL:   i960 bug EOF
+	p0000646.C: In function `int  warn_return_1 ()':
+	p0000646.C:109: warning: control reaches end of non-void function
+	p0000646.C: In function `int  warn_return_arg (int)':
+	p0000646.C:117: warning: control reaches end of non-void function
+	p0000646.C: In function `int  warn_return_sum (int, int)':
+	p0000646.C:125: warning: control reaches end of non-void function
+	p0000646.C: In function `struct foo warn_return_foo ()':
+	p0000646.C:132: warning: control reaches end of non-void function
+
+	--- Running ./g++.other/t01-4.exp ---
+        FAIL:   abort
+	900403_04.C:8: zero width for bit-field `foo'
+	--- Running ./g++.other/t01-3.exp ---
+        FAIL:   segment violation
+	900519_12.C:9: parse error before `;'
+	900519_12.C:12: Segmentation violation
+	/usr/latest/bin/gcc: Internal compiler error: program cc1plus got fatal signal
+
+                === g++ Summary ===
+
+	# of expected passes 1
+	# of expected failures 3
+	/usr/latest/bin/g++ version cygnus-2.0.1
+	</screen>
+	</example>
+
+    </sect3>
+
+    <sect3 id="debugfile" xreflabel="Debug Log File">
+      <title>Debug Log File</title>
+
+      <para>With the <option>--debug</option> option, you can request
+      a log file showing the output from
+      <productname>Expect</productname> itself, running in debugging
+      mode. This file (<filename>dbg.log</filename>, in the directory
+      where you start <command>runtest</command>) shows each pattern
+      <productname>Expect</productname> considers in analyzing test
+      output.</para>
+
+      <para>This file reflects each <command>send</command> command,
+      showing the string sent as input to the tool under test; and
+      each <productname>Expect</productname> command, showing each
+      pattern it compares with the tool output.</para>
+
+      <example>
+        <title>The log messages begin with a message of the form</title>
+
+	<screen>
+
+	expect: does {<symbol>tool output</symbol>} (spawn_id <symbol>n</symbol>)
+	 match pattern {<emphasis>expected pattern</emphasis>}?
+
+        </screen>
+      </example>
+
+      <para>For every unsuccessful match,
+      <productname>Expect</productname> issues a
+      <emphasis>no</emphasis> after this message; if other patterns
+      are specified for the same <productname>Expect</productname>
+      command, they are reflected also, but without the first part of
+      the message (<emphasis>expect... match pattern</emphasis>).</para>
+
+      <para>When <productname>Expect</productname> finds a match, the
+      log for the successful match ends with <emphasis>yes</emphasis>,
+      followed by a record of the <productname>Expect</productname>
+      variables set to describe a successful match.</para>
+
+      <example>
+        <title>Here is an excerpt from the debugging log for a
+        <productname>GDB</productname> test:</title>
+
+	<screen>
+	send: sent {break gdbme.c:34\n} to spawn id 6
+	expect: does {} (spawn_id 6) match pattern {Breakpoint.*at.* file
+	gdbme.c, line 34.*\(gdb\) $}? no
+	{.*\(gdb\) $}? no
+	expect: does {} (spawn_id 0) match pattern {return} ? no
+	{\(y or n\) }? no
+	{buffer_full}? no
+	{virtual}? no
+	{memory}? no
+	{exhausted}? no
+	{Undefined}? no
+	{command}? no
+	break gdbme.c:34
+	Breakpoint 8 at 0x23d8: file gdbme.c, line 34.
+	(gdb) expect: does {break gdbme.c:34\r\nBreakpoint 8 at 0x23d8:
+	file gdbme.c, line 34.\r\n(gdb) } (spawn_id 6) match pattern
+	{Breakpoint.*at.* file gdbme.c, line 34.*\(gdb\) $}? yes
+	expect: set expect_out(0,start) {18}
+	expect: set expect_out(0,end) {71}
+	expect: set expect_out(0,string) {Breakpoint 8 at 0x23d8: file
+	gdbme.c, line 34.\r\n(gdb) }
+	epect: set expect_out(spawn_id) {6}
+	expect: set expect_out(buffer) {break gdbme.c:34\r\nBreakpoint 8
+	at 0x23d8: file gdbme.c, line 34.\r\n(gdb) }
+        PASS:   70      0       breakpoint line number in file
+	</screen>
+	</example>
+
+	<para>This example exhibits three properties of
+	<productname>Expect</productname> and
+	<productname>&dj;</productname> that might be surprising at
+	first glance:</para>
+
+	<itemizedlist mark="bullet">
+	<listitem><para>Empty output for the first attempted match.  The
+	first set of attempted matches shown ran against the output
+	<emphasis>{}</emphasis> --- that is, no
+	output. <productname>Expect</productname> begins
+	attempting to match the patterns supplied immediately; often,
+	the first pass is against incomplete output (or completely
+	before all output, as in this case).</para></listitem>
+
+	<listitem><para>Interspersed tool output.  The beginning of
+	the log entry for the second attempted match may be hard to
+	spot: this is because the prompt <emphasis>{(gdb) }</emphasis>
+	appears on the same line, just before the
+	<emphasis>expect:</emphasis> that marks the beginning of the
+	log entry.</para></listitem>
+
+	<listitem><para>Fail-safe patterns.  Many of the patterns
+	tested are fail-safe patterns provided by
+	<productname>GDB</productname> testing utilities, to reduce
+	possible indeterminacy.  It is useful to anticipate potential
+	variations caused by extreme system conditions
+	(<productname>GDB</productname> might issue the message
+	<emphasis>virtual memory exhausted</emphasis> in rare
+	circumstances), or by changes in the tested program
+	(<emphasis>Undefined command</emphasis> is the likeliest
+	outcome if the name of a tested command changes).</para>
+
+	<para>The pattern <emphasis>{return}</emphasis> is a
+	particularly interesting fail-safe to notice; it checks for an
+	unexpected <keycap>RET</keycap> prompt.  This may happen,
+	for example, if the tested tool can filter output through a
+	pager.</para>
+
+	<para>These fail-safe patterns (like the debugging log itself)
+	are primarily useful while developing test scripts.  Use the
+	<command>error</command> procedure to make the actions for
+	fail-safe patterns produce messages starting with
+	<emphasis>ERROR</emphasis> on standard output, and in the
+	detailed log file.</para></listitem>
+	</itemizedlist>
+    </sect3>
+   </sect2>
+  </sect1>
+
+  <sect1 id="Customizing" xreflabel="Customizing DejaGnu">
+    <title>Customizing &dj;</title>
+
+    <para>The site configuration file, <filename>site.exp</filename>,
+    captures configuration-dependent values and propagates them to the
+    &dj; test environment using Tcl variables.  This ties the
+    &dj; test scripts into the <command>configure</command> and
+    <command>make</command> programs. If this file is setup correctly,
+    it is possible to execute a testsuite merely by typing
+    <command>runtest</command>.</para>
+
+    <para>&dj; supports two <filename>site.exp</filename>
+    files. The multiple instances of <filename>site.exp</filename> are
+    loaded in a fixed order built into &dj;. The first file loaded
+    is the local file <filename>site.exp</filename>, and then the
+    optional global <filename>site.exp</filename> file as
+    pointed to by the <symbol>DEJAGNU</symbol> environment
+    variable.</para>
+
+    <para>There is an optional <emphasis>master</emphasis>
+    <filename>site.exp</filename>, capturing configuration values that
+    apply to &dj; across the board, in each configuration-specific
+    subdirectory of the &dj; library directory.
+    <command>runtest</command> loads these values first. The master
+    <filename>site.exp</filename> contains the default values for all
+    targets and hosts supported by &dj;. This master file is
+    identified by setting the environment variable
+    <symbol>DEJAGNU</symbol> to the name of the file. This is also
+    referred to as the ``global'' config file.</para>
+
+    <para>Any directory containing a configured testsuite also has a
+    local <filename>site.exp</filename>, capturing configuration values
+    specific to the tool under test.  Since <command>runtest</command>
+    loads these values last, the individual test configuration can
+    either rely on and use, or override, any of the global values from
+    the global <filename>site.exp</filename> file.</para>
+
+    <para>You can usually generate or update the testsuite's local
+    <filename>site.exp</filename> by typing <command>make
+    site.exp</command> in the testsuite directory, after the test
+    suite is configured.</para>
+
+    <para>You can also have a file in your home directory called
+    <filename>.dejagnurc</filename>. This gets loaded first before the
+    other config files. Usually this is used for personal stuff, like
+    setting the <symbol>all_flag</symbol> so all the output gets
+    printed, or your own verbosity levels. This file is usually
+    restricted to setting command line options.</para>
+
+    <para>You can further override the default values in a
+    user-editable section of any <filename>site.exp</filename>, or by
+    setting variables on the <command>runtest</command> command
+    line.</para>
+
+    <sect2 id="local" xreflabel="Local Config File">
+      <title>Local Config File</title>
+
+      <para>It is usually more convenient to keep these <emphasis>manual
+      overrides</emphasis> in the <filename>site.exp</filename>
+      local to each test directory, rather than in the global
+      <filename>site.exp</filename> in the installed &dj;
+      library. This file is mostly for supplying tool specific info
+      that is required by the testsuite.</para>
+
+      <para>All local <filename>site.exp</filename> files have
+      two sections, separated by comment text. The first section is
+      the part that is generated by <command>make</command>. It is
+      essentially a collection of Tcl variable definitions based on
+      <filename>Makefile</filename> environment variables. Since they
+      are generated by <command>make</command>, they contain the
+      values as specified by <command>configure</command>.  (You can
+      also customize these values by using the <option>--site</option>
+      option to <command>configure</command>.) In particular, this
+      section contains the <filename>Makefile</filename>
+      variables for host and target configuration data. Do not edit
+      this first section; if you do, your changes are replaced next
+      time you run <command>make</command>.</para>
+
+      <example>
+        <title>The first section starts with</title>
+
+	<programlisting>
+	## these variables are automatically generated by make ##
+	# Do not edit here. If you wish to override these values
+	# add them to the last section
+	</programlisting>
+      </example>
+
+      <para>In the second section, you can override any default values
+      (locally to &dj;) for all the variables.  The second section
+      can also contain your preferred defaults for all the command
+      line options to <command>runtest</command>. This allows you to
+      easily customize <command>runtest</command> for your preferences
+      in each configured test-suite tree, so that you need not type
+      options repeatedly on the command line.  (The second section may
+      also be empty, if you do not wish to override any defaults.)</para>
+
+      <example>
+        <title>The first section ends with this line</title>
+
+	<programlisting>
+	## All variables above are generated by configure. Do Not Edit ##
+	</programlisting>
+      </example>
+
+      <para>You can make any changes under this line. If you wish to
+      redefine a variable in the top section, then just put a
+      duplicate value in this second section. Usually the values
+      defined in this config file are related to the configuration of
+      the test run. This is the ideal place to set the variables
+      <symbol>host_triplet</symbol>, <symbol>build_triplet</symbol>,
+      <symbol>target_triplet</symbol>. All other variables are tool
+      dependent, i.e., for testing a compiler, the value for
+      <symbol>CC</symbol> might be set to a freshly built binary, as
+      opposed to one in the user's path.</para>
+
+      <para>Here's an example local site.exp file, as used for
+      <productname>GCC/G++</productname> testing.</para>
+
+      <example>
+        <title>Local Config File</title>
+
+      <programlisting>
+      ## these variables are automatically generated by make ##
+      # Do not edit here. If you wish to override these values
+      # add them to the last section
+      set rootme "/build/devo-builds/i586-pc-linux-gnulibc1/gcc"
+      set host_triplet i586-pc-linux-gnulibc1
+      set build_triplet i586-pc-linux-gnulibc1
+      set target_triplet i586-pc-linux-gnulibc1
+      set target_alias i586-pc-linux-gnulibc1
+      set CFLAGS ""
+      set CXXFLAGS "-isystem /build/devo-builds/i586-pc-linux-gnulibc1/gcc/../libio -isystem $srcdir/../libg++/src -isystem $srcdir/../libio -isystem $srcdir/../libstdc++ -isystem $srcdir/../libstdc++/stl -L/build/devo-builds/i586-pc-linux-gnulibc1/gcc/../libg++ -L/build/devo-builds/i586-pc-linux-gnulibc1/gcc/../libstdc++"
+      append LDFLAGS " -L/build/devo-builds/i586-pc-linux-gnulibc1/gcc/../ld"
+      set tmpdir /build/devo-builds/i586-pc-linux-gnulibc1/gcc/testsuite
+      set srcdir "${srcdir}/testsuite"
+      ## All variables above are generated by configure. Do Not Edit ##
+
+      </programlisting>
+    </example>
+
+    <para>This file defines the required fields for a local config
+    file, namely the three config triplets, and the srcdir. It also
+    defines several other Tcl variables that are used exclusively by
+    the GCC testsuite. For most test cases, the CXXFLAGS and LDFLAGS
+    are supplied by &dj; itself for cross testing, but to test a
+    compiler, GCC needs to manipulate these itself.</para>
+
+    </sect2>
+     <sect2 id="global" xreflabel="Global Config File">
+      <title>Global Config File</title>
+
+      <para>The master config file is where all the target specific
+      config variables for a whole site get set. The idea is
+      that for a centralized testing lab where people have to share a
+      target between multiple developers. There are settings for both
+      remote targets and remote hosts.  Here's an example of a Master
+      Config File (also called the Global config file) for a
+      <emphasis>canadian cross</emphasis>. A canadian cross is when
+      you build and test a cross compiler on a machine other than the
+      one it's to be hosted on.</para>
+
+      <para>Here we have the config settings for our California
+      office. Note that all config values are site dependent. Here we
+      have two sets of values that we use for testing m68k-aout cross
+      compilers. As both of these target boards has a different
+      debugging protocol, we test on both of them in sequence.</para>
+
+      <example>
+       <title>Global Config file</title>
+
+      <programlisting>
+
+      # Make sure we look in the right place for the board description files.
+      if ![info exists boards_dir] {
+          set boards_dir {}
+      }
+      lappend boards_dir "/nfs/cygint/s1/cygnus/dejagnu/boards"
+
+      verbose "Global Config File: target_triplet is $target_triplet" 2
+      global target_list
+
+      case "$target_triplet" in {
+          { "native" } {
+              set target_list "unix"
+          }
+          { "sparc64-*elf" } {
+              set target_list "sparc64-sim"
+          }
+          { "mips-*elf" } {
+              set target_list "mips-sim wilma barney"
+          }
+          { "mips-lsi-elf" } {
+              set target_list "mips-lsi-sim{,soft-float,el}"
+          }
+          { "sh-*hms" } {
+              set target_list { "sh-hms-sim" "bloozy" }
+          }
+      }
+      </programlisting>
+    </example>
+
+    <para>In this case, we have support for several cross compilers,
+    that all run on this host. For testing on operating systems that
+    don't support Expect, &dj; can be run on the local build
+    machine, and it can connect to the remote host and run all the
+    tests for this cross compiler on that host. All the remote OS
+    requires is a working telnetd.</para>
+
+    <para>As you can see, all one does is set the variable
+    <symbol>target_list</symbol> to the list of targets and options to
+    test. The simple settings, like for
+    <emphasis>sparc64-elf</emphasis> only require setting the name of
+    the single board config file. The <emphasis>mips-elf</emphasis>
+    target is more complicated. Here it sets the list to three target
+    boards. One is the default mips target, and both
+    <emphasis>wilma</emphasis> <emphasis>barney</emphasis> are
+    symbolic names for other mips boards. Symbolic names are covered
+    in the <xref linkend="addboard"/> chapter. The more complicated
+    example is the one for <emphasis>mips-lsi-elf</emphasis>. This one
+    runs the tests with multiple iterations using all possible
+    combinations of the <option>--soft-float</option> and the
+    <option>--el</option> (little endian) option. Needless to say,
+    this last feature is mostly compiler specific.</para>
+
+    </sect2>
+
+    <sect2 id="boardconfig" xreflabel="Board Config File">
+      <title>Board Config File</title>
+
+      <para>The board config file is where board specific config data
+      is stored. A board config file contains all the higher-level
+      configuration settings. There is a rough inheritance scheme, where it is
+      possible to base a new board description file on an existing one. There
+      are also collections of custom procedures for common environments. For
+      more information on adding a new board config file, go to the <xref
+      linkend="addboard"/> chapter. </para>
+
+      <para>An example board config file for a GNU simulator is as
+      follows. <function>set_board_info</function> is a procedure that sets the
+      field name to the specified value. The procedures in square brackets
+      <emphasis>[]</emphasis> are <emphasis>helper procedures</emphasis>. These
+      are used to find parts of a tool chain required to build an executable
+      image that may reside in various locations. This is mostly of use for
+      when the startup code, the standard C libraries, or the tool chain itself
+      is part of your build tree.</para>
+
+      <example>
+        <title>Board Config File</title>
+
+      <programlisting>
+      # This is a list of toolchains that are supported on this board.
+      set_board_info target_install {sparc64-elf}
+
+      # Load the generic configuration for this board. This will define any
+      # routines needed by the tool to communicate with the board.
+      load_generic_config "sim"
+
+      # We need this for find_gcc and *_include_flags/*_link_flags.
+      load_base_board_description "basic-sim"
+
+      # Use long64 by default.
+      process_multilib_options "long64"
+
+      setup_sim sparc64
+
+      # We only support newlib on this target. We assume that all multilib
+      # options have been specified before we get here.
+      set_board_info compiler  "[find_gcc]"
+      set_board_info cflags  "[libgloss_include_flags] [newlib_include_flags]"
+      set_board_info ldflags  "[libgloss_link_flags] [newlib_link_flags]"
+      # No linker script.
+      set_board_info ldscript "";
+
+      # Used by a few gcc.c-torture testcases to delimit how large the
+      # stack can be.
+      set_board_info gcc,stack_size 16384
+      # The simulator doesn't return exit statuses and we need to indicate this
+      # the standard GCC wrapper will work with this target.
+      set_board_info needs_status_wrapper 1
+      # We can't pass arguments to programs.
+      set_board_info noargs 1
+      </programlisting>
+     </example>
+
+     <para>There are five helper procedures used in this example. The first
+     one, <function>find gcc</function> looks for a copy of the GNU compiler in
+     your build tree, or it uses the one in your path. This will also return
+     the proper transformed name for a cross compiler if you whole build tree
+     is configured for one. The next helper procedures are
+     <function>libgloss_include_flags</function> &amp;
+     <function>libgloss_link_flags</function>. These return the proper flags to
+     compiler and link an executable image using <xref
+     linkend="libgloss"/>, the GNU BSP (Board Support Package). The final
+     procedures are <function>newlib_include_flag</function> &amp;
+     <function>newlib_include_flag</function>. These find the Newlib C
+     library, which is a reentrant standard C library for embedded systems
+     comprising of non GPL'd code.</para>
+
+    </sect2>
+
+    <sect2 id="releng" xreflabel="Remote Host Testing">
+      <title>Remote Host Testing</title>
+
+      <note><para>Thanks to Dj Delorie for the original paper that
+      this section is based on.</para></note>
+
+      <para>&dj; also supports running the tests on a remote
+      host. To set this up, the remote host needs an ftp server, and a
+      telnet server. Currently foreign operating systems used as
+      remote hosts are VxWorks, VRTX, DOS/Windows 3.1, MacOS and Windows.</para>
+
+      <para>The recommended source for a Windows-based FTP
+      server is to get IIS (either IIS 1 or Personal Web Server) from
+      <ulink
+      url="http://www.microsoft.com">http://www.microsoft.com</ulink>.
+      When you install it, make sure you install the FTP server - it's
+      not selected by default. Go into the IIS manager and change the
+      FTP server so that it does not allow anonymous FTP. Set the home
+      directory to the root directory (i.e. c:\) of a suitable
+      drive. Allow writing via FTP.</para>
+
+      <para>It will create an account like IUSR_FOOBAR where foobar is
+      the name of your machine. Go into the user editor and give that
+      account a password that you don't mind hanging around in the
+      clear (i.e. not the same as your admin or personal
+      passwords). Also, add it to all the various permission groups.</para>
+
+      <para>You'll also need a telnet server. For Windows, go
+      to the <ulink url="http://ataman.com">Ataman</ulink> web site,
+      pick up the Ataman Remote Logon Services for Windows, and
+      install it. You can get started on the eval period anyway. Add
+      IUSR_FOOBAR to the list of allowed users, set the HOME directory
+      to be the same as the FTP default directory. Change the Mode
+      prompt to simple.</para>
+
+      <para>Ok, now you need to pick a directory name to do all the
+      testing in. For the sake of this example, we'll call it piggy
+      (i.e. c:\piggy). Create this directory.</para>
+
+      <para>You'll need a unix machine. Create a directory for the
+      scripts you'll need. For this example, we'll use
+      /usr/local/swamp/testing. You'll need to have a source tree
+      somewhere, say /usr/src/devo. Now, copy some files from
+      releng's area in SV to your machine:</para>
+
+      <example>
+        <title>Remote host setup</title>
+
+      <screen>
+      cd /usr/local/swamp/testing
+      mkdir boards
+      scp darkstar.welcomehome.org:/dejagnu/cst/bin/MkTestDir .
+      scp darkstar.welcomehome.org:/dejagnu/site.exp .
+      scp darkstar.welcomehome.org:/dejagnu/boards/useless98r2.exp boards/foobar.exp
+      export DEJAGNU=/usr/local/swamp/testing/site.exp
+
+      </screen>
+      </example>
+
+      <para>You must edit the boards/foobar.exp file to reflect your
+      machine; change the hostname (foobar.com), username
+      (iusr_foobar), password, and ftp_directory (c:/piggy) to match
+      what you selected.</para>
+
+      <para>Edit the global <filename> site.exp</filename> to reflect your
+      boards directory:</para>
+
+      <example>
+        <title>Add The Board Directory</title>
+
+	<programlisting>
+	lappend boards_dir "/usr/local/swamp/testing/boards"
+	</programlisting>
+	</example>
+
+	<para>Now run MkTestDir, which is in the contrib
+	directory. The first parameter is the toolchain prefix, the
+	second is the location of your devo tree. If you are testing a
+	cross compiler (ex: you have sh-hms-gcc.exe in your PATH on
+	the PC), do something like this:</para>
+
+      <example>
+        <title>Setup Cross Remote Testing</title>
+
+	<programlisting>
+	./MkTestDir sh-hms /usr/dejagnu/src/devo
+	</programlisting>
+	</example>
+
+	<para>If you are testing a native PC compiler (ex: you have
+	gcc.exe in your PATH on the PC), do this:</para>
+
+      <example>
+        <title>Setup Native Remote Testing</title>
+
+	<programlisting>
+	./MkTestDir '' /usr/dejagnu/src/devo
+	</programlisting>
+      </example>
+
+	<para>To test the setup, <command>ftp</command> to your PC
+	using the username (iusr_foobar) and password you selected. CD
+	to the test directory. Upload a file to the PC. Now telnet to
+	your PC using the same username and password. CD to the test
+	directory. Make sure the file is there. Type "set" and/or "gcc
+	-v" (or sh-hms-gcc -v) and make sure the default PATH contains
+	the installation you want to test.</para>
+
+      <example>
+        <title>Run Test Remotely</title>
+
+	<programlisting>
+	cd /usr/local/swamp/testing
+	make  -k -w check RUNTESTFLAGS="--host_board foobar --target_board foobar -v -v" > check.out 2>&amp;1
+	</programlisting>
+	</example>
+
+	<para>To run a specific test, use a command like this (for
+	this example, you'd run this from the gcc directory that
+	MkTestDir created):</para>
+
+      <example>
+        <title>Run a Test Remotely</title>
+
+	<programlisting>
+	make check RUNTESTFLAGS="--host_board sloth --target_board sloth -v compile.exp=921202-1.c"
+	</programlisting>
+      </example>
+
+	<para>Note: if you are testing a cross-compiler, put in the
+	correct target board. You'll also have to download more .exp
+	files and modify them for your local configuration. The -v's
+	are optional.</para>
+
+    </sect2>
+
+    <sect2 id="configfile" xreflabel="Config File Values">
+      <title>Config File Values</title>
+
+      <para>&dj; uses a named array in Tcl to hold all the info for
+      each machine. In the case of a canadian cross, this means host
+      information as well as target information. The named array is
+      called <symbol>target_info</symbol>, and it has two indices. The
+      following fields are part of the array.</para>
+
+      <sect3 id="optiondefs" xreflabel="Option Variables">
+        <title>Command Line Option Variables</title>
+
+	<para>In the user editable second section of the <xref
+	linkend="personal"/> you can not only override the configuration
+	variables captured in the first section, but also specify
+	default values for all on the <command>runtest</command>
+	command line options.  Save for <option>--debug</option>,
+	<option>--help</option>, and <option>--version</option>, each
+	command line option has an associated Tcl variable.  Use the
+	Tcl <command>set</command> command to specify a new default
+	value (as for the configuration variables).  The following
+	table describes the correspondence between command line
+	options and variables you can set in
+	<filename>site.exp</filename>.  <xref linkend="invoking"/>, for
+	explanations of the command-line options.</para>
+
+	<para><table frame="all" rowsep="0" colsep="0">
+	  <title>Tcl Variables For Command Line Options</title>
+
+	  <tgroup cols="5" align="char" rowsep="1" colsep="0">
+	  <thead><row>
+	    <entry>runtest</entry><entry>Tcl</entry>
+	    <entry>option</entry><entry>variable</entry><entry>description</entry>
+	  </row></thead>
+	  <tbody>
+
+	  <row>
+	    <entry>--all</entry>
+	    <entry>all_flag</entry>
+	    <entry>display all test results if set</entry>
+	  </row>
+
+	  <row>
+	    <entry>--baud</entry>
+	    <entry>baud</entry>
+	    <entry>set the default baud rate to something other than
+	    9600.</entry>
+	  </row>
+
+	  <row>
+	    <entry>--connect</entry>
+	    <entry>connectmode</entry>
+	    <entry><command>rlogin</command>,
+	    <command>telnet</command>, <command>rsh</command>,
+	    <command>kermit</command>, <command>tip</command>, or
+	    <command>mondfe</command></entry>
+	  </row>
+
+	  <row>
+            <entry>--outdir</entry>
+	    <entry>outdir</entry>
+	    <entry>directory for <filename>tool.sum</filename> and
+	    <filename>tool.log.</filename></entry>
+	  </row>
+
+	  <row>
+	    <entry>--objdir</entry>
+	    <entry>objdir</entry>
+	    <entry>directory for pre-compiled binaries</entry>
+	  </row>
+
+	  <row>
+	    <entry>--reboot</entry>
+	    <entry>reboot</entry>
+	    <entry>reboot the target if set to
+	    <emphasis>"1"</emphasis>; do not reboot if set to
+	    <emphasis>"0"</emphasis> (the default).</entry>
+	  </row>
+
+	  <row>
+	    <entry>--srcdir</entry>
+	    <entry>srcdir</entry>
+	    <entry>directory of test subdirectories</entry>
+	  </row>
+
+	  <row>
+	    <entry>--strace</entry>
+	    <entry>tracelevel</entry>
+	    <entry>a number: Tcl trace depth</entry>
+	  </row>
+
+	  <row>
+	    <entry>--tool</entry>
+	    <entry>tool</entry>
+	    <entry>name of tool to test; identifies init, test subdir</entry>
+	  </row>
+
+	  <row>
+	    <entry>--verbose</entry>
+	    <entry>verbose</entry>
+	    <entry>verbosity level.  As option, use multiple times; as
+	    variable, set a number, 0 or greater.</entry>
+	  </row>
+
+	  <row>
+	    <entry>--target</entry>
+	    <entry>target_triplet</entry>
+	    <entry>The canonical configuration string for the target.</entry>
+	  </row>
+
+	  <row>
+	    <entry>--host</entry>
+	    <entry>host_triplet</entry>
+	    <entry>The canonical configuration string for the host.</entry>
+	  </row>
+
+	  <row>
+	    <entry>--build</entry>
+	    <entry>build_triplet</entry>
+	    <entry>The canonical configuration string for the build
+	    host.</entry>
+	  </row>
+
+	  <row>
+	    <entry>--mail</entry>
+	    <entry>address</entry>
+	    <entry>Email the output log to the specified address.</entry>
+	  </row>
+
+	  </tbody>
+	  </tgroup>
+	  </table>
+	</para>
+
+    </sect3>
+
+    <sect3 id="personal" xreflabel="Personal Config File">
+      <title>Personal Config File</title>
+
+      <para>The personal config file is used to customize
+      <command>runtest's</command> behaviour for each person. It is
+      typically used to set the user preferred setting for verbosity,
+      and any experimental Tcl procedures. My personal
+      <filename>~/.dejagnurc</filename> file looks like:</para>
+
+      <example>
+        <title>Personal Config File</title>
+
+	<programlisting>
+	set all_flag 1
+	set RLOGIN /usr/ucb/rlogin
+	set RSH /usr/local/sbin/ssh
+	</programlisting>
+      </example>
+
+      <para>Here I set <symbol>all_flag</symbol> so I see all the test
+      cases that PASS along with the ones that FAIL. I also set
+      <symbol>RLOGIN</symbol> to the BSD version. I have
+      <productname>Kerberos</productname> installed, and when I rlogin
+      to a target board, it usually isn't supported. So I use the non
+      secure version rather than the default that's in my path. I also
+      set <symbol>RSH</symbol> to the <productname>SSH</productname>
+      secure shell, as rsh is mostly used to test unix
+      machines within a local network here.</para>
+
+      </sect3>
+    </sect2>
+
+  </sect1>
+
+  <sect1 id="Extending" xreflabel="Extending DejaGnu">
+    <title>Extending &dj;</title>
+
+    <sect2 id="addsuite"  xreflabel="Adding a new Testsuite">
+      <title>Adding A New Testsuite</title>
+
+      <para>The testsuite for a new tool should always be located in that tools
+      source directory. &dj; require the directory be named
+      <filename>testsuite</filename>. Under this directory, the test cases go
+      in a subdirectory whose name begins with the tool name. For example, for
+      a tool named <emphasis>flubber</emphasis>, each subdirectory containing
+      testsuites must start with <emphasis>"flubber."</emphasis>.</para>
+
+    </sect2>
+
+    <sect2 id="addtool" xreflabel="Adding A New Tool">
+      <title>Adding A New Tool</title>
+
+      <para>In general, the best way to learn how to write (code or even prose)
+      is to read something similar.  This principle applies to test cases and
+      to testsuites.  Unfortunately, well-established testsuites have a way
+      of developing their own conventions: as test writers become more
+      experienced with &dj; and with Tcl, they accumulate more utilities,
+      and take advantage of more and more features of
+      <productname>Expect</productname> and <productname>Tcl</productname> in
+      general.</para>
+
+      <para>Inspecting such established testsuites may make the prospect of
+      creating an entirely new testsuite appear overwhelming.  Nevertheless,
+      it is quite straightforward to get a new testsuite going.</para>
+
+      <para>There is one testsuite that is guaranteed not to grow more
+      elaborate over time: both it and the tool it tests were created expressly
+      to illustrate what it takes to get started with &dj;.  The
+      <filename>example/</filename> directory of the &dj; distribution
+      contains both an interactive tool called <command>calc</command>, and a
+      testsuite for it.  Reading this testsuite, and experimenting with it,
+      is a good way to supplement the information in this section.  (Thanks to
+      Robert Lupton for creating calc and its testsuite---and also the first
+      version of this section of the manual!)</para>
+
+      <para>To help orient you further in this task, here is an outline of the
+      steps to begin building a testsuite for a program example.</para>
+
+     <itemizedlist mark="bullet">
+
+      <listitem><para>Create or select a directory to contain your new
+      collection of tests. Change into that directory (shown here as
+      <filename>testsuite</filename>):</para>
+
+      <para>Create a <filename>configure.in</filename> file in this directory,
+      to control configuration-dependent choices for your tests.  So far as
+      &dj; is concerned, the important thing is to set a value for the
+      variable <symbol>target_abbrev</symbol>; this value is the link to the
+      init file you will write soon.  (For simplicity, we assume the
+      environment is Unix, and use <emphasis>unix</emphasis> as the
+      value.)</para>
+
+      <para>What else is needed in <filename>configure.in</filename> depends on
+      the requirements of your tool, your intended test environments, and which
+      configure system you use.  This example is a minimal configure.in for use
+      with <productname>GNU Autoconf</productname>. </para></listitem>
+
+      <listitem><para>Create <filename>Makefile.in</filename> (if you are using
+      Autoconf), or <filename>Makefile.am</filename>(if you are using
+      Automake), the source file used by configure to build your
+      <filename>Makefile</filename>. If you are using GNU Automake.just add the
+      keyword <emphasis>dejagnu</emphasis> to the
+      <emphasis>AUTOMAKE_OPTIONS</emphasis> variable in your
+      <filename>Makefile.am</filename> file. This will add all the Makefile
+      support needed to run &dj;, and support the <xref linkend="makecheck"/>
+      target.</para>
+
+      <para>You also need to include two targets important to &dj;:
+      <emphasis>check</emphasis>, to run the tests, and
+      <emphasis>site.exp</emphasis>, to set up the Tcl copies of
+      configuration-dependent values. This is called the <xref linkend="local"/>
+      The check target must run the <command>runtest</command> program to
+      execute the tests.</para>
+
+      <para>The <filename>site.exp</filename> target should usually set up
+      (among other things) the $tool variable for the name of your program. If
+      the local site.exp file is setup correctly, it is possible to execute the
+      tests by merely typing <command>runtest</command> on the command
+      line.</para>
+
+      <example>
+        <title>Sample Makefile.in Fragment</title>
+
+	<programlisting>
+	# Look for a local version of &dj;, otherwise use one in the path
+	RUNTEST = `if test -f $(top_srcdir)/../dejagnu/runtest; then \
+	      echo $(top_srcdir) ../dejagnu/runtest; \
+	    else \
+	       echo runtest; \
+	     fi`
+
+	# The flags to pass to runtest
+	RUNTESTFLAGS =
+
+	# Execute the tests
+	check: site.exp all
+        $(RUNTEST) $(RUNTESTFLAGS) \
+            --tool <symbol>${example}</symbol> --srcdir $(srcdir)
+
+	# Make the local config file
+	site.exp: ./config.status Makefile
+	    @echo "Making a new config file..."
+            -@rm -f ./tmp?
+            @touch site.exp
+
+            -@mv site.exp site.bak
+            @echo "## these variables are automatically\
+ generated by make ##" > ./tmp0
+	    @echo "# Do not edit here. If you wish to\
+ override these values" >> ./tmp0
+            @echo "# add them to the last section" >> ./tmp0
+            @echo "set host_os ${host_os}" >> ./tmp0
+            @echo "set host_alias ${host_alias}" >> ./tmp0
+            @echo "set host_cpu ${host_cpu}" >> ./tmp0
+            @echo "set host_vendor ${host_vendor}" >> ./tmp0
+            @echo "set target_os ${target_os}" >> ./tmp0
+            @echo "set target_alias ${target_alias}" >> ./tmp0
+            @echo "set target_cpu ${target_cpu}" >> ./tmp0
+            @echo "set target_vendor ${target_vendor}" >> ./tmp0
+            @echo "set host_triplet ${host_canonical}" >> ./tmp0
+            @echo "set target_triplet ${target_canonical}">>./tmp0
+            @echo "set tool binutils" >> ./tmp0
+            @echo "set srcdir ${srcdir}" >> ./tmp0
+            @echo "set objdir `pwd`" >> ./tmp0
+            @echo "set <symbol>${examplename}</symbol> <symbol>${example}</symbol>" >> ./tmp0
+            @echo "## All variables above are generated by\
+ configure. Do Not Edit ##" >> ./tmp0
+            @cat ./tmp0 > site.exp
+            @sed &lt; site.bak \
+               -e '1,/^## All variables above are.*##/ d' \
+               >> site.exp
+            -@rm -f ./tmp?
+
+	    </programlisting>
+	    </example>
+	  </listitem>
+
+	  <listitem><para>Create a directory (in <filename>testsuite</filename>)
+	  called <filename>config</filename>. Make a <emphasis>Tool Init
+	  File</emphasis> in this directory. Its name must start with the
+	  <symbol>target_abbrev</symbol> value, or be named
+	  <filename>default.exp</filename> so call it
+	  <filename>config/unix.exp</filename> for our Unix based example. This
+	  is the file that contains the target-dependent procedures.
+	  Fortunately, on Unix, most of them do not have to do very much in
+	  order for <command>runtest</command> to run.</para>
+
+	  <para>If the program being tested is not interactive, you can get
+	  away with this minimal <filename>unix.exp</filename> to begin
+	  with:</para>
+
+	  <example>
+	    <title>Simple Batch Program Tool Init File</title>
+
+	  <programlisting>
+
+	  proc foo_exit {} {}
+	  proc foo_version {} {}
+
+	  </programlisting>
+	  </example>
+
+	  <para>If the program being tested is interactive, however, you might
+	  as well define a <emphasis>start</emphasis> routine and invoke it by
+	  using an init file like this:</para>
+
+	  <example>
+	    <title>Simple Interactive Program Tool Init File</title>
+
+	  <programlisting>
+	
+	  proc foo_exit {} {}
+	  proc foo_version {} {}
+
+	  proc foo_start {} {
+	    global ${examplename}
+	    spawn ${examplename}
+	    expect {
+	        -re "" {}
+	    }
+	  }
+
+	  # Start the program running we want to test
+	  foo_start
+
+	  </programlisting>
+	  </example>
+	  </listitem>
+
+	  <listitem><para>Create a directory whose name begins with your tool's
+	  name, to contain tests. For example, if your tool's name is
+	  <emphasis>gcc</emphasis>, then the directories all need to start with
+	  <emphasis>"gcc."</emphasis>.</para></listitem>
+
+	  <listitem><para>Create a sample test file. Its name must end with
+	  <filename>.exp</filename>. You can use
+	  <filename>first-try.exp</filename>. To begin with, just write there a
+	  line of Tcl code to issue a message.</para>
+
+	  <example>
+	    <title>Testing A New Tool Config</title>
+
+	  <programlisting>
+
+	  send_user "Testing: one, two...\n"
+
+	  </programlisting>
+	  </example>
+  	  </listitem>
+
+	  <listitem><para>Back in the <filename>testsuite</filename> (top
+	  level) directory, run <command>configure</command>. Typically you do
+	  this while in the build directory. You may have to specify more of a
+	  path, if a suitable configure is not available in your execution
+	  path.</para></listitem>
+
+	  <listitem><para>You are now ready to triumphantly type <command>make
+	  check</command> or <command>runtest</command>.  You should see
+	  something like this:</para>
+
+	  <example>
+	    <title>Example Test Case Run</title>
+
+	  <screen>
+	  Test Run By rhl on Fri Jan 29 16:25:44 EST 1993
+
+                === example tests ===
+
+	  Running ./example.0/first-try.exp ...
+	  Testing: one, two...
+
+                === example Summary ===
+
+	 </screen>
+	 </example>
+
+	 <para>There is no output in the summary, because so far the example
+	 does not call any of the procedures that establish a test
+	 outcome.</para></listitem>
+
+	 <listitem><para>Write some real tests. For an interactive tool, you
+	 should probably write a real exit routine in fairly short order. In
+	 any case, you should also write a real version routine
+	 soon. </para></listitem>
+
+    </itemizedlist>
+
+    </sect2>
+
+    <sect2 id="addtarget" xreflabel="Adding A New Target">
+      <title>Adding A New Target</title>
+
+      <para>&dj; has some additional requirements for target support, beyond
+      the general-purpose provisions of configure. &dj; must actively
+      communicate with the target, rather than simply generating or managing
+      code for the target architecture.  Therefore, each tool requires an
+      initialization module for each target.  For new targets, you must supply
+      a few Tcl procedures to adapt &dj; to the target.  This permits
+      &dj; itself to remain target independent.</para>
+
+      <para>Usually the best way to write a new initialization module is to
+      edit an existing initialization module; some trial and error will be
+      required. If necessary, you can use the @samp{--debug} option to see what
+      is really going on.</para>
+
+      <para>When you code an initialization module, be generous in printing
+      information controlled by the <function>verbose</function>
+      procedure.</para>
+
+      <para>For cross targets, most of the work is in getting the
+      communications right. Communications code (for several situations
+      involving IP networks or serial lines) is available in a &dj; library
+      file.</para>
+
+      <para>If you suspect a communication problem, try running the connection
+      interactively from <productname>Expect</productname>.  (There are three
+      ways of running <productname>Expect</productname> as an interactive
+      interpreter.  You can run <productname>Expect</productname> with no
+      arguments, and control it completely interactively; or you can use
+      <command>expect -i</command> together with other command-line options and
+      arguments; or you can run the command <command>interpreter</command> from
+      any <productname>Expect</productname> procedure.  Use
+      <command>return</command> to get back to the calling procedure (if any),
+      or <command>return -tcl</command> to make the calling procedure itself
+      return to its caller; use <command>exit</command> or end-of-file to leave
+      Expect altogether.)  Run the program whose name is recorded in
+      <symbol>$connectmode</symbol>, with the arguments in
+      <symbol>$targetname</symbol>, to establish a connection.  You should at
+      least be able to get a prompt from any target that is physically
+      connected.</para>
+
+    </sect2>
+
+    <sect2 id="addboard" xreflabel="Adding A New Board">
+      <title>Adding A New Board</title>
+
+      <para>Adding a new board consists of creating a new board config
+      file. Examples are in
+      <filename>dejagnu/baseboards</filename>. Usually to make a new
+      board file, it's easiest to copy an existing one. It is also
+      possible to have your file be based on a
+      <emphasis>baseboard</emphasis> file with only one or two
+      changes needed. Typically, this can be as simple as just
+      changing the linker script. Once the new baseboard file is done,
+      add it to the <symbol>boards_DATA</symbol> list in the
+      <filename>dejagnu/baseboards/Makefile.am</filename>, and regenerate the
+      Makefile.in using automake. Then just rebuild and install &dj;. You
+      can test it by:</para>
+
+      <para>There is a crude inheritance scheme going on with board files, so
+      you can include one board file into another, The two main procedures used
+      to do this are <function>load_generic_config</function> and
+      <function>load_base_board_description</function>. The generic config file
+      contains other procedures used for a certain class of target. The
+      board description file is where the board specific settings go. Commonly
+      there are similar target environments with just different
+      processors.</para>
+
+      <example>
+      <title>Testing a New Board Config File</title>
+
+      <screen>
+      make check RUNTESTFLAGS="--target_board=<emphasis>newboardfile</emphasis>".
+      </screen>
+      </example>
+
+      <para>Here's an example of a board config file. There are
+      several <emphasis>helper procedures</emphasis> used in this
+      example. A helper procedure is one that look for a tool of files
+      in commonly installed locations. These are mostly used when
+      testing in the build tree, because the executables to be tested
+      are in the same tree as the new dejagnu files. The helper
+      procedures are the ones in square braces
+      <emphasis>[]</emphasis>, which is the Tcl execution characters.</para>
+
+      <example>
+      <title>Example Board Config File</title>
+
+      <programlisting>
+
+      # Load the generic configuration for this board. This will define a basic
+      # set of routines needed by the tool to communicate with the board.
+      load_generic_config "sim"
+
+      # basic-sim.exp is a basic description for the standard Cygnus simulator.
+      load_base_board_description "basic-sim"
+
+      # The compiler used to build for this board. This has *nothing* to do
+      # with what compiler is tested if we're testing gcc.
+      set_board_info compiler "[find_gcc]"
+
+      # We only support newlib on this target.
+      # However, we include libgloss so we can find the linker scripts.
+      set_board_info cflags "[newlib_include_flags] [libgloss_include_flags]"
+      set_board_info ldflags "[newlib_link_flags]"
+
+      # No linker script for this board.
+      set_board_info ldscript "-Tsim.ld";
+
+      # The simulator doesn't return exit statuses and we need to indicate this.
+      set_board_info needs_status_wrapper 1
+
+      # Can't pass arguments to this target.
+      set_board_info noargs 1
+
+      # No signals.
+      set_board_info gdb,nosignals 1
+
+      # And it can't call functions.
+      set_board_info gdb,cannot_call_functions 1
+
+      </programlisting>
+      </example>
+
+    </sect2>
+
+    <sect2 id="boarddefs" xreflabel="Board File Values">
+      <title>Board Config File Values</title>
+
+      <para>These fields are all in the <symbol>board_info</symbol> These are
+      all set by using the <function>set_board_info</function> procedure. The
+      parameters are the field name, followed by the value to set the field
+      to.</para>
+
+  	 <para><table frame="all" rowsep="0" colsep="0">
+	  <title>Common Board Info Fields</title>
+
+	  <tgroup cols="3" align="char" rowsep="1" colsep="0">
+	  <thead><row>
+	    <entry>Field</entry>
+	    <entry>Sample Value</entry>
+	    <entry>Description</entry>
+	  </row></thead>
+	  <tbody>
+
+	  <row>
+	    <entry>compiler</entry>
+	    <entry>"[find_gcc]"</entry>
+	    <entry>The path to the compiler to use.</entry>
+	  </row>
+
+	  <row>
+	    <entry>cflags</entry>
+	    <entry>"-mca"</entry>
+	    <entry>Compilation flags for the compiler.</entry>
+	  </row>
+
+	  <row>
+	    <entry>ldflags</entry>
+	    <entry>"[libgloss_link_flags] [newlib_link_flags]"</entry>
+	    <entry>Linking flags for the compiler.</entry>
+	  </row>
+
+	  <row>
+	    <entry>ldscript</entry>
+	    <entry>"-Wl,-Tidt.ld"</entry>
+	    <entry>The linker script to use when cross compiling.</entry>
+	  </row>
+
+	  <row>
+	    <entry>libs</entry>
+	    <entry>"-lgcc"</entry>
+	    <entry>Any additional libraries to link in.</entry>
+	  </row>
+
+	  <row>
+	    <entry>shell_prompt</entry>
+	    <entry>"cygmon>"</entry>
+	    <entry>The command prompt of the remote shell.</entry>
+	  </row>
+
+	  <row>
+	    <entry>hex_startaddr</entry>
+	    <entry>"0xa0020000"</entry>
+	    <entry>The Starting address as a string.</entry>
+	  </row>
+
+	  <row>
+	    <entry>start_addr</entry>
+	    <entry>0xa0008000</entry>
+	    <entry>The starting address as a value.</entry>
+	  </row>
+
+	  <row>
+	    <entry>startaddr</entry>
+	    <entry>"a0020000"</entry>
+	    <entry></entry>
+	  </row>
+
+	  <row>
+	    <entry>exit_statuses_bad</entry>
+	    <entry>1</entry>
+	    <entry>Whether there is an accurate exit status.</entry>
+	  </row>
+
+	  <row>
+	    <entry>reboot_delay</entry>
+	    <entry>10</entry>
+	    <entry>The delay between power off and power on.</entry>
+	  </row>
+
+	  <row>
+	    <entry>unreliable</entry>
+	    <entry>1</entry>
+	    <entry>Whether communication with the board is unreliable.</entry>
+	  </row>
+
+	  <row>
+	    <entry>sim</entry>
+	    <entry>[find_sim]</entry>
+	    <entry>The path to the simulator to use.</entry>
+	  </row>
+
+	  <row>
+	    <entry>objcopy</entry>
+	    <entry>$tempfil</entry>
+	    <entry>The path to the <command>objcopy</command> program.</entry>
+	  </row>
+
+	  <row>
+	    <entry>support_libs</entry>
+	    <entry>"${prefix_dir}/i386-coff/"</entry>
+	    <entry>Support libraries needed for cross compiling.</entry>
+	  </row>
+
+	  <row>
+	    <entry>addl_link_flags</entry>
+	    <entry>"-N"</entry>
+	    <entry>Additional link flags, rarely used.</entry>
+	  </row>
+
+	  </tbody>
+	  </tgroup>
+	  </table>
+	</para>
+
+	 <para>These fields are used by the GCC and GDB tests, and are mostly
+	 only useful to somewhat trying to debug a new board file for one of
+	 these tools. Many of these are used only by a few testcases, and their
+	 purpose is esoteric. These are listed with sample values as a guide to
+	 better guessing if you need to change any of these.</para>
+
+  	 <para><table frame="all" rowsep="0" colsep="0">
+	  <title>Board Info Fields For GCC &amp; GDB</title>
+
+	  <tgroup cols="3" align="char" rowsep="1" colsep="0">
+	  <thead><row>
+	    <entry>Field</entry>
+	    <entry>Sample Value</entry>
+	    <entry>Description</entry>
+	  </row></thead>
+	  <tbody>
+
+	  <row>
+	    <entry>strip</entry>
+	    <entry>$tempfile</entry>
+	    <entry>Strip the executable of symbols.</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb_load_offset</entry>
+	    <entry>"0x40050000"</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb_protocol</entry>
+	    <entry>"remote"</entry>
+	    <entry>The GDB debugging protocol to use.</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb_sect_offset</entry>
+	    <entry>"0x41000000";</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb_stub_ldscript</entry>
+	    <entry>"-Wl,-Teva-stub.ld"</entry>
+	    <entry>The linker script to use with a GDB stub.</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb_init_command</entry>
+	    <entry>"set mipsfpu none"</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb,cannot_call_functions</entry>
+	    <entry>1</entry>
+	    <entry>Whether GDB can call functions on the target,</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb,noargs</entry>
+	    <entry>1</entry>
+	    <entry>Whether the target can take command line arguments.</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb,nosignals</entry>
+	    <entry>1</entry>
+	    <entry>Whether there are signals on the target.</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb,short_int</entry>
+	    <entry>1</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb,start_symbol</entry>
+	    <entry>"_start";</entry>
+	    <entry>The starting symbol in the executable.</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb,target_sim_options</entry>
+	    <entry>"-sparclite"</entry>
+	    <entry>Special options to pass to the simulator.</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb,timeout</entry>
+	    <entry>540</entry>
+	    <entry>Timeout value to use for remote communication.</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb_init_command</entry>
+	    <entry>"print/x \$fsr = 0x0"</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb_load_offset</entry>
+	    <entry>"0x12020000"</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb_opts</entry>
+	    <entry>"--command gdbinit"</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb_prompt</entry>
+	    <entry>"\\(gdb960\\)"</entry>
+	    <entry>The prompt GDB is using.</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb_run_command</entry>
+	    <entry>"jump start"</entry>
+	  </row>
+
+	  <row>
+	    <entry>gdb_stub_offset</entry>
+	    <entry>"0x12010000"</entry>
+	  </row>
+
+	  <row>
+	    <entry>use_gdb_stub</entry>
+	    <entry>1</entry>
+	    <entry>Whether to use a GDB stub.</entry>
+	  </row>
+
+	  <row>
+	    <entry>use_vma_offset</entry>
+	    <entry>1</entry>
+	  </row>
+
+	  <row>
+	    <entry>wrap_m68k_aout</entry>
+	    <entry>1</entry>
+	  </row>
+
+	  <row>
+	    <entry>gcc,no_label_values</entry>
+	    <entry>1</entry>
+	  </row>
+
+	  <row>
+	    <entry>gcc,no_trampolines</entry>
+	    <entry>1</entry>
+	  </row>
+
+	  <row>
+	    <entry>gcc,no_varargs</entry>
+	    <entry>1</entry>
+	  </row>
+
+	  <row>
+	    <entry>gcc,stack_size</entry>
+	    <entry>16384</entry>
+	    <entry>Stack size to use with some GCC testcases.</entry>
+	  </row>
+
+	  <row>
+	    <entry>ieee_multilib_flags</entry>
+	    <entry>"-mieee";</entry>
+	  </row>
+
+	  <row>
+	    <entry>is_simulator</entry>
+	    <entry>1</entry>
+	  </row>
+
+	  <row>
+	    <entry>needs_status_wrapper</entry>
+	    <entry>1</entry>
+	  </row>
+
+	  <row>
+	    <entry>no_double</entry>
+	    <entry>1</entry>
+	  </row>
+
+	  <row>
+	    <entry>no_long_long</entry>
+	    <entry>1</entry>
+	  </row>
+
+	  <row>
+	    <entry>noargs</entry>
+	    <entry>1</entry>
+	  </row>
+
+	  <row>
+	    <entry>nullstone,lib</entry>
+	    <entry>"mips-clock.c"</entry>
+	  </row>
+
+	  <row>
+	    <entry>nullstone,ticks_per_sec</entry>
+	    <entry>3782018</entry>
+	  </row>
+
+	  <row>
+	    <entry>sys_speed_value</entry>
+	    <entry>200</entry>
+	  </row>
+
+	  <row>
+	    <entry>target_install</entry>
+	    <entry>{sh-hms}</entry>
+	  </row>
+
+	  </tbody>
+	  </tgroup>
+	  </table>
+	</para>
+
+    </sect2>
+
+    <sect2 id="writing" xreflabel="Writing A Test Case">
+      <title>Writing A Test Case</title>
+
+      <para>The easiest way to prepare a new test case is to base it
+      on an existing one for a similar situation.  There are two major
+      categories of tests: batch or interactive.  Batch oriented tests
+      are usually easier to write.</para>
+
+      <para>The GCC tests are a good example of batch oriented tests.
+      All GCC tests consist primarily of a call to a single common
+      procedure, since all the tests either have no output, or only
+      have a few warning messages when successfully compiled.  Any
+      non-warning output is a test failure.  All the C code needed is
+      kept in the test directory.  The test driver, written in Tcl,
+      need only get a listing of all the C files in the directory, and
+      compile them all using a generic procedure. This procedure and a
+      few others supporting for these tests are kept in the library
+      module <filename>lib/c-torture.exp</filename> in the GCC test
+      suite. Most tests of this kind use very few
+      <productname>expect</productname> features, and are coded almost
+      purely in Tcl.</para>
+
+      <para>Writing the complete suite of C tests, then, consisted of
+      these steps:</para>
+
+      <itemizedlist mark="bullet">
+      <listitem><para>Copying all the C code into the test directory.
+      These tests were based on the C-torture test created by Torbjorn
+      Granlund (on behalf of the Free Software Foundation) for GCC
+      development.</para></listitem>
+
+      <listitem><para>Writing (and debugging) the generic Tcl procedures for
+      compilation.</para></listitem>
+
+      <listitem><para>Writing the simple test driver: its main task is to
+      search the directory (using the Tcl procedure
+      <emphasis>glob</emphasis> for filename expansion with wildcards)
+      and call a Tcl procedure with each filename.  It also checks for
+      a few errors from the testing procedure.</para></listitem>
+      </itemizedlist>
+
+      <para>Testing interactive programs is intrinsically more
+      complex.  Tests for most interactive programs require some trial
+      and error before they are complete.</para>
+
+      <para>However, some interactive programs can be tested in a
+      simple fashion reminiscent of batch tests.  For example, prior
+      to the creation of &dj;, the GDB distribution already
+      included a wide-ranging testing procedure.  This procedure was
+      very robust, and had already undergone much more debugging and
+      error checking than many recent &dj; test cases.
+      Accordingly, the best approach was simply to encapsulate the
+      existing GDB tests, for reporting purposes. Thereafter, new GDB
+      tests built up a family of Tcl procedures specialized for GDB
+      testing.</para>
+
+    </sect2>
+
+    <sect2 id="debugging" xreflabel="Debugging A Test Case">
+      <title>Debugging A Test Case</title>
+
+      <para>These are the kinds of debugging information available
+      from &dj;:</para>
+
+      <itemizedlist mark="bullet">
+
+      <listitem><para>Output controlled by test scripts themselves,
+      explicitly allowed for by the test author.  This kind of
+      debugging output appears in the detailed output recorded in the
+      &dj; log file.  To do the same for new tests, use the
+      <command>verbose</command> procedure (which in turn uses the
+      variable also called <emphasis>verbose</emphasis>) to control
+      how much output to generate.  This will make it easier for other
+      people running the test to debug it if necessary.  Whenever
+      possible, if <emphasis>$verbose</emphasis> is
+      <emphasis>0</emphasis>, there should be no output other than the
+      output from <emphasis>pass</emphasis>,
+      <emphasis>fail</emphasis>, <emphasis>error</emphasis>, and
+      <emphasis>warning</emphasis>.  Then, to whatever extent is
+      appropriate for the particular test, allow successively higher
+      values of <emphasis>$verbose</emphasis> to generate more
+      information.  Be kind to other programmers who use your tests:
+      provide for a lot of debugging information.</para></listitem>
+
+      <listitem><para>Output from the internal debugging functions of
+      Tcl and <productname>Expect</productname>. There is a command
+      line options for each; both forms of debugging output are
+      recorded in the file <filename>dbg.log</filename> in the current
+      directory.</para>
+
+      <para>Use <option>--debug</option> for information from the
+       expect level; it generates displays of the expect attempts to
+       match the tool output with the patterns specified. This output
+       can be very helpful while developing test scripts, since it
+       shows precisely the characters received.  Iterating between the
+       latest attempt at a new test script and the corresponding
+       <filename>dbg.log</filename> can allow you to create the final
+       patterns by ``cut and paste''.  This is sometimes the best way
+       to write a test case.</para></listitem>
+
+       <listitem><para>Use <option>--strace</option> to see more
+       detail at the Tcl level; this shows how Tcl procedure
+       definitions expand, as they execute. The associated number
+       controls the depth of definitions expanded.</para></listitem>
+
+       <listitem><para>Finally, if the value of
+       <emphasis>verbose</emphasis> is 3 or greater,&dj; turns on
+       the expect command <command>log_user</command>.  This command
+       prints all expect actions to the expect standard output, to the
+       detailed log file, and (if <option>--debug</option> is on) to
+       <filename>dbg.log</filename>.</para></listitem>
+       </itemizedlist>
+
+    </sect2>
+
+    <sect2 id="adding" xreflabel="Adding A Test Case To A Testsuite">
+      <title>Adding A Test Case To A Testsuite.</title>
+
+      <para>There are two slightly different ways to add a test
+      case. One is to add the test case to an existing directory. The
+      other is to create a new directory to hold your test. The
+      existing test directories represent several styles of testing,
+      all of which are slightly different; examine the directories for
+      the tool of interest to see which (if any) is most suitable.</para>
+
+      <para>Adding a GCC test can be very simple: just add the C code
+      to any directory beginning with <filename>gcc</filename>. and it
+      runs on the next <programlisting>runtest --tool
+      gcc</programlisting>.</para>
+
+      <para>To add a test to GDB, first add any source code you will
+      need to the test directory. Then you can either create a new
+      expect file, or add your test to an existing one (any
+      file with a <emphasis>.exp</emphasis> suffix).  Creating a new
+      .exp file is probably a better idea if the test is significantly
+      different from existing tests. Adding it as a separate file also
+      makes upgrading easier. If the C code has to be already compiled
+      before the test will run, then you'll have to add it to the
+      <filename>Makefile.in</filename> file for that test directory,
+      then run <command>configure</command> and
+      <command>make</command>.</para>
+
+      <para>Adding a test by creating a new directory is very
+      similar:</para>
+
+      <itemizedlist mark="bullet">
+
+      <listitem><para>Create the new directory. All subdirectory names
+      begin with the name of the tool to test; e.g. G++ tests might be
+      in a directory called <filename>g++.other</filename>. There can
+      be multiple test directories that start with the same tool name
+      (such as <emphasis>g++</emphasis>).</para></listitem>
+
+      <listitem><para>Add the new directory name to the
+      <symbol>configdirs</symbol> definition in the
+      <filename>configure.in</filename> file for the testsuite
+      directory. This way when <command>make</command> and
+      <command>configure</command> next run, they include the new
+      directory.</para></listitem>
+
+      <listitem><para>Add the new test case to the directory, as
+      above. </para></listitem>
+
+      <listitem><para>To add support in the new directory for
+      configure and make, you must also create a
+      <filename>Makefile.in</filename> and a
+      <filename>configure.in</filename>.</para></listitem>
+      </itemizedlist>
+
+    </sect2>
+
+    <sect2 id="hints" xreflabel="Hints On Writing A Test Case">
+      <title>Hints On Writing A Test Case</title>
+
+      <para>It is safest to write patterns that match all the output
+      generated by the tested program; this is called closure.
+      If a pattern does not match the entire output, any output that
+      remains will be examined by the next <command>expect</command>
+      command. In this situation, the precise boundary that determines
+      which <command>expect</command> command sees what is very
+      sensitive to timing between the Expect task and the task running
+      the tested tool.  As a result, the test may sometimes appear to
+      work, but is likely to have unpredictable results. (This problem
+      is particularly likely for interactive tools, but can also
+      affect batch tools---especially for tests that take a long time
+      to finish.) The best way to ensure closure is to use the
+      <option>-re</option> option for the <command>expect</command>
+      command to write the pattern as a full regular expressions; then
+      you can match the end of output using a <emphasis>$</emphasis>.
+      It is also a good idea to write patterns that match all
+      available output by using <emphasis>.*\</emphasis> after the
+      text of interest; this will also match any intervening blank
+      lines.  Sometimes an alternative is to match end of line using
+      <emphasis>\r</emphasis> or <emphasis>\n</emphasis>, but this is
+      usually too dependent on terminal settings.</para>
+
+      <para>Always escape punctuation, such as <emphasis>(</emphasis>
+      or <emphasis>&quot;</emphasis>, in your patterns; for example, write
+      <emphasis>\(</emphasis>.  If you forget to escape punctuation,
+      you will usually see an error message like <programlisting>extra
+      characters after close-quote.</programlisting></para>
+
+      <para>If you have trouble understanding why a pattern does not
+      match the program output, try using the <option>--debug</option>
+      option to <command>runtest</command>, and examine the debug log
+      carefully.</para>
+
+      <para>Be careful not to neglect output generated by setup rather
+      than by the interesting parts of a test case.  For example,
+      while testing GDB, I issue a send <emphasis>set height
+      0\n</emphasis> command.  The purpose is simply to make sure GDB
+      never calls a paging program.  The <emphasis>set
+      height</emphasis> command in GDB does not generate any
+      output; but running any command makes GDB issue a new
+      <emphasis>(gdb) </emphasis> prompt.  If there were no
+      <command>expect</command> command to match this prompt, the
+      output <emphasis>(gdb) </emphasis> begins the text seen by the
+      next <command>expect</command> command---which might make that
+      pattern fail to match.</para>
+
+      <para>To preserve basic sanity, I also recommended that no test
+      ever pass if there was any kind of problem in the test case.  To
+      take an extreme case, tests that pass even when the tool will
+      not spawn are misleading. Ideally, a test in this sort of
+      situation should not fail either. Instead, print an error
+      message by calling one of the &dj; procedures
+      <command>error</command> or <command>warning</command>.</para>
+
+    </sect2>
+
+    <sect2 id="tvariables" xreflabel="Test Case Variables">
+      <title>Special variables used by test cases.</title>
+
+      <para>There are special variables used by test cases. These contain
+      other information from &dj;. Your test cases can use these variables,
+      with conventional meanings (as well as the variables saved in
+      <filename>site.exp</filename>. You can use the value of these variables,
+      but they should never be changed.</para>
+
+        <variablelist>
+          <varlistentry>
+            <term>$prms_id</term>
+	    <listitem><para>The tracking system (e.g. GNATS) number identifying
+	    a corresponding bugreport.  (<emphasis>0</emphasis>} if you do not
+	    specify it in the test script.)</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>$item bug_id</term>
+	    <listitem><para>An optional bug id; may reflect a bug
+	    identification from another organization.  (<emphasis>0</emphasis>
+	    if you do not specify it.)</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>$subdir</term>
+	    <listitem><para>The subdirectory for the current test
+	    case.</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>$expect_out(buffer)</term>
+	    <listitem><para>The output from the last command. This is an
+	    internal variable set by Expect. More information can be found in
+	    the Expect manual.</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>$exec_output</term>
+	    <listitem><para>This is the output from a
+	    <function>${tool}_load</function> command. This only applies to
+	    tools like GCC and GAS which produce an object file that must in
+	    turn be executed to complete a test.</para></listitem>
+          </varlistentry>
+
+          <varlistentry>
+            <term>$comp_output</term>
+	    <listitem><para>This is the output from a
+	    <function>${tool}_start</function> command.  This is conventionally
+	    used for batch oriented programs, like GCC and GAS, that may
+	    produce interesting output (warnings, errors) without further
+	    interaction.</para></listitem>
+          </varlistentry>
+        </variablelist>
+
+    </sect2>
+
+</sect1>
+
+  <sect1 id="unit" xreflabel="Unit Testing">
+    <title>Unit Testing</title>
+
+    <sect2 id="unittest"  xreflabel="What Is Unit Testing ?">
+      <title>What Is Unit Testing ?</title>
+
+      <para>Most regression testing as done by &dj; is system
+      testing. This is the complete application is tested all at
+      once. Unit testing is for testing single files, or small
+      libraries. In this case, each file is linked with a test case in
+      C or C++, and each function or class and method is tested in
+      series, with the test case having to check private data or
+      global variables to see if the function or method worked.</para>
+
+      <para>This works particularly well for testing APIs and at level
+      where it is easier to debug them, than by needing to trace through
+      the entire application. Also if there is a specification for the
+      API to be tested, the testcase can also function as a compliance
+      test.</para>
+
+    </sect2>
+
+    <sect2 id="djh" xreflabel="The dejagnu.h Header File">
+      <title>The dejagnu.h Header File</title>
+
+      <para>&dj; uses a single header file to assist in unit
+      testing. As this file also produces its one test state output,
+      it can be run standalone, which is very useful for testing on
+      embedded systems. This header file has a C and C++ API for the
+      test states, with simple totals, and standardized
+      output. Because the output has been standardized, &dj; can be
+      made to work with this test case, without writing almost any
+      Tcl. The library module, dejagnu.exp, will look for the output
+      messages, and then merge them into &dj;'s.</para>
+
+     </sect2>
+
+</sect1>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-namecase-general:t
+sgml-general-insert-case:lower
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:1
+sgml-indent-data:nil
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

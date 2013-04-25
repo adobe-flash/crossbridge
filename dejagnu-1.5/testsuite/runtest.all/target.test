@@ -1,0 +1,247 @@
+set srcdir [lindex $argv 0]
+set subdir [lindex $argv 1]
+set objdir [lindex $argv 2]
+
+if [ file exists $objdir/setval.tmp ] {
+    source $objdir/setval.tmp
+} else {
+    puts "ERROR: $objdir/setval.tmp doesn't exist"
+}
+if [ file exists $srcdir/$subdir/default_procs.tcl ] {
+    source "$srcdir/$subdir/default_procs.tcl"
+} else {
+    puts "ERROR: $srcdir/$subdir/default_procs.tcl doesn't exist"
+}
+
+set file $srcdir/../lib/target.exp
+if [ file exists $file] {
+    source $file
+} else {
+    puts "ERROR: $file doesn't exist"
+}
+# we load framework so we can use stuff like is3way
+set file $srcdir/../lib/framework.exp
+if [ file exists $file] {
+    source $file
+} else {
+    puts "ERROR: $file doesn't exist"
+}
+# we load the remote stuff so we can test execute_anywhere
+set file $srcdir/../lib/remote.exp
+if [ file exists $file] {
+    source $file
+} else {
+    puts "ERROR: $file doesn't exist"
+}
+
+#
+# Create a false target config array
+#
+set target_info(idp,name)       "idp"
+set target_info(idp,ldflags)    "-Tidp.ld"
+set target_info(idp,config)     m68k-unknown-aout
+set target_info(idp,cflags)     ""
+set target_info(idp,connect)    "telnet"
+set target_info(idp,target)     "s12"
+set target_info(idp,serial)     "tstty12"
+set target_info(idp,netport)    "localhost:23"
+set target_info(idp,baud)       "9600"
+# MVME target
+set target_info(mvme,name)      "mvme"
+set target_info(mvme,ldflags)   "-Tmvme.ld"
+set target_info(mvme,config)    m68k-unknown-aout
+set target_info(mvme,cflags)    ""
+set target_info(mvme,connect)   "telnet"
+set target_info(mvme,target)    "s12"
+set target_info(mvme,serial)    "tstty8"
+set target_info(mvme,netport)   "localhost:23"
+set target_info(mvme,baud)      "9600"
+
+# Test remote open. We try not to use any of the support procs in
+# target.exp to for isolation testing. "target" is the name of the
+# default array setup by the procs in target.exp.
+
+set timeout 100
+
+# test list_target
+
+if { [list_targets] == "idp mvme" } {
+    puts "PASSED: list_targets"
+} else {
+    puts "FAILED: list_targets"
+}
+push_config target idp
+set matches 0
+if { $target_info(target,name) == "idp" } {
+    incr matches
+}
+if { $target_info(target,ldflags) == "-Tidp.ld" } {
+    incr matches
+}
+if { $target_info(target,config) == "m68k-unknown-aout" } {
+    incr matches
+}
+if { $target_info(target,cflags) == "" } {
+    incr matches
+}
+if { $target_info(target,connect) == "telnet" } {
+    incr matches
+}
+if { $target_info(target,target) == "s12" } {
+    incr matches
+}
+if { $target_info(target,serial) == "tstty12" } {
+    incr matches
+}
+if { $target_info(target,netport) == "localhost:23" } {
+    incr matches
+}
+if { $target_info(target,baud) == "9600" } {
+    incr matches
+}
+if { $matches == 9 } {
+    puts "PASSED: push_config target"
+} else {
+    puts "FAILED: push_config target"
+}
+
+# test pop_config target
+pop_config target
+set matches 0
+if { $target_info(target,name) == "" } {
+    incr matches
+}
+if { $target_info(target,ldflags) == "" } {
+    incr matches
+}
+if { $target_info(target,config) == "" } {
+    incr matches
+}
+if { $target_info(target,cflags) == "" } {
+    incr matches
+}
+if { $target_info(target,connect) == "" } {
+    incr matches
+}
+if { $target_info(target,target) == "" } {
+    incr matches
+}
+if { $target_info(target,serial) == "" } {
+    incr matches
+}
+if { $target_info(target,netport) == "" } {
+    incr matches
+}
+if { $target_info(target,baud) == "" } {
+    incr matches
+}
+if { $matches == 9 } {
+    puts "PASSED: pop_config target"
+} else {
+    puts "FAILED: pop_config target"
+}
+
+push_config host idp
+set matches 0
+if { $target_info(host,name) == "idp" } {
+    incr matches
+}
+if { $target_info(host,ldflags) == "-Tidp.ld" } {
+    incr matches
+}
+if { $target_info(host,config) == "m68k-unknown-aout" } {
+    incr matches
+}
+if { $target_info(host,cflags) == "" } {
+    incr matches
+}
+if { $target_info(host,connect) == "telnet" } {
+    incr matches
+}
+if { $target_info(host,target) == "s12" } {
+    incr matches
+}
+if { $target_info(host,serial) == "tstty12" } {
+    incr matches
+}
+if { $target_info(host,netport) == "localhost:23" } {
+    incr matches
+}
+if { $target_info(host,baud) == "9600" } {
+    incr matches
+}
+if { $matches == 9 } {
+    puts "PASSED: push_config target"
+} else {
+    puts "FAILED: push_config target"
+}
+
+# test pop_config host
+pop_config host
+set matches 0
+if { $target_info(host,name) == "" } {
+    incr matches
+}
+if { $target_info(host,ldflags) == "" } {
+    incr matches
+}
+if { $target_info(host,config) == "" } {
+    incr matches
+}
+if { $target_info(host,cflags) == "" } {
+    incr matches
+}
+if { $target_info(host,connect) == "" } {
+    incr matches
+}
+if { $target_info(host,target) == "" } {
+    incr matches
+}
+if { $target_info(host,serial) == "" } {
+    incr matches
+}
+if { $target_info(host,netport) == "" } {
+    incr matches
+}
+if { $target_info(host,baud) == "" } {
+    incr matches
+}
+if { $matches == 9 } {
+    puts "PASSED: pop_config host"
+} else {
+    puts "FAILED: pop_config host"
+}
+
+# test execute_anywhere for a native environment
+set host_triplet i586-unknown-linux
+set target_triplet i586-unknown-linux
+set build_triplet i586-unknown-linux
+if { [string match "*setval.tmp*" [execute_anywhere "ls"]] } {
+    puts "PASSED: execute_anywhere, native"
+} else {
+    puts "FAILED: execute_anywhere, native"
+}
+
+# test execute_anywhere for a normal cross
+set target_triplet m68k-unknown-coff
+if { [string match "*testsuite" [execute_anywhere "pwd"]] } {
+    puts "PASSED: execute_anywhere, normal cross"
+} else {
+    puts "FAILED: execute_anywhere, normal cross"
+}
+
+# test execute_anywhere for a canadian cross
+set build_triplet m68k-test-test
+set target_info(host,connect) rlogin
+set target_info(host,netport) $target_info(idp,netport)
+set target_info(host,target)  localhost
+if { [string match "*FooBar*" [execute_anywhere "echo FooBar"]] } {
+    puts "PASSED: execute_anywhere, canadian cross"
+} else {
+    puts "FAILED: execute_anywhere, canadian cross"
+}
+
+# compile arg
+# archive arg
+# ranlib arg
+# link_objects arg

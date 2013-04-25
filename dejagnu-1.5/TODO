@@ -1,0 +1,56 @@
+Last updated $Date: 2004/02/08 14:02:07 $
+
+Bigger items
+============
+
+* Internationali[sz]ation.
+* Use a throw-away slave interpreter for running each test case.
+* Transfer timeouts should be dependent on file size and link speed.
+* Add more support for target boards and RTOSes.
+* Use the new expect terminal support for an "escape codes" API.
+* Use expectk and write a GUI testing API, complete with record/playback.
+
+Documentation
+=============
+
+* Add a "testing methodologies" section to the manual.
+
+
+From: mec.gnu@mindspring.com (Michael Elizabeth Chastain)
+Subject: my dejagnu wish list
+Newsgroups: gmane.comp.sysutils.dejagnu.general
+Date: Sat, 31 Jan 2004 21:02:21 -0500 (EST)
+
+My wish list for dejagnu:
+
+. clean up the exit status value.
+
+  The current situation is:
+
+    1  a FAIL, XPASS, KPASS, or UNRESOLVED result occurred
+    1  an unknown TCL procedure was called
+    1  --status option and a TCL error happened
+    0  all other cases
+
+  I would like to see something like:
+
+    0  all tests are okay
+    1  at least one test is not okay (FAIL, XPASS, KPASS, UNRESOLVED)
+    2  a TCL error occured
+  130  user hit ^C (SIGINT)
+  131  user hit ^\ (SIGQUIT)
+
+  The important part is that I want to detect whether dejagnu ran
+  to completion or whether the user interrupted it with ^C or ^\.
+
+. When the compiler produces error messages, default_target_compile
+  calls "verbose -log ...".  There is no need for "-log", because
+  runtest.exp already turned on "expect" logging with
+  "log_file -a $outdir/$tool.log", so there is already a copy of
+  the compiler output in the log file.  Just "verbose ..." or
+  nothing at all.
+
+. Reset $warncnt and $errcnt at the start of each script.  Right now,
+  if an error happens in a script and then no tests are run,
+  $errcnt carries over to the next script and forces the first test
+  of the new script to be UNRESOLVED.

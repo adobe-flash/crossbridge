@@ -1,0 +1,138 @@
+# test clone_output
+
+set srcdir [lindex $argv 0]
+set subdir [lindex $argv 1]
+set objdir [lindex $argv 2]
+
+if [ file exists $objdir/setval.tmp ] {
+    source $objdir/setval.tmp
+} else {
+    puts "ERROR: $objdir/setval.tmp doesn't exist"
+}
+if [ file exists $srcdir/$subdir/default_procs.tcl ] {
+    source "$srcdir/$subdir/default_procs.tcl"
+} else {
+    puts "ERROR: $srcdir/$subdir/default_procs.tcl doesn't exist"
+}
+if [ file exists $srcdir/../lib/framework.exp] {
+    source $srcdir/../lib/framework.exp
+} else {
+    puts "ERROR: $srcdir/../lib/framework.exp doesn't exist"
+}
+
+set all_flag 1
+
+set host_triplet i586-unknown-linux
+set target_triplet i586-unknown-linux
+set target_cpu i586
+set target_os linux
+set build_triplet i586-unknown-linux
+
+# FIXME: should use run_tests here, but due to Tcl's weird scoping rules, I get
+# problems.
+
+#
+# Tests for a native configuration
+#
+if [isbuild $build_triplet] {
+    puts "PASSED: isbuild, native"
+} else {
+    puts "FAILED: isbuild, native"
+}
+
+if [isbuild $target_cpu-*-$target_os ] {
+    puts "PASSED: isbuild, native regexp"
+} else {
+    puts "FAILED: isbuild, native regexp"
+}
+
+if [isbuild hppa-ibm-macos ] {
+    puts "FAILED: isbuild, native bogus config string"
+} else {
+    puts "PASSED: isbuild, native bogus config string"
+}
+
+# ishost tests
+if [ishost $host_triplet] {
+    puts "PASSED: ishost, native"
+} else {
+    puts "FAILED: ishost, native"
+}
+
+if [ishost $target_cpu-*-$target_os] {
+    puts "PASSED: ishost, native regexp"
+} else {
+    puts "FAILED: ishost, native regexp"
+}
+
+if [ishost hppa-ibm-macos] {
+    puts "FAILED: ishost, native bogus config string"
+} else {
+    puts "PASSED: ishost, native bogus config string"
+}
+
+# istarget tests
+if [istarget $target_triplet] {
+    puts "PASSED: istarget, native"
+} else {
+    puts "FAILED: istarget, native"
+}
+
+if [istarget $target_cpu-*-$target_os] {
+    puts "PASSED: istarget, native regexp"
+} else {
+    puts "FAILED: istarget, native regexp"
+}
+
+if [istarget hppa-ibm-macos] {
+    puts "FAILED: istarget, native bogus config string"
+} else {
+    puts "PASSED: istarget, native bogus config string"
+}
+
+# native tests
+if [isnative] {
+    puts "PASSED: isnative, native"
+} else {
+    puts "FAILED: isnative, native"
+}
+
+if [is3way] {
+     puts "FAILED: is3way, native"
+} else {
+    puts "PASSED: is3way, native"
+}
+
+#
+# Tests for a normal cross configuration
+#
+set target_triplet m68k-unknown-elf
+if [isnative] {
+    puts "FAILED: isnative, cross"
+} else {
+    puts "PASSED: isnative, cross"
+}
+
+if [is3way] {
+     puts "FAILED: is3way, cross"
+} else {
+    puts "PASSED: is3way, cross"
+}
+
+#
+# Tests for a canadian cross configuration
+#
+set host_triplet  i386-unknown-winnt
+if [isnative] {
+    puts "FAILED: isnative, canadian cross"
+} else {
+    puts "PASSED: isnative, canadian cross"
+}
+
+if [is3way] {
+     puts "PASSED: is3way, canadian cross"
+} else {
+    puts "FAILED: is3way, canadian cross"
+}
+
+

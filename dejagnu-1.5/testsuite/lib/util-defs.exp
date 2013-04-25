@@ -1,0 +1,101 @@
+# Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+# 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+#
+# This file is part of DejaGnu.
+#
+# DejaGnu is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# DejaGnu is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with DejaGnu; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.
+
+# This file was written by Rob Savoye <rob@welcomehome.org>.
+
+#
+# Run a utility and test the result.
+#
+# Parameters:
+# First one is the command
+# Second one is command arguments
+# Third one is the file name
+# Fourth one is the regexp style pattern to match for a PASS
+#
+# Returns:
+#  1 if the test failed,
+#  0 if the test passes,
+# -1 if there was an internal error.
+#
+
+proc util_test { args } {
+    global verbose
+    # get the parameters
+    set cmd	[lindex $args 0]
+    verbose 	"Utility to execute is $cmd" 2
+    set cmd_arg [lindex $args 1]
+    verbose 	"Command line arguments are $cmd_arg" 2
+    set file    [lindex $args 2]
+    verbose 	"The file name to use is $file" 2
+    set pattern [lindex $args 3]
+    verbose	"The pattern to match is \"$pattern\"" 2
+
+    if [info exists file] {
+	if ![string match "" $file] {
+	    if ![file exists $file] {
+		perror "$file doesn't exist"
+		return -1
+	    }
+	}
+    }
+
+    # Run the utility to be tested and analyze the results.
+
+    set comp_output [util_start $cmd $cmd_arg $file]
+
+    verbose "Output is \"$comp_output\"" 2
+    verbose "Pattern is \"$pattern\"" 2
+
+    if [regexp "$pattern" $comp_output] {
+	verbose "Pattern matches." 2
+	return 0
+    }
+
+    verbose "Pattern does not match." 2
+    return 1
+}
+
+#
+# Run the utility
+#
+# Return NULL or the output.
+#
+
+proc util_start { args } {
+    global verbose
+    set cmd	[lindex $args 0]
+    set cmd_arg [lindex $args 1]
+    set file    [lindex $args 2]
+
+    if {[which $cmd] == 0} {
+        perror "Can't find $cmd"
+	return ""
+    }
+
+    if { $verbose > 0 } {
+	verbose "Spawning \"$cmd $cmd_arg $file\""
+    } else {
+	send_log "Spawning \"$cmd $cmd_arg $file\"\n"
+    }
+    catch "exec $cmd $cmd_arg $file" comp_output
+    if ![string match "" $comp_output] {	
+        send_log "$comp_output\n"
+    }
+    return $comp_output
+}

@@ -1,0 +1,79 @@
+# Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
+# 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+#
+# This file is part of DejaGnu.
+#
+# DejaGnu is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# DejaGnu is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with DejaGnu; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.
+
+# This file was written by Rob Savoye <rob@welcomehome.org>.
+
+global RUNTEST
+if ![info exists RUNTEST] then {
+    set RUNTEST [transform runtest]
+}
+
+if ![info exists EXPECT] {
+    set EXPECT [findfile $base_dir/../../expect/expect "$base_dir/../../expect/expect" expect]
+    verbose "EXPECT defaulting to $EXPECT" 2
+}
+
+global RUNTESTFLAGS
+if ![info exists RUNTESTFLAGS] then {
+    set RUNTESTFLAGS "-v -v -a"
+}
+
+#
+# runtest_version -- extract and print the version number
+#
+proc runtest_version { } {
+    global RUNTEST
+
+    catch {exec $RUNTEST -V} tmp
+    if [info exists tmp] then {
+	clone_output "$tmp\n"
+    }
+}
+
+#
+# runtest_load -- loads the program. For runtest, this is just a stub
+#
+proc runtest_load { arg } {
+}
+
+#
+# runtest_exit -- exit the test driver for expect
+#
+proc runtest_exit { } {
+    close
+}
+
+#
+# runtest_start -- start everything
+#
+proc runtest_start { } {
+    global verbose
+    global spawn_id
+    global subdir
+    global srcdir
+    global objdir
+    global RUNTEST
+    global RUNTESTFLAGS
+
+    if {[which $RUNTEST] != 0} then {
+	perror "Can't find $RUNTEST"
+    }
+
+    #    return [open [concat "$RUNTEST $RUNTESTFLAGS"] r]
+}

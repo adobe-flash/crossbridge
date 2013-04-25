@@ -1,0 +1,89 @@
+# Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003
+# Free Software Foundation, Inc.
+#
+# This file is part of DejaGnu.
+#
+# DejaGnu is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# DejaGnu is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with DejaGnu; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.
+
+load_lib libsup.exp
+
+proc process_test { test } {
+    global srcdir
+    global subdir
+    global objdir
+    global EXPECT
+
+    verbose "Executing test case $test"
+    set text "\[- A-Za-z0-9\,\.\;\"\_\:\'\`\(\)\!\#\=\+\?\&\*]*"
+
+    set timeout 150
+
+    if [file exists $test] {
+	verbose "Processing test $test" 2
+	spawn -open  [open "|$EXPECT $test $srcdir $subdir [pwd]" r]
+	expect {
+	    "No such file or directory" {
+		perror "$test wouldn't run" 0
+	    }
+	    -re "\[\r\n\]*NOTSUPPORTED: $text\[\r\n\]*" {
+		unsupported "[lrange $expect_out(0,string) 1 end]"
+		exp_continue
+	    }
+	    -re "\[\r\n\]*NOTTESTED: $text\[\r\n\]*" {
+		untested "[lrange $expect_out(0,string) 1 end]"
+		exp_continue
+	    }
+	    -re "\[\r\n\]*PASSED: $text\[\r\n\]*" {
+		pass "[lrange $expect_out(0,string) 1 end]"
+		exp_continue
+	    }
+	    -re "\[\r\n\]*FAILED: $text\[\r\n\]*" {
+		fail "[lrange $expect_out(0,string) 1 end]"
+		exp_continue
+	    }
+	    -re "\[\r\n\]*WARNED: $text\[\r\n\]*" {
+		verbose "$expect_out(0,string)" 2
+		exp_continue
+	    }
+	    -re "\[\r\n\]*ERRORED: $text\[\r\n\]*" {
+		verbose "$expect_out(0,string)" 2
+		exp_continue
+	    }
+	    timeout {
+		perror "$test timed out" 0
+		exp_continue
+	    }
+	    eof {
+		verbose "All Done" 3
+	    }
+	}
+    } else {
+	perror "$test doesn't exist" 0
+    }
+}
+
+if ![info exists EXPECT] {
+    set EXPECT [findfile $base_dir/../../expect/expect "$base_dir/../../expect/expect" expect]
+    verbose "EXPECT defaulting to $EXPECT" 2
+}
+
+make_defaults_file [pwd]/setval.tmp
+
+foreach i [glob $srcdir/$subdir/*.test] {
+    process_test $i
+}
+
+# Clean up behind ourselves.
+file delete .tmp [pwd]/setval.tmp

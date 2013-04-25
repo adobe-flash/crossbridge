@@ -1,0 +1,80 @@
+-* text -*-
+
+Changes since 1.4.4:
+
+1. The runtest.1 man page has been brought up to date.
+2. The Docbook/SGML documentation files were removed in favour of the
+   Docbook/XML documentation.  The Texinfo source for the Info pages is
+   now automatically generated from the Docbook source.
+3. The Makefile structure has been substantially simplified.  There
+   is now a single top-level Makefile.am.  The use of recursive make
+   has been eliminated.
+4. lib/mondfe.exp and lib/xsh.exp have been removed.  Users requiring
+   these communication modes can still use the DejaGnu 1.4 branch or
+   can contact dejagnu@gnu.org to discuss reinstating these files.
+5. The configure script now ensures that Expect is installed and that
+   it is linked against Tcl 8.3 or greater.
+6. The runtest program now gracefully handles the possibility of the
+   expect binary vanishing after DejaGnu has been installed (for
+   example, by the user altering their PATH).
+7. The user-visible utility procedures `absolute', `prune', `psource'
+   and `slay' are deprecated and will be removed in the next release.
+   If a testsuite uses any of these procedures, a copy of the
+   procedure should be made and placed in the lib directory of the
+   testsuite.
+
+Changes since 1.4.2:
+
+1. New XML output option, so test results can be loaded into a database.
+2. Support for the KFAIL/KPASS (known failures).
+3. New "Hello World" example.
+4. New tutorial chapter.
+5. Test cases build with either GCC 2.x or 3.x.
+6. BlueGnu has been removed from the contrib directory.
+7. The contrib/test* scipts were bitrotten and have been removed.  If
+   you still want copies of these, they can be found in the previous
+   DejaGnu release.
+8. i960glue.c has been removed.
+
+Changes since 1.4.1:
+
+1. Various patches for bugs reported from net users.
+2. Test case builds with either libstdc++-v3 (as used by GCC 3.0.x) or
+   the older v2 (as used by GCC 2.95.x).
+
+Changes since 1.4.0:
+
+1. There is new support for a simple unit testing API, that is also
+   useful for embedded testing.
+
+Changes since 1.3:
+
+1. DejaGnu is now back under active maintainance. The initial work has
+   been rewriting the manual to bring it up to date, and switching to
+   SGML.
+2. NT support has also been added.
+3. DejaGnu now uses Automake.
+
+Changes since 1.1.1:
+
+1. Works with (included in release) Tcl 7.3 and Expect 5.6.
+2. Much better error trapping and handling, including the execution of
+   sub scripts.
+3. Re-worked configuration subsystem.
+4. Default handling for testing unknown targets.
+5. New testsuite for expect and runtest.
+6. More debugging procedures.
+
+Changes since 1.0:
+
+1. DejaGnu now conforms to POSIX 1003.3, a standard for testing frameworks.
+2. A Tcl debugger written by Don Libes has been added.
+3. Lots of bug fixes.
+
+Changes since 0.9:
+
+1. DejaGnu now installs itself like other utilities.
+2. 700 G++ tests are included.
+3. The bugs in the GCC tests have been fixed.
+4. Testsuites are released separately.
+5. Testsuite sources now reside with the within each tool's source tree.

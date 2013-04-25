@@ -1,0 +1,217 @@
+set srcdir [lindex $argv 0]
+set subdir [lindex $argv 1]
+set objdir [lindex $argv 2]
+
+if [ file exists $objdir/setval.tmp ] {
+    source $objdir/setval.tmp
+} else {
+    puts "ERROR: $objdir/setval.tmp doesn't exist"
+}
+if [ file exists $srcdir/$subdir/default_procs.tcl ] {
+    source "$srcdir/$subdir/default_procs.tcl"
+} else {
+    puts "ERROR: $srcdir/$subdir/default_procs.tcl doesn't exist"
+}
+
+set file $srcdir/../lib/remote.exp
+if [ file exists $file] {
+    source $file
+} else {
+    puts "ERROR: $file doesn't exist"
+}
+
+global errno ""
+
+#
+# Create a false target config array
+#
+set target_info(idp,name)       "idp"
+set target_info(idp,ldflags)    "-Tidp.ld"
+set target_info(idp,config)     m68k-unknown-aout
+set target_info(idp,cflags)     ""
+set target_info(idp,connect)    telnet
+set target_info(idp,target)     "s12"
+set target_info(idp,serial)     "tstty12"
+set target_info(idp,netport)    "localhost:23"
+set target_info(idp,baud)       "9600"
+# MVME target
+set target_info(mvme,name)      "mvme"
+set target_info(mvme,ldflags)   "-Tmvme.ld"
+set target_info(mvme,config)    m68k-unknown-aout
+set target_info(mvme,cflags)    ""
+set target_info(mvme,connect)   telnet
+set target_info(mvme,target)    "s12"
+set target_info(mvme,serial)    "tstty8"
+set target_info(mvme,netport)   "localhost:23"
+set target_info(mvme,baud)      "9600"
+
+# Test remote open. We try not to use any of the support procs in
+# target.exp to for isolation testing. "target" is the name of the
+# default array setup by the procs in target.exp.
+
+set timeout 100
+set errno ""
+
+#
+# Force connection errors
+#
+
+# force an rlogin error
+if { [rlogin foobar.barfoo.com] < 0 } {
+    puts "PASSED: rlogin bogus host"
+} else {
+    puts "FAILED: rlogin bogus"
+}
+
+# force an rsh error
+if { [rsh foobar.barfoo.com] < 0 } {
+    puts "PASSED: rsh bogus host"
+} else {
+    puts "FAILED: rsh bogus"
+}
+
+# force a telnet error
+if { [telnet foobar.barfoo.com] < 0 } {
+    puts "PASSED: telnet bogus host"
+} else {
+    puts "FAILED: telnet bogus"
+}
+
+#
+# Connect to localhost
+#
+
+# localhost rlogin test
+if { [rlogin localhost] < 0 } {
+    if [string match "*unencrypted connection" $errno] {
+	NOTTESTED "rlogin localhost"
+    } else {
+	puts "FAILED: rlogin localhost"
+    }
+} else {
+    puts "PASSED: rlogin localhost"
+}
+catch "exp_send exit\n"
+catch "close -i $spawn_id"
+catch "wait -i $spawn_id"
+
+# localhost rsh test
+if { [rsh localhost] < 0 } {
+    if [string match "*kinit" $errno] {
+	puts "NOTTESTED: rsh localhost"
+    } else {
+	puts "FAILED: rsh localhost"
+    }
+} else {
+    puts "PASSED: rsh localhost"
+}
+catch "exp_send exit\n"
+catch "close -i $spawn_id"
+catch "wait -i $spawn_id"
+
+# localhost telnet test. In this case it will return
+# an error cause we get prompted for a password or login. For
+# now this is considered an error, as we usually only
+# telnet to a terminal server.
+if { [telnet localhost] < 0 } {
+    if [string match "*password." $errno] {
+	puts "NOTTESTED: telnet localhost"
+    } else {
+	puts "FAILED: telnet localhost"
+    }
+} else {
+    puts "PASSED: telnet localhost"
+}
+catch "exp_send exit\n"
+catch "close -i $spawn_id"
+catch "wait -i $spawn_id"
+
+#
+# Connect to the configured target
+#
+set target_info(target,netport) $target_info(idp,netport)
+set target_info(target,target)  localhost
+set target_info(target,connect) rlogin
+if { [rlogin target] < 0 } {
+    if [ string match "*kinit" $errno] {
+	puts "NOTTESTED: rlogin target"
+    } else {
+	puts "FAILED: rlogin target"
+    }
+} else {
+    puts "PASSED: rlogin target"
+}
+catch "exp_send exit\n"
+catch "close -i $spawn_id"
+catch "wait -i $spawn_id"
+
+# test remote_open
+if { [rsh target] < 0 } {
+    if [ string match "*kinit" $errno] {
+	puts "NOTTESTED: rsh target"
+    } else {
+	puts "FAILED: rsh target"
+    }
+} else {
+    puts "PASSED: rsh target"
+}
+catch "exp_send exit\n"
+catch "close -i $spawn_id"
+catch "wait -i $spawn_id"
+
+# telnet to host
+# FIXME: This won't work till we figure out how to telnet and
+# not get a password prompt.
+
+#
+# Connect to the configured host
+#
+set target_info(host,connect) rlogin
+set target_info(host,netport) $target_info(idp,netport)
+set target_info(host,target)  localhost
+
+# rlogin to host
+if { [rlogin host] < 0 } {
+    if [ string match "*kinit*" $errno] {
+	puts "NOTTESTED: rlogin host"
+    } else {
+	puts "FAILED: rlogin host"
+    }
+} else {
+    puts "PASSED: rlogin host"
+}
+catch "exp_send exit\n"
+catch "close -i $spawn_id"
+catch "wait -i $spawn_id"
+
+# rsh to host
+if { [rsh host] < 0 } {
+    if [ string match "*kinit*" $errno] {
+	puts "NOTTESTED: rsh host"
+    } else {
+	puts "FAILED: rsh host"
+    }
+} else {
+    puts "PASSED: rsh host"
+}
+catch "exp_send exit\n"
+catch "close -i $spawn_id"
+catch "wait -i $spawn_id"
+
+# telnet to host
+# FIXME: This won't work till we figure out how to telnet and
+# not get a password prompt.
+
+# tip port
+# remote_close args
+# rcp_download src dest
+# tip_download shell_id file
+# kermit args
+# download args
+
+
+
+
+
+
+

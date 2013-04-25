@@ -1,0 +1,57 @@
+# Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+# Free Software Foundation, Inc.
+#
+# This file is part of DejaGnu.
+#
+# DejaGnu is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# DejaGnu is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with DejaGnu; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.
+
+# This file tests pass/fail/etc.
+# The way we do this is to recursively invoke ourselves on a small testsuite
+# and analyze the results.
+
+load_lib util-defs.exp
+
+if ![info exists tmpdir] {
+    set tmpdir $objdir/tmpdir
+}
+
+if ![file isdirectory $tmpdir] {
+    catch "file mkdir $tmpdir"
+}
+
+set tests {
+    { pass "expected passes\[ \t\]+1\n" }
+    { fail "unexpected failures\[ \t\]+1\n" }
+    { xpass "unexpected successes\[ \t\]+1\n" }
+    { xfail "expected failures\[ \t\]+1\n" }
+    { kpass "unknown successes\[ \t\]+1\n" }
+    { kfail "known failures\[ \t\]+1\n" }
+    { untested "untested testcases\[ \t\]+1\n" }
+    { unresolved "unresolved testcases\[ \t\]+1\n" }
+    { unsupported "unsupported tests\[ \t\]+1\n" }
+}
+
+foreach t $tests {
+    if [util_test "$RUNTEST" \
+	    "--outdir $tmpdir STATS_TEST=[lindex $t 0] stats-sub.exp" \
+	    "" \
+	    [lindex $t 1]] {
+	fail [lindex $t 0]
+    } else {
+	pass [lindex $t 0]
+    }
+}
+
+file delete -force $tmpdir
