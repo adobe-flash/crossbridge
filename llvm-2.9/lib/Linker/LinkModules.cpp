@@ -40,6 +40,12 @@ static inline bool Error(std::string *E, const Twine &Message) {
   return true;
 }
 
+// We want aliases to behave like symbols wrt linkage so that
+// multiple modules can define identical aliases to unique symbols.
+const bool allowMultiAliasLinking = true;
+const bool allowAliasCollisions = true;
+
+
 // Function: ResolveTypes()
 //
 // Description:
@@ -667,7 +673,7 @@ static bool LinkAlias(Module *Dest, const Module *Src,
     const GlobalAlias *SGA = I;
     const GlobalValue *SAliasee = SGA->getAliasedGlobal();
     GlobalAlias *NewGA = NULL;
-
+    
     // Globals were already linked, thus we can just query ValueMap for variant
     // of SAliasee in Dest.
     ValueToValueMapTy::const_iterator VMI = ValueMap.find(SAliasee);
@@ -715,12 +721,27 @@ static bool LinkAlias(Module *Dest, const Module *Src,
       // Types are known to be the same, check whether aliasees equal. As
       // globals are already linked we just need query ValueMap to find the
       // mapping.
-      if (DAliasee == DGA->getAliasedGlobal()) {
+      if (allowMultiAliasLinking || DAliasee == DGA->getAliasedGlobal()) {
         // This is just two copies of the same alias. Propagate linkage, if
         // necessary.
         DGA->setLinkage(CalculateAliasLinkage(SGA, DGA));
 
-        NewGA = DGA;
+        // Update the Dest Alias to point where the Src Alias points (last linked alias wins)
+        if(allowMultiAliasLinking) {
+          NewGA = new GlobalAlias(SGA->getType(), SGA->getLinkage(),
+                                SGA->getName(), DAliaseeConst, Dest);
+          CopyGVAttributes(NewGA, SGA);
+
+          // Any uses of DGV need to change to NewGA, with cast, if needed.
+          if (SGA->getType() != DGA->getType())
+            DGA->replaceAllUsesWith(ConstantExpr::getBitCast(NewGA, DGA->getType()));
+          else
+            DGA->replaceAllUsesWith(NewGA);
+
+          DGA->eraseFromParent();
+        } else {
+          NewGA = DGA;
+        }
         // Proceed to 'common' steps
       } else
         return Error(Err, "Alias Collision on '"  + SGA->getName()+
@@ -780,9 +801,15 @@ static bool LinkAlias(Module *Dest, const Module *Src,
         DF->eraseFromParent();
 
         // Proceed to 'common' steps
-      } else
+      } else {
+        if(allowAliasCollisions) {
+          ValueMap[SGA] = DGV;
+          continue;
+        }
+
         return Error(Err, "Function-Alias Collision on '" + SGA->getName() +
-                     "': symbol multiple defined");
+                     "': symbol multiple defined 1");
+      }
     } else {
       // No linking to be performed, simply create an identical version of the
       // alias over in the dest module...
@@ -874,7 +901,7 @@ static bool LinkFunctionProtos(Module *Dest, const Module *Src,
 
   // Loop over all of the functions in the src module, mapping them over
   for (Module::const_iterator I = Src->begin(), E = Src->end(); I != E; ++I) {
-    const Function *SF = I;   // SrcFunction
+    Function *SF = (Function*)&*I;   // SrcFunction
     GlobalValue *DGV = 0;
 
     // Check to see if may have to link the function with the global, alias or
@@ -923,9 +950,16 @@ static bool LinkFunctionProtos(Module *Dest, const Module *Src,
       DGV->setVisibility(SF->getVisibility());
 
     if (LinkFromSrc) {
-      if (isa<GlobalAlias>(DGV))
-        return Error(Err, "Function-Alias Collision on '" + SF->getName() +
+      if (isa<GlobalAlias>(DGV)) {
+        if(allowAliasCollisions) {
+          //printf("Renaming to avoid Function-Alias Collision on %s\n", DGV->getName().str().c_str());
+          const Twine t("");
+          DGV->setName(t);
+        } else {
+          return Error(Err, "Function-Alias Collision on '" + SF->getName() +
                      "': symbol multiple defined");
+        }
+      }
 
       // We have a definition of the same name but different type in the
       // source module. Copy the prototype to the destination and replace
@@ -943,6 +977,8 @@ static bool LinkFunctionProtos(Module *Dest, const Module *Src,
       // not have internal linkage.
       if (GlobalVariable *Var = dyn_cast<GlobalVariable>(DGV))
         Var->eraseFromParent();
+      else if (GlobalAlias *A = dyn_cast<GlobalAlias>(DGV))
+        A->eraseFromParent();
       else
         cast<Function>(DGV)->eraseFromParent();
 
@@ -1147,6 +1183,9 @@ static bool LinkAppendingVars(Module *M,
 }
 
 static bool ResolveAliases(Module *Dest) {
+  if(allowMultiAliasLinking)
+    return false;
+  
   for (Module::alias_iterator I = Dest->alias_begin(), E = Dest->alias_end();
        I != E; ++I)
     // We can't sue resolveGlobalAlias here because we need to preserve

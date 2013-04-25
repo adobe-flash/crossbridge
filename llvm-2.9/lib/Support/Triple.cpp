@@ -25,6 +25,7 @@ const char *Triple::getArchTypeName(ArchType Kind) {
 
   case alpha:   return "alpha";
   case arm:     return "arm";
+  case avm2:    return "avm2";
   case bfin:    return "bfin";
   case cellspu: return "cellspu";
   case mips:    return "mips";
@@ -56,6 +57,8 @@ const char *Triple::getArchTypePrefix(ArchType Kind) {
 
   case arm:
   case thumb:   return "arm";
+
+  case avm2:   return "avm2";
 
   case bfin:    return "bfin";
 
@@ -130,6 +133,8 @@ Triple::ArchType Triple::getArchTypeForLLVMName(StringRef Name) {
     return alpha;
   if (Name == "arm")
     return arm;
+  if (Name == "avm2")
+    return avm2;
   if (Name == "bfin")
     return bfin;
   if (Name == "cellspu")
@@ -205,6 +210,9 @@ Triple::ArchType Triple::getArchTypeForDarwinArchName(StringRef Str) {
   if (Str == "ptx")
     return Triple::ptx;
 
+  if (Str == "avm2")
+    return Triple::avm2;
+
   return Triple::UnknownArch;
 }
 
@@ -226,6 +234,8 @@ const char *Triple::getArchNameForAssembler() {
     return "mblaze";
   if (Str == "arm")
     return "arm";
+  if (Str == "avm2")
+    return "avm2";
   if (Str == "armv4t" || Str == "thumbv4t")
     return "armv4t";
   if (Str == "armv5" || Str == "armv5e" || Str == "thumbv5"
@@ -287,6 +297,8 @@ Triple::ArchType Triple::ParseArch(StringRef ArchName) {
     return xcore;
   else if (ArchName == "ptx")
     return ptx;
+  else if (ArchName == "avm2")
+      return avm2;
   else
     return UnknownArch;
 }

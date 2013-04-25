@@ -313,3 +313,13 @@ void MCStreamer::EmitRawText(const Twine &T) {
   T.toVector(Str);
   EmitRawText(Str.str());
 }
+
+void MCStreamer::EmitRawTextAsm(StringRef String) {
+  EmitRawText(String);
+}
+
+void MCStreamer::EmitRawTextAsm(const Twine &T) {
+  SmallString<128> Str;
+  T.toVector(Str);
+  EmitRawTextAsm(Str.str());
+}

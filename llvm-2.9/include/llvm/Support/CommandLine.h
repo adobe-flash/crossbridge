@@ -42,7 +42,7 @@ namespace cl {
 //
 void ParseCommandLineOptions(int argc, char **argv,
                              const char *Overview = 0,
-                             bool ReadResponseFiles = false);
+                             bool ReadResponseFiles = true);
 
 //===----------------------------------------------------------------------===//
 // ParseEnvironmentOptions - Environment variable option processing alternate
@@ -50,7 +50,7 @@ void ParseCommandLineOptions(int argc, char **argv,
 //
 void ParseEnvironmentOptions(const char *progName, const char *envvar,
                              const char *Overview = 0,
-                             bool ReadResponseFiles = false);
+                             bool ReadResponseFiles = true);
 
 ///===---------------------------------------------------------------------===//
 /// SetVersionPrinter - Override the default (LLVM specific) version printer

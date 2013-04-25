@@ -1,6 +1,6 @@
 # See docs/CMake.html for instructions about how to build LLVM with CMake.
 
-project(LLVM)
+project(LLVM )
 cmake_minimum_required(VERSION 2.8)
 
 # Add path for custom modules
@@ -66,6 +66,8 @@ endif()
 set(LLVM_ALL_TARGETS
   Alpha
   ARM
+  AVM2
+  AVM2Shim
   Blackfin
   CBackend
   CellSPU
@@ -175,7 +177,7 @@ set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LLVM_BINARY_DIR}/lib )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-include_directories( ${LLVM_BINARY_DIR}/include ${LLVM_MAIN_INCLUDE_DIR})
+include_directories( ${LLVM_BINARY_DIR}/include ${LLVM_MAIN_INCLUDE_DIR} ${LLVM_MAIN_INCLUDE_DIR}/../../avm2_env/misc/)
 
 if( ${CMAKE_SYSTEM_NAME} MATCHES SunOS )
    SET(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-include llvm/Support/Solaris.h")
@@ -218,6 +220,7 @@ add_subdirectory(include/llvm)
 
 add_subdirectory(lib)
 
+add_subdirectory(utils/fpcmp)
 add_subdirectory(utils/FileCheck)
 add_subdirectory(utils/FileUpdate)
 add_subdirectory(utils/count)

@@ -5858,17 +5858,21 @@ SDValue DAGCombiner::visitLOAD(SDNode *N) {
     }
   }
 
-  // If this load is directly stored, replace the load value with the stored
-  // value.
-  // TODO: Handle store large -> read small portion.
-  // TODO: Handle TRUNCSTORE/LOADEXT
-  if (LD->getExtensionType() == ISD::NON_EXTLOAD &&
-      !LD->isVolatile()) {
-    if (ISD::isNON_TRUNCStore(Chain.getNode())) {
-      StoreSDNode *PrevST = cast<StoreSDNode>(Chain);
-      if (PrevST->getBasePtr() == Ptr &&
-          PrevST->getValue().getValueType() == N->getValueType(0))
-      return CombineTo(N, Chain.getOperand(1), Chain);
+  // AVM2 - skip this optimiztion if we are compiling for debugging,
+  // because it causes problems with gdb. See ALC-339.
+  if (OptLevel != CodeGenOpt::None) {
+    // If this load is directly stored, replace the load value with the stored
+    // value.
+    // TODO: Handle store large -> read small portion.
+    // TODO: Handle TRUNCSTORE/LOADEXT
+    if (LD->getExtensionType() == ISD::NON_EXTLOAD &&
+        !LD->isVolatile()) {
+      if (ISD::isNON_TRUNCStore(Chain.getNode())) {
+        StoreSDNode *PrevST = cast<StoreSDNode>(Chain);
+        if (PrevST->getBasePtr() == Ptr &&
+            PrevST->getValue().getValueType() == N->getValueType(0))
+        return CombineTo(N, Chain.getOperand(1), Chain);
+      }
     }
   }
 

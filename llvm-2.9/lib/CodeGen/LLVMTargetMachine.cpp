@@ -100,7 +100,7 @@ EnableFastISelOption("fast-isel", cl::Hidden,
 
 LLVMTargetMachine::LLVMTargetMachine(const Target &T,
                                      const std::string &Triple)
-  : TargetMachine(T), TargetTriple(Triple) {
+  : TargetMachine(T), TargetTriple(Triple), EnableRegAlloc(true) {
   AsmInfo = T.createAsmInfo(TargetTriple);
 }
 
@@ -386,11 +386,15 @@ bool LLVMTargetMachine::addCommonCodeGenPasses(PassManagerBase &PM,
     printAndVerify(PM, "After PreRegAlloc passes");
 
   // Perform register allocation.
-  PM.add(createRegisterAllocator(OptLevel));
+  if(EnableRegAlloc)
+    PM.add(createRegisterAllocator(OptLevel));
+  else
+    PM.add(createVirtRegReductionPass());
+
   printAndVerify(PM, "After Register Allocation");
 
   // Perform stack slot coloring and post-ra machine LICM.
-  if (OptLevel != CodeGenOpt::None) {
+  if (EnableRegAlloc && OptLevel != CodeGenOpt::None) {
     // FIXME: Re-enable coloring with register when it's capable of adding
     // kill markers.
     if (!DisableSSC)
@@ -404,7 +408,7 @@ bool LLVMTargetMachine::addCommonCodeGenPasses(PassManagerBase &PM,
   }
 
   // Run post-ra passes.
-  if (addPostRegAlloc(PM, OptLevel))
+  if (EnableRegAlloc && addPostRegAlloc(PM, OptLevel))
     printAndVerify(PM, "After PostRegAlloc passes");
 
   PM.add(createLowerSubregsPass());
@@ -415,23 +419,23 @@ bool LLVMTargetMachine::addCommonCodeGenPasses(PassManagerBase &PM,
   printAndVerify(PM, "After PrologEpilogCodeInserter");
 
   // Run pre-sched2 passes.
-  if (addPreSched2(PM, OptLevel))
+  if (EnableRegAlloc && addPreSched2(PM, OptLevel))
     printAndVerify(PM, "After PreSched2 passes");
 
   // Second pass scheduler.
-  if (OptLevel != CodeGenOpt::None && !DisablePostRA) {
+  if (EnableRegAlloc && OptLevel != CodeGenOpt::None && !DisablePostRA) {
     PM.add(createPostRAScheduler(OptLevel));
     printAndVerify(PM, "After PostRAScheduler");
   }
 
   // Branch folding must be run after regalloc and prolog/epilog insertion.
-  if (OptLevel != CodeGenOpt::None && !DisableBranchFold) {
+  if (EnableRegAlloc && OptLevel != CodeGenOpt::None && !DisableBranchFold) {
     PM.add(createBranchFoldingPass(getEnableTailMergeDefault()));
     printNoVerify(PM, "After BranchFolding");
   }
 
   // Tail duplication.
-  if (OptLevel != CodeGenOpt::None && !DisableTailDuplicate) {
+  if (EnableRegAlloc && OptLevel != CodeGenOpt::None && !DisableTailDuplicate) {
     PM.add(createTailDuplicatePass(false));
     printNoVerify(PM, "After TailDuplicate");
   }
@@ -441,7 +445,7 @@ bool LLVMTargetMachine::addCommonCodeGenPasses(PassManagerBase &PM,
   if (PrintGCInfo)
     PM.add(createGCInfoPrinter(dbgs()));
 
-  if (OptLevel != CodeGenOpt::None && !DisableCodePlace) {
+  if (EnableRegAlloc && OptLevel != CodeGenOpt::None && !DisableCodePlace) {
     PM.add(createCodePlacementOptPass());
     printNoVerify(PM, "After CodePlacementOpt");
   }

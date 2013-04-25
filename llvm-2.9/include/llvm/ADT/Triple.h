@@ -48,6 +48,7 @@ public:
 
     alpha,   // Alpha: alpha
     arm,     // ARM; arm, armv.*, xscale
+    avm2,    // Actionscript VM 2
     bfin,    // Blackfin: bfin
     cellspu, // CellSPU: spu, cellspu
     mips,    // MIPS: mips, mipsallegrex

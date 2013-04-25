@@ -195,6 +195,13 @@ int main(int argc, char **argv) {
   sys::PrintStackTraceOnErrorSignal();
   PrettyStackTraceProgram X(argc, argv);
 
+  // Ensure our FPU state is consistently in double preceision mode
+  #if defined(__CYGWIN__) || defined(__MINGW32__)
+  unsigned short cw;
+  cw = 0x27F;
+  __asm__ volatile ("fldcw %0" :: "m" (cw));
+  #endif
+
   // Enable debug stream buffering.
   EnableDebugBuffering = true;
 

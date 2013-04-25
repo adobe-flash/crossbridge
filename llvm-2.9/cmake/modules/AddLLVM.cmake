@@ -29,7 +29,7 @@ endmacro(add_llvm_library name)
 
 
 macro(add_llvm_loadable_module name)
-  if( NOT LLVM_ON_UNIX OR CYGWIN )
+  if( NOT LLVM_ON_UNIX )
     message(STATUS "Loadable modules not supported on this platform.
 ${name} ignored.")
     # Add empty "phony" target
@@ -50,6 +50,11 @@ ${name} ignored.")
       set_target_properties(${name} PROPERTIES
         LINK_FLAGS "-Wl,-flat_namespace -Wl,-undefined -Wl,suppress")
     endif()
+
+    if ( LLVM_CYGWINMAC )
+      set_target_properties(${name} PROPERTIES
+        LINK_FLAGS "-shared")
+    endif ()
 
     install(TARGETS ${name}
       LIBRARY DESTINATION lib${LLVM_LIBDIR_SUFFIX}
@@ -86,6 +91,15 @@ macro(add_llvm_executable name)
     endif()
   endif()
 endmacro(add_llvm_executable name)
+
+
+macro(llvm_target_link_libraries name)
+  if( CYGWIN OR LLVM_CYGWINMAC )
+    target_link_libraries(${name} -Wl,--start-group ${ARGN} -Wl,--end-group )
+  else()
+    target_link_libraries(${name} ${ARGN} )
+  endif()
+endmacro(llvm_target_link_libraries name)
 
 
 macro(add_llvm_tool name)

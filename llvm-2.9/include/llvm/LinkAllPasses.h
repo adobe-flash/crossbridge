@@ -103,6 +103,7 @@ namespace {
       (void) llvm::createProfileLoaderPass();
       (void) llvm::createPathProfileLoaderPass();
       (void) llvm::createPromoteMemoryToRegisterPass();
+      (void) llvm::createDemotePhiToMemoryPass();
       (void) llvm::createDemoteRegisterToMemoryPass();
       (void) llvm::createPruneEHPass();
       (void) llvm::createPostDomOnlyPrinterPass();

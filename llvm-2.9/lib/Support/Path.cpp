@@ -13,6 +13,7 @@
 
 #include "llvm/Support/Path.h"
 #include "llvm/Support/FileSystem.h"
+#include "llvm/Support/ManagedStatic.h"
 #include "llvm/Config/config.h"
 #include "llvm/Support/FileSystem.h"
 #include <cassert>
@@ -273,6 +274,19 @@ static StringRef getDirnameCharSep(StringRef path, const char *Sep) {
 
   return path.substr(0, pos+1);
 }
+
+class LLVMTempDir {
+public:
+  Path *path;
+  LLVMTempDir() : path(NULL) {}
+  ~LLVMTempDir() {
+    if(path) {
+      path->eraseFromDisk(true);
+      delete path;
+    }
+  }
+};
+static ManagedStatic<LLVMTempDir> appTempDir;
 
 // Include the truly platform-specific parts of this class.
 #if defined(LLVM_ON_UNIX)

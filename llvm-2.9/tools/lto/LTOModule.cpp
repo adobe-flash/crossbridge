@@ -702,8 +702,8 @@ bool LTOModule::ParseSymbols() {
   }
 
   // add asm globals
-  if (addAsmGlobalSymbols(Context))
-    return true;
+  //if (addAsmGlobalSymbols(Context))
+  //  return true;
 
   // add aliases
   for (Module::alias_iterator i = _module->alias_begin(),

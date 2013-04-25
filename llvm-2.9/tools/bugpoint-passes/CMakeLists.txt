@@ -1,4 +1,4 @@
-add_llvm_loadable_module( BugpointPasses
+add_llvm_library( BugpointPasses
   TestPasses.cpp
   )
 

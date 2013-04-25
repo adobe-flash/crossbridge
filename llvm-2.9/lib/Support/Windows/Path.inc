@@ -193,12 +193,11 @@ Path::isAbsolute() const {
   }
 }
 
-static Path *TempDirectory;
-
 Path
 Path::GetTemporaryDirectory(std::string* ErrMsg) {
-  if (TempDirectory)
-    return *TempDirectory;
+  // return the cached temp directory
+  if(appTempDir->path != NULL)
+    return *appTempDir->path;
 
   char pathname[MAX_PATH];
   if (!GetTempPath(MAX_PATH, pathname)) {
@@ -207,8 +206,7 @@ Path::GetTemporaryDirectory(std::string* ErrMsg) {
     return Path();
   }
 
-  Path result;
-  result.set(pathname);
+  Path result(pathname);
 
   // Append a subdirectory passed on our process id so multiple LLVMs don't
   // step on each other's toes.
@@ -226,8 +224,8 @@ Path::GetTemporaryDirectory(std::string* ErrMsg) {
 
   // And finally (re-)create the empty directory.
   result.createDirectoryOnDisk(false);
-  TempDirectory = new Path(result);
-  return *TempDirectory;
+  appTempDir->path = new Path(result);
+  return *appTempDir->path;
 }
 
 // FIXME: the following set of functions don't map to Windows very well.

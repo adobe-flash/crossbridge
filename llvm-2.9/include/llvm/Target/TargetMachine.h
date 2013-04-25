@@ -282,13 +282,14 @@ class LLVMTargetMachine : public TargetMachine {
 protected: // Can only create subclasses.
   LLVMTargetMachine(const Target &T, const std::string &TargetTriple);
 
+  bool EnableRegAlloc;
 private:
   /// addCommonCodeGenPasses - Add standard LLVM codegen passes used for
   /// both emitting to assembly files or machine code output.
   ///
   bool addCommonCodeGenPasses(PassManagerBase &, CodeGenOpt::Level,
                               bool DisableVerify, MCContext *&OutCtx);
-
+  
   virtual void setCodeModelForJIT();
   virtual void setCodeModelForStatic();
 

@@ -180,6 +180,7 @@ void initializeProfileEstimatorPassPass(PassRegistry&);
 void initializeProfileInfoAnalysisGroup(PassRegistry&);
 void initializePathProfileInfoAnalysisGroup(PassRegistry&);
 void initializePathProfileVerifierPass(PassRegistry&);
+void initializePhiToMemPass(PassRegistry&);
 void initializeProfileVerifierPassPass(PassRegistry&);
 void initializePromotePassPass(PassRegistry&);
 void initializePruneEHPass(PassRegistry&);
@@ -225,6 +226,7 @@ void initializeUnreachableBlockElimPass(PassRegistry&);
 void initializeUnreachableMachineBlockElimPass(PassRegistry&);
 void initializeVerifierPass(PassRegistry&);
 void initializeVirtRegMapPass(PassRegistry&);
+void initializeVirtRegReductionPass(PassRegistry&); // SEP
 void initializeInstSimplifierPass(PassRegistry&);
 
 }

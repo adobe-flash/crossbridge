@@ -57,7 +57,7 @@ function(llvm_process_sources OUT_VAR)
   # Set common compiler options:
   if( NOT LLVM_REQUIRES_EH )
     if( CMAKE_COMPILER_IS_GNUCXX )
-      add_definitions( -fno-exceptions )
+      #add_definitions( -fno-exceptions )
     elseif( MSVC )
       llvm_replace_compiler_option(CMAKE_CXX_FLAGS "/EHsc" "/EHs-c-")
       add_definitions( /D_HAS_EXCEPTIONS=0 )

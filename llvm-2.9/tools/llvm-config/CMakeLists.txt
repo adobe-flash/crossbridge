@@ -38,7 +38,7 @@ foreach(c ${LLVM_TARGETS_TO_BUILD})
   set(TARGETS_BUILT "${TARGETS_BUILT} ${c}")
 endforeach(c)
 set(TARGETS_TO_BUILD ${TARGETS_BUILT})
-set(TARGET_HAS_JIT "1")  # TODO
+set(TARGET_HAS_JIT "0")  # TODO
 
 # Avoids replacement at config-time:
 set(LLVM_CPPFLAGS "@LLVM_CPPFLAGS@")

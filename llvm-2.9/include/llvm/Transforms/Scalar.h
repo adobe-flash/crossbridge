@@ -158,6 +158,14 @@ FunctionPass *createPromoteMemoryToRegisterPass();
 
 //===----------------------------------------------------------------------===//
 //
+// DemotePhiToMemoryPass - This pass is used to demote PHIs to memory
+// references.
+//
+FunctionPass *createDemotePhiToMemoryPass();
+extern char &DemotePhiToMemoryID;
+
+//===----------------------------------------------------------------------===//
+//
 // DemoteRegisterToMemoryPass - This pass is used to demote registers to memory
 // references. In basically undoes the PromoteMemoryToRegister pass to make cfg
 // hacking easier.

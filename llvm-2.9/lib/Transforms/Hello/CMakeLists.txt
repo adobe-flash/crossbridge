@@ -1,3 +1,3 @@
-add_llvm_loadable_module( LLVMHello
+add_llvm_library( LLVMHello
   Hello.cpp
   )

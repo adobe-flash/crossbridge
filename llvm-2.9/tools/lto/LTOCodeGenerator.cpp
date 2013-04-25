@@ -55,6 +55,9 @@ using namespace llvm;
 static cl::opt<bool> DisableInline("disable-inlining",
   cl::desc("Do not run the inliner pass"));
 
+static cl::opt<bool>
+StripDebug("strip-debug",
+           cl::desc("Strip debugger symbol info from translation unit"));
 
 const char* LTOCodeGenerator::getVersionString()
 {
@@ -364,6 +367,10 @@ bool LTOCodeGenerator::generateObjectFile(raw_ostream& out,
     // Add an appropriate TargetData instance for this module...
     passes.add(new TargetData(*_target->getTargetData()));
     
+    // If the -strip-debug command line option was specified, do it.
+    if (StripDebug)
+      passes.add(createStripSymbolsPass(true));
+
     createStandardLTOPasses(&passes, /*Internalize=*/ false, !DisableInline,
                             /*VerifyEach=*/ false);
 

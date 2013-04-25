@@ -236,6 +236,9 @@ namespace llvm {
   ///
   FunctionPass *createExpandISelPseudosPass();
 
+  // SEP virtual register reduction pass
+  FunctionPass *createVirtRegReductionPass();
+
 } // End llvm namespace
 
 #endif

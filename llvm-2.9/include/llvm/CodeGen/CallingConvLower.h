@@ -190,6 +190,8 @@ public:
   /// false otherwise.
   bool CheckReturn(const SmallVectorImpl<ISD::OutputArg> &ArgsFlags,
                    CCAssignFn Fn);
+  bool CheckReturn(const SmallVectorImpl<ISD::InputArg> &ArgsFlags,
+                   CCAssignFn Fn);
 
   /// AnalyzeCallOperands - Analyze the outgoing arguments to a call,
   /// incorporating info about the passed values into this state.

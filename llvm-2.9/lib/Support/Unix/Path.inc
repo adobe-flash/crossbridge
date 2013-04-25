@@ -128,23 +128,29 @@ Path::GetRootDirectory() {
 
 Path
 Path::GetTemporaryDirectory(std::string *ErrMsg) {
+
+  // return the cached temp directory
+  if(appTempDir->path != NULL)
+    return *appTempDir->path;
+
 #if defined(HAVE_MKDTEMP)
   // The best way is with mkdtemp but that's not available on many systems,
   // Linux and FreeBSD have it. Others probably won't.
-  char pathname[] = "/tmp/llvm_XXXXXX";
+  char pathname[] = "/tmp/llvm_mkdtemp_XXXXXX";
   if (0 == mkdtemp(pathname)) {
     MakeErrMsg(ErrMsg,
                std::string(pathname) + ": can't create temporary directory");
     return Path();
   }
-  return Path(pathname);
+
+  appTempDir->path = new Path(pathname);
 #elif defined(HAVE_MKSTEMP)
   // If no mkdtemp is available, mkstemp can be used to create a temporary file
   // which is then removed and created as a directory. We prefer this over
   // mktemp because of mktemp's inherent security and threading risks. We still
   // have a slight race condition from the time the temporary file is created to
   // the time it is re-created as a directoy.
-  char pathname[] = "/tmp/llvm_XXXXXX";
+  char pathname[] = "/tmp/llvm_mkstemp_XXXXXX";
   int fd = 0;
   if (-1 == (fd = mkstemp(pathname))) {
     MakeErrMsg(ErrMsg,
@@ -158,14 +164,14 @@ Path::GetTemporaryDirectory(std::string *ErrMsg) {
       std::string(pathname) + ": can't create temporary directory");
     return Path();
   }
-  return Path(pathname);
+  appTempDir->path = new Path(pathname);
 #elif defined(HAVE_MKTEMP)
   // If a system doesn't have mkdtemp(3) or mkstemp(3) but it does have
   // mktemp(3) then we'll assume that system (e.g. AIX) has a reasonable
   // implementation of mktemp(3) and doesn't follow BSD 4.3's lead of replacing
   // the XXXXXX with the pid of the process and a letter. That leads to only
   // twenty six temporary files that can be generated.
-  char pathname[] = "/tmp/llvm_XXXXXX";
+  char pathname[] = "/tmp/llvm_mktemp_XXXXXX";
   char *TmpName = ::mktemp(pathname);
   if (TmpName == 0) {
     MakeErrMsg(ErrMsg,
@@ -177,7 +183,7 @@ Path::GetTemporaryDirectory(std::string *ErrMsg) {
         std::string(TmpName) + ": can't create temporary directory");
     return Path();
   }
-  return Path(TmpName);
+  appTempDir->path = new Path(TmpName);
 #else
   // This is the worst case implementation. tempnam(3) leaks memory unless its
   // on an SVID2 (or later) system. On BSD 4.3 it leaks. tmpnam(3) has thread
@@ -191,15 +197,17 @@ Path::GetTemporaryDirectory(std::string *ErrMsg) {
   char pathname[MAXPATHLEN];
   do {
     num++;
-    sprintf(pathname, "/tmp/llvm_%010u", unsigned(num));
+    sprintf(pathname, "/tmp/llvm_tempnam_%010u", unsigned(num));
   } while ( 0 == access(pathname, F_OK ) );
   if (-1 == ::mkdir(pathname, S_IRWXU)) {
     MakeErrMsg(ErrMsg,
       std::string(pathname) + ": can't create temporary directory");
     return Path();
   }
-  return Path(pathname);
+  appTempDir->path = new Path(pathname);
 #endif
+
+  return Path(*appTempDir->path);
 }
 
 void

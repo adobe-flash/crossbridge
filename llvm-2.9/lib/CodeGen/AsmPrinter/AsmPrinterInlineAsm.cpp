@@ -79,7 +79,7 @@ void AsmPrinter::EmitInlineAsm(StringRef Str, const MDNode *LocMDNode) const {
   // This is useful in case the asm parser doesn't handle something but the
   // system assembler does.
   if (OutStreamer.hasRawTextSupport()) {
-    OutStreamer.EmitRawText(Str);
+    OutStreamer.EmitRawTextAsm(Str);
     return;
   }
 
@@ -129,6 +129,10 @@ void AsmPrinter::EmitInlineAsm(StringRef Str, const MDNode *LocMDNode) const {
 /// instruction that is an inline asm.
 void AsmPrinter::EmitInlineAsm(const MachineInstr *MI) const {
   assert(MI->isInlineAsm() && "printInlineAsm only works on inline asms");
+    
+  // AVM2 Specific
+  EmitInlineAsmProlog(MI);
+  // AVM2 Specific
 
   unsigned NumOperands = MI->getNumOperands();
 

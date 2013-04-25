@@ -19,6 +19,8 @@
 #include <memory>
 using namespace llvm;
 
+const bool weaksRemainUnresolved = true;
+
 /// Read a variable-bit-rate encoded unsigned integer
 static inline unsigned readInteger(const char*&At, const char*End) {
   unsigned Shift = 0;
@@ -578,9 +580,14 @@ Archive::findModulesDefiningSymbols(std::set<std::string>& symbols,
       // be ignored.
       result.insert(m);
 
-      // Remove the symbol now that its been resolved, being careful to
-      // post-increment the iterator.
-      symbols.erase(I++);
+      GlobalAlias *GA = m->getNamedAlias(*I);
+      if(!GA || (weaksRemainUnresolved && !GA->isWeakForLinker())) {
+        // Remove the symbol now that its been resolved, being careful to
+        // post-increment the iterator.
+        symbols.erase(I++);
+      } else {
+        ++I;
+      }
     } else {
       ++I;
     }

@@ -76,7 +76,7 @@ if( LLVM_ENABLE_PIC )
     # Xcode has -mdynamic-no-pic on by default, which overrides -fPIC. I don't
     # know how to disable this, so just force ENABLE_PIC off for now.
     message(WARNING "-fPIC not supported with Xcode.")
-  elseif( WIN32 )
+  elseif( WIN32 OR CYGWIN )
     # On Windows all code is PIC. MinGW warns if -fPIC is used.
   else()
     include(CheckCXXCompilerFlag)
@@ -169,7 +169,7 @@ if( MSVC )
   endif (LLVM_ENABLE_WERROR)
 elseif( CMAKE_COMPILER_IS_GNUCXX )
   if (LLVM_ENABLE_WARNINGS)
-    add_llvm_definitions( -Wall -W -Wno-unused-parameter -Wwrite-strings )
+    add_llvm_definitions( -Wall -W -Wno-unused-parameter )
     if (LLVM_ENABLE_PEDANTIC)
       add_llvm_definitions( -pedantic -Wno-long-long )
     endif (LLVM_ENABLE_PEDANTIC)
