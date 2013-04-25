@@ -1,0 +1,1 @@
+// This is just to keep asdoc happy when parsing HTTPBackingStore.as
