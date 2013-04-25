@@ -1,0 +1,35 @@
+This package is merely a fork of ncurses' terminfo.src
+file, with enough autotools stuff around it so that it
+can be build separately.  [*]
+
+Recommended configure options:
+./configure \
+  --prefix=/usr \
+  --enable-symlinks \
+  --enable-tcap-names \
+  --with-default-terminfo-dir=/usr/share/terminfo \
+  --with-install-prefix=/tmp
+make install.data 
+
+
+The file
+    terminfo.src
+is exactly the same as the one in the ncurses tree, after
+all relevant Official Ncurses Patches and Rollups have been
+applied (up to the date of this package).
+
+
+
+[*] The autoconf files (aclocal.m4, configure.in, etc)
+were also taken directly from ncurses (with only slight
+modifications), and not written from scratch for this package.
+Therefore, you shouldn't try to autoreconf it -- unless you
+use the patched version of autoconf-2.13 that is required
+by the ncurses package (see
+http://invisible-island.net/autoconf/autoconf.html).
+
+Also, this means that `configure --help' will report a lot
+of options that have nothing to do with terminfo, but are
+only applicable to ncurses itself. Furthermore, because it
+does so much additional checking, the configure script takes
+a lot longer to run than is strictly required by terminfo alone.

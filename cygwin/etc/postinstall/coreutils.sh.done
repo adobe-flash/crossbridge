@@ -1,0 +1,18 @@
+#!/bin/sh
+# Postinstall script for coreutils.
+
+manifest=/etc/preremove/coreutils-manifest.lst
+
+[ -f ${manifest} ] || { echo "$0: Unable to find manifest file"; exit 1; }
+
+while read f; do
+    fSrc=/etc/defaults/${f}
+    fDest=/${f}
+    if [ ! -e ${fDest} -a ! -L ${fDest} ]; then
+        /bin/echo "$0: Using the default version of ${fDest} (${fSrc})"
+        /bin/touch ${fDest}
+        /bin/cp ${fSrc} ${fDest}
+    else
+        echo "$0: ${fDest} is already in existance, not overwriting."
+    fi
+done < ${manifest}

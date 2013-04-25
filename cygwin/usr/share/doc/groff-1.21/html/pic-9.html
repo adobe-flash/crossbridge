@@ -1,0 +1,125 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-9.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-8.html">prev</a> | <a href="pic-10.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>9. Naming Objects
+<a name="9. Naming Objects"></a>
+</h2>
+
+
+<p style="margin-top: 1em"><font color="#000000">The most
+natural way to name locations in <b>pic</b> is relative to
+objects. In order to do this, you have to be able you have
+to be able to name objects. The <b>pic</b> language has rich
+facilities for this that try to emulate the syntax of
+English.</font></p>
+
+<h3>9.1. Naming Objects By Order Of Drawing
+<a name="9.1. Naming Objects By Order Of Drawing"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+simplest (and generally the most useful) way to name an
+object is with a <b>last</b> clause. It needs to be followed
+by an object type name; <b>box</b>, <b>circle</b>,
+<b>ellipse</b>, <b>line</b>, <b>arrow</b>, <b>spline</b>,
+<b>&quot;&quot;</b>, or <b>[]</b> (the last type refers to a
+<i>composite object</i> which we&rsquo;ll discuss later).
+So, for example, the <b>last circle</b> clause in the
+program attached to Figure 9.1.3 refers to the last circle
+drawn.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">More
+generally, objects of a given type are implicitly numbered
+(starting from&nbsp;1). You can refer to (say) the third
+ellipse in the current picture with <b>3rd ellipse</b>, or
+to the first box as <b>1st box</b>, or to the fifth text
+string (which isn&rsquo;t an attribute to another object) as
+<b>5th &quot;&quot;</b>.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Objects
+are also numbered backwards by type from the last one. You
+can say <b>2nd last box</b> to get the second-to-last box,
+or <b>3rd last ellipse</b> to get the third-to-last
+ellipse.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">In places
+where <i>n</i><b>th</b> is allowed,
+<b>&lsquo;</b><i>expr</i><b>&rsquo;th</b> is also allowed.
+Note that <b>&rsquo;th</b> is a single token: no space is
+allowed between the <b>&rsquo;</b> and the <b>th</b>. For
+example,</font></p>
+
+<pre style="margin-left:20%; margin-top: 1em">for i = 1 to 4 do {
+   line from &lsquo;i&rsquo;th box.nw to &lsquo;i+1&rsquo;th box.se
+}</pre>
+
+
+<h3>9.2. Naming Objects With Labels
+<a name="9.2. Naming Objects With Labels"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">You can
+also specify an object by referring to a label. A label is a
+word (which must begin with a capital letter) followed by a
+colon; you declare it by placing it immediately before the
+object drawing command. For example, the program</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">.PS
+A: box &quot;first&quot; &quot;object&quot;
+move;
+B: ellipse &quot;second&quot; &quot;object&quot;
+move;
+arrow right at A .r;
+.PE</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">declares
+labels <b>A</b> and <b>B</b> for its first and second
+objects. Here&rsquo;s what that looks like:</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic30.png" alt="Image img/pic30.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+9-1: Example of label use</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+<b>at</b> statement in the fourth line uses the label
+<b>A</b> (the behavior of <b>at</b> is explained in the next
+section). We&rsquo;ll see later on that labels are most
+useful for referring to block composite objects.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Labels are
+not constants but variables (you can view colon as a sort of
+assignment). You can say something like <b>A: A + (1,0);</b>
+and the effect is to reassign the label <b>A</b> to
+designate a position one inch to the right of its old
+value.</font></p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-8.html">prev</a> | <a href="pic-10.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

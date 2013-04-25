@@ -1,0 +1,183 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-15.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-14.html">prev</a> | <a href="pic-16.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>15. Import/Export Commands
+<a name="15. Import/Export Commands"></a>
+</h2>
+
+
+<p style="margin-top: 1em"><font color="#000000">Commands
+that import or export data between <b>pic</b> and its
+environment are described here.</font></p>
+
+<h3>15.1. File and Table Insertion
+<a name="15.1. File and Table Insertion"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+statement</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><tt>copy</tt>
+<i>filename</i></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">inserts
+the contents of <i>filename</i> in the <b>pic</b> input
+stream. Any <b>.PS</b>/<b>.PE</b> pair in the file is
+ignored. You can use this to include pre-generated
+images.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">A variant
+of this statement replicates the <b>copy thru</b> feature of
+<i>grap</i>(1). The call</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><tt>copy</tt>
+<i>filename</i> <tt>thru</tt> <i>macro</i></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">calls
+<i>macro</i> (which may be either a name or replacement
+text) on the arguments obtained by breaking each line of the
+file into blank-separated fields. The macro may have up to
+9&nbsp;arguments. The replacement text may be delimited by
+braces or by a pair of instances of any character not
+appearing in the rest of the text.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">If you
+write</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><tt>copy
+thru</tt> <i>macro</i></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">omitting
+the filename, lines to be parsed are taken from the input
+source up to the next <b>.PE</b>.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">In either
+of the last two <b>copy</b> commands, GNU <b>gpic</b>
+permits a trailing &lsquo;<b>until</b> <i>word</i>&rsquo;
+clause to be added which terminates the copy when the first
+word matches the argument (the default behavior is therefore
+equivalent to <b>until .PE</b>).</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000">Accordingly,
+the command</font></p>
+
+<pre style="margin-left:20%; margin-top: 1em">.PS
+copy thru % circle at ($1,$2) % until &quot;END&quot;
+1 2
+3 4
+5 6
+END
+box
+.PE</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">is
+equivalent to</font></p>
+
+<pre style="margin-left:20%; margin-top: 1em">.PS
+circle at (1,2)
+circle at (3,4)
+circle at (5,6)
+box
+.PE</pre>
+
+
+<h3>15.2. Debug Messages
+<a name="15.2. Debug Messages"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+command <b>print</b> accepts any number of arguments,
+concatenates their output forms, and writes the result to
+standard error. Each argument must be an expression, a
+position, or a text string.</font></p>
+
+<h3>15.3. Escape to Post-Processor
+<a name="15.3. Escape to Post-Processor"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">If you
+write</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><b>command</b>
+<i>arg</i>...</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"><b>pic</b>
+concatenates the arguments and pass them through as a line
+to troff or TeX. Each <i>arg</i> must be an expression, a
+position, or text. This has a similar effect to a line
+beginning with <b>.</b> or <b>\</b>, but allows the values
+of variables to be passed through.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">For
+example,</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">.PS
+x = 14
+command &quot;.ds string x is &quot; x &quot;.&quot;
+.PE
+\*[string]</pre>
+
+
+
+<p style="margin-top: 1em"><font color="#000000">prints</font></p>
+
+
+<pre style="margin-left:10%; margin-top: 1em">x is 14.</pre>
+
+
+<h3>15.4. Executing Shell Commands
+<a name="15.4. Executing Shell Commands"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+command</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><tt>sh
+{</tt> <i>anything...</i> <tt>}</tt></font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000">macro-expands
+the text in braces, then executes it as a shell command.
+This could be used to generate images or data tables for
+later inclusion. The delimiters shown as {} here may also be
+two copies of any one character not present in the shell
+command text. In either case, the body may contain balanced
+{} pairs. Strings in the body may contain balanced or
+unbalanced braces in any case.</font></p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-14.html">prev</a> | <a href="pic-16.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

@@ -1,0 +1,185 @@
+.\"	-*-	mode: roff	-*-
+.ig
+
+hdmisc.tmac
+
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+written by Joachim Walsdorff <Joachim.Walsdorff@urz.uni-heidelberg.de>.
+
+groff is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+groff is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+..
+.if d t*getarg \
+.nx
+.de t*getarg
+.ds \\$1
+.ds args
+.if (\\n[.$] < 2) \
+.return
+.ds $1 \\$1
+.shift
+.length * \\*[$1]
+.while \\n[.$] \{\
+.ds * "\\$1
+.ds ** "\\$1
+.length ** \\*[**]
+.shift
+.if (\\n[*] > \\n[**]) \{\
+.as args " "\\*[**]"
+.continue
+.\}
+.substring * 0 (\\n[*] - 1)
+.ie !"\?\\*[$1]\?"\?\\*[*]\?" \{\
+.as args " "\\*[**]"
+.continue
+.\}
+.el \{\
+.ie "\?\\*[**]\?"\?\\*[$1]\?" \
+.ds \\*[$1] \\*[$1]
+.el \{\
+.ie "\?\\*[**]\?"\?\\*[$1]=\?" \
+.ds \\*[$1] =
+.el \{\
+.substring ** (\\n[*] + 1) -1
+.ds * \\*[**]
+.substring * 0 0
+.if "\?\\*[*]\?"\?'\?" \{\
+.substring ** 1 -1
+.ds * \\*[**]
+.substring * -1 -1
+.ie "\?\\*[*]\?"\?'\?" \
+.substring ** 0 -2
+.el \{\
+.as \\*[$1] \\*[**] 
+.while 1 \{\
+.ds ** \\$1
+.ds * \\$1
+.shift
+.substring * -1 -1
+.if "\?\\*[*]\?"\?'\?" \{\
+.substring ** 0 -2
+.break
+.\}
+.as \\*[$1] \\*[**] 
+.\}
+.\}\}
+.as \\*[$1] \\*[**]
+.\}
+.as args " \\$@
+.\}\}
+.return
+.\}
+..
+.de t*index
+.if "\\$2"" \{\
+.nr t*index -999
+.return
+.\}
+.length ** \\$1
+.length $2 \\$2
+.nr * 0-1 1
+.while (\\n+[*] < \\n[**]) \{\
+.ds * \\$1
+.substring * \\n[*] (\\n[*] + \\n[$2] - 1)
+.if "\?\\*[*]\?"\?\\$2\?" \
+.break
+.\}
+.ie (\\n[*] == \\n[**]) \
+.nr t*index 0
+.el \
+.nr t*index (\\n[*] + 1)
+..
+.de t*SP
+.if (\\n[nl] < 0) \
+.br
+.nr * \\n[.p]
+.ie "\\$1"" \
+.pl +1
+.el \
+.pl +\\$1
+.nr ** (\\n[.p] - \\n[*])
+.pl \\n[*]u
+.if ((\\n[nl] - \\n[tH]) & (\\n[nl] - \\n[<<]) : \\n[.k]) \{\
+.ie ((\\n[.d] - \\n[M#]) : \\n[.k]) \{\
+.sp \\n[**]u
+.nr S# \\n[**]
+.\}
+.el \{\
+.if (\\n[**] - \\n[S#]) \{\
+.sp (\\n[**]u - \\n[S#]u)
+.nr S# \\n[**]
+.\}\}
+.nr M# \\n[.d]
+.\}
+..
+.de t*P1
+.while \\n[.$] \{\
+.nop \\$1
+.shift
+.\}
+..
+.de t*pv
+.br
+.if \\n[.$] \
+.ps (\\n[t*s]u * \\$1z / 1z)
+.ie (\\n[.$] - 1) \
+.vs (\\n[t*v]u * \\$2p / 1p)
+.el \{\
+.vs (\\n[t*v]u * \\$1p / 1p)
+.return
+.\}
+.if !""\\$3" \
+.hy \\$3
+.if !""\\$4" \{\
+.nr t*v \\n[.v]
+.nr t*s \\n[.ps]
+.nr t*hy \\n[.hy]
+.\}
+..
+.de *pop
+.ie "\\$1"pops" \
+.ds \\$2 \\$4
+.el \
+.nr \\$2 \\$4
+.ds $3 \\$3
+.shift 4
+.ds \\*[$3] "\\$@
+..
+.de pop
+.*pop \\$0 \\$1 \\$2 \\*[\\$2]
+..
+.als popr pop
+.als pops pop
+.de t*DI
+.nr * \\n[.u]
+.nf
+.\\$1
+.rm \\$1
+.if \\n[*] \
+.fi
+..
+.de t*EM
+.if !"\\*[t*kept]"" \{\
+.tm1 "hdtbl: Not all tables have been printed.
+.tm1 "       Add `.bp' at the end of your document.
+.\}
+.if !"\\*[t*held]"" \{\
+.tm1 "hdtbl: There are held tables which haven't been printed.
+.tm1 "       Add `.t*free' at the end of your document.
+.\}
+.if \\n[t*#] \
+.tm hdtbl: Missing `.ETB' macro; last .TBL in \\*[t*FN] at line \\*[t*LN].
+..

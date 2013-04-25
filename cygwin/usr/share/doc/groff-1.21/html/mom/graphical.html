@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Graphical Objects</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="docprocessing.html#top">Next: Document processing</a></td>
+</tr>
+</table>
+
+<h1 class="docs">Graphical objects</h1>
+
+<div style="text-align: center;">
+<ul class="no-enumerator" style="margin-left: -2.5em;">
+  <li><a href="#intro-graphical">Introduction to graphical objects</a></li>
+  <li><a href="#behaviour">Graphical objects behaviour</a></li>
+  <li><a href="#order">Order of arguments</a></li>
+  <li><a href="#index-graphical">Index of graphical objects macros</a></li>
+</ul>
+</div>
+
+<div class="rule-medium"><hr/></div>
+
+<h2 id="intro-graphical" class="docs">Introduction to graphical objects</h2>
+
+<p>
+Groff has a number of
+<a href="definitions.html#inlines">inline escapes</a>
+for drawing rules, polygons, ellipses and splines.  All begin with
+<kbd>\D</kbd> (presumably for &#8220;Draw&#8221;) and are documented
+in the groff info manual:
+<br/>
+<span class="pre-in-pp">
+  info groff => Escape index => \D
+</span>
+The escapes allow you to draw just about any simple graphical object
+you can think of, but owing to their syntax, they&#8217;re not always easy
+to read, which can make tweaking them difficult.  Additionally,
+while they perform in a <i>consistent</i> manner, they don&#8217;t
+always perform in an <i>expected</i> manner.
+</p>
+
+<p>
+Experience shows that the most common graphical elements typesetters
+need are rules (horizontal and vertical), boxes, and circles (or
+ellipses).  For this reason, mom provides macros
+to draw these objects in an easy-to-understand way; the results are
+predictable, and mom&#8217;s syntax makes fixes or tweaks
+painless.
+</p>
+
+<p id="graphical-example">
+For example, if you want to draw a 2-inch square outline box at the left
+margin using groff&#8217;s <kbd>\D</kbd> escapes, it looks like this:
+<br/>
+<span class="pre-in-pp">
+             back up
+               by
+             weight
+            +-------+
+            |       |
+   \D't 500'\h'-500u'\D'p 2i 0 0 2i -2i 0 0 -2i'
+  |       |          |                        |
+  +-------+          +------------------------+
+   set rule          draw box, 1 line at a time
+    weight
+</span>
+
+Obviously, this isn&#8217;t very efficient for something as simple as a
+box.
+</p>
+
+<p>
+Here&#8217;s the same box, drawn with mom&#8217;s box drawing
+macro,
+<kbd><a href="#dbx">DBX</a></kbd>:
+<br/>
+<span class="pre-in-pp">
+  left margin indent--+  +--box width
+                      |  |
+             .DBX .5  0  2i  2i
+                  |          |
+     rule weight--+          +--box depth
+     (in points)
+</span>
+</p>
+
+<p>
+Mom&#8217;s graphical object macros allow&mdash;in fact,
+require&mdash;giving the rule weight (&#8220;thickness&#8221;) for
+the object (or saying that you want it filled), an indent from the
+left margin where the object begins, the dimensions of the object,
+and optionally a colour for the object.
+</p>
+
+<p>
+There are no defaults for the arguments to mom'a graphical object
+macros, which means you must supply the arguments every time you
+invoke them.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+As stated above, mom only provides macros for commonly-used
+graphical objects (rules, boxes, circles).  More complex objects
+(polygons, non-straight lines, splines) must be drawn using
+groff&#8217;s <kbd>\D</kbd> escapes.
+</p>
+</div>
+
+<h3 id="behaviour" class="docs">Graphical object behaviour</h3>
+
+<p>
+Mom&#8217;s graphical object macros all behave in the following,
+carved-in-stone ways:
+</p>
+<ol style="margin-top: -.5em; margin-bottom: -.5em;">
+   <li>Objects are drawn from the
+       <a href="definitions.html#baseline">baseline</a>
+       down, including horizontal rules.</li>
+   <li>Objects begin precisely at the left indent supplied as
+       an argument to the macro.</li>
+   <li>Objects are drawn from left to right.</li>
+   <li>Enclosed objects (boxes, circles) are drawn from the
+       perimeter <i>inward</i>.</li>
+   <li>Objects return to their horizontal/vertical point of origin.</li>
+</ol>
+
+<p>
+The consistency means that once you've mastered the very simple
+order of arguments that applies to invoking graphical object
+macros, you can draw objects with full confidence that you know
+exactly where they&#8217;re placed and how much room they
+occupy.  Furthermore, because all return to their point of origin,
+you&#8217;ll know exactly where you are on the page.
+</p>
+
+<h3 id="order" class="docs">Order of arguments</h3>
+
+<p>
+The order of arguments to the graphical object macros is the same
+for every macro:
+</p>
+<ul style="margin-top: -.5em; margin-bottom: -.5em;">
+  <li>the <kbd><span style="text-decoration: underline">W</span></kbd>eight of the rule
+  <ul style="margin-left: -.75em;">
+    <li>if the object is enclosed (i.e. is a box or circle), the
+        weight of the rule if you want the object outlined</li>
+    <li>the single word, <kbd>SOLID</kbd>, may be used in place
+        of the <b>weight</b> argument if you want the
+        object filled</li>
+  </ul></li>
+  <li>the <kbd><span style="text-decoration: underline">I</span></kbd>ndent from the current left margin at
+      which to begin the object</li>
+  <li>the <kbd><span style="text-decoration: underline">L</span></kbd>ength of the object, if applicable</li>
+  <li>the <kbd><span style="text-decoration: underline">D</span></kbd>epth of the object, if applicable</li>
+  <li>the <kbd><span style="text-decoration: underline">C</span></kbd>olour of the object (optional)</li>
+</ul>
+
+<p>
+A simple mnemonic for the order of arguments is &#8220;<b>WILD
+C</b>ard&#8221;.  If you fix the mnemonic in your brain and apply
+a little judicious reasoning, you&#8217;ll always remember how to
+draw graphical objects.  The &#8220;judicious reasoning&#8221; means
+that, for example, horizontal rules don&#8217;t require a depth and
+vertical rules don&#8217;t require a length.  Thus, in the case of
+drawing a horizontal rule, you supply the macro,
+<kbd><a href="#drh">DRH</a></kbd>,
+with only the arguments (from the mnemonic) that apply: <b>W-I-L</b> (and
+possibly <b>C</b>).
+</p>
+
+<div class="macro-list-container">
+<h3 id="index-graphical" class="macro-list">Graphical objects macros</h3>
+
+<ul class="macro-list">
+  <li><a href="#drh">DRH</a>
+      &ndash; horizontal rules</li>
+  <li><a href="#drv">DRV</a>
+      &ndash; vertical rules</li>
+  <li><a href="#dbx">DBX</a>
+      &ndash; box</li>
+  <li><a href="#dcl">DCL</a>
+      &ndash; circles or ellipses</li>
+</ul>
+</div>
+
+<!-- -DRH- -->
+
+<div class="macro-id-overline">
+<h3 id="drh" class="macro-id">Drawing horizontal rules</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>DRH</b> <kbd class="macro-args">&lt;none&gt; | &lt;weight&gt;  &lt;indent&gt; &lt;length&gt; [&lt;colour&gt;]</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;The argument to <kbd class="normal">&lt;weight&gt;</kbd> is in
+<a href="definitions.html#picaspoints" class="normal">points</a>,
+but do <span class="normal">NOT</span> append the
+<a href="definitions.html#unitsofmeasure">unit of measure</a>,
+<kbd class="normal">p</kbd>.
+<br/>
+&bull;&nbsp;The arguments, <kbd class="normal">&lt;indent&gt;</kbd> and
+<kbd class="normal">&lt;length&gt;</kbd>, require a unit of measure.
+</p>
+
+<p>
+If all you want is to draw a rule from your current left
+margin to your current right margin (in other words, a &quot;full
+measure&quot; rule), you may invoke <kbd>.DRH</kbd> without any
+arguments.
+</p>
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+DRH is the only graphical object macro that may be invoked
+without arguments.  The weight (&#8220;thickness&#8221;) of
+the rule is determined by the argument you last gave the
+macro, <a href="inlines.html#rule-weight">RULE_WEIGHT</a>.
+DRH, used this way, is exactly equivalent to entering the
+<a href="definitions.html#inlines">inline escape</a>, <a
+href="inlines.html#inline-rule-mom"><kbd>\*[RULE]</kbd></a>.
+</p>
+</div>
+
+<p style="margin-top: -.5em;">
+To draw horizontal rules of a specified length, you must, at
+a minimum, supply DRH with the arguments <kbd>weight,</kbd>
+<kbd>indent</kbd> (measured from the current left margin) and
+<kbd>length</kbd>.
+</p>
+
+<p>
+Optionally, you may give a <kbd>colour</kbd> argument.  The colour
+may be either one defined with
+<a href="color.html#newcolor">NEWCOLOR</a>,
+or a named X-colour inititialized with
+<a href="color.html#xcolor">XCOLOR</a>,
+or an X-colour alias (again, initialized with XCOLOR).
+</p>
+
+<p>
+Say, for example, you want to draw a 1-1/4 point horizontal rule
+that starts 2 picas from the current left margin and runs for 3
+inches.  To do so, you'd invoke <kbd>.DRH</kbd> like this:
+<br/>
+<span class="pre-in-pp">
+      weight  length
+         |      |
+  .DRH 1.25 2P 3i
+            |
+          indent
+</span>
+(Note that the rule weight argument, which is expressed in points,
+must NOT have the unit of measure <kbd>p</kbd> appended to it.)
+</p>
+
+<p>
+If, in addition, you want the rule blue:
+<br/>
+<span class="pre-in-pp">
+  .DRH 1.25 2P 3i blue
+</span>
+</p>
+
+<h3 class="docs">How mom handles the positioning of horizontal rules</h3>
+
+<p>
+Horizontal rules are drawn from left to right, and from the baseline
+down. &#8220;From the baseline down&#8221; means that if you request
+a rule with a weight of four points, the four points of rule fall
+entirely below the baseline.
+</p>
+
+<p>
+Furthermore, after the rule is drawn, mom returns you to the current
+left margin, at the same vertical position on the page as when DRH
+was invoked.  In other words, DRH causes no movement on the page,
+either horizontal or vertical.
+</p>
+
+<!-- -DRV- -->
+
+<div class="macro-id-overline">
+<h3 id="drv" class="macro-id">Drawing vertical rules</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>DRV</b> <kbd class="macro-args">&lt;weight&gt;  &lt;indent&gt; &lt;depth&gt; [&lt;colour&gt;]</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;The argument to <kbd class="normal">&lt;weight&gt;</kbd> is in
+<a href="definitions.html#picaspoints" class="normal">points</a>,
+but do <span class="normal">NOT</span> append the
+<a href="definitions.html#unitsofmeasure">unit of measure</a>,
+<kbd class="normal">p</kbd>.
+<br/>
+&bull;&nbsp;The arguments, <kbd class="normal">&lt;indent&gt;</kbd> and
+<kbd class="normal">&lt;depth&gt;</kbd>, require a unit of measure.
+</p>
+
+<p>
+To draw vertical rules of a specified length, you must, at
+a minimum, supply DRV with the arguments <kbd>weight,</kbd>
+<kbd>indent</kbd> (measured from the current left margin) and
+<kbd>depth</kbd>.
+</p>
+
+<p>
+Optionally, you may give a <kbd>colour</kbd> argument.  The colour
+may be either one defined with
+<a href="color.html#newcolor">NEWCOLOR</a>,
+or a named X-colour inititialized with
+<a href="color.html#xcolor">XCOLOR</a>,
+or an X-colour alias (again, initialized with XCOLOR).
+</p>
+
+<p>
+Say, for example, you want to draw a 3/4-point vertical rule that
+starts 19-1/2 picas from the current left margin and has a depth of
+6 centimeters.  To do so, you'd invoke <kbd>.DRV</kbd> like this:
+<br/>
+<span class="pre-in-pp">
+       weight   depth
+         |        |
+  .DRV .75 19P+6p 6c
+             |
+           indent
+</span>
+(Note that the rule weight argument, which is expressed in points,
+must NOT have the unit of measure <kbd>p</kbd> appended to it.)
+</p>
+
+<p>
+If, in addition, you want the rule red:
+<br/>
+<span class="pre-in-pp">
+  .DRV .75 19P+6p 6c red
+</span>
+</p>
+
+<h3 class="docs">How mom handles the positioning of vertical rules</h3>
+
+<p>
+Vertical rules are drawn from the baseline down, and from left to
+right. &quot;Left to right&quot; means that if you request a rule
+with a weight of four points, the four points of rule fall entirely
+to the left of the indent given to DRV.
+</p>
+
+<p>
+Furthermore, after the rule is drawn, mom returns you to the current
+left margin, at the same vertical position on the page as when DRV
+was invoked.  In other words, DRV causes no movement on the page,
+either horizontal or vertical.
+</p>
+
+<!-- -DBX- -->
+
+<div class="macro-id-overline">
+<h3 id="dbx" class="macro-id">Drawing boxes</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>DBX</b> <kbd class="macro-args">&lt; &lt;weight&gt; | SOLID &gt; &lt;indent&gt; &lt;length&gt; &lt;depth&gt; [&lt;colour&gt;]</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;The argument to <kbd class="normal">&lt;weight&gt;</kbd> is in
+<a href="definitions.html#picaspoints" class="normal">points</a>,
+but do <span class="normal">NOT</span> append the
+<a href="definitions.html#unitsofmeasure">unit of measure</a>,
+<kbd class="normal">p</kbd>.
+<br/>
+&bull;&nbsp;The arguments, <kbd class="normal">&lt;indent&gt;</kbd>,
+<kbd class="normal">&lt;length&gt;</kbd> and
+<kbd class="normal">&lt;depth&gt;</kbd>, require a unit of measure.
+</p>
+
+<p>
+To draw boxes of specified dimensions, you must, at a minimum,
+supply DBX with the arguments <kbd>weight</kbd> or <kbd>SOLID</kbd>,
+<kbd>indent</kbd> (measured from the current left margin),
+<kbd>length</kbd> and <kbd>depth</kbd>.
+</p>
+
+<p>
+Optionally, you may give a <kbd>colour</kbd> argument.  The colour
+may be either one defined with
+<a href="color.html#newcolor">NEWCOLOR</a>,
+or a named X-colour inititialized with
+<a href="color.html#xcolor">XCOLOR</a>,
+or an X-colour alias (again, initialized with XCOLOR).
+</p>
+
+<p>
+Say, for example, you want to draw a 1/2 point outline box that
+starts one inch from the current left margin and has the dimensions 
+12 picas x 6 picas.  To do so, you'd invoke <kbd>.DBX</kbd> like this:
+<br/>
+<span class="pre-in-pp">
+         indent   depth
+           |        |
+  .DBX .5  1i  12P  6P
+        |       |
+     weight   length
+</span>
+(Note that the box weight argument, which is expressed in points,
+must NOT have the unit of measure <kbd>p</kbd> appended to it.)
+</p>
+
+<p>
+If you want the same box, but solid (&#8220;filled&#8221;) rather
+than drawn as an outline:
+<br/>
+<span class="pre-in-pp">
+  .DBX SOLID 1i 12P 6P
+</span>
+Additionally, if you want the box green:
+<br/>
+<span class="pre-in-pp">
+  .DBX .5 1i 12P 6P green
+   or
+  .DBX SOLID 1i 12P 6P green
+</span>
+</p>
+
+<h3 class="docs">How mom handles the positioning of boxes</h3>
+
+<p>
+Boxes are drawn from the baseline down, from left to right, and
+from the perimeter <i>inward</i>. &#8220;From the perimeter
+inward&#8221; means that if you request a box weight of six points,
+the 6-point rules used to draw the outline of the box fall entirely
+<i>within</i> the dimensions of the box.
+</p>
+
+<p>
+Furthermore, after the box is drawn, mom returns you to the current
+left margin, at the same vertical position on the page as when DBX
+was invoked.  In other words, DBX causes no movement on the page,
+either horizontal or vertical.
+</p>
+
+<!-- -DCL- -->
+
+<div class="macro-id-overline">
+<h3 id="dcl" class="macro-id">Drawing circles (ellipses)</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>DCL</b> <kbd class="macro-args">&lt; &lt;weight&gt; | SOLID &gt; &lt;indent&gt; &lt;length&gt; &lt;depth&gt; [&lt;colour&gt;]</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;The argument to <kbd class="normal">&lt;weight&gt;</kbd> is in
+<a href="definitions.html#picaspoints" class="normal">points</a>,
+but do <span class="normal">NOT</span> append the
+<a href="definitions.html#unitsofmeasure">unit of measure</a>,
+<kbd class="normal">p</kbd>.
+<br/>
+&bull;&nbsp;The arguments, <kbd class="normal">&lt;indent&gt;</kbd>,
+<kbd class="normal">length</kbd> and
+<kbd class="normal">&lt;depth&gt;</kbd>, require a unit of measure.
+</p>
+
+<p>
+To draw circles of specified dimensions, you must, at a minimum,
+supply DCL with the arguments <kbd>weight</kbd> or <kbd>SOLID</kbd>,
+<kbd>indent</kbd> (measured from the current left margin),
+<kbd>length</kbd> and <kbd>depth</kbd>.
+</p>
+
+<p>
+Optionally, you may give a <kbd>colour</kbd> argument.  The colour
+may be either one defined with
+<a href="color.html#newcolor">NEWCOLOR</a>,
+or a named X-colour inititialized with
+<a href="color.html#xcolor">XCOLOR</a>,
+or an X-colour alias (again, initialized with XCOLOR).
+</p>
+
+<p>
+Say, for example, you want to draw a 1/2 point outline circle
+(ellipse, actually, in this case) that starts one inch from the
+current left margin and has the dimensions 6 centimeters x 3
+centimeters.  To do so, you'd invoke <kbd>.DCL</kbd> like this:
+<br/>
+<span class="pre-in-pp">
+         indent  depth
+           |       |
+  .DCL .5  1i  6c  3c
+        |      |
+     weight   ength
+</span>
+(Note that the box weight argument, which is expressed in points,
+must NOT have the unit of measure <kbd>p</kbd> appended to it.)
+</p>
+
+<p>
+If you want the same box, but solid (&#8220;filled&#8221;) rather
+than drawn as an outline:
+<br/>
+<span class="pre-in-pp">
+  .DCL SOLID 1i 6c 3c
+</span>
+Additionally, if you want the circle yellow:
+<br/>
+<span class="pre-in-pp">
+  .DCL .5 1i 6c 3c yellow
+   or
+  .DCL SOLID 1i 6c 3c yellow
+</span>
+</p>
+
+<h3 class="docs">How mom handles the positioning of circles (ellipses)</h3>
+
+<p>
+Circles (ellipses) are drawn from the baseline down, from left
+to right, and from the perimeter <i>inward</i>. &#8220;From the
+perimeter inward&#8221; means that if you request a circle weight of
+six points, the 6-point rule used to draw the outline of the circle
+or ellipse falls entirely <i>within</i> the dimensions of the
+circle or ellipse.
+</p>
+
+<p>
+Furthermore, after the circle is drawn, mom returns you to the
+current left margin, at the same vertical position on the page as
+when DCL was invoked.  In other words, DCL causes no movement on the
+page, either horizontal or vertical.
+</p>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 33%; text-align: right;"><a href="docprocessing.html#top">Next: Document processing</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

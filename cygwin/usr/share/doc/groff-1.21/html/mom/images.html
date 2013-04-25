@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Inserting images into mom documents</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="headfootpage.html#top">Next: Page headers/footers, pagination</a></td>
+</tr>
+</table>
+
+<h1 class="docs">Inserting images into a document</h1>
+
+<p>
+You can insert images into a document by using the PSPIC
+macro. PSPIC isn&#8217;t actually part of mom; it comes packaged
+with groff itself.  Images must be in PostScript format, either
+straight .ps or .eps (Encapsulated PostScript).  If you have the
+ImageMagick suite of programmes installed on your system, a simple way
+to convert most image formats to .eps is with <kbd>convert</kbd>, at
+the command line, as in this jpg&nbsp;=>&nbsp;eps example:
+<br/>
+<span class="pre-in-pp">
+  convert &lt;filename&gt;.jpg &lt;filename&gt;.eps 
+</span>
+There have been reports of trouble with PostScript level 2 images,
+so don&#8217;t save your images in this format.
+</p>
+
+<!-- -PSPIC- -->
+
+<div class="macro-id-overline">
+<h3 id="pspic" class= "macro-id">PSPIC</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>PSPIC</b> <kbd class="macro-args">[ -L | -R | -I &lt;n&gt; ] &lt;file&gt; [ width [ height ] ]</kbd>
+</div>
+
+<p>
+<kbd>man groff-tmac</kbd> contains the documentation for PSPIC, but
+I&#8217;ll repeat it here with a few modifications for clarity.
+</p>
+
+<div class="examples-container">
+<h3 id="groff-tmac" class="docs" style="margin-top: .5em;">From groff-tmac</h3>
+<p style="margin-top: .5em; margin-bottom: .5em;">
+<kbd>&lt;file&gt;</kbd> is the name of the file containing the
+image; <kbd>width</kbd> and <kbd>height</kbd> give the desired
+width and height of the image as you wish it to appear within the
+document.  The width and height arguments may have
+<a href="definitions.html#unitofmeasure">units of measure</a>
+attached; the default unit of measure is
+<kbd>i</kbd>.  PSPIC will scale the graphic
+uniformly in the x and y directions so that it is no more than
+<kbd>width</kbd> wide and <kbd>height</kbd> high.  By default, the
+graphic will be horizontally centered.  The <kbd>-L</kbd> and
+<kbd>-R</kbd> options cause the graphic to be left-aligned and
+right-aligned, respectively.  The <kbd>-I</kbd> option causes
+the graphic to be indented by <kbd>&lt;n&gt;</kbd>;  the default unit of
+measure is <kbd>m</kbd>
+(<a href="definitions.html#em">ems</a>).
+</p>
+</div>
+
+<p>
+Unless you&#8217;re a PostScript whiz and have futzed around with
+bounding boxes and whatnot, it&#8217;s unlikely that your image will
+occupy an easily predictable and precise amount of space on the
+page.  This is particularly significant when it comes to the amount
+of vertical space occupied by the image.  A certain amount of
+manual tweaking of the vertical placement of the image will
+probably be required, via the
+<a href="typesetting.html#ald">ALD</a>
+and
+<a href="typesetting.html#rld">RLD</a>
+macros.
+</p>
+
+<p>
+Additionally, images inserted into
+<a href="definitions.html#running">running text</a>
+will almost certainly disrupt the baseline placement of running
+text.  In order to get mom back on track after
+invoking <kbd>.PSPIC</kbd>, I strongly recommend using the
+<a href="docprocessing.html#shim">SHIM</a>
+macro so that the bottom margin of running text falls where it
+should.
+</p>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 20%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 46%; text-align: right;"><a href="headfootpage.html">Next: Page headers/footers, pagination</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

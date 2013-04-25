@@ -1,0 +1,518 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>dos2unix 6.0 - DOS/MAC to UNIX and vice versa text file format converter</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:rurban@x-ray.at" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#mac_mode">MAC MODE</a></li>
+	<li><a href="#conversion_modes">CONVERSION MODES</a></li>
+	<li><a href="#unicode">UNICODE</a></li>
+	<ul>
+
+		<li><a href="#encodings">Encodings</a></li>
+		<li><a href="#conversion">Conversion</a></li>
+		<li><a href="#byte_order_mark">Byte Order Mark</a></li>
+		<li><a href="#unicode_examples">Unicode examples</a></li>
+	</ul>
+
+	<li><a href="#examples">EXAMPLES</a></li>
+	<li><a href="#recursive_conversion">RECURSIVE CONVERSION</a></li>
+	<li><a href="#localization">LOCALIZATION</a></li>
+	<li><a href="#return_value">RETURN VALUE</a></li>
+	<li><a href="#standards">STANDARDS</a></li>
+	<li><a href="#authors">AUTHORS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>dos2unix - DOS/Mac to Unix and vice versa text file format converter</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    dos2unix [options] [FILE ...] [-n INFILE OUTFILE ...]
+    unix2dos [options] [FILE ...] [-n INFILE OUTFILE ...]</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The Dos2unix package includes utilities <code>dos2unix</code> and <code>unix2dos</code> to convert
+plain text files in DOS or Mac format to Unix format and vice versa.</p>
+<p>In DOS/Windows text files a line break, also known as newline, is a combination
+of two characters: a Carriage Return (CR) followed by a Line Feed (LF). In Unix
+text files a line break is a single character: the Line Feed (LF). In Mac text
+files, prior to Mac OS X, a line break was single Carriage Return (CR)
+character. Nowadays Mac OS uses Unix style (LF) line breaks.</p>
+<p>Binary files are automatically skipped, unless conversion is forced.</p>
+<p>Non-regular files, such as directories and FIFOs, are automatically skipped.</p>
+<p>Symbolic links and their targets are by default kept untouched.
+Symbolic links can optionally be replaced, or the output can be written
+to the symbolic link target.
+Symbolic links on Windows are not supported. Windows symbolic links
+always replaced, keeping the targets unchanged.</p>
+<p>Dos2unix was modelled after dos2unix under SunOS/Solaris and has similar
+conversion modes.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="__" class="item"><strong>--</strong></a></strong></dt>
+
+<dd>
+<p>Treat all following options as file names. Use this option if you want to
+convert files whose names start with a dash. For instance to convert
+a file named &quot;-foo&quot;, you can use this command:</p>
+<pre>
+    dos2unix -- -foo</pre>
+<p>Or in new file mode:</p>
+<pre>
+    dos2unix -n -- -foo out.txt</pre>
+</dd>
+<dt><strong><a name="ascii" class="item"><strong>-ascii</strong></a></strong></dt>
+
+<dd>
+<p>Convert only line breaks. This is the default conversion mode.</p>
+</dd>
+<dt><strong><a name="iso" class="item"><strong>-iso</strong></a></strong></dt>
+
+<dd>
+<p>Conversion between DOS and ISO-8859-1 character set. See also section
+CONVERSION MODES.</p>
+</dd>
+<dt><strong><a name="1252" class="item"><strong>-1252</strong></a></strong></dt>
+
+<dd>
+<p>Use Windows code page 1252 (Western European).</p>
+</dd>
+<dt><strong><a name="437" class="item"><strong>-437</strong></a></strong></dt>
+
+<dd>
+<p>Use DOS code page 437 (US). This is the default code page used for ISO conversion.</p>
+</dd>
+<dt><strong><a name="850" class="item"><strong>-850</strong></a></strong></dt>
+
+<dd>
+<p>Use DOS code page 850 (Western European).</p>
+</dd>
+<dt><strong><a name="860" class="item"><strong>-860</strong></a></strong></dt>
+
+<dd>
+<p>Use DOS code page 860 (Portuguese).</p>
+</dd>
+<dt><strong><a name="863" class="item"><strong>-863</strong></a></strong></dt>
+
+<dd>
+<p>Use DOS code page 863 (French Canadian).</p>
+</dd>
+<dt><strong><a name="865" class="item"><strong>-865</strong></a></strong></dt>
+
+<dd>
+<p>Use DOS code page 865 (Nordic).</p>
+</dd>
+<dt><strong><a name="7" class="item"><strong>-7</strong></a></strong></dt>
+
+<dd>
+<p>Convert 8 bit characters to 7 bit space.</p>
+</dd>
+<dt><strong><a name="c_convmode_convmode" class="item"><strong>-c, --convmode CONVMODE</strong></a></strong></dt>
+
+<dd>
+<p>Set conversion mode. Where CONVMODE is one of:
+<em>ascii</em>, <em>7bit</em>, <em>iso</em>, <em>mac</em>
+with ascii being the default.</p>
+</dd>
+<dt><strong><a name="f_force" class="item"><strong>-f, --force</strong></a></strong></dt>
+
+<dd>
+<p>Force conversion of binary files.</p>
+</dd>
+<dt><strong><a name="h_help" class="item"><strong>-h, --help</strong></a></strong></dt>
+
+<dd>
+<p>Display help and exit.</p>
+</dd>
+<dt><strong><a name="k_keepdate" class="item"><strong>-k, --keepdate</strong></a></strong></dt>
+
+<dd>
+<p>Keep the date stamp of output file same as input file.</p>
+</dd>
+<dt><strong><a name="l_license" class="item"><strong>-L, --license</strong></a></strong></dt>
+
+<dd>
+<p>Display program's license.</p>
+</dd>
+<dt><strong><a name="l_newline" class="item"><strong>-l, --newline</strong></a></strong></dt>
+
+<dd>
+<p>Add additional newline.</p>
+<p><strong>dos2unix</strong>: Only DOS line breaks are changed to two Unix line breaks.
+In Mac mode only Mac line breaks are changed to two Unix
+line breaks.</p>
+<p><strong>unix2dos</strong>: Only Unix line breaks are changed to two DOS line breaks.
+In Mac mode Unix line breaks are changed to two Mac line breaks.</p>
+</dd>
+<dt><strong><a name="m_add_bom" class="item"><strong>-m, --add-bom</strong></a></strong></dt>
+
+<dd>
+<p>Write an UTF-8 Byte Order Mark in the output file. Never use this option when
+the output encoding is other than UTF-8. See also section UNICODE.</p>
+</dd>
+<dt><strong><a name="n_newfile_infile_outfile" class="item"><strong>-n, --newfile INFILE OUTFILE ...</strong></a></strong></dt>
+
+<dd>
+<p>New file mode. Convert file INFILE and write output to file OUTFILE.
+File names must be given in pairs and wildcard names should <em>not</em> be
+used or you <em>will</em> lose your files.</p>
+</dd>
+<dt><strong><a name="o_oldfile_file" class="item"><strong>-o, --oldfile FILE ...</strong></a></strong></dt>
+
+<dd>
+<p>Old file mode. Convert file FILE and overwrite output to it. The program
+default to run in this mode. Wildcard names may be used.</p>
+</dd>
+<dt><strong><a name="q_quiet" class="item"><strong>-q, --quiet</strong></a></strong></dt>
+
+<dd>
+<p>Quiet mode. Suppress all warnings and messages. The return value is zero.
+Except when wrong command-line options are used.</p>
+</dd>
+<dt><strong><a name="s_safe" class="item"><strong>-s, --safe</strong></a></strong></dt>
+
+<dd>
+<p>Skip binary files (default).</p>
+</dd>
+<dt><strong><a name="f_follow_symlink" class="item"><strong>-F, --follow-symlink</strong></a></strong></dt>
+
+<dd>
+<p>Follow symbolic links and convert the targets.</p>
+</dd>
+<dt><strong><a name="r_replace_symlink" class="item"><strong>-R, --replace-symlink</strong></a></strong></dt>
+
+<dd>
+<p>Replace symbolic links with converted files
+(original target files remain unchanged).</p>
+</dd>
+<dt><strong><a name="s_skip_symlink" class="item"><strong>-S, --skip-symlink</strong></a></strong></dt>
+
+<dd>
+<p>Keep symbolic links and targets unchanged (default).</p>
+</dd>
+<dt><strong><a name="v_version" class="item"><strong>-V, --version</strong></a></strong></dt>
+
+<dd>
+<p>Display version information and exit.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="mac_mode">MAC MODE</a></h1>
+<p>In normal mode line breaks are converted from DOS to Unix and vice versa.
+Mac line breaks are not converted.</p>
+<p>In Mac mode line breaks are converted from Mac to Unix and vice versa. DOS
+line breaks are not changed.</p>
+<p>To run in Mac mode use the command-line option <code>-c mac</code> or use the
+commands <code>mac2unix</code> or <code>unix2mac</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="conversion_modes">CONVERSION MODES</a></h1>
+<p>Conversion modes <em>ascii</em>, <em>7bit</em>, and <em>iso</em>
+are similar to those of dos2unix/unix2dos under SunOS/Solaris.</p>
+<dl>
+<dt><strong><strong>ascii</strong></strong></dt>
+
+<dd>
+<p>In mode <a href="#ascii"><code>ascii</code></a> only line breaks are converted. This is the default
+conversion mode.</p>
+<p>Although the name of this mode is ASCII, which is a 7 bit standard, the
+actual mode is 8 bit. Use always this mode when converting Unicode UTF-8
+files.</p>
+</li>
+<li><strong><a name="bit" class="item"><strong>7bit</strong></a></strong>
+
+<p>In this mode all 8 bit non-ASCII characters (with values from 128 to 255)
+are converted to a 7 bit space.</p>
+</dd>
+<dt><strong><strong>iso</strong></strong></dt>
+
+<dd>
+<p>Characters are converted between a DOS character set (code page) and ISO
+character set ISO-8859-1 (Latin-1) on Unix. DOS characters without ISO-8859-1
+equivalent, for which conversion is not possible, are converted to a dot. The
+same counts for ISO-8859-1 characters without DOS counterpart.</p>
+<p>When only option <a href="#iso"><code>-iso</code></a> is used dos2unix will try to determine the active code
+page. When this is not possible dos2unix will use default code page CP437,
+which is mainly used in the USA.  To force a specific code page use options
+<a href="#437"><code>-437</code></a> (US), <a href="#850"><code>-850</code></a> (Western European), <a href="#860"><code>-860</code></a> (Portuguese), <a href="#863"><code>-863</code></a> (French
+Canadian), or <a href="#865"><code>-865</code></a> (Nordic).  Windows code page CP1252 (Western European) is
+also supported with option <a href="#1252"><code>-1252</code></a>. For other code pages use dos2unix in
+combination with <code>iconv(1)</code>.  Iconv can convert between a long list of character
+encodings.</p>
+<p>Never use ISO converion on Unicode text files. It will corrupt UTF-8 encoded files.</p>
+<p>Some examples:</p>
+<p>Convert from DOS default code page to Unix Latin-1</p>
+<pre>
+    dos2unix -iso -n in.txt out.txt</pre>
+<p>Convert from DOS CP850 to Unix Latin-1</p>
+<pre>
+    dos2unix -850 -n in.txt out.txt</pre>
+<p>Convert from Windows CP1252 to Unix Latin-1</p>
+<pre>
+    dos2unix -1252 -n in.txt out.txt</pre>
+<p>Convert from Windows CP1252 to Unix UTF-8 (Unicode)</p>
+<pre>
+    iconv -f CP1252 -t UTF-8 in.txt | dos2unix &gt; out.txt</pre>
+<p>Convert from Unix Latin-1 to DOS default code page.</p>
+<pre>
+    unix2dos -iso -n in.txt out.txt</pre>
+<p>Convert from Unix Latin-1 to DOS CP850</p>
+<pre>
+    unix2dos -850 -n in.txt out.txt</pre>
+<p>Convert from Unix Latin-1 to Windows CP1252</p>
+<pre>
+    unix2dos -1252 -n in.txt out.txt</pre>
+<p>Convert from Unix UTF-8 (Unicode) to Windows CP1252</p>
+<pre>
+    unix2dos &lt; in.txt | iconv -f UTF-8 -t CP1252 &gt; out.txt</pre>
+<p>See also <a href="http://czyborra.com/charsets/codepages.html">http://czyborra.com/charsets/codepages.html</a>
+and <a href="http://czyborra.com/charsets/iso8859.html">http://czyborra.com/charsets/iso8859.html</a>.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="unicode">UNICODE</a></h1>
+<p>
+</p>
+<h2><a name="encodings">Encodings</a></h2>
+<p>There exist different Unicode encodings. On Unix and Linux Unicode files are
+typically encoded in UTF-8 encoding. On Windows Unicode text files can be
+encoded in UTF-8, UTF-16, or UTF-16 big endian, but are mostly encoded in
+UTF-16 format.</p>
+<p>
+</p>
+<h2><a name="conversion">Conversion</a></h2>
+<p>Unicode text files can have DOS, Unix or Mac line breaks, like regular text
+files.</p>
+<p>All versions of dos2unix and unix2dos can convert UTF-8 encoded files, because
+UTF-8 was designed for backward compatiblity with ASCII.</p>
+<p>Dos2unix and unix2dos with Unicode UTF-16 support, can read little and big
+endian UTF-16 encoded text files. To see if dos2unix was built with UTF-16
+support type <code>dos2unix -V</code>.</p>
+<p>The Windows versions of dos2unix and unix2dos convert UTF-16 encoded files
+always to UTF-8 encoded files. Unix versions of dos2unix/unix2dos convert
+UTF-16 encoded files to the locale character encoding when it is set to UTF-8.
+Use the <code>locale(1)</code> command to find out what the locale character encoding is.</p>
+<p>Because UTF-8 formatted text files are well supported on both Windows and Unix,
+dos2unix and unix2dos have no option to write UTF-16 files. All UTF-16
+characters can be encoded in UTF-8. Conversion from UTF-16 to UTF-8 is without
+loss. UTF-16 files will be skipped on Unix when the locale character encoding
+is not UTF-8, to prevent accidental loss of text. When an UTF-16 to UTF-8
+conversion error occurs, for instance when the UTF-16 input file contains
+an error, the file will be skipped.</p>
+<p>ISO and 7-bit mode conversion do not work on UTF-16 files.</p>
+<p>
+</p>
+<h2><a name="byte_order_mark">Byte Order Mark</a></h2>
+<p>On Windows Unicode text files typically have a Byte Order Mark (BOM), because
+many Windows programs (including Notepad) add BOMs by default. See also
+<a href="http://en.wikipedia.org/wiki/Byte_order_mark">http://en.wikipedia.org/wiki/Byte_order_mark</a>.</p>
+<p>On Unix Unicode files typically don't have a BOM. It is assumed that text files
+are encoded in the locale character encoding.</p>
+<p>Dos2unix can only detect if a file is in UTF-16 format if the file has a BOM.
+When an UTF-16 file doesn't have a BOM, dos2unix will see the file as a binary
+file.</p>
+<p>Use dos2unix in combination with <code>iconv(1)</code> to convert an UTF-16 file without
+BOM.</p>
+<p>Dos2unix never writes a BOM in the output file, unless you use option <code>-m</code>.</p>
+<p>Unix2dos writes a BOM in the output file when the input file has a BOM, or
+when option <code>-m</code> is used.</p>
+<p>
+</p>
+<h2><a name="unicode_examples">Unicode examples</a></h2>
+<p>Convert from Windows UTF-16 (with BOM) to Unix UTF-8</p>
+<pre>
+    dos2unix -n in.txt out.txt</pre>
+<p>Convert from Windows UTF-16 (without BOM) to Unix UTF-8</p>
+<pre>
+    iconv -f UTF-16 -t UTF-8 in.txt | dos2unix &gt; out.txt</pre>
+<p>Convert from Unix UTF-8 to Windows UTF-8 with BOM</p>
+<pre>
+    unix2dos -m -n in.txt out.txt</pre>
+<p>Convert from Unix UTF-8 to Windows UTF-16</p>
+<pre>
+    unix2dos &lt; in.txt | iconv -f UTF-8 -t UTF-16 &gt; out.txt</pre>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>Read input from 'stdin' and write output to 'stdout'.</p>
+<pre>
+    dos2unix
+    dos2unix -l -c mac</pre>
+<p>Convert and replace a.txt. Convert and replace b.txt.</p>
+<pre>
+    dos2unix a.txt b.txt
+    dos2unix -o a.txt b.txt</pre>
+<p>Convert and replace a.txt in ascii conversion mode.</p>
+<pre>
+    dos2unix a.txt</pre>
+<p>Convert and replace a.txt in ascii conversion mode.
+Convert and replace b.txt in 7bit conversion mode.</p>
+<pre>
+    dos2unix a.txt -c 7bit b.txt
+    dos2unix -c ascii a.txt -c 7bit b.txt
+    dos2unix -ascii a.txt -7 b.txt</pre>
+<p>Convert a.txt from Mac to Unix format.</p>
+<pre>
+    dos2unix -c mac a.txt
+    mac2unix a.txt</pre>
+<p>Convert a.txt from Unix to Mac format.</p>
+<pre>
+    unix2dos -c mac a.txt
+    unix2mac a.txt</pre>
+<p>Convert and replace a.txt while keeping original date stamp.</p>
+<pre>
+    dos2unix -k a.txt
+    dos2unix -k -o a.txt</pre>
+<p>Convert a.txt and write to e.txt.</p>
+<pre>
+    dos2unix -n a.txt e.txt</pre>
+<p>Convert a.txt and write to e.txt, keep date stamp of e.txt same as a.txt.</p>
+<pre>
+    dos2unix -k -n a.txt e.txt</pre>
+<p>Convert and replace a.txt. Convert b.txt and write to e.txt.</p>
+<pre>
+    dos2unix a.txt -n b.txt e.txt
+    dos2unix -o a.txt -n b.txt e.txt</pre>
+<p>Convert c.txt and write to e.txt. Convert and replace a.txt.
+Convert and replace b.txt. Convert d.txt and write to f.txt.</p>
+<pre>
+    dos2unix -n c.txt e.txt -o a.txt b.txt -n d.txt f.txt</pre>
+<p>
+</p>
+<hr />
+<h1><a name="recursive_conversion">RECURSIVE CONVERSION</a></h1>
+<p>Use dos2unix in combination with the <code>find(1)</code> and <code>xargs(1)</code> commands to
+recursively convert text files in a directory tree structure. For instance to
+convert all .txt files in the directory tree under the current directory type:</p>
+<pre>
+    find . -name *.txt |xargs dos2unix</pre>
+<p>
+</p>
+<hr />
+<h1><a name="localization">LOCALIZATION</a></h1>
+<dl>
+<dt><strong><a name="lang" class="item"><strong>LANG</strong></a></strong></dt>
+
+<dd>
+<p>The primary language is selected with the environment variable LANG. The LANG
+variable consists out of several parts. The first part is in small letters the
+language code. The second is optional and is the country code in capital
+letters, preceded with an underscore. There is also an optional third part:
+character encoding, preceded with a dot. A few examples for POSIX standard type
+shells:</p>
+<pre>
+    export LANG=nl               Dutch
+    export LANG=nl_NL            Dutch, The Netherlands
+    export LANG=nl_BE            Dutch, Belgium
+    export LANG=es_ES            Spanish, Spain
+    export LANG=es_MX            Spanish, Mexico
+    export LANG=en_US.iso88591   English, USA, Latin-1 encoding
+    export LANG=en_GB.UTF-8      English, UK, UTF-8 encoding</pre>
+<p>For a complete list of language and country codes see the gettext manual:
+<a href="http://www.gnu.org/software/gettext/manual/gettext.html#Language-Codes">http://www.gnu.org/software/gettext/manual/gettext.html#Language-Codes</a></p>
+<p>On Unix systems you can use to command <code>locale(1)</code> to get locale specific
+information.</p>
+</dd>
+<dt><strong><a name="language" class="item"><strong>LANGUAGE</strong></a></strong></dt>
+
+<dd>
+<p>With the LANGUAGE environment variable you can specify a priority list of
+languages, separated by colons. Dos2unix gives preference to LANGUAGE over LANG.
+For instance, first Dutch and then German: <code>LANGUAGE=nl:de</code>. You have to first
+enable localization, by setting LANG (or LC_ALL) to a value other than
+&quot;C&quot;, before you can use a language priority list through the LANGUAGE
+variable. See also the gettext manual:
+<a href="http://www.gnu.org/software/gettext/manual/gettext.html#The-LANGUAGE-variable">http://www.gnu.org/software/gettext/manual/gettext.html#The-LANGUAGE-variable</a></p>
+<p>If you select a language which is not available you will get the
+standard English messages.</p>
+</dd>
+<dt><strong><a name="dos2unix_localedir" class="item"><strong>DOS2UNIX_LOCALEDIR</strong></a></strong></dt>
+
+<dd>
+<p>With the environment variable DOS2UNIX_LOCALEDIR the LOCALEDIR set
+during compilation can be overruled. LOCALEDIR is used to find the
+language files. The GNU default value is <code>/usr/local/share/locale</code>.
+Option <strong>--version</strong> will display the LOCALEDIR that is used.</p>
+<p>Example (POSIX shell):</p>
+<pre>
+    export DOS2UNIX_LOCALEDIR=$HOME/share/locale</pre>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="return_value">RETURN VALUE</a></h1>
+<p>On success, zero is returned.  When a system error occurs the last system error will be
+returned. For other errors 1 is returned.</p>
+<p>The return value is always zero in quiet mode, except when wrong command-line options
+are used.</p>
+<p>
+</p>
+<hr />
+<h1><a name="standards">STANDARDS</a></h1>
+<p><a href="http://en.wikipedia.org/wiki/Text_file">http://en.wikipedia.org/wiki/Text_file</a></p>
+<p><a href="http://en.wikipedia.org/wiki/Carriage_return">http://en.wikipedia.org/wiki/Carriage_return</a></p>
+<p><a href="http://en.wikipedia.org/wiki/Newline">http://en.wikipedia.org/wiki/Newline</a></p>
+<p><a href="http://en.wikipedia.org/wiki/Unicode">http://en.wikipedia.org/wiki/Unicode</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="authors">AUTHORS</a></h1>
+<p>Benjamin Lin - &lt;<a href="mailto:blin@socs.uts.edu.au">blin@socs.uts.edu.au</a>&gt;
+Bernd Johannes Wuebben (mac2unix mode) - &lt;<a href="mailto:wuebben@kde.org">wuebben@kde.org</a>&gt;,
+Christian Wurll (add extra newline) - &lt;<a href="mailto:wurll@ira.uka.de">wurll@ira.uka.de</a>&gt;,
+Erwin Waterlander - &lt;<a href="mailto:waterlan@xs4all.nl">waterlan@xs4all.nl</a>&gt; (Maintainer)</p>
+<p>Project page: <a href="http://waterlan.home.xs4all.nl/dos2unix.html">http://waterlan.home.xs4all.nl/dos2unix.html</a></p>
+<p>SourceForge page: <a href="http://sourceforge.net/projects/dos2unix/">http://sourceforge.net/projects/dos2unix/</a></p>
+<p>Freecode: <a href="http://freecode.com/projects/dos2unix">http://freecode.com/projects/dos2unix</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><code>file(1)</code>
+<code>find(1)</code>
+<code>iconv(1)</code>
+<code>locale(1)</code>
+<code>xargs(1)</code></p>
+
+</body>
+
+</html>

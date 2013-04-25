@@ -1,0 +1,86 @@
+which
+-------------------------------------------
+GNU Which prints out the full path of the executables that bash(1) would
+execute when the passed program names would have been entered on the
+shell prompt. It uses the exact same algorithm as bash. Tildes and a dot
+in the PATH are now expanded to the full path by default. Options allow
+users to print "~/*" or "./*" and/or to print all executables that match
+any directory in the PATH. 
+
+Runtime requirements (these, or newer):
+  cygwin-1.7.0-37
+
+Build requirements (these, or newer):
+  binutils-20080624-2
+  cygport-0.9.4-1
+  cygwin-1.7.0-37
+  gawk-3.1.6-1
+  gcc-core-3.4.4-3
+  make-3.81-4
+  sed-4.1.5-2
+
+Canonical homepage:
+  http://www.xs4all.nl/~carlo17/which/
+
+Canonical download:
+  http://www.xs4all.nl/~carlo17/which/
+
+-------------------------------------------
+
+Build instructions:
+  unpack which-2.20-2-src.tar.bz2
+    if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+  cd /usr/src
+  cygport ./which-2.20-2.cygport all
+
+This will create:
+  /usr/src/which-2.20-2-src.tar.bz2
+  /usr/src/which-2.20-2.tar.bz2
+
+Or use 'cygport which-2.20-2.cygport prep' to get a patched source
+directory.
+
+To find out the files included in the binary distribution, you can
+use "cygcheck -l which", or browse the listing for the appropriate
+version at <http://cygwin.com/packages/>.
+
+-------------------------------------------
+
+Port Notes:
+
+----- version 2.20-2 -----
+Rebuilt for Cygwin 1.7.
+
+----- version 2.20-1 -----
+New upstream release.
+
+----- version 2.19-1 -----
+New upstream release.
+
+Removed the local patch for the problem with the two leading slashes
+for a UNC path being replaced with one slash, as reported in
+http://cygwin.com/ml/cygwin/2008-01/msg00018.html. Upstream has
+included a fix for this issue.
+
+----- version 2.18-2 -----
+Fixed a problem with the two leading slashes for a UNC path being
+replaced with one slash, as reported in
+http://cygwin.com/ml/cygwin/2008-01/msg00018.html.
+
+Switched to using PATH_MAX instead of hard-coded 256.
+
+----- version 2.18-1 -----
+This is the initial Cygwin release of GNU which; previous versions
+of which distributed with Cygwin were not from this source.
+
+Compiled with one patch to use access() for checking whether a
+directory contains an executable, just as bash does.
+
+-------------------------------------------
+
+For more information about this package, see the upstream documentation in
+/usr/share/doc/which-2.20-2/.
+
+Cygwin port maintained by: David Rothenberger <daveroth@acm.org>
+Please address all questions to the Cygwin mailing list at <cygwin@cygwin.com>

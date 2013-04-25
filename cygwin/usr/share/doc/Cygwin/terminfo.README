@@ -1,0 +1,223 @@
+terminfo
+========================================================================
+A fork of the terminfo database normally distributed with the ncurses
+package.
+
+As contrasted with the backwards-compatible terminfo0 package, in this
+version the database entries are arranged by the two-char hex code of
+the first letter of the entry name, rather than by that first letter
+itself.  The older arrangement can cause problems on case-insensitve
+file systems. That is:
+   old:   r/rxvt    R/Rxvt    (clash!)
+   new:   72/rxvt   52/Rxvt   (no clash)
+Both versions of the database can be installed at the same time. The
+newer structure is used by cygncurses-9.dll and its clients. The older
+structure is used by cygncurses-8.dll and its clients.
+
+
+Runtime requirements:
+  none
+
+Build requirements (these, or newer)
+  cygwin-1.7.2-1
+  ncurses-5.7-18
+  cygport-0.9.81-1
+
+Canonical homepage:
+  none
+
+Canonical download:
+  ftp://ftp.gnu.org/pub/gnu/ncurses/
+
+License:
+  MIT/X
+
+Language:
+  binary ncurses terminal info format
+ 
+========================================================================
+
+Build instructions:
+  unpack terminfo-5.7_YYYYMMDD-X-src.tar.bz2
+    if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+  cd /usr/src
+  cygport ./terminfo-5.7_YYYYMMDD-X.cygport all
+
+This will create:
+  /usr/src/terminfo-5.7_YYYYMMDD-X.tar.bz2
+  /usr/src/terminfo-extra-5.7_YYYYMMDD-X.tar.bz2
+  /usr/src/termcap-5.7_YYYYMMDD-X.tar.bz2
+  /usr/src/terminfo-5.7_YYYYMMDD-X-src.tar.bz2
+
+Or use 'cygport ./terminfo-5.7_YYYYMMDD-X.cygport prep' to get a 
+patched source directory
+
+To find out the files included in the binary distribution, you can
+use "cygcheck -l terminfo", or browse the listing for the appropriate
+version at <http://cygwin.com/packages/>.
+
+========================================================================
+
+Port Notes:
+----------  terminfo-5.7_20091114-14 -- 2010 Mar 24 -----------
+* Add cygwin-old for 1.5 compatibility (reverts to kbs=^H)
+* Support vt100 sequences -- Thomas Wolff
+
+----------  terminfo-5.7_20091114-13 -- 2009 Nov 30 -----------
+* Use 'tic -C -r' when generating termcap; fixes segfault in xterm.
+
+----------  terminfo-5.7_20091114-12 -- 2009 Nov 26 -----------
+* Fix packaging bugs
+  + move nsterm-old from -extra to base package
+* Revert -11 change: don't include old, obsolete, unsupported-by-
+  terminfo terminal type defns, even if the old termcap had them.
+
+----------  terminfo-5.7_20091114-11 -- 2009 Nov 21 -----------
+* Fix bugs in generated termcap file
+  + include all dependent terminal types
+  + add old terminal aliases from original /etc/termcap
+  + add a small number of terminal type defns that were unique
+    to cygwin's original /etc/termcap
+* Include in /etc/termcap hicolor variants of putty, xterm,
+  rxvt, and screen.
+ 
+----------  terminfo-5.7_20091114-10 -- 2009 Nov 20 -----------
+* Update to latest upstream
+* Generate /etc/termcap from terminfo source
+* Includes patches to change the backspace key from ^H to \177
+  (that is, ^?) on screen, cygwin, and xterm.  As the default behavior
+  of screen itself is to use ^? for backspace, this agrees with current
+  behavior. Recently cygwin-1.7's console handling code was changed to
+  also use ^? for backspace (but not cygwin-1.5's) -- so this version
+  of terminfo, unlike the -1 release for cygwin-1.5, also changes the
+  terminal database info for the cygwin console to match.  Finally,
+  it is expected that soon, the cygwin-1.7 version of xterm will also
+  change to use ^? -- but it does not yet do so (and we do not expect
+  the cygwin-1.5 version of xterm to ever change in this way).  So,
+  for now, on cygwin-1.7, you may need to add the following lines
+	*backarrowKeyIsErase: true
+        *ptyInitialErase: true
+  to your /etc/X11/app-defaults/XTerm file after installing this
+  edition of terminfo.
+
+----------  terminfo-5.7_20090228-10 -- 2009 Feb 28 -----------
+* Fork for cygwin-1.7 development
+* Build with cygport-0.9.4
+
+----------  terminfo-5.7_20090228-1 -- 2009 Feb 28 -----------
+* Resync'ed with 20090228 patchlevel of ncurses-5.7
+* Split into two packages:
+  - terminfo contains what Fedora 'ncurses-base' does;
+    basically, cygwin, vt*, xterm*, putty*, screen*, and rxvt*
+    with a few others.
+  - terminfo-extra contains everything else
+
+----------  terminfo-5.5_20061104-1 -- 2006 Nov 15 -----------
+Resync'ed with 200601104 patchlevel of ncurses-5.5
+Upstream changes (verses terminfo-5.5_20060323)
+   === (rollup patch was MASSIVE)
+   * add xterm+256color building block -TD
+   * add gnome-256color, putty-256color, rxvt-256color -TD
+   * add hpterm-color -TD
+   * add xterm+pcc0, xterm+pcc1, xterm+pcc2, xterm+pcc3 -TD
+   * add gnome-fc5 (prompted by GenToo #122566) -TD
+   * remove obsolete/misleading comments about kcbt on Linux -Alain Bench
+   * improve xterm-256color by combining the ibm+16color setaf/setab
+     strings with SGR 48.  The setf/setb strings also are cancelled here
+     rather than omitted so derived entries will cancel those also -Alain
+     Bench
+   * add some notes regarding copyright to terminfo.src -TD
+   * use rxvt+pcfkeys in Eterm -TD
+   * remove km and flash from gnome, Eterm and rxvt since they do not work
+     as one would expect (km sends ESC rather than setting the 8th bit
+     of the key) -TD
+   * add/use ansi+enq, vt100+enq and vt102+enq -TD
+   * add konsole-solaris -TD
+   * update xterm-sun and xterm-sco entries to match xterm #216 -TD
+   * modify is2/rs2 strings for xterm-r6 as per fix in xterm #148 -TD
+   * modify xterm-24 to inherit from "xterm" -TD
+   * add xiterm entry -TD
+   * add putty-vt100 entry -TD
+   * corrected spelling of Michael A Dorman's name, prompted by
+     http://www.advogato.org/person/mdorman/diary.html -TD
+   * add xterm+pcf0, xterm+pcf2 from xterm #216 -TD
+   * update xterm+pcfkeys to match xterm #216 -TD
+   * make descriptions of xterm entries consistent with its terminfo -TD
+   * add xfce, mgt -TD
+   * correct acsc string in kterm -TD
+   * add kon entry -TD
+   * remove invis from linux and related entries, add klone+sgr8 for those
+     that implement the feature (or have not been shown to lack it) -TD
+   === vt220-keypad rxvt+pcfkeys
+   # 2006-09-23
+   #      * add ka2, kb1, kb3, kc2 to vt220-keypad as an extension -TD
+   #      * minor improvements to rxvt+pcfkeys -TD
+   === ansi+sgr xnuppc+f xnuppc+f2 
+   # 2006-09-30
+   #      * fix a few typos in if/then/else expressions -TD
+   === screen
+   === screen-16color  screen-16color-s  screen-16color-bce  screen-16color-bce-s
+   === screen-256color screen-256color-s screen-256color-bce screen-256color-bce-s
+   # 2006-10-07
+   #      * add several GNU Screen variations with 16- and 256-colors, and
+   #        status line (Alain Bench).
+
+----------  terminfo-5.5_20060323-1 -- 2006 Mar 23 -----------
+* Resync'ed with 20060318 patchlevel of ncurses-5.5
+* Use ncurses version of xterm now; it's been updated
+* Small cygwin console fixes from upstream
+* Upstream changes (verses terminfo-5.5_20060323)
+   === rxvt-basic
+   # 2005-10-15
+   #      * correct order of use= in rxvt-basic -TD
+   === xterm-new
+   # 2005-10-26
+   #      * use kind/kri as shifted up/down cursor keys for xterm-new -TD
+   === cygwin
+   # 2005-11-12
+   #      * other minor fixes to cygwin based on tack -TD
+   #      * correct smacs in cygwin (report by Baurzhan Ismagulov).
+   === nsterm-16color xterm-256color
+   # 2006-02-18
+   #      * add nsterm-16color entry -TD
+   #      * remove ncv flag from xterm-16color -TD
+   #      * remove setf/setb from xterm-256color to match xterm #209 -TD
+   #      * update mlterm entry to 2.9.2 -TD
+   === nsterm-16color
+   # 2006-02-25
+   #      * fixes to make nsterm-16color match report
+   #        by Christian Ebert -Alain Bench
+
+----- version 5.4_20041009-1 -----
+Resync'ed with 20041009 patchlevel of ncurses-5.4
+Added fix for smacs glyph on cygwin (tx. Bas van Gompel)
+
+----- version 5.3_20030726-1 -----
+Resync'ed with 20030726 patchlevel of ncurses-5.3
+Moved documentation to /usr/share/*
+
+----- version 5.3-3 -----
+Added 'el' entry for cygwin. (cgf)
+
+----- version 5.3-2 -----
+Fixed the cygwin terminfo stuff (I hope) -- it was 
+very messed up in 5.3-1.  Sorry for the trouble.
+
+----- version 5.3-1 -----
+Updated basic terminfo.src to the version distributed 
+with ncurses-5.3.  However, we still use the XFree86 
+xterm defintion, and cygwin terminfo patches.
+
+----- version 5.2-3 -----
+???
+
+----- version 5.2-2 -----
+Migrated to script-based building.  Overwrite the ncurses
+xterm definitions with the ones from XFree86-4.2.0
+
+----- version 5.2-1 -----
+Initial release
+
+
+Cygwin port maintained by: Charles Wilson  <cygwin@cygwin.com>

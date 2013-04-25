@@ -1,0 +1,747 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Document processing, tables of contents</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="refer.html#top">Next: Bibliographies and references</a></td>
+</tr>
+</table>
+
+<h1 class="docs">Tables of contents</h1>
+
+<div style="width: 68%; margin: auto;">
+<ul class="no-enumerator">
+  <li><a href="#toc-intro">Introduction to tables of contents</a>
+  <ul style="margin-left: -.5em; list-style-type: disc;">
+    <li><a href="#toc-behaviour">Tables of contents behaviour</a></li>
+    <li><a href="#psselect">Using <kbd>psselect</kbd> to put the table of contents where you want it</a></li>
+  </ul></li>
+  <li><a href="#toc">Instruct mom to output a table of contents</a></li>
+  <li><a href="#toc-control-top">Control macros for tables of contents</a>
+  <ul style="margin-left: -.5em; list-style-type: disc;">
+    <li><a href="#index-toc-control">Table of contents control macros and defaults</a></li>
+  </ul></li>
+</ul>
+</div>
+
+<div class="rule-medium"><hr/></div>
+
+<h2 id="toc-intro" class="docs">Introduction to tables of contents</h2>
+
+<p>
+Want a table of contents for your document?  Easy.  Just enter
+<br/>
+<span class="pre-in-pp">
+  .TOC
+</span>
+as the very last macro of your document file. Mom will have picked
+up all document titles (in
+<a href="rectoverso.html#collate">collated</a>
+documents), all heads, subheads, and paragraph heads, as well as
+any endnotes pages that have been output, and assigned them the
+appropriate page number (and page numbering style).  Talk about a
+no-brainer!
+</p>
+
+<p>
+That said, tables of contents have even more control macros than
+endnotes.  As always, the reason for so many control macros is so
+that if you want to change just about any aspect of the table of
+contents&#8217; typographic appearance, you can.  Mom is all about
+simplicity <i>and</i> flexibility.
+</p>
+
+<h3 id="toc-behaviour" class="docs">Tables of contents behaviour</h3>
+
+<p>
+When you output a table of contents (with
+<kbd><a href="#toc">.TOC</a></kbd>),
+mom finishes processing the last page of your document, then breaks
+to a new page for printing the table of contents.
+</p>
+
+<p>
+Mom follows standard typesetting conventions for tables of contents.
+To this end, if
+<a href="headfootpage.html#headers">HEADERS</a>
+are enabled for the document, the first page of the table of
+contents has no page header, but does have a first page number
+(roman numeral), always &#8220;i&#8221;, in the bottom margin.  If
+<a href="headfootpage.html#footers">FOOTERS</a>
+are enabled for the document, the first page has neither a footer,
+nor a page number in the top margin.  (If you absolutely must have
+a page footer on the first page of the table of contents, simply
+invoke
+<a href="headfootpage.html#footer-on-first-page"><kbd>.FOOTER_ON_FIRST_PAGE</kbd></a>
+immediately before <kbd>.TOC</kbd>.)  Subsequent table of contents
+pages have both page headers or footers and a page number.
+</p>
+
+<p>
+Entries in a table of contents are hierarchically indented, as
+you would expect.  By default, each type of entry (e.g. a head
+or a subhead) is set in a different font as well.  If any of
+heads, subheads or paragraph heads are numbered in the body of the
+document, they are also numbered in the table of contents.  Head,
+subhead and paragraph head numbering in the table of contents is
+<i>not</i> concatenated, as it is in the body of the document,
+because it's visually redundant in a table of contents.
+</p>
+
+<p>
+Tables of contents are never set in columns, regardless of whether
+the rest of the document is.  Lastly, if
+<a href="rectoverso.html#recto-verso">recto/verso</a>
+printing is enabled, the table of contents respects it.  This
+sometimes leads to tables of contents that begin with the wrong
+margins, but the margins can be corrected either by outputting a
+<a href="#blank-page">BLANKPAGE</a>
+or by using the control macro
+<a href="#toc-rv-switch">TOC_RV_SWITCH</a>.
+</p>
+
+<p>
+The overall table of contents 
+<a href="definitions.html#family">family</a>,
+<a href="definitions.html#ps">point size</a>
+and
+<a href="definitions.html#leading">lead</a>
+can be altered with
+<a href="definitions.html#controlmacro">control macros</a>,
+as can the family,
+<a href="definitions.html#font">font</a>,
+point size and indent of each type of entry (i.e. title, head,
+subhead, paragraph head).  Furthermore, the page numbering style
+can be changed, as can the amount of visual space reserved for page
+reference numbers.
+</p>
+
+<h5 id="psselect" class="docs">Using <kbd>psselect</kbd> to put the table of contents where you want it</h5>
+
+<p>
+Mom always outputs the table of contents at the end of a document.
+While this is desirable for some language conventions&mdash;French,
+for example&mdash;it is not desirable for others.
+</p>
+
+<p>
+If you&#8217;d like your tables of contents near the start of
+your document, you have two options: re-arrange the pages by hand
+(okay for one or two hard copies of the document), or use the
+<kbd>psselect</kbd> programme provided by the <b>psutils</b> suite
+of tools (which you may have to install as a package from your
+distribution if it is not already on your system).
+</p>
+
+<p>
+The procedure for using <kbd>psselect</kbd> to put the table of
+contents near the beginning of the document begins by you
+determining how many pages it contains.  You can
+do this by previewing the document with the PostScript viewer of
+your choice (gv, okular, evince, etc).
+</p>
+
+<p>
+Once you know the number of pages in the table of contents, you use
+<kbd>psselect</kbd> to place them where you want.
+</p>
+
+<p>
+Say, for example, the table of contents runs to just one page.  The
+command to place a one-page table of contents at the start of a
+document is:
+<br/>
+<span class="pre-in-pp">
+   psselect -p _1,1-_2 
+</span>
+The <kbd>-p</kbd> option instructs <kbd>psselect</kbd> that what
+follows is a comma-separated list of the order in which you want
+pages of a document re-arranged.  The underscore character means
+"counting backwards from the end of the document".  Thus, the above
+says: "Put the last page first (i.e. the table of contents), followed
+by all pages from the original first page up to the second to last
+(i.e. the last page before the table of contents)."
+</p>
+
+<p>
+If your table of contents runs to two pages, the option to
+<kbd>psselect</kbd> would look like this:
+<br/>
+<span class="pre-in-pp">
+   psselect -p _1-_2,1-_3
+</span>
+If your table of contents runs to two pages and you have a cover
+page, the command would look like this:
+<br/>
+<span class="pre-in-pp">
+   psselect -p 1,_1-_2,2-_3
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+<kbd>psselect</kbd> outputs to stdout, so you have to redirect the
+output to a new file.
+<br/>
+<span class="pre-in-pp">
+  psselect -p &lt;page list&gt; &lt;file&gt;.ps &gt; &lt;new-file&gt;.ps
+</span>
+</p>
+</div>
+
+
+<!-- -TOC- -->
+
+<div class="macro-id-overline">
+<h3 id="toc" class="macro-id">Instruct mom to output a table of contents</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>TOC</b>
+</div>
+
+<p>
+If you want a table of contents, just place <kbd>.TOC</kbd> at the
+very end of your document.  Mom takes care of the rest.
+</p>
+
+<div class="rule-short"><hr/></div>
+
+<h2 id="toc-control-top" class="macro-group">Control macros for tables of contents</h2>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">ERRATUM:</span> In versions of mom prior to
+1.3-e_3, the documentation incorrectly stated that table of contents
+control macros could go anywhere in a mom file prior to invoking
+<kbd>.TOC</kbd>.
+</p>
+
+<p class="tip-bottom">
+In fact, table of contents control macros must come before
+<kbd><a href="docprocessing.html#start">.START</a></kbd>.
+</p>
+</div>
+
+<div class="defaults-container" style="background-color: #ded4bd; border: none;">
+<h3 id="index-toc-control" class="docs defaults">Table of contents control macros and defaults</h3>
+
+<ol style="margin-top: .5em; padding-bottom: .5em;">
+  <li><a href="#toc-general">General table of contents style control</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#toc-family">TOC_FAMILY</a> &ndash; base family for tables of contents</li>
+    <li><a href="#toc-pt-size">TOC_PT_SIZE</a> &ndash; base point size for tables of contents</li>
+    <li><a href="#toc-lead">TOC_LEAD</a> &ndash; leading of tables of contents</li>
+  </ul></li>
+  <li><a href="#toc-pagenumbering">Table of contents page numbering</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#paginate-toc">PAGINATE_TOC</a> &ndash; turn table of contents pagination on or off</li>
+    <li><a href="#toc-pagenum-style">TOC_PAGENUM_STYLE</a> &ndash; table of contents page numbering style</li>
+  </ul></li>
+  <li><a href="#toc-header">Changing the table of contents header (title), string and style</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#toc-header-string">Changing the header (title) string</a>
+    <ul style="margin-left: -.5em;">
+      <li><a href="#toc-header-style">Table of contents header (title) string control macros and defaults</a></li>
+    </ul></li>
+  </ul></li>
+  <li><a href="#toc-style">Changing the style of table of contents entries and page number references</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#toc-indent-note">Note: the table of contents _INDENT control macros</a></li>
+    <li><a href="#toc-title">Changing the style of table of contents title entries</a></li>
+    <li><a href="#toc-head">Changing the style of table of contents head entries</a></li>
+    <li><a href="#toc-subhead">Changing the style of table of contents subhead entries</a></li>
+    <li><a href="#toc-parahead">Changing the style of table of contents paragraph head entries</a></li>
+    <li><a href="#toc-pn">Changing the style of table of contents page number references</a></li>
+  </ul></li>
+  <li><a href="#toc-additional">Additional table of contents control macros</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#toc-appends-author">Append author(s) to table of contents title entries</a></li>
+    <li><a href="#toc-title-entry">Alter the wording of a table of contents title entry</a></li>
+    <li><a href="#toc-padding">Establish the number of placeholders to leave for page reference numbers</a></li>
+    <li><a href="#toc-rv-switch">Switch tables of contents page margins</a></li>
+  </ul></li>
+</ol>
+</div>
+
+<h4 id="toc-general" class="docs" style="margin-top: -1.5em; margin-bottom: .5em;">1. General tables of contents style control</h4>
+
+<div id="toc-family" class="box-macro-args">
+Macro: <b>TOC_FAMILY</b> <kbd class="macro-args">&lt;family&gt;</kbd>
+</div>
+
+<p>
+TOC_FAMILY establishes the default family for every page element in
+a table of contents, including the table of contents&#8217; header
+(title) string (by default, &#8220;Contents&#8221;) and the page
+number in the top or bottom margin.  The default is the prevailing
+document family.
+</p>
+
+<p>
+All page elements in the table of contents also have their own
+_FAMILY control macros, which can be used on a case-by-case basis to
+override the default family set with TOC_FAMILY.
+</p>
+
+<!-- -TOC_PT_SIZE- -->
+
+<div id="toc-pt-size" class="box-macro-args">
+Macro: <b>TOC_PT_SIZE</b> <kbd class="macro-args">&lt;base type size of the toc&gt;</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Does not require a <a href="definitions.html#unitofmeasure">unit of measure</a>; points is assumed
+</p>
+
+<p>
+Unlike most other control macros that deal with size of document
+elements, TOC_PT_SIZE takes as its argument an absolute value,
+relative to nothing.  (Compare this with the
+<a href="docelement.html#point-size">_SIZE</a>
+control macros.)  The argument represents the base point size
+of tables of contents from which the size of all other table of
+contents elements are calculated.
+</p>
+
+<p>
+The default for
+<a href="docprocessing.html#printstyle">PRINTSTYLE <kbd>TYPESET</kbd></a>
+is 12.5 points (the same default size used in the body of the
+document).
+</p>
+
+<div id="toc-lead" class="box-macro-args">
+Macro: <b>TOC_LEAD</b> <kbd class="macro-args">&lt;leading of the toc&gt; [ ADJUST ]</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Does not require a <a href="definitions.html#unitofmeasure">unit of measure</a>; points is assumed
+</p>
+
+<p>
+Unlike most other control macros that deal with leading of document
+elements, TOC_LEAD takes as its argument an absolute value, relative
+to nothing.  Therefore, the argument represents the
+<a href="definitions.html#leading">leading</a>
+of tables of contents in
+<a href="definitions.html#picaspoints">points</a>
+unless you append an alternative
+<a href="definitions.html#unitofmeasure">unit of measure</a>.
+For example,
+<br/>
+<span class="pre-in-pp">
+  .TOC_LEAD 14
+</span>
+sets the base leading of tables of contents to 14 points, whereas
+<br/>
+<span class="pre-in-pp">
+  .TOC_LEAD .5i
+</span>
+sets the base leading of tables of contents to 1/2 inch.
+</p>
+
+<p>
+If you want the leading of tables of contents adjusted to fill the
+page, pass TOC_LEAD the optional argument <kbd>ADJUST</kbd>.  (See
+<a href="docprocessing.html#doc-lead-adjust">DOC_LEAD_ADJUST</a>
+for an explanation of leading adjustment.)
+</p>
+
+<p>
+The default for
+<a href="docprocessing.html#printstyle">PRINTSTYLE TYPESET</a>
+is the prevailing document lead (16 by default), adjusted.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Even if you give mom a <kbd>.DOC_LEAD_ADJUST&nbsp;.OFF</kbd> command,
+she will still, by default, adjust the leading of the table of
+contents.  You <i>must</i> enter
+<kbd>TOC_LEAD&nbsp;&lt;lead&gt;</kbd> with no <kbd>ADJUST</kbd>
+argument to disable this default behaviour.
+</p>
+
+<p class="tip-bottom">
+<span class="additional-note">Additional note:</span>
+Tables of contents are always double-spaced in
+<a href="docprocessing.html#printstyle">PRINTSTYLE <kbd>TYPEWRITE</kbd></a>,
+regardless of whether the body of the document is single-spaced.
+</p>
+</div>
+
+<h4 id="toc-pagenumbering" class="docs">2. Table of contents page numbering</h4>
+
+<p>
+The pagination style of tables of contents is controlled by the same
+macros that control
+<a href="headfootpage.html#pagination-intro">document page numbering</a>,
+except
+<a href="headfootpage.html#pagenum">PAGENUM</a>
+(tables of contents always start on page 1).  The defaults are the
+same as for the rest of the document, with the exception that tables
+of contents, by default, have roman numeral page numbers.
+</p>
+
+<p>
+Therefore, if you wish to change some aspect of table of contents
+pagination style, use the
+<a href="headfootpage.html#index-pagination-control">document pagination control macros</a>
+immediately prior to <kbd>.TOC</kbd>.
+</p>
+
+<p>
+A special macro,
+<kbd><a href="#toc-pagenum-style">TOC_PAGENUM_STYLE</a></kbd>
+controls the style of table of contents pagination (i.e. the actual
+table of contents pages' numbers, not the page number references of
+entries).
+</p>
+
+<!-- -PAGINATE_TOC- -->
+
+<div id="paginate-toc" class="box-macro-args">
+Macro: <b>PAGINATE_TOC</b> <kbd class="macro-args">&lt;toggle&gt;</kbd>
+</div>
+
+<p>
+By default, mom paginates tables of contents.  If you&#8217;d like
+her not to, do
+<br/>
+<span class="pre-in-pp">
+  .PAGINATE_TOC OFF
+</span>
+(or <kbd>NO, X,</kbd> etc).
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Simply invoking
+<kbd>.PAGINATION&nbsp;OFF</kbd>
+or
+<kbd>.PAGINATE&nbsp;OFF</kbd>
+disables table of contents pagination <i>for the first
+page of the table of contents only.</i> You must use
+<kbd>.PAGINATE_TOC&nbsp;OFF</kbd> to disable table of contents
+pagination completely, even if pagination is turned off elsewhere in
+your document.
+</p>
+</div>
+
+<!-- -TOC_PAGENUM_STYLE- -->
+
+<div id="toc-pagenum-style" class="box-macro-args">
+Macro: <b>TOC_PAGENUM_STYLE</b> <kbd class="macro-args">&lt;DIGIT | ROMAN | roman | ALPHA | alpha&gt;</kbd>
+</div>
+<p class="requires">
+See
+<a href="headfootpage.html#pagenum-style"><span style="font-style: normal;">PAGENUM_STYLE</span></a>
+for an explanation of the arguments.
+</p>
+
+<p>
+By default, mom uses roman numerals to number table of contents
+pages.  Use TOC_PAGENUM_STYLE if you&#8217;d prefer something else.
+For example, to have standard digits instead of roman numerals, do
+the following:
+<br/>
+<span class="pre-in-pp">
+  .TOC_PAGENUM_STYLE DIGIT
+</span>
+</p>
+
+<h4 id="toc-header" class="docs" style="margin-top: -.5em;">3. Changing the table of contents header (title) string and style</h4>
+
+<p>
+The table of contents header string is the title that appears at to top of the
+table of contents.  By default, it&#8217;s &#8220;Contents&#8221;.</p>
+
+<div id="toc-header-string" class="box-macro-args">
+Macro: <b>TOC_HEADER_STRING</b> <kbd class="macro-args">&lt;string&gt;</kbd>
+</div>
+
+<p>
+If you&#8217;d like the title of the table of contents to read
+something other than &#8220;Contents&#8221;, do, for
+example
+<br/>
+<span class="pre-in-pp">
+  .TOC_HEADER_STRING "Table of Contents"
+</span>
+</p>
+
+<h5 id="toc-header-style" class="docs" style="margin-top: -.5em; text-transform: none;">Table of contents header string (title) control macros and defaults</h5>
+
+<div class="defaults-container" style="margin-top: 1em; padding-bottom: 8px;">
+<p class="defaults" style="padding-top: 6px;">
+See
+<a href="docelement.html#control-macro-args">Arguments to the control macros</a>.
+</p>
+<span class="pre defaults">
+.TOC_HEADER_FAMILY  default = prevailing doc family 
+.TOC_HEADER_FONT    default = bold
+.TOC_HEADER_SIZE    default = +4
+.TOC_HEADER_QUAD    default = left
+</span>
+</div>
+
+<h4 id="toc-style" class="docs" style="margin-top: -1em;">4. Changing the style of table of contents entries and page number references</h4>
+
+<p>
+&#8220;Entries&#8221; refers to titles in
+<a href="rectoverso.html#collate-intro">collated</a>
+documents
+(<a href="docprocessing.html#title">TITLE</a>)
+, heads
+(<a href="docelement.html#head">HEAD</a>),
+subheads
+(<a href="docelement.html#subhead">SUBHEAD</a>),
+and paragraph heads
+(<a href="docelement.html#parahead">PARAHEAD</a>)
+as they appear in the table of contents.  Their style is managed by
+the usual
+<a href="definitions.html#controlmacro">control macros</a>,
+which take the form <kbd>TOC_&lt;ELEMENT&gt;_&lt;SPEC&gt;</kbd>
+(e.g. <kbd>TOC_HEAD_FAMILY</kbd> or <kbd>TOC_SUBHEAD_INDENT</kbd>).
+</p>
+
+<p>
+&#8220;Page number references&#8221; means the page numbers associated with
+entries.  They take the form <kbd>TOC_PN_&lt;SPEC&gt;</kbd>.
+</p>
+
+<p>
+The following is a list of the control macros for table of contents
+entries, along with their defaults.
+</p>
+
+<div id="toc-indent-note" class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+The table of contents _INDENT
+macros set an absolute indent, relative to nothing, and therefore
+require an appended
+<a href="definitions.html#unitofmeasure">unit of measure</a>.
+</p>
+</div>
+<div id="index-toc-entry-control-macros" class="defaults-container" style="padding-bottom: 8px;">
+<p class="defaults" style="padding-top: 6px;">
+See
+<a href="docelement.html#control-macro-args">Arguments to the control macros</a>.
+</p>
+
+<span class="pre defaults">
+<span id="toc-title">
+.TOC_TITLE_FAMILY  default = prevailing doc family 
+.TOC_TITLE_FONT    default = bold italic
+.TOC_TITLE_SIZE    default = +0
+.TOC_TITLE_INDENT  default = 0 for TYPESET and TYPEWRITE
+</span>
+<span id="toc-head">
+.TOC_HEAD_FAMILY  default = prevailing doc family 
+.TOC_HEAD_FONT    default = bold
+.TOC_HEAD_SIZE    default = +.5
+.TOC_HEAD_INDENT  default = 18p for TYPESET; 2m for TYPEWRITE
+</span>
+<span id="toc-subhead">
+.TOC_SUBHEAD_FAMILY  default = prevailing doc family 
+.TOC_SUBHEAD_FONT    default = roman
+.TOC_SUBHEAD_SIZE    default = +0
+.TOC_SUBHEAD_INDENT  default = 30p for TYPESET; 4m for TYPEWRITE
+</span>
+<span id="toc-parahead">
+.TOC_PARAHEAD_FAMILY  default = prevailing doc family 
+.TOC_PARAHEAD_FONT    default = italic
+.TOC_PARAHEAD_SIZE    default = +0
+.TOC_PARAHEAD_INDENT  default = 42p for TYPESET; 6m for TYPEWRITE
+</span>
+.TOC_PN_FAMILY  default = prevailing doc family 
+.TOC_PN_FONT    default = roman
+.TOC_PN_SIZE    default = +0
+</span>
+</div>
+
+<h4 id="toc-additional" class="docs" style="margin-top: -1em;">5. Additional table of contents control macros</h4>
+
+<p>
+The following four macros allow you to
+</p>
+<ul style="margin-top: -.5em; margin-left: -.5em;">
+  <li>instruct mom to <a href="#toc-appends-author">append author(s) to</a> <a href="docprocessing.html#title">TITLE</a> <a href="toc-appends-author">entries</a></li>
+  <li><a href="#toc-title-entry">alter the wording of</a> <a href="docprocessing.html#title">TITLE</a> <a href="#toc-title-entry">entries</a></li>
+  <li>establish <a href="#toc-padding">how many placeholders to leave for page number references</a></li>
+  <li><a href="#toc-rv-switch">switch table of contents page margins</a> should they be incorrect for recto/verso printing</li>
+</ul>
+
+<!-- -TOC_APPENDS_AUTHOR- -->
+
+<div id="toc-appends-author" class="box-macro-args">
+Macro: <b>TOC_APPENDS_AUTHOR</b> <kbd class="macro-args">&lt;none&gt; | &lt;&quot;name(s) of authors&quot;&gt;</kbd>
+</div>
+
+<p>
+In certain kinds of collated documents, different authors are
+responsible for the articles or stories contained within them.  In
+such documents, you may wish to have the author or authors appended
+to the table of contents&#8217; title entry for each story or
+article.
+</p>
+
+<p>
+If you invoke <kbd>.TOC_APPENDS_AUTHOR</kbd> <i>without</i> an
+argument, mom appends the first argument you passed to
+<a href="docprocessing.html#author">AUTHOR</a>
+to table of contents title entries, separated by a front-slash.
+</p>
+
+<p>
+If you invoke <kbd>.TOC_APPENDS_AUTHOR</kbd> <i>with</i> an argument
+(surrounded by double-quotes), mom will append it to the table of
+contents title entries instead.  This is useful if you have multiple
+authors you wish to identify by last name only.  For example, if
+three authors&mdash;Joe Blough, Jane Doe, and John Deere&mdash;are
+responsible for a single article
+<br/>
+<span class="pre-in-pp">
+  .TOC_APPENDS_AUTHOR "Blough et al."
+</span>
+would be a good way to identify them in the table of contents.
+</p>
+
+<!-- -TOC_TITLE_ENTRY- -->
+
+<div id="toc-title-entry" class="box-macro-args">
+Macro: <b>TOC_TITLE_ENTRY</b> <kbd class="macro-args">&lt;&quot;alternate wording for a title entry in the toc&quot;&gt;</kbd>
+</div>
+
+<p>
+In 
+<a href="rectoverso.html#collate">collated</a>
+documents, the title of each chapter appears in the table of
+contents.  It may sometimes happen that you don&#8217;t want the
+title as it appears in the table of contents to be the same as what
+appears in the
+<a href="definitions.html#docheader">docheader</a>.
+You might, for example, want to shorten it.  Or, in the case of
+chapters where the docheader contains both a chapter number and a
+chapter title, like this
+<br/>
+<span class="pre-in-pp">
+             Chapter 6
+  Burning Bush &mdash; Maybe God Was Right
+</span>
+you might want only the chapter title, not the chapter number, to
+show up in the table of contents.  (By default, <kbd>.TOC</kbd>
+generates both.)
+</p>
+
+<p>
+If you want to change the wording of a title entry in the table of
+contents, simply invoke
+<br/>
+<span class="pre-in-pp">
+  .TOC_TITLE_ENTRY
+</span>
+with the desired wording, enclosed in double-quotes.  Using the
+example, above,
+<br/>
+<span class="pre-in-pp">
+  .CHAPTER 6
+  .CHAPTER_TITLE "Burning Bush &mdash; Maybe God Was Right"
+  .TOC_TITLE_ENTRY "Burning Bush"
+  .DOCTYPE CHAPTER
+</span>
+
+would identify chapter 6 in the table of contents simply as
+&#8220;Burning Bush&#8221;.
+</p>
+
+<!-- -TOC_PADDING- -->
+
+<div id="toc-padding" class="box-macro-args">
+Macro: <b>TOC_PADDING</b> <kbd class="macro-args">&lt;number of placeholders to allow for page number listings&gt;</kbd>
+</div>
+
+<p>
+By default, mom allows room for 3 digits in the page number
+references of table of contents entries.  If you&#8217;d like some
+other number of placeholders, say 2 (if your document runs to less
+than 100 pages), do
+<br/>
+<span class="pre-in-pp">
+  .TOC_PADDING 2
+</span>
+</p>
+
+<!-- -TOC_RV_SWITCH- -->
+
+<div id="toc-rv-switch" class="box-macro-args">
+Macro: <b>TOC_RV_SWITCH</b>
+</div>
+
+<p>
+TOC_RV_SWITCH doesn&#8217;t take an argument.  It simply instructs
+mom to switch the left and right margins of
+<a href="rectoverso.html#recto-verso">recto/verso</a>
+documents should the table of contents happen to begin on an even
+page when you want an odd, or vice versa.
+</p>
+
+<p>
+The same result can be accomplished by outputting a
+<a href="#blank-page">BLANKPAGE</a>.
+</p>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 24%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 42%; text-align: right;"><a href="refer.html">Next: Bibliographies and references</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->
+

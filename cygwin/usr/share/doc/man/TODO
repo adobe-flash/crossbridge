@@ -1,0 +1,28 @@
+Resuming regular releases after Grad School hiatus.
+
+Improvements and reviews of internationalization/localization.
+
+----> The localization and platform support are being addressed in the
+upcoming minor releases. Comments and patches welcome.
+
+----> UTF-8 support is in the works as well. Comments and patches welcome.
+
+hman does not use LANG; review coherence of ENV use.
+
+Review support under HP-UX, Irix, Solaris, AIX, OS-X and other *NIXes. 
+
+Add support for missing macros in man2html. 
+
+Are there security problems in the present setup?
+
+-----------------------------------------------------------
+MANPL gives page length - undocumented; may disappear again
+
+[But brobison@ecst.csuchico.edu likes it and says:
+it allows one to do something like:
+
+export LINES
+export MANPAGER='less -i'
+export MANPL='$(perl -e "print ($LINES - 1) / 6, \"i\";")'
+]
+

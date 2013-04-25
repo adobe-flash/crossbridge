@@ -1,0 +1,127 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:42 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>webpage-13.html</title>
+
+ <link rel="stylesheet" type="text/css" href="groff.css" >
+</head>
+[ <a href="webpage.html">top</a> ]
+
+
+<h2>NEWS VERSION 1.18.1
+<a name="heading13"></a>
+</h2>
+ <hr><table><tr><td valign="top" width="30%" bgcolor="#eeeeee">
+<a href="webpage-1.html#heading1">License</a><br>
+<a href="webpage-2.html#heading2">README</a><br>
+<a href="webpage-3.html#heading3">CVS and FTP access</a><br>
+<a href="webpage-4.html#heading4">Groff dependencies</a><br>
+<a href="webpage-5.html#heading5">Bug reports</a><br>
+<a href="webpage-6.html#heading6">Mailing lists</a><br>
+<a href="webpage-7.html#heading7">NEWS VERSION 1.21</a><br>
+<a href="webpage-8.html#heading8">NEWS VERSION 1.20.1</a><br>
+<a href="webpage-9.html#heading9">NEWS VERSION 1.20</a><br>
+<a href="webpage-10.html#heading10">NEWS VERSION 1.19.2</a><br>
+<a href="webpage-11.html#heading11">NEWS VERSION 1.19.1</a><br>
+<a href="webpage-12.html#heading12">NEWS VERSION 1.19</a><br>
+<a href="webpage-13.html#heading13">NEWS VERSION 1.18.1</a><br>
+<a href="webpage-14.html#heading14">NEWS VERSION 1.18</a><br>
+
+</td><td valign="top" width="70%">
+
+<p>troff</p><ul>
+
+<p><li>The non-slanted PostScript font definition files
+have been regenerated to include left and right italic
+correction values. Applying those to a glyph (this is,
+prepending the glyph with &lsquo;\,&rsquo; and appending
+&lsquo;\/&rsquo; to the glyph) sets the glyph width to the
+real value given by the horizontal bounding box values.
+Without those escapes, the advance width for the particular
+glyph is used (which can differ considerably).</p>
+
+<p style="margin-top: 1em">Most users will neither need
+this feature nor notice a difference in existing documents
+(provided \, and \/ is used as advertised, namely for italic
+fonts only); its main goal is to improve image generation
+with grohtml.</p>
+
+<p style="margin-top: 1em">This is an experimental change,
+and feedback is welcome. </li></p></ul>
+
+<p>tbl</p><ul>
+
+<p><li>Added global option &lsquo;nospaces&rsquo; to ignore
+leading and trailing spaces in data items. </li></p></ul>
+
+<p>grolbp</p><ul>
+
+<p><li>The option &minus;w (&minus;&minus;linewidth) has
+been added (similar to other device drivers) to set the
+default line width. </li></p></ul>
+
+<p>grn</p><ul>
+
+<p><li>Support for b-spline and Bezier curves has been
+added. </li></p></ul>
+
+<p>groffer</p><ul>
+
+<p><li>New option &minus;&minus;shell to select the shell
+under wich groffer shall run. </li></p></ul>
+
+<p>Macro Packages</p><ul>
+
+<p><li>The string &lsquo;Am&rsquo; (producing an ampersand)
+has been added to mdoc for compatibility with NetBSD.</p>
+
+<p style="margin-top: 1em"></li><li>&lsquo;.IX&rsquo; is
+now deprecated for mom; you should use &lsquo;.IQ&rsquo;
+(Indent Quit) instead.</p>
+
+<p style="margin-top: 1em"></li><li>In mom, new inlines
+&lsquo;FWD&rsquo;, &lsquo;BCK&rsquo;, &lsquo;UP&rsquo;, and
+&lsquo;DOWN&rsquo; deal with horizontal and vertical
+movements; please refer to contrib/mom/NEWS for more
+details.</p>
+
+<p style="margin-top: 1em"></li><li>New macro
+ENDNOTES_HDRFTR_CENTER for mom to better control headers.
+</li></p> </ul>
+
+<p>Miscellaneous</p><ul>
+
+<p><li>The &lsquo;papersize&rsquo; keyword in the DESC file
+now accepts multiple arguments. It is scanned from left to
+the right, and the first valid argument is used. This makes
+it possible to provide a fallback paper size.</p>
+
+<p style="margin-top: 1em">Example:</p>
+
+<p style="margin-left:3%; margin-top: 1em"><tt>papersize
+/etc/papersize a4</tt></p>
+
+<p style="margin-top: 1em"></li><li>A local font directory
+has been prepended to the default font path; it defaults to
+/usr/local/share/groff/site-font. Similar to the normal font
+searching process, files must be placed into a dev<i>XXX</i>
+subdirectory, e.g.</p>
+
+
+<p style="margin-left:3%; margin-top: 1em"><tt>/usr/local/share/groff/site-font/devps/FOO</tt></p>
+
+<p style="margin-top: 1em">for a PostScript font definition
+file FOO. </li></p></ul></td></tr></table><hr>
+[ <a href="webpage.html">top</a> ]

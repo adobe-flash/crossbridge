@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Colour</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="graphical.html#top">Next: Graphical objects</a></td>
+</tr>
+</table>
+
+<h1 class="docs">Coloured text</h1>
+
+<div style="text-align: center;">
+<a href="#index-color">List of color macros</a>
+</div>
+
+<div class="rule-medium"><hr/></div>
+
+<h2 class="docs">Introduction</h2>
+
+<p>
+Mom&#8217;s support for coloured text is straightforward.  You begin
+by telling mom about the colours you want with
+<kbd><a href="#newcolor">NEWCOLOR</a></kbd>
+or
+<kbd><a href="#xcolor">XCOLOR</a></kbd>.
+Afterward, any time you want text to be coloured, you either colour
+it with an
+<a href="definitions.html#inlines">inline escape</a>
+that contains the colour name (e.g. <kbd>\*[red]</kbd>
+or <kbd>\*[blue]</kbd>) or invoke the macro,
+<kbd><a href="#color">COLOR</a></kbd>,
+with the name of the colour you want.
+</p>
+
+<p id="color-example">
+For example, say you want to have the name &#8220;Jack&#8221; in the
+sentence &#8220;All work and no play makes Jack a dull boy&#8221;
+appear in yellow.  You'd begin by telling mom about the colour,
+yellow.  There are two ways of doing this; see
+<kbd><a href="#newcolor">NEWCOLOR</a></kbd>
+and
+<kbd><a href="#xcolor">XCOLOR</a></kbd>
+for a full explanation of the difference between the two.
+</p>
+
+<p>
+If you use XCOLOR, you'd enter this:
+<br/>
+<span class="pre-in-pp">
+  .XCOLOR yellow
+</span>
+If you use NEWCOLOR, you might enter:
+<br/>
+<span class="pre-in-pp">
+  .NEWCOLOR yellow RGB #FFFF00
+</span>
+</p>
+
+<p id="color-example2" style="margin-top: -1em;">
+After &#8220;defining&#8221; (or &#8220;initializing&#8221;) the
+colour &#8220;yellow&#8221;, you'd colourize the name, Jack, either
+with an inline escape
+<br/>
+<span class="pre-in-pp">
+  All work and no play makes \*[yellow]Jack\*[black] a dull boy.
+</span>
+or with the
+<kbd><a href="#color">COLOR</a></kbd>
+macro
+<br/>
+<span class="pre-in-pp">
+  All work and no play makes
+  .COLOR yellow
+  Jack
+  .COLOR black
+  a dull boy.
+</span>
+Notice, in both examples, that a) you have to set the colour back
+to black after &#8220;Jack&#8221;, and b) you don&#8217;t have to
+define or intialize the colour, black. Mom predefines it for you.
+</p>
+
+<p>
+For information on using colour during
+<a href="docprocessing.html#intro-macros-docprocessing">document processing</a>,
+see
+<a href="docprocessing.html#color">Colour support in document processing</a>.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Mom&#8217;s colour support is for text only.  She doesn&#8217;t
+support &#8220;fill&#8221; (or &#8220;background&#8221;) colour for
+solid, enclosed graphical objects (polygons, ellipses) drawn with
+groff&#8217;s <kbd>\D</kbd>
+<a href="definitions.html#inlines">inline escapes</a>,
+although you may give a colour as one of the arguments to
+mom&#8217;s &#8220;box&#8221; and &#8220;circle&#8221; macros,
+<a href="graphical.html#dbx">DBX</a>
+and
+<a href="graphical.html#dcl">DCL</a>
+when the first argument to these macros is <kbd>SOLID</kbd>.
+</p>
+</div>
+
+<div class="box-tip">
+<p class="tip">
+<span class="experts">Experts:</span>
+If you&#8217;re accustomed to using groff&#8217;s
+<kbd>.defcolor</kbd> to define colours, and groff&#8217;s inline
+<kbd>\m[&lt;colorname&gt;]</kbd> to call them, you may continue to
+do so without confusing mom.
+</p>
+</div>
+
+<div class="macro-list-container">
+<h3 id="index-color" class="macro-list">Coloured text macros</h3>
+
+<ul class="macro-list">
+  <li><a href="#newcolor">NEWCOLOR</a></li>
+  <li><a href="#xcolor">XCOLOR</a></li>
+  <li><a href="#color">COLOR</a></li>
+  <li><a href="#color-inline">\*[&lt;colorname&gt;]</a> (inline escape)</li>
+</ul>
+</div>
+
+<div class="rule-medium" style="margin-bottom: 1.5em;"><hr/></div>
+
+<!-- -NEWCOLOR- -->
+
+<div class="macro-id-overline">
+<h3 id="newcolor" class="macro-id">Creating (initializing) a colour with NEWCOLOR</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>NEWCOLOR</b> <kbd class="macro-args">&lt;colour name&gt; [&lt;colour scheme&gt;] &lt;colour components&gt;</kbd>
+</div>
+
+<p>
+NEWCOLOR lets you create a colour, rather like an artist mixing
+paint on a palette.  The colour isn&#8217;t used immediately;
+NEWCOLOR merely tells mom how to mix the colour when you need it.
+If you haven&#8217;t invoked <kbd>.NEWCOLOR</kbd> (or
+<kbd><a href="#xcolor">.XCOLOR</a></kbd>),
+mom doesn&#8217;t have a clue what you mean when you reference a
+colour (with
+<a href="#color">COLOR</a>
+or
+<a href="#color-inline"><kbd>\*[&lt;color name&gt;]</kbd></a>).
+</p>
+
+<p>
+The first argument to NEWCOLOR is a name for your colour.  It
+can be anything you like&mdash;provided it&#8217;s just one word
+long&mdash;and can be caps, lower case, or any combination of the
+two.
+</p>
+
+<p>
+The second argument, which is entirely optional, is the
+&#8220;colour scheme&#8221; you want mom to use when mixing the
+colour.  Valid arguments are
+<br/>
+<span class="pre-in-pp">
+  RBG   (3 components: red green blue)
+  CYM   (3 components: cyan yellow magenta)
+  CMYK  (4 components: cyan magenta yellow black)
+  GRAY  (1 component)
+</span>
+If you omit the second argument, mom assumes you
+want RGB.
+</p>
+
+<p>
+The final argument is the components of your colour.  This can be
+hexadecimal string starting with a pound sign (<kbd>#</kbd>) (for
+colour values in the 0-255 range) or two pound signs (<kbd>##</kbd>)
+(for colour values in the 0-65535 range), or it can be a series of
+decimal digits, separated by spaces, one digit per component, with
+the argument enclosed in double quotes.  (If this is all gibberish
+to you, see
+<a href="#color-tip">Tips for newbies</a>.)
+</p>
+
+<p>
+Thus, to tell mom about a colour named &#8220;YELLOW&#8221;, you
+could enter one of the following:
+<br/>
+<span class="pre-in-pp">
+  .NEWCOLOR YELLOW #FFFF00         \"or ##FFFFFFFF0000 or "1 1 0"
+  .NEWCOLOR YELLOW RGB #FFFF00     \"or ##FFFFFFFF0000 or "1 1 0"
+  .NEWCOLOR YELLOW CYM #00FF00     \"or ##0000FFFF0000 or "0 1 0"
+  .NEWCOLOR YELLOW CYMK #00FF0000  \"or ##0000FFFF00000000 or "1 1 0"
+</span>
+After you've told mom about a colour, you can then get her to set
+text in that colour either with the
+<a href="definitions.html#inlines">inline escape</a>,
+<a href="#color-inline"><kbd>\*[&lt;colorname&gt;]</kbd></a>,
+or the macro,
+<a href="#color">COLOR</a>.
+(See the
+<a href="#color-example">example</a>,
+above.)
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span>
+The colorname you give to NEWCOLOR may be used with groff&#8217;s
+<kbd>\m[&lt;colorname&gt;]</kbd> inline escape (the <kbd>\m</kbd>
+escape is used to set text and rule colours).  Thus, assuming
+a colorname &#8220;blueblack&#8221; set with NEWCOLOR,
+<kbd>\*[blueblack]</kbd> and <kbd>\m[blueblack]</kbd> are
+equivalent.  Furthermore, the colorname can be given as an argument
+to <b>groff</b>&#8217;s
+<a href="definitions.html#primitives">primitive</a>
+request, <kbd>.gcolor</kbd> (which does the same thing as
+<kbd>\m[&lt;colorname&gt;]</kbd>).
+</p>
+
+<p class="tip-bottom">
+Equally, the colorname may be used with
+<kbd>\M[&lt;colorname&gt;]</kbd> and <kbd>.fcolor</kbd>, which set
+the &#8220;fill&#8221; colour for solid graphical objects.
+</p>
+</div>
+
+<div class="box-tip">
+<p id="color-tip" class="tip-top">
+<span class="tip">Tips for newbies:</span>
+Colour manipulation can be tremendously confusing if you don&#8217;t
+have a background in graphic arts or computing.  My advice, if color
+intimidates you, is to stick to using mom&#8217;s default RGB colour
+scheme, and to fire up a color chooser that gives you the RGB values
+you want for the colour you select.  Plug those values into the
+components argument to NEWCOLOR, and you&#8217;ll get the colour
+you want.  Both the KDE and gnome desktops have colour selectors
+that provide you with the shorter RGB hexadecimal string.  If
+you&#8217;re not running KDE or gnome, the X utility, xcolorsel,
+provides you with a similar functionality, although it only provides
+RGB values for 256 pre-defined colours.  If you use xcolorsel, be
+sure to click the button &#8220;Display format&#8221; and select
+&#8220;8 bit truncated rgb&#8221;.
+</p>
+
+<p class="tip-bottom">
+Alternatively, you can use mom&#8217;s simpler
+<kbd><a href="#xcolor">XCOLOR</a></kbd>
+macro to initialize one of the 256 pre-defined X colours by
+supplying the name of the color as an argument.
+</p>
+</div>
+
+<!-- -XCOLOR- -->
+
+<div class="macro-id-overline">
+<h3 id="xcolor" class="macro-id">Initializing a colour with XCOLOR</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>XCOLOR</b> <kbd class="macro-args">&lt;X colorname&gt; [&lt;alias&gt;]</kbd>
+</div>
+
+<p class="requires">
+<kbd style="font-style: normal">&lt;X colorname&gt;</kbd> <i>must be all one word, all lower case.</i>
+<br/>
+(See
+<a href="#xcolor-names" style="font-style: normal;">Finding X color names</a>
+for how to get a list of valid colour names.)
+</p>
+
+<p>
+XCOLOR is similar to NEWCOLOR in that it tells mom to initialize a
+colour, but it&#8217;s easier to use.  All you have to do is pass
+it, as an argument, the valid name of one of the 256 pre-defined
+X colours.  The name must be all one word, and, breaking with mom
+policy, it must be entered in lower case.
+</p>
+
+<p>
+For example, if you want to intialize the X colour, coral, all you
+have to do is enter
+<br/>
+<span class="pre-in-pp">
+  .XCOLOR coral
+</span>
+Afterwards
+<br/>
+<span class="pre-in-pp">
+  .COLOR coral
+</span>
+
+will colourize subsequent text coral until you instruct mom to
+return to black, or some other pre-defined, initialized colour.
+(The
+<a href="definitions.html#inlines">inline escape</a>
+<kbd>\*[coral]</kbd> will equally colourize text coral after you've
+initialized the colour with XCOLOR.)
+</p>
+
+<p>
+The downside of XCOLOR is that you can&#8217;t create custom
+colours.  This restriction, however, is mitigated by the fact that
+for many users, 256 colours is more than enough to play around with.
+</p>
+
+<p>
+While some X colours have fanciful names (peachpuff, papayawhip,
+thistle, snow), many are self-explanatory and self-descriptive
+in ordinary colour terms. &#8220;blue&#8221; is pure (rgb)
+blue, &#8220;green&#8221; is pure (rgb) green, and so on.
+Furthermore, for many X colors, there exist four variants, each
+representing increasingly darker shades of the same colour.
+For example, &#8220;blue1&#8221; is a relatively bright blue;
+&#8220;blue2&#8221;, &#8220;blue3&#8221; and &#8220;blue4&#8221; are
+increasingly darker shades.  For that reason, you may find XCOLOR is
+a better choice than NEWCOLOR when it comes to initializing common
+colors.
+</p>
+
+<p>
+The whimsical nature of X colour names sometimes makes for names
+that are long to type in, e.g. &#8220;mediumspringgreen&#8221;.  The
+optional second argument to XCOLOR allows you to come up with more
+convenient name by which to reference the colour.  For example, you
+could enter
+<br/>
+<span class="pre-in-pp">
+  .XCOLOR mediumspringgreen mygreen
+</span>
+or
+<span class="pre-in-pp">
+  .XCOLOR mediumspringgreen MYGREEN
+</span>
+so that whenever you want text mediumspringgreen-ed, you
+can use either <kbd>.COLOR mygreen</kbd> (or
+<kbd>.COLOR MYGREEN</kbd>) or the inline escape
+<kbd>\*[mygreen]</kbd> (or <kbd>\*[MYGREEN]</kbd>.)
+</p>
+
+<h3 id="xcolor-names" class="docs">Finding X color names</h3>
+
+<p>
+There are two ways of finding the names of the pre-defined X
+colours.  One is to consult the file, rgb.txt, included with all
+X11 installations.  The location of the file on a Debian GNU/Linux
+distribution is typically /etc/X11/rgb.txt.  Other distributions and
+other X installations may have the file in another location.  The
+file lists the colour names, but doesn&#8217;t show you what the
+colours actually look like.
+</p>
+
+<p>
+A better way to get the colour names, as well as to see what the
+colours look like, is to fire up a colour chooser (like xcolorsel)
+that both lists the colour names and shows a swatch of the colour
+as well.
+</p>
+
+<p>
+Whichever method you use to find X color names, remember that the
+names, passed as arguments to XCOLOR, must be all one word, all in
+lower case.
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span>
+Both the colorname and the alias you give to XCOLOR may be
+used with groff&#8217;s <kbd>\m[&lt;colorname&gt;]</kbd>
+inline escape (the <kbd>\m</kbd> escape is used to set
+text and rule colours).  Thus, assuming an X-colorname
+&#8220;mediumspringgreen&#8221; set with XCOLOR, and an alias,
+&#8220;mygreen&#8221;, <kbd>\*[mediumspringgreen]</kbd>,
+<kbd>\m[mediumspringgreen]</kbd>, <kbd>\*[mygreen]</kbd> and
+<kbd>\m[mygreen]</kbd> are all equivalent.  Furthermore, both the
+colorname and the alias can be given as an argument to groff&#8217;s
+<a href="definitions.html#primitives">primitive</a>
+request, <kbd>.gcolor</kbd> (which does the same thing as
+<kbd>\m[&lt;colorname&gt;]</kbd>).
+</p>
+
+<p class="tip-bottom">
+The colorname initialized with XCOLOR <i>but not the
+alias</i> may also be used with groff&#8217;s inline escape,
+<kbd>\M[&lt;colorname&gt;]</kbd>, and the corresponding primitive,
+<kbd>.fcolor</kbd>, both of which set the &#8220;fill&#8221; colour
+for solid graphical objects.  If you need a colour initialized with
+XCOLOR for <kbd>\M</kbd> or <kbd>.fcolor</kbd>, you MUST give the
+full colorname; the alias won&#8217;t work.
+</p>
+</div>
+
+<!-- -COLOR- -->
+
+<div class="macro-id-overline">
+<h3 id="color" class="macro-id">Invoking a color</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>COLOR</b> <kbd class="macro-args">&lt;colorname&gt;</kbd>
+</div>
+
+<p id="color-inline" class="requires" style="font-style: normal;">
+Inline: <kbd>\*[&lt;colorname&gt;]</kbd>
+</p>
+
+<p>
+Once you've told mom about a colour (via
+<a href="#newcolor">NEWCOLOR</a>
+or
+<a href="#xcolor">XCOLOR</a>,
+you use either the macro, COLOR, or the
+<a href="definitions.html#inlines">inline escape</a>,
+<kbd>\*[&lt;colorname&gt;]</kbd>, to cause mom to
+set subsequent text in that colour.  See the
+<a href="#color-example2">example</a>,
+above, which shows both in action.
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span>
+You can use the <kbd>\*[&lt;colorname&gt;]</kbd> inline escape in
+any
+<a href="docprocessing.html#top">document processing</a>
+macro that takes a
+<a href="definitions.html#stringargument">string argument</a>.
+However, you must remember to reset the colour at the end of the
+argument (typically with <kbd>\*[black]</kbd>) unless you want all
+subsequent invocations of that particular macro to be colourized.
+</p>
+
+<p>
+Furthermore, if you use <kbd>\*[&lt;colorname&gt;]</kbd> in the
+string argument passed to
+<a href="docelement.html#head">HEAD</a>,
+<a href="docelement.html#subhead">SUBHEAD</a>
+or
+<a href="docelement.html#parahead">PARAHEAD</a>,
+and you've requested that any of these types of heads be numbered,
+the numbers themselves will not be coloured, only the text you
+passed the macro.  If you wish the numbers to be colourized as well,
+you must explicitly tell mom that you wish all of the head(s),
+subhead(s) or parahead(s), including the numbers, colourized by
+invoking the appropriate
+<a href="docelement.html#docelement-control">control macro</a>.
+</p>
+
+<p class="tip-bottom">
+For colorizing underscored text, see
+<a href="goodies.html#underscore-color">Colorizing underscored text</a>
+in the notes at the end of
+<a href="goodies.html#underscore">UNDERSCORE</a>.
+</p>
+</div>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 33%; text-align: right;"><a href="graphical.html#top">Next: Graphical objects</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

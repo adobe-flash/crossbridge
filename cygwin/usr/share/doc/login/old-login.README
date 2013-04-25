@@ -1,0 +1,86 @@
+This is the latest port of `login(1)' to work under Cygwin since
+version 1.3.6 with eg. telnetd(8).
+
+======================================================================
+Under NT/2K/XP, login(1) is _not_ supposed to work on the command line
+to change user context!  Though you're able to tweak user permissions
+to get login(1) working that way, that's NOT officially supported.
+======================================================================
+
+This version now supports login w/o password, supported beginning with
+Cygwin version 1.3.6.  Note that this is explicitly allowed only in 
+limited cases:
+  (1) NT/2k/XP: SYSTEM user, or a specially privileged user (see below)
+  (2) Windows Server 2003, 2008, and Vista: a specially privileged user
+
+The user account that login is invoked by must have the following 
+privileges:
+        SeAssignPrimaryTokenPrivilege
+        SeCreateTokenPrivilege
+        SeTcbPrivilege
+        SeIncreaseQuotaPrivilege
+On NT/2k/XP, the SYSTEM user (aka LocalSystem) has these privileges.
+However, on newer versions of Windows, it does not, and a special 
+user account must be created. Most of the <server>-config scripts 
+can create this account for you (such as ssh-host-config from the 
+openssh package, or iu-config from the inetutils package, etc).
+
+The user account should also be a member of the local Administrators
+group (unless you are on NT/2k/XP, and are using SYSTEM).
+
+This change now allows interactive login with rlogin(1) and rsh(1) using
+rhosts authentication.
+
+Login(1) uses all new logon features of 1.1.3. Moreover it's code is
+slighty cleaned up to avoid compiler warnings.
+
+On Win9X systems the password authentication is done via 56 bit DES
+encrypted passwords in /etc/passwd.  To generate those passwords you
+can use `crypt.exe' from the crypt package on the same site or you
+copy your encrypted password from your Linux box.
+
+The rest of the description is for NT/W2K/XP/Vista/...
+
+For usage with NT/W2K security, `login' is patched to allow login of
+domain users.  Setting CYGWIN=ntsec is mandatory for that feature.
+
+/etc/passwd and /etc/group have to be created so that they contain the
+SIDs of the users and groups. The new mkpasswd and mkgroup tools since
+cygwin V1.1.0 create the files that way by default.
+
+Change /etc/passwd either so:
+
+    Change the pw_name field so that it contains the nt-domain
+    and the nt-username separated by a backslash:
+
+    domain\user::1104:513:John Doe,S-1-5-21-...
+
+    Disadvantage: You can't see the username in calls to `ls -l'
+    anymore because ls shortens the name to 8 characters. Moreover
+    you will have to use this long form (domain\user) on the command
+    line, eg. in calls to chown(1).
+
+or so:
+
+    The pw_gecos field may contain an additional field, that
+    beginns with (upper case!) "U-", followed by the domain
+    and the username separated by a backslash. 
+    CAUTION: The SID _must_ remain the _last_ field in pw_gecos!!!
+    BTW: The field separator in pw_gecos is the comma.
+    The username in pw_name itself may be any nice name:
+
+    domuser::1104:513:John Doe,U-domain\user,S-1-5-21-...
+
+    Now you may use `domuser' as your login name with telnet!!!
+    This is possible additionally for local users, if you don't like
+    your NT login name ;-) You only have to leave out the domain:
+
+    locuser::1104:513:John Doe,U-user,S-1-5-21-...
+
+    Disadvantage: No other field in pw_gecos may begin with "U-".
+
+Please send requests, error reports etc. to the mailing list
+cygwin@cygwin.com
+
+Have fun,
+Corinna

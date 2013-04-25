@@ -1,0 +1,46 @@
+Binutils README
+Collated by Chris Faylor
+
+New in this release:
+
+== Specifically for Cygwin ==
+
+* --enable-auto-image-base default address has been raised to accommodate
+larger cygwin1.dll.
+
+* --enable-auto-image-base now takes an optional address to specify lowest
+rebase address allowed.
+
+== For binutils ==
+
+Changes in 2.22:
+
+* Add support for displaying the contents of .debug.macro sections.
+
+* Add --preprocessor-arg option to windres to specify additional options
+  passed to preprocessor.
+
+* Add --dwarf-start and --dwarf-end to readelf and objdump.  These are used by
+  the new Emacs mode, see dwarf-mode.el.
+
+== For gas ==
+
+Changes in 2.22:
+
+* Add support for the Tilera TILEPRO and TILE-Gx architectures.
+
+== For ld ==
+
+Changes in 2.22:
+
+* --copy-dt-needed-entries is no longer enabled by default.  Instead
+  --no-copy-dt-needed-entries is the default.
+
+* INPUT_SECTION_FLAGS has been added to the linker script language
+to allow selection of input sections by section header section flags.
+
+* Add support for the Tilera TILEPRO and TILE-Gx architectures.
+
+* Added SORT_BY_INIT_PRIORITY to the linker script language to permit
+sorting sections by numerical value of the GCC init_priority attribute
+encoded in the section name.

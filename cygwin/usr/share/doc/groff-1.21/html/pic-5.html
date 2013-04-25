@@ -1,0 +1,101 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-5.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-4.html">prev</a> | <a href="pic-6.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>5. Generalized Lines and Splines
+<a name="5. Generalized Lines and Splines"></a>
+</h2>
+
+
+<h3>5.1. Diagonal Lines
+<a name="5.1. Diagonal Lines"></a>
+</h3>
+
+
+<p style="margin-top: 1em">It is possible to specify
+diagonal lines or arrows by adding multiple <b>up</b>,
+<b>down</b>, <b>left</b>, and <b>right</b> modifiers to the
+line object. Any of these can have a multiplier. To
+understand the effects, think of the drawing area as being
+gridded with standard-sized boxes.</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic14.png" alt="Image img/pic14.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 5-1:
+Diagonal arrows (dotted boxes show the implied 0.5-inch
+grid)</p>
+
+<h3>5.2. Multi-Segment Line Objects
+<a name="5.2. Multi-Segment Line Objects"></a>
+</h3>
+
+
+<p style="margin-top: 1em">A &ldquo;line&rdquo; or
+&ldquo;arrow&rdquo; object may actually be a path consisting
+of any number of segments of varying lengths and directions.
+To describe a path, connect several line or arrow commands
+with the keyword <b>then</b>.</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic15.png" alt="Image img/pic15.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 5-2:
+<b>line right 1 then down .5 left 1 then right 1</b></p>
+
+<p style="margin-top: 1em">If a path starts with
+<b>then</b>, the first segment is assumed to be into the
+current direction, using the default length.</p>
+
+<h3>5.3. Spline Objects
+<a name="5.3. Spline Objects"></a>
+</h3>
+
+
+<p style="margin-top: 1em">If you start a path with the
+<b>spline</b> keyword, the path vertices are treated as
+control points for a spline curve fit.</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic16.png" alt="Image img/pic16.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 5-3:
+<b>spline right 1 then down .5 left 1 then right 1</b></p>
+
+<p style="margin-top: 1em">You can describe many
+natural-looking but irregular curves this way. For
+example:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic17.png" alt="Image img/pic17.png"></p>
+
+<p align="center">Figure 5-4: Two more spline examples</p>
+
+<p style="margin-top: 1em">Note the arrow decorations.
+Arrowheads can be applied naturally to any path-based
+object, line or spline. We&rsquo;ll see how in the next
+section.</p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-4.html">prev</a> | <a href="pic-6.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

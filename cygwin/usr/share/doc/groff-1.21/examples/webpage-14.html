@@ -1,0 +1,739 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:42 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>webpage-14.html</title>
+
+ <link rel="stylesheet" type="text/css" href="groff.css" >
+</head>
+[ <a href="webpage.html">top</a> ]
+
+
+<h2>NEWS VERSION 1.18
+<a name="heading14"></a>
+</h2>
+ <hr><table><tr><td valign="top" width="30%" bgcolor="#eeeeee">
+<a href="webpage-1.html#heading1">License</a><br>
+<a href="webpage-2.html#heading2">README</a><br>
+<a href="webpage-3.html#heading3">CVS and FTP access</a><br>
+<a href="webpage-4.html#heading4">Groff dependencies</a><br>
+<a href="webpage-5.html#heading5">Bug reports</a><br>
+<a href="webpage-6.html#heading6">Mailing lists</a><br>
+<a href="webpage-7.html#heading7">NEWS VERSION 1.21</a><br>
+<a href="webpage-8.html#heading8">NEWS VERSION 1.20.1</a><br>
+<a href="webpage-9.html#heading9">NEWS VERSION 1.20</a><br>
+<a href="webpage-10.html#heading10">NEWS VERSION 1.19.2</a><br>
+<a href="webpage-11.html#heading11">NEWS VERSION 1.19.1</a><br>
+<a href="webpage-12.html#heading12">NEWS VERSION 1.19</a><br>
+<a href="webpage-13.html#heading13">NEWS VERSION 1.18.1</a><br>
+<a href="webpage-14.html#heading14">NEWS VERSION 1.18</a><br>
+
+</td><td valign="top" width="70%">
+
+<p>This section describes recent user-visible changes in
+groff. Bug fixes are not described. There are more details
+in the man pages.</p>
+
+
+<p align="center" style="margin-top: 1em"><big><big><big><font color="#FF0000">Please
+read the changes below regarding
+<a href="#grotty">grotty</a>, groff&rsquo;s tty
+frontend.</font></big></big></big></p>
+
+<p><font color="#000000">Troff</font></p><ul>
+
+<p><font color="#000000"><li>Color support has been added
+to troff and pic (and to the device drivers grops, grodvi,
+grotty, and grohtml &ndash; other preprocessors and drivers
+will follow). A new function &lsquo;defcolor&rsquo; defines
+colors; the escape sequence &lsquo;\m&rsquo; sets the
+drawing color, the escape sequence &lsquo;\M&rsquo;
+specifies the background color for closed objects created
+with \D&rsquo;...&rsquo; commands. &lsquo;\m[]&rsquo; and
+&lsquo;\M[]&rsquo; switch back to the previous color.
+&lsquo;\m&rsquo; and &lsquo;\M&rsquo; correspond to the new
+troff output command sets starting with &lsquo;m&rsquo; and
+&lsquo;DF&rsquo;. The device-specific default color is
+called &lsquo;default&rsquo; and can&rsquo;t be
+redefined.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Use the
+&lsquo;color&rsquo; request to toggle the usage of colors
+(default is on); the read-only register &lsquo;.color&rsquo;
+is&nbsp;0 if colors are not active, and non-zero
+otherwise.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The old
+&lsquo;Df&rsquo; output command is mapped onto
+&lsquo;DFg&rsquo;; all color output commands don&rsquo;t
+change the current font position (consequently,
+&lsquo;Df&rsquo; doesn&rsquo;t either).</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000">Outputting
+color can be disabled in troff and groff with the
+option&nbsp;&minus;c (it is always disabled in compatibility
+mode). See the section on grotty for the
+<a href="#GROFF_NO_SGR">GROFF_NO_SGR</a> environment
+variable also.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">For
+defining color components as fractions between 0 and&nbsp;1,
+a new scaling indicator &lsquo;f&rsquo; has been defined:
+1f&nbsp;=&nbsp;65536u. For testing whether a color is
+defined (with .if and .ie), a new conditional operator
+&lsquo;m&rsquo; is available.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">More
+details can be found in the groff_diff.7 manual page and in
+groff.texinfo.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Similar
+to \m and \M, \f[] switches back to the previous font. \fP
+(and \f[P]) is still valid for backwards
+compatibility.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+new escape \F is the same as &lsquo;.fam&rsquo;; \F[]
+switches back to previous family &ndash; \F[P] selects
+family &lsquo;P&rsquo;.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Two
+new glyph symbols are available: &lsquo;eu&rsquo; is the
+official Euro symbol; &lsquo;Eu&rsquo; is a font-specific
+glyph variant.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+new glyph symbols &lsquo;t+&minus;&rsquo;,
+&lsquo;tdi&rsquo;, and &lsquo;tmu&rsquo; are textual
+variants of &lsquo;+&minus;&rsquo;, &lsquo;di&rsquo;, and
+&lsquo;mu&rsquo;, respectively.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Latin-1
+character 181 (PS name &lsquo;mu&rsquo;, Unicode name U+00B5
+MICRO SIGN) has got the troff glyph name
+&lsquo;mc&rsquo;.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>&minus;Tutf8
+is now available on EBCDIC hosts.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Strings
+can take arguments, using this syntax:
+\*[foo&nbsp;arg1&nbsp;arg2&nbsp;...]. Example:</font></p>
+
+<pre style="margin-left:3%; margin-top: 1em">.ds xxx This is a \\$1 test.
+\*[xxx nice]</pre>
+
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>It
+is now possible to have whitespace between the first and
+second dot (or the name of the ending macro) to end a macro
+definition. Example:</font></p>
+
+<pre style="margin-left:3%; margin-top: 1em">.de !
+..
+.
+.de foo
+.  nop Hello, I&rsquo;m &lsquo;foo&rsquo;.
+.  nop I will now define &lsquo;bar&rsquo;.
+.  de bar !
+.    nop Hello, I&rsquo;m &lsquo;bar&rsquo;.
+.  !
+..</pre>
+
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>&lsquo;.fn&rsquo;
+is a new string-valued register which returns the (internal)
+real font name; styles and families are properly
+concatenated.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Three
+new read/write registers &lsquo;seconds&rsquo;,
+&lsquo;minutes&rsquo;, and &lsquo;hours&rsquo; contain the
+current time, set at start-up of troff. Use the
+&lsquo;af&rsquo; request to control their output
+format.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+new request &lsquo;fchar&rsquo; can be used to provide
+fallback characters. It has the same syntax as the
+&lsquo;char&rsquo; request; the only difference is that a
+character defined with &lsquo;.char&rsquo; hides the glyph
+with the same name in the current font, whereas a character
+defined with &lsquo;.fchar&rsquo; is checked only if the
+particular glyph isn&rsquo;t found in the current font. This
+test happens before checking special fonts.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>In
+analogy to the &lsquo;tmc&rsquo; request,
+&lsquo;.writec&rsquo; is the same as &lsquo;.write&rsquo;
+but doesn&rsquo;t emit a final newline.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+new request &lsquo;itc&rsquo; is a variant of
+&lsquo;.it&rsquo; for which a line interrupted with \c
+counts as one input line.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Two
+new requests &lsquo;ds1&rsquo; and &lsquo;as1&rsquo; which
+are similar to &lsquo;ds&rsquo; and &lsquo;as&rsquo; but
+with compatibility mode disabled during expansion of strings
+defined by them.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+syntax of the &lsquo;substring&rsquo; request has been
+changed: The first character in a string now has
+index&nbsp;0, the last character has index&nbsp;&minus;1.
+Note that this is an incompatible change.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>To
+emit strings directly to the intermediate output, a new
+&lsquo;output&rsquo; request has been added; it is similar
+to &lsquo;\!&rsquo; used at the top level.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>&lsquo;.hpf&rsquo;
+has been extended. It can now handle most TeX hyphenation
+pattern files without modification. To do that, the commands
+\patterns, \hyphenation, and \endinput are recognized.
+Please refer to groff_diff.7 for more
+information.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>&lsquo;hpfcode&rsquo;
+is a new request to provide an input encoding mapping for
+the &lsquo;hpf&rsquo; request.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+new request &lsquo;hpfa&rsquo; appends hyphenation patterns
+(&lsquo;hpf&rsquo; replaces already existing
+patterns).</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>A
+new request &lsquo;ami&rsquo; (append macro indirect) has
+been added. The first and second parameter of
+&lsquo;ami&rsquo; are taken from string registers rather
+than directly; this very special request is needed to make
+&lsquo;trace.tmac&rsquo; independent from the escape
+character (which might even be disabled).</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+new request &lsquo;sizes&rsquo; is similar to the
+&lsquo;sizes&rsquo; command in DESC files. It expects the
+same syntax; the data must be on a single line, and the
+final &lsquo;0&rsquo; can be omitted.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>&lsquo;trin&rsquo;
+(translate input) is a new request which is similar to
+&lsquo;tr&rsquo; with the exception that the
+&lsquo;asciify&rsquo; request uses the character code (if
+any) before the character translation. Example:</font></p>
+
+<pre style="margin-left:3%; margin-top: 1em">.trin ax
+.di xxx
+a
+.br
+.di
+.xxx
+.trin aa
+.asciify xxx
+.xxx</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">The result
+is &lsquo;x&nbsp;a&rsquo;. Using &lsquo;tr&rsquo;, the
+result would be &lsquo;x&nbsp;x&rsquo;.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+request &lsquo;pvs&rsquo; isn&rsquo;t new, but hasn&rsquo;t
+been documented before. It adds vertical space after a line
+has been output. This makes it an alternative to the
+&lsquo;ls&rsquo; request to produce double-spaced documents.
+The read-only register &lsquo;.pvs&rsquo; holds the current
+amount of the post-vertical line space.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>For
+compatibility with plan 9&rsquo;s troff, multiple
+&lsquo;pi&rsquo; requests are supported:</font></p>
+
+<pre style="margin-left:3%; margin-top: 1em">.pi foo
+.pi bar</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">is now
+equivalent to</font></p>
+
+
+<p style="margin-left:3%; margin-top: 1em"><font color="#000000"><tt>.pi
+foo | bar</tt></font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>A
+new escape sequence &lsquo;\O&rsquo; is available to disable
+and enable glyph output. Please see groff_diff.man and
+groff.texinfo for more details.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+escapes &lsquo;\%&rsquo;, &lsquo;\&amp;&rsquo;,
+&lsquo;\)&rsquo;, and &lsquo;\:&rsquo; no longer cause an
+error in \X; they are ignored now. Additionally
+&lsquo;\&nbsp;&rsquo; and &lsquo;\~&rsquo; are converted to
+single space characters.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+default tab distance in nroff mode is now 0.8i to be
+compatible with UNIX troff.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Using
+the latin-1 input character 0xAD (soft hyphen) for the
+&lsquo;shc&rsquo; request was a bad idea. Instead, it is now
+translated to &lsquo;\%&rsquo;, and the default hyphenation
+character is again \[hy]. Note that the glyph \[shc] is not
+useful for typographic purposes; it only exists to have
+glyph names for all latin-1 characters. </li></font></p></ul>
+
+<p><font color="#000000">Macro Packages</font></p><ul>
+
+
+<p><font color="#000000"><li><a href="mailto:df191@ncf.ca">Peter Schaffter</a>
+has contributed a new major macro package called
+&lsquo;mom&rsquo;, mainly for non-scientific writers, which
+takes care of many typographic issues. It comes with a
+complete reference (in HTML format) and some examples.
+&lsquo;mom&rsquo; has been designed to format documents for
+PostScript output only.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Two
+macros &lsquo;AT&rsquo; (AT&amp;T) and &lsquo;UC&rsquo;
+(Univ. of California) have been added to the man macros for
+compatibility with older BSD releases.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Both
+the man and mdoc macro packages now use the LL and LT
+registers for setting the line and title length,
+respectively (similar to those registers in the ms macro
+package). If not set on the command line or in a macro file
+loaded before the macro package itself, they default to 78n
+in nroff mode and 6.5i in troff mode.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+&lsquo;&minus;xwidth&rsquo; specifier in the mdoc macro
+package has been removed. Its functionality is now
+integrated directly into &lsquo;&minus;width&rsquo;.
+Similarly, &lsquo;&minus;column&rsquo; has been extended to
+has this functionality also.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>A
+new macro &lsquo;Ex&rsquo; has been added to the mdoc macro
+package to document an exit status.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>&lsquo;troff.man&rsquo;
+has been split. Differences to UNIX troff are now documented
+in the new man page &lsquo;groff_diff.man&rsquo;.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+PSPIC macro has been extended to work with DVI output
+(&lsquo;pspic.tmac&rsquo; is now automatically loaded for
+&minus;Tdvi), using a dvips special to load the EPS
+file.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+trace.tmac package now traces calls to &lsquo;am&rsquo;
+also. Additionally, it works in compatibility
+mode.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>&lsquo;troff.1&rsquo;
+has been split. Differences to UNIX troff are now documented
+in the new man page &lsquo;groff_diff.7&rsquo;.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>&lsquo;groff_mwww.7&rsquo;
+has been renamed to &lsquo;groff_www.7&rsquo;. The file
+mwww.tmac has been removed.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>&lsquo;groff_ms.7&rsquo;
+has been completely rewritten. It now contains a complete
+reference to the ms macros.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>&lsquo;groff_trace.7&rsquo;
+documents the trace macro package.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Changes
+in www.tmac</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Note that
+HTML support is still in alpha change, so it is rather
+likely that both macro names and macro syntax will change.
+Some of the macros mentioned below aren&rsquo;t really new
+but haven&rsquo;t been documented properly
+before.</font></p> <ul>
+
+<p><font color="#000000"><li>The following macros have been
+renamed:</font></p>
+
+
+<p style="margin-left:3%; margin-top: 1em"><font color="#000000">MAILTO
+-&gt; MTO <br>
+IMAGE -&gt; IMG <br>
+LINE -&gt; HR</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>For
+consistency, the macros &lsquo;URL&rsquo;,
+&lsquo;FTL&rsquo;, and &lsquo;MTO&rsquo; now all have the
+address as the first parameter followed by the
+description.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>By
+default, grohtml generates links to all section headings at
+the top of the document. Use the new &lsquo;LK&rsquo; macro
+to specify a different place.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>For
+specifying the background color and a background image, use
+the new macros &lsquo;BCL&rsquo; and &lsquo;BGIMG&rsquo;,
+respectively.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+macro &lsquo;NHR&rsquo; has been added; it suppresses the
+generation of top and bottom rules which grohtml emits by
+default.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+new macro &lsquo;HX&rsquo; determines the cut-off point for
+automatic link generation to headings.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+image position parameter names in &lsquo;IMG&rsquo; have
+been changed to &lsquo;&minus;L&rsquo;,
+&lsquo;&minus;R&rsquo;, and
+&lsquo;&minus;C&rsquo;.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>New
+macro &lsquo;PIMG&rsquo; for inclusion of a PNG image (it
+automatically converts it into an EPS file if not
+&minus;Thtml is used).</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>New
+macro &lsquo;MPIMG&rsquo; for putting a PNG image into the
+left or right margin (it automatically converts it into an
+EPS file if not &minus;Thtml is used).</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>New
+macros &lsquo;HnS&rsquo;, &lsquo;HnE&rsquo; to start and end
+a header line block.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>New
+macro &lsquo;DC&rsquo; to produce dropcap
+characters.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>New
+macro &lsquo;HTL&rsquo; to generate an HTML title line only
+but no H1 heading.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>New
+macros &lsquo;ULS&rsquo; and &lsquo;ULE&rsquo; to start and
+end an unordered list. The new macro &lsquo;LI&rsquo;
+inserts a list item. </li></font></p></ul>
+
+<p><font color="#000000"></li></font></p></ul>
+
+<p><font color="#000000">groff</font></p><ul>
+
+<p><font color="#000000"><li>The new command line
+&lsquo;&minus;c&rsquo; disables color output (which is
+always disabled in compatibility mode). </li></font></p></ul>
+
+<p><font color="#000000">Nroff</font></p><ul>
+
+<p><font color="#000000"><li>Two new command line options
+&lsquo;&minus;c&rsquo; and &lsquo;&minus;C&rsquo;; the
+former passes &lsquo;&minus;c&rsquo; to grotty (switching to
+the old output scheme); the latter passes
+&lsquo;&minus;C&rsquo; to groff (enabling compatibility
+mode). </li></font></p></ul>
+
+<p><font color="#000000">pic</font></p><ul>
+
+<p><font color="#000000"><li>New keywords
+&lsquo;color&rsquo; (or &lsquo;colour&rsquo;,
+&lsquo;colored&rsquo;, &lsquo;coloured&rsquo;),
+&lsquo;outline&rsquo; (or &lsquo;outlined&rsquo;), and
+&lsquo;shaded&rsquo; are available. &lsquo;outline&rsquo;
+sets the color of the outline, &lsquo;shaded&rsquo; the fill
+color, and &lsquo;color&rsquo; sets both.
+Example:</font></p>
+
+
+<p style="margin-left:3%; margin-top: 1em"><font color="#000000"><tt>circle
+shaded &quot;green&quot; outline &quot;black&quot;
+;</tt></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Filled
+arrows always use the outline color for filling.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Color
+support for TeX output is not implemented yet.
+</li></font></p> </ul>
+
+<p><font color="#000000">Pic2graph</font></p><ul>
+
+<p><font color="#000000"><li>A new script contributed by
+<a href="mailto:esr@thyrsus.com">Eric S. Raymond</a>. It
+converts a PIC diagram into a cropped image. Since it uses
+gs and the PNM library, virtually all graphics formats are
+available for output. </li></font></p></ul>
+
+<p><font color="#000000">Eqn2graph</font></p><ul>
+
+<p><font color="#000000"><li>A new script contributed by
+<a href="mailto:esr@thyrsus.com">Eric S. Raymond</a>. It
+converts an EQN diagram into a cropped image. Since it uses
+gs and the PNM library, virtually all graphics formats are
+available for output. </li></font></p></ul>
+
+<p><font color="#000000">Groffer</font></p><ul>
+
+<p><font color="#000000"><li>A new script contributed by
+<a href="mailto:bwarken@mayn.de">Bernd Warken</a>. It
+displays groff files and man pages on X and tty, taking care
+of most parameters automatically. </li></font></p></ul>
+
+<p><font color="#000000">Grog</font></p><ul>
+
+<p><font color="#000000"><li>Documents using the mom macro
+package are recognized. </li></font></p></ul>
+
+<p><font color="#000000">grops</font></p><ul>
+
+<p><font color="#000000"><li>Color support has been
+added.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>A
+new option &lsquo;&minus;p&rsquo; is available to select the
+output paper size. It has the same syntax as the new
+&lsquo;papersize&rsquo; keyword in the DESC file.
+</li></font></p> </ul>
+
+<p><font color="#000000">Grodvi</font></p><ul>
+
+<p><font color="#000000"><li>By default, font sizes are now
+available in the range 5&minus;10000pt, similar to PS fonts.
+If you want the old behaviour (i.e., font sizes at discrete
+values only), insert the following at the start of your
+document:</font></p>
+
+<pre style="margin-left:3%; margin-top: 1em">.if &rsquo;\*[.T]&rsquo;dvi&rsquo; \
+.  sizes 500 600 700 800 900 1000 1095 1200 1400 1440 1600 \
+         1728 1800 2000 2074 2200 2400 2488 2800 3600</pre>
+
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>A
+new font file HBI (using cmssbxo10; this is slanted sans
+serif bold extended) has been added.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Two
+font families are now available: &lsquo;T&rsquo; and
+&lsquo;H&rsquo;.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>EC
+and TC fonts have been integrated. Use
+&lsquo;&minus;mec&rsquo; (calling the file ec.tmac) to
+switch to them. Those fonts give a much better coverage of
+the symbols defined by groff than the CM fonts.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Note that
+ec.tmac must be called before any language-specific files;
+it doesn&rsquo;t take care of hcode values.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>Color
+support has been added. For drawing commands, colors are
+translated to gray values currently. </li></font></p></ul>
+
+<p><font color="#000000"><a name="grotty"></a>
+Grotty</font></p> <ul>
+
+<p><font color="#000000"><li>Color support has been added,
+using the SGR (ISO&nbsp;6429, sometimes called ANSI color)
+escape sequences.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>SGR
+escape sequences are now used by default for underlining and
+bold printing also, no longer using the backspace character
+trick. To revert to the old behaviour, use the
+&lsquo;&minus;c&rsquo; switch.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Note that
+you have to use the &lsquo;&minus;R&rsquo; option of
+&lsquo;less&rsquo; to make SGR escapes display correctly. On
+the other hand, terminal programs and consoles like
+&lsquo;xterm&rsquo; which support SGR sequences natively can
+directly display the output of grotty. Consequently, the
+options &lsquo;&minus;b&rsquo;, &lsquo;&minus;B&rsquo;,
+&lsquo;&minus;u&rsquo;, and &lsquo;&minus;U&rsquo; work only
+in combination with &lsquo;&minus;c&rsquo; and are ignored
+silently otherwise.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">For the
+&lsquo;man&rsquo; program, it may be necessary to add the
+&lsquo;&minus;R&rsquo; option of &lsquo;less&rsquo; to the
+$PAGER environment variable (or $MANPAGER, depending on the
+used version of &lsquo;man&rsquo;); alternatively, you can
+use &lsquo;man&rsquo;s &lsquo;&minus;P&rsquo; option (or
+adapt its configuration file accordingly). See man(1) for
+more details.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"><a name="GROFF_NO_SGR"></a>
+</li><li>If the environment variable GROFF_NO_SGR is set,
+SGR output is disabled, reverting to the old
+behaviour.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>A
+new special \X&rsquo;tty:&nbsp;sgr&nbsp;n&rsquo; has been
+added; if n is non-zero or missing, enable SGR output (the
+default).</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>If
+the new option &lsquo;&minus;i&rsquo; is used (only in SGR
+mode), grotty sends escape sequences to set the italic font
+attribute instead of the underline attribute for italic
+fonts. Note that many terminals don&rsquo;t have support for
+this (including xterm). </li></font></p></ul>
+
+<p><font color="#000000">grohtml</font></p><ul>
+
+<p><font color="#000000"><li>Color support for glyphs has
+been added.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>New
+option &lsquo;&minus;h&rsquo; to select the style of
+headings in HTML output.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>New
+option &lsquo;&minus;b&rsquo; to set the background colour
+to white.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>New
+options &lsquo;&minus;a&rsquo; and &lsquo;&minus;g&rsquo; to
+control the number of bits for anti-aliasing used for text
+and graphics, respectively. Default value is&nbsp;4;
+0&nbsp;means no anti-aliasing.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>groff
+character/glyph entities now map onto HTML&nbsp;4 character
+entities. </li></font></p></ul>
+
+<p><font color="#000000">Grolbp</font></p><ul>
+
+<p><font color="#000000"><li>Valid paper sizes are now
+specified as with the new &lsquo;papersize&rsquo; keyword in
+the DESC file. Specifically, the old custom paper type
+format &lsquo;custAAAxBBB&rsquo; is no longer supported.
+</li></font></p> </ul>
+
+<p><font color="#000000">Miscellaneous</font></p><ul>
+
+<p><font color="#000000"><li>A new manual page
+&lsquo;ditroff.7&rsquo; is available.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>The
+groff texinfo manual is now installed, together with a bunch
+of examples.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>A
+new keyword &lsquo;papersize&rsquo; has been added to the
+DESC file format. Its argument is either</font></p><ul>
+
+<p><font color="#000000"><li>a predefined paper format
+(e.g. &lsquo;A4&rsquo; or &lsquo;letter&rsquo;)</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>a
+file name pointing to a file which must contain a paper size
+specification in its first line (e.g.
+&lsquo;/etc/papersize&rsquo;)</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"></li><li>a
+custom paper size definition like &lsquo;35c,4i&rsquo;
+</li></font></p> </ul>
+
+<p style="margin-top: 1em"><font color="#000000">See
+groff_font(5) for more details. This keyword only affects
+the physical dimensions of the output medium; grops, grolj4,
+and grolbp use it currently. troff completely ignores it.
+</li></font></p> </ul></td></tr></table><hr>
+[ <a href="webpage.html">top</a> ]

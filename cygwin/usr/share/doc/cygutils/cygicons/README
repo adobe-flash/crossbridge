@@ -1,0 +1,272 @@
+Provenance, licensing, and resolution, Oh My!
+
+Windows .ICO file format
+========================================================================
+Windows icons come in many flavors: size, number of colors, transparency
+mechanism, etc.
+
+The format of a single .ico image:
+----------------------------------
+Each image contains (among other things)
+  o an indication of its size in pixels
+  o an indication of the bit depth: 1,4,8,24,32
+  o [optional]: a palette, containing
+    * N entries, where N = 2 ^ bitdepth
+    * each entry contains a 32bit record, consisting
+      of an 8bit R, G, B triple and a reserve byte
+      (no, it's not used for alpha)
+  o an "AND" mask containing (most of) the pixel
+    data.  This is an MxM raster (LL->LR, ... UL->UR)
+    of pixels, where each pixel is represented by 
+    1, 4, 8, 24, or 32 bits.  If 4 or 8, then the
+    values represent indices into the palette. If
+    1, the values represent black/white.  If 24,
+    the values represent 24bit RGB data.  If 32,
+    the values represent 24bit RGB data + 8bit alpha.
+  o [optional]: an "XOR" maks containing (more) pixel
+    data.  This is an MxM raster (LL->LR, ... UL->UR)
+    of pixels, where each pixel is represent by
+    1 bit.  This is used to create transparency (and
+    other effects) for 1, 4, 8, and 24 bit icons.
+    32bit icons have a built-in alpha channel in the
+    "AND" mask, which provides all the transparency 
+    effects it needs.    
+
+One-bit transparency:
+---------------------
+Applies to 1,4,8, and 24 bit icon images.
+
+As mentioned above, each icon image actually contains two
+MxM pixel data arrays.  The first is called the "AND mask"
+and uses N bits per pixel (where N is 1,4,8,24,or 32, although
+32 bit icons use a different mechanism for transparency). The
+second data array is called the "XOR mask" and is one bit per
+pixel.
+
+The XOR mask allows a few fancy effects: transparency, but
+also "inverting" the background.  For transparency to work,
+you have to choose one of your 16 (or 256, or 16M) colors
+as the "transparent" color, and then make sure the XOR mask
+has 1's everywhere the transparent color is used in the AND
+mask, and 0's everywhere else.
+   For all the nitty-gritty, see
+   http://msdn.microsoft.com/archive/default.asp?url=/archive/en-us/dnargdi/html/msdn_transblt.asp
+By setting up places in the image where the XOR mask has 1's,
+but the transparent color is not used in the AND mask at that
+location, you get color-inversion at those locations.
+
+Most icon editors simplify this process: you don't deal with
+the XOR mask directly. Instead, you pick a color to be the
+"transparent" one, and the editor figures out how to construct
+the XOR mask from that.  (Thus, color-inversion effects are
+hard to achieve with most icon editors).
+
+The point is this: you get N colors (where N=2 ^ bitdepth, so
+16 for 4bit, 256 for 8bit, 16M for 24bit) and NO transparency,
+or you get N-1 colors and transparency.
+
+Main icon format types:
+-----------------------
+   16 color: icons which contain only 16 colors
+             chosen from a specific palette (not
+             just ANY 16 colors).  This palette
+             is the EGA 16:
+                    0   0    0   black
+                  128   0    0   dark red
+                    0 128    0   dark green
+                  128 128    0   brown
+                    0   0  128   dark blue
+                  128   0  128   purple
+                    0 128  128   teal
+                  128 128  128   grey
+                  192 192  192   light grey
+                  255   0    0   red
+                    0 255    0   green
+                  255 255    0   yellow
+                    0   0  255   blue
+                  255   0  255   magenta
+                    0 255  255   cyan
+                  255 255  255   white
+
+             Additionally, one of these 16 colors
+             can be designated the "transparent"
+             color, given 15 "real" colors and
+             1-bit transparency.
+
+             "1-bit" transparency means no alpha,
+             and no anti-aliasing.
+
+   256color: icons which contain only 256 colors
+             the palette can specify 256 unique
+             colors chosen from the universe of
+             16M 24bit RGB values.  Many 256color
+             icons use a standard palette (the
+             so-called web-safe 216, plus 40 others
+             chosen somehow).
+
+             Again, one of these 256 colors can be
+             designated the "transparent" color. 
+             Windows XP style guidelines say that
+             magenta (#ff00ff) should be used for
+             this.
+
+             "1-bit" transparency means no alpha,
+             and no anti-aliasing.
+
+   24bit   : 16M colors, but you have to give up
+             one of them if you want transparency.
+             No alpha, no anti-aliasing.
+
+   32bit   : 16M colors, with full 8bit alpha
+             support and anti-aliasing.
+
+Main icon sizes:
+----------------
+   16x16    : used on the TaskBar
+   24x24    : uncommon. used on the left half of
+              the Start Menu in Windows XP.
+   32x32    : default icon size for desktop icons
+   48x48    : DisplayProperties->Appearance->Advanced,
+              Item=Icon, set size.  Not often used.
+   64x64    : New icon size for Vista.
+   256x256  : New icon size for Vista. Stored in compressed
+              PNG format within the .ico file; completely
+              violates all the rules described above.
+
+Icons in this package:
+========================================================================
+Provenance, licensing, and resolution information.
+
+
+==================================================
+cygwin.ico
+    License    : GPL
+    Author     : unknown
+    Provenance : setup module on cygwin-apps repository
+                 cvs -d:pserver:anoncvs@sources.redhat.com:/cvs/cygwin-apps co setup
+                 subdir: setup/cygwin.ico
+    Comments   :
+    Contents   :
+      48x48 16 color
+      32x32 16 color
+      16x16 16 color
+
+==================================================
+cygwinred.ico
+cygwinblue.ico
+cygwincyan.ico
+cygwinpurple.ico
+cygwinyellow.ico
+    License   : GPL
+    Author    : Charles Wilson
+    Provenance: cygutils module on cygwin-apps repository
+                cvs -d:pserver:anoncvs@sources.redhat.com:/cvs/cygwin-apps co cygutils
+                subdir: cygutils/src/cygicons/
+    Comments  : simple derived works, derived from cygwin.ico
+    Contents  :
+      48x48 16 color
+      32x32 16 color
+      16x16 16 color
+
+==================================================
+cygwinshiny.ico
+    License   : GPL (assumed)
+    Author    : Nicky H.
+    Provenance: posted to cygwin mailing list
+                http://cygwin.com/ml/cygwin/2004-10/msg00549.html
+    Comments  : was posted with the express hope that it
+                be incorporated into the setup.exe source
+                code, which would require GPL.  Note that
+                this version has been modified from the
+                original, 32bit-only contribution: I added
+                256color and 16color versions.
+    Contents  :
+      48x48 16 color
+      32x32 16 color
+      16x16 16 color
+      48x48 256 color
+      32x32 256 color
+      16x16 256 color
+      48x48 32bit
+      32x32 32bit
+      16x16 32bit
+
+==================================================
+cygwing.ico
+    License   : Public Domain (assumed)
+    Author    : August Mayer
+    Provenance: posted to cygwin mailing list
+                http://cygwin.com/ml/cygwin/2001-07/msg01099.html
+    Comments  : While I'm not a graphic designer or the like,
+                I have created a slightly improved version of
+                the Cygwin icon. Enjoy! -- A. Mayer
+    Contents  :
+      32x32 16 color
+      16x16 16 color
+      32x32 256 color
+
+==================================================
+cygwings.ico
+    License   : Public Domain (assumed)
+    Author    : August Mayer
+    Provenance: posted to cygwin mailing list
+                http://cygwin.com/ml/cygwin/2001-07/msg01151.html
+    Comments  : Similar to cygwing.ico, but with better anti-aliasing
+    Contents  :
+      32x32 16 color
+      16x16 16 color
+      32x32 256 color
+
+==================================================
+cygwin-kdelook.ico
+    License   : GPL
+    Author    : FBL
+    Provenance: submitted to kde-look.org
+                http://www.kde-look.org/content/show.php?content=36393
+    Comments  :
+    Contents  :
+      96x96 256 color
+      72x72 256 color
+      64x64 256 color
+      48x48 256 color
+      32x32 256 color
+      16x16 256 color
+      96x96 24bit
+      72x72 24bit
+      64x64 24bit
+      48x48 24bit
+      32x32 24bit
+      16x16 24bit
+      96x96 32bit
+      72x72 32bit
+      64x64 32bit
+      48x48 32bit
+      32x32 32bit
+      16x16 32bit
+
+
+==================================================
+hippo.ico
+    License   : CC-BY-SA 3.0
+    Author    : Charles Wilson
+    Provenance: derived from public domain, Michal Pecyna
+                http://openclipart.org/media/files/TheStructorr/1751
+    Comments  :
+    Contents  :
+      48x48 16 color
+      32x32 16 color
+      24x24 16 color
+      16x16 16 color
+      48x48 256 color
+      32x32 256 color
+      24x24 256 color
+      16x16 256 color
+      64x64 32bit 
+      48x48 32bit
+      32x32 32bit
+      24x24 32bit
+      16x16 32bit
+      256x256 32bit PNG
+
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/us/"><img alt="Creative Commons License" style="border-width:0" src="http://i.creativecommons.org/l/by-sa/3.0/us/88x31.png" /></a><br /><span xmlns:dc="http://purl.org/dc/elements/1.1/" href="http://purl.org/dc/dcmitype/StillImage" property="dc:title" rel="dc:type">hippo.ico</span> by <span xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName">Charles Wilson</span> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/us/">Creative Commons Attribution-Share Alike 3.0 United States License</a>.<br />Based on a work at <a xmlns:dc="http://purl.org/dc/elements/1.1/" href=" http://openclipart.org/media/files/TheStructorr/1751" rel="dc:source"> http://openclipart.org/media/files/TheStructorr/1751</a>.
+

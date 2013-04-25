@@ -1,0 +1,28 @@
+The NLSPATH / locale stuff doesnt work under IRIX.
+(Patches are welcome.)
+
+---------------------------------------------------------------
+
+It is reported that IRIX uses /usr/share/man/[apu]_man/man[1-8]
+corresponding to admin, programmer and user pages.
+
+One finds files like /usr/share/catman/u_man/cat1/ls.z
+
+Maybe 
+
+	MAN_IRIX_CATNAMES=1
+
+in the environment and
+
+	MANPATH /usr/share/man/a_man /usr/share/catman/a_man
+	MANPATH /usr/share/man/p_man /usr/share/catman/p_man
+	MANPATH /usr/share/man/u_man /usr/share/catman/u_man
+
+in the man.conf file
+will suffice to make this man work in an IRIX environment.
+Reports on success/failure are welcome.
+
+---------------------------------------------------------------
+
+
+flucifredi@acm.org

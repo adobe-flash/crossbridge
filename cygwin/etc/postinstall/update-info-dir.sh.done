@@ -1,0 +1,18 @@
+#!/bin/bash
+rm -f /usr/info/dir.info /usr/share/info/dir.info /usr/info/dir /usr/share/info/dir
+for d in /usr/info /usr/share/info; do
+    for f in $d/*; do
+	case "$f" in
+	    *\**)
+		;;
+	    */dir|*/dir.info*)
+		;;
+	    *-[0123456789]*)
+		;;
+	    *)
+		install-info --quiet $f /usr/share/info/dir ||
+		install-info  --quiet --entry="* $$f ($f): $$f" $$f /usr/share/info/dir
+		;;
+	esac
+    done
+done >/dev/null 2>&1

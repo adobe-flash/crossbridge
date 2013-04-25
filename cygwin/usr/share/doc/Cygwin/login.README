@@ -1,0 +1,73 @@
+login
+===========================================================
+Provides an application that is used to sign
+on to a system.
+
+
+Runtime requirements:
+  cygwin-1.7.0-45
+  bash
+
+Build requirements:
+  cygwin-1.7.0-45
+  cygport-0.9.5-1
+  gcc-3.4.4-999
+  gcc-g++-3.4.4-999
+  w32api-3.13-1
+  binutils-20080624-2
+  xz-utils
+
+Canonical website:
+  n/a
+
+Canonical download:
+  n/a
+
+===========================================================
+
+Build instructions:
+  unpack login-VER-REL-src.tar.bz2
+    if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+  cd /usr/src
+  cygport ./login-VER-REL.cygport all
+
+This will create:
+  /usr/src/login-VER-REL-src.tar.bz2
+  /usr/src/login-VER-REL.tar.bz2
+
+===========================================================
+
+Files included in the binary package:
+
+  /usr/bin/login.exe
+  /usr/share/doc/login/old-login.README
+  /usr/share/doc/Cygwin/login.README
+  /usr/share/man/man1/login.1.gz
+
+===========================================================
+
+Port Notes:
+
+----------  login-1.10-10 -- 20 Apr 2009 -----------
+* Fork for cygwin-1.7 development.
+
+----------  login-1.10-1 -- 20 Apr 2009 -----------
+* Some build system modifications
+* Added to cygwin-apps repository on sourceware; bumped
+  version number to 1.10 and incorporated all -src.patch
+  changes.
+* No code changes (other than using GNU indent).
+
+----------  login-1.9-8 -- 19 Apr 2008 -----------
+* switched to cygport build framework. Because there is
+  no upstream 'base' package, am using login-1.9-7 as "base"
+* Add support for detecting superuser by checking privileges
+  instead of hardcoded comparison to SYSTEM. This is necessary
+  for correct operation on Vista.
+* Detect special accounts by name or SID, not by uid
+
+----------  login-1.9-7 -- unknown -----------
+* last release by previous maintainer
+
+Cygwin port maintained by:  Charles Wilson <cygwin@cygwin.com>

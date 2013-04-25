@@ -1,0 +1,100 @@
+gettext-runtime
+===================================================================
+All 1 tests passed
+
+
+gettext-tools
+===================================================================
+1 of 326 tests failed
+(18 tests were not run)
+
+   SKIP: gettext-3, -5, -6, -7, -8
+   SKIP: msgunfmt-csharp-1
+   SKIP: msgunfmt-java-1     (!! but I have gcj !!)
+   SKIP: recode-sr-latin-1
+   SKIP: recode-sr-latin-2
+   SKIP: lang-{objc,clisp,librep,guile,smalltalk}
+   SKIP: lang-java
+   SKIP: lang-{csharp,pascal,perl-1,perl-2,php}
+
+   FAIL: lang-tcl
+
+gettext-3: skipped on non-glibc systems
+gettext-5: skipped on non-glibc systems
+gettext-6: skipped on non-glibc && non MacOS systems
+gettext-7: skipped on non-glibc && non MacOS systems
+gettext-8: setrlimit does not work
+msgunfmt-csharp-1: skipped because csharp not available
+msgunfmt-java-1:   skipped because java compiler or jar not found
+                   (gcj is not sufficient; it doesn't allow to set
+		   the JDK "level" -- 1.1, 1.3, etc).
+lang-*:            in general skipped because the relevant compiler
+                   is not found.  Exceptions listed below.
+lang-java:         Skipped because java compiler not found (see above).
+lang-perl-1:       perl package Locale::Messages is not installed
+lang-perl-2:       perl package libintl-perl is not installed
+
+lang-tcl:
+< «Votre commande, s'il vous plait», dit le garçon.
+---
+> ▒Votre commande, s'il vous plait▒, dit le gar▒on.
+
+Perhaps because our tcl is not pure cygwin, but rather win32ish,
+and is not built with i18n support?
+
+
+NOTE: there were four other failures that arose because of the
+      changes to localename.  These were:
+         format-c-3
+         format-c-4
+         plural-1
+         plural-2
+      but the test suite was patched to avoid these failures.
+      The problem is rather complicated; gettext-0.18.1.1 now has a
+      libintl_setlocale function that is used by libintl clients,
+      instead of the system setlocale.  The localename patch left
+      that in place, but ensured that it did far less work -- was less
+      obtrusive -- in its interposition between clients and the system
+      setlocale.  However, some of that eliminated 'work' also allowed
+      the gettext test suite to 'cheat' a bit -- it used non-existent
+      locales (like 'fr' rather than 'fr_FR'), and *re-hijacked* the
+      setlocale function itself.  None of that works anymore -- and
+      *actual* clients are unlikely to need/want to do it -- so the
+      test suite was patched to use real locales in all cases, and to
+      not re-hijack.
+
+gettext-tools/gnulib-tests
+===================================================================
+[old note; unverified in the current release]: All tests fail when
+--enable-relocation (the tests do not "activate" the relocation
+support, but the gnulib library they link to expect it).
+
+When not --enable-relocation (the normal case):
+2 of 120 tests failed (3 tests were not run)
+but 2 of the passes actually should be failures.
+
+FAIL: test-file-has-acl.sh -- file_has_acl("tmpdir0") returned yes,
+      expected no.  This is expected on cygwin; all files always have
+      ACLs (there are default ones that can't be removed using cygwin
+      setfacl).
+
+PASS: test-copy-acl.sh     -- but
+      coredump at line 205; also 'setfacl -d group:0 tmpfile0
+                                  setfacl: illegal acl entries'
+PASS: test-copy-file.sh    -- but
+      coredump at line 199; also 'setfacl -d group:0 tmpfile0
+                                  setfacl: illegal acl entries'
+
+      In both of these cases, I suspect the segfault is due to poor error
+      handling when setfacl reports an error.  FWIW, the line numbers
+      reported seem to be off:
+         test-copy-acl.sh:205   'case $acl_flavor in'
+         test-copy-file.sh:199  'case $acl_flavor in'
+      I can't see those being the cause of a segfault (in bash?)
+
+SKIP: test-mbrtowc4.sh     -- no transitional chinese locale is supported
+SKIP: test-mbsrtowcs4.sh   -- no transitional chinese locale is supported
+SKIP: test-mbsstr3.sh      -- no chinese GB18030 locale is supported
+FAIL: test-strchrnul.exe   -- segfault (bug fixed in cygwin-1.7.10?)
+                              http://sourceware.org/ml/newlib/2011/msg00145.html
+

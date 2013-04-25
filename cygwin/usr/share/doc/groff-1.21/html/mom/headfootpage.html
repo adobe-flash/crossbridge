@@ -1,0 +1,2187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Document processing, page headers/footers and pagination</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="rectoverso.html#top">Next: Recto/verso printing, collating</a></td>
+</tr>
+</table>
+
+<h1 class="docs">Page headers/footers, pagination</h1>
+
+<div style="text-align: center;">
+<ul class="no-enumerator" style="margin-left: -2.5em;">
+  <li><a href="#headfootpage-intro">Introduction &ndash; VERY IMPORTANT; read me!</a></li>
+  <li> <a href="#pagination-note">An important note on pagination</a></li>
+  <li><a href="#description-general">General description of headers/footers</a></li>
+  <li><a href="#header-style">Default specs for headers/footers</a></li>
+  <li><a href="#vertical-spacing">Vertical placement and spacing of headers/footers</a></li>
+</ul>
+</div>
+
+<div class="rule-medium"><hr/></div>
+
+<h2 id="toc-doc-head-foot-page" class="docs" style="text-align: center;">Table of contents</h2>
+
+<h3 class="toc toc-docproc-header" style="margin-top: 1em;"><a class="header-link" href="#headfoot-management">Managing page headers and footers</a></h3>
+<ul class="toc-docproc" style="margin-top: .5em;">
+  <li><a href="#headers">HEADERS</a> &ndash; on or off</li>
+  <li><a href="#footers">FOOTERS</a> &ndash; on or off</li>
+  <li><a href="#footer-on-first-page">FOOTER_ON_FIRST_PAGE</a></li>
+</ul>
+<h3 class="toc toc-docproc-header"><a class="header-link" href="#headfoot-control">Control macros for headers/footers</a></h3>
+  <ul class="toc-docproc" style="margin-top: .5em;">
+    <li><a href="#index-headfoot-control">Header/footer control macros and defaults</a>
+  <ul class="toc-docproc">
+    <li><a href="#hdrftr-strings">Header/footer strings</a>
+    <ul class="toc-docproc">
+      <li><a href="#reserved-strings">Using mom&#8217;s reserved strings in header/footer definitions</a> (TITLE, AUTHOR, etc.)</li>
+    </ul></li>
+    <li><a href="#hdrftr-style">Header/footer style</a>
+    <ul class="toc-docproc">
+      <li><a href="#hdrftr-style-global">Global changes</a></li>
+      <li><a href="#hdrftr-style-part">Part-by-part changes</a></li>
+    </ul></li>
+    <li><a href="#hdrftr-vertical">Vertical placement and spacing of headers/footers</a>
+    <ul class="toc-docproc">
+      <li><a href="#hdrftr-margin">HEADER_MARGIN&nbsp;/&nbsp;FOOTER_MARGIN</a>
+      <ul class="toc-docproc no-enumerator" style="margin-left: -2em;">
+        <li>&ndash;&nbsp;<a href="#footer-margin">Important: FOOTER_MARGIN and bottom margins</a></li>
+      </ul></li>
+    </ul></li>
+    <li><a href="#hdrftr-separator">The header/footer separator rule</a>
+    <ul class="toc-docproc">
+      <li><a href="#hdrftr-rule">HEADER_RULE</a> &ndash; on or off</li>
+      <li><a href="#hdrftr-rule-weight">HEADER_RULE_WEIGHT</a> &ndash; weight of the rule</li>
+      <li><a href="#hdrftr-rule-gap">HEADER_RULE_GAP</a> &ndash; distance of rule from header/footer</li>
+      <li><a href="#hdrftr-rule-color">HEADER_RULE_COLOR</a> &ndash; colour of the header/footer rule</li>
+    </ul></li>
+  </ul></li>
+</ul>
+<h3 class="toc toc-docproc-header"><a class="header-link" href="#userdef-hdrftr-rv">User-defined, single string recto/verso headers/footers</a></h3>
+<ul class="toc-docproc" style="margin-top: .5em;">
+  <li><a href="#hdrftr-recto">HEADER_RECTO, HEADER_VERSO</a>
+  <ul style="margin-left: -.5em">
+    <li><a href="#userdef-hdrftr">User-defined, single string headers/footers (no recto/verso)</a></li>
+    <li><a href="#padding-hdrftr">Padding the header-recto/header-verso string</a></li>
+  </ul></li>
+</ul>
+<h3 class="toc toc-docproc-header"><a class="header-link" href="#headers-and-footers-intro">Headers and footers on the same page</a></h3>
+<h3 class="toc toc-docproc-header" style="margin-top: .75em;"><a class="header-link" href="#pagination-intro">Pagination</a></h3>
+<ul class="toc-docproc" style="margin-top: .5em;">
+  <li><a href="#index-pagination">Pagination macros</a></li>
+  <li><a href="#index-pagination-control">Pagination control macros and defaults</a></li>
+</ul>
+<h3 class="toc toc-docproc-header"><a class="header-link" href="#blank-pages">Inserting blank pages into a document</a></h3>
+
+<div class="rule-medium" style="margin-top: 1.5em;"><hr/></div>
+
+<h2 id="headfootpage-intro" class="macro-group">Managing page headers and footers</h2>
+
+<div id="headerfooter" class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span>
+Because headers and footers are virtually identical, this
+documentation addresses itself only to headers.  In all cases,
+unless otherwise noted, descriptions of headers describe footers as
+well.
+</p>
+
+<p class="tip-bottom">
+Furthermore, any
+<a href="definitions.html#controlmacro">control macro</a>
+that begins with HEADER_ may be used to control footers, simply by
+replacing HEADER_ with FOOTER_.
+</p>
+</div>
+
+<p style="margin-top: -.75em;">
+<a href="definitions.html#header">Headers</a>
+and
+<a href="definitions.html#footer">footers</a>,
+as defined in the section
+<a href="definitions.html#mom">Mom&#8217;s Document Processing Terms</a>,
+are those parts of a document that contain information about the document
+itself which appear in the margins either above or below
+<a href="definitions.html#running">running text</a>.
+They are, in all respects but two, identical.  The differences are:
+</p>
+<ol style="margin-top: -.5em; margin-bottom: -.5em;">
+  <li>headers appear in the margin <i>above</i> running text while
+      footers appear in the margin <i>beneath</i> running text;
+  </li>
+  <li>the (optional) rule that separates headers from running
+      text appears <i>below</i> the header while
+      the (optional) rule that separates footers from running
+      text appears <i>above</i> the footer.
+  </li>
+</ol>
+
+<div id="pagination-note" class="box-tip" style="margin-top: 1.5em;">
+<p class="tip">
+<span class="note">Note:</span>
+While the single page number that mom generates in either the top
+or bottom margin above or below running text is technically a kind
+of header/footer, mom and this documentation treat it as a separate
+page element.
+</p>
+</div>
+
+<div id="author-note" class="box-tip">
+<p class="tip">
+<span class="note">Author's note:</span>
+Left to their own devices (i.e. if you&#8217;re happy with the way
+mom does things by default), headers are something you never have to
+worry about.  You can skip reading this section entirely.  But if
+you want to change them, be advised that headers have more macros to
+control their appearance than any other document element.  The text
+of this documentation becomes correspondingly dense at this point.
+</p>
+</div>
+
+<h3 id="description-general" class="docs">General description of headers/footers</h3>
+
+<p>
+Headers comprise three distinct parts: a left part, a centre part,
+and a right part.  Each part contains text (a &#8220;string&#8221;)
+that identifies some aspect of the document as a whole.
+</p>
+
+<p>
+&#8221;The left part (&#8220;header-left) lines up with the
+document&#8217;s left margin.  The centre part (&#8220;header
+centre&#8220;) is centred on the document&#8217;s line length.
+&#8221;The right part (&#8220;header-right) lines up with the
+document&#8217;s right margin.  Not all parts need contain a string,
+and if you don&#8217;t want headers at all, you can turn them off
+completely.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note to groff experts:</span>
+Although mom&#8217;s headers resemble the three-part titles
+generated by <kbd>.tl</kbd>, they&#8217;re in no way related to it,
+nor based upon it. <kbd>.tl</kbd> is not used at all in mom.
+</p>
+</div>
+
+<p>
+Normally, mom fills headers with strings appropriate to the document
+type selected with
+<a href="docprocessing.html#doctype">DOCTYPE</a>.
+You can, however, supply whatever strings you like&mdash;including
+page numbers&mdash;to go in any part of headers.  What&#8217;s more,
+you can set the family, font, size, colour and capitalization style
+(caps or caps/lower-case) for each header part individually.
+</p>
+
+<p>
+By default, mom prints a horizontal rule beneath headers to separate
+them visually from running text.  In the case of footers, the rule
+is above.  You can increase or decrease the space between the header
+and the rule if you like (with
+<kbd><a href="#hdrftr-rule-gap">HEADER_RULE_GAP</a></kbd>),
+or remove it completely.
+</p>
+
+<h3 id="header-style" class="docs">Default specs for headers/footers</h3>
+
+<p>
+Mom makes small type adjustments to each part of the header (left,
+centre, right) to achieve an aesthetically pleasing result.  The
+defaults are listed below.  (The strings mom puts by default in each
+part are explained in
+<a href="docprocessing.html#doctype">DOCTYPE</a>.)
+</p>
+
+<div class="defaults-container" style="padding-bottom: 8px;">
+<p class="defaults" style="padding-top: 6px; padding-bottom: 6px; text-align: center;">
+<i>Note:</i> Except for capitalization (all caps or caps/lower-case),
+these defaults apply only to
+<a href="docprocessing.html#printstyle">PRINTSTYLE&nbsp;<kbd>TYPESET</kbd></a>.
+</p>
+<span class="pre defaults">
+TYPE SPEC    HEADER LEFT         HEADER CENTER       HEADER RIGHT
+---------    -----------         -------------       ------------
+Family       document default    document default    document default
+Font         roman               italic              roman
+Colour       (black)             (black)             (black)
+All caps     no                  no                  yes
+Size*        -.5 (points)        -.5 (points)        -2 (points)
+            (-2 if all caps)    (-2 if all caps)    (-.5 if not all caps)
+
+*Relative to the point size of type in paragraphs
+</span>
+</div>
+
+<p style="margin-top: -1.5em;">
+You can, of course, change any of the defaults using the appropriate
+control macros.  And should you wish to design headers from the
+ground up, mom has a special macro,
+<a href="#hdrftr-plain">HEADER_PLAIN</a>,
+that removes all type adjustments to headers.  The straightforward
+type specs for paragraphs are used instead, providing a simple
+reference point for any alterations you want to make to the family,
+font, size and capitalization style of any header part.
+</p>
+
+<h3 id="vertical-spacing" class="docs">Vertical placement and spacing of headers/footers</h3>
+
+<p>
+As explained in the section,
+<a href="docprocessing.html#behaviour">Typesetting macros during document processing</a>,
+the top and bottom margins of a mom document are the vertical start
+and end positions of
+<a href="definitions.html#running">running text</a>,
+not the vertical positions of headers or footers, which, by definition,
+appear in the margins above (or below) running text.
+</p>
+
+<p>
+The vertical placement of headers is controlled by the macro
+<a href="#hdrftr-margin">HEADER_MARGIN</a>,
+which establishes the
+<a href="definitions.html">baseline</a>
+position of headers relative to the top edge of the page.  The
+header rule, whose position is relative to the header itself, is
+controlled by a separate macro.
+</p>
+
+<p>
+FOOTER_MARGIN is the counterpart to HEADER_MARGIN, and establishes
+the baseline position of footers relative to the bottom edge of the
+page.
+</p>
+
+<p>
+The distance between headers and the start
+of running text can be controlled with the macro,
+<a href="#hdrftr-gap">HEADER_GAP</a>
+(effectively making HEADER_MARGIN + HEADER_GAP the top margin of
+running text unless you give mom a literal top margin (with
+<a href="typesetting.html#t-margin">T_MARGIN</a>),
+in which case she ignores HEADER_GAP and begins the running text at
+whatever top margin you give.
+</p>
+
+<p>
+FOOTER_GAP and
+<a href="typesetting.html#b-margin">B_MARGIN</a>
+work similarly, except they determine where running text <i>ends</i>
+on the page.  (See
+<a href="#footer-margin">Important &ndash; footer margin and bottom margins</a>
+for a warning about possible conflicts between the footer margin and
+the bottom margin.)
+</p>
+
+<p>
+Confused?  Mom apologizes.  It&#8217;s really quite simple.  By
+default, mom sets headers 4-1/2
+<a href="definitions.html#picaspoints">picas</a>
+down from the top of the page and begins the running text 3 picas
+(the HEADER_GAP) beneath that, which means the effective top margin
+of the running text is 7-1/2 picas (visually approx. 1 inch).
+However, if you give mom a literal top margin (with
+<a href="typesetting.html#t-margin">T_MARGIN</a>),
+she ignores the HEADER_GAP and starts the running text at whatever
+top margin you give.
+</p>
+
+<p>
+Footers are treated similarly.  Mom sets footers 3 picas up from the
+bottom of the page, and interrupts the processing of running text 3
+picas (the FOOTER_GAP) above that (again, visually approx. 1 inch).
+However, if you give mom a literal bottom margin (with
+<a href="typesetting.html#b-margin">B_MARGIN</a>),
+she ignores the FOOTER_GAP and interrupts the processing of running
+text at whatever bottom margin you give.
+</p>
+
+<p>
+If mom is paginating your document (she does, by default, at the
+bottom of each page), the vertical spacing and placement of page
+numbers, whether at the top or the bottom of the page, is managed
+exactly as if the page numbers were headers (or footers), and are
+controlled by the same macros.  See
+<a href="#pagination">Pagination control</a>.
+</p>
+
+<div class="rule-short"><hr/></div>
+
+<!-- ======================================================================== -->
+
+<h2 id="headfoot-management" class="macro-group">Managing headers/footers</h2>
+
+<p>
+The following are the basic macros for turning
+<a href="definitions.html#header">headers</a>
+or
+<a href="definitions.html#footer">footers</a>
+on or off.  They should be invoked prior to
+<a href="docprocessing.html#start">START</a>.
+</p>
+
+<p>
+By default, mom prints page headers.  If you turn
+them off, she will begin the
+<a href="definitions.html#running">running text</a>
+on each page with a default top margin of 6
+<a href="definitions.html#picaspoints">picas</a>
+unless you have requested a different top margin (with
+<a href="typesetting.html#t-margin">T_MARGIN</a>)
+prior to
+<a href="docprocessing.html#start">START</a>.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+<a href="#headers">HEADERS</a>
+and
+<a href="#footers">FOOTERS</a>
+are mutually exclusive.  If headers are on, footers (but not
+bottom-of-page numbering) are automatically turned off.  Equally,
+if footers are on, headers (but not top-of-page numbering) are
+automatically turned off.  Thus, if you&#8217;d prefer footers in a
+document, you need only invoke
+<kbd><a href="#footers">.FOOTERS</a></kbd>;
+there&#8217;s no need to turn headers off first.
+</p>
+</div>
+
+<p>
+If you need both headers and footers, there&#8217;s a special macro,
+<a href="#headers-and-footers">HEADERS_AND_FOOTERS</a>,
+that allows you to set it up.
+</p>
+
+<div class="macro-list-container">
+<h3 id="index-hdrftr" class="macro-list">Header/footer macros</h3>
+<ul class="macro-list">
+  <li><a href="#headers">HEADERS</a> &ndash; on or off</li>
+  <li><a href="#footers">FOOTERS</a> &ndash; on or off</li>
+  <li><a href="#footer-on-first-page">FOOTER_ON_FIRST_PAGE</a></li>
+  <li><a href="#userdef-hdrftr-rv">User-defined, single string recto/verso headers/footers</a>
+  <ul>
+    <li><a href="#hdrftr-rectoverso">HEADER_RECTO, HEADER_VERSO</a>
+    <ul style="margin-left: -.5em;">
+      <li><a href="#userdef-hdrftr">User-defined, single string headers/footers (no recto/verso)</a></li>
+    </ul></li>
+    <li><a href="#reserved-strings">Using mom&#8217;s reserved strings in header/footer definitions</a>
+        (title, author, etc.)
+    </li>
+  </ul></li>
+  <li><a href="#headers-and-footers-intro">HEADERS_AND_FOOTERS</a> &ndash;
+       putting both headers and footers on document pages
+  </li>
+  <li><a href="#headfoot-control">Header and footer control macros</a></li>
+</ul>
+</div>
+
+<!-- -HEADERS- -->
+
+<div class="macro-id-overline">
+<h3 class="macro-id">Headers</h3>
+</div>
+
+<div id="headers" class="box-macro-args">
+Macro: <b>HEADERS</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+<a href="definitions.html#header">Page headers</a>
+are on by default.  If you don&#8217;t want them, turn them off by
+invoking <kbd>.HEADERS</kbd> with any argument (<b>OFF, QUIT,
+END, X...</b>), e.g.
+<br/>
+<span class="pre-in-pp">
+    .HEADERS OFF
+</span>
+</p>
+
+<p>
+<b>NOTE:</b> HEADERS automatically
+disables 
+<a href="definitions.html#footer">footers</a>
+(you can&#8217;t have both), but not the page numbers that normally
+appear at the bottom of the page.
+</p>
+
+<p>
+<b>ADDITIONAL NOTE:</b> If HEADERS
+are OFF, mom&#8217;s normal top
+margin for
+<a href="definitions.html#running">running text</a>
+(7.5
+<a href="definitions.html#picaspoints">picas</a>)
+changes to 6 picas (visually approx. 1 inch).  This does NOT apply
+to the situation where footers have been explicitly turned on
+(with
+<kbd><a href="#footers">FOOTERS</a></kbd>).
+Explicitly invoking footers moves page numbering to the
+top of the page, where its placement and spacing are the same as
+for headers.  (I.e. the top margin of running text remains 7.5
+picas.)
+</p>
+
+<!-- -FOOTERS- -->
+
+<div class="macro-id-overline">
+<h3 id="footers" class="macro-id">Footers</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>FOOTERS</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+<a href="definitions.html#footer">Page footers</a>
+are off by default.  If you want them instead of
+<a href="definitions.html#header">headers</a>
+(you can&#8217;t have both), turn them on by invoking
+<kbd>.FOOTERS</kbd> without an argument, e.g.
+<br/>
+<span class="pre-in-pp">
+    .FOOTERS
+</span>
+</p>
+
+<p>
+FOOTERS automatically disables headers, and
+mom shifts the placement of page numbers from their
+normal position at page bottom to the top of the page.
+</p>
+
+<p>
+<b>NOTE:</b> By default, when footers are on,
+mom does not print a page number on the first
+page of a document, nor on first pages after
+<a href="rectoverso.html#collate">COLLATE</a>.
+If you don&#8217;t want this behaviour, you can change it with
+<kbd><a href="#pagenum-on-first-page">PAGENUM_ON_FIRST_PAGE</a></kbd>.
+</p>
+
+<!-- -FOOTER_ON_FIRST_PAGE- -->
+
+<div class="macro-id-overline">
+<h3 id="footer-on-first-page" class="macro-id">Footer on first page</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>FOOTER_ON_FIRST_PAGE</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+If you invoke
+<a href="#footers"><kbd>.FOOTERS</kbd></a>,
+mom, by default, does not print a footer on the
+first page of the document.  (The
+<a href="definitions.html">docheader</a>
+on page 1 makes it redundant.)  However, should you wish a footer on
+page 1, invoke <kbd>.FOOTER_ON_FIRST_PAGE</kbd> without any argument.
+</p>
+
+<div class="rule-short"><hr/></div>
+
+<h2 id="headfoot-control" class="macro-group">Control macros for headers/footers</h2>
+
+<p>
+Virtually every part of headers (and footers; see the note on how
+<a href="#headerfooter">&#8220;headers&#8221; means &#8220;footers&#8221;</a>
+in the
+<a href="#headfootpage-intro">Introduction</a>
+to headers/footers) can be designed to your own specifications.
+</p>
+
+<div class="macro-list-container">
+<h3 id="index-headfoot-control" class="macro-list">Header/footer control macros and defaults</h3>
+
+<ol style="margin-top: -1.5em; padding-bottom: 6px;">
+  <li><a href="#hdrftr-strings">Header/footer strings</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#hdrftr-left">HEADER_LEFT</a></li>
+    <li><a href="#hdrftr-centre">HEADER_CENTER</a>
+    <ul style="margin-left: -.5em;">
+      <li><a href="#hdrftr-centre-pad">Padding the header-centre string</a></li>
+    </ul></li>
+    <li><a href="#hdrftr-right">HEADER_RIGHT</a></li>
+    <li><a href="#reserved-strings">Using mom&#8217;s reserved strings in header/footer definitions</a>
+        (e.g. <kbd>\E*[$TITLE]</kbd> when you want
+        <br/>
+        the title, <kbd>\E*[$AUTHOR]</kbd> when you want the author, etc.)
+    </li>
+    <li><a href="#page-number-symbol">Replacing header-left, centre or right with the page number</a></li>
+    <li><a href="#page-number-incl">Including the  page number in header-left, centre or right</a></li>
+  </ul></li>
+  <li><a href="#hdrftr-style">Header/footer style</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#hdrftr-style-global">Global changes</a>
+    <ul style="margin-left: -.5em;">
+      <li><a href="#hdrftr-global-family">HEADER_FAMILY</a> &ndash; family for entire header</li>
+      <li><a href="#hdrftr-global-size">HEADER_SIZE</a> &ndash; size for entire header</li>
+      <li><a href="#hdrftr-plain">HEADER_PLAIN</a> &ndash; disable default adjustments to header parts</li>
+      <li><a href="#hdrftr-color">HEADER_COLOR</a> &ndash; colourize the header</li>
+    </ul></li>
+    <li><a href="#hdrftr-style-part">Part-by-part changes</a>
+    <ul style="margin-left: -.5em;">
+      <li><a href="#_family">_FAMILY</a> &ndash; left, centre or right family</li>
+      <li><a href="#_font">_FONT</a> &ndash; left, centre or right font</li>
+      <li><a href="#_size">_SIZE</a> &ndash; left, centre or right size</li>
+      <li><a href="#_caps">_CAPS</a> &ndash; left, centre or right all caps</li>
+      <li><a href="#_color">_COLOR</a> &ndash; left, centre or right colour</li>
+    </ul></li>
+  </ul></li>
+  <li><a href="#hdrftr-vertical">Header/footer vertical placement and spacing</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#hdrftr-margin">HEADER_MARGIN</a></li>
+    <li><a href="#hdrftr-gap">HEADER_GAP</a></li>
+  </ul></li>
+  <li><a href="#hdrftr-separator">Header/footer separator rule</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#hdrftr-rule">HEADER_RULE</a></li>
+    <li><a href="#hdrftr-rule-weight">HEADER_RULE_WEIGHT</a></li>
+    <li><a href="#hdrftr-rule-gap">HEADER_RULE_GAP</a></li>
+    <li><a href="#hdrftr-rule-color">HEADER_RULE_COLOR</a></li>
+  </ul></li>
+</ol>
+</div>
+
+<!-- -HDRFTR_STRINGS- -->
+
+<h4 id="hdrftr-strings" class="docs">1. Header/footer strings</h4>
+
+<div id="hdrftr-left" class="box-macro-args" style="margin-top: 1em;">
+&#8221;Macro: <b>HEADER_LEFT</b> <kbd class="macro-args">&#8220;&lt;text of header-left&gt; | #</kbd>
+</div>
+
+<div id="hdrftr-centre" class="box-macro-args" style="margin-top: 1em;">
+&#8221;Macro: <b>HEADER_CENTER</b> <kbd class="macro-args">&#8220;&lt;text of header-centre&gt; | #</kbd>
+</div>
+
+<div id="hdrftr-right" class="box-macro-args" style="margin-top: 1em;">
+&#8221;Macro: <b>HEADER_RIGHT</b> <kbd class="macro-args">&#8220;&lt;text of header-right&gt; | #</kbd>
+</div>
+
+<p>
+To change the text (the &#8220;string&#8221;) of the left, centre,
+or right part of headers, invoke the appropriate macro, above,
+with the string you want.  For example, mom, by default, prints
+the document&#8217;s author in the header-left position.  If your
+document has, say, two authors, and you want both their names to
+appear header-left, change HEADER_LEFT like this:
+<br/>
+<span class="pre-in-pp">
+  .HEADER_LEFT "R. Stallman, E. Raymond"
+</span>
+</p>
+
+<p>
+Because the arguments to HEADER_LEFT, _CENTER,
+and _RIGHT are
+<a href="definitions.html#stringargument">string arguments</a>,
+they must be enclosed in double-quotes.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Replace HEADER_, above, with FOOTER_ to change the strings in
+footers.
+</p>
+</div>
+
+<h3 id="hdrftr-centre-pad" class="docs">Padding the header/footer centre string</h3>
+
+<div class="box-macro-args" style="margin-top: 1em;">
+Macro: <b>HEADER_CENTER_PAD</b> <kbd class="macro-args">LEFT | RIGHT &lt;amount of space by which to pad centre string left or right&gt;</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+By default, mom centres the header-centre string on the line length
+in effect for page headers.
+</p>
+
+<p>
+In some cases, notably when the header-left or header-right
+strings are particularly long, the effect isn&#8217;t pretty.  The
+offendingly long header-left or right crowds, or even overprints,
+the header-centre.  That&#8217;s where HEADER_CENTER_PAD comes
+in.  With a bit of experimentation (yes, you have to preview the
+document), you can use HEADER_CENTER_PAD to move the header-centre
+string left or right until it looks acceptably centred between the
+two other strings.
+</p>
+
+<p>
+For example, say your document is an outline for a novel called
+<i>By the Shores of Lake Attica</i>.  You&#8217;ve told mom you want
+<br/>
+<span class="pre-in-pp">
+  .DOCTYPE NAMED "Outline"
+</span>
+but when you preview your work, you see that &#8220;Outline&#8221;,
+in the centre of the page header, is uncomfortably close to the
+title, which is to the right.  By invoking
+<br/>
+<span class="pre-in-pp">
+  .HEADER_CENTER_PAD RIGHT 3P
+</span>
+you can scoot the word "Outline" over three
+<a href="definitions.html#picaspoints">picas</a>
+<i>to the left</i> (because the padding is added onto the right of the
+string) so that your head looks nicely spaced out.  Invoking
+<kbd>.HEADER_CENTER_PAD</kbd> with the <kbd>LEFT</kbd> argument puts
+the padding on the left side of the string so that it scoots
+right.
+</p>
+
+<p>
+Most reassuring of all is that if you use HEADER_CENTER_PAD
+conjunction with
+<a href="rectoverso.html#recto-verso">RECTO_VERSO</a>,
+mom will pad the centre string appropriately left OR right,
+depending on which page you&#8217;re on, without you having to tell
+her to do so.
+</p>
+
+<h3 id="reserved-strings" class="docs">Using mom&#8217;s reserved strings in header/footer definitions</h3>
+
+<p>
+As pointed out in the
+<a href="#author-note">Author&#8217;s note</a>
+in the introduction to headers/footers, headers and footers are
+something you don&#8217;t normally have to worry much about. Mom
+usually knows what to do.
+</p>
+
+<p>
+However, situations do arise where you need to manipulate what goes
+in the header/footer strings, setting and resetting them as you go
+along.
+</p>
+
+<p>
+A case where you might want to do this would be if you want to
+output endnotes at the end of each document in a series of
+<a href="rectoverso.html#collate">collated</a>
+documents, and you want the word "Endnotes" to go in the header
+centre position of the endnotes, but want, say, the
+<a href="docprocessing.html#title">TITLE</a>
+to go back into the centre position for the next output document.
+</p>
+
+<p>
+In scenarios like the above, mom has a number of reserved strings
+you can plug into the HEADER_LEFT, _CENTER and _RIGHT macros.  They
+are:
+<br/>
+<span class="pre-in-pp">
+  \E*[$TITLE]          &mdash;the current argument passed to .TITLE
+  \E*[$DOCTITLE]       &mdash;the current argument passed to .DOCTITLE
+  \E*[$AUTHOR]         &mdash;the current first argument passed to .AUTHOR
+  \E*[$AUTHOR_1...9]   &mdash;the current arguments passed to .AUTHOR
+  \E*[$AUTHORS]        &mdash;a comma-separated concatenated string
+                          of all the current arguments passed to .AUTHOR
+                          (i.e. a list of authors)
+  \E*[$CHAPTER_STRING] &mdash;the current argument passed to .CHAPTER_STRING,
+                          if invoked, otherwise, "Chapter"
+  \E*[$CHAPTER]        &mdash;the current argument (typically a number) passed
+                          to .CHAPTER
+  \E*[$CHAPTER_TITLE]  &mdash;the current argument passed to .CHAPTER_TITLE
+</span>
+Returning to the scenario above, first, you&#8217;d define a centre
+string for the endnotes page:
+<br/>
+<span class="pre-in-pp">
+  .HEADER_CENTER "Endnotes"
+</span>
+Then, you&#8217;d output the endnotes:
+<br/>
+<span class="pre-in-pp">
+  .ENDNOTES
+</span>
+Then, you&#8217;d prepare mom for the next document:
+<br/>
+<span class="pre-in-pp">
+  .COLLATE
+  .TITLE "New Doc Title"
+  .AUTHOR "Josephine Blough"
+</span>
+Then, you&#8217;d redefine the header-centre string using the reserved
+string <kbd>\*[$TITLE]</kbd>, like this:
+<br/>
+<span class="pre-in-pp">
+  .HEADER_CENTER "\E*[$TITLE]"
+</span>
+And last, you&#8217;d do:
+<br/>
+<span class="pre-in-pp">
+  .START
+</span>
+Voilà!  Any argument you pass to
+<a href="docprocessing.html#title">TITLE</a>
+from here on in (say, for subsequent documents) is back in the
+header-centre position.  Here&#8217;s the whole routine again:
+<br/>
+<span class="pre-in-pp">
+  .HEADER_CENTER "Endnotes"
+  .ENDNOTES
+  .COLLATE
+  .TITLE         "New Doc Title"
+  .AUTHOR        "Josephine Blough"
+  .HEADER_CENTER "\E*[$TITLE]"
+  .START
+</span>
+</p>
+
+<p>
+If need be, you can concatenate the strings, as in the following
+example.
+<br/>
+<span class="pre-in-pp">
+  .HEADER_CENTER "\E*[$CHAPTER_STRING] \E*[$CHAPTER]"
+</span>
+which, assuming a <kbd>.CHAPTER_STRING</kbd> of
+<kbd>"Chapter"</kbd> and a <kbd>.CHAPTER</kbd> of
+<kbd>"2"</kbd>, would put &#8220;Chapter 2&#8221; in the
+header-centre position.
+</p>
+
+<h3 id="page-number-symbol" class="docs">Replacing header-left, -centre or -right with the page number</h3>
+
+<p>
+If you would like to have the current page number appear in the
+header-left, -centre, or -right position instead of a text string,
+invoke the appropriate macro, above, with the single argument
+<kbd>#</kbd> (the &#8220;number&#8221; or &#8220;pound&#8221; sign).
+Do not surround the pound size with double-quotes, as you would
+normally do if the argument to <kbd>.HEADER_CENTER</kbd> were a
+string.  For example,
+<br/>
+<span class="pre-in-pp">
+  .HEADER_CENTER #
+</span> 
+(notice, no double-quotes) will print the current page number in the
+centre part of headers.
+</p>
+
+<h3 id="page-number-incl" class="docs">Including the page number in header-left, -CENTER or -right</h3>
+
+<p>
+If you would like to <i>include</i> the current page number in the
+string you pass to HEADER_LEFT, _CENTER, or _RIGHT, (as
+opposed to replacing the string with the page number), use the
+special
+<a href="definitions.html#inlines">inline escape</a>
+<kbd>\*[PAGE#]</kbd> in the string argument.
+</p>
+
+<p>
+For example, say you have a document that&#8217;s ten pages long,
+and you want header-right to say &#8220;page &lt;whichever&gt; of
+10&#8221;, invoke <kbd>.HEADER_RIGHT</kbd> as follows:
+<br/>
+<span class="pre-in-pp">
+  .HEADER_RIGHT "page \*[PAGE#] of 10"
+</span>
+The header-right of page two will read &#8220;page 2 of 10&#8221;,
+the header-right of page three will read &#8220;page 3 of 10&#8221;,
+and so on.
+</p>
+
+<!-- -HDRFTR_STYLE- -->
+
+<h4 id="hdrftr-style" class="docs">2. Header/footer style</h4>
+
+<h5 id="hdrftr-style-global" class="docs" style="margin-top: 1em;">Global changes</h5>
+
+<p style="margin-top: .5em;">
+The following macros allow you to make changes that affect all parts
+of the header at once.
+</p>
+
+<div class="macro-list-container">
+<ul style="padding-top: 6px; padding-bottom: 6px; margin-left: -.5em;">
+  <li><a href="#hdrftr-global-family">HEADER_FAMILY</a></li>
+  <li><a href="#hdrftr-global-size">HEADER_SIZE</a></li>
+  <li><a href="#hdrftr-plain">HEADER_PLAIN</a></li>
+  <li><a href="#hdrftr-color">HEADER_COLOR</a></li>
+</ul>
+</div>
+
+<div id="hdrftr-global-family" class="box-macro-args">
+Macro: <b>HEADER_FAMILY</b> <kbd class="macro-args">&lt;family&gt;</kbd>
+</div>
+
+<p>
+By default, mom uses the default document family for headers.  If
+you would like her to use another
+<a href="definitions.html#family">family</a>
+in headers, invoke <kbd>.HEADER_FAMILY</kbd> with the identifier
+for the family you want.  The argument is the same as for the
+typesetting macro
+<a href="typesetting.html#family">FAMILY</a>.
+</p>
+
+<p>
+Replace HEADER_, above, with FOOTER_ to change the footer family.
+</p>
+
+<div id="hdrftr-global-size" class="box-macro-args">
+Macro: <b>HEADER_SIZE</b> <kbd class="macro-args">&lt;+|-number of points&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Argument is relative to the point size of type in paragraphs.
+See
+<span style="font-style: normal;"><a href="docelement.html#control-macro-args">Arguments to the control macros</a></span>
+for an explanation of how control macros ending in
+_SIZE work.
+</p>
+
+<p>
+By default, mom makes small adjustments to the size of each part
+of a header to achieve an aesthetically pleasing result.  If
+you&#8217;d like her to continue to do so, but would like the
+overall appearance of headers to be a little smaller or a little
+larger, invoke <kbd>.HEADER_SIZE</kbd> with + or - the number of <a
+href="definitions.html#picaspoints">points</a> (fractions allowed)
+by which you want her to in/decrease the size of headers.  For
+example,
+<br/>
+<span class="pre-in-pp">
+  .HEADER_SIZE +.75
+</span>
+increases the size of every part of a header by 3/4 of a point while
+respecting mom&#8217;s own little size changes.
+</p>
+
+<p>
+Replace HEADER_, above, with FOOTER_ to change the footer size.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Normally, macros that control headers have no effect on
+<a href="docprocessing.html#printstyle">PRINTSTYLE <kbd>TYPEWRITE</kbd></a>.
+HEADER_SIZE is an exception.  While all parts of a header in
+PRINTSTYLE&nbsp;<kbd>TYPEWRITE</kbd> are always the same size, you
+can use HEADER_SIZE with PRINTSTYLE&nbsp;<kbd>TYPEWRITE</kbd> to
+reduce the header&#8217;s overall point size.  You&#8217;ll most
+likely require this when the
+<a href="docprocessing.html#copystyle">COPYSTYLE</a>
+is <kbd>DRAFT</kbd>, since portions of the header may overprint if,
+say, the title of your document is very long.
+</p>
+</div>
+
+<div id="hdrftr-color" class="box-macro-args">
+Macro: <b>HEADER_COLOR</b> <kbd class="macro-args">&lt;colorname&gt;</kbd>
+</div>
+
+<p>
+If you want your headers in a colour different from the document
+default (usually black), invoke <kbd>.HEADER_COLOR</kbd> with the
+name of a colour pre-defined (or &#8220;initialized&#8221;) with
+<a href="color.html#newcolor">NEWCOLOR</a>
+or
+<a href="color.html#xcolor">XCOLOR</a>.
+</p>
+
+<p>
+HEADER_COLOR will set all the parts of the header
+plus the header rule in the colour you give it as an argument.  If
+you wish finer control over colour in headers, you can use
+<a href="#_color">HEADER_&lt;POSITION&gt;_COLOR</a>
+to colourize each part of the header separately, as well as
+<a href="#hdrftr-rule-color">HEADER_RULE_COLOR</a>
+to change the colour of the header rule.
+</p>
+
+<p>
+Replace HEADER_, above, with FOOTER_ to colourize footers.
+</p>
+
+<div class="box-macro-args">
+Macro: <b>HEADER_PLAIN</b>
+</div>
+
+<p>
+By default, mom makes adjustments to the font, size, and
+capitalization style of each part of headers to achieve an
+aesthetically pleasing look.  Should you wish to design your own
+headers from the ground up without worrying how changes to the
+various elements of header style interact with mom&#8217;s defaults,
+invoke <kbd>.HEADER_PLAIN</kbd> by itself, with no argument. Mom
+will disable her default behaviour for headers, and reset all
+elements of header style to the same family, font, point size and
+colour as she uses in paragraphs.
+</p>
+
+<p>
+Replace HEADER_, above, with FOOTER_ to disable mom&#8217;s default
+behaviour for the various elements of footer style.
+</p>
+
+<h4 id="hdrftr-style-part" class="docs">3. Part by part changes</h4>
+
+<p>
+When using the following control &#8221;macros, replace
+&#8220;&lt;POSITION&gt; by <b>LEFT, CENTER,</b> or RIGHT as
+appropriate.
+</p>
+
+<div class="macro-list-container">
+<ul style="padding-top: 6px; padding-bottom: 6px; margin-left: -.5em;">
+  <li><a href="#_family">HEADER_&lt;POSITION&gt;_FAMILY</a></li>
+  <li><a href="#_font">HEADER_&lt;POSITION&gt;_FONT</a></li>
+  <li><a href="#_size">HEADER_&lt;POSITION&gt;_SIZE</a></li>
+  <li><a href="#_caps">HEADER_&lt;POSITION&gt;_CAPS</a></li>
+  <li><a href="#_color">HEADER_&lt;POSITION&gt;_COLOR</a></li>
+</ul>
+</div>
+
+<div id="_family" class="box-macro-args">
+Macro: <b>HEADER_&lt;POSITION&gt;_FAMILY</b> <kbd class="macro-args">&lt;family&gt;</kbd>
+</div>
+
+<p>
+Use HEADER_&lt;POSITION&gt;_FAMILY to change the
+<a href="definitions.html#family">family</a>
+of any part of headers.  See
+<a href="docelement.html#control-macro-args">Arguments to the control macros</a>
+for an explanation of how control macros ending in _FAMILY work.
+</p>
+
+<p>
+Replace HEADER_, above, with FOOTER_ to change a footer part&#8217;s family.
+</p>
+
+<div id="_font" class="box-macro-args">
+Macro: <b>HEADER_&lt;POSITION&gt;_FONT</b> <kbd class="macro-args">&lt;font&gt;</kbd>
+</div>
+
+<p>
+Use HEADER_&lt;POSITION&gt;_FONT to change the
+<a href="definitions.html#font">font</a>
+of any part of headers.  See
+<a href="docelement.html#control-macro-args">Arguments to the control macros</a>
+for an explanation of how control macros ending in _FONT work.
+</p>
+
+<p>
+Replace HEADER_, above, with FOOTER_ to change a footer part&#8217;s font.
+</p>
+
+<div id="_size" class="box-macro-args">
+Macro: <b>HEADER_&lt;POSITION&gt;_SIZE</b> <kbd class="macro-args">&lt;+|-number of points&gt;</kbd>
+</div>
+
+<p>
+Use HEADER_&lt;POSITION&gt;_SIZE to change the size of any part of
+headers (relative to the point size of type in paragraphs).  See
+<a href="docelement.html#control-macro-args">Arguments to the control macros</a>
+for an explanation of how control macros ending in _SIZE work.
+</p>
+
+<p>
+Replace HEADER_, above, with FOOTER_ to change a footer part&#8217;s size.
+</p>
+
+<div id="_caps" class="box-macro-args">
+Macro: <b>HEADER_&lt;POSITION&gt;_CAPS</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+HEADER_&lt;POSITION&gt;_CAPS is a
+<a href="definitions.html#toggle">toggle macro</a>.
+If you want any part of headers to be set in all caps, regardless of
+the capitalization of that part&#8217;s string as given to the
+<a href="docprocessing.html#reference-macros">reference macros</a>
+or as defined by you with the
+<a href="#hdrftr-strings">header string control macros</a>,
+simply invoke this macro (using the appropriate position) with no
+argument.  If you wish to turn capitalization off (say, for the
+header-right string that mom capitalizes by default), invoke the
+macro with any argument (e.g. <kbd>OFF, QUIT, END, X</kbd>...).
+</p>
+
+<p>
+Replace HEADER_, above, with FOOTER_ to change a footer part&#8217;s
+capitalization style.
+</p>
+
+<div id="_color" class="box-macro-args">
+Macro: <b>HEADER_&lt;POSITION&gt;_COLOR</b> <kbd class="macro-args">&lt;colorname&gt;</kbd>
+</div>
+
+<p>
+HEADER_&lt;POSITION&gt;_COLOR allows you to set a colour for each of
+the three possible parts of a page header separately.  For example,
+say you want the right part of the header (by default, the document
+title) in red, this is how you&#8217;d get it:
+<br/>
+<span class="pre-in-pp">
+  .HEADER_RIGHT_COLOR red
+</span>
+The other parts of the header will be in the default header colour
+(usually black, but that can be changed with
+<a href="#hdrftr-color">HEADER_COLOR</a>).
+</p>
+
+<p>
+Remember that you have to define (or &#8220;initialize&#8221;) a
+colour with
+<a href="color.html#newcolor">NEWCOLOR</a>
+or
+<a href="color.html#xcolor">XCOLOR</a>
+before you can use the colour.
+</p>
+
+<p>
+If you create a
+<a href="#userdef-hdrftr-rv">user-defined header</a>
+with
+<a href="#hdrftr-rectoverso">HEADER_RECTO</a>
+or
+<a href="#hdrftr-rectoverso">HEADER_VERSO</a>,
+and you want various elements within the header to be colourized,
+embed the colours in the string passed to HEADER_RECTO or
+HEADER_VERSO with the
+<a href="color.html#color-inline"><kbd>\*[&lt;colorname&gt;]</kbd></a>
+<a href="definitions.html#inlines">inline escape</a>.
+</p>
+
+<p>
+Replace HEADER_, above, with FOOTER_ to set the colours for the
+various elements of footers.
+</p>
+
+<!-- -HDRFTR_VERTICAL- -->
+
+<h4 id="hdrftr-vertical" class="docs">3. Header/footer vertical placement and spacing</h4>
+
+<p>
+See
+<a href="#vertical-spacing">Vertical placement and spacing of headers/footers</a>
+for an explanation of how mom deals with
+headers, footers, and top/bottom page margins.
+</p>
+
+<div class="macro-list-container">
+<ul style="padding-top: 6px; padding-bottom: 6px; margin-left: -.5em;">
+  <li><a href="#hdftr_margin">HEADER_MARGIN</a></li>
+  <li><a href="#hdftr_gap">HEADER_GAP</a></li>
+</ul>
+</div>
+
+<!-- -HDRFTR_MARGIN- -->
+
+<div id="hdrftr-margin" class="box-macro-args">
+Macro: <b>HEADER_MARGIN</b> <kbd class="macro-args">&lt;distance to baseline of header&gt;</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+Use HEADER_MARGIN to set the distance from the top edge of the page to the
+<a href="definitions.html#baseline">baseline</a>
+of type in headers.  A unit of measure is required, and decimal
+fractions are allowed.
+</p>
+
+<p>
+Mom&#8217;s default header margin is 4-1/2
+<a href="definitions.html#picaspoints">picas</a>,
+but if you want a different margin, say, 1/2-inch, do
+<br/>
+<span class="pre-in-pp">
+  .HEADER_MARGIN .5i
+</span>
+If your document uses
+<a href="definitions.html#footer">footers</a>,
+replace HEADER_, above, with FOOTER_.  The argument to FOOTER_MARGIN
+is the distance from the bottom edge of the page to the baseline of
+type in footers.  Mom&#8217;s default footer margin is 3
+<a href="definitions.html#picaspoints">picas</a>.
+</p>
+
+<h3 class="docs">Header/footer margins and page numbering</h3>
+
+<p>
+Mom uses HEADER_MARGIN and FOOTER_MARGIN to establish the baseline
+position of page numbers in addition to the baseline position of
+headers and footers proper.
+</p>
+
+<p>
+By default, page numbers appear at the bottom of the page, therefore
+if you want the default position (bottom), but want to change the
+baseline placement, use FOOTER_MARGIN.  Conversely, if page numbers
+are at the top of the page, either because you turned
+<a href="#footers">FOOTERS</a>
+on or because you instructed mom to put them there with
+<a href="#pagenum-pos">PAGENUM_POS</a>,
+you&#8217;d use HEADER_MARGIN to change their baseline placement.
+</p>
+
+<div id="footer-margin" class="box-important" style="padding-bottom: 15px;">
+<p class="tip-top">
+<span class="important" style="display: block; margin-bottom: -1em;">Important &ndash; FOOTER_MARGIN and bottom margins</span>
+<br/>
+Mom requires a footer margin (i.e. the distance from the bottom of
+the page at which to place footers) for proper operation, hence she
+sets one, even if you don&#8217;t.  As stated above, her default
+footer margin is 3-picas.
+</p>
+
+<p>
+If you use
+<a href="typesetting.html#b-margin">B_MARGIN</a>
+or
+<a href="typesetting.html#page">PAGE</a>,
+to set a bottom margin for your document (prior to
+<a href="docprocessing.html#start">START</a>)
+and the margin&#8217;s too close to mom&#8217;s default
+footer margin (or a footer margin you set yourself with
+FOOTER_MARGIN), mom will not print your footers; additionally,
+she&#8217;ll give you a warning and some advice on standard error.
+When this happens, you must reset either B_MARGIN or FOOTER_MARGIN
+so there&#8217;s an adequate amount of space for mom to print the
+bottom line of running text and the footer.
+</p>
+
+<p>
+If you see the warning even when footers and/or bottom-of-page page
+numbering are disabled, set a nominal footer margin of 0 prior to
+<a href="docprocessing.html#start">START</a>,
+as in these examples.
+</p>
+
+<div id="examples-footnotes-1" class="examples-container" style="padding-bottom: 1em;">
+<div class="examples" style="margin-top: 0; margin-bottom: -.25em;">Example 1</div>
+<span class="pre">
+  &lt;reference macros, etc&gt;
+  .PAGINATION    OFF
+  .B_MARGIN      .25i
+  .FOOTER_MARGIN O
+  .START
+</span>
+</div>
+
+<div id="examples-footnotes-2" class="examples-container" style="margin-top: 1em; padding-bottom: 1em;">
+<div class="examples" style="margin-top: 0;">Example 2</div>
+<span class="pre">
+  &lt;reference macros, etc&gt;
+  .HEADERS       OFF
+  .PAGENUM_POS   TOP RIGHT
+  .B_MARGIN      .25i
+  .FOOTER_MARGIN O
+  .START
+</span>
+</div>
+</div>
+
+<!-- -HDRFTR_GAP- -->
+
+<div id="hdrftr-gap" class="box-macro-args">
+Macro: <b>HEADER_GAP</b> <kbd class="macro-args">&lt;distance from header to start of running text&gt;</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+Use HEADER_GAP to set the distance from the
+<a href="definitions.html#baseline">baseline</a>
+of type in headers to the start of
+<a href="definitions.html#running">running text</a>.
+A unit of measure is required, and decimal fractions are allowed.
+</p>
+
+<p>
+As explained in
+<a href="#vertical-spacing">Vertical placement and spacing of headers/footers</a>,
+HEADER_MARGIN + HEADER_GAP determine the default vertical starting
+position of running text on the page unless you have given mom your
+own top margin (with
+<a href="typesetting.html#t-margin">T_MARGIN</a>).
+If you give a top margin, mom ignores HEADER_GAP; running text
+starts at your stated top margin.
+</p>
+
+<p>
+Mom&#8217;s default header gap is 3
+<a href="definitions.html#picaspoints">picas</a>,
+but if you want a different gap, say, 2 centimetres, do
+<br/>
+<span class="pre-in-pp">
+  .HEADER_GAP 2c
+</span>
+</p>
+
+<p>
+If your document uses
+<a href="definitions.html#footer">footers</a>,
+replace HEADER_, above, with FOOTER_.  The argument to FOOTER_GAP
+is the distance from the baseline of type in footers to the last
+baseline of running text on the page.
+</p>
+
+<p>
+As explained in
+<a href="#vertical-spacing">Vertical placement and spacing of headers/footers</a>,
+FOOTER_MARGIN + FOOTER_GAP determine the default vertical end
+position of running text on the page unless you have given mom a
+bottom margin (with
+<a href="typesetting.html#b-margin">B_MARGIN</a>).
+If you give a bottom margin, mom ignores FOOTER_GAP; running text
+ends at your stated bottom margin, subject to the restriction outlined
+<a href="#footer-margin">here</a>.
+</p>
+
+<p>
+Mom&#8217;s default footer gap is 3 
+<a href="definitions.html#picaspoints">picas</a>.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Mom uses HEADER_GAP and FOOTER_GAP to establish the start and end
+baseline positions of running text with respect to both headers and
+footers AND page numbers.  If you wish to change the gap between the
+last line of running text and a bottom page number, use FOOTER_GAP.
+If page numbers are at the top of the page, change the gap between
+the number and the first line of running text with HEADER_GAP.
+</p>
+</div>
+
+<!-- -HDRFTR_SEPARATOR- -->
+
+<h4 id="hdrftr-separator" class="docs">4. Header/footer separator rule</h4>
+
+<p>
+The header/footer separator rule is a modest horizontal rule,
+set slightly below the header (or above the footer), that runs
+the length of the
+<a href="definitions.html#header">header</a>
+and helps separate it visually from
+<a href="definitions.html#running">running text</a>.  If
+you don&#8217;t want the rule, you can turn it off.  If you want it,
+but at a different vertical position relative to the header (or
+footer), you can alter its placement.
+</p>
+
+<div class="macro-list-container">
+<ul style="padding-top: 6px; padding-bottom: 6px; margin-left: -.5em;">
+  <li><a href="#hdrftr-rule">HEADER_RULE</a> &ndash; on or off</li>
+  <li><a href="#hdrftr-rule-weight">HEADER_RULE_WEIGHT</a> &ndash; weight of the rule</li>
+  <li><a href="#hdrftr-rule-gap">HEADER_RULE_GAP</a> &ndash; distance of rule from header</li>
+  <li><a href="#hdrftr-rule-color">HEADER_RULE_COLOR</a> &ndash; color of rule header</li>
+</ul>
+</div>
+
+<!-- -HDRFTR_RULE- -->
+
+<div id="hdrftr-rule" class="box-macro-args">
+Macro: <b>HEADER_RULE</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+By default, mom prints a header separator rule underneath headers
+(or above footers). If you don&#8217;t want the rule, turn it off by
+invoking <kbd>.HEADER_RULE</kbd> with any argument (<kbd>OFF, QUIT,
+END, X...</kbd>), e.g.
+<br/>
+<span class="pre-in-pp">
+  .HEADER_RULE OFF
+</span>
+To turn the rule (back) on, invoke <kbd>.HEADER_RULE</kbd>
+without any argument.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Replace HEADER_, above, with FOOTER_ to enable/disable the printing
+of the footer separator rule.  (Most likely, if you&#8217;re using
+<kbd><a href="#footers">FOOTERS</a></kbd>,
+you&#8217;ll want it off.)
+</p>
+</div>
+
+<!-- -HDRFTR_RULE_WEIGHT- -->
+
+<div id="hdrftr-rule-weight" class="box-macro-args">
+Macro: <b>HEADER_RULE_WEIGHT</b> <kbd class="macro-args">&lt;weight in points&gt;</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Argument must <span class="normal">NOT</span> have a <a href="definitions.html#unitofmeasure">unit of measure</a> appended
+</p>
+
+<p>
+HEADER_RULE_WEIGHT controls the weight (&#8220;thickness&#8221;) of
+the header rule.  Like
+<a href="inlines.html#rule-weight">RULE_WEIGHT</a>,
+it takes a single argument: the weight of the header rule expressed
+in
+<a href="definitions.html#picaspoints">points</a>
+but without the unit of measure, <kbd>p</kbd>, appended.  The
+argument to HEADER_RULE_WEIGHT must be greater than 0 and less than
+100; decimal fractions are allowed.
+</p>
+
+<p>
+Say, for example, you want a really strong header separator rule.  
+<br/>
+<span class="pre-in-pp">
+  .HEADER_RULE_WEIGHT 4
+</span>
+which sets the separator rule weight to 4 points, is how you&#8217;d do
+it.
+</p>
+
+<p>
+Mom&#8217;s default header rule weight is 1/2 point.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Replace HEADER_, above, with FOOTER_ to set the weight of the footer
+separator rule.
+</p>
+</div>
+
+<!-- -HDRFTR_RULE_GAP- -->
+
+<div id="hdrftr-rule-gap" class="box-macro-args">
+Macro: <b>HEADER_RULE_GAP</b> <kbd class="macro-args">&lt;distance of rule beneath header&gt;</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+HEADER_RULE_GAP is the distance from the
+<a href="definitions.html#baseline">baseline</a>
+of type in headers to the top edge of the rule underneath.  (If
+FOOTER_RULE_GAP, the gap is the distance from the top of the highest
+<a href="definitions.html#ascender">ascender</a>
+to the bottom edge of the rule.)  A unit of measure is required, and
+decimal fractions are allowed.  Please note that HEADER_RULE_GAP has
+no effect on
+<a href="#hdrftr-gap">HEADER_GAP</a>
+(i.e. HEADER_RULE_GAP is NOT added to HEADER_GAP when mom calculates
+the space between headers and the start of
+<a href="definitions.html#running">running text</a>).
+</p>
+
+<p>
+By default, the header rule gap is 4
+<a href="definitions.html#picaspoints">points</a>.
+If you&#8217;d like to change it to, say, 1/4
+<a href="definitions.html#em">em</a>, do
+<br/>
+<span class="pre-in-pp">
+  .HEADER_RULE_GAP .25m
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Replace HEADER_, above, with FOOTER_ if you&#8217;re using
+<a href="definitions.html#footer">footers</a>
+and want to change the separator rule gap.  In footers, the gap is
+measured from the top of the tallest
+<a href="definitions.html#ascender">ascender</a>
+in the footer.
+</p>
+
+<p class="tip-bottom">
+<span class="additional-note">Additional note:</span>
+When using
+<a href="#hdrftr-recto">FOOTER_RECTO</a>
+and
+<a href="#hdrftr-verso">FOOTER_VERSO</a>,
+make sure that the default size for footers
+(<a href="#footer-global-size">FOOTER_SIZE</a>)
+is set to the largest size of type that will be used in the footer
+or mom may not get the rule gap right.  Inline changes to the size
+of type in FOOTER_RECTO and FOOTER_VERSO should always be negative
+(smaller) than the default.
+</p>
+</div>
+
+<!-- -HDRFTR_RULE_COLOR- -->
+
+<div id="hdrftr-rule-color" class="box-macro-args">
+Macro: <b>HEADER_RULE_COLOR</b> <kbd class="macro-args">&lt;colorname&gt;</kbd>
+</div>
+
+<p>
+If you wish to change the colour of the header rule, invoke
+<kbd>.HEADER_RULE_COLOR</kbd> with the name of a colour pre-defined
+(or &#8220;initialized&#8221;) with
+<a href="color.html#newcolor">NEWCOLOR</a>
+or
+<a href="color.html#xcolor">XCOLOR</a>.
+</p>
+
+<p>
+HEADER_RULE_COLOR overrides the colour set with
+<a href="#hdrftr-color">HDRFTR_COLOR</a>,
+so it&#8217;s possible to have the heads entirely in, say, blue (set
+with HEADER_COLOR), and the header rule in, say, red.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Replace HEADER_, above, with FOOTER_ to change the colour of the
+footer rule.
+</p>
+</div>
+
+<div class="rule-short"><hr/></div>
+
+<!-- -USERDEF_HDRFTR- -->
+
+<h2 id="userdef-hdrftr-rv" class="macro-group">User-defined, single string recto/verso headers/footers</h2>
+
+<p>
+Sometimes, you&#8217;ll find you can&#8217;t get mom&#8217;s
+handling of 3-part headers or footers to do exactly what you want in
+the order you want.  This is most likely happen when you want the
+information contained in the headers/footers split over two pages,
+as is often the case with recto/verso documents.
+</p>
+
+<p>
+Say, for example, you want recto page headers to contain a
+document&#8217;s author, centred, and verso page headers to contain
+the document&#8217;s title, also centred, like this:
+<br/>
+<span class="pre-in-pp">
+    +------------------------+   +------------------------+     
+    |         Author         |   |         Title          |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    +------------------------+   +------------------------+     
+</span>
+With mom&#8217;s standard 3-part headers, this isn&#8217;t possible,
+even when
+<a href="rectoverso.html#recto-verso">RECTO_VERSO</a>
+is enabled.  RECTO_VERSO switches the left and right parts of
+headers on alternate pages, but the centre part remains unchanged.
+</p>
+
+<p>
+Any time you need distinctly different headers on alternate pages,
+mom has macros that let you manually design and determine what goes
+into headers on recto pages, and what goes into headers on verso
+pages.  The macros are
+<a href="#hdrftr-recto">HEADER_RECTO</a>
+and
+<a href="#hdrftr-verso">HEADER_VERSO</a>.
+Both allow you to state whether the header is flush left, centred,
+or flush right, and both take a single
+<a href="definitions.html#stringargument">string argument</a>
+with which, by combining text and
+<a href="definitions.html#inlines">inline escapes</a>,
+you can make the headers come out just about any way you want.
+Use of the <kbd>\*[PAGE#]</kbd> escape is permitted in the string
+argument (see
+<a href="#page-number-incl">Including the page number in header-left, -centre or -right</a>),
+and, as an added bonus, mom provides a special mechanism whereby
+it&#8217;s possible to
+<a href="#padding-hdrftr">pad</a>
+the string as well.  The padding mechanism lets you create headers
+that contain left, centre and right parts like mom's defaults but
+entirely of your own design.
+</p>
+
+<div class="macro-list-container">
+<ul style="padding-top: 6px; padding-bottom: 6px; margin-left: -.5em;">
+  <li><a href="#hdrftr-recto">HEADER_RECTO</a></li>
+  <li><a href="#hdrftr-verso">HEADER_VERSO</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#userdef-hdrftr">User-defined single string headers/footers (no recto/verso)</a></li>
+    <li><a href="#padding-hdrftr">Padding the header-recto/header-verso string</a></li>
+  </ul></li>
+</ul>
+</div>
+
+<!-- -HDRFTR_RECTOVERSO- -->
+
+<div id="hdrftr-recto" class="box-macro-args">
+Macro: <b>HEADER_RECTO</b> <kbd class="macro-args">LEFT | CENTER | RIGHT [ CAPS ] "&lt;header recto string&gt;"</kbd>
+</div>
+
+<div id="hdrftr-verso" class="box-macro-args" style="margin-top: 1em;">
+Macro: <b>HEADER_VERSO</b> <kbd class="macro-args">LEFT | CENTER | RIGHT [ CAPS ] "&lt;header verso string&gt;"</kbd>
+</div>
+
+<div id="userdef-hdrftr" class="box-tip" style="margin-top: 1.5em; outline: 2px dashed #000089; margin-left: 3px; margin-right: 3px;">
+<p class="tip">
+<span class="tip" style="display: block; margin-bottom: -1.25em; color: #000056; font-size: 105%;">User-defined single string headers/footers (no recto/verso)</span>
+<br/>
+HEADER_RECTO may be used to create user-defined, single string
+headers (or footers, with FOOTER_RECTO), even when recto/verso is
+not enabled (with
+<a href="rectoverso.html#recto-verso">RECTO_VERSO</a>).
+In such cases, the header/footer you create is the one used on
+every page, making HEADER_RECTO your &#8220;I need to design my own
+headers from scratch&#8221; solution.
+</p>
+</div>
+
+<p>
+HEADER_RECTO and HEADER_VERSO behave identically, hence all
+references to HEADER_RECTO in this section also refer to
+HEADER_VERSO.  Furthermore, FOOTER_ can be used instead of HEADER_
+to set up recto/verso footers.
+</p>
+
+<p>
+The first argument to HEADER_RECTO is the direction in which you
+want the header
+<a href="definitions.html#quad">quadded</a>.
+<kbd>L, C</kbd> and <kbd>R</kbd> may be used in place of <kbd>LEFT,
+CENTER</kbd> and <kbd>RIGHT</kbd>.
+</p>
+
+<p>
+The second argument (optional) tells mom to capitalize the text of
+the header. <b>Please note:</b> Do not use <kbd><a
+href="inlines.html#uc-lc">\*[UC]...\*[LC]</a></kbd> inside the
+string passed to HEADER_RECTO.
+</p>
+
+<p>
+The final argument is a string, surrounded by double-quotes,
+containing what you want in the header.  HEADER_RECTO disables
+mom&#8217;s normal 3-part headers, therefore anything you want in
+the headers must be entered by hand in the string, including colours
+(via the
+<a href="definitions.html#inlines">inline escape</a>
+<a href="color.html#color-inline"><kbd>\*[&lt;colorname&gt;]</kbd></a>).
+</p>
+
+<p>
+By default, HEADER_RECTO is set at the same size, and in the same
+family and font, as paragraph text.  The control macros
+<a href="#hdrftr-global-family">HEADER_FAMILY</a>
+and
+<a href="#hdrftr-global-size">HEADER_SIZE</a>
+may be used to change the default family and size.  Changes to the
+font(s) within the string must be accomplished with the
+<a href="definitions.html#inlines">inline escapes</a>
+<kbd>\*[ROM], \*[IT], \*[BD], \*[BDI]</kbd> and
+<kbd>\*[PREV]</kbd> (see
+<a href="inlines.html#inline-fonts-mom">Changing fonts</a>).
+Additional refinements to the style of the header-recto string,
+including horizontal spacing and/or positioning, can also be made
+with inline escapes.
+</p>
+
+<p>
+To include the current page number in the string, use the
+<kbd>\*[PAGE#]</kbd>
+<a href="definitions.html#inlines">inline escape</a>.
+</p>
+
+<h3 id="padding-hdrftr" class="docs">Padding the header-recto/header-verso string</h3>
+
+<p>
+You can &#8220;pad&#8221; the header-recto string, a convenience
+you&#8217;ll appreciate in circumstances such as the following.
+<br/>
+<span class="pre-in-pp">
+               VERSO                       RECTO 
+    +------------------------+   +------------------------+     
+    | Author          Page#  |   | Page#            Title |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    |                        |   |                        |     
+    +------------------------+   +------------------------+     
+</span>
+</p>
+
+<p>
+There are two steps to padding the string argument passed to HEADER_RECTO
+(if you&#8217;re unsure what padding is, see
+<a href="goodies.html#pad">Insert space into lines</a>).
+</p>
+<ol style="margin-top: -.5em; margin-left: -.5em; margin-bottom: -.5em;">
+  <li>Begin and end the string (inside the double-quotes) with the caret character (<kbd>^</kbd>).</li>
+  <li>Enter the pound sign (<kbd>#</kbd>) at any point in the string where you want an equalized amount of whitespace inserted.</li>
+</ol>
+
+<p>
+The situation depicted above is accomplished like this:
+<br/>
+<span class="pre-in-pp">
+  .HEADER_RECTO LEFT "^\*[PAGE#]#\E*[$TITLE]^"
+  .HEADER_VERSO LEFT "^\E*[$AUTHOR]#\*[PAGE#]^"
+</span>
+Notice that the quad argument, <kbd>LEFT</kbd>, is used in both
+cases.  When padding a header, it doesn&#8217;t matter which
+quad argument you use, although you must be sure to supply
+one.  Also note that mom does not interpret the <kbd>#</kbd> in
+<kbd>\*[PAGE#]</kbd> as a padding marker (i.e. as a place to insert
+whitespace).
+</p>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">Important:</span>
+The
+<a href="goodies.html#pad-marker">PAD_MARKER</a>
+macro, which changes the default pad marker (<kbd>#</kbd>) used by
+<a href="goodies.html#pad">PAD</a>,
+has no effect on the pad marker used in the HEADER_RECTO string.  If
+you absolutely must have a literal pound sign in your HEADER_RECTO
+string, use the escape sequence for the pound sign
+(&nbsp;<kbd>\[sh]</kbd>&nbsp;) where you want the pound sign to go.
+</p>
+</div>
+
+<!-- -HDRFTR_RECTOVERSO- -->
+
+<h2 id="headers-and-footers-intro" class="macro-group">Headers and footers on the same page</h2>
+
+<p>
+Normally, mom prints either a header or a footer, but not both, depending on whether
+<a href="docprocessing.html#header">HEADERS</a>
+or
+<a href="docprocessing.html#footer">FOOTERS</a>
+is enabled.  (Page numbering, whether in the top margin
+or the bottom, is not considered a header or a footer.)
+Should you need both headers and footers on the same page, the
+single macro, HEADERS_AND_FOOTERS, is the way to set it up.
+</p>
+
+<div id="headers-and-footers" class="box-macro-args">
+Macro: <b>HEADERS_AND_FOOTERS</b> <kbd class="macro-args">(see Invocation)</kbd>
+</div>
+
+<p>
+Invocation:
+<br/>
+<span class="pre-in-pp" style="margin-bottom: -1em;">
+  .HEADERS_AND_FOOTERS \
+  &lt;L | C | R&gt; "&lt;header-recto string&gt;" \
+  &lt;L | C | R&gt; "&lt;footer-recto string&gt;" \
+  &lt;L | C | R&gt; "&lt;header-verso string&gt;" \
+  &lt;L | C | R&gt; "&lt;header-verso string&gt;"
+</span>
+or
+<span class="pre-in-pp" style="margin-top: -.5em;">
+  .HEADERS_AND_FOOTERS &lt;anything&gt;
+</span>
+</p>
+
+<p>
+Unlike the macros,
+<a href="#headers">HEADERS</a>
+and
+<a href="#footers">FOOTERS</a>,
+which are
+<a href="definitions.html#toggle">toggle</a>
+macros, HEADERS_AND_FOOTERS requires that you supply the information
+you want in the headers and footers yourself.  Mom does no automatic
+generation of things like the title and the author in headers and
+footers when you&#8217;re using HEADERS_AND_FOOTERS.  Furthermore,
+style changes&mdash;family, font, pointsize, colour, capitalization,
+etc &mdash;are entirely your responsibility and must be made with
+<a href="definitions.html#inlines">inline escapes</a>
+in the arguments passed to <kbd>&#8220;&lt;recto
+&#8221;header string&gt;&#8220;</kbd>, <kbd>&lt;recto footer
+string&gt;&#8220;</kbd>, etc.  By default, mom sets the headers and
+footers created with HEADERS_AND_FOOTERS in the same family, font,
+point size, capitalization style and colour as
+<a href="definitions.html#running">running text</a>.
+</p>
+
+<p>
+The manner of entering what you want is identical to the way you
+input
+<a href="#userdef-hdrftr-rv">single string headers and footers</a>.
+I suggest reading up on them, as well as looking at the entries,
+<kbd><a href="#hdrftr-rectoverso">HEADER_RECTO</a></kbd>
+and
+<a href="#reserved-strings">Using mom&#8217;s reserved strings in header/footer definitions</a>.
+</p>
+
+<p>
+The same
+<a href="#padding-hdrftr">padding mechanism</a>
+used in HEADER_RECTO and HEADER_VERSO is available in the
+<a href="definitions.html#stringargument">string arguments</a>
+passed to HEADERS_AND_FOOTERS, allowing you to simulate two- and
+three-part headers and footers.
+</p>
+
+<p>
+<kbd>L | C | R</kbd> in the arguments to HEADERS_AND_FOOTERS refers
+to whether you want the specific header or footer set flush left,
+centered, or flush right.  (You can also use the longer forms,
+<kbd>LEFT</kbd>, <kbd>CENTER</kbd> and <kbd>RIGHT</kbd>.)  The
+string you give afterwards is whatever text you want, including
+mom&#8217;s
+<a href="#reserved-strings">reserved strings</a>,
+and whatever
+<a href="definitions.html#inlines">inline escapes</a>
+you need to change things like family and font, pointsize, colour,
+etc. as you go along.
+</p>
+
+<p>
+Note the backslashes in the invocation, above.  Every set of
+arguments given this way to HEADERS_AND_FOOTERS <i>except the
+last</i> requires a backslash after it.  The use of backslashes
+isn&#8217;t required if you want to put the entire argument list on
+the same (very long!) line as the macro itself; I recommend sticking
+to the style shown above to keep things manageable.
+</p>
+
+<p>
+If you want to disable having both headers and footers on the same
+page, invoke <kbd>.HEADERS_AND_FOOTERS</kbd> with any argument
+you want (e.g. <kbd>OFF, QUIT, END, X...</kbd>). Mom will restore
+her default behaviour of setting automatically generated page
+headers, with the page number, centered, at the bottom of the
+page.  If you would prefer footers instead of headers after turning
+HEADERS_AND_FOOTERS off, invoke
+<a href="#footers"><kbd>.FOOTERS</kbd></a>
+afterwards.
+</p>
+
+<h4 class="docs" style="margin-bottom: 1em;">Examples of HEADERS_AND_FOOTERS usage</h4>
+
+<div id="examples-userdef-hdrftr-1" class="examples-container" style="padding-bottom: 0;">
+<div class="examples" style="margin-top: 12px; margin-bottom: 0;">Example 1: Header and footer the same on every page</div>
+<span class="pre">
+.HEADERS_AND_FOOTERS \          +-----------------------+
+C "\E*[$TITLE]" \               |         Title         |
+L "^\E*[$AUTHOR]#\*[PAGE#]^"    |                       |
+                                |                       |
+                                |                       |
+                                |                       |
+                                |                       |
+                                |                       |
+                                |                       |
+                                |                       |
+                                |                       |
+                                |                       |
+                                |                       |
+                                |                       |
+                                | Author          Pg. # |
+                                +-----------------------+
+</span>
+
+<p>
+<kbd>\E*[$TITLE]</kbd> and <kbd>\E*[$AUTHOR]</kbd> will print the
+strings you pass to
+<a href="docprocessing.html#title">TITLE</a>
+and
+<a href="docprocessing.html#author">AUTHOR</a>;
+<kbd>\*[PAGE#]</kbd> is how you include the page number in a header
+or footer string.  (For a list of special strings you can use in
+headers and footers, see
+<a href="#reserved-strings">here</a>.)
+</p>
+
+<p>
+You don&#8217;t have to use these special strings.  You can type
+in anything you like.  I&#8217;ve only used them here to show that
+they&#8217;re available.
+</p>
+</div>
+
+<div id="examples-userdef-hdrftr-2" class="examples-container" style="margin-top: 1em; padding-bottom: 18px;">
+<div class="examples" style="margin-top: 12px; margin-bottom: 0;">Example 2: Different headers and footers on recto/verso pages</div>
+<span class="pre">
+.HEADERS_AND_FOOTERS \
+C "BOOK TITLE" \
+L "^\*[PAGE#]#\E*[$AUTHOR]^" \
+C "Story Title" \
+L "^\E*[$AUTHOR]#\*[PAGE#]^"
+
+        +-----------------------+     +------------------------+
+        |      BOOK TITLE       |     |       Story Title      |
+        |                       |     |                        |
+        |                       |     |                        |
+        |                       |     |                        |
+        |                       |     |                        |
+        |                       |     |                        |
+        |                       |     |                        |
+        |                       |     |                        |
+        |                       |     |                        |
+        |                       |     |                        |
+        |                       |     |                        |
+        |                       |     |                        |
+        |                       |     |                        |
+        | Pg. #          Author |     | Author            Pg.# |
+        +-----------------------+     +------------------------+
+</span>
+</div>
+
+<div class="rule-short" style="margin-top: 1.25em;"><hr/></div>
+
+<!-- ==================================================================== -->
+
+<h2 id="pagination-intro" class="macro-group">Pagination</h2>
+
+<p>
+By default, mom paginates documents.  Page numbers
+appear in the bottom margin of the page, centred between two hyphens.
+As with all elements of mom&#8217;s document processing,
+most aspects of pagination style can be altered to suit your taste
+with control macros.
+</p>
+
+
+<div class="macro-list-container">
+<h3 id="index-pagination" class="macro-list">Pagination macros</h3>
+<ul class="macro-list">
+  <li><a href="#paginate">PAGINATE</a> &ndash; pagination on or off</li>
+  <li><a href="#pagenumber">PAGENUMBER</a> &ndash; user-defined (starting) page number</li>
+  <li><a href="#pagenum-style">PAGENUM_STYLE</a> &ndash; digits, roman numerals, etc</li>
+  <li><a href="#pagenum-on-first-page">PAGENUM_ON_FIRST_PAGE</a> &ndash; applies only when footers are enabled</li>
+  <li><a href="#draft-with-pagenumber">DRAFT_WITH_PAGENUMBER</a> &ndash; attach draft/revision information to page numbers</li>
+  <li><a href="#paginate-control">Pagination control macros and defaults</a></li>
+</ul>
+</div>
+
+<!-- -PAGINATE- -->
+
+<div id="paginate" class="box-macro-args">
+Macro: <b>PAGINATE</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p class="alias" style="margin-bottom: 0;">
+<i>Alias:</i> <b>PAGINATION</b>
+</p>
+
+<p>
+By default, mom paginates documents (in the bottom margin).  If
+you&#8217;d prefer she not paginate, turn pagination off by invoking
+<kbd>.PAGINATE</kbd> with any argument (<kbd>OFF, NO, QUIT, END,
+X...</kbd>), e.g.
+<br/>
+<span class="pre-in-pp">
+  .PAGINATE NO 
+</span>
+To (re)start pagination, invoke <kbd>.PAGINATE</kbd> without any
+argument.
+</p>
+
+<!-- -PAGENUMBER- -->
+
+<div id="pagenumber" class="box-macro-args">
+Macro: <b>PAGENUMBER</b> <kbd class="macro-args">&lt;number&gt;</kbd>
+</div>
+
+<p>
+As is to be expected, pagination of documents begins at page 1.  If
+you&#8217;d prefer that mom begin with a different number on the
+first page of a document, invoke <kbd>.PAGENUMBER</kbd> with the
+number you want.
+</p>
+
+<p>
+PAGENUMBER need not be used only to give mom a "first page" number.
+It can be used at any time to tell mom what number you want a page
+to have.  Subsequent page numbers will, of course, be incremented by
+1 from that number.
+</p>
+
+<!-- -PAGENUM_STYLE- -->
+
+<div id="pagenum-style" class="box-macro-args">
+Macro: <b>PAGENUM_STYLE</b> <kbd class="macro-args">DIGIT | ROMAN | roman | ALPHA | alpha</kbd>
+</div>
+
+<p>
+PAGENUM_STYLE lets you tell mom what kind of page numbering you
+want.
+<br/>
+<span class="pre-in-pp">
+  DIGIT   Arabic digits (1, 2, 3...)
+  ROMAN   upper case roman numerals (I, II, III...)
+  roman   lower case roman numerals (i, ii, iii...)
+  ALPHA   upper case letters (A, B, C...)
+  alpha   lower case letters (a, b, c...)
+</span>
+</p>
+
+<!-- -PAGENUM_ON_FIRST_PAGE- -->
+
+<div id="pagenum-on-first-page" class="box-macro-args">
+Macro: <b>PAGENUM_ON_FIRST_PAGE</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+This macro applies only if you&#8217;ve enabled
+<a href="#footers">FOOTERS</a>.
+If FOOTERS are on, mom automatically places page numbers at the tops
+of pages except on the first page of a document (or on first pages
+after
+<a href="rectoverso.html#collate">COLLATE</a>).
+If you&#8217;d like the page number to appear on &#8220;first&#8221; pages
+when footers are on, invoke
+<br/>
+<span class="pre-in-pp">
+  .PAGENUM_ON_FIRST_PAGE
+</span>
+with no argument.  Any other argument turns the feature off
+(<kbd>OFF, QUIT, END, X</kbd>, etc).
+</p>
+
+<p>
+As with most of the
+<a href="definitions.html#controlmacro">control macros</a>,
+PAGENUM_ON_FIRST_PAGE can be invoked at any time, meaning that if
+you don&#8217;t want a page number on the very first page of a
+document, but do want one on pages that appear after COLLATE, omit
+it before the first
+<a href="docprocessing.html#start">START</a>
+of the document, then invoke it either just before or after your
+first COLLATE.
+</p>
+
+<!-- -DRAFT_WITH_PAGENUMBER- -->
+
+<div id="draft-with-pagenumber" class="box-macro-args">
+Macro: <b>DRAFT_WITH_PAGENUMBER</b>
+</div>
+
+<p>
+Sometimes, in
+<a href="docprocessing.html#copystyle">COPYSTYLE <kbd>DRAFT</kbd></a>,
+the CENTER part of page headers gets overcrowded because of
+the draft and revision information that go there by default.
+DRAFT_WITH_PAGENUMBER is one way to fix the problem.
+</p>
+
+<p>
+Invoked without an argument, <kbd>.DRAFT_WITH_PAGENUMBER</kbd>
+removes draft/revision information from the page headers and
+attaches it instead to the document&#8217;s page numbering, in the
+form
+<br/>
+<span class="pre-in-pp">
+  Draft #, Rev. # / &lt;pagenumber&gt;
+</span>
+If you have not supplied mom with a draft number (with
+<a href="docprocessing.html#draft">DRAFT</a>)
+DRAFT_WITH_PAGENUMBER will assume &#8220;Draft 1&#8220;, and will
+print it before the page number.
+</p>
+
+<p>
+See the note in
+<a href="docprocessing.html#copystyle-note">COPYSTYLE <kbd>DRAFT</kbd>
+</a>
+for other ways of dealing with crowded page headers when formatting
+draft-style copy.
+</p>
+
+<!-- -PAGINATE_CONTROL- -->
+
+<div class="macro-list-container">
+<h3 id="index-pagination-control" class="macro-list">Pagination control macros and defaults</h3>
+
+<ol style="margin-top: -1.5em; padding-bottom: 6px;">
+  <li><a href="#paginate-general">Family/font/size/colour</a></li>
+  <li><a href="#pagenum-pos">Page number position (vertical and horizontal)</a></li>
+  <li><a href="#pagenum-hyphens">Enclose page numbers with hyphens (on or off)</a></li>
+</ol>
+</div>
+
+<h4 id="paginate-general" class="docs">1. Page number family/font/size/colour</h4>
+
+<div class="defaults-container" style="margin-top: 1em; padding-bottom: 8px;">
+<p class="defaults" style="padding-top: 6px;">
+See
+<a href="docelement.html#control-macro-args">Arguments to the control macros</a>.
+</p>
+<span class="pre defaults">
+.PAGENUM_FAMILY default = prevailing document family; default is Times Roman
+.PAGENUM_FONT   default = roman
+.PAGENUM_SIZE   default = 0 (i.e. same size as paragraph text)
+.PAGENUM_COLOR  default = black
+</span>
+</div>
+
+<h4 id="pagenum-pos" class="docs" style="margin-top: -1em;">2. Page number position</h4>
+
+<div class="box-macro-args" style="margin-top: 1em;">
+Macro: <b>PAGENUM_POS</b> <kbd class="macro-args">TOP | BOTTOM&nbsp;&nbsp;LEFT | CENTER | RIGHT</kbd>
+</div>
+
+<p>
+Use PAGENUM_POS to change the default position of automatic page
+numbering. PAGENUM_POS requires <i>two</i> arguments: a vertical
+position (<kbd>TOP</kbd> or <kbd>BOTTOM</kbd>) and a horizontal
+position (<kbd>LEFT</kbd> or <kbd>CENTER</kbd> or <kbd>RIGHT</kbd>).
+</p>
+
+<p>
+For example, if you turn both
+<a href="definitions.html#header">headers</a>
+and
+<a href="definitions.html#footer">footers</a> 
+off (with <kbd>.HEADERS&nbsp;OFF</kbd> and
+<kbd>.FOOTERS&nbsp;OFF</kbd>) and you want mom to number your pages
+at the top right position, enter
+<br/>
+<span class="pre-in-pp">
+  .PAGENUM_POS TOP RIGHT
+</span>
+</p>
+
+<h4 id="pagenum-hyphens" class="docs" style="margin-top: -1em;">3. Enclose page numbers with hyphens (on or off)</h4>
+
+<div class="box-macro-args" style="margin-top: 1em;">
+Macro: <b>PAGENUM_HYPHENS</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+By default, mom encloses page numbers between hyphens.  If you
+don&#8217;t want this behaviour, invoke the macro PAGENUM_HYPHENS
+with any argument (<kbd>OFF, QUIT, END, X</kbd>, etc), like this:
+<br/>
+<span class="pre-in-pp">
+  .PAGENUM_HYPHENS OFF
+</span>
+If, for some reason, you want to turn page number hyphens back
+on, invoke the macro without an argument.
+</p>
+
+<!-- -BLANK_PAGE- -->
+
+<h2 id="blank-pages" class="macro-group">Inserting blank pages into a document</h2>
+
+<div class="box-macro-args">
+Macro: <b>BLANKPAGE</b> <kbd class="macro-args">&lt;# of blank pages to insert&gt; [DIVIDER [NULL]]</kbd>
+</div>
+
+<p>
+This one does exactly what you&#8217;d expect&mdash;inserts a blank
+page (or pages) into a document.  Unless you give the optional argument,
+<kbd>NULL</kbd>, mom silently increments the page number of every
+blank page and keeps track of
+<a href="rectoverso.html#recto-verso">recto/verso</a>
+stuff, but otherwise does nothing.  This is useful for forcing new
+sections of a document onto recto pages, but may have other
+applications as well.
+</p>
+
+<p>
+The required argument to BLANK_PAGE is the number of blank pages to
+insert.  The argument is not optional, hence even if you only want
+one blank page, you have to tell mom:
+<br/>
+<span class="pre-in-pp">
+  .BLANKPAGE 1
+</span>
+The optional argument, <kbd>DIVIDER</kbd>, must be given if
+you&#8217;re inserting a blank page before the start of any new
+document section (i.e. a new chapter, or endnotes, a bibliography,
+or table of contents).  Without the <kbd>DIVIDER</kbd> argument, mom
+simply inserts the blank pages and prepares the next page to receive
+<a href="definitions.html#running">running text</a>.
+</p>
+
+<p>
+<kbd>NULL</kbd>, which is also optional, allows you to output the
+specified number of pages without mom incrementing the page number
+for each blank page.  She will, however, continue to keep track
+of which pages are recto/verso if recto/verso printing has been
+enabled.
+</p>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 24%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 42%; text-align: right;"><a href="rectoverso.html">Next: Recto/verso printing, collating</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

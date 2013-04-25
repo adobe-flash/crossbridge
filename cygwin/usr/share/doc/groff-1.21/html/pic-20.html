@@ -1,0 +1,186 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-20.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-19.html">prev</a> | <a href="pic-21.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>20. Some Larger Examples
+<a name="20. Some Larger Examples"></a>
+</h2>
+
+
+<p style="margin-top: 1em"><font color="#000000">Here are a
+few larger examples, with complete source code. One of our
+earlier examples is generated in an instructive way using a
+for loop:</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">.PS
+# Draw a demonstration up left arrow with grid box overlay
+define gridarrow
+{
+    move right 0.1
+    [
+        {arrow up left $1;}
+        box wid 0.5 ht 0.5 dotted with .nw at last arrow .end;
+        for i = 2 to ($1 / 0.5) do
+        {
+            box wid 0.5 ht 0.5 dotted with .sw at last box .se;
+        }
+        move down from last arrow .center;
+        [
+            if ( $1 == boxht ) \
+            then { &quot;\fBline up left\fP&quot; } \
+            else { sprintf(&quot;\fBarrow up left %g\fP&quot;, $1) };
+        ]
+    ]
+    move right 0.1 from last [] .e;
+}
+gridarrow(0.5);
+gridarrow(1);
+gridarrow(1.5);
+gridarrow(2);
+undef gridarrow
+.PE</pre>
+
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><small><img src="img/pic48.png" alt="Image img/pic48.png"></small></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+20-1: Diagonal arrows (dotted boxes show the implied
+0.5-inch grid)</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000">Here&rsquo;s
+an example concocted to demonstrate layout of a large,
+multiple-part pattern:</font></p>
+<pre style="margin-left:10%; margin-top: 1em">.PS
+define filter {box ht 0.25 rad 0.125}
+lineht = 0.25;
+Top: [
+    right;
+    box &quot;\fBms\fR&quot; &quot;sources&quot;;
+    move;
+    box &quot;\fBHTML\fR&quot; &quot;sources&quot;;
+    move;
+    box &quot;\fBlinuxdoc-sgml\fP&quot; &quot;sources&quot; wid 1.5;
+    move;
+    box &quot;\fBTexinfo\fP&quot; &quot;sources&quot;;
+
+    line down from 1st box .s lineht;
+    A: line down;
+    line down from 2nd box .s; filter &quot;\fBhtml2ms\fP&quot;;
+    B: line down;
+    line down from 3rd box .s; filter &quot;\fBformat\fP&quot;;
+    C: line down;
+    line down from 4th box .s; filter &quot;\fBtexi2roff\fP&quot;;
+    D: line down;
+]
+move down 1 from last [] .s;
+Anchor: box wid 1 ht 0.75 &quot;\fBms\fR&quot; &quot;intermediate&quot; &quot;form&quot;;
+arrow from Top.A.end to Anchor.nw;
+arrow from Top.B.end to 1/3 of the way between Anchor.nw and Anchor.ne;
+arrow from Top.C.end to 2/3 of the way between Anchor.nw and Anchor.ne;
+arrow from Top.D.end to Anchor.ne
+{
+    # PostScript column
+    move to Anchor .sw;
+    line down left then down -&gt;;
+    filter &quot;\fBpic\fP&quot;;
+    arrow;
+    filter &quot;\fBeqn\fP&quot;;
+    arrow;
+    filter &quot;\fBtbl\fP&quot;;
+    arrow;
+    filter &quot;\fBgroff\fP&quot;;
+    arrow;
+    box &quot;PostScript&quot;;
+
+    # HTML column
+    move to Anchor .se;
+    line down right then down -&gt;;
+    A: filter dotted &quot;\fBpic2img\fP&quot;;
+    arrow;
+    B: filter dotted &quot;\fBeqn2html\fP&quot;;
+    arrow;
+    C: filter dotted &quot;\fBtbl2html\fP&quot;;
+    arrow;
+    filter &quot;\fBms2html\fP&quot;;
+    arrow;
+    box &quot;HTML&quot;;
+
+
+    # Nonexistence caption
+    box dashed wid 1 at B + (2,0) &quot;These tools&quot; &quot;don&rsquo;t yet exist&quot;;
+    line chop 0 chop 0.1 dashed from last box .nw to A.e -&gt;;
+    line chop 0 chop 0.1 dashed from last box .w  to B.e -&gt;;
+    line chop 0 chop 0.1 dashed from last box .sw to C.e -&gt;;
+}
+.PE</pre>
+
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><small><img src="img/pic49.png" alt="Image img/pic49.png"></small></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+20-2: Hypothetical production flow for dual-mode
+publishing</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic50.png" alt="Image img/pic50.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+20-3: Three-dimensional Boxes</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Here the
+source code for figure 20-3:</font></p>
+<pre style="margin-left:10%; margin-top: 1em">.PS
+# a three-dimensional block
+#
+# tblock(&lt;width&gt;, &lt;height&gt;, &lt;text&gt;)
+
+define tblock { [
+  box ht $2 wid $1 \
+      color &quot;gold&quot; outlined &quot;black&quot; \
+      xslanted 0 yslanted 0 \
+      $3;
+  box ht .1 wid $1 \
+      color &quot;yellow&quot; outlined &quot;black&quot; \
+      xslanted .1 yslanted 0 \
+      with .sw at last box .nw;
+  box ht $2 wid .1 \
+      color &quot;goldenrod&quot; outlined &quot;black&quot; \
+      xslanted 0 yslanted .1 \
+      with .nw at 2nd last box .ne;
+] }
+
+
+tblock(1, .5, &quot;Master&quot; &quot;1&quot;);
+move -.1
+tblock(.5, 1, &quot;Slave&quot;);
+.PE</pre>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-19.html">prev</a> | <a href="pic-21.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

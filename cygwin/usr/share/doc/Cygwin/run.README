@@ -1,0 +1,106 @@
+run
+========================================================================
+"run" is a simple application to launch console programs with their
+console hidden. It is intended for use on various Microsoft Windows
+operating systems.
+
+Runtime requirements:
+  cygwin-1.7.7-1
+
+Build requirements:
+  cygwin-1.7.7-1
+  gcc4-core-4.3.4-3
+  binutils-2.20.51-2
+  cygport-0.10.2-1
+
+Canonical homepage:
+  none
+
+Canonical download:
+  cvs -z3 -d:pserver:anoncvs@cygwin.com:/cvs/cygwin-apps co run
+
+License:
+  GPLv2+
+
+Language:
+  C
+
+========================================================================
+
+Build instructions:
+  unpack run-1.1.13-X-src.tar.bz2
+    if you use setup to install this src package, it will be
+         unpacked under /usr/src automatically
+  cd /usr/src
+  cygport ./run-1.1.13-X.cygport all
+
+This will create:
+  /usr/src/run-1.1.13-X.tar.bz2
+  /usr/src/run-1.1.13-X-src.tar.bz2
+
+Or use 'cygport ./run-1.1.13-X.cygport prep' to get a patched
+source directory.
+
+To find out the files included in the binary distribution,
+you can use "cygcheck -l run", or browse the listing for
+the appropriate version at <http://cygwin.com/packages/>.
+
+========================================================================
+
+Port Notes:
+----------  run-1.1.13-1 - 2011-Jan-25 -----------
+* Fix segfault related to symlinks (Jonathan Kamens)
+* Remove ancient workarounds for cygwin B19 and B20: don't use
+  CYGWIN_CONV_* macros but instead call cygwin_conv_* functions
+  directly.
+* For cygwin-1.7, avoid deprecated cygwin_conv_* functions.
+  NOTE: Only the barest minimal changes were made, so (a) non-ascii
+  characters still not supported, and (b) long pathnames are not
+  yet supported. This will occur on the new 1.2 development stream.
+
+----------  run-1.1.12-11 - 2009-Dec-01 -----------
+* Ensure stdout and stderr for inferior are distinct (fixes bug
+  that occurs with some versions of cygwin).
+
+----------  run-1.1.12-10 - 2009-08-18 -----------
+* Fix various 100% CPU usage issues
+* Logical refactoring: run only creates (and hides) a console
+  if absolutely necessary. Otherwise, it relies on an existing (hidden)
+  console, or avoids the issue entirely if $target itself is GUI.
+
+----------  run-1.1.11-10 - 2009-08-10 -----------
+* Fork for cygwin-1.7 packaging. Underlying source branch will occur
+  later, with 1.2.x.
+
+----------  run-1.1.11-1 - 2009-08-10 -----------
+* New maintainer (Charles Wilson took over from Alexander Gottwald)
+* Updated build machinery
+* Switch to cygport build framework.
+* Added patch to support invisible consoles on Windows 7 (Corinna Vinschen)
+* Modified invisiconsole mechanism on cygwin-1.5/WinXP+ (Corinna Vinschen)
+* Remove explicit requires: cygwin; rely on sourceware infrastructure
+  to add it back.
+
+----------  run-1.1.10-1 - 2006-05-22 -----------
+* Create a real hidden console 
+
+----------  run-1.1.9-1 -- 2006-04-06 -----------
+* Remove quotes from search path. Fixes problem with spaces in filenames
+
+----------  run-1.1.8-1 -- 2006-03-31 -----------
+* Remove quotes from exename. Fixes problem with spaces in filenames
+
+----------  run-1.1.7-1 -- 2006-03-08 -----------
+* Copy cygwin environment variables to windows environment
+* Disable WinMainCRTStartup wrapper
+
+----------  run-1.1.6-1 -- 2005-11-09 -----------
+* The order of icons has been adjusted so the X is now at index 2
+  again and X-start-menu-icons should display right.
+* Manpage added
+
+----------  run-1.1.5-1 -- 2005-10-26 -----------
+* Extracted from X-startup-scripts package
+
+Cygwin port maintained by: Charles Wilson <cygwin@cygwin.com>
+Please address all questions to the Cygwin mailing list at <cygwin@cygwin.com>

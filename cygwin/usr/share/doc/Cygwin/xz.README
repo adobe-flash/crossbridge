@@ -1,0 +1,276 @@
+xz
+========================================================================
+This package provides a data compression library and utilities
+supporting the .xz and .lzma file formats, which use the LZMA
+compression algorithm.  LZMA provides high compression ratios and very
+fast decompression, with minimal memory requirements for decompression.
+XZ Utils is the latest generation of this software, supplanting the
+older LZMA Utils.
+
+The cygwin xz package replaces and obsoletes the cygwin lzma package.
+
+LZMA Utils (and its own antecedent, the LZMA SDK) provided the 'lzma'
+tool, which supported the 'LZMA-Alone' file format usually indicated by
+the extension '.lzma'.  Internally, this file format used what is now
+called the LZMA1 compression algorithm.
+
+XZ Utils provides the xz tool, which supports the new .xz file format
+usually indicated by the extension '.xz'. Internally, it uses a
+variation of the original LZMA compression algorithm, called LZMA2.
+However, the new xz tool also seamlessly supports the older .lzma files
+and LZMA1 compression.
+
+========================================================================
+Runtime requirements
+  cygwin-1.7.9-1
+  libintl8-0.17-11
+  libiconv2-1.13.1-2
+
+Build requirements
+  cygport-0.10.4-1
+  binutils-2.20.51-1
+  gcc4-core-4.3.4-4
+  bash-4.1.10-4
+  make-3.81-2
+  autoconf2.5
+  automake1.11
+  libtool
+  gettext-0.17-11
+  gettext-devel-0.17-11
+  cvs-1.12.13-10 (for autopoint)
+  libiconv-1.13.1-2
+
+Canonical homepage:
+  http://tukaani.org/xz/
+
+Canonical download:
+  http://tukaani.org/xz/download
+
+License:
+  liblzma:               public domain
+  xz, xzdec, lzmadec:    public domain (LGPLv2.1+ under certain circumstances)
+  lzdiff, other scripts: GPLv2+
+  build system:          varies: public domain, GPLv2+, GPLv3+
+
+Language:
+  C, shell
+
+========================================================================
+
+Build instructions:
+  unpack xz-VER-REL-src.tar.bz2
+    if you use setup to install this src package, it will be unpacked
+    under /usr/src automatically
+  cd /usr/src
+  cygport xz-VER-REL.cygport all
+
+This will create:
+  /usr/src/xz-VER-REL.tar.bz2
+  /usr/src/liblzma-devel-VER-REL.tar.bz2
+  /usr/src/liblzma1-VER-REL.tar.bz2
+  /usr/src/xz-VER-REL-src.tar.bz2
+
+========================================================================
+
+Files included in the packages:
+
+Files in liblzma5:          /usr/bin/cyglzma-5.dll
+Files in liblzma-devel:     see 'cygcheck -l liblzma-devel' output 
+Files in xz:                see 'cygcheck -l xz' output
+
+
+History:
+========================================================================
+
+1. LZMA SDK
+First there was the LZMA SDK. Upstream, it shipped no libraries; only a
+few executables such as 'lzma'. The source code was provided for public
+use (under a variety of licenses), but it was expected that developers
+would incorporate the source code directly into their own projects.
+This is not The Unix Way.
+
+The LZMA SDK was tightly coupled with the 7zip compression program, and
+both were developed on and solely for the Windows platform.  7zip -- but
+not the LZMA SDK -- was ported to Unix under the auspices of the p7zip
+("Portable 7zip") project. (As an aside, p7zip was then ported to
+cygwin...to come full circle). However, it should be clear that the file
+format used by 7zip (and p7zip) was completely different from the one
+supported by the LZMA SDK's 'lzma' tool.  The latter used what was
+called the 'LZMA-Alone' format, which consisted of 13 bytes of header
+information followed by a raw lzma-compressed byte-stream.  7zip, on the
+other hand, used a much more complicated file format capable of hosting
+multiple files, spanned archives, and other features. The only
+similarity is that the core data compression algorithm used by both is
+LZMA.
+
+2. LZMA Utils
+Eventually, a unix port of the LZMA SDK appeared, in the form of the
+LZMA Utils distribution, which reorganized the original source code, and
+provided the decompression code in library form (liblzmadec). It also
+provided a version of the 'lzma' program, but with a completely
+different command-line interface. The LZMA Utils version consciously
+mimicked the command-line options of the familiar gzip and bzip2 tools,
+while the original LZMA SDK version was...different. Very different.
+This is because the LZMA SDK's tool was originally intended just as a
+test and development utility, to help refine the algorithm. So, it has
+a number of 'compression guru' options that no sane user cares to use,
+and very few of the 'normal user' options that they would.
+
+   LZMA Utils: (Lasse Collin)
+      lzma -d foo.tar.lzma
+         uncompress to (implied) foo.tar, and remove
+         original compressed file.
+      lzma foo.tar
+         compress to (implied) foo.tar.lzma, and remove
+         original uncompressed file.
+      Supports familiar "tuning" options like -0 .. -9
+      Sends output data to stdout using -c
+      Could be invoked under alternate names (symlinks) 
+      for different behavior:
+          unlzma == lzma -d  (uncompress)
+          lzcat  == lzma -dc (uncompress to stdout)
+
+   LZMA SDK: (Igor Pavlov)
+      lzma d foo.tar.lzma foo.tar
+      lzma e foo.tar      foo.tar.lzma   
+         mode d/e is the required first non-option argument
+         both input and output files must be specified
+      stdout? what's that?
+
+Finally, LZMA Utils also shipped a number of helpful scripts similar to
+the familiar ones from gzip and bzip2:
+  lzdiff/lzcmp, lzgrep/lzegrep/lzfgrep, lzless/lzmore
+
+So, the LZMA SDK version was hardly suitable for replacing or augmenting
+the existing bzip2 and gzip compression programs on unix systems,
+especially as the most common use was in conjunction with tar.  But tar
+expects compression programs to satisfy a common command-line argument
+format, and to be able to manipulate data on standard streams. Most
+linux distributions had standardized on LZMA Utils after a few months.
+
+The lzma tool from both LZMA SDK and LZMA Utils each support the
+LZMA-Alone (.lzma) file format, as does the liblzmadec library from
+LZMA Utils.
+
+However, the .lzma file format (e.g. LZMA-Alone) is not sufficient for
+modern needs, as it (1) had no 'signature bytes' so compressed files
+were difficult to automatically detect and verify, (2) it had no
+provision for internal integrity checks, and (3) it could not support
+multi-file archives.
+
+3. XZ Utils
+The newest member of this family is XZ Utils, which after a long alpha
+(and even longer beta) period, was finally released as version 5.0.0 on
+2010 October 23. Addressing the shortcomings of the LZMA-Alone file
+format, the xz file format and the (slightly modified) LZMA2 compression
+algorithm were jointly developed by Lasse Collin (LZMA Utils) and Igor
+Pavlov (LZMA SDK). The xz tool has all of the benefits of the LZMA Utils'
+version of the lzma tool, and ships with all of the same helpful scripts.
+In addition, it can be invoked as either 'xz' (or xzcat, unxz) or 'lzma'
+(or lzcat, unlzma) so you don't even need to retrain your fingers.
+
+You probably should, though, because .lzma files are already being
+replaced by .xz files on by many software distribution sites, including
+GNU ones.
+
+Finally, the XZ Utils also provides the liblzma decompression AND
+compression library, which supports both LZMA-Alone (that is, the old
+.lzma) format, and the new .xz format.
+
+The new .xz file format has an easily identifiable initial signature for
+automated format detection and verification. It supports integrity checks
+of several types including cryptographic hashes. Finally, the format also
+supports multiple compressed streams within the same file (that is,
+multi-file archives).  However, the xz tool does NOT, at present, support
+multi-file archives; only archives with a single compressed stream.
+
+As an aside, eventually the 7zip (and p7zip) utilities will support a
+"new" .7z format -- which will be simply a compatible variant of the .xz
+file format, but with custom filters (codecs) specified in the (highly
+extensible) header defined by the .xz standard. This was the primary
+reason for the new .xz format to support multi-file archives; because
+the xz tool has no present need for them, and doesn't even support them
+(although the liblzma library does).
+
+Single File Compression
+========================================================================
+Although the xz file format supports multiple streams, the xz tool
+itself is concerned only with single files that have been compressed as
+a single complete stream using LZMA compression. This is similar to the
+behavior of the older lzma tool and its LZMA-Alone file format, or the
+archetypal gzip and bzip2 compression programs.
+
+Just as with bzip2 and gzip (and the old lzma tool), to create multi-
+file archives you should use tar and THEN compress with xz.exe.  For an
+integrated compressed archive file format that uses LZMA compression,
+see p7zip and the 7zip programs, and their associated .7z file format.
+
+========================================================================
+
+Port Notes:
+----------  xz-5.0.2_20110517-1 -- 2011 May 18 -----------
+* Update to 2011-May-17 git snapshot
+  Tue May 17 12:26:28 2011 +0300
+  841dc1f891b48b23f84c0f0e0c86c7c4e4bdcdf5
+  - contains a few fixes and back-compatibility corrections, relative
+    to the official 5.0.2 source distribution
+* Upstream changes:
+  - memory usage limits are disabled by default (use --memory=...)
+  - XZ_DEFAULTS variable is now supported
+  - new 'xz --list' option (use --verbose repeatedly for detailed output)
+  - fixed memory leak
+  - fixed encoding issue with "empty blocks"
+  - documentation improvements
+  - bump soname to 5.0.2 (dllname = 5)
+* Bump DLL package to "5" to match dllname of post-5.0 releases.
+
+----------  xz-4.999.9beta-11 -- 2010 Apr 09 -----------
+* Update to 2010-Apr-01 git snapshot
+  Wed Mar 31 16:47:25 2010 +0300
+  a1f7a986b8d708f9290da9799ca1b8d7082fad3e
+* Rebuild using gcc4, against official cygwin-1.7.x release.
+
+----------  xz-4.999.9beta-10 -- 2009 Aug 30 -----------
+* Update to latest upstream release
+* Use (new) upstream xz.1 in preference to cygwin-custom
+  attempt at a man page.
+* Upstream:
+  - Lots of documentation updates
+  - Fixes data corruption error
+  - C++ compatiblity fixes
+  - New lzmainfo utility
+  - Fixes to helper scripts (xzdiff, xzless, etc)
+  - Other miscellaneous bug fixes and build improvements
+  - Distribute a changelog derived from git log.
+
+----------  xz-4.999.8beta_20090714-10 -- 2009 Jul 18 -----------
+* Update to latest git master 2009-07-14 21:10:36 +0300
+  a35755c5de808df027675688855d1b621a4fb428
+* Most cygwin/mingw patches have now been merged upstream.
+  Remaining ones are:
+  - Add support for automake-1.11 silent rules
+  - use libtool-2.2.x macros instead of 1.5.x ones.
+
+---------- xz-4.999.8betaCYG4-10 -- 2009 Jun 27 -----------
+* Update to latest git master
+* Includes additional patches currently pending upstream
+  but the "pristine" source package already includes them.
+
+---------- xz-4.999.8beta_20090605-10 -- 2009 Jun 19 -----------
+* Update to latest git master (author says current top-of-tree
+  is "much better" than 4.999beta8, but is not going to release
+  a new beta anytime soon. Go figure.)
+* However, there has been an ABI change so the DLL number needs
+  to be bumped.
+* Remove cygwin from requires: in hint files, as sourceware
+  will take care of that.
+
+---------- xz-4.999.8beta-10 -- 2009 Mar 14 -----------
+* Fork for cygwin-1.7 development
+
+---------- xz-4.999.8beta-1 -- 2009 Mar 14 -----------
+* Initial cygwin port
+
+========================================================================
+Cygwin port maintained by: Chuck Wilson <cygwin@cygwin.com>
+

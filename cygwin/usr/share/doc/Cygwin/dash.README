@@ -1,0 +1,72 @@
+dash 0.5.7-1
+------------------------------------------
+DASH is a POSIX-compliant implementation of /bin/sh that aims to be as
+small as possible. It does this without sacrificing speed where
+possible. In fact, it is significantly faster than bash (the GNU
+Bourne-Again SHell) for most tasks.
+
+Runtime requirements (these or newer):
+  cygwin-1.7.9-1
+
+Additional build conditions (these or newer):
+  bash-4.1.10-4
+  binutils-2.22.51-1
+  cygport-0.10.6-1
+  gcc4-4.5.3-3
+
+Canonical homepage:
+  http://gondor.apana.org.au/~herbert/dash
+
+Canonical download:
+  http://gondor.apana.org.au/~herbert/dash/files/
+
+License:
+  BSD
+
+Language:
+  C
+
+------------------------------------
+
+Build instructions:
+  unpack dash-0.5.7-1-src.tar.bz2
+    if you use setup to install this src package, it will be
+    unpacked under /usr/src automatically
+  cd /usr/src
+  cygport dash-0.5.7-1 all
+
+This will create:
+  /usr/src/dash-0.5.7-1.tar.bz2
+  /usr/src/dash-0.5.7-1-src.tar.bz2
+
+Or use 'cygport dash-0.5.7-1 prep' to get a patched source directory
+
+To find out the files included in the binary distribution, you can use
+"cygcheck -l dash", or browse the listing for the appropriate version
+at <http://cygwin.com/packages/>.
+
+------------------
+
+Port Notes:
+
+----- version 0.5.7-1 -- 2011-12-03 -----
+New upstream version.
+
+----- version 0.5.6.1-2 -- 2010-06-29 -----
+Rebuild to remove dynamic library dependence.
+
+----- version 0.5.6.1-1 -- 2010-06-28 -----
+New upstream version.
+
+----- version 0.5.5.1-2 -- 2009-07-14 -----
+Apply LINENO patch.  Replace the obsolete ash package.
+
+----- version 0.5.5.1-1 -- 2009-07-08 -----
+First port to cygwin.
+
+--------------------
+For more information about this package, see the upstream documentation in
+/usr/share/doc/dash/.
+
+Cygwin port maintained by: Eric Blake <ebb9@byu.net>
+Please address all questions to the Cygwin mailing list at <cygwin@cygwin.com>

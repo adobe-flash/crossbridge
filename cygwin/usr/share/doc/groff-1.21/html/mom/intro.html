@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>What is mom?</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+  <tr>
+    <td><a href="toc.html">Back to Table of Contents</a></td>
+    <td style="text-align: right;"><a href="definitions.html#top">Next: Definitions</a></td>
+  </tr>
+  </table>
+
+<h1 id="intro" class="docs">What is mom?</h1>
+
+<div style="text-align: center;">
+<ul class="no-enumerator" style="margin-left: -2.5em;">
+  <li ><a href="#intro-intro">Who is mom meant for?</a></li>
+  <li ><a href="#intro-typesetting">Typesetting with mom</a></li>
+  <li ><a href="#intro-docprocessing">Document processing with mom</a></li>
+  <li ><a href="#intro-philosophy">Mom&#8217;s philosophy</a></li>
+  <li ><a href="#intro-documentation">A note on mom&#8217;s documentation</a></li>
+  <li ><a href="#canonical">Canonical reference materials</a></li>
+  <li ><a href="#macro-args">How to read macro arguments</a></li>
+</ul>
+</div>
+
+<div class="rule-short" style="margin-top: 18px;"><hr/></div>
+
+<h2 id="intro-intro" class="docs">Who is mom meant for?</h2>
+
+<p>
+Mom (&#8220;my own macros&#8221;, &#8220;my other macros&#8221;,
+&#8220;maximum overdrive macros&#8221;...) is a macro set for
+groff, designed to format documents for PostScript output.
+She&#8217;s aimed at three kinds of users:
+</p>
+
+<ol style="margin-top: -.5em; margin-bottom: -.5em;">
+  <li>Typesetters who suspect groff might be &#8220;the right
+      tool for the job&#8221; but who are
+      frustrated/intimidated by groff&#8217;s terse, geeky,
+      not-always-typographically-intuitive
+      <a href="definitions.html#primitives">primitives</a>;
+  </li>
+  <li>Non-scientific writers (novelists, short story writers,
+      journalists, students) who just want their work to
+      look good;
+  </li>
+  <li>Newbies to computer typesetting, document processing or
+      groff who need a well-documented macro set to help them get
+      started.
+  </li>
+</ol>
+
+<p>
+As might be inferred from the above, mom is two macro packages in
+one: a set of typesetting macros, and a set of document formatting
+macros.  The typesetting macros govern the physical aspects
+of page layout and provide sane, comprehensible control over
+typographic refinements.  The document formatting macros let you
+focus on a document&#8217;s content and logical structure without
+worrying about typesetting or page layout at all.
+</p>
+
+<p>
+Because mom provides both typesetting and document formatting
+macros, it&#8217;s safe to say she blurs the distinction
+between document processing and document design.  While
+her basic document style come with pretty spiffy defaults
+(okay&mdash;change &#8220;spiffy&#8221; to &#8220;typographically
+professional&#8221;), you can easily control how all the various
+document elements look: titles, page headers and footers, page
+numbering, heads, subheads, footnotes and so on can be made to
+come out exactly the way you want.  And should you need precise
+typographic control over elements in a document that fall outside
+the range of mom&#8217;s document element tags, you don&#8217;t
+have to read up on groff
+<a href="definitions.html#primitives">primitives</a>
+in order to accomplish what you want; the typesetting macros take
+care of that.
+</p>
+
+<h2 id="intro-typesetting" class="docs">Typesetting with mom</h2>
+
+<p>
+Mom&#8217;s typesetting macros control the basic parameters
+of type: margins, line length, type family, font, point size,
+linespacing, and so on.  In addition, they allow you to move
+around on the page horizontally and vertically, and to set up
+tabs, indents, and columns.  Finally, they let you adjust such
+typographic details as justification style, letter spacing, word
+spacing, hyphenation, and kerning.
+</p>
+
+<p>
+In terms of typographic control, these macros resemble
+the commands used on dedicated typesetting computers like
+Compugraphics and Linotronics.  Most of them simply give access
+to groff&#8217;s typesetting primitives in a way that&#8217;s
+consistent and easy to use.  A few of them (tabs and indents,
+for example) handle fundamental typesetting requirements in ways
+radically different from groff primitives.
+</p>
+
+<p>
+With mom&#8217;s typesetting macros, you can, if you wish, create
+individual output pages that you design from the ground up.
+Provided you have not signalled to mom that you want document
+processing (via the
+<kbd><a href="docprocessing.html#start">START</a></kbd>
+macro; see below), every macro is a literal command that remains
+in effect until you modify it or turn it off.  This means that if
+you want to create flyers, surveys, tabulated forms, curricula
+vitae and so on, you may do so in the good old-fashioned way: one
+step at a time with complete control over every element on the
+page.
+</p>
+
+<p>
+Years of reading various mailing lists dealing with computer
+typesetting (groff, TeX, and friends) have convinced me that no
+program can ever replace the human eye and human input when it
+comes to high quality typesetting.  As of this writing, a thread
+on the subject of &#8220;micro typography&#8221; in groff has been
+going on for nearly a month.  The reason for the lengthy thread
+is obvious; words and punctuation on the printed page are too
+variable, too fluid, to be rendered flawlessly by any algorithm,
+no matter how clever.  (For whatever it&#8217;s worth, a similar
+problem exists with engraving musical scores by computer.)
+</p>
+
+<p>
+Mom does not try to solve the problems posed by things like
+hanging punctuation, left-margin adjustments for upper case
+letters like T and W, and so on.  She merely tries to provide
+tools that allow knowledgeable typesetters to come up with
+solutions to these problems in ways that are easier and more
+intuitive than manipulating groff at the
+<a href="definitions.html#primitives">primitive</a>
+level.  As a professional typesetter of more than two decades, and
+a writer, I have encountered few situations that cannot be handled
+by mom&#8217;s typesetting macros.
+</p>
+
+<p>
+Author&#8217;s note: One area where groff itself needs serious
+rethinking is in the matter of an algorithm that takes into
+account both word and letter spacing when
+<a href="definitions.html#just">justifying</a>
+lines.  At present, only word spacing is adjusted, requiring what
+I consider an unnecessary amount of user intervention whenever
+letter spacing is required.
+</p>
+
+<h2 id="intro-docprocessing" class="docs">Document processing with mom</h2>
+
+<p>
+Mom&#8217;s document processing macros let you format documents
+without having to worry about the typographic details.  In this
+respect, mom is similar to other groff macro packages, as well as
+to html and LaTeX.  Where mom differs is in the degree of control
+you have over the look and placement of the various elements of
+a document.  For example, if you don&#8217;t want your heads
+underlined, or you want them bigger/smaller, or you&#8217;d prefer
+them to be in a different font, or you&#8217;d rather they were
+flush left instead of centred, you can make the changes easily
+and have them apply to the whole document.  Temporary and one-off
+changes are easy, too.
+</p>
+
+<p>
+Mom has some nifty features other macro sets don&#8217;t provide.
+For example, you can switch between draft-style and final-copy
+output.  If you regularly make submissions to publishers and
+editors who insist on "typewritten, double-spaced," there&#8217;s
+a special macro&mdash;
+<a href="docprocessing.html#printstyle"><kbd>PRINTSTYLE TYPEWRITE</kbd></a>&mdash;
+that changes typeset documents into ones that would make your
+high-school typing teacher proud.  Footnotes, endnotes, tables of
+contents, multiple columns, nested lists, recto/verso printing and
+user designable headers and footers are also part of the fun.
+</p>
+
+<h2 id="intro-philosophy" class="docs">Mom&#8217;s philosophy</h2>
+
+<p>
+Formatting documents should be easy, from soup to nuts.  Writers
+need to focus on what they&#8217;re writing, not on how it looks.
+From the moment you fire up an editor to the moment you add
+"FINIS" to your opus, nothing should interfere with the flow of
+your words.  The commands needed to format your work should be
+easy to remember, comprehensible, and stand out well from the
+text.  There shouldn&#8217;t be too much clutter.  Your documents
+should be as readable inside a text editor as they are on the
+printed page.
+</p>
+
+<p>
+Unfortunately, in computerland, &#8220;easy,&#8221;
+&#8220;comprehensible,&#8221; and &#8220;readable&#8221; often
+mean &#8220;you&#8217;re stuck with what you get.&#8221; No
+document formatting system can give you exactly what you want all
+the time, every time.  Documents, it seems, always need to be
+tweaked, either to satisfy a typographic whim or to clarify some
+aspect of their content.
+</p>
+
+<p>
+Groff has traditionally solved the problem of formatting vs.
+tweaking by requiring users of the common macro packages (mm, ms,
+me and their offspring) to resort to groff
+<a href="definitions.html#primitives">primitives</a>
+and
+<a href="definitions.html#inlines">inline escapes</a>
+for their special typesetting needs.  Not to put too fine a
+point on it, groff primitives tend toward the abstruse, and most
+inline escapes are about as readable in-line as an encrypted
+password.  This does not make for happy-camper writers, who either
+find themselves stuck with a document formatting style they
+don&#8217;t really like, or are forced to learn groff from the
+ground up&mdash;a daunting task, to say the least.
+</p>
+
+<p>
+Mom aims to make creating documents a simple matter, but with
+no corresponding loss of user control.  The document processing
+macros provide an excellent set of defaults, but if something is
+not to your liking, you can change it.  And in combination with
+the typesetting macros, you have all the tools you need to massage
+passages and tweak pages until they look utterly professional.
+</p>
+
+<p>
+One rarely hears the term &#8220;user interface&#8221; in
+conjunction with document processing.  Since formatting takes
+place inside a text editor, little thought is given to the
+look and feel of the formatting commands.  Mom attempts to
+rectify this by providing users with a consistent, readable
+&#8220;coding&#8221; style.  Most of the macros (especially in
+the document processing set) have humanly-readable names.  Not
+only does this speed up learning the macros, it makes the sense
+of what&#8217;s going on in a document, typographically and
+structurally, easier to decipher.
+</p>
+
+<p>
+Mom does not try to be all things to all people.  In contrast to
+the normal groff philosophy, she does not try to produce output
+that looks good no matter where it&#8217;s displayed.  She&#8217;s
+designed for printed output, although with
+<a href="docprocessing.html#printstyle"><kbd>PRINTSTYLE TYPEWRITE</kbd></a>
+she produces acceptable terminal copy.  She makes no attempt to be
+compatible with older versions of troff.
+</p>
+
+<p>
+One special feature in mom&#8217;s design is the attention she
+pays to aligning the bottom margins of every page.  Nothing
+screams shoddy in typeset documents louder than bottom margins
+that wander, or, in typesetter jargon, &#8220;hang.&#8221; There
+are, of course, situations where whitespace at the bottom of a
+page may be desirable (for example, you wouldn&#8217;t want a head
+to appear at the bottom of the page without some text underneath
+it), but in all cases where hanging bottom margins can be avoided,
+mom does avoid them, by clever adjustments to leading (&#8220;line
+spacing&#8221;) and the spacing between different elements on the
+page.
+</p>
+
+<h2 id="intro-documentation" class="docs">A note on mom&#8217;s documentation</h2>
+
+<p>
+Writing documentation is tough, no doubt about it.  One is never
+quite sure of the user&#8217;s level of expertise.  Is s/he new
+to the application, new to its underlying protocols and programs,
+new to the operating system, new to computers?  At some point, one
+has to decide whom the documentation is for.  Making the wrong
+decision can mean the difference between a program that gets used
+and a program that gets tossed.
+</p>
+
+<p>
+Mom&#8217;s documentation assumes users know their way around
+their own operating system (basic file management, how to invoke
+commands, how to use a text editor, etc).  I use GNU/Linux,
+and while the documentation may exhibit a GNU/Linux bias, mom
+and groff can, in fact, be used on a variety of other popular
+operating systems, including the one from Redmond, Virginia, USA.
+</p>
+
+<p>
+The documentation further assumes they at least know what groff
+is, even if they don&#8217;t know much about it.  Lastly,
+it assumes that everyone&mdash;groff newbies and experts
+alike&mdash;learns faster from a few well-placed examples than
+from manpage-style reference docs.  What mom&#8217;s documentation
+doesn&#8217;t assume is that you know everything&mdash;not about
+groff, not about typesetting, not about document processing.  Even
+experts have odd lacunae in their knowledge base.  Therefore,
+whenever I suspect that a term or procedure will cause head
+scratching, I offer an explanation.  And when explanations
+aren&#8217;t enough, I offer examples.
+</p>
+
+<h2 id="canonical" class="docs">Canonical reference materials</h2>
+
+<p>
+The canonical reference materials for groff are
+<strong>cstr54</strong> (a downloadable PostScript copy of which
+is available
+<a href="http://www.kohala.com/start/troff/">here</a>)
+and the <strong>troff</strong> and <strong>groff_diff</strong>
+manpages.  Another excellent source of information (maybe the best)
+is the groff info pages, available by typing
+<kbd>info groff</kbd>
+at the command line (assuming you have the TeXinfo standalone
+browser installed on your system, which is standard for most
+GNU/Linux distributions).  And for inputting special characters,
+see <kbd>man groff_char</kbd>.
+</p>
+
+<p style="margin-top: 24px;">
+I&#8217;ve tried to avoid reiterating the information contained
+in these documents; however, in a few places, this has proved
+impossible.  But be forewarned: I have no qualms about
+sidestepping excruciating completeness concerning groff usage;
+I&#8217;m more interested in getting mom users up and running.
+<i>Mea culpa.</i>
+</p>
+
+<div class="box-tip">
+<p class="tip-top" style="padding-bottom: 9px;">
+<b>Note:</b> Mom&#8217;s macro file (om.tmac) is heavily
+commented.  Each macro is preceded by a description of its
+arguments, function and usage, which may give you information in
+addition to what&#8217;s contained in this documentation.
+</p>
+</div>
+
+<div class="box-tip">
+<p class="tip-top" style="padding-bottom: 9px; text-indent: 0px;">
+<strong>Addendum:</strong> As of version 1.4-a, the main macro
+file, om.tmac, is now stripped of comments when groff is built
+from sources. om.tmac in the sources themselves still contains
+the comments, as do the tarballs posted on mom&#8217;s homepage.
+</p>
+</div>
+
+<div class="rule-short" style="padding-top: 6px; padding-bottom: 3px;"><hr/></div>
+
+<h2 id="macro-args" class="docs">How to read macro arguments</h2>
+
+<p>
+The concise descriptions of macros in this documentation typically
+look like this:
+</p>
+
+<div class="box-macro-args">
+Macro: <b>MACRO_NAME</b> <kbd class="macro-args">arguments</kbd>
+</div>
+
+<p>
+<kbd>arguments</kbd> lists the macro&#8217;s
+arguments using conventions that should be familiar to anyone who
+has ever read a manpage.  Briefly:
+</p>
+
+<ol>
+  <li>Macro arguments are separated from each other by spaces.</li>
+  <li>If an argument is surrounded by chevrons
+      (<kbd>&lt;&nbsp;&gt;</kbd>), it&#8217;s a description
+      of the argument, not the argument itself.
+  </li>
+  <li>If an argument begins with or is surrounded by double-quotes, the
+      double quotes MUST be included in the argument.
+  </li>
+  <li>If the user has a choice between several arguments, each of the
+      choices is separated by the pipe character
+      (<kbd>|</kbd>), which means &#8220;or.&#8221;
+  </li>
+  <li>Arguments that are optional are surrounded by square brackets.</li>
+  <li><kbd>&lt;off&gt;</kbd> in an argument list means that any
+      argument other than those in the argument list turns the
+      macro off.
+  </li>
+</ol>
+
+<h3 id="toggle-macro" class="docs">Toggle macros</h3>
+
+<p>
+Some macros don&#8217;t require an argument.  They simply start
+something.  When you need to turn them off, the same macro with
+<em>any</em> argument will do the trick.  That&#8217;s right:
+<em>any</em> argument (in caps, lowercase or a mixture
+thereof).  This permits choosing whatever works for you:
+<kbd>OFF, end, Quit, Q, X</kbd>...  Hell, it
+could even be <kbd>I_love_mom</kbd>.
+</p>
+
+<p>
+Since these macros toggle things on and off, the argument list
+simply reads <kbd>toggle</kbd>.
+</p>
+
+<div id="examples" class="examples-container">
+<h2 class="docs" style="margin-top: .5em;">Examples</h2>
+
+<div class="examples">Example 1: An argument requiring double-quotes</div>
+
+<div class="box-macro-args" style="max-width: 684px;">
+Macro: <b>TITLE</b> <kbd class="macro-args">&quot;&lt;title of document&gt;&quot;</kbd>
+</div>
+
+<p>
+The required argument to TITLE is the title of your document.
+Since it&#8217;s surrounded by double-quotes, you must include
+them in the argument, like this:
+<br/>
+<span class="pre-in-pp">
+  .TITLE "My Pulitzer Novel"
+</span>
+</p>
+
+<div class="examples" style="margin-top: -1em;">Example 2: A macro with required and optional arguments</div>
+
+<div class="box-macro-args"  style="width: 684px;">
+Macro: <b>TAB_SET</b> <kbd class="macro-args">&lt;tab number&gt;  &lt;indent&gt;  &lt;length&gt;  [ L | R | C | J [ QUAD ] ]&nbsp;</kbd>
+</div>
+
+<p>
+The first required argument is a number that identifies the tab
+(say, "3").  The second required argument is an indent from the
+left margin (say, 6 picas).  The third required argument is the
+length of the tab (say, 3 picas).  Therefore, at a minimum, when
+using this macro, you would enter:
+<br/>
+<span class="pre-in-pp">
+  .TAB_SET 3 6P 3P
+</span>
+The remaining two arguments are optional.  The first is a
+single letter, either <kbd>L, R, C</kbd> or
+<kbd>J</kbd>.  The second, which is itself
+optional after <kbd>L, R, C</kbd> or
+<kbd>J</kbd>, is the word <kbd>QUAD</kbd>.
+Therefore, depending on what additional information you wish to
+pass to the macro, you could enter:
+<br/>
+<span class="pre-in-pp">
+  .TAB_SET 3 6P 3P L
+</span>
+or
+<br/>
+<span class="pre-in-pp">
+  .TAB_SET 3 6P 3P L QUAD
+</span>
+</p>
+
+<div id="toggle-example" class="examples" style="margin-top: -1em;">Example 3: A sample toggle macro:</div>
+
+<div class="box-macro-args" style="max-width: 684px;">
+Macro: <b>QUOTE</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+<kbd>QUOTE</kbd> begins a section of quoted text
+in a document and doesn&#8217;t require an argument.  When the
+quote&#8217;s finished, you have to tell mom it&#8217;s done.
+<span class="pre">
+  .QUOTE
+  So runs my dream, but what am I?
+  An infant crying in the night
+  An infant crying for the light
+  And with no language but a cry.
+  .QUOTE OFF
+</span>
+</p>
+
+<p>
+  Alternatively, you could have turned the quote off with
+  <kbd>END</kbd>, or <kbd>X</kbd>, or something else.
+  </p>
+</div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 33%; text-align: right;"><a href="definitions.html#top">Next: Definitions</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

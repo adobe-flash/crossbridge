@@ -1,0 +1,342 @@
+.\"	-*-	mode: roff	-*-
+.ig
+
+common.roff
+
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2010 Free Software Foundation, Inc.
+written by Joachim Walsdorff <Joachim.Walsdorff@urz.uni-heidelberg.de>.
+
+groff is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+groff is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+..
+.
+.
+.mso hdtbl.tmac\"			load table macros
+.
+.\"	******************************************************************
+.\"	**	Some macros and the page setup used by the examples	**
+.\"	******************************************************************
+.
+.\"	******************************************************************
+.\"	**	some of the following macros use system commands	**
+.\"	**	and are therefore `unsafe': they need the `-U' argument **
+.\"	**	when calling groff/troff				**
+.\"	******************************************************************
+.
+.\"	******************************************************************
+.\"	**		Header macro for the examples			**
+.\"	******************************************************************
+.de H
+.  nr *w* (17 * \w\\$* / 10 + 4n)
+.  TBL border=1n \
+       bc=yellow \
+       bgc=red4 \
+       fgc=yellow \
+       csp=0 \
+       fst=TB \
+       "fsz=1.7 1.5" \
+       hal=c \
+       tal=c \
+       "width=(\\n[*w*]+4n)<?\n[.l]"
+.  TR .TD
+.  t*P1 \\$*
+.  ETB
+.  SP
+..
+.
+.
+.\"	******************************************************************
+.\"	**	Utility macro for the date, requires UNIX date.		**
+.\"	**	after return string *date contains the date in the	**
+.\"	**	standard form of the Unix date-command,			**
+.\"	**	for example "Sun Dec  5 22:27:57     2004"		**
+.\"	******************************************************************
+.de date
+.  pso bash -c "echo -n .ds *date\ ;date"
+.  tm \\*[*date] ***
+..
+.
+.
+.\"	******************************************************************
+.\"	**	Utility macro for time measurement, requires UNIX date	**
+.\"	**	.time s[tart]|[end]					**
+.\"	**		.time start:					**
+.\"	**			reg *time gets the start-time (seconds) **
+.\"	**		.time [end]:					**
+.\"	**			reg *time gets the difference of the	**
+.\"	**				end- and start-time (seconds)	**
+.\"	******************************************************************
+.de time
+.  ds * \\$1\"
+.  substring * 0 0
+.  ie "\\*[*]"s" \
+.    pso bash -c "echo -n .nr *time 0+;date +%s"
+.  el \{\
+.   pso bash -c "echo -n .nr *time -;date +%s"
+.   nr *time 0-\\n[*time]
+.   tm elapsed time: \\n[*time] seconds
+.  \}
+..
+.
+.
+.\"	******************************************************************
+.\"	**		Perform n-times all the arbitrary arguments	**
+.\"	**		.PN n a2 a3 ...					**
+.\"	**			PN is nestable				**
+.\"	******************************************************************
+.de PN
+.  nr *pn +1
+.  nr PN\\n[*pn] (\\$1 + 1) 1
+.  shift
+.
+.  while \\n-[PN\\n[*pn]] \
+.    t*P1 \\$@
+.
+.  nr *pn -1
+..
+.
+.
+.\"	Utility macro:	.d2x decimal_number [base [string_name]]
+.\"
+.\"		Convert `decimal_number' to another base `base' (in the
+.\"		range 1..16) and store the result in string `string_name'.
+.\"		If `base' is missing or empty, convert to a hexadecimal
+.\"		number.  If `string_name' is missing or empty, return value
+.\"		in string `hex#', otherwise return the value in both
+.\"		`string_name' and `hex#'.
+.\"
+.\"		The base value 1 is handled specially: The returned
+.\"		string contains the character `|' `decimal_number' times
+.\"		(for example, input value 4 yields `||||').
+.ds d2x-0 0\"
+.ds d2x-1 1\"
+.ds d2x-2 2\"
+.ds d2x-3 3\"
+.ds d2x-4 4\"
+.ds d2x-5 5\"
+.ds d2x-6 6\"
+.ds d2x-7 7\"
+.ds d2x-8 8\"
+.ds d2x-9 9\"
+.ds d2x-10 A\"
+.ds d2x-11 B\"
+.ds d2x-12 C\"
+.ds d2x-13 D\"
+.ds d2x-14 E\"
+.ds d2x-15 F\"
+.
+.
+.de d2x
+.  if !\B\\$1 \{\
+.    tm \\n[.F]:\\n[.c]: invalid or missing first argument
+.    tm1 "     usage: `.d2x decimal_number [base [string_name]]'
+.    return
+.  \}
+.
+.  nr i# (-1) 1
+.  nr j# 1
+.  ds hex#
+.  nr dec# (\\$1) 1
+.
+.  if !\\$1 \
+.    nr dec# (-\\n[dec#])
+.
+.  ie !"\\$2"" \{\
+.    ie !\B\\$2 \
+.      tm \\n[.F]:\\n[.c]: invalid base `\\$2'
+.    el \
+.      ie ((\\$2 < 1) : (\\$2 > 16)) \
+.        tm \\n[.F]:\\n[.c]: invalid base `\\$2'
+.      el \
+.        nr b# \\$2
+.  \}\}
+.  el \
+.    nr b# 16
+.
+.  nr xb# 1
+.
+.  ie (\\n[b#] == 1) \{\
+.    nr dec# +1
+.    while \\n-[dec#] \
+.      as hex# |\"
+.  \}
+.  el \{\
+.    while (\\n[dec#] - \\n[xb#]) \{\
+.      nr xb# (\\n[xb#] * \\n[b#])
+.      nr j# +1
+.    \}
+.
+.    while (\\n+[i#] < \\n[j#]) \{\
+.      nr ** (\\n[dec#] / \\n[xb#])
+.      as hex# \\*[d2x-\\n[**]]\"
+.      nr dec# (\\n[dec#] - (\\n[xb#] * \\n[**]))
+.      nr xb# (\\n[xb#] / \\n[b#])
+.    \}
+.  \}
+.
+.  \" strip leading zero, if any
+.  ds * \\*[hex#]\"
+.  substring * 0 0
+.  if "\\*[*]"0" \
+.    substring hex# 1 -1
+.
+.  if (\\$1 < 0) \
+.    ds hex# -\\*[hex#]\"
+.
+.  if !"\\$3"" \{\
+.    ie !\A\\$3 \
+.      tm \\n[.F]:\\n[.c]: invalid string name `\\$3'
+.    el \
+.      ds \\$3 \\*[hex#]\"
+.  \}
+..
+.
+.
+.\"	Utility macro:	.random#
+.\"			.random-seed seed1 seed2
+.\"
+.\"		Return pseudo-random numbers in the range 0..0xFFFFFF,
+.\"		represented as the concatenation of `#' and six
+.\"		hexadecimal digits, in the string `#random'.  The
+.\"		macro `random-seed' can be used to set seed values,
+.\"		which should be integers in the range 1..2147483562 and
+.\"		1..2147483398 for `seed1' and `seed2', respectively
+.\"		(the macro applies a modulo operation to assure this
+.\"		range).  If `random-seed' isn't called the registers
+.\"		`seconds', `minutes', `hours', `dy', `mo', `year', and
+.\"		`$$' are used to compute it.
+.\"
+.\"		The used generator is presented in L'Ecuyer's 1988 paper
+.\"		`Efficient and Portable Combined Random Number
+.\"		Generators', which combines two Multiplicative Linear
+.\"		Congruential Generators (MLCGs) to achieve a period of
+.\"		2.3*10^18.
+.af hours 00
+.af minutes 00
+.af seconds 00
+.af year 0000
+.af mo 00
+.af dy 00
+.
+.ds random-s1 \n[minutes]\n[seconds]\n[$$]\n[hours]\"
+.\" prevent overflow
+.substring random-s1 0 8
+.
+.nr random-s1 (\*[random-s1] % 2147483562)
+.nr random-s2 \n[dy]\n[year]\n[mo]
+.
+.
+.de random-seed
+.  if !(\\n[.$] == 2) \{\
+.    tm1 "random-seed: Invalid number of arguments.
+.    tm1 "             usage: `.random-seed seed1 seed2'
+.    return
+.  \}
+.
+.  nr random-s1 (\\$1 % 2147483562)
+.  nr random-s2 (\\$2 % 2147483398)
+..
+.
+.
+.de random#
+.  nr * (\\n[random-s1] / 53668)
+.  nr random-s1 (40014 * (\\n[random-s1] - (\\n[*] * 53668)) \
+                - (\\n[*] * 12211))
+.  if !\\n[random-s1] \
+.    nr random-s1 +2147483563
+.
+.  nr * (\\n[random-s2] / 52774)
+.  nr random-s2 (40692 * (\\n[random-s2] - (\\n[*] * 52774)) \
+                - (\\n[*] * 3791))
+.  if !\\n[random-s2] \
+.    nr random-s2 +2147483399
+.
+.  nr * (\\n[random-s1] - \\n[random-s2])
+.  if (\\n[*] < 1) \
+.    nr * +2147483562
+.
+.  \" reduce the result to the leftmost 24 bits
+.  nr * (\\n[*] / 128)
+.
+.  d2x \\n[*]
+.  ds hex# 000000\\*[hex#]\"
+.  substring hex# -6
+.  ds #random #\\*[hex#]\"
+..
+.
+.
+.\"	******************************************************************
+.\"	**			minimal Page setup			**
+.\"	******************************************************************
+.
+.nr s \n[.ps]
+.nr v \n[.v]
+.nr p \n[.p]
+.nr o \n[.o]
+.pv 1.2 1.2 "" X
+.nr l 6.6i				\"	set text width
+.ll \n[t*l]u
+.nr o 2c				\"	set offset
+.po \n[o]u
+.nr p 29.7c				\"	set paper length (A4)
+.pl \n[p]u
+.nr tH 1i				\"	set top margin
+.sp |\n[tH]u
+.
+.ds t*HM //arbitrary text for page header, except on the first page//\"
+.ds t*BM //arbitrary text for page footer, except on the last page/\\n[%]/\"
+.
+.ev 99
+.lt \n[t*l]u
+.ev
+.
+.
+.de HM
+.  sp |.5i				\"	print header in top margin
+.  tl \\*[t*HM]
+.  sp |\\n[tH]u
+.  ev
+..
+.
+.
+.de BM
+.  ev 99
+.  sp |(\\n[p]u - .5i)			\"	print footer in bottom margin
+.  tl \\*[t*BM]
+.  bp
+..
+.
+.
+.de EM
+.  rm BM			\"	no page number at bottom of last page
+.  t*EM
+..
+.
+.
+.wh 0 HM
+.wh 0-1.5i BM
+.em EM
+.
+.\" Some packages (-mm) define their own .SP macro.
+.\" Use ours if another one isn't already available.
+.if !d SP .als SP t*SP
+.
+.if "\n[.m]"" \
+.  gcolor black
+.if "\n[.M]"" \
+.  fcolor white
+.
+.\" EOF

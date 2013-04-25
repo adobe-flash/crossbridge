@@ -1,0 +1,369 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:42 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>webpage-9.html</title>
+
+ <link rel="stylesheet" type="text/css" href="groff.css" >
+</head>
+[ <a href="webpage.html">top</a> ]
+
+
+<h2>NEWS VERSION 1.20
+<a name="heading9"></a>
+</h2>
+ <hr><table><tr><td valign="top" width="30%" bgcolor="#eeeeee">
+<a href="webpage-1.html#heading1">License</a><br>
+<a href="webpage-2.html#heading2">README</a><br>
+<a href="webpage-3.html#heading3">CVS and FTP access</a><br>
+<a href="webpage-4.html#heading4">Groff dependencies</a><br>
+<a href="webpage-5.html#heading5">Bug reports</a><br>
+<a href="webpage-6.html#heading6">Mailing lists</a><br>
+<a href="webpage-7.html#heading7">NEWS VERSION 1.21</a><br>
+<a href="webpage-8.html#heading8">NEWS VERSION 1.20.1</a><br>
+<a href="webpage-9.html#heading9">NEWS VERSION 1.20</a><br>
+<a href="webpage-10.html#heading10">NEWS VERSION 1.19.2</a><br>
+<a href="webpage-11.html#heading11">NEWS VERSION 1.19.1</a><br>
+<a href="webpage-12.html#heading12">NEWS VERSION 1.19</a><br>
+<a href="webpage-13.html#heading13">NEWS VERSION 1.18.1</a><br>
+<a href="webpage-14.html#heading14">NEWS VERSION 1.18</a><br>
+
+</td><td valign="top" width="70%">
+
+<p>groff</p><ul>
+
+<p><li>XHTML support has been added to grohtml and can be
+specified by &minus;Txhtml. This option also utilizes the
+MathML capability of eqn and combines the outputs of both in
+the final XHTML file. Users can also specify the
+&lsquo;&minus;P&minus;V&rsquo; option together with
+&lsquo;&minus;Txhtml&rsquo; in groff. This has the effect of
+creating an XHTML validator button at the bottom of each
+page.</p>
+
+<p style="margin-top: 1em"></li><li>Some options have been
+added to control a new preprocessor, &lsquo;preconv&rsquo;
+(see below): &lsquo;&minus;k&rsquo; activates it,
+&lsquo;&minus;K&rsquo; sets the input encoding, and
+&lsquo;&minus;D&rsquo; sets the default encoding.</p>
+
+<p style="margin-top: 1em"></li><li>A new environment
+variable &lsquo;GROFF_ENCODING&rsquo; sets the encoding of
+input files; it implies command option
+&lsquo;&minus;k&rsquo;. </li></p></ul>
+
+<p>troff</p><ul>
+
+<p><li>Two new requests &lsquo;device&rsquo; and
+&lsquo;devicem&rsquo; have been added which are equivalents
+to the \X and \Y escapes, respectively.</p>
+
+<p style="margin-top: 1em"></li><li>A new read-only number
+register &lsquo;.br&rsquo; is available which is set
+to&nbsp;1 if a macro is called as .foo and to&nbsp;0 if
+called as &rsquo;foo. This allows to reliably modify
+requests.</p>
+
+<pre style="margin-left:3%; margin-top: 1em">.als bp@orig bp
+.de bp
+.  tm before bp
+.  ie \\n[.br] .bp@orig
+.  el &rsquo;bp@orig
+.  tm after bp
+..</pre>
+
+
+<p style="margin-top: 1em"></li><li>A new request
+&lsquo;fzoom&rsquo; has been added to adjust the optical
+size of a font in relation to the others. The zoom factor is
+given in integer multiples of 1/1000th. In the following
+example, the CR font is magnified by 10% (the zoom factor is
+1.1).</p>
+
+<pre style="margin-left:3%; margin-top: 1em">.fam P
+.fzoom CR 1100
+.ps 12
+Palatino and \f[CR]Courier\f[]</pre>
+
+
+<p style="margin-top: 1em">The new number register
+&lsquo;.zoom&rsquo; holds the zoom value of the current
+font, in multiples of 1/1000th.</p>
+
+<p style="margin-top: 1em"></li><li>The
+&lsquo;cflags&rsquo; request has been extended with a new
+flag value 64, to be used in combination with values&nbsp;2
+(break before character) and&nbsp;4 (break after character).
+If set, the hyphenation codes of the surrounding characters
+are ignored.</p>
+
+<p style="margin-top: 1em"></li><li>A new debugging
+request, &lsquo;pev&rsquo;, has been added to print all of
+the current known environments to stderr. It first prints
+the state of the current environment, then iterates through
+all of the known environments, printing each except the one
+that is current.</p>
+
+<p style="margin-top: 1em"></li><li>A new escape
+&lsquo;\$^&rsquo; has been added. It represents the
+parameters of a macro as if they were an argument to the
+&lsquo;ds&rsquo; request. This is used by
+&lsquo;trace.tmac&rsquo;.</p>
+
+<p style="margin-top: 1em"></li><li>A new read-only number
+register &lsquo;.O&rsquo; is available which returns the
+current suppression level as set by the &lsquo;\O&rsquo;
+escape.</p>
+
+<p style="margin-top: 1em"></li><li>The space width emitted
+by the &lsquo;\|&rsquo; and &lsquo;\^&rsquo; escape
+sequences can be controlled on a per-font basis. If there is
+a glyph named &lsquo;\|&rsquo; or &lsquo;\^&rsquo;,
+respectively (note the leading backslash), defined in the
+current font file, use this glyph&rsquo;s width instead of
+the default value.</p>
+
+<p style="margin-top: 1em">This behaviour is not new, but
+hasn&rsquo;t been documented before. </li></p></ul>
+
+<p>nroff</p><ul>
+
+<p><li>Two new command line options &lsquo;&minus;w&rsquo;
+and &lsquo;&minus;W&rsquo; are accepted and passed to groff
+to enable and disable warning messages, respectively.
+</li></p> </ul>
+
+<p>preconv</p><ul>
+
+<p><li>This is a new preprocessor to convert various input
+encodings to something groff understands (this is, ASCII and
+\[uXXXX] entities, with &lsquo;XXXX&rsquo; a hexadecimal
+number with 4 to 6 digits, representing a Unicode input
+code). Normally, preconv should be invoked with options
+&lsquo;&minus;k&rsquo; and &lsquo;&minus;K&rsquo; of groff.
+See the preconv man page for details. </li></p></ul>
+
+<p>pic</p><ul>
+
+<p><li>int(x) now really behaves as documented: It
+truncates the non-integer part of&nbsp;x, this is, it rounds
+towards zero and not towards the next integer less than or
+equal to&nbsp;x.</p>
+
+<p style="margin-top: 1em"></li><li>Pic now supports up to
+32 macro arguments (and up to 16 on EBCDIC platforms).</p>
+
+<p style="margin-top: 1em"></li><li>Heinz-J&uuml;rgen
+&Ouml;rtel contributed code for two new keywords,
+&lsquo;xslanted&rsquo; and &lsquo;yslanted&rsquo;, which can
+change the shape of boxes into arbitrary parallelograms.
+</li></p> </ul>
+
+<p>tbl</p><ul>
+
+<p><li>Latest versions of DWB tbl introduced an
+&lsquo;x&rsquo; column specifier for a single column
+expanded to the line width. GNU tbl has now been extended to
+support even multiple &lsquo;x&rsquo; specifiers within a
+table.</p>
+
+<p style="margin-top: 1em"></li><li>To avoid collision with
+the new &lsquo;x&rsquo; specifier, a block formatting macro
+must now be selected with specifier letter &lsquo;m&rsquo;.
+</li></p> </ul>
+
+<p>eqn</p><ul>
+
+<p><li>Eric S. Raymond has added a new device type to eqn,
+MathML. When &minus;TMathML is enabled, eqn now emits MathML
+formula markup rather than groff commands. The new groff
+&minus;Txhtml device uses this. </li></p></ul>
+
+<p>chem</p><ul>
+
+<p><li>The preprocessor &lsquo;chem&rsquo; was added.
+&lsquo;chem&rsquo; is a roff language to generate chemical
+structure diagrams. It generates &lsquo;pic&rsquo; output.
+</li></p> </ul>
+
+<p>grops</p><ul>
+
+<p><li>The PS font definition files have been regenerated
+with newer AFM versions from Adobe&rsquo;s 35 core fonts as
+present in most Level&nbsp;2 PS printers. The changes are
+minor (most notably, the addition of the &lsquo;Euro&rsquo;
+glyph and an extended set of kerning values).</p>
+
+<p style="margin-top: 1em">For backwards compatibility, the
+old set of font definition files is still available; for
+details please read the man page of grops. </li></p></ul>
+
+<p>grotty</p><ul>
+
+<p><li>\D&rsquo;p...&rsquo; is now supported if the polygon
+consists entirely of horizontal and vertical lines.
+</li></p> </ul>
+
+<p>grohtml</p><ul>
+
+<p><li>XHTML support has been added.</p>
+
+<p style="margin-top: 1em"></li><li>New command line option
+&lsquo;&minus;V&rsquo; (to be used in XHTML mode) to produce
+an XHTML validator button.</p>
+
+<p style="margin-top: 1em"></li><li>New command line option
+&lsquo;&minus;y&rsquo; to produce a right-justified groff
+signature at the end of the document (in combination with
+option &lsquo;&minus;V&rsquo;). </li></p></ul>
+
+<p>gxditview</p><ul>
+
+<p><li>Support for keyboard navigation has been
+improved.</p>
+
+<p style="margin-top: 1em"></li><li>Similar to other X11
+applications, there are now two resource files,
+&lsquo;GXditview&rsquo; and &lsquo;GXditview-color&rsquo;.
+</li></p> </ul>
+
+<p>groffer</p><ul>
+
+<p><li>&lsquo;groffer&rsquo; version 1.* exists now in a
+shell and a Perl version. </li></p></ul>
+
+<p>afmtodit</p><ul>
+
+<p><li>New option &lsquo;&minus;c&rsquo; to output more
+font information as comments.</p>
+
+<p style="margin-top: 1em"></li><li>New option
+&lsquo;&minus;k&rsquo; to suppress output of kerning
+data.</p>
+
+<p style="margin-top: 1em"></li><li>New option
+&lsquo;&minus;f NAME&rsquo; to set the internal name of the
+groff font. </li></p></ul>
+
+<p>macro packages</p><ul>
+
+<p><li>Joachim Walsdorff contributed the
+&lsquo;hdtbl&rsquo; package for the generation of tables,
+using a syntax very similar to the HTML table model. For
+example, a table with two cells and two rows looks like
+this:</p>
+
+<pre style="margin-left:3%; margin-top: 1em">.TBL cols=2
+.  TR .TD 1*1 .TD 1*2
+.  TR .TD 2*1 .TD 2*2
+.ETB</pre>
+
+
+<p style="margin-top: 1em">Here the same table using a more
+expanded syntax:</p>
+
+<pre style="margin-left:3%; margin-top: 1em">.TBL cols=2
+.  TR
+.    TD 1*1
+.    TD 1*2
+.  TR
+.    TD 2*1
+.    TD 2*2
+.ETB</pre>
+
+
+<p style="margin-top: 1em">Tables can be nested;
+&lsquo;hdtbl&rsquo; works without a preprocessor so that the
+full capability of groff&rsquo;s macro engine is
+available.</p>
+
+<p style="margin-top: 1em">This package currently works
+with &lsquo;-Tps&rsquo; only.</p>
+
+<p style="margin-top: 1em"></li><li>&minus;mandoc now
+supports multiple man pages (in either man or mdoc
+format).</p>
+
+<p style="margin-top: 1em"></li><li>Fabrice M&eacute;nard
+contributed locales support. In particular, it is now
+possible to get French localization of the main macro
+packages (&minus;ms, &minus;mm, &minus;me, and &minus;mom,
+but not &minus;man and &minus;mdoc which are localized
+differently) by appending &lsquo;-mfr&rsquo; to the list of
+macro packages. Example:</p>
+
+<pre style="margin-left:3%; margin-top: 1em">groff &minus;ms &minus;mfr foo &gt; foo.ps</pre>
+
+
+<p style="margin-top: 1em">Note that latin-9 input encoding
+is used for French (to support the &lsquo;oe&rsquo;
+ligature).</p>
+
+<p style="margin-top: 1em"></li><li>Swedish macro
+localization (with &lsquo;&minus;msv&rsquo;) has been
+added.</p>
+
+<p style="margin-top: 1em"></li><li>German macro
+localization (with &lsquo;&minus;mde&rsquo; and
+&lsquo;&minus;mden&rsquo; for traditional and new
+orthography, respectively) has been added.</p>
+
+<p style="margin-top: 1em"></li><li>Czech macro
+localization (with &lsquo;&minus;mcs&rsquo;) has been
+added.</p>
+
+<p style="margin-top: 1em">Note that latin-2 input encoding
+is used for Czech.</p>
+
+<p style="margin-top: 1em"></li><li>A new macro
+&lsquo;Dx&rsquo; has been added to the mdoc package which
+identifies the DragonFly OS.</p>
+
+<p style="margin-top: 1em"></li><li>If mdoc is used to
+print multiple man pages (together with the &minus;rcR=0
+command line option), each man page now starts a new
+page.</p>
+
+<p style="margin-top: 1em"></li><li>&minus;mtrace has been
+considerably improved, now showing number and string
+register assignments, among other things. See the
+groff_trace man page for details.</p>
+
+<p style="margin-top: 1em"></li><li>The PSPIC macro now
+works with all devices (producing a hollow rectangle on
+devices which don&rsquo;t support inclusion of PS images)
+and is loaded in troffrc at start-up.</p>
+
+<p style="margin-top: 1em"></li><li>A new auxiliary macro
+package &lsquo;62bit&rsquo; has been added which provides
+some macros for adding, multiplying, and dividing signed
+62bit integers (mainly to handle normal groff number
+operations without risking overflow errors).</p>
+
+<p style="margin-top: 1em"></li><li>For &minus;ms, Eric S.
+Raymond contributed support for ancient Bell Labs localisms
+&lsquo;.SC&rsquo;, &lsquo;.UC&rsquo;, &lsquo;.P1&rsquo;, and
+&lsquo;.P2&rsquo;. The latter three are enabled only after
+.SC is called.</p>
+
+<p style="margin-top: 1em"></li><li>A new string,
+&lsquo;SN-STYLE&rsquo;, has been added to the ms macros,
+controlling the formatting of section numbers in headings
+defined by &lsquo;.NH&rsquo;.</p>
+
+<p style="margin-top: 1em"></li><li>The new macro package
+&lsquo;ptx&rsquo; provides a template definition for the
+&lsquo;.xx&rsquo; macro as needed by GNU ptx (for creating
+permuted indices). </li></p></ul></td></tr></table><hr>
+[ <a href="webpage.html">top</a> ]

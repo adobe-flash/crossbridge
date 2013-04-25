@@ -1,0 +1,32 @@
+Volker Zell writes:
+
+To run a precompiled version of man with Cygwin 1.5.24 and above you will need 
+the following utilities
+
+ o man, bash, cygwin, bzip2, coreutils, gawk, groff, gzip and less
+
+Click on the "Install Cygwin now" link on the http://cygwin.com/ web page.
+This downloads setup.exe to your system.  Save it and run setup, answer 
+the questions and pick up the above mentioned packages from the different 
+categories.
+
+
+Building from source
+====================
+
+Adjust the paths in configure and man2html/Makefile.in to suit your
+installation.
+
+man-1.6e builds with:
+
+    CC="gcc -O2 -DNONLS -DLC_MESSAGES=6" ./configure +fhs +lang all
+    
+then issue:
+
+    make
+    
+then:
+
+    make install
+
+Edit the installed man.conf to suit your site.

@@ -1,0 +1,221 @@
+1.4.10
+  * getclip and putclip now support new cygwin-1.7.13+ clipboard format.
+  * cygstart now supports file:// and mailto: URLs (Yaakov Selkowitz)
+  * Added -R/--raw option to readshortcut (prevents expanding embedded
+    environment variables within paths). Reported by Denis Excoffier.
+  * mkshortcut and readshortcut now use cygwin-1.7 path conversion
+    functions rather than deprecated ones. However, they make only
+    minimal concessions to unicode, and operate mostly on narrow character
+    encoded pathnames. They should now be able to handle "long" pathnames
+    however.
+
+1.4.8
+  * Integrate cygstart with FD.o menu and mimetype system.
+    (Yaakov Selkowitz)
+  * Remove ascii utility; replaced by separate package derived
+    from ESR's implementation http://catb.org/~esr/ascii/
+  * Remove realpath utility; replaced by new implementation
+    provided by coreutils (8.15 and above).
+
+1.4.6
+  * conv: no longer distribute as dos2unix, unix2dos, u2d, or d2u.
+    Those programs now available from the separate dos2unix package.
+  * ascii: by default, now only prints characters 0..127. Use new
+    option --extended/-e for old behavior, printing characters 0..255.
+    See this thread: http://cygwin.com/ml/cygwin/2010-04/msg00600.html
+  * cygstart: Fix --reference. Allow relative paths (enables, e.g.
+    'cygstart calc'). Reported by Ken Hirsch.
+    http://cygwin.com/ml/cygwin/2010-01/msg01101.html
+  * cygdrop: Minor fixes (Christian Franke)
+  * mkshortcut: Minor fixes (Jon TURNEY)
+  * Updated license for lpr to GPLv3+ (with permission from
+    Rick Rankin)
+  * Updated license for readshortcut to GPLv3+ (with permission
+    from Rob Siklos)
+  * Updated license for realpath to GPLv3+ (was GPLv2+)
+  * Updated license for cygstart to GPLv3+ (was GPLv2+; no objections
+    from Michael Schaap)
+  * Updated license for cygdrop to GPLv3+ (was GPLv2+; no objections
+    from Christian Franke)
+  * Updated license for mkshortcut to GPLv3+ (was GPLv2+; no objections
+    from Joshua Daniel Franklin)
+  * Updated license for the cygicons.dll (as a collection) to GPLv3+ (was
+    GPLv2+). Individual icons within the collection remain under their
+    original license.
+  * Updated license for banner to GPLv3+ (with permission from
+    from Joerg Schaible)
+
+1.4.4
+  * Fix longstanding bug in mkshortcut, in which failure was
+    reported even on success (Andy Koppe).
+  * --help, --license, --usage, and --version output now goes
+    to stdout instead of stderr
+  * Add standard command line options to cygdrop (--version,
+    --help, --license, --usage)
+  * Various internal code cleanups
+
+1.4.2
+  Add hippo icon to cygicons.
+  Fix mkshortcut bug.
+
+1.4.1
+  Add --help option to lpr.
+  Build system improvements.
+  Add support for building on MinGW.
+  Add new cygdrop utility (Christian Franke; requires w2k or better)
+  Many of the utilities have been relicensed as GPLv3+.
+
+1.4.0
+  Add support to cygstart for filenames with UTF/wide chars.
+  (IWAMURO Motonori).
+
+^^ Begin cygwin-1.7-specific development ^^ 
+
+1.3.4
+  Fix installation bug, exposed by new libtool's modified
+  behavior (reported by Jerry Hedden and David Rothenberger)
+
+1.3.3
+  cygstart: Add new -w/--wait option (Barry Kelly)
+            Propagate exit status of child process when -w (Alex Smith)
+
+1.3.2
+  cygicons: a new DLL that provides cygwin-related icons
+            original images were obtained from various (free
+            as in speech) sources.
+  Now installs documentation into $(prefix)/share/doc/cygutils
+  Also installs per-component documentation in $(docdir)/component/
+  No longer link apps to libpopt if they don't need it.
+  Needs libtool for building cygicons, but side effect is to use
+    libtool throughout.  cygicons requires libtool to be configured
+    with RC support (e.g. windres). This may break building on 
+    non-w32 platforms.
+
+1.3.1
+  cygstart: compatibility fixes for recent cygwin snapshots
+  build machinery updated to latest autotools -- now passes distcheck
+
+1.3.0
+  cal      - remove
+  col      - remove
+  colcrt   - remove
+  colrm    - remove
+  column   - remove
+  ddate    - remove
+  getopt   - remove
+  mcookie  - remove
+  namei    - remove
+  rename   - remove
+  rev      - remove
+
+1.2.10
+  cygstart: properly convert environment variables to Win32 (Michael Schaap)
+  cygstart: don't parse options listed after the command (Eric Blake)
+
+1.2.9
+  Fix memory leak/crash in readshortcut (cgf)
+
+
+1.2.8
+  more updates to cygstart (Michael Schaap)
+  bugfix for dump under mingw (Kees Zeelenberg)
+
+1.2.7
+  Updates to cygstart (Anthony Derosa, Michael Schaap)
+  New 'rename' program (Christopher Faylor)
+
+1.2.6
+  Remove readlink (now provided by coreutils-5.3.0+)
+  conv/d2u/u2d:  add --force/--safe options (defaults to safe).
+     Identify binary files by presence of '\0' and bail if --safe.
+     Do not short circuit if first line ends in target style; keep
+     going.  Collapse sequences of '\r' without '\n' to a single
+     EOL of target style.  '--force' propagates '\0' from input to
+     output.
+
+1.2.5:
+  Add new -s (startup norm|max|min mode) option for 
+    mkshortcut
+  Add new -d|--desc option for mkshortcut (to control
+    the 'description' field == tooltip text)
+
+1.2.4:
+  Remove ipcs, ipcrm which are now provided by cygwin itself
+  Remove support for building ipc tools against cygipc; build
+    only against cygserver.  CygIPC versions are now (again)
+    provided by the cygipc package itself.
+
+1.2.3 (unreleased):
+  Bugfix for lpr
+  Bugfix for ipck
+  Adapt ipck for cygserver compatibility
+  Fix docs for mkshortcut to reflect new -w/--workingdir option
+
+1.2.2:
+  Add readshortcut (Rob Siklos)
+  Actually implement the --dos/--unix options to putclip
+    and getclip (Rob Siklos)
+  Add the --no-conv option to putclip and getclip
+
+1.2.1:
+  Fix some configury errors, update documenation
+
+1.2.0:
+  Added ipcs, ipcrm, and ipck programs from cygipc.
+
+1.1.4:
+  Added -w/--workingdir option to mkshortcut (David Baur)
+  Reimplemented lpr in C++ (Rick Rankin)
+
+1.1.3:
+  Removed last, utmpdump (now provided by the sysvinit package)
+  Updated to latest autotools and gettext -- but remove gettext
+    source; no longer necessary with AM_GETTEXT_GNU([external])
+
+1.1.2:
+  Add rev, column, colcrt, colrm, mcookie.  Use GNU gettext (add
+  gettext source, as well).
+
+1.1.1:
+  Add getopt and readlink
+
+1.1.0:
+  change to one-big-makefile (cf. "Recursive Make Considered
+  Harmful").  Update documentation (esp. "HOW-TO-CONTRIBUTE" to
+  reflect that.
+
+1.0.0:
+  rearrange directory structure to cut down on clutter
+  (first insure that every .c and .h file has the correct
+  license notice)
+
+0.9.9:
+  add explicit license information to each .c and .h file.
+  move (almost all) #includes into common.h
+  add lpr
+  add mkshortcut
+
+0.9.8:
+  add last, utmpdump implementations from Mark Bradshaw
+  add realpath, ddate implementations
+
+0.9.7:
+  fix banner, release on sources mirror system
+
+0.9.6:
+  huge reorg, separate apps by license
+
+0.9.5:
+  renamed the package to `cygutils'
+  added Joerg Schaible's 'banner' implementation
+
+0.9.4:
+  added ipc tools from "Linux Programmer's Guide":
+    semtool, semstat, shmtool, msgtool 
+
+0.9.3:
+  Autoconfiscated. Not really cross-platform yet, still 
+  will only build properly on cygwin.
+
+0.9.1:
+  initial public release

@@ -1,0 +1,427 @@
+2012-03-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.0.1: Release tar ball made.
+
+2012-03-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* getopt.c: Add DJGPP to list of platforms where it's ok
+	to include <stdlib.h>.
+	* awkgram.y, builtin.c, ext.c, mbsupport.h, re.c: Update
+	copyright year.
+
+2012-03-21         Corinna Vinschen      <vinschen@redhat.com>
+
+	* getopt.c: Add Cygwin to list of platforms where it's ok
+	to include <stdlib.h>.
+
+2012-03-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Get new getopt to work on Linux and C90 compilers:
+
+	* getopt.c: Undef ELIDE_CODE for gawk.
+	(_getopt_internal_r): Init first.needs_free to 0. In test for -W
+	move executable code to after declarations for C90 compilers.
+	* getopt1.c: Undef ELIDE_CODE for gawk.
+
+	Minor bug fix with printf, thanks to John Haque:
+
+	* builtin.c (format_tree): Initialize base to zero at the top
+	of the while loop.
+
+	Getting next tar ball ready:
+
+	* configure.ac: Remove duplicate check for wcscoll. Thanks
+	to Stepan Kasal.
+
+2012-03-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* getopt.c, getopt.h, getopt1.c, getopt_int.h, regcomp.c,
+	regex.c, regex.h, regex_internal.c, regex_internal.h,
+	regexec.c: Sync with GLIBC, what the heck.
+
+2012-03-14         Eli Zaretskii  <eliz@gnu.org>
+
+	* mbsupport.h (btowc): Change for non-DJGPP.
+	* re.c (dfaerror): Add call to exit for DJGPP.
+
+2012-03-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex_internal.c (re_string_skip_chars): Fix calculation of
+	remain_len with m.b. chars. Thanks to Stanislav Brabec
+	<sbrabec@suse.cz>.
+
+2012-02-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (init_groupset): Make `getgroups' failing a non-fatal
+	error.  After all, what's the big deal?  Should help on Plan 9.
+
+2012-02-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c (parse_bracket_exp): Revert changes 2012-02-15 to stay
+	in sync with grep.
+	* dfa.h (dfarerror): Add __attribute__ from grep.
+
+2012-02-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix warnings from GCC 4.6.2 -Wall option.
+
+	* awkgram.y (newline_eof): New function to replace body of
+	NEWLINE_EOF macro.
+	(yylex): Replace body of NEWLINE_EOF macro.
+	* dfa.c (parse_bracket_exp): Init variables to zero.
+	* ext.c (dummy, junk): Remove.
+	* regex_internal.c (re_string_reconstruct): Remove buf array. It was
+	set but not used.
+
+2012-02-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNU grep.
+
+2012-02-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (main): Move init of `output_fp' to before parsing of
+	program so that error messages from msg.c don't dump core.
+	Thanks to Michael Haardt <michael@moria.de>.
+
+2012-01-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c [is_valid_unibtye_character]: Fix from GNU grep to 
+	bug reported by me from Scott Deifik for DJGPP.
+
+2012-01-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNU grep.
+
+2011-12-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h [STREQ, STREQN]: Remove macros.
+	* awkgram.y, builtin.c, command.y, debug.c, eval.c,
+	io.c, msg.c: Change all uses to call strcmp, strncmp.
+
+2011-12-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Finish Rational Range Interpretation (!)
+
+	* dfa.c (match_mb_charset): Compare wide characters directly
+	instead of using wcscoll().
+	* regexec.c (check_node_accept_byte): Ditto.
+
+	Thanks to Paolo Bonzini for pointing these out.
+
+2011-12-06         John Haque      <j.eh@mchsi.com>
+
+	* debug.c (source_find): Fix misplaced call to efree.
+	* profile.c (redir2str): Add a missing comma in the redirtab array.
+	* eval.c (r_interpret): Disallow call to exit if currule is undefined.
+	This avoids the possiblity of running END blocks more than once when
+	used in a user-defined sorted-in comparision function.
+	* array.c (sort_user_func): Adjust appropriately.
+
+2011-12-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h, mbsupport.h: Changes for MBS support on DJGPP
+	and z/OS.
+	* io.c: Disable pty support on z/OS.
+
+2011-11-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNU grep.
+	* dfa.h: Add _GL_ATTRIBUTE_PURE macro. Bleah.
+
+2011-11-14         John Haque      <j.eh@mchsi.com>
+
+	* debug.c (set_breakpoint_at): Fix problem with setting
+	breakpoints in a switch statement. Thanks to Giorgio Palandri
+	<giorgio.palandri@gmail.com> for the bug report.
+
+2011-11-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* mbsupport.h: Add check for HAVE_BTOWC, per Pat Rankin.
+
+2011-11-12         Eli Zaretskii  <eliz@gnu.org>
+
+	* mbsupport.h: Additional glop for dfa.c in Windows environment.
+
+2011-11-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Move glop for ! MBS_SUPPORT to ...
+	* mbsupport.h: ... here.
+	* replace.c: Include missing_d/wcmisc.c if ! MBS_SUPPORT.
+	* regex_internal.h: Move include of mbsupport.h up and add
+	additional checks to avoid inclusion of wctype.h and wchar.h.
+
+2011-10-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_strftime): Per Pat Rankin, instead of casting
+	fclock, use a long variable and check for negative or overflow.
+
+2011-10-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (dist-hook): Use `cd $(srcdir)/pc' so that
+	`make distcheck' works completely.
+	* builtin.c (do_strftime): Add cast to long int in check
+	for fclock < 0 for systems where time_t is unsigned (e.g., VMS).
+
+2011-10-25  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	dist: generated file `version.c' is not removed by "make distclean"
+
+	* Makefile.am (distcleancheck_listfiles): Define to ignore the
+	generated `version.c' file.
+
+2011-10-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c (wcscoll): Create for VMS.
+	* Makefile.am (dist-hook): Run sed scripts to make pc/config.h.
+
+2011-10-24  Eli Zaretskii  <eliz@gnu.org>
+
+	* builtin.c [HAVE_POPEN_H]: Include "popen.h".
+	* README.git: Update for pc/ systems.
+
+2011-10-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (distcleancheck_listfiles): Added, per advice from
+	Stefano Lattarini <stefano.lattarini@gmail.com>.
+	* dfa.c: Additional faking of mbsupport for systems without it;
+	mainly VMS.
+
+2011-10-21  Stefano Lattarini  <stefano.lattarini@gmail.com>
+
+	* configure.ac (AM_C_PROTOTYPES): Remove call to this macro.
+	The comments in configure.ac said that the call to AM_C_PROTOTYPES
+	was needed for dfa.h, synced from GNU grep; but this statement is
+	not true anymore in grep since commit v2.5.4-24-g9b5e7d4 "replace
+	AC_CHECK_* with gnulib modules", dating back to 2009-11-26.  Also,
+	the support for automatic de-ANSI-fication has been deprecated in
+	automake 1.11.2, and will be removed altogether in automake 1.12.
+	* vms/vms-conf.h (PROTOTYPES, __PROTOTYPES): Remove these #define,
+	they are not used anymore.
+	* pc/config.h (PROTOTYPES): Likewise.
+
+2011-10-18         Dave Pitts            <dpitts@cozx.com>
+
+	* dfa.c: Move some decls to the top of their functions for
+	C90 compilers.
+
+2011-10-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_strftime): Add check for negative / overflowed
+	time_t value with fatal error. Thanks to Hermann Peifer
+	<peifer@gmx.eu> for the bug report.
+	* dfa.c (setbit_wc): Non-MBS version. Add a return false
+	since VMS compiler doesn't understand that abort doesn't return.
+
+2011-10-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_sub): Init textlen to zero to avoid "may be
+	used unitialized" warning. Thanks to Corinna Vinschen for
+	pointing this out.
+	* eval.c (unwind_stack): Add parentheses around condition in while
+	to avoid overzealous warning from GCC.
+
+2011-09-30  Eli Zaretskii  <eliz@gnu.org>
+
+	* io.c (remap_std_file): Fix non-portable code that caused
+	redirected "print" to fail if a previous read from standard input
+	returned EOF.  Reported by David Millis <tvtronix@yahoo.com>.
+	(remap_std_file): Per Eli's suggestion, removed the leading close
+	of oldfd and will let dup2 do the close for us.
+
+2011-10-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNU grep.
+
+2011-10-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h, main.c (gawk_mb_cur_max): Make it a constant 1 when
+	MBS_SUPPORT isn't available to allow GCC dead code constant
+	expression computation and dead code elimination to help out.
+
+2011-10-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* io.c (rsnullscan, get_a_record): Fix the cases where terminators
+	are incomplete when RS == "". Also fix the case where the new value
+	is shorter than the old one.  Based on patch from Rogier
+	<rogier777@gmail.com> as submitted by Jeroen Schot
+	<schot@A-Eskwadraat.nl>.
+
+2011-09-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* eval.c, io.c, re.c: Fix some spelling errors. Thanks to
+	Jeroen Schot <schot@A-Eskwadraat.nl>.
+
+2011-09-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c, mbsupport.h: Sync with GNU grep. Large amount of changes
+	that remove many ifdefs, moving many conditions for multibyte
+	support into regular C code and relying GCC's dead code optimization
+	to elimnate code that won't be needed.
+	* dfa.c: For gawk, add a number of additional defines so that things
+	will compile if MBS_SUPPORT is 0.
+	* array.c, awk.h, awkgram.y, builtin.c, eval.c, field.c, main.c,
+	node.c, re.c: Change `#ifdef MBS_SUPPORT' to `#if MBS_SUPPORT'.
+	* awk.h, regex_internal.h: Move NO_MBSUPPORT handling to ...
+	* mbsupport.h: ...here.
+
+2011-09-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNU grep.
+
+2011-09-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNU grep.
+
+2011-08-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix pty co-process communication on Ubuntu GNU/Linux.
+
+	* io.c: Add include of <sys/ioctl.h> to get definition of TIOCSCTTY.
+	(two_way_open): Move call for this ioctl to after setsid() call.
+
+2011-08-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex_internal.c (re_string_fetch_byte_case ): Remove
+	__attribute((pure)) since it causes failures with gcc -O2
+	-fno-inline. Thanks to Neil Cahill <ncahill_alt@yahoo.com>
+	for reporting the bug.
+
+2011-08-10         John Haque      <j.eh@mchsi.com>
+
+	BEGINFILE/ENDFILE related code redone.
+
+	* awk.h (prev_frame_size, has_endfile, target_get_record,
+	target_newfile): New defines.
+	* awkgram.y (mk_program): Initialize has_endfile appropriately for
+	Op_get_record.
+	(parse_program): Initialize new jump targets for
+	Op_get_record and Op_newfile.
+	* eval.c (unwind_stack): Change argument to number of
+	items to be left in the stack. Adjust code.
+	(pop_fcall, pop_stack): New defines.
+	(setup_frame): Initialize prev_frame_size.
+	(exec_state, EXEC_STATE): New structure and typedef.
+	(exec_state_stack): New variable.
+	(push_exec_state, pop_exec_state): New functions to save and
+	later retrieve an execution state.
+	(r_interpret): Use the new functions and the defines in
+	cases Op_K_getline, Op_after_beginfile, Op_after_endfile,
+	Op_newfile and Op_K_exit.
+	* io.c (after_beginfile): When skipping a file using nextfile,
+	return zero in case there was an error opening the file. 
+	(has_endfile): Nuke global variable.
+	(inrec): Add a second argument to pass errno to the calling
+	routine.
+	* debug.c (print_instruction): Update cases.
+
+2011-08-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix (apparently long-standing) problem with FIELDWIDTHS.
+	Thanks to Johannes Meixner <jsmeix@suse.de>.
+
+	* field.c (set_FIELDWIDTHS): Adjust calculations.
+
+	Fix problem with FPAT, reported by "T. X. G." <leopardie333@yahoo.com>
+
+	* awk.h (Regexp): Add new member 'non_empty'.
+	* field.c (fpat_parse_field): Save/restore local variable non_empty
+	from member in Regexp struct.
+
+2011-08-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Fix pty issue reported by "T. X. G." <leopardie333@yahoo.com>
+
+	* configure.ac: Check for setsid.
+	* awk.h: If not HAVE_SETSID define it as an empty macro.
+	* io.c (two_way_open): Call setsid if using pty's.
+
+2011-07-29  Eli Zaretskii  <eliz@gnu.org>
+
+	* builtin.c (format_tree): Rename small -> small_flag,
+	big -> big_flag, bigbig -> bigbig_flag.  Solves compilation errors
+	when building Gawk with libsigsegv on MS-Windows, see
+	https://lists.gnu.org/archive/html/bug-gawk/2011-07/msg00029.html.
+
+2011-07-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* builtin.c (do_sub): Revert to gawk 3.1 behavior for backslash
+	handling. It was stupid to think I could break compatibility.
+	Thanks to John Ellson <ellson@research.att.com> for raising
+	the issue.
+
+2011-07-26         John Haque      <j.eh@mchsi.com>
+
+	* eval.c (r_interpret): In cases Op_var_assign and Op_field_assign,
+	include Op_K_getline_redir in the test for skipping the routine.
+
+2011-07-26         John Haque      <j.eh@mchsi.com>
+
+	Fix handling of assign routines for 'getline var'.
+	Rework the previous fix for (g)sub.
+
+	* awk.h: New define assign_ctxt for use in Op_var_assign
+	and Op_field_assign opcodes. Remove define AFTER_ASSIGN.
+	* awkgram.y (snode, mk_getline): Initialize assign_ctxt.
+	* builtin.c (do_sub): Adjust to take only the first two
+	arguments.
+	* eval.c (r_interpret): In cases Op_var_assign and Op_field_assign,
+	skip the routine as appropriate. Adjust case Op_sub_builtin.
+	* main.c (get_spec_varname): New function.
+	* debug.c (print_instruction): Use the new function to get
+	special variable name.
+
+2011-07-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* main.c (varinit): Mark FPAT as NON_STANDARD. Thanks to
+	Wolfgang Seeberg <wolfgang.seeberg@yahoo.com> for the report.
+	* Makefile.am (EXTRA_DIST): Add po/README, per advice from
+	Bruno Haible.
+	* dfa.c: Sync with GNU grep.
+	* xalloc.h (xzalloc): New function, from GNU grep, for dfa.c.
+	* README: Note that bug list is really a real mailing list.
+
+2011-07-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (AUTOMAKE_OPTIONS): Removed.
+	* configure.ac (AM_INIT_AUTOMAKE): Removed dist-bzip2 option, on
+	advice from Karl Berry.
+
+2011-07-15         John Haque      <j.eh@mchsi.com>
+
+	* awk.h (Op_sub_builtin): New opcode.
+	(GSUB, GENSUB, AFTER_ASSIGN, LITERAL): New flags for 
+	Op_sub_builtin.
+	* awkgram.y (struct tokentab): Change opcode to	Op_sub_builtin
+	for sub, gsub and gensub.
+	(snode): Update processing of sub, gsub and gensub.
+	* builtin.c (do_sub, do_gsub, do_gensub): Nuke.
+	(sub_common): Renamed to do_sub. Relocate gensub argument
+	handling code from do_gensub to here; Simplify the code a
+	little bit. 
+	* eval.c (r_interpret): Handle Op_sub_builtin. Avoid field
+	re-splitting or $0 rebuilding if (g)sub target string is
+	a field and no substitutions were done.
+	* pprint (profile.c): Add case for the new opcode.
+	* print_instruction (debug.c): Ditto.
+
+2011-07-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awk.h: Typo fix: "loner" --> longer. Thanks to Nelson Beebe.
+	* builtin.c (efwrite): Fix flushing test back to what it was 
+	in 3.1.8. Thanks to Strefil <strefil@yandex.ru> for the problem
+	report.
+	* configure.ac: Bump version to 4.0.0a for stable branch.
+
+2011-06-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Add ChangeLog.0.
+	* 4.0.0: Remake the tar ball.
+
+2011-06-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* configure.ac: Update version to 4.0.0.
+	* configure: Regenerated.
+	* ChangeLog.0: Rotated ChangeLog into this file.
+	* ChangeLog: Created anew for gawk 4.0.0 and on.
+	* README: Bump version to 4.0.0.
+	* 4.0.0: Release tar ball made.

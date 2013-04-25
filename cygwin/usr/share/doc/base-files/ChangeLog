@@ -1,0 +1,226 @@
+Cygwin base system miscellaneous files
+--------------------------------------
+TODO:
+-----
+    * Write a cygport file.
+    * Should future versions relay in /etc/mkshrc to set PS1 properly for mksh
+      if mksh supports sourcing /etc/mkshrc for interactive-login sessions?
+    * Ask zsh mantainer to put /etc/zprofile and /etc/zshrc in place during
+      installation.
+    * Should users with GID 544/0 have /usr/bin/sbin in their paths?
+
+Change Log
+----------
+4.1-1
+    * Setting a system locale and a per-user locale breaks some configs
+      and doesn't play well with mintty. Changed to a user-defined setting in
+      /etc/profile/lang.* Reported by Peter Rosin and Andy Koppe. See
+      cygwin.com/ml/cygwin/2012-02/msg00448.html
+4.0-9
+    * Bug fix release.
+      In profile.d/* scripts, calls to "locale" and "tzset"
+      must use absolute paths - Harry G. McGavran, Jr.
+      cygwin.com/ml/cygwin/2012-02/msg00352.html
+4.0-8
+    * Bug fix release.
+      Error in commad substitution in .bash_profile and .profile.
+      Reported by Mike Kaganski and Tom Schutter. See
+      cygwin.com/ml/cygwin/2012-02/msg00332.html
+      cygwin.com/ml/cygwin/2012-02/msg00335.html
+      Hardcoding SHELL from /etc/profile broke some configs. Rolled back.
+      Reported by David Rothenberger. See
+      cygwin.com/ml/cygwin/2012-02/msg00341.html
+4.0-7
+    * Environment variable SHELL is now exported from /etc/profile.
+      Improved profile_d() function in /etc/profile - Cyrille Lefevre
+      cygwin.com/ml/cygwin/2011-11/msg00128.html
+    * TMP and TEMP as defined in the Windows environment must be kept
+      for windows apps, even if started from cygwin - Atry
+      cygwin.com/ml/cygwin/2012-01/msg00201.html
+    * Added two files under /etc/profile.d/ that use tzset, which
+      uses the geographical location setting of the user to find the right
+      mapping, rather than the locale setting. Only on Windows 2000 which
+      doesn't know about the user's geographical location, or if fetching
+      the geographical location fails, it falls back to the user's locale.
+      Corrected error in var setting - Corinna Vinschen
+      See cygwin.com/ml/cygwin-developers/2012-01/msg00042.html,
+      cygwin.com/ml/cygwin-developers/2012-01/msg00044.html
+      Updated manifest.
+    * Added CC0 license header to scripts, and the CC0 license
+      itself which is under /usr/share/doc/common-licenses/.
+      Modified locale setting in /etc/profile.d/lang.{sh,csh} to
+      honor the OS setting.
+      Corrected some files' header info.
+      Added Greg's Wiki's URL in /etc/profile.
+      Bumped version number.
+4.0-6
+    * Re-corrected PRINTER setting.
+    * Dropped non-POSIX tests in /etc/profile - Eric Blake
+      cygwin.com/ml/cygwin/2011-03/msg00510.html
+    * Dropped user's homedir ownership test.
+4.0-5
+    * Added test in /etc/profile PRINTER setting - Corinna Vinschen
+      cygwin.com/ml/cygwin/2011-03/msg00397.html
+4.0-4
+    * Set TMP and TEMP to /tmp in /etc/profile.
+    * Dropped CVS stuff from /etc/profile - Andy Koppe
+4.0-3
+    * Never released.
+    * Reordered /etc/profile to properly initialise PS1 - Cyrille Lefevre
+    * Supressed a fork in /etc/profile routine for copying skeletal files and
+      added a test to `cd' command - Cyrille Lefevre 
+    * Removed /bin from path, as it is included via /usr/bin.
+4.0-2
+    * Never released.
+    * A modified version of a case switch to run shell dependent stuff based 
+      on ENV variables detection is back in /etc/profile, as proposed in
+      cygwin.com/ml/cygwin/2010-11/msg00464.html - Daniel Colascione
+    * Since SYS_BASHRC and SYS_BASH_LOGOUT will be enabled in bash-4.1
+      .bash_logout (added in 4.0-1) has been deprecated in favour of 
+      /etc/bash.bash_logout.
+      cygwin.com/ml/cygwin-apps/2010-12/msg00075.html
+    * Added tests to /etc/profile, /etc/bash.bashrc, .bash_profile, .bashrc
+      and .profile to check if they have been already sourced, as suggested by
+      Andy Koppe in cygwin.com/ml/cygwin-apps/2010-12/msg00071.html
+    * HOSTNAME definition back in /etc/profile.
+    * Dropped .mkshrc. This has to be discussed with mksh mantainer.
+4.0-1
+    * Never released.
+    * Applied patch in base-files-mketc.sh to solve a problem with creation
+      of symlinks in /etc for case-sensitive-enabled win7 systems.
+      sourceware.org/ml/cygwin/2010-04/txt00011.txt - Shaddy Baddah
+    * New file skel/.bash_logout clear the screen after logout.
+    * New file skel/.profile set HOSTNAME for dash & posh.
+    * New file skel/.mkshrc source /etc/mkshrc.
+    * Updated the manifest.lst to include new files.
+    * Moved the command for setting /tmp perms to 
+      postinstall/base-files-mketc.sh.
+      cygwin.com/ml/cygwin/2010-11/msg00464.html - Daniel Colascione
+    * Modified the PRINTER setting in /etc/profile. No case switch
+      now. 
+      cygwin.com/ml/cygwin/2010-11/msg00464.html - Daniel Colascione
+    * Added a WARNING in the conditional loop that creates $HOME for
+      already existing homes that don't belong to the user.
+      cygwin.com/ml/cygwin-developers/2010-09/msg00007.html -
+      Corinna Vinschen & Andy Koppe
+    * Added two hooks to source .bash_aliases and .bash_functions, if they
+      exist.
+    * Added an example function to .bashrc (enhanced cd command)
+    * Backtick command substitution notation replaced with $(...)
+    * All variable expansion is written within curly braces.
+    * Case switch to detect which shell is running taken out of /etc/profile.
+    * Bug regarding PS1 unset in interactive shells with a non-interactive 
+      ancestor solved. cygwin.com/ml/cygwin/2010-02/msg00503.html -
+      Reported by Jon Turney
+    * Bug regarding mksh a well-defined PS1 solved. 
+      sourceware.org/ml/cygwin/2010-05/msg00000.html - Reported by
+      Chris Sutcliffe
+3.9-3
+    * Removed X11R6 from $PATH - Angelo Graziosi
+    * Fixed escaping \t in HISTIGNORE
+      - Angelo Graziosi, Eric Blake
+3.9-2
+    * Removed some 1.5 hold overs from /etc/postinstall/base-files-mketc.sh
+      - Corinna Vinschen
+3.9-1
+    * Set LANG scripts in /etc/profile.d/
+      - Corinna Vinschen, Thomas Wolff, Christopher Faylor
+    * Unset TMP and TEMP in ~/.bashrc 
+      - Angelo Graziosi, Robert Pendell, Ken Brown, Corinna Vinschen
+3.8-4
+    * Fixed permissions - Corinna Vinschen
+3.8-3
+    * Ensure that the destination directory exists during postinstall
+      - Yitzchak Scott-Thoennes
+3.8-2
+    * The skeleton files are copied even if the the mkdir has failed.
+      This happens to network users who install Cygwin while connected,
+      with HOME on a network drive, and then later use their laptop while
+      disconnected.  In that case the skeleton files are not copied, a
+      warning issued and HOME set to "${TEMP}", "${TMP}", /tmp, or
+      (finally) / - Pierre A. Humblet
+3.8-1
+    * Update to Cygwin 1.7 version - Herb Maeder
+    * Additional licenses
+3.7-1
+    * Additional (commented out) settings taken from
+      http://www.ukuug.org/events/linux2003/papers/bash_tips/index.html
+      - Append history rather than overwrite
+      - Append whenever displaying the prompt
+      - 'Magic' Space.  Inserts a space character and performs
+        a history expansion in the line
+      - Ignore small typos when cd'ing
+    * Corrected settitle() function in .bashrc - Igor Peshansky
+    * DIR_COLORS moved to the coreutils package - Eric Blake
+    * Follow links in /etc/profile.d - Max Bowsher
+3.6-1
+    * Typo - Eric Blake
+    * Bash completion examples - Eric Blake
+3.5-1
+    * Changed setup.hint from ash to bash
+    * Toned down the warning about customisation
+      - Rex Eastbourne Andrew Schulman, Igor Pechtchanski
+    * Changed ${MANPATH}.  Changed order and removed autotool
+      - Igor Pechtchanski, Brian Dessent
+    * Changed ${INFOPATH}.  Changed order and removed autotool.
+    * Fixed some mistakes in .inputrc and added some more
+      examples - Igor Pechtchanski
+3.4-2
+    * Redirected chmod errors to /dev/null caused by lack of
+      admin rights - Angelo Graziosi, Igor Pechtchanski, Karl M
+    * Removed the test around chmod 1777 /tmp - Igor Pechtchanski
+3.4-1
+    * Removed stty erase ^H - lots!
+    * chmod 1777 /tmp - Corinna Vinschen
+    * Properly quote [:upper:] [:lower:] - Webb Roberts
+    * Add local to the sort - Eric Blake
+    * Various quote corrections - Eric Blake
+    * Simplified the bash PS1 - Eric Blake
+    * Made the SHELL switch more portable
+      - Eric Blake, Cliff Hones, cfg, Igor Pechtchanski
+3.3-1 (Never uploaded)
+    * Add a warning about editing base-files files
+    * Add a note about where the originals are to be found
+    * Add some more examples to skel/.bashrc - Chris Wilson
+3.2-1
+    * Quote all ${variable}s.  Except, ${PATH}, ${MANPATH} and ${INFOPATH}
+3.1-3
+    * Change cd ${HOME} functionality for CHERE - Dave Kilroy
+3.1-2
+    * Fix for zsh/ksh - Tero Niemela
+3.1-1
+    * Never released - fixed spelling errors 
+3.0-3
+    * Fix not required for cp - Pierre A. Humblet
+3.0-2
+    * Fix for security interactions when using cp - Thanks to
+      Pierre A. Humblet
+3.0-1
+    * Added several open source license files.  These were sourced
+      from http://www.opensource.org/licenses/
+      Packages may contain minor variations on these files.
+    * Added a preremove script to help keep the various scripts
+      uptodate (unless they've been modified).
+    * At Igor Pechtchanski's suggestion, all base-file scripts
+      are now versioned.
+    * Several patches, thanks to all.  Now I'm keeping this
+      changelog I'll be sure to add names!  Appologies to all who
+      helped with this version.
+
+    ******************************************************
+    *                                                    *
+    * NOTE: if you want the automatic update script to   *
+    *       keep files up to date, you *must* delete the *
+    *       following files and then reinstall the       *
+    *       base-files package;                          *
+    *           /etc/bash.bashrc                         *
+    *           /etc/DIR_COLORS                          *
+    *           /etc/profile                             *
+    *           /etc/skel/.bashrc                        *
+    *           /etc/skel/.bash_profile                  *
+    *           /etc/skel/.inputrc                       *
+    *                                                    *
+    ******************************************************
+
+Prior to 3.0-1
+    * Thanks to everyone who helped!

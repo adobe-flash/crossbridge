@@ -1,0 +1,113 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-16.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-15.html">prev</a> | <a href="pic-17.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>16. Control-flow constructs
+<a name="16. Control-flow constructs"></a>
+</h2>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+<b>pic</b> language provides conditionals and looping. For
+example,</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">pi = atan2(0,-1);
+for i = 0 to 2 * pi by 0.1 do {
+    &quot;-&quot; at (i/2, 0);
+    &quot;.&quot; at (i/2, sin(i)/2);
+    &quot;:&quot; at (i/2, cos(i)/2);
+}</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">which
+yields this:</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic45.png" alt="Image img/pic45.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+16-1: Plotting with a <b>for</b> loop</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The syntax
+of the <b>for</b> statement is:</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><b>for</b>
+<i>variable</i> <b>=</b> <i>expr1</i> <b>to</b> <i>expr2</i>
+[<b>by</b> [<b>*</b>]<i>expr3</i>] <b>do</b> <i>X body
+X</i></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+semantics are as follows: Set <i>variable</i> to
+<i>expr1</i>. While the value of <i>variable</i> is less
+than or equal to <i>expr2</i>, do <i>body</i> and increment
+<i>variable</i> by <i>expr3</i>; if <b>by</b> is not given,
+increment <i>variable</i> by&nbsp;1. If <i>expr3</i> is
+prefixed by&nbsp;<b>*</b> then <i>variable</i> is multiplied
+instead by <i>expr3</i>. The value of <i>expr3</i> can be
+negative for the additive case; <i>variable</i> is then
+tested whether it is greater than or equal to <i>expr2</i>.
+For the multiplicative case, <i>expr3</i> must be greater
+than zero. If the constraints aren&rsquo;t met, the loop
+isn&rsquo;t executed. <i>X</i> can be any character not
+occurring in <i>body</i>; or the two <i>X</i>s may be paired
+braces (as in the <b>sh</b> command).</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The syntax
+of the <b>if</b> statement is as follows:</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><b>if</b>
+<i>expr</i> <b>then</b> <i>X if-true X</i> [<b>else</b> <i>Y
+if-false Y</i>]</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Its
+semantics are as follows: Evaluate <i>expr</i>; if it is
+non-zero then do <i>if-true</i>, otherwise do
+<i>if-false</i>. <i>X</i> can be any character not occurring
+in <i>if-true</i>. <i>Y</i> can be any character not
+occurring in <i>if-false</i>.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Eithe or
+both of the <i>X</i> or <i>Y</i> pairs may instead be
+balanced pairs of braces ({ and&nbsp;}) as in the <b>sh</b>
+command. In either case, the <i>if-true</i> may contain
+balanced pairs of braces. None of these delimiters are seen
+inside strings.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">All the
+usual relational operators my be used in conditional
+expressions; <b>!</b> (logical negation, not factorial),
+<b>&amp;&amp;</b>, <b>||</b>, <b>==</b>, <b>!=</b>,
+<b>&gt;=</b>, <b>&lt;=</b>, <b>&lt;</b>,
+<b>&gt;</b>.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">String
+comparison is also supported using <b>==</b> and <b>!=</b>.
+String comparisons may need to be parenthesized to avoid
+syntactic ambiguities.</font></p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-15.html">prev</a> | <a href="pic-17.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

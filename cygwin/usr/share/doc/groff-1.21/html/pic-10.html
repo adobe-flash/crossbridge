@@ -1,0 +1,377 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-10.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-9.html">prev</a> | <a href="pic-11.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>10. Describing locations
+<a name="10. Describing locations"></a>
+</h2>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+location of points can be described in many different ways.
+All these forms are interchangeable as for as the <b>pic</b>
+language syntax is concerned; where you can use one, any of
+the others that would make semantic sense are
+allowed.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+special label <b>Here</b> always refers to the current
+position.</font></p>
+
+<h3>10.1. Absolute Coordinates
+<a name="10.1. Absolute Coordinates"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+simplest is absolute coordinates in inches; <b>pic</b> uses
+a Cartesian system with (0,0) at the lower left corner of
+the virtual drawing surface for each picture (that is,
+X&nbsp;increases to the right and Y&nbsp;increases upwards).
+An absolute location may always be written in the
+conventional form as two comma-separated numbers surrounded
+by parentheses (and this is recommended for clarity). In
+contexts where it creates no ambiguity, the pair of X and
+Y&nbsp;coordinates suffices without parentheses.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">It is a
+good idea to avoid absolute coordinates, however. They tend
+to make picture descriptions difficult to understand and
+modify. Instead, there are quite a number of ways to specify
+locations relative to <b>pic</b> objects and previous
+locations.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Another
+possibility of surprise is the fact that <b>pic</b> crops
+the picture to the smallest bounding box before writing it
+out. For example, if you have a picture consisting of a
+small box with its lower left corner at (2,2) and another
+small box with its upper right corner at (5,5), the width
+and height of the image are both 3&nbsp;units and
+not&nbsp;5. To get the origin at (0,0) included, simply add
+an invisible object to the picture, positioning the
+object&rsquo;s left corner at (0,0).</font></p>
+
+<h3>10.2. Locations Relative to Objects
+<a name="10.2. Locations Relative to Objects"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">The symbol
+<b>Here</b> always refers to the position of the last object
+drawn or the destination of the last <b>move</b>.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Alone and
+unqualified, a <b>last circle</b> or any other way of
+specifying a closed-object or arc location refers as a
+position to the geometric center of the object. Unqualified,
+the name of a line or spline object refers to the position
+of the object start.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Also,
+<b>pic</b> objects have quite a few named locations
+associated with them. One of these is the object center,
+which can be indicated (redundantly) with the suffix
+<b>.center</b> (or just <b>.c</b>). Thus, <b>last circle
+.center</b> is equivalent to <b>last circle</b>.</font></p>
+
+<h4>10.2.1. Locations Relative to Closed Objects
+<a name="10.2.1. Locations Relative to Closed Objects"></a>
+</h4>
+
+
+<p style="margin-top: 1em"><font color="#000000">Every
+closed object (box, circle, ellipse, or block composite)
+also has eight compass points associated with it;</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic31.png" alt="Image img/pic31.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+10-1: Compass points</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">these are
+the locations where eight compass rays from the geometric
+center would intersect the figure. So when we say <b>last
+circle .s</b> we are referring to the south compass point of
+the last circle drawn. The explanation of Figure 7.3&rsquo;s
+program is now complete.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">(In case
+you dislike compass points, the names <b>.top</b>,
+<b>.bottom</b>, <b>.left</b> and <b>.right</b> are synonyms
+for <b>.n</b>, <b>.s</b>, <b>.e</b>, and <b>.w</b>
+respectively; they can even be abbreviated to <b>.t</b>,
+<b>.b</b>, <b>.l</b> and <b>.r</b>).</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The names
+<b>center</b>, <b>top</b>, <b>bottom</b>, <b>left</b>,
+<b>right</b>, <b>north</b>, <b>south</b>, <b>east</b>, and
+<b>west</b> can also be used (without the leading dot) in a
+prefix form marked by <b>of</b>; thus, <b>center of last
+circle</b> and <b>top of 2nd last ellipse</b> are both valid
+object references. Finally, the names <b>left</b> and
+<b>right</b> can be prefixed with <b>upper</b> and
+<b>lower</b> which both have the obvious meaning.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Arc
+objects also have compass points; they are the compass
+points of the implied circle.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000">Non-closed
+objects (line, arrow, or spline) have compass points too,
+but the locations of them are completely arbitrary. In
+particular, different <b>pic</b> implementations return
+different locations.</font></p>
+
+<h4>10.2.2. Locations Relative to Open Objects
+<a name="10.2.2. Locations Relative to Open Objects"></a>
+</h4>
+
+
+<p style="margin-top: 1em"><font color="#000000">Every open
+object (line, arrow, arc, or spline) has three named points:
+<b>.start</b>, <b>.center</b> (or <b>.c</b>), and
+<b>.end</b>. They can also be used without leading dots in
+the <b>of</b> prefix form. The center of an arc is the
+center of its circle, but the center of a line, path, or
+spline is halfway between its endpoints.</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic32.png" alt="Image img/pic32.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+10-2: Special points on open objects</font></p>
+
+<h3>10.3. Ways of Composing Positions
+<a name="10.3. Ways of Composing Positions"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">Once you
+have two positions to work with, there are several ways to
+combine them to specify new positions.</font></p>
+
+<h4>10.3.1. Vector Sums and Displacements
+<a name="10.3.1. Vector Sums and Displacements"></a>
+</h4>
+
+
+<p style="margin-top: 1em"><font color="#000000">Positions
+may be added or subtracted to yield a new position (to be
+more precise, you can only add a position and an expression
+pair; the latter must be on the right side of the addition
+or subtraction sign). The result is the conventional vector
+sum or difference of coordinates. For example, <b>last box
+.ne + (0.1, 0)</b> is a valid position. This example
+illustrates a common use, to define a position slightly
+offset from a named one (say, for captioning
+purposes).</font></p>
+
+<h4>10.3.2. Interpolation Between Positions
+<a name="10.3.2. Interpolation Between Positions"></a>
+</h4>
+
+
+<p style="margin-top: 1em"><font color="#000000">A position
+may be interpolated between any two positions. The syntax is
+&lsquo;<i>fraction</i> <b>of the way between</b>
+<i>position1</i> <b>and</b> <i>position2</i>&rsquo;. For
+example, you can say <b>1/3 of the way between here and last
+ellipse .ne</b>. The fraction may be in
+numerator/denominator form or may be an ordinary number
+(values are <i>not</i> restricted to [0,1]). As an
+alternative to this verbose syntax, you can say
+&lsquo;<i>fraction</i> <b>&lt;</b><i>position1</i> <b>,</b>
+<i>position2</i><b>&gt;</b>&rsquo;; thus, the example could
+also be written as <b>1/3 &lt;here, last
+ellipse&gt;</b>.</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic33.png" alt="Image img/pic33.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+10-3: <b>P: 1/3 of the way between last arrow .start and
+last arrow .end</b></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">This
+facility can be used, for example, to draw double
+connections.</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic34.png" alt="Image img/pic34.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+10-4: Doubled arrows</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">You can
+get Figure 10-4 from the following program:</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">.PS
+A: box &quot;yin&quot;; move;
+B: box &quot;yang&quot;;
+arrow right at 1/4 &lt;A.e,A.ne&gt;;
+arrow left  at 1/4 &lt;B.w,B.sw&gt;;
+.PE</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">Note the
+use of the short form for interpolating points.</font></p>
+
+<h4>10.3.3. Projections of Points
+<a name="10.3.3. Projections of Points"></a>
+</h4>
+
+
+<p style="margin-top: 1em"><font color="#000000">Given two
+positions <i>p</i> and <i>q</i>, the position
+<b>(</b><i>p</i><b>,</b> <i>q</i><b>)</b> has the
+X&nbsp;coordinate of <i>p</i> and the Y coordinate of
+<i>q</i>. This can be helpful in placing an object at one of
+the corners of the virtual box defined by two other
+objects.</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic35.png" alt="Image img/pic35.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+10-5: Using (<i>x</i>, <i>y</i>) composition</font></p>
+
+<h3>10.4. Using Locations
+<a name="10.4. Using Locations"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">There are
+four ways to use locations; <b>at</b>, <b>from</b>,
+<b>to</b>, and <b>with</b>. All four are object modifiers;
+that is, you use them as suffixes to a drawing
+command.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+<b>at</b> modifier says to draw a closed object or arc with
+its center at the following location, or to draw a
+line/spline/arrow starting at the following
+location.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+<b>to</b> modifier can be used alone to specify a move
+destination. The <b>from</b> modifier can be used alone in
+the same way as <b>at</b>.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+<b>from</b> and <b>to</b> modifiers can be used with a
+<b>line</b> or <b>arc</b> command to specify start and end
+points of the object. In conjunction with named locations,
+this offers a very flexible mechanism for connecting
+objects. For example, the following program</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">.PS
+box &quot;from&quot;
+move 0.75;
+ellipse &quot;to&quot;
+arc cw from 1/3 of the way \
+    between last box .n and last box .ne to last ellipse .n;
+.PE</pre>
+
+
+
+<p style="margin-top: 1em"><font color="#000000">yields:</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic36.png" alt="Image img/pic36.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+10-6: A tricky connection specified with English-like
+syntax</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+<b>with</b> modifier allows you to identify a named
+attachment point of an object (or a position within the
+object) with another point. This is very useful for
+connecting objects in a natural way. For an example,
+consider these two programs:</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic37.png" alt="Image img/pic37.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+10-7: Using the <b>with</b> modifier for
+attachments</font></p>
+
+<h3>10.5. The &lsquo;chop&rsquo; Modifier
+<a name="10.5. The &lsquo;chop&rsquo; Modifier"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">When
+drawing lines between circles that don&rsquo;t intersect
+them at a compass point, it is useful to be able to shorten
+a line by the radius of the circle at either or both ends.
+Consider the following program:</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">.PS
+circle &quot;x&quot;
+circle &quot;y&quot; at 1st circle - (0.4, 0.6)
+circle &quot;z&quot; at 1st circle + (0.4, -0.6)
+arrow from 1st circle to 2nd circle chop
+arrow from 2nd circle to 3rd circle chop
+arrow from 3rd circle to 1st circle chop
+.PE</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">It yields
+the following:</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic38.png" alt="Image img/pic38.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+10-8: The <b>chop</b> modifier</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Notice
+that the <b>chop</b> attribute moves arrowheads rather than
+stepping on them. By default, the <b>chop</b> modifier
+shortens both ends of the line by <b>circlerad</b>. By
+suffixing it with a number you can change the amount of
+chopping.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">If you say
+<b>line ... chop</b> <i>r1</i> <b>chop</b> <i>r2</i> with
+<i>r1</i> and <i>r2</i> both numbers, you can vary the
+amount of chopping at both ends. You can use this in
+combination with trigonometric functions to write code that
+deals with more complex intersections.</font></p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-9.html">prev</a> | <a href="pic-11.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

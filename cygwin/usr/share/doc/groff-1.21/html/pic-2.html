@@ -1,0 +1,66 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-2.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-1.html">prev</a> | <a href="pic-3.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>2. Invoking PIC
+<a name="2. Invoking PIC"></a>
+</h2>
+
+
+<p style="margin-top: 1em">Every <b>pic</b> description is
+a little program describing drawing actions. The
+<b>[gtn]roff</b>-dependent versions compile the program by
+<i>pic</i>(1) into <i>gtroff</i>(1) macros; the
+<i>pic2plot</i>(1) implementation uses a plotting library to
+draw the picture directly. Programs that process or display
+<i>gtroff</i>(1) output need not know or care that parts of
+the image began life as <b>pic</b> descriptions.</p>
+
+<p style="margin-top: 1em">The <i>pic</i>(1) program tries
+to translate anything between <b>.PS</b> and <b>.PE</b>
+markers, and passes through everything else. The normal
+definitions of <b>.PS</b> and <b>.PE</b> in the <i>ms</i>
+macro package and elsewhere have also the side-effect of
+centering the <b>pic</b> output on the page.</p>
+
+<h3>2.1. PIC Error Messages
+<a name="2.1. PIC Error Messages"></a>
+</h3>
+
+
+<p style="margin-top: 1em">If you make a <b>pic</b> syntax
+error, <i>gpic</i>(1) issues an error message in the
+standard <i>gcc</i>(1)-like syntax. A typical error message
+looks like this,</p>
+
+<pre style="margin-left:10%; margin-top: 1em">pic:pic.ms:&lt;nnn&gt;: parse error before &lsquo;&lt;token&gt;&rsquo;
+pic:pic.ms:&lt;nnn&gt;: giving up on this picture</pre>
+
+
+<p style="margin-top: 1em">where &lang;nnn&rang; is a line
+number, and &lang;token&rang; is a token near (usually just
+after) the error location.</p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-1.html">prev</a> | <a href="pic-3.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

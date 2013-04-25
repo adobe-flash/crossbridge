@@ -1,0 +1,117 @@
+Version 2.19 --> 2.20
+
+* xmalloc.h included a readline header for no apparent reason. The compilation
+  failed if readline was not installed. The dependency on the readline header
+  was removed. Submitted by Tushar Teredesai.
+
+Version 2.18 --> 2.19
+
+* Upgraded code from bash to version 3.2. This DOES has influence
+  on how Which behaves under certain circumstances.
+* Support for Cygwin: Two leading slashes are now treated as
+  possibly special, because a double leading slash can have an
+  implementation-defined meaning (depending on the Operating
+  System), as is for example the case in Cygwin.
+  See http://www.opengroup.org/onlinepubs/009695399/basedefs/xbd_chap04.html#tag_04_11
+  This means that GNU which no longer collapses two leading slashes
+  of a path into a single slash.
+* When the environment variable HOME is not set, the home directory
+  is now read from /etc/passwd or set to '/' if no home directory
+  could be found (this now matches the tilde lib used in bash).
+* Fixed the function declaration given in README.alias
+* Added a @dircategory and @direntry to which.texinfo
+* Changed the license to GPLv3.
+
+Version 2.17 --> 2.18
+
+* Fixes regarding cwautomacros (maintainer build system only).
+* Improvement of 'make release' target (maintainer target).
+
+Version 2.16 --> 2.17
+
+* Add support for shells that output '{' on the same line as the
+  function name in the output of 'declare -f' (ie zsh).
+* Added support for Tandem OSS.
+* Build system now uses cwautomacros (mostly just it's autogen.sh).
+
+Version 2.15 --> 2.16
+
+* This release fixes the bug, introduced in 2.15, that files for
+  which the 'other' permission bits apply do NOT need to be readable.
+  (The confusion came from the fact that it needs to be readable
+  when it is a shell script but there is no way to find out if a
+  non-readable file is a shell script or not.)
+  The next release of bash will be using the same algorithm again,
+  and that is the only thing that really matters.  This is also the
+  algorithm that most other shells use.
+
+Version 2.14 --> 2.15
+
+* Upgraded build system to work with automake 1.7.2 and autoconf 2.57.
+* Fixed search routine to skip executables that are not executable.
+  This is NOT done by all versions of bash (which is a bug).
+  The stock bash-2.0.5b thinks it is allowed to execute a file
+  when it has the eXec bit set for our group or other, but that
+  is not the case: when we own the file, the eXec bit of the *owner*
+  must be set and the group/other bits are irrelevant.  And when
+  we don't own the file, but the file is in our group, then only
+  the group bit matters and not the other eXec bit.  And finally,
+  when we do not own the file and the file is not in our group
+  then not only the 'other' eXec bit needs to be set, but the
+  file must be readable as well.  This has been reported to the
+  maintainer of bash.  For the rest, the search routine has been
+  copied/upgraded to that of bash version 2.0.5b.
+
+Version 2.13 --> 2.14
+
+* Upgraded build system to work with automake 1.5 and autoconf 2.53.
+* Upgraded --read-functions functionality to work with bash 2.0.5b.
+
+Version 2.12 --> 2.13
+
+* Support for shell functions.  This version also fixes the
+  problem that the alias for `which' wasn't inherited by subshells.
+  You need to change the alias by a shell function! (The rpm does
+  this automatically).
+* Fixes for the .spec file (merged changes from RedHat 7.1)
+  Now installs the which.info file as well.
+
+Version 2.11 --> 2.12
+
+* Minor man page fix (no reason to upgrade at all thus)
+
+Version 2.10 --> 2.11
+
+* Added a texinfo file (no reason to upgrade at all thus)
+  `info' is the prefered format for documenting GNU tools.
+
+Version 2.9 --> 2.10
+
+* Buildsystem fixes (no reason to upgrade at all thus):
+  Used the correct order of calling the automake/conf utils,
+  fixed my E-mail address and added a Source: line to the rpm spec.
+
+Version 2.8 --> 2.9
+
+* Fixed compile problem in Solaris 5.6 using cc
+* Added a `--help' option
+* RPMs now add a /etc/profile.d script, automatically setting a useful alias
+
+Version 2.7 --> 2.8
+
+* aclocal.m4 was missing from the tar, resulting in
+  a build failure if autoconf isn't installed.
+
+Version 2.6 --> 2.7
+
+* Support for aliases
+* Configure/compile fix in the `tilde' directory.
+
+Version 2.5 --> 2.6
+
+* Doesn't depend on libreadline.a anymore.
+
+Version 2.4 --> 2.5
+
+* Fixed which-2.spec
+* RPMs are now available from http://www.xs4all.nl/~carlo17/which

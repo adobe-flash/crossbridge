@@ -1,0 +1,18 @@
+If you want `which' to inform you about aliases and shell functions in bash,
+then you need to add the following five lines to your $HOME/.bash_profile:
+
+  function which ()
+  {
+      (alias; declare -f) | /usr/bin/which --tty-only --read-alias --read-functions --show-dot --show-tilde $@
+  }
+  export -f which
+
+This is the recommended use of this `which'.  Note that the rpm already adds
+this to /etc/profile.d; there is no need to add it to $HOME/.bash_profile if
+you installed the rpm.
+
+The C shell (csh, tcsh) doesn't have shell functions, but fortunately
+inherites aliases in subshells.  To support aliases with a C shell add
+the following line to your .profile:
+
+  alias which 'alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'

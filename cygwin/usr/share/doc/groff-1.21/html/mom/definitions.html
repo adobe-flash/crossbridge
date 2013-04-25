@@ -1,0 +1,976 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Definitions and Terms</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+  <tr>
+    <td><a href="toc.html">Back to Table of Contents</a></td>
+    <td style="text-align: right;"><a href="using.html#top">Next: Using mom</a></td>
+  </tr>
+</table>
+
+<h1 id="terms" class="docs">Definitions of terms used in this manual</h1>
+
+<p>
+I use a number of typesetting-specific and groff-specific terms
+throughout this documentation, as well as a few terms that apply
+to mom herself.  To make life easier, I&#8217;ll explain
+them here.  Refer back to this section should you encounter a word
+or concept you&#8217;re not familiar with.
+</p>
+
+<div class="rule-short" style="margin-top: 18px; margin-bottom: 28px;"><hr/></div>
+
+<div class="col-1-definitions">
+  <table class="definitions">
+    <tr><th class="definitions">Typesetting terms</th></tr>
+    <tr> 
+      <td>
+        <a href="#ascender">Ascender</a><br/>
+        <a href="#baseline">Baseline</a><br/>
+        <a href="#ballotbox">Ballot box</a><br/>
+        <a href="#bullet">Bullet</a><br/>
+        <a href="#capheight">Cap-height</a><br/>
+        <a href="#descender">Descender</a><br/>
+        <a href="#discretionaryhyphen">Discretionary hyphen</a><br/>
+        <a href="#dropcap">Drop cap</a><br/>
+        <a href="#em">Em/en</a><br/>
+        <a href="#family">Family</a><br/>
+        <a href="#figurespace">Figure space/Digit space</a><br/>
+        <a href="#fixedwidthfont">Fixed width font</a><br/>
+        <a href="#fixedwidthspace">Fixed width space</a><br/>
+        <a href="#font">Font</a><br/>
+        <a href="#force">Force justify</a><br/>
+        <a href="#just">Justify/justification</a><br/>
+        <a href="#gutter">Gutter</a><br/>
+        <a href="#kern">Kerning</a><br/>
+        <a href="#kernunit">Kern Units</a><br/>
+        <a href="#leading">Lead/leading</a><br/>
+        <a href="#leader">Leaders</a><br/>
+        <a href="#ligatures">Ligature</a><br/>
+        <a href="#picaspoints">Picas/Points</a><br/>
+        <a href="#ps">Point Size</a><br/>
+        <a href="#quad">Quad</a><br/>
+        <a href="#rag">Rag</a><br/>
+        <a href="#shape">Shape</a><br/>
+        <a href="#solid">Solid/set solid</a><br/>
+        <a href="#trackkerning">Track kerning/Line kerning</a><br/>
+        <a href="#unbreakablespace">Unbreakable space</a><br/>
+        <a href="#weight">Weight</a><br/>
+        <a href="#wordspace">Word space</a><br/>
+        <a href="#xheight">x-height</a><br/>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="col-2-definitions">
+  <table class="definitions">
+    <tr><th class="definitions">Groff terms</th></tr>
+    <tr> 
+      <td>
+        <a href="#alias">Alias</a><br/>
+        <a href="#arguments">Arguments</a><br/>
+        <a href="#commentlines">Comment lines</a><br/>
+        <a href="#controllines">Control Lines</a><br/>
+        <a href="#filled">Filled lines</a><br/>
+        <a href="#inlines">Inline escapes</a><br/>
+        <a href="#inputline">Input line</a><br/>
+        <a href="#macros">Macros</a><br/>
+        <a href="#units">Machine units</a><br/>
+        <a href="#numericargument">Numeric argument</a><br/>
+        <a href="#outputline">Output line</a><br/>
+        <a href="#primitives">Primitives</a><br/>
+        <a href="#stringargument">String Argument</a><br/>
+        <a href="#unitofmeasure">Unit of measure</a><br/>
+        <a href="#zerowidthcharacter">Zero-width character</a><br/>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<div class="col-3-definitions">
+  <table class="definitions">
+    <tr><th class="definitions">Mom terms</th></tr>
+    <tr>
+      <td>
+        <a href="#blockquote">Blockquote</a><br/>
+        <a href="#controlmacro">Control macro</a><br/>
+        <a href="#docheader">Docheader</a><br/>
+        <a href="#epigraph">Epigraph</a><br/>
+        <a href="#footer">Footer</a><br/>
+        <a href="#head">Head</a><br/>
+        <a href="#header">Header</a><br/>
+        <a href="#linebreak">Linebreak</a><br/>
+        <a href="#parahead">Paragraph head</a><br/>
+        <a href="#quote">Quote</a><br/>
+        <a href="#running">Running text</a><br/>
+        <a href="#subhead">Subhead</a><br/>
+        <a href="#toggle">Toggle</a><br/>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<h3 id="typesetting-terms" class="docs">Typesetting terms</h3>
+<dl>
+  <dt id="ascender">Ascender</dt>
+  <dd>
+  The portion of a letter that extends above the bowl.  For
+  example, the letters a, c, and e have no ascenders.  The letters
+  b, d, and h do.
+  </dd>
+
+  <dt id="baseline">Baseline</dt>
+  <dd>
+  The imaginary line on which the bottoms of capital letters and
+  the bowls of lower case letters rest.
+  </dd>
+  
+  <dt id="ballotbox">Ballot box</dt>
+  <dd>
+  An unfilled square, usually
+  <a href="#capheight">cap-height</a>
+  in size, typically placed beside items in a checklist.
+  </dd>
+  
+  <dt id="bullet">Bullet</dt>
+  <dd>
+  A small, filled circle typically found beside items or points in
+  a list.
+  </dd>
+  
+  <dt id="capheight">Cap-height</dt>
+  <dd>
+  The height of the tallest capital letter in a given
+  <a href="#font">font</a>
+  at the current
+  <a href="#ps">point size</a>.
+  </dd>
+  
+  <dt id="descender">Descender</dt>
+  <dd>
+  The portion of a letter that extends beneath the
+  <a href="#baseline">baseline</a>
+  (j, q, y are letters with descenders).
+  </dd>
+  
+  <dt id="discretionaryhyphen">Discretionary hyphen</dt>
+  <dd>
+  A symbol inserted between two syllables of a word that indicates
+  to a typesetting program the valid hyphenation points in the
+  word.  Normally, if hyphenation is turned on, groff knows where
+  to hyphenate words.  However, hyphenation being what it is
+  (in English, at any rate), groff doesn&#8217;t always get it right.
+  Discretionary hyphens make sure it does.  In the event that the
+  word doesn&#8217;t need to be hyphenated at all, groff leaves them
+  alone.  In groff, the discretionary hyphen is entered with
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  \%  (backslash followed by a percent)
+  </span>
+  </dd>
+  
+  <dt id="dropcap">Drop cap</dt>
+  <dd>
+  A large, usually upper-case letter that introduces the first
+  paragraph of a document or section thereof.  The top of the
+  drop cap usually lines up with the top of the first line of the
+  paragraph, and typically &#8220;drops&#8221; several lines lower.
+  Text adjacent to the drop cap is indented to the right of the
+  letter until the bottom of the drop cap is reached, at which
+  point text reverts to the left margin.
+  </dd>
+  
+  <dt id="em">Em/en</dt>
+  <dd>
+  An em is a relative measurement equal to the width of the
+  letter M at a given
+  <a href="#ps">point size</a>
+  in a given
+  <a href="#font">font</a>.
+  Since most Ms are designed square, an em is usually (but
+  sometimes erroneously) considered to be the same size as the
+  current point size (i.e. if the point size of the type is 12,
+  one em equals 12 points).  An en is equal to the width of a
+  letter N (historically 2/3 of an em, although groff treats an en
+  as 1/2 of an em).  Typically, ems and ens are used to measure
+  indents, or to define the length of dashes (long hyphens).
+  </dd>
+  
+  <dt id="family">Family</dt>
+  <dd>
+  The collective name by which a collection of
+  <a href="#font">fonts</a>
+  are known, e.g.  Helvetica, Times Roman, Garamond.
+  </dd>
+  
+  <dt id="figurespace">Figure space/Digit space</dt>
+  <dd>
+  A
+  <a href="#fixedwidthspace">fixed width space</a>
+  that has the width of one digit.  Used for aligning numerals in,
+  say, columns or numbered lists.  In groff, the figure space is
+  entered with
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  \0  (backslash followed by a zero)
+  </span>
+  </dd>
+  
+  <dt id="fixedwidthfont">Fixed width font</dt>
+  <dd>
+  A family or font in which every character occupies exactly the
+  same amount of vertical space on the line.  Courier is the
+  best-known, if not the most elegant, fixed-width font.
+  </dd>
+
+  <dt id="fixedwidthspace">Fixed width space</dt>
+  <dd>
+  Equal to
+  <a href="#wordspace">word space</a>,
+  but does not expand or contract when text is
+  <a href="#just">justified</a>.
+  In groff, fixed width space is entered with
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  \&lt;space&gt; (backslash followed by hitting the spacebar)
+  </span>
+  </dd>
+  
+  <dt id="font">Font</dt>
+  <dd>
+  The specific
+  <a href="#weight">weight</a>
+  and
+  <a href="#shape">shape</a>
+  of type within a
+  <a href="#family">family</a>,
+  e.g. light, medium, bold (which are weights), and roman, italic,
+  condensed (which are shapes).  By default, groff knows of four
+  fonts within its default set of families: R (medium roman), I
+  (medium italic), B (bold roman) and BI (bold italic).
+  Mom considerably extends this very basic list.
+  </dd>
+  
+  <dt id="force">Force justify</dt>
+  <dd>
+  Sometimes, in
+  <a href="#just">justified</a>
+  text, a line needs to be broken short of the right margin.
+  Force justifying means telling a typesetting program (like
+  groff) that you want the line broken early AND that you want the
+  line&#8217;s word spacing stretched to force the line flush with the
+  right margin.
+  </dd>
+  
+  <dt id="gutter">Gutter</dt>
+  <dd>
+  The vertical whitespace separating columns of type.
+  </dd>
+  
+  <dt id="just">Justify/justification</dt>
+  <dd>
+  Lines of type are justified when they&#8217;re flush at both the left
+  and right margins.  Justification is the act of making both
+  margins flush.  Some people use the terms "left justified" and
+  "right justified" to mean type where only the left (or right)
+  margins align.  I don&#8217;t.  See
+  <a href="#quad">quad</a>.
+  </dd>
+  
+  <dt id="kern">Kerning</dt>
+  <dd>
+  Moving pairs of letters closer together to remove excess
+  whitespace between them.  In the days before phototypesetting,
+  type was set from small, rectangular blocks of wood or metal,
+  each block having exactly one letter.  Because the edge of
+  each block determined the edge of each letter, certain letter
+  combinations (TA, for example) didn&#8217;t fit together well and had
+  to be mortised by hand to bring them visually closer.  Modern
+  typesetting systems usually take care of kerning automatically,
+  but they&#8217;re far from perfect.  Professional typesetters still
+  devote a lot of time to fitting letters and punctuation together
+  properly.
+  </dd>
+  
+  <dt id="kernunit">Kern Units</dt>
+  <dd>
+  A relative distance equal to 1/36 of the current
+  <a href="#ps">point size</a>.
+  Used between individual letters
+  for
+  <a href="#kern">kerning</a>.
+  Different typesetting systems use different values (1/54 is
+  popular), and sometimes call kern units by a different name.
+  </dd>
+  
+  <dt id="leading">Lead/leading</dt>
+  <dd>
+  The distance from the
+  <a href="#baseline">baseline</a>
+  of one line of type to the line of type immediately beneath
+  it.  Pronounced "ledding."  Also called line spacing.  Usually
+  measured in
+  <a href="#picaspoints">points</a>.
+  
+  <p>
+  <em>In case you&#8217;re interested...</em> In previous centuries,
+  lines of type were separated by thin strips of&mdash;you guessed
+  it&mdash;lead.  Lines of type that had no lead between them were said
+  to be &#8220;set solid.&#8221; Once you began separating them with
+  strips of lead, they were said to be &#8220;leaded&#8221;, and the
+  spacing was expressed in terms of the number of
+  <a href="#picaspoints">points</a>
+  of lead.  For this reason, &#8220;leading&#8221; and &#8220;line
+  spacing&#8221; aren&#8217;t, historically speaking, synonymous.
+  If type was set 10 on 12, for example, the leading was 2
+  points, not 12.  Nowadays, however, the two terms are used
+  interchangeably to mean the distance from baseline to baseline.
+  </p>
+
+  </dd>
+  
+  <dt id="leader">Leaders</dt>
+  <dd>
+  Single characters used to fill lines, usually to their end.  So
+  called because they &#8220;lead&#8221; the eye from one element
+  of the page to another.  For example, in the following (brief)
+  Table of Contents, the periods (dots) are leaders.
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  Foreword............... 2
+  Chapter 1.............. 5
+  Chapter 2.............. 38
+  Chapter 3.............. 60
+  </span>
+  </dd>
+  
+  <dt id="ligatures">Ligature</dt>
+  <dd>
+  Ligatures are letters joined together to form a single
+  character.  The commonest are fi, fl, ff, ffi and ffl.  Others
+  are ae and oe.  Occasionally, one sees an st ligature, but this
+  is archaic and quite rare.
+  </dd>
+  
+  <dt id="picaspoints">Picas/Points</dt>
+  <dd>
+  There are twelve points in a pica, and six picas in an inch
+  (hence 72 points to the inch).  In the same way that gem-dealers
+  have always used their own system of measurement for weight
+  (carats), typographers have always used their own system of
+  measurement for type.
+  </dd>
+  
+  <dt id="ps">Point Size</dt>
+  <dd>
+  The nominal size of type, measured in
+  <a href="#picaspoints">points</a>
+  from the bottom of the longest
+  <a href="#descender">descender</a>
+  to the top of the highest
+  <a href="#ascender">ascender</a>.
+  In reality, type is always fractionally smaller than its point
+  size.
+  </dd>
+  
+  <dt id="quad">Quad</dt>
+  <dd>
+  When only one margin of type is flush, lines of type are quadded
+  in the direction of the flush margin.  Therefore, quad left
+  means the left margin is flush, the right isn&#8217;t.  Quad right
+  means the right margin is flush, the left isn&#8217;t.  Quad centre
+  means neither the left nor the right margin is flush; rather,
+  lines of type are quadded on both sides so that type appears
+  centred on the page.
+  </dd>
+  
+  <dt id="rag">Rag</dt>
+  <dd>
+  Describes a margin that isn&#8217;t flush.  Rag right means the right
+  margin isn&#8217;t flush.  Rag left means the left margin isn&#8217;t flush.
+  The expression "flush left/rag right" is sometimes used to
+  describe type that is
+  <a href="#quad">quadded</a>
+  left.
+  </dd>
+  
+  <dt id="shape">Shape</dt>
+  <dd>
+  The degree of slant and/or the width of characters.
+  (Technically speaking, this is not a proper typesetting term;
+  however, it may help clarify some concepts presented in these
+  documents.)
+  
+  <p>
+  Some typical shapes are:
+  </p>
+
+  <ul style="margin-top: -.5em; margin-bottom: -.5em">
+      <li>&#8220;Roman&#8221;, which has no slant, and has letterforms of
+          average width</li>
+      <li>&#8220;Italic&#8221;, which is slanted, and has letterforms
+          of average width</li>
+      <li>&#8220;Condensed&#8221;, which has no slant, but has
+          letterforms narrower than the average represented by Roman</li>
+      <li>&#8220;Condensed Italic&#8221;, which is slanted, with letterforms narrower
+          than average</li>
+  </ul>
+
+  <p>
+  The term
+  <a href="#font">font</a>,
+  as it is used in these documents, refers to a combination of
+  <a href="#weight">weight</a>
+  and shape.
+  </p>
+
+  </dd>
+  
+  <dt id="solid">Solid/set solid</dt>
+  <dd>
+  When no
+  <a href="#leading">lead</a>
+  is added between lines of type (i.e. the
+  <a href="#ps">point size</a>
+  and linespacing are the same), the lines are said to be &#8220;set
+  solid.&#8221;
+  </dd>
+  
+  <dt id="trackkerning">Track kerning/Line kerning</dt>
+  <dd>
+  Sometimes, it&#8217;s advantageous to increase or decrease the amount
+  of space between every letter in a line by an equal (usually
+  small) amount, in order to fit more (or fewer) characters on the
+  line.  The correct term is letter spacing, but track kerning and
+  line kerning (and sometimes, just "kerning") have come to mean
+  the same thing.
+  </dd>
+  
+  <dt id="unbreakablespace">Unbreakable space</dt>
+  <dd>
+  Equal to
+  <a href="#wordspace">word space</a>,
+  however words separated by an unbreakable space will always be
+  kept together on the same line.  Expands and contracts like word
+  space.  Useful for proper names, which one should, whenever
+  possible, avoid splitting onto two lines.  In groff, unbreakable
+  space is entered with
+  
+  <span class="pre" style="margin-bottom: -2em;">
+   \~  (backslash followed by a tilde)
+  </span>
+  </dd>
+  
+  <dt id="weight">Weight</dt>
+  <dd>
+  The thickness of the strokes of letterforms.  Medium and Book
+  have average thicknesses and are the weights used for most
+  of the text in books, magazines, newspapers, etc.  Light has
+  strokes slightly thinner than Medium or Book, but is still
+  acceptable for most text.  Semibold, Bold, Heavy and Black all
+  have strokes of increasing thickness, making them suitable for
+  heads, subheads, headlines and the like.
+  </dd>
+  
+  <dt id="wordspace">Word space</dt>
+  <dd>
+  The amount of whitespace between words.  When text is
+  <a href="#just">justified</a>,
+  word space expands or contracts to make the margins flush.
+  </dd>
+  
+  <dt id="xheight">x-height</dt>
+  <dd>
+  The height of a lower case letter x in a given font at a given
+  point size.  Generally used to mean the average height of the
+  bowl of lower case letters.
+  </dd>
+</dl>
+
+<h3 id="groff-terms" class="docs">Groff terms</h3>
+
+<dl>
+  <dt id="alias">Alias</dt>
+  <dd>
+  A
+  <a href="#macros">macro</a>
+  invoked by a name different from its &#8220;official&#8221;
+  name.  For example, the official name of the macro to change
+  <a href="#family">family</a>
+  is <kbd>FAMILY</kbd>.  Its alias is <kbd>FAM</kbd>.
+  Aliases may be created for any macro (via the
+  <a href="goodies.html#alias"><kbd>ALIAS</kbd></a>
+  macro) provided the alias uses a name not already taken by the
+  mom macros or one of the groff
+  <a href="#primitives">primitives</a>.
+  For a complete list of words or names you must not use, see the
+  <a href="reserved.html#reserved">list of reserved words</a>.
+  </dd>
+  
+  <dt id="arguments">Arguments</dt>
+  <dd>
+  Parameters or information needed by a
+  <a href="#macros">macro</a>
+  to do its job.  For example, in the macro
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  .PT_SIZE 12
+  </span>
+  
+  <kbd>12</kbd> is the argument.  In the macro
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  .QUAD LEFT
+  </span>
+  
+  <kbd>LEFT</kbd> is the argument.  Arguments are separated from
+  macros by spaces.  Some macros require several arguments; each
+  is separated by a space.
+  </dd>
+  
+  <dt id="commentlines">Comment Lines</dt>
+  <dd>
+  <a href="#inputline">Input lines</a>
+  introduced with the comment character
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  \#  (backslash followed by the pound sign)
+  </span>
+  
+  When processing output, groff silently ignores everything on a
+  line that begins with the comment character.
+  </dd>
+  
+  <dt id="controllines">Control Lines</dt>
+  <dd>
+  Instructions to groff that appear on a line by themselves, which
+  means that &#8220;control lines&#8221; are either
+  <a href="#macros">macros</a>
+  or groff
+  <a href="#primitives">primitives</a>.
+  Control lines begin with a period or, occasionally, an apostrophe.
+  </dd>
+  
+  <dt id="filled">Filled lines/fill mode</dt>
+  <dd>
+  Automatic
+  <a href="#just">justification</a>
+  or
+  <a href="#quad">quadding</a>.
+  In fill mode, the ends of lines as they appear in your text
+  editor are ignored.  Instead, words from adjoining
+  <a href="#inputline">input lines</a>
+  are added one at a time to the output line until no more words
+  fit.  Then, depending whether text is to be
+  <a href="#just">justified</a>
+  or
+  <a href="#quad">quadded</a>
+  (left, right, or centre), and depending on whether automatic
+  hyphenation is turned on, groff attempts to hyphenate the last
+  word, or, barring that, spreads and breaks the line (when
+  justification is turned on) or breaks and quads the line (when
+  quadding is turned on).
+  
+  <p>
+  Nofill mode (non-filled text) means that groff respects the ends
+  of lines exactly as they appear in your text editor.
+  </p>
+
+  </dd>
+  
+  <dt id="inlines">Inline escapes</dt>
+  <dd>
+  Instructions issued to groff that appear as part of an
+  <a href="#inputline">input line</a>
+  (as opposed to
+  <a href="#macros">macros</a>,
+  which must appear on a line by themselves).  Inline escapes are
+  always introduced by the backslash character.  For example,
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  A line of text with the word T\*[BU 2]oronto in it
+  </span>
+  
+  contains the inline escape <kbd>\*[BU 2]</kbd> (which means
+  &#8220;move the letter &#8216;o&#8217; 2
+  <a href="#kernunit">kern units</a>
+  closer to the letter &#8216;T&#8217;&#8221;).
+  
+  <p style="margin-bottom: -2em;">
+  Mom&#8217;s inline escapes always take the form
+  <kbd>\*[&lt;ESCAPE&gt;]</kbd>, where <kbd>ESCAPE</kbd> is
+  composed of capital letters, sometimes followed immediately by a
+  digit, sometimes followed by a space and a
+  <a href="#numericargument">numeric argument</a>.
+  Groff&#8217;s escapes begin with the backslash
+  character but typically have no star and are in lower case.  For
+  example, the mom escapes to move forward 6
+  points on a line are either
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  \*[FP6]&nbsp;&nbsp;or&nbsp;&nbsp;\*[FWD 6p]
+  </span>
+  
+  while the groff escape for the same thing is
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  \h&#8217;6p&#8217;
+  </span>
+  </p>
+
+  </dd>
+  
+  <dt id="inputline" style="margin-top: -1em;">Input line</dt>
+  <dd>
+  A line of text as it appears in your text editor.
+  </dd>
+  
+  <dt id="macros">Macros</dt>
+  <dd>
+  Instructions embedded in a document that determine how groff
+  processes the text for output. mom&#8217;s macros
+  always begin with a period, on a line by themselves, and must
+  be typed in capital letters.  Typically, macros contain complex
+  commands issued to groff&mdash;behind the scenes&mdash;via
+  groff
+  <a href="#primitives">primitives</a>.
+  </dd>
+  
+  <dt id="units">Machine units</dt>
+  <dd>
+  A machine unit is 1/1000 of a
+  <a href="#picaspoints">point</a>
+  when the groff device is ps. (&#8220;ps&#8221; means
+  &#8220;PostScript&#8221;&mdash;the default device for
+  which groff prepares output, and the device for which
+  mom was specifically designed.)
+  </dd>
+  
+  <dt id="numericargument">Numeric argument</dt>
+  <dd>
+  An
+  <a href="#arguments">argument</a>
+  that has the form of a digit.  Numeric arguments can be built
+  out of arithmetic expressions using +, -, *, and / for plus,
+  minus, times, and divided-by respectively.  If a numeric
+  argument requires a
+  <a href="#unitofmeasure">unit of measure</a>,
+  a unit of measure must be appended to <em>every</em> digit in
+  the argument.  For example:
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  .ALD 1i-1v
+  </span>
+  
+  <div class="box-important" style="margin-right: 2.5em;">
+    <p class="tip">
+    <span class="important">IMPORTANT:</span> groff does not
+    respect the order of operations, but rather evaluates
+    arithmetic expressions from left to right.  Parentheses must
+    be used to circumvent this peculiarity.  Not to worry, though.
+    The likelihood of more than just the occasional plus or minus
+    sign when using mom&#8217;s macros is slim.
+    </p>
+  </div>
+  </dd>
+  
+  <dt id="outputline">Output line</dt>
+  <dd>
+  A line of text as it appears in output copy.
+  </dd>
+  
+  <dt id="primitives">Primitives</dt>
+  <dd>
+  The lowercase instructions, introduced with a period, that groff
+  uses as its native command language, and out of which macros
+  are built.  The majority of groff&#8217;s primitive requests are two
+  letters long.
+  </dd>
+  
+  <dt id="stringargument">String Argument</dt>
+  <dd>
+  Technically, any
+  <a href="#arguments">argument</a>
+  that is not numeric.  In this documentation, string argument
+  means an argument that requires the user to input text.  For
+  example, in the
+  <a href="#macros">macro</a>
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  .TITLE "My Pulitzer Novel"
+  </span>
+  
+  <kbd>"My Pulitzer Novel"</kbd> is a string argument.
+  
+  <p>
+  Because string arguments must be enclosed by double-quotes, you
+  can&#8217;t use double-quotes as part of the string argument.  If you
+  need double-quotes to be part of a string argument, use the
+  <a href="#inlines">inline escapes</a>
+  <kbd>\(lq</kbd> and <kbd>\(rq</kbd> (leftquote and
+  rightquote respectively) in place of the double-quote character
+  (<kbd>"</kbd>).
+  </p>
+
+  </dd>
+  
+  <dt id="unitofmeasure">Unit of measure</dt>
+  <dd>
+  The single letter after a
+  <a href="#numericargument">numeric argument</a>
+  that tells mom what measurement scale the
+  argument should use.  Common valid units are:
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  i (inches)
+  p (points)
+  P (Picas)
+  c (centimetres)
+  m (ems)
+  n (ens)
+  u (machine units)
+  v (the current leading [line space])
+  </span>
+
+  <p style="margin-top: -1em;">
+  Units of measure must come immediately after the numeric
+  argument (i.e. with no space between the argument and the unit
+  of measure), like this:
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  .ALD 2v
+  .LL  39P
+  .IL  1i
+  </span>
+  
+  The above example advances 2 line spaces and sets the line
+  length to 39 picas with a left indent of 1 inch.
+  </p>
+  
+  <div class="box-important" style="margin-right: 2.5em;">
+    <p class="tip">
+    <span class="important">IMPORTANT:</span>
+    Most mom macros that set the size or measure of something must
+    be given a unit of measure since most of the macros do not have
+    default units of measure.  There are a couple of exceptions,
+    the most notable of which are <kbd>PT_SIZE</kbd> and
+    <kbd class="bold">LS</kbd>.  Both use
+    <a href="#picaspoints">points</a>
+    as the default unit of measure, which means you don&#8217;t have to
+    append &#8220;p&#8221; to their argument.
+    </p>
+  </div>
+  
+  <p>
+  You can enter decimal values for any unit of measure.  Different
+  units may be combined by adding them together (e.g. 1.5i+2m,
+  which gives a measure of 1-1/2 inches plus 2 ems).
+  </p>
+  
+  <div class="box-tip" style="margin-right: 2.5em;">
+    <p class="tip">
+    <span class="note">Note:</span>
+    a pica is composed of 12 points, therefore 12.5 picas is 12
+    picas and 6 points, not 12 picas and 5 points.  If you want 12
+    picas and 5 points, you have to enter the measure as 12P+5p.
+    </p>
+  </div>
+
+  </dd>
+  
+  <dt id="zerowidthcharacter">Zero-width character</dt>
+  <dd>
+  The
+  <a href="#inlines">inline escape</a>
+  that allows you to print a literal period, apostrophe and, if
+  <a href="#outputline">output lines</a>
+  are
+  <a href="#filled">filled</a>,
+  a space that falls at the beginning of an
+  <a href="#inputline">input line</a>.
+  It looks like this:
+  
+  <span class="pre" style="margin-bottom: -2em;">
+  \&amp; (backslash followed by an ampersand)
+  </span>
+  
+  Normally, groff interprets a period (or an apostrophe) at the
+  beginning of an input line as meaning that what follows is a
+  <a href="#controllines">control line</a>.
+  In fill modes, groff treats a space at the beginning of an input
+  line as meaning &#8220;start a new line and put a space at the
+  beginning of it.&#8221; If you want groff to interpret periods
+  and apostrophes at the beginning of input lines literally (i.e.
+  print them), or spaces at the beginning of input lines as just
+  garden variety word spaces, you must start the line with the
+  zero-width character.
+  </dd>
+</dl>
+
+<h3 id="mom-terms" class="docs">Mom terms</h3>
+<dl>
+  <dt id="blockquote">Blockquote</dt>
+  <dd>
+  Cited material other than
+  <a href="#quote">quotes</a>.
+  Typically set at a smaller point size than paragraph text,
+  indented from the left and right margins.  Blockquotes are
+  <a href="#filled">filled</a>.
+  </dd>
+  
+  <dt id="controlmacro">Control macro</dt>
+  <dd>
+  Macros used in
+  <a href="docprocessing.html#docprocessing">document processing</a>
+  to control/alter the appearance of document elements (e.g.
+  heads, quotes, footnotes,
+  <a href="#header">headers</a>,
+  etc.).
+  </dd>
+  
+  <dt id="docheader">Document header/docheader</dt>
+  <dd>
+  Document information (title, subtitle, author, etc) output at
+  the top of page one.
+  </dd>
+  
+  <dt id="epigraph">Epigraph</dt>
+  <dd>
+  A short, usually cited passage that appears at the beginning of
+  a chapter, story, or other document.
+  </dd>
+  
+  <dt id="footer">Footer/page footer</dt>
+  <dd>
+  Document information (frequently author and title) output in
+  the bottom margin of pages <em>after</em> page one.  Not to be
+  confused with footnotes, which are considered part of
+  <a href="#running">running text</a>.
+  </dd>
+  
+  <dt id="head">Head</dt>
+  <dd>
+  A title that introduces a major section of a document.
+  </dd>
+  
+  <dt id="header">Header/page header</dt>
+  <dd>
+  Document information (frequently author and title) output in the
+  top margin of pages <em>after</em> page one.
+  
+  <div class="box-tip" style="margin-right: 2.5em;">
+    <p class="tip">
+    <span class="note">Note:</span> In terms of content and style,
+    headers and
+    <a href="#footer">footers</a>
+    are the same; they differ only in their placement on the page.
+    In most places in this documentation, references to the content
+    or style of headers applies equally to footers.
+    </p>
+  </div>
+
+  </dd>
+  
+  <dt id="linebreak">Linebreak/author linebreak</dt>
+  <dd>
+  A gap in the vertical flow of
+  <a href="#running">running text</a>,
+  frequently set off by typographic symbols such as asterisks or
+  daggers.  Used to indicate a shift in the content of a document
+  (e.g. a scene change in a short story).  Also commonly called a
+  scene break or a section break.
+  </dd>
+  
+  <dt id="parahead">Paragraph head</dt>
+  <dd>
+  A title joined to the body of a paragraph; hierarchically one
+  level beneath
+  <a href="#subhead">subheads</a>.
+  </dd>
+  
+  <dt id="quote">Quote</dt>
+  <dd>
+  A quote, to mom, is a line-for-line setting
+  of quoted material (e.g. poetry, song lyrics, or a snippet of
+  programming code).  You don&#8217;t have to use
+  <a href="typesetting.html#br"><kbd>BR</kbd></a>
+  with quotes.
+  </dd>
+  
+  <dt id="running">Running text</dt>
+  <dd>
+  In a document formatted with mom, running
+  text means text that forms the body of the document, including
+  elements such as heads and subheads.
+  <a href="#docheader">Docheaders</a>,
+  <a href="#header">headers</a>,
+  <a href="#footer">footers</a>
+  and page numbers are not part of running text.
+  </dd>
+  
+  <dt id="subhead">Subhead</dt>
+  <dd>
+  A title used to introduce secondary sections of a document;
+  hierarchically one level beneath sections introduced by
+  <a href="#head">heads</a>.
+  </dd>
+  
+  <dt id="toggle">Toggle</dt>
+  <dd>
+  A macro or tag that, when invoked without an argument, begins
+  something or turns a feature on, and, when invoked with ANY
+  argument, ends something or turns a feature off.  See
+  <a href="intro.html#toggle-example">Example 3</a>
+  of the section
+  <a href="intro.html#macro-args">How to read macro arguments</a>.
+  </dd>
+</dl>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+  <tr>
+    <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+    <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+    <td style="width: 33%; text-align: right;"><a href="using.html#top">Next: Using mom</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified:-->

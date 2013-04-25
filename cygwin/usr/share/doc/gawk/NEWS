@@ -1,0 +1,123 @@
+   Copyright (C) 2010, 2011, 2012 Free Software Foundation, Inc.
+   
+   Copying and distribution of this file, with or without modification,
+   are permitted in any medium without royalty provided the copyright
+   notice and this notice are preserved.
+ 
+Changes from 4.0.0 to 4.0.1
+---------------------------
+
+1. The default handling of backslash in sub() and gsub() has been reverted to
+   the behavior of 3.1. It was silly to think I could break compatibility that
+   way, even for standards compliance.
+
+2. Completed the implementation of Rational Range Interpretation.
+
+3. Failure to get the group set is no longer a fatal error.
+
+4. Lots of minor bugs fixed and portability clean-ups along the way. See
+   the ChangeLog for details.
+
+Changes from 3.1.8 to 4.0.0
+---------------------------
+
+1. The special files /dev/pid, /dev/ppid, /dev/pgrpid and /dev/user are
+   now completely gone. Use PROCINFO instead.
+
+2. The POSIX 2008 behavior for `sub' and `gsub' are now the default.
+   THIS CHANGES BEHAVIOR!!!!
+
+3. The \s and \S escape sequences are now recognized in regular expressions.
+
+4. The split() function accepts an optional fourth argument which is an array
+   to hold the values of the separators.
+
+5. The new -b / --characters-as-bytes option means "hands off my data"; gawk
+   won't try to treat input as a multibyte string.
+
+6. There is a new --sandbox option; see the doc.
+
+7. Indirect function calls are now available.
+
+8. Interval expressions are now part of default regular expressions for
+   GNU Awk syntax.
+
+9. --gen-po is now correctly named --gen-pot.
+
+10. switch / case is now enabled by default. There's no longer a need
+    for a configure-time option.
+
+11. Gawk now supports BEGINFILE and ENDFILE. See the doc for details.
+
+12. Directories named on the command line now produce a warning, not
+    a fatal error, unless --posix or --traditional.
+
+13. The new FPAT variable allows you to specify a regexp that matches
+    the fields, instead of matching the field separator. The new patsplit()
+    function gives the same capability for splitting.
+
+14. All long options now have short options, for use in `#!' scripts.
+
+15. Support for IPv6 is added via the /inet6/... special file. /inet4/...
+    forces IPv4 and /inet chooses the system default (probably IPv4).
+
+16. Added a warning for /[:space:]/ that should be /[[:space:]]/.
+
+17. Merged with John Haque's byte code internals. Adds dgawk debugger and
+    possibly improved performance.
+
+18. `break' and `continue' are no longer valid outside a loop, even with
+    --traditional.
+
+19. POSIX character classes work with --traditional (BWK awk supports them).
+
+20. Nuked redundant --compat, --copyleft, and --usage long options.
+
+21. Arrays of arrays added. See the doc.
+
+22. Per the GNU Coding Standards, dynamic extensions must now define
+    a global symbol indicating that they are GPL-compatible. See
+    the documentation and example extensions.
+    THIS CHANGES BEHAVIOR!!!!
+
+23. In POSIX mode, string comparisons use strcoll/wcscoll.
+    THIS CHANGES BEHAVIOR!!!!
+
+24. The option for raw sockets was removed, since it was never implemented.
+
+25. Gawk now treats ranges of the form [d-h] as if they were in the C
+    locale, no matter what kind of regexp is being used, and even if
+    --posix.  The latest POSIX standard allows this, and the documentation
+    has been updated.  Maybe this will stop all the questions about
+    [a-z] matching uppercase letters.
+    THIS CHANGES BEHAVIOR!!!!
+
+26. PROCINFO["strftime"] now holds the default format for strftime().
+
+27. Updated to latest infrastructure: Autoconf 2.68, Automake 1.11.1,
+    Gettext 0.18.1, Bison 2.5.
+
+28. Many code cleanups. Removed code for many old, unsupported systems:
+	- Atari
+	- Amiga
+	- BeOS
+	- Cray
+	- MIPS RiscOS
+	- MS-DOS with Microsoft Compiler
+	- MS-Windows with Microsoft Compiler
+	- NeXT
+	- SunOS 3.x, Sun 386 (Road Runner)
+	- Tandem (non-POSIX)
+	- Prestandard VAX C compiler for VAX/VMS
+	- Probably others that I've forgotten
+
+29. If PROCINFO["sorted_in"] exists, for(iggy in foo) loops sort the
+    indices before looping over them.  The value of this element
+    provides control over how the indices are sorted before the loop
+    traversal starts. See the manual.
+
+30. A new isarray() function exists to distinguish if an item is an array
+    or not, to make it possible to traverse multidimensional arrays.
+
+31. asort() and asorti() take a third argument specifying how to sort.
+    See the doc.

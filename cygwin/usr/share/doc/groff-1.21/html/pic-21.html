@@ -1,0 +1,784 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-21.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-20.html">prev</a> | <a href="pic-22.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>21. PIC Reference
+<a name="21. PIC Reference"></a>
+</h2>
+
+
+<p style="margin-top: 1em"><font color="#000000">This is an
+annotated grammar of <b>pic</b>.</font></p>
+
+<h3>21.1. Lexical Items
+<a name="21.1. Lexical Items"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">In
+general, <b>pic</b> is a free-format, token-oriented
+language that ignores whitespace outside strings. But
+certain lines and contructs are specially interpreted at the
+lexical level:</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">A comment
+begins with <b>#</b> and continues to <b>\n</b> (comments
+may also follow text in a line). A line beginning with a
+period or backslash may be interpreted as text to be passed
+through to the post-processor, depending on command-line
+options. An end-of-line backslash is interpreted as a
+request to continue the line; the backslash and following
+newline are ignored.</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000">Here
+are the grammar terminals:</font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="6%">
+
+
+
+<p style="margin-top: 1em"><font color="#000000"><small>INT</small></font></p> </td>
+<td width="4%"></td>
+<td width="38%">
+
+
+<p style="margin-top: 1em"><font color="#000000">A positive
+integer.</font></p> </td>
+<td width="42%">
+</td></tr>
+</table>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><small>NUMBER</small></font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="8%"></td>
+<td width="2%"></td>
+<td width="80%">
+
+
+<p><font color="#000000">A floating point numeric constant.
+May contain a decimal point or be expressed in scientific
+notation in the style of <i>printf</i>(3)&rsquo;s %e escape.
+A trailing &lsquo;i&rsquo; or &lsquo;I&rsquo; (indicating
+the unit &lsquo;inch&rsquo;) is ignored.</font></p></td></tr>
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="8%">
+
+
+
+<p style="margin-top: 1em"><font color="#000000"><small>TEXT</small></font></p> </td>
+<td width="2%"></td>
+<td width="80%">
+
+
+<p style="margin-top: 1em"><font color="#000000">A string
+enclosed in double quotes. A double quote within
+<small>TEXT</small> must be preceded by a backslash. Instead
+of <small>TEXT</small> you can use</font></p></td></tr>
+</table>
+
+<pre style="margin-left:30%; margin-top: 1em">sprintf ( TEXT [, &lt;expr&gt; ...] )</pre>
+
+
+
+<p style="margin-left:20%; margin-top: 1em"><font color="#000000">except
+after the &lsquo;until&rsquo; and &lsquo;last&rsquo;
+keywords, and after all ordinal keywords (&lsquo;th&rsquo;
+and friends).</font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="16%">
+
+
+
+<p style="margin-top: 1em"><font color="#000000"><small>VARIABLE</small></font></p> </td>
+<td width="74%">
+</td></tr>
+</table>
+
+<p style="margin-left:20%;"><font color="#000000">A string
+starting with a character from the set [a-z], optionally
+followed by one or more characters of the set [a-zA-Z0-9_].
+(Values of variables are preserved across
+pictures.)</font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="10%"></td>
+<td width="10%">
+
+
+
+<p style="margin-top: 1em"><font color="#000000"><small>LABEL</small></font></p> </td>
+<td width="80%">
+
+
+<p style="margin-top: 1em"><font color="#000000">A string
+starting with a character from the set [A-Z], optionally
+followed by one or more characters of the set
+[a-zA-Z0-9_].</font></p> </td></tr>
+</table>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><small>COMMAND-LINE</small></font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="80%">
+
+
+<p><font color="#000000">A line starting with a command
+character (&lsquo;.&rsquo; in groff mode, &lsquo;\&rsquo; in
+TeX mode).</font></p></td></tr>
+</table>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><small>BALANCED-TEXT</small></font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="80%">
+
+
+<p><font color="#000000">A string either enclosed by
+&lsquo;{&rsquo; and &lsquo;}&rsquo; or with <i>X</i> and
+<i>X</i>, where <i>X</i> doesn&rsquo;t occur in the
+string.</font></p> </td></tr>
+</table>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><small>BALANCED-BODY</small></font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="80%">
+
+
+<p><font color="#000000">Delimiters as in
+<small>BALANCED-TEXT</small> ; the body is interpreted as
+&lsquo;<b>&lang;command&rang;...</b>&rsquo;.</font></p> </td></tr>
+</table>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><small>FILENAME</small></font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="80%">
+
+
+<p><font color="#000000">The name of a file. This has the
+same semantics as <small>TEXT</small> .</font></p></td></tr>
+</table>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><small>MACRONAME</small></font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="20%"></td>
+<td width="50%">
+
+
+<p><font color="#000000">Either <small>VARIABLE</small> or
+<small>LABEL</small> .</font></p></td>
+<td width="30%">
+</td></tr>
+</table>
+
+<h3>21.2. Semi-Formal Grammar
+<a name="21.2. Semi-Formal Grammar"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">Tokens not
+enclosed in &lang;&rang; are literals, except:</font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="4%">
+
+
+
+<p style="margin-top: 1em"><font color="#000000">1.</font></p> </td>
+<td width="6%"></td>
+<td width="90%">
+
+
+<p style="margin-top: 1em"><font color="#000000"><b>\n</b>
+is a newline.</font></p></td></tr>
+<tr valign="top" align="left">
+<td width="4%">
+
+
+
+<p style="margin-top: 1em"><font color="#000000">2.</font></p> </td>
+<td width="6%"></td>
+<td width="90%">
+
+
+<p style="margin-top: 1em"><font color="#000000">Three dots
+is a suffix meaning &lsquo;replace with 0 or more
+repetitions of the preceding element(s).</font></p></td></tr>
+<tr valign="top" align="left">
+<td width="4%">
+
+
+
+<p style="margin-top: 1em"><font color="#000000">3.</font></p> </td>
+<td width="6%"></td>
+<td width="90%">
+
+
+<p style="margin-top: 1em"><font color="#000000">An
+enclosure in square brackets has its usual meaning of
+&lsquo;this clause is optional&rsquo;.</font></p></td></tr>
+<tr valign="top" align="left">
+<td width="4%">
+
+
+
+<p style="margin-top: 1em"><font color="#000000">4.</font></p> </td>
+<td width="6%"></td>
+<td width="90%">
+
+
+
+<p style="margin-top: 1em"><font color="#000000">Square-bracket-enclosed
+portions within tokens are optional. Thus,
+&lsquo;h[eigh]t&rsquo; matches either &lsquo;height&rsquo;
+or &lsquo;ht&rsquo;.</font></p></td></tr>
+</table>
+
+<p style="margin-top: 1em"><font color="#000000">If one of
+these special tokens has to be referred to literally, it is
+surrounded with single quotes.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+top-level <b>pic</b> object is a picture.</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">&lt;picture&gt; ::=
+  .PS [NUMBER [NUMBER]]\n
+  &lt;statement&gt; ...
+  .PE \n</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+arguments, if present, represent the width and height of the
+picture, causing <b>pic</b> to attempt to scale it to the
+given dimensions in inches. In no case, however, the X and
+Y&nbsp;dimensions of the picture exceed the values of the
+style variables <b>maxpswid</b> and <b>maxpsheight</b>
+(which default to the normal 8.5i by 11i page
+size).</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">If the
+ending &lsquo;.PE&rsquo; is replaced by &lsquo;.PF&rsquo;,
+the page vertical position is restored to its value at the
+time &lsquo;.PS&rsquo; was encountered. Another alternate
+form of invocation is &lsquo;.PS&nbsp;&lt;
+<small>FILENAME</small> &rsquo;, which replaces the
+&lsquo;.PS&rsquo; line with a file to be interpreted by
+<b>pic</b> (but this feature is deprecated).</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+&lsquo;.PS&rsquo;, &lsquo;.PE&rsquo;, and &lsquo;.PF&rsquo;
+macros to perform centering and scaling are normally
+supplied by the post-processor.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">In the
+following, either &lsquo;|&rsquo; or a new line starts an
+alternative.</font></p>
+<pre style="margin-left:10%; margin-top: 1em">&lt;statement&gt; ::=
+  &lt;command&gt; ;
+  &lt;command&gt; \n
+
+&lt;command&gt; ::=
+  &lt;primitive&gt; [&lt;attribute&gt;]
+  LABEL : [;] &lt;command&gt;
+  LABEL : [;] &lt;command&gt; [&lt;position&gt;]
+  { &lt;command&gt; ... }
+  VARIABLE [:] = &lt;any-expr&gt;
+  figname = MACRONAME
+  up | down | left | right
+  COMMAND-LINE
+  command &lt;print-arg&gt; ...
+  print &lt;print-arg&gt; ...
+  sh BALANCED-TEXT
+  copy FILENAME
+  copy [FILENAME] thru MACRONAME [until TEXT]
+  copy [FILENAME] thru BALANCED-BODY [until TEXT]
+  for VARIABLE = &lt;expr&gt; to &lt;expr&gt; [by [*] &lt;expr&gt;] do BALANCED-BODY
+  if &lt;any-expr&gt; then BALANCED-BODY [else BALANCED-BODY]
+  reset [VARIABLE [[,] VARIABLE ...]]
+
+
+&lt;print-arg&gt; ::=
+  TEXT
+  &lt;expr&gt;
+  &lt;position&gt;</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+current position and direction are saved on entry to a
+&lsquo;{&nbsp;...&nbsp;}&rsquo; construction and restored on
+exit from it.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Note that
+in &lsquo;if&rsquo; constructions, newlines can only occur
+in <small>BALANCED-BODY</small> . This means that</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">if
+{ ... }
+else
+{ ... }</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">fails. You
+have to use the braces on the same line as the
+keywords:</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">if {
+...
+} else {
+...
+}</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">This
+restriction doesn&rsquo;t hold for the body after the
+&lsquo;do&rsquo; in a &lsquo;for&rsquo;
+construction.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">At the
+beginning of each picture, &lsquo;figname&rsquo; is reset to
+the vbox name &lsquo;graph&rsquo;; this command has only a
+meaning in TeX mode. While the grammar rules allow digits
+and the underscore in the value of &lsquo;figname&rsquo;,
+TeX normally accepts uppercase and lowercase letters only as
+box names (you have to use &lsquo;\csname&rsquo; if you
+really need to circumvent this limitation).</font></p>
+<pre style="margin-left:10%; margin-top: 1em">&lt;any-expr&gt; ::=
+  &lt;expr&gt;
+  &lt;text-expr&gt;
+  &lt;any-expr&gt; &lt;logical-op&gt; &lt;any-expr&gt;
+  ! &lt;any-expr&gt;
+
+&lt;logical-op&gt; ::=
+  == | != | &amp;&amp; | &rsquo;||&rsquo;
+
+&lt;text-expr&gt; ::=
+  TEXT == TEXT
+  TEXT != TEXT</pre>
+
+<p style="margin-top: 1em"><font color="#000000">Logical
+operators are handled specially by <b>pic</b> since they can
+deal with text strings also. <b>pic</b> uses
+<i>strcmp</i>(3) to test for equality of strings; an empty
+string is considered as &lsquo;false&rsquo; for
+&lsquo;&amp;&amp;&rsquo; and &lsquo;||&rsquo;.</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">&lt;primitive&gt; ::=
+  box                   # closed object &mdash; rectangle
+  circle                # closed object &mdash; circle
+  ellipse               # closed object &mdash; ellipse
+  arc                   # open object &mdash; quarter-circle
+  line                  # open object &mdash; line
+  arrow                 # open object &mdash; line with arrowhead
+  spline                # open object &mdash; spline curve
+  move
+  TEXT TEXT ...         # text within invisible box
+  plot &lt;expr&gt; TEXT      # formatted text
+  &rsquo;[&rsquo; &lt;command&gt; ... &rsquo;]&rsquo;</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">Drawn
+objects within &lsquo;[&nbsp;...&nbsp;]&rsquo; are treated
+as a single composite object with a rectangular shape (that
+of the bounding box of all the elements). Variable and label
+assignments within a block are local to the block. Current
+direction of motion is restored to the value at start of
+block upon exit. Position is <i>not</i> restored (unlike
+&lsquo;{&nbsp;}&rsquo;); instead, the current position
+becomes the exit position for the current direction on the
+block&rsquo;s bounding box.</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">&lt;attribute&gt; ::=
+  h[eigh]t &lt;expr&gt;       # set height of closed figure
+  wid[th] &lt;expr&gt;        # set width of closed figure
+  rad[ius] &lt;expr&gt;       # set radius of circle/arc
+  diam[eter] &lt;expr&gt;     # set diameter of circle/arc
+  up [&lt;expr&gt;]           # move up
+  down [&lt;expr&gt;]         # move down
+  left [&lt;expr&gt;]         # move left
+  right [&lt;expr&gt;]        # move right
+  from &lt;position&gt;       # set from position of open figure
+  to &lt;position&gt;         # set to position of open figure
+  at &lt;position&gt;         # set center of open figure
+  with &lt;path&gt;           # fix corner/named point at specified location
+  with &lt;position&gt;       # fix position of object at specified location
+  by &lt;expr-pair&gt;        # set object&rsquo;s attachment point
+  then                  # sequential segment composition
+  dotted [&lt;expr&gt;]       # set dotted line style
+  dashed [&lt;expr&gt;]       # set dashed line style
+  thick[ness] &lt;expr&gt;    # set thickness of lines
+  chop [&lt;expr&gt;]         # chop end(s) of segment
+  &rsquo;-&gt;&rsquo; | &rsquo;&lt;-&rsquo; | &rsquo;&lt;-&gt;&rsquo;   # decorate with arrows
+  invis[ible]           # make primitive invisible
+  solid                 # make closed figure solid
+  fill[ed] [&lt;expr&gt;]     # set fill density for figure
+  xscaled &lt;expr&gt;        # slant box into x direction
+  yscaled &lt;expr&gt;        # slant box into y direction
+  colo[u]r[ed] TEXT     # set fill and outline color for figure
+  outline[d] TEXT       # set outline color for figure
+  shaded TEXT           # set fill color for figure
+  same                  # copy size of previous object
+  cw | ccw              # set orientation of curves
+  ljust | rjust         # adjust text horizontally
+  above | below         # adjust text vertically
+  aligned               # align parallel to object
+  TEXT TEXT ...         # text within object
+  &lt;expr&gt;                # motion in the current direction</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">Missing
+attributes are supplied from defaults; inappropriate ones
+are silently ignored. For lines, splines, and arcs, height
+and width refer to arrowhead size.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+&lsquo;at&rsquo; primitive sets the center of the current
+object. The &lsquo;with&rsquo; attribute fixes the specified
+feature of the given object to a specified location. (Note
+that &lsquo;with&rsquo; is incorrectly described in the
+Kernighan paper.)</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+&lsquo;by&rsquo; primitive is not documented in the tutorial
+portion of the Kernighan paper, and should probably be
+considered unreliable.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+primitive &lsquo;arrow&rsquo; is a synonym for
+&lsquo;line&nbsp;-&gt;&rsquo;.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Text is
+normally an attribute of some object, in which case
+successive strings are vertically stacked and centered on
+the object&rsquo;s center by default. Standalone text is
+treated as though placed in an invisible box.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">A text
+item consists of a string or sprintf-expression, optionally
+followed by positioning information. Text (or strings
+specified with &lsquo;sprintf&rsquo;) may contain font
+changes, size changes, and local motions, provided those
+changes are undone before the end of the current item. Text
+may also contain \-escapes denoting special characters. The
+base font and specific set of escapes supported is
+implementation dependent, but supported escapes always
+include the following:</font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="16%">
+
+
+<p style="margin-top: 1em"><font color="#000000">\fR,
+\f1</font></p> </td>
+<td width="84%">
+</td></tr>
+</table>
+
+<p style="margin-left:10%;"><font color="#000000">Set Roman
+style (the default)</font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="16%">
+
+
+<p style="margin-top: 1em"><font color="#000000">\fI,
+\f2</font></p> </td>
+<td width="84%">
+</td></tr>
+</table>
+
+<p style="margin-left:10%;"><font color="#000000">Set
+Italic style</font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="16%">
+
+
+<p style="margin-top: 1em"><font color="#000000">\fB,
+\f3</font></p> </td>
+<td width="84%">
+</td></tr>
+</table>
+
+<p style="margin-left:10%;"><font color="#000000">Set Bold
+style</font></p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="18%">
+
+
+
+<p style="margin-top: 1em"><font color="#000000">\fP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font></p> </td>
+<td width="82%">
+</td></tr>
+</table>
+
+<p style="margin-left:10%;"><font color="#000000">Revert to
+previous style; only works one level deep, does not
+stack.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Color
+names are dependent on the pic implementation, but in all
+modern versions color names recognized by the X&nbsp;window
+system are supported.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">A position
+is an (x,y) coordinate pair. There are lots of different
+ways to specify positions:</font></p>
+<pre style="margin-left:10%; margin-top: 1em">&lt;position&gt; ::=
+  &lt;position-not-place&gt;
+  &lt;place&gt;
+  ( &lt;position&gt; )
+
+&lt;position-not-place&gt; ::=
+  &lt;expr-pair&gt;
+  &lt;position&gt; + &lt;expr-pair&gt;
+  &lt;position&gt; - &lt;expr-pair&gt;
+  ( &lt;position&gt; , &lt;position&gt; )
+  &lt;expr&gt; [of the way] between &lt;position&gt; and &lt;position&gt;
+  &lt;expr&gt; &rsquo;&lt;&rsquo; &lt;position&gt; , &lt;position&gt; &rsquo;&gt;&rsquo;
+
+&lt;expr-pair&gt; ::=
+  &lt;expr&gt; , &lt;expr&gt;
+  ( expr-pair )
+
+&lt;place&gt; ::=
+  &lt;label&gt;
+  &lt;label&gt; &lt;corner&gt;
+  &lt;corner&gt; [of] &lt;label&gt;
+  Here
+
+&lt;label&gt; ::=
+  LABEL [. LABEL ...]
+  &lt;nth-primitive&gt;
+
+&lt;corner&gt; ::=
+  .n | .e | .w | .s
+  .ne | .se | .nw | .sw
+  .c[enter] | .start | .end
+  .t[op] | .b[ot[tom]] | .l[eft] | .r[ight]
+  left | right | &lt;top-of&gt; | &lt;bottom-of&gt;
+  &lt;north-of&gt; | &lt;south-of&gt; | &lt;east-of&gt; | &lt;west-of&gt;
+  &lt;center-of&gt; | &lt;start-of&gt; | &lt;end-of&gt;
+  upper left | lower left | upper right | lower right
+
+&lt;<i>xxx</i>-of&gt; ::=
+<i>  xxx</i>                   # followed by &lsquo;of&rsquo;
+
+&lt;nth-primitive&gt; ::=
+  &lt;ordinal&gt; &lt;object-type&gt;
+  [&lt;ordinal&gt;] last &lt;object-type&gt;
+
+&lt;ordinal&gt; ::=
+  INT th
+  INT st | INT nd | INT rd
+  &lsquo; &lt;any-expr&gt; &rsquo;th
+
+
+&lt;object-type&gt; ::=
+  box
+  circle
+  ellipse
+  arc
+  line
+  arrow
+  spline
+  &rsquo;[]&rsquo;
+  TEXT</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">As
+Kernighan notes, &ldquo;since barbarisms like <b>1th</b> and
+<b>3th</b> are barbaric, synonyms like <b>1st</b> and
+<b>3rd</b> are accepted as well.&rdquo; Objects of a given
+type are numbered from 1 upwards in order of declaration;
+the <b>last</b> modifier counts backwards.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+&ldquo;&rsquo;th&rdquo; form (which allows you to select a
+previous object with an expression, as opposed to a numeric
+literal) is not documented in DWB&rsquo;s
+<i>pic</i>(1).</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+&lang;<i>xxx</i>-of&rang; rule is special: The lexical
+parser checks whether <i>xxx</i> is followed by the token
+&lsquo;of&rsquo; without eliminating it so that the grammar
+parser can still see &lsquo;of&rsquo;. Valid examples of
+specifying a place with corner and label are thus</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">A .n
+.n of A
+.n A
+north of A</pre>
+
+
+
+<p style="margin-top: 1em"><font color="#000000">while</font></p>
+
+
+<pre style="margin-left:10%; margin-top: 1em">north A
+A north</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">both cause
+a syntax error. (DWB <b>pic</b> also allows the weird form
+&lsquo;A&nbsp;north&nbsp;of&rsquo;.)</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Here the
+special rules for the &lsquo;with&rsquo; keyword using a
+path:</font></p>
+<pre style="margin-left:10%; margin-top: 1em">&lt;path&gt; ::=
+  &lt;relative-path&gt;
+  ( &lt;relative-path&gt; , &lt;relative-path&gt; )
+
+
+&lt;relative-path&gt; ::=
+  &lt;corner&gt;
+  . LABEL [. LABEL ...] [&lt;corner&gt;]</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+following style variables control output:</font></p>
+
+
+<p align="center"><font color="#000000"><img src="img/pic51.png" alt="Image img/pic51.png"></font></p>
+
+<p><font color="#000000">Any of these can be set by
+assignment, or reset using the <b>reset</b> statement. Style
+variables assigned within &lsquo;[&nbsp;]&rsquo; blocks are
+restored to their beginning-of-block value on exit;
+top-level assignments persist across pictures. Dimensions
+are divided by <b>scale</b> on output.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">All
+<b>pic</b> expressions are evaluated in floating point;
+units are always inches (a trailing &lsquo;i&rsquo; or
+&lsquo;I&rsquo; is ignored). Expressions have the following
+simple grammar, with semantics very similar to
+C&nbsp;expressions:</font></p>
+<pre style="margin-left:10%; margin-top: 1em">&lt;expr&gt; ::=
+  VARIABLE
+  NUMBER
+  &lt;place&gt; &lt;place-attribute&gt;
+  &lt;expr&gt; &lt;op&gt; &lt;expr&gt;
+  - &lt;expr&gt;
+  ( &lt;any-expr&gt; )
+  ! &lt;expr&gt;
+  &lt;func1&gt; ( &lt;any-expr&gt; )
+  &lt;func2&gt; ( &lt;any-expr&gt; , &lt;any-expr&gt; )
+  rand ( )
+
+&lt;place-attribute&gt;
+ .x | .y | .h[eigh]t | .wid[th] | .rad
+
+&lt;op&gt; ::=
+  + | - | * | / | % | ^ | &rsquo;&lt;&rsquo; | &rsquo;&gt;&rsquo; | &rsquo;&lt;=&rsquo; | &rsquo;&gt;=&rsquo;
+
+&lt;func1&gt; ::=
+  sin | cos | log | exp | sqrt | int | rand | srand
+
+&lt;func2&gt; ::=
+  atan2 | max | min</pre>
+
+<p style="margin-top: 1em"><font color="#000000">Both
+<b>exp</b> and <b>log</b> are base 10; <b>int</b> does
+integer truncation; and <b>rand()</b> returns a random
+number in [0-1).</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">There are
+<b>define</b> and <b>undef</b> statements which are not part
+of the grammar (they behave as pre-processor macros to the
+language). These may be used to define
+pseudo-functions.</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><b>define</b>
+<i>name</i> <b>{</b> <i>replacement-text</i>
+<b>}</b></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">This
+defines <i>name</i> as a macro to be replaced by the
+replacement text (not including the braces). The macro may
+be called as</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><i>name</i><b>(</b><i>arg1,
+arg2, ..., argn</i><b>)</b></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+arguments (if any) are substituted for tokens $1, $2 ... $n
+appearing in the replacement text. To undefine a macro, say
+<b>undef</b> <i>name</i>, specifying the name to be
+undefined.</font></p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-20.html">prev</a> | <a href="pic-22.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

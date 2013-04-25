@@ -1,0 +1,2062 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Document processing, bibliographies and references</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="letters.html#top">Next: Writing letters</a></td>
+</tr>
+</table>
+
+<h1 class="docs">Bibliographies and references</h1>
+
+<div style="width: 75%; margin: auto;">
+<ul class="no-enumerator">
+  <li><a href="#intro-ref">Introduction to bibliographies and references</a></li>
+  <li><a href="#tutorial-ref">Tutorial on <kbd>refer</kbd> usage with mom</a>
+  <ul style="margin-left: -.5em; list-style-type: disc;">
+    <li><a href="#db-ref">Create a <kbd>refer</kbd> database</a></li>
+    <li><a href="#rcommands-ref">Insert a <kbd>refer</kbd> block</a></li>
+    <li><a href="#placement-ref">Tell mom where you want your references (footnotes/endnotes or a bibliography)</a></li>
+    <li><a href="#accessing-ref">Accessing references in the database</a></li>
+    <li><a href="#fn-en-recipe">Entering footnote/endnote references</a></li>
+    <li><a href="#bibliography-recipe">Creating a bibliography</a></li>
+    <li><a href="#invoking-ref">Invoking groff with mom and <kbd>refer</kbd></a></li>
+  </ul></li>
+  <li><a href="#mla">MLA (Modern Language Association) style</a>
+  <ul style="margin-left: -.5em; list-style-type: disc;">
+    <li><a href="#ref-styles">Types of references (endnote/footnote or bibliographic)</a></li>
+    <li><a href="#parenthetical">Inserting parenthetical references into the text</a></li>
+  </ul></li>
+  <li><a href="#database">The <kbd>refer</kbd> database</a>
+  <ul style="margin-left: -.5em; list-style-type: disc;">
+    <li><a href="#database-intro">Introduction</a></li>
+    <li><a href="#database-rules">Rules</a></li>
+    <li><a href="#fields-quick">Quick guide to field identifiers (%A for author, %T for title, etc)</a></li> 
+    <li><a href="#fields-specifics">Field identifiers: specifics, usage and examples</a>
+    <ul style="margin-left: -.5em; list-style-type: square;">
+      <li><a href="#ibid">avoiding ibid, idem and their ilk</a></li>
+    </ul></li> 
+  </ul></li>
+  <li><a href="#index-ref">The bibliography and reference macros</a>
+  <ul style="margin-left: -.5em; list-style-type: disc;">
+    <li><a href="#biblio-control">Bibliography control macros and defaults</a></li>
+  </ul></li>
+</ul>
+</div>
+
+<div class="rule-medium"><hr/></div>
+
+<h2 id="intro-ref" class="docs">Introduction to bibliographies and references</h2>
+
+<p>
+Mom provides the ability to format and generate bibliographies, as
+well as footnote or endnote references, in MLA (Modern Language
+Association) style.  She accomplishes this by working in conjunction
+with a special groff program called <kbd>refer</kbd>.
+</p>
+
+<p>
+<kbd>Refer</kbd> requires first that you create a database of works
+that will be cited in your documents.  Once that&#8217;s done, special
+macros let you briefly key in references to entries in the database
+and have mom format them with respect to order, punctuation and
+italicization in footnotes, endnotes, or a full bibliography.
+</p>
+
+<p>
+<kbd>Refer</kbd> has been around for a long time.  It&#8217;s
+powerful and has many, many features.  Unfortunately, the manpage
+(<kbd>man&nbsp;refer</kbd>), while complete and accurate, is
+dense and not a good introduction.  (It&#8217;s a classic manpage
+Catch-22: the manpage is useful only after you know how to use the
+program.)
+</p>
+
+<p>
+In order to get mom users up and running with <kbd>refer</kbd>,
+this section of mom&#8217;s documentation focuses exclusively, in a
+recipe-like manner, on what you need to know to use <kbd>refer</kbd>
+satisfactorily in conjunction with mom.  The instructions are not to
+be taken as a manual on full <kbd>refer</kbd> usage.
+</p>
+
+<p>
+If you&#8217;re already a <kbd>refer</kbd> user, the information
+herein will be useful for adapting your current <kbd>refer</kbd>
+usage to mom&#8217;s way of doing things.  If you&#8217;ve never
+used <kbd>refer</kbd>, the information is essential, and, in many
+cases, may be all you need.
+</p>
+
+<p>
+I encourage anyone interested in what MLA style looks
+like&mdash;and, by extension, how your bibliographies and references
+will look after mom formats them&mdash;to check out
+<br/>
+<span class="pre-in-pp">
+  http://www.aresearchguide.com/12biblio.html
+</span>
+or any other website or reference book on MLA style.
+</p>
+
+<div class="rule-short" style="margin-top: 1em;"><hr/></div>
+
+<div class="examples-container" style="margin-top: 1.5em; margin-bottom: 1.5em;">
+<h3 id="tutorial-ref" class="docs">Tutorial on refer usage with mom</h3>
+<ol style="margin-top: 1em; margin-bottom: -.5em;">
+  <li><a href="#db-ref">Create a <kbd>refer</kbd> database</a>
+  <ul style="margin-left: -.5em; list-style-type: disc;">
+    <li><a href="#example-refer-database">example <kbd>refer</kbd> database</a></li>
+  </ul></li>
+  <li><a href="#rcommands-ref">Insert a <kbd>refer</kbd> block</a>
+  <ul style="margin-left: -.5em; list-style-type: disc;">
+    <li><a href="#fn-en-block">refer block for footnotes/endnotes</a></li>
+    <li><a href="#bibliography-block">refer block for bibliographies</a></li>
+  </ul></li>
+  <li><a href="#placement-ref">Tell mom where you want your references (footnotes/endnotes or a bibliography)</a></li>
+  <li><a href="#accessing-ref">Accessing references in the database</a></li>
+  <li><a href="#fn-en-recipe">Entering footnote/endnote references</a></li>
+  <li><a href="#bibliography-recipe">Creating a bibliography</a></li>
+  <li><a href="#invoking-ref">Invoking groff with mom and <kbd>refer</kbd></a></li>
+</ol>
+
+<h4 id="db-ref" class="docs">1. Create a refer database</h4>
+
+<p>
+The first step in using <kbd>refer</kbd> with mom is creating a
+database.  The database is a text file containing entries for the
+works you will be citing.  You may set up separate databases for
+individual documents, or create a large database that can be
+accessed by many documents.
+</p>
+
+<p>
+Entries (&#8220;records&#8221; in refer-speak) in the database
+are separated from each other by a single, blank line.  The records
+themselves are composed of single lines (&#8220;fields&#8221;) with
+no blank lines between them.  Each field begins with a percent
+sign and a single letter (the &quot;field identifier&quot;)
+e.g. <kbd>%A</kbd> or <kbd>%T</kbd>.  The letter identifies
+what part of a bibliographic entry the field refers to: Author,
+Title, Publisher, Date, etc.  After the field identifier comes
+a single space, followed by the information appropriate to
+field.
+</p>
+
+<!-- Add rules for punctuation and italics -->
+
+<p>
+Here&#8217;s an example database containing two records so you can
+visualize what the above paragraph says.
+</p>
+
+<div id="example-refer-database" class="examples" style="margin-top: -.5em;">Example <kbd>refer</kbd> database</div>
+<div class="examples-container" style="padding-bottom: 1em;">
+<span class="pre">
+%A Terry Pratchett
+%A Neil Gaiman
+%T Good Omens
+%C London
+%I Gollancz
+%D 1990
+
+%A Peter Schaffter
+%T The Schumann Proof
+%C Toronto
+%I RendezVous Press
+%D 2004
+</span>
+</div>
+
+<p>
+The order in which you enter fields doesn&#8217;t matter.
+<kbd>Refer</kbd> will re-arrange them for you.
+</p>
+
+<h4 id="rcommands-ref" class="docs">2. Insert a refer block</h4>
+
+<p>
+Having set up your database, you now need to put some
+<kbd>refer</kbd>-specific commands in your mom file.
+</p>
+
+<p>
+<kbd>Refer</kbd> commands are introduced by a single line
+containing <kbd>.R1</kbd>, and concluded with a single line
+containing <kbd>.R2</kbd>.  What goes between the <kbd>.R1</kbd>
+and <kbd>.R2</kbd> lines is called a &#8220;refer block&#8221;.
+<kbd>Refer</kbd> commands in a refer block should be entered one per
+line, in lowercase letters, <i>with no initial period</i> (dot).
+The specific commands, and the placement of the block, depend on
+whether you want your references in footnotes/endnotes or in a
+bibliography.
+</p>
+
+<h5 id="fn-en-block" class="docs" style="font-size: 90%; margin-top: .25em;">Refer block for footnotes/endnotes</h5>
+
+<p style="margin-top: .5em;">
+If you want footnote or endnote references, place this block at
+the <i>top</i> of your mom file.
+</p>
+
+<div id="refer-block1" class="examples" style="margin-top: -.5em;">
+<div class="examples-container" style="padding-bottom: 1em;">
+<span class="pre">
+.R1
+no-label-in-text
+no-label-in-reference
+join-authors " and " ", " ", and "
+database &lt;full path to database&gt;
+.R2
+</span>
+</div>
+</div>
+<p style="margin-top: .5em; font-size: 95%; line-height: 120%;">
+<kbd>&lt;full&nbsp;path&nbsp;to&nbsp;the&nbsp;database&gt;</kbd>
+means the full path including the filename, e.g.
+<kbd>/home/user/refer/my-database-file</kbd>.
+</p>
+
+<h5 id="bibliography-block" class="docs" style="font-size: 90%; margin-top: .25em;">Refer block for bibliographies</h5>
+
+<p style="margin-top: .5em;">
+If you want a bibliography, place this block at the <i>bottom</i> of
+your mom file, prior to invoking
+<a href="#bibliography">BIBLIOGRAPHY</a>.
+</p>
+
+<div id="refer-block2" class="examples" style="margin-top: -.5em;">
+<div class="examples-container" style="padding-bottom: 1em;">
+<span class="pre">
+.R1
+no-label-in-text
+no-label-in-reference
+join-authors ", and " ", " ", and "
+sort A1Q1T1B1E1
+reverse A1
+database &lt;full path to database&gt;
+.R2
+</span>
+</div>
+</div>
+
+<p style="margin-top: .5em; font-size: 95%; line-height: 120%;">
+<kbd>&lt;full&nbsp;path&nbsp;to&nbsp;the&nbsp;database&gt;</kbd>
+means the full path including the filename, e.g.
+<kbd>/home/user/refer/my-database</kbd>.
+</p>
+
+<!-- Some sort of header saying "these blocks for these kinds of refs", followed
+     by en/fn block and bib block.  Make embedded refs, and a discussion of why they're
+     not really a good idea, another section.
+-->
+
+<h4 id="placement-ref" class="docs">3. Tell mom where you want your references (footnotes/endnotes or a bibliography)</h4>
+
+<p>
+If you want references in footnotes, issue the instruction
+<br/>
+<span class="pre-in-pp">
+  .FOOTNOTE_REFS
+</span>
+anywhere before the first citation in your file.
+</p>
+
+<p>
+If you want references in endnotes, issue the instruction
+<br/>
+<span class="pre-in-pp">
+  .ENDNOTE_REFS
+</span>
+anywhere before the first citation in your file.
+</p>
+
+<p>
+If you want your references in a bibliography, issue the instruction
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY
+</span>
+at the end of your file, before
+<a href="tables-of-contents.html#TOC">TOC</a>
+(Table of Contents).
+</p>
+
+<h4 id="accessing-ref" class="docs">4. Accessing references in the database</h4>
+
+<p>
+References are accessed by putting keywords from the desired database
+record between two special <kbd>refer</kbd> commands:
+<br/>
+<span class="pre-in-pp">
+  .[
+</span>
+and
+<br/>
+<span class="pre-in-pp">
+  .]
+</span>
+Keywords are any word, or set of words, that identify a database
+record unambiguously.  Thus, if you have only one database record for
+the author Ray Bradbury, 
+<br/>
+<span class="pre-in-pp">
+  .[
+  bradbury
+  .]
+</span>
+is sufficient.  However, if your database contains several records
+for books by Bradbury, say, <i>Fahrenheit 451</i> and <i>The
+Martian Chronicles</i>,
+&#8220;<kbd>bradbury&nbsp;451</kbd>&#8221; and
+&#8220;<kbd>bradbury&nbsp;martian</kbd>&#8221; would identify the two records unambiguously.
+</p>
+
+<p>
+A special database field identifier, <kbd>%K</kbd>, lets you create
+unique keywords for database records to help clear up any ambiguity.
+</p>
+
+<p>
+Notice that you don&#8217;t have to worry about capitalization when
+entering keywords.
+</p>
+
+<h4 id="fn-en-recipe" class="docs">5. Entering footnote/endnote references</h4> 
+
+<p>
+Depending on which you have issued, a
+<kbd><a href="#footnote-refs">.FOOTNOTE_REFS</a></kbd>
+or an
+<kbd><a href="#endnote-refs">.ENDNOTE_REFS</a></kbd>
+command, entering references is done like this:
+<br/>
+<span class="pre-in-pp">
+  .REF
+  .[
+  keyword(s)
+  .]
+  .REF
+</span>
+If FOOTNOTE_REFS is in effect, the reference between the first
+and second <kbd>.REF</kbd> will be treated as a footnote.  If
+ENDNOTE_REFS, it will be treated as an endnote.  Endnote references
+must be explictly output with
+<a href="docelement.html#ENDNOTES">ENDNOTES</a>
+at the end of your file, before
+<a href="tables-of-contents.html#TOC">TOC</a>.
+</p>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">Important:</span>
+REF behaves identically to
+<a href="docelement.html#footnote">FOOTNOTE</a>
+and
+<a href="docelement.html#endnote">ENDNOTE</a>
+with respect to the use of the <kbd>\c</kbd> inline escape.  Please
+read the
+<a href="docelement.html#footnote-note">HYPER IMPORTANT NOTE</a>
+found in the document entry for FOOTNOTE (which also applies to
+ENDNOTE).
+</p>
+</div>
+
+<h4 id="bibliography-recipe" class="docs">6. Creating a bibliography</h4>
+
+<p>
+Bibliographic references come between
+<kbd><a href="#bibliography">.BIBLIOGRAPHY</a></kbd>
+and
+<kbd><a href="#bibliography">.BIBLIOGRAPHY&nbsp;OFF</a></kbd>.
+They require no <kbd>.REF</kbd>&#8217;s surrounding the
+&nbsp;&nbsp;<kbd>.[</kbd>&nbsp;&nbsp;and&nbsp;&nbsp;<kbd>.]</kbd>&nbsp;&nbsp;commands.
+Once you have input the desired references, issue the
+following, exactly as shown:
+<br/>
+<span class="pre-in-pp">
+  .[
+  $LIST$
+  .]
+</span>
+and follow it with <kbd>.BIBLIOGRAPHY&nbsp;OFF</kbd>.
+Study the example provided below if you&#8217;re having trouble
+visualizing this.
+</p>
+
+<div id="example-bibliography" class="examples" style="margin-top: -.5em;">Example bibliography</div>
+<div class="examples-container" style="padding-bottom: 1em;">
+<span class="pre">
+.BIBLIOGRAPHY
+.R1
+no-label-in-text
+no-label-in-reference
+join-authors ", and " ", " ", and "
+sort A1Q1T1B1E1
+reverse A1
+database &lt;full path to database&gt;
+.R2
+.[
+bradbury
+.]
+.[
+pratchett
+.]
+.[
+$LIST$
+.]
+.BIBLIOGRAPHY OFF
+</span>
+</div>
+
+<p>
+Alternatively, if you wish to output your entire database as a
+bibliography, do the following at the end of your document, before
+<kbd><a href="tables-of-contest.html#TOC">.TOC</a></kbd>:
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY
+  .R1
+  no-label-in-text
+  no-label-in-reference
+  join-authors ", and " ", " ", and "
+  sort A1Q1T1B1E1
+  reverse A1
+  bibliography &lt;full path to database&gt;
+  .R2
+  .BIBLIOGRAPHY OFF
+</span>
+</p>
+
+<h4 id="invoking-ref" class="docs">7. Invoking groff with mom and refer</h4>
+
+<p>
+So, now you&#8217;ve got a document formatted properly to use
+references processed with <kbd>refer</kbd>, what do you do to output
+the document?
+</p>
+
+<p>
+It&#8217;s simple.  Instead of invoking groff with just the
+<kbd>-mom</kbd> option, as explained
+<a href="using.html#using-saving">here</a>,
+invoke groff with the <kbd>-R</kbd> option as well, like this:
+<br/>
+<span class="pre-in-pp">
+  groff -R -mom &lt;filename&gt; ...
+</span>
+</p>
+</div>
+
+<div class="rule-medium" style="margin-top: 1em;"><hr/></div>
+
+<h2 id="mla" class="docs">MLA (Modern Language Association) style</h2>
+
+<h3 id="ref-styles" class="docs">Types of references (endnote/footnote or bibliographic)</h3>
+
+<p>
+MLA allows for three types of references, or referencing styles:
+</p>
+<ul style="margin-top: -.5em;">
+  <li>short, parenthetical references in the text, linked to a list
+      of works cited (a bibliography) at the end of the document</li>
+  <li>footnote references</li>
+  <li>endnote references</li>
+</ul>
+
+<p style="margin-top: -.5em;">
+There are significant differences between the way footnote/endnote
+references should be formatted, and the formatting style of
+bibliographies.  One example is that footnote/endnote references
+should have their first lines indented, whereas bibliographic
+references should have their second lines indented.  Fortunately,
+with mom, there&#8217;s no need to concern yourself with the differences;
+they&#8217;re taken care of automatically.
+</p>
+
+<p>
+In terms of inserting references into your documents,
+footnote/endnote references are input in a manner similar to
+entering any other kind of
+<a href="docelement.html#footnote-into">footnote</a>
+or
+<a href="docelement.html#endnote-into">endnote</a>.
+Parenthetical references linked to a bibliography, however, need to
+be handled differently.
+</p>
+
+<h3 id="parenthetical" class="docs">Inserting parenthetical references into the text</h3>
+
+<p>
+MLA style prefers restricting the information in parenthetical
+references to the barest minimum needed to find the cited work in
+the bibliography.  Human judgment is usually required, therefore
+it is generally best to enter the parenthetical references by hand
+rather than asking mom and <kbd>refer</kbd> to generate them.  While
+the latter is possible with the macro pair,
+<kbd><a href="#bracket-refs-parens">.REF(</a> /<a href="#bracket-refs-parens">.REF)</a></kbd>,
+it requires more work to set up your
+<a href="#db-ref">database</a>
+and interrupts the flow of your input file.  Consider these two
+examples, which accomplish exactly the same thing:
+</p>
+<div class="examples-container" style="padding-bottom: .25em;">
+<span class="pre-in-pp">
+  Ancient writers attributed the invention of the monochord
+  to Pythagoras, who lived in the sixth century BC (Marcuse,
+  \*[IT]Survey\*[ROM] 197).  Marcone, however, discovered
+  precursors of the instrument dating at least two centuries
+  earlier (\*[IT]Plectrum\*[ROM] 98).
+</span>
+</div>
+<span style="display: inline-block; padding-top: .5em; padding-bottom: .5em;">versus</span>
+<div class="examples-container" style="padding-bottom: .25em;">
+<span class="pre-in-pp">
+  Ancient writers attributed the invention of the monochord
+  to Pythagoras, who lived in the sixth century BC
+  .REF(
+  .[
+  survey
+  %P 197
+  .]
+  .REF)
+  .  Marcone, however, discovered precursors of the instrument
+  dating at least two centuries earlier
+  .REF(
+  .[
+  plectrum
+  %P 98
+  .]
+  .REF)
+  .
+</span>
+</div>
+
+<p>
+Clearly, the first example takes less work, and is much easier to read.
+</p>
+
+<div class="rule-medium" style="margin-top: 1em;"><hr/></div>
+
+<h2 id="database" class="docs">The refer database</h2>
+
+<h3 id="database-intro" class="docs">Introduction</h3>
+
+<p style="margin-top: .5em;">
+The heart and soul of <kbd>refer</kbd> is the bibliographic
+database.  Knowing how to create records (ie. the entries for works
+cited in a document) is largely a question matching data (author,
+title, publisher, etc) with the correct field identifier.  For
+example, if you&#8217;re citing from a scholarly journal, you need to know
+that <kbd>%J</kbd> is the field identifier for journal names and
+<kbd>%N</kbd> is the field identifier for the journal number.  Use
+the
+<a href="#fields-quick">Quick list of field identifiers</a>
+as your guide.
+</p>
+
+<h3 id="database-rules" class="docs">The rules</h3>
+
+<p style="margin-top: .5em;">
+Entering the data correctly is also important.  Fortunately, there
+are very few rules, and those there are make sense.  In a nutshell:
+</p>
+<ul style="margin-top: -.5em;">
+  <li>enter the data in each field in natural order; author John Smith is
+      &#8220;John Smith&#8221;, editor Jane Doe is &#8220;Jane Doe&#8221;</li>
+  <li>capitalize all proper nouns and words in titles as you expect
+      to see them; otherwise, use lowercase</li>
+  <li>use no terminating punctuation unless required; typically,
+      required punctuation is the period after a shortform
+      (&#8220;ed.&#8221; or &#8220;eds.&#8221;, &#8220;Jr.&#8221;,
+      etc) or a question mark or exclamation mark at the end of a
+      title</li>
+  <li>if part of a field needs to be set off in single-quotes, use
+      <kbd>\[oq]</kbd> and <kbd>\[cq]</kbd> (openquote, closequote) rather than the
+      single-quote (or apostrophe) character on your keyboard</li>
+  <li>if part of a field needs to be forced into italics, use the
+      escapes <kbd>\*[IT]</kbd> and <kbd>\*[PREV]</kbd>; if the italicized
+      portion concludes the field, omit <kbd>\*[PREV]</kbd></li>
+  <li>if you require characters with accents, ligatures or special
+      symbols, use groff&#8217;s &#8220;named&#8221; glyphs (eg.
+      <kbd>\['e]</kbd> for <kbd>é</kbd>); a full list can be found in
+      <kbd>man groff_char</kbd></li>
+</ul>
+
+<h3 id="fields-quick" class="docs" style="margin-top: 1.25em; margin-bottom: .5em;">Quick guide to field identifiers <span style="text-transform: none;">(click on any that are links for more information)</span></h3>
+
+<div class="examples-container" style="padding-bottom: 1em;">
+<span class="pre">
+<a class="quick" href="#A">%A</a> author           &ndash; records may contain multiple authors,
+                      one per line
+<a class="quick" href="#Q">%Q</a> non-human author &ndash; corporate author, eg. National Geographic;
+                      may also be used for exceptional reference types
+<a class="quick" href="#m">%m</a> multiple authors &ndash; whenever "et al." is desirable
+<a class="quick" href="#i">%i</a> idem             &ndash; multiple works by the same author
+<a class="quick" href="#p">%p</a> post-author      &ndash; post-author information (eg appendix,
+                      foreword, letter)
+%T title            &ndash; primary title (of a book) or the
+                      title of an article (within a scholarly
+                      journal or a magazine)
+%B book title       &ndash; when %T contains the title of an article;
+<a class="quick" href="#q">%q</a> force quote      &ndash; force a title into double-quotes
+%t reprint title    &ndash; if different from a work's original title
+%b main author      &ndash; when citing a preface, foreword,
+                      introduction, or afterword, the author of
+                      the complete original work
+<a class="quick" href="#E">%E</a> editor           &ndash; records may contain multiple editors,
+                      one per line
+<a class="quick" href="#l">%l</a> translator       &ndash; if more than one translator, all the
+                      names
+%r translator       &ndash; if tr. and ed. are one in the same
+    and editor
+%M magazine or      &ndash; when %T contains the title of an article
+    newspaper
+%J journal          &ndash; when %T contains the title of an article
+%e edition          &ndash; number or name of an edition
+                      (e.g. Second, 2nd, Collector's, etc.)
+%S series           &ndash; series name of books or journals
+%V volume           &ndash; volume number (of books)
+%N journal number   &ndash; journal or magazine number
+%R report number    &ndash; technical report number
+%G gov&#8217;t.           &ndash; government ordering number
+<a class="quick" href="#O">%O</a> other            &ndash; information or which there is no appropriate
+                      field letter
+<a class="quick" href="#C">%C</a> city             &ndash; city of publication
+%I publisher        &ndash; publisher
+%D date             &ndash; publication date
+<a class="quick" href="#d">%d</a> original        
+   publication date &ndash; if different from date of publication
+<a class="quick" href="#P">%P</a> page(s)          &ndash; page number or range
+<a class="quick" href="#n">%n</a> annotation       &ndash; annotation to the reference
+%s site name        &ndash; for internet references, the website name
+%c content          &ndash; for internet references, the source of
+                      the material (eg. Web or Email); for websites,
+                      the content, if unclear
+%o organization     &ndash; for internet sites, the organization, group
+                      or sponsor of the site
+%a access date      &ndash; for internet sites, the date of access
+%u URL              &ndash; for internet sites, the full URL
+<a class="quick" href="#K">%K</a> keywords         &ndash; words that help clear up ambiguities in
+                      the database
+</span>
+</div>
+
+<h3 id="fields-specifics" class="docs">Field identifiers: specifics, usage and examples</h3>
+
+<h4 id="A" class="docs fields">%A &ndash; author field</h4>
+
+<p>
+For multiple authors, enter each in a separate <kbd>%A</kbd>
+field in the order in which they should appear.  If the author on
+the title page is the editor (say, a book of short stories edited by
+Ray Bradbury), add <kbd>, ed.</kbd> to the end of the
+<kbd>%A</kbd> field, like this:
+<br/>
+<span class="pre-in-pp">
+  %A Ray Bradbury, ed.
+</span>
+Do not use the <kbd>%E</kbd> field in these instances.  If the work
+has several such editors, enter each in a separate <kbd>%A</kbd>
+field, as for multiple authors, and add <kbd>, eds.</kbd> to the
+last one, like this:
+<br/>
+<span class="pre-in-pp">
+  %A Jane Dearborne
+  %A Bill Parsons, eds.
+</span>
+</p>
+
+<h4 id="Q" class="docs fields">%Q &ndash; exceptional entries</h4>
+
+<p>
+Sometimes, a work has no author or title information, for example a
+book review in a newspaper.  In such cases, use <kbd>%Q</kbd>, like
+this:
+<br/>
+<span class="pre-in-pp">
+  %Q Rev. of \*[IT]Mean Streets Omnibus\*[PREV], ed. Raymond Hammett
+  %M Times Literary Supplement
+  %D 7 July 1972
+</span>
+</p>
+
+<h4 id="m" class="docs fields">%m &ndash; multiple authors (et al.)</h4>
+
+<p>
+Whenever it&#8217;s desirable to abbreviate a list of authors with
+&#8220;et al.&#8221; enter it in the <kbd>%m field</kbd>, like this:
+<br/>
+<span class="pre-in-pp">
+  %A Paul Lauter
+  %A Doug Scofield
+  %m et al.
+</span>
+</p>
+
+<h4 id="i" class="docs fields">%i &ndash; idem</h4>
+
+<p>
+Whenever there are several works by the same author, fill out the
+<kbd>%A</kbd> field with the author&#8217;s name and follow it with the
+<kbd>%i idem</kbd>, like this:
+<br/>
+<span class="pre-in-pp">
+  %A Jonathon Schmidt
+  %i idem
+</span>
+Per MLA style, the author&#8217;s name will be replaced by a long dash.
+</p>
+
+<p>
+If it&#8217;s necessary to state the role the author served (say,
+editor or translator), fill out the <kbd>%i</kbd> field with the
+information minus <kbd>idem</kbd>, like this:
+<br/>
+<span class="pre-in-pp">
+  %A Ray Bradbury
+  %i ed.
+  %T Timeless Stories for Today and Tomorrow
+</span>
+</p>
+
+<h4 id="p" class="docs fields">%p &ndash; post-author information</h4>
+
+<p>
+When citing from a preface, foreword, introduction, afterword or
+appendix, MLA requires that the information come between the
+author&#8217;s name and the work&#8217;s title, like this:
+<br/>
+<span class="pre-in-pp">
+  %A Martin Packham, Jr.
+  %p appendix
+  %T Why the West was Won
+</span>
+Do not capitalize the first word in the <kbd>%p</kbd> field unless
+it is a proper noun.
+</p>
+
+<h4 id="q" class="docs fields">%q &ndash; force title into double-quotes</h4>
+
+<p>
+Occasionally, you may not be able to use <kbd>%T</kbd> for the
+title because doing so will cause it to come out in italics when
+double-quotes are called for.  An example of this is when citing
+from a dissertation.  Use <kbd>%q</kbd> to get around the problem,
+like this:
+<br/>
+<span class="pre-in-pp">
+  %A Carol Sakala
+  %q Maternity Care Policy in the United States
+  %O diss., Boston U, 1993
+</span>
+</p>
+
+<h4 id="E" class="docs fields">%E &ndash; editor</h4>
+
+<p>
+Use this only if the author and the editor are not one in the same,
+e.g.
+<br/>
+<span class="pre-in-pp">
+  %A Geoffrey Chaucer
+  %T The Works of Geoffrey Chaucer
+  %E F. W. Robinson
+</span>
+</p>
+
+<h4 id="l" class="docs fields">%l &ndash; translator</h4>
+
+<p>
+If there is more than one translator, enter all the names, with
+appropriate conjunctions and punctuation, like this:
+<br/>
+<span class="pre-in-pp">
+  %A Feodor Dostoevsky
+  %T Crime and Punishment
+  %l Jessie Coulson, Marjorie Benton, and George Bigian
+</span>
+</p>
+
+<h4 id="O" class="docs fields">%O &ndash; other</h4>
+
+<p>
+Occasionally, MLA requires additional information after the title
+but before the publication data (city/publisher/date), for instance,
+the number of volumes in a series, or the fact that the work cited
+is a dissertation.  Here are two examples:
+<br/>
+<span class="pre-in-pp">
+  %A Arthur M. Schlesinger
+  %T History of U.S. Political Parties
+  %O 4 vols.
+  %C New York
+  %I Chelsea
+  %D 1973
+
+  %A Carol Sakala
+  %q Maternity Care Policy in the United States
+  %O diss., Boston U, 1993
+</span>
+Do not capitalize the first word of the <kbd>%O</kbd> field unless
+it is a proper noun.
+</p>
+
+<p>
+Generally, consider <kbd>%O</kbd> a catch-all for information that
+does not match the criterion of any existing field identifier.
+</p>
+
+<h4 id="C" class="docs fields">%C &ndash; city</h4>
+
+<p>
+Normally, <kbd>%C</kbd> takes the name of the city of publication,
+and that&#8217;s all.  In the case of a republished book, if new material
+has been added, put such information in the <kbd>%C</kbd>
+field, like this:
+<br/>
+<span class="pre-in-pp">
+  %A Theodore Dreiser
+  %T Sister Carrie
+  %d 1900
+  %C Introd. E. L. Doctorow, New York
+</span>
+</p>
+
+<h4 id="d" class="docs fields">%d &ndash; original date of publication</h4>
+
+<p>
+Normally, all that is required in the <kbd>%d</kbd> field is the
+original date of publication.  However, if supplementary original
+publication data is desired, include it in the field, like this:
+<br/>
+<span class="pre-in-pp">
+  %A Kazuo Ishiguro
+  %T The Remains of the Day
+  %d London: Faber, 1989
+  %D New York
+  %I Knopf
+  %D 1990
+</span>
+</p>
+
+<h4 id="K" class="docs fields">%K &ndash; keywords</h4>
+
+<p>
+<kbd>Refer</kbd> hates ambiguity, and complains when encountering
+it.  Ambiguities result from the duplication of any word in more
+than one database record when that word is used to identify a
+reference in your input file.  Use <kbd>%K</kbd> to create unique
+keywords found nowhere else in the database.
+</p>
+
+<p>
+Imagine, for example, that your database contains records for
+Ray Bradbury&#8217;s <i>The Illustrated Man</i>, another record for
+<i>The Illustrated Bradbury</i> and a third for <i>Bradbury,
+Illustrated</i>.  <kbd>%K</kbd> can be used to clear up any
+ambiguities by assigning a unique word to each record, for example
+<kbd>%K ill-man</kbd> for the first, <kbd>%K ill-brad</kbd> for the
+second, and <kbd>%K brad-ill</kbd> for the third.
+</p>
+
+<h4 id="P" class="docs fields">%P &ndash; pages</h4>
+
+<p>
+When citing page numbers, which is often the case with footnotes
+and endnotes, it is not necessary to put the numbers in the database
+records.  The <kbd>%P</kbd> field can be added underneath the
+keyword(s) in the <kbd>.[</kbd> / <kbd>.]</kbd> entries in your
+input file, allowing you to recycle database records.  For example,
+<br/>
+<span class="pre-in-pp">
+  %A Frye
+  %T Anatomy
+  %K frye-anat
+</span>
+could be your short record for Northrop Frye&#8217;s <i>The Anatomy of
+Criticism</i>.  Any time you wanted to cite a particular page or
+range of pages from that work in a footnote or endnote, you can
+put
+<br/>
+<span class="pre-in-pp">
+  .REF
+  .[
+  frye-anat
+  %P 67-8
+  .]
+  .REF
+</span>
+in your input file, and have it show up with the correct page(s).
+</p>
+
+<h4 id="n" class="docs fields">%n &ndash; annotations</h4>
+
+<p>
+Annotations come at the very end of references.  Capitalize all
+words that require it, including, for bibliographic references (but not
+for footnotes/endnotes) the first.
+</p>
+
+<div class="rule-short"><hr/></div>
+
+<div class="macro-list-container">
+<h3 id="index-ref" class="macro-list">The bibliography and reference macros</h3>
+<ul class="macro-list">
+  <li><a href="#ref">REF</a> &ndash; begin/end a <kbd>refer</kbd> reference</li>
+  <li><a href="#footnote-refs">FOOTNOTE_REFS</a> &ndash; instruct mom to put REFs in footnotes</li>
+  <li><a href="#endnote-refs">ENDNOTE_REFS</a> &ndash; instruct mom to put REFs in endnotes</li>
+  <li><a href="#bracket-refs">Embed references in the text</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#bracket-refs-parens">REF(</a> &ndash; embed a reference in the text between parentheses</li>
+    <li><a href="#bracket-refs-brackets">REF[</a> &ndash; embed a reference in the text between square brackets</li>
+    <li><a href="#bracket-refs-braces">REF{</a> &ndash; embed a reference in the text between braces</li>
+    <li><a href="#bracket-refs-angle">REF&lt;</a> &ndash; embed a reference in the text between angle brackets</li>
+    <li><a href="#refs-style">REF_STYLE</a> &ndash; bibliography or footnote/endnote</li>
+  </ul></li>
+  <li><a href="#indent-refs">INDENT_REFS</a> &ndash; manage indenting of references, per MLA standards</li>
+  <li><a href="#hyphenate-refs">HYPHENATE_REFS</a> &ndash; enable/disable hyphenation of references</li>
+  <li><a href="#bibliography">BIBLIOGRAPHY</a> &ndash; begin a bibliography</li>
+  <li><a href="#bibliography-type">BIBLIOGRAPHY_TYPE</a> &ndash; plain, or numbered list bibliography</li>
+  <li><a href="#biblio-control">Bibliography control macros and defaults</a></li>
+</ul>
+</div>
+
+<!-- -REF- -->
+
+<div class="macro-id-overline">
+<h3 id="ref" class="macro-id">Begin/end a <kbd style="text-transform: none;">refer</kbd> reference</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>REF</b>
+</div>
+
+<p>
+The macro, REF, tells mom that what follows is
+<kbd>refer</kbd>-specific, a keyword-identified reference from a
+<kbd>refer</kbd> database.  Depending on whether you&#8217;ve issued
+a
+<kbd><a href="#footnote-refs">.FOOTNOTE_REFS</a></kbd>
+or
+<kbd><a href="#endnote-refs">.ENDNOTE_REFS</a></kbd>
+instruction, REF also tells mom where to place the reference.  If
+FOOTNOTE_REFS, the reference will be formatted and placed in a
+footnote.  If ENDNOTE_REFS, the reference will be collected for
+output as an endnote.  If you have issued neither instruction, the
+reference will be collected for later output, most likely in a
+<a href="#bibliography">bibliography</a>.
+</p>
+
+<p>
+Before you use REF, you must create a <kbd>refer</kbd> block
+containing <kbd>refer</kbd> commands (see
+<a href="#rcommands-ref">Required refer commands</a>
+in the tutorial, above).
+</p>
+
+<p>
+REF usage always looks like this:
+<br/>
+<span class="pre-in-pp">
+  .REF
+  .[
+  keyword(s)
+  .]
+  .REF
+</span>
+Notice that REF &#8220;brackets&#8221; the <kbd>refer</kbd> instructions,
+and never takes an argument.
+</p>
+
+<p>
+What REF really is is a convenience.  One could, for example, put a
+reference in a footnote by doing
+<br/>
+<span class="pre-in-pp">
+  .FOOTNOTE
+  .[
+  keyword(s)
+  .]
+  .FOOTNOTE OFF
+</span>
+However, if you have a lot of references going into footnotes (or
+endnotes), it&#8217;s much shorter to type <kbd>.REF/.REF</kbd>
+than <kbd>.FOOTNOTE/.FOOTNOTE OFF</kbd>.  It also helps you
+distinguish&mdash;visually, in your input file&mdash;between
+footnotes (or endnotes) which are references, and footnotes (or
+endnotes) which are explanatory, or expand on the text.
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span>
+If you&#8217;re using REF to put references in footnotes and your
+footnotes need to be indented, you may (indeed, should) pass REF the
+same arguments used to indent footnotes.  See
+<a href="docelement.html#footnote">FOOTNOTE</a>.
+</p>
+
+<p class="tip-bottom">
+<span class="additional-note">Additional note:</span>
+When REF is used with
+<a href="#footnote-refs">FOOTNOTE_REFS</a>
+or
+<a href="#endnote-refs">ENDNOTE_REFS</a>,
+it behaves identically to
+<a href="docelement.html#footnote">FOOTNOTE</a>
+or
+<a href="docelement.html#footnote">ENDNOTE</a>,
+so please read the HYPER IMPORTANT NOTE found in the document entry
+for
+<a href="docelement.html#footnote-note">FOOTNOTE</a>
+and/or
+<a href="docelement.html#endnote-note">ENDNOTE</a>.
+</p>
+</div>
+
+<!-- -FOOTNOTE_REFS- -->
+
+
+<div class="macro-id-overline">
+<h3 id="footnote-refs" class="macro-id">Instruct mom to put references in footnotes</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>FOOTNOTE_REFS</b>
+</div>
+
+<p>
+FOOTNOTE_REFS is an instruction to
+<a href="#ref">REF</a>,
+saying, &#8220;put all subsequent references bracketed by the REF
+macro into footnotes.&#8221; You invoke it by itself, with no
+argument.
+</p>
+
+<p>
+When FOOTNOTE_REFS is in effect, regular footnotes, (i.e.
+those introduced with <kbd>.FOOTNOTE</kbd> and terminated with
+<kbd>.FOOTNOTE OFF</kbd>) continue to behave normally.
+</p>
+
+<p>
+You may switch between FOOTNOTE_REFS and
+<a href="#endnote-refs">ENDNOTE_REFS</a>
+at any time.
+</p>
+
+<p>
+By default, FOOTNOTE_REFS sets the
+<a href="docelement.html#footnote-marker-style">FOOTNOTE_MARKER_STYLE</a>
+to <kbd>NUMBER</kbd> (i.e. superscript numbers).  You may change
+change that if you wish by invoking FOOTNOTE_MARKER_STYLE, with the
+argument you want after FOOTNOTE_REFS.
+</p>
+
+<p>
+If you have a lot of footnote references, and are identifying
+footnotes by line number rather than by markers in the text, you may
+want to enable
+<a href="docelement.html#footnotes-run-on">FOOTNOTES_RUN_ON</a>
+in conjunctions with FOOTNOTE_REFS.
+</p>
+
+<!-- -ENDNOTE_REFS- -->
+
+<div class="macro-id-overline">
+<h3 id="endnote-refs" class="macro-id">Instruct mom to put references in endnotes</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>ENDNOTE_REFS</b>
+</div>
+
+<p>
+ENDNOTE_REFS is an instruction to
+<a href="#ref">REF</a>,
+saying, &#8220;add all subsequent references bracketed by the REF
+macro to endnotes.&#8221; You invoke it by itself, with no argument.
+</p>
+
+<p>
+When ENDNOTE_REFS is in effect, mom continues to format regular
+endnotes, (i.e. those introduced with <kbd>.ENDNOTE</kbd> and
+terminated with <kbd>.ENDNOTE OFF</kbd>) in the normal way.
+</p>
+
+<p>
+You may switch between ENDNOTE_REFS and
+<a href="#footnote-refs">FOOTNOTE_REFS</a>
+at any time.
+</p>
+
+<!-- -BRACKET_REFS- -->
+
+<div class="macro-id-overline">
+<h3 id="bracket-refs" class="macro-id">Embed references in the text</h3>
+</div>
+
+<div id="bracket-refs-parens" class="box-macro-args">
+Macro pair: <b>REF(</b>&nbsp;&nbsp;...&nbsp;&nbsp;<b>REF)</b>
+</div>
+
+<div id="bracket-refs-brackets" class="box-macro-args" style="margin-top: 1em;">
+Macro pair: <b>REF[</b>&nbsp;&nbsp;...&nbsp;&nbsp;<b>REF]</b>
+</div>
+
+<div id="bracket-refs-braces" class="box-macro-args" style="margin-top: 1em;">
+Macro pair: <b>REF{</b>&nbsp;&nbsp;...&nbsp;&nbsp;<b>REF}</b>
+</div>
+
+<div id="bracket-refs-angle" class="box-macro-args" style="margin-top: 1em;">
+Macro pair: <b>REF&lt;</b>&nbsp;&nbsp;...&nbsp;&nbsp;<b>REF&gt;</b>
+</div>
+
+<p>
+You may sometimes want to embed fairly complete references directly
+into the body of your document, typically, but not always, inside
+parentheses.  An instance where this might be desirable would be
+when there are one or two citations in a document where footnotes or
+endnotes are inappropriate, and a bibliography just plain silly (as
+it would be for just one or two citations).
+</p>
+
+<p>
+Mom allows you to embed references from your database directly into
+documents through the use of the REF&lt;bracket&nbsp;type&gt;
+macros.
+</p>
+
+<p>
+All four macro pairs, above, are invoked the same way, namely
+by introducing the reference with the first (&#8220;open&#8221;)
+macro of the REF&lt;bracket&nbsp;type&gt;
+pair, and terminating it with the second (&#8220;close&#8221;)
+REF&lt;bracket&nbsp;type&gt; of the pair.  For
+example
+<br/>
+<span class="pre-in-pp">
+  .REF(
+  .[
+  keyword(s)
+  .]
+  .REF)
+</span>
+will embed a reference in the body of your document, surrounded
+by parentheses. <kbd>.REF[</kbd>&nbsp;/&nbsp;<kbd>.REF]</kbd>
+will surround the reference with square brackets, etc.
+</p>
+
+<h3 id="ref-style" class="docs">REF_STYLE</h3>
+
+<p>
+When embedding references in the body of text, you&#8217;ll need to
+tell mom which formatting style to use: footnote/endnote or
+bibliography.  Footnote/endnote referencing style uses no periods
+between fields, only proper nouns and titles are capitalized, and
+publication data is enclosed in parentheses.  Bibliography
+referencing style separates each field with a period, every
+field begins with a capital letter, and publication data is not in
+parentheses.
+</p>
+
+<p>
+If you want footnote/endnote style, invoke
+<kbd>.REF_STYLE&nbsp;NOTE</kbd>.  If you want bibliographic style,
+invoke <kbd>.REF_STYLE&nbsp;BIBLIO</kbd>.
+</p>
+
+<!-- -INDENT_REFS- -->
+
+<div class="macro-id-overline">
+<h3 id="indent-refs" class="macro-id">Manage indenting of references, per MLA standards</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>INDENT_REFS</b> <kbd class="macro-args">FOOTNOTE | ENDNOTE | BIBLIO &lt;indent&gt; </kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;<kbd style="font-style: normal;">&lt;indent&gt;</kbd> requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+MLA-style requires that footnote or endnote references should
+have their first lines indented, whereas bibliographic references
+should have their second and subsequent lines indented.  Thus, if
+you invoke INDENT_REFS with a first argument of <kbd>FOOTNOTE</kbd>
+or <kbd>ENDNOTE</kbd>, the value you give to
+<kbd>&lt;indent&gt;</kbd> sets the indent of the first line for
+those types of references; if you invoke it with <kbd>BIBLIO</kbd>,
+the value you give <kbd>&lt;indent&gt;</kbd> sets the indent of
+second and subsequent lines in bibliographies.
+</p>
+
+<p>
+By default, the indent for all three types of references is 1/2-inch
+for
+<a href="docprocessing.html#printstyle">PRINSTYLE <kbd>TYPEWRITE</kbd></a>
+and 2
+<a href="definitions.html#em">ems</a>
+for
+<a href="docprocessing.html#printstyle">PRINSTYLE <kbd>TYPESET</kbd></a>.
+</p>
+
+<p>
+If you&#8217;d like to change the indent for footnote, endnote or
+bibliography references, just invoke <kbd>.INDENT_REFS</kbd> with
+a first argument saying which one you want the indent changed for, and
+a second argument saying what you&#8217;d like the indent to be.
+For example, if you want the second-line indent of references on a
+bibliography page to be 3
+<a href="definitions.html#picas-points">picas</a>,
+<br/>
+<span class="pre-in-pp">
+  .INDENT_REFS BIBLIO 3P
+</span>
+is how you&#8217;d set it up.
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="tip">Tip:</span>
+If you are identifying endnotes by line number
+(<a href="docelement.html#endnote-marker-style">ENDNOTE_MARKER_STYLE&nbsp;<kbd>LINE</kbd></a>)
+and have instructed mom to put references bracketed by
+<kbd><a href="#ref">.REF</a></kbd>
+into endnotes (with
+<a href="#endnote-refs">ENDNOTE_REFS</a>),
+you will almost certainly want to adjust the second-line indent for
+references in endnotes, owing to the way mom formats line-numbered
+endnotes.  Study the output of such documents to see whether an
+indent adjustment is required.
+</p>
+
+<p>
+The same advice applies to references in endnotes when you have enabled
+<br/>
+<span class="pre-in-pp">
+  <a href="docelement.html#endnote-numbers-align-left">.ENDNOTE_NUMBERS_ALIGN_LEFT</a>
+</span>
+in favour of mom&#8217;s default, which is to align them right.
+Study the output to determine what size of second-line indent works
+best.
+</p>
+
+<p class="tip-bottom">
+<i>(Frankly, endnote references formatted in MLA-style combined with
+left-aligned endnote numbers is a no-win situation, and so is best
+avoided.  Wherever you set the indent, you&#8217;ll end up with the
+endnote numbers appearing to hang into the left margin, so you might
+as well have them hang, as is the case with
+<kbd style="font-style: normal;">.ENDNOTE_NUMBERS_ALIGN_RIGHT</kbd>.</i>&nbsp;&nbsp;&ndash;&nbsp;Ed.)
+</p>
+</div>
+
+<!-- -HYPHENATE_REFS- -->
+
+<div class="macro-id-overline">
+<h3 id="hyphenate-refs" class="macro-id">Enable/disable hyphenation of references</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>HYPHENATE_REFS</b> <kbd class="macro-args">&lt;toggle&gt;</kbd>
+</div>
+
+<p>
+If you have hyphenation turned on for a document (see
+<a href="typesetting.html#hy">HY</a>),
+and in most cases you probably do, mom will hyphenate references
+bracketed by the
+<a href="#ref">REF</a>
+macro.  Since references typically contain quite a lot of proper
+names, which shouldn&#8217;t be hyphenated, you may want to disable
+hyphenation for references.
+</p>
+
+<p>
+HYPHENATE_REFS is a toggle macro; invoking it by itself will turn
+automatic hyphenation of REF-bracketed references on (the default).
+Invoking it with any other argument (<kbd>OFF, NO, X</kbd>, etc.)
+will disable automatic hyphenation for references bracketed by REF.
+</p>
+
+<p>
+An alternative to turning reference hyphenation off is to prepend
+to selected proper names in your <kbd>refer</kbd> database
+the groff
+<a href="definitions.html#discretionaryhyphen">discretionary hyphen</a>
+character, <kbd>\%</kbd>.  (See
+<a href="#ref-disc-hy">here</a>
+in the tutorial for an example.)
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+References embedded in the body of a document with
+<kbd><a href="#bracket-refs">.REF &lt;bracket&nbsp;type&gt;</a></kbd>
+are considered part of
+<a href="definitions.html#running">running text</a>,
+and are hyphenated (or not) according to whether hyphenation is
+turned on or off for running text.  Therefore, if you want to
+disable hyphenation for such references, you must do so temporarily,
+with
+<a href="typesetting.html#hy">HY</a>,
+like this:
+<br/>
+<span class="pre-in-pp">
+  .HY OFF
+  .REF(
+  .[
+  keyword(s)
+  .]
+  .REF)
+  .HY
+</span>
+Alternatively, sprinkle your database fields liberally with
+<kbd>\%</kbd>.
+</p>
+</div>
+
+<!-- -BIBLIOGRAPHY- -->
+
+<div class="macro-id-overline">
+<h3 id="bibliography" class="macro-id">Begin a bibliography</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY</b> <kbd class="marco-args">toggle</kbd>
+</div>
+
+<p>
+If you want to append a bibliography to your document, all you need
+do is invoke <kbd>.BIBLIOGRAPHY</kbd>. <kbd>.BIBLIOGRAPHY</kbd>
+breaks to a new page, prints the title (BIBLIOGRAPHY by default, but
+that can be changed), and awaits <kbd>refer</kbd> instructions.  How
+to create bibliographies is covered in the tutorial section,
+<a href="#bibliography-recipe">Creating bibliography pages</a>.
+When all the required data has been entered, type
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY OFF
+</span>
+to complete the bibliography.
+</p>
+
+<p>
+See the
+<a href="#biblio-control">Bibliography control macros and defaults</a>
+for macros to tweak, design and control the appearance of
+bibliography pages.
+</p>
+
+<!-- -BIBLIOGRAPHY_TYPE- -->
+
+<div class="macro-id-overline">
+<h3 id="bibliography-type" class="macro-id">Plain, or numbered list bibliography</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_TYPE</b> <kbd class="macro-args">PLAIN | LIST [ &lt;list separator&gt; ] [ &lt;list prefix&gt; ]</kbd>
+</div>
+
+<p>
+Mom offers two styles of bibliography output: plain, or numbered
+list style.  With the argument, <kbd>PLAIN</kbd>, bibliography entries are output
+with no enumerators.  With the argument, <kbd>LIST</kbd>, each entry is numbered.
+</p>
+
+<p>
+The two optional arguments, <kbd>&lt;list&nbsp;separator&gt;</kbd>
+and <kbd>&lt;list&nbsp;prefix&gt;</kbd> have the same meaning as the
+equivalent arguments to
+<a href="docelement.html#list">LIST</a>
+(i.e. <kbd>&lt;separator&gt;</kbd> and <kbd>&lt;prefix&gt;</kbd>).
+</p>
+
+<p>
+You may enter the BIBLIOGRAPHY_TYPE either before or after
+<kbd>.BIBLIOGRAPHY</kbd>.  It must, however, always come before
+the <kbd>refer</kbd> command to output bibliographies.  (See the
+tutorial section,
+<a href="#biblio-ref">Creating bibliography pages</a>,
+for instructions on how to output bibliographies.)
+</p>
+
+<p>
+Mom&#8217;s default BIBLIOGRAPHY_TYPE is PLAIN.
+</p>
+
+<!-- -BIBLIO_CONTROL- -->
+
+<div class="defaults-container" style="background-color: #ded4bd; border: none;">
+<h3 id="biblio-control" class="docs defaults">Bibliography control macros and defaults</h3> 
+
+<p style="margin-top: .25em; margin-left: 9px;">
+Mom processes bibliography pages in a manner very similar to the
+way she processes endnotes pages.  The bibliography page control
+macros, therefore, behave in the same way as their endnotes pages
+equivalents.
+</p>
+
+<ol style="margin-top: -.5em; padding-bottom: .5em;">
+  <li><a href="#biblio-general"><b>General bibliography style control</b></a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#biblio-style">Base family/font/quad</a></li>
+    <li><a href="#biblio-pt-size">Base point size</a></li>
+    <li><a href="#biblio-lead">Leading</a></li>
+    <li><a href="#biblio-spacing">Adjust the space between bibliography entries</a></li>
+    <li><a href="#singlespace-biblio">Singlespace bibliographies (for TYPEWRITE only)</a></li>
+    <li><a href="#biblio-no-columns">Turning off column mode during bibliography output</a></li>
+  </ul></li>
+  <li><a href="#biblio-pagination"><b>Pagination of bibliographies</b></a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#biblio-pagenum-style">Page numbering style</a></li>
+    <li><a href="#biblio-first-pagenumber">Setting the first page number of bibliographies</a></li>
+    <li><a href="#biblio-no-first-pagenum">Omitting a page number on the first page of bibliographies</a></li>
+    <li><a href="#suspend-pagination">Suspending pagination during bibliography output</a></li>
+  </ul></li>
+  <li><a href="#biblio-header-control"><b>Header/footer control</b></a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#biblio-modify-hdrftr">Modifying what goes in bibliography headers/footers</a></li>
+    <li><a href="#biblio-hdrftr-center">Header/footer centre string when doctype is CHAPTER</a></li>
+    <li><a href="#biblio-allows-headers">Allow headers on bibliography pages</a></li>
+  </ul></li>
+  <li><a href="#biblio-main-title"><b>Bibliography first-page title control</b></a>
+  <ul>
+    <li><a href="#biblio-string">Title string</a></li>
+    <li><a href="#biblio-string-control">Title string control macros and defaults</a></li>
+    <li><a href="#biblio-string-placement">Title string placement</a></li>
+    <li><a href="#biblio-string-underline">Title string underscoring</a></li>
+    <li><a href="#biblio-string-caps">Title string capitalization</a></li>
+  </ul></li>
+</ol>
+</div>
+
+<h4 id="biblio-general" class="docs" style="margin-top: -1.5em; margin-bottom: .5em;">1. General bibliography page style control</h4>
+
+<h5 id="biblio-style" class="docs" style="margin-top: 0; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Base family/font/quad</h5>
+
+<div class="defaults-container" style="padding-bottom: 8px;">
+<p class="defaults" style="padding-top: 6px;">
+See
+<a href="#control-macro-args">Arguments to the control macros</a>.
+</p>
+<span class="pre defaults">
+.BIBLIOGRAPHY_FAMILY    default = prevailing document family; default is Times Roman
+.BIBLIOGRAPHY_FONT      default = roman
+.BIBLIOGRAPHY_QUAD*     default = justified
+
+*Note: BIBLIOGRAPHY_QUAD must be set to either L (LEFT) or J (JUSTIFIED);
+ R (RIGHT) and C (CENTER) will not work.
+</span>
+</div>
+
+<!-- -BIBLIO_PT_SIZE- -->
+
+<h5 id="biblio-pt-size" class="docs" style="margin-top: -1.5em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Base point size</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_PT_SIZE</b> <kbd class="macro-args">&lt;base type size of bibliography&gt;</kbd>
+</div>
+
+<p>
+Unlike most other control macros that deal with size of document
+elements, BIBLIOGRAPHY_PT_SIZE takes as its argument an absolute
+value, relative to nothing.  Therefore, the argument represents the
+size of bibliography type in
+<a href="definitions.html#picaspoints">points</a>,
+unless you append an alternative
+<a href="definitions.html#unitofmeasure">unit of measure</a>.
+For example,
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY_PT_SIZE 12
+</span>
+sets the base point size of type on the bibliography page to 12
+points, whereas
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY_PT_SIZE .6i
+</span>
+sets the base point size of type on the bibliography page to 1/6 of an
+inch.
+</p>
+
+<p>
+The type size set with BIBLIOGRAPHY_PT_SIZE is the size of type used
+for the text of the bibliographies, and forms the basis from which
+the point size of other bibliography page elements is calculated.
+</p>
+
+<p>
+The default for
+<a href="docprocessing.html#printstyle">PRINTSTYLE <kbd>TYPESET</kbd></a>
+is 12.5 points (the same default size used in the body of the
+document).
+</p>
+
+<!-- -BIBLIO_LEAD- -->
+
+<h5 id="biblio-lead" class="docs" style="margin-top: -.5em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Leading</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_LEAD</b> <kbd class="macro-args">&lt;base leading of bibliographies&gt; [ ADJUST ]</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Does not require a <a href="definitions.html#unitofmeasure">unit of measure</a>; points is assumed
+</p>
+
+<p>
+Unlike most other control macros that deal with leading of document
+elements, BIBLIOGRAPHY_LEAD takes as its argument an absolute value,
+relative to nothing.  Therefore, the argument represents the
+<a href="definitions.html#leading">leading</a>
+of bibliographies in
+<a href="definitions.html#picaspoints">points</a>
+unless you append an alternative
+<a href="definitions.html#unitofmeasure">unit of measure</a>.
+For example,
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY_LEAD 14
+</span>
+sets the base leading of type on the bibliography page to 14
+points, whereas
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY_LEAD .5i
+</span>
+sets the base leading of type on the bibliography page to 1/2 inch.
+</p>
+
+<p>
+If you want the leading of bibliographies adjusted to fill the page,
+pass BIBLIOGRAPHY_LEAD the optional argument,
+<kbd>ADJUST</kbd>.  (See
+<a href="docprocessing.html#doc-lead-adjust">DOC_LEAD_ADJUST</a>
+for an explanation of leading adjustment.)
+</p>
+
+<p>
+The default for
+<a href="docprocessing.html#printstyle">PRINTSTYLE <kbd>TYPESET</kbd></a>
+is the prevailing document lead (16 by default), adjusted.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Even if you give mom a <kbd>.DOC_LEAD_ADJUST&nbsp;OFF</kbd> command,
+she will still, by default, adjust bibliography leading.  You
+<i>must</i> enter <kbd>BIBLIOGRAPHY_LEAD&nbsp;&lt;lead&gt;</kbd>
+with no <kbd>ADJUST</kbd> argument to disable this default
+behaviour.
+</p>
+</div>
+
+<!-- -BIBLIO_SPACING- -->
+
+<h5 id="biblio-spacing" class="docs" style="margin-top: -.5em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Adjust the space between bibliography entries</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_SPACING</b> <kbd class="macro-args">&lt;amount of space&gt; </kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+By default, mom inserts no space between bibliography entries.
+If you&#8217;d prefer she add some, instruct her to do so with
+BIBLIOGRAPHY_SPACING.  Say, for example, you want a half a linespace
+between entries,
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY_SPACING .5v
+</span>
+would do the trick.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+As with endnotes pages, inserting space between bibliography entries
+will most likely result in hanging bottom margins.
+</p>
+</div>
+
+<!-- -SINGLESPACE_BIBLIO- -->
+
+<h5 id="singlespace-biblio" class="docs" style="margin-top: -.5em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Singlespace bibliography (TYPEWRITE only)</h5>
+
+<div class="box-macro-args">
+Macro: <b>SINGLESPACE_BIBLIOGRAPHY</b> <kbd class="macro-args">&lt;toggle&gt;</kbd>
+</div>
+
+<p>
+If your 
+<a href="docprocessing.html#printstyle">PRINTSTYLE</a>
+is <kbd>TYPEWRITE</kbd> and you use TYPEWRITE&#8217;s default
+double-spacing, bibliographies are double-spaced.  If your document
+is single-spaced, bibliographies are single-spaced.
+</p>
+
+<p>
+If, for some reason, you&#8217;d prefer that bibliographies be
+single-spaced in an otherwise double-spaced document (including
+double-spaced
+<a href="rectoverso.html#collate">collated</a>
+documents), invoke <kbd>.SINGLESPACE_BIBLIOGRAPHY</kbd> with with no
+argument.
+</p>
+
+<!-- -BIBLIO_NO_COLUMNS- -->
+
+<h5 id="biblio-no-columns" class="docs" style="margin-top: -.5em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Turning off column mode during bibliography output</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_NO_COLUMNS</b> <kbd class="macro-args">&lt;toggle&gt;</kbd>
+</div>
+
+<p>
+By default, if your document is set in
+<a href="docprocessing.html#columns">columns</a>,
+mom sets the bibliographies in columns, too.  However, if your
+document is set in columns and you&#8217;d like the bibliographies
+not to be, just invoke <kbd>.BIBLIOGRAPHY_NO_COLUMNS</kbd> with
+no argument.  The bibliography pages will be set to the full page
+measure of your document.
+</p>
+
+<p>
+If you output bibliographies at the end of each document in a
+<a href="rectoverso.html#collate">collated</a>
+document set in columns, column mode will automatically be
+reinstated for each document, even with BIBLIOGRAPHY_NO_COLUMNS
+turned on.  In such circumstances, you must re-enable
+ENDNOTES_NO_COLUMNS for each separate collated document.
+</p>
+
+<h4 id="biblio-pagination" class="docs" style="margin-bottom: .5em;">2. Pagination of bibliographies</h4>
+
+<!-- -BIBLIO_PAGENUM_STYLE- -->
+
+<h5 id="biblio-pagenum-style" class="docs" style="margin-top: 0; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Page numbering style</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_PAGENUM_STYLE</b> <kbd class="macro-args">DIGIT | ROMAN | roman | ALPHA | alpha</kbd>
+</div>
+
+<p>
+Use this macro to set the page numbering style of bibliography
+pages.  The arguments are identical to those for
+<a href="headfootpage.html#pagenum-style">PAGENUM_STYLE</a>.
+The default is <kbd>digit</kbd>.  You may want to change it to, say,
+<kbd>alpha</kbd>, which you would do with
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY_PAGENUM_STYLE alpha
+</span>
+</p>
+
+<!-- -BIBLIO_FIRST_PAGENUMBER- -->
+
+<h5 id="biblio-first-pagenumber" class="docs" style="margin-top: -.5em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Setting the first page number of bibliographies</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBILOGRAPHY_FIRST_PAGENUMBER</b> <kbd class="macro-args">&lt;page # that appears on page 1 of bibliographies&gt;</kbd>
+</div>
+
+<p>
+Use this macro with caution.  If the bibliography for a
+<a href="rectoverso.html#collate">collated</a>
+document is to be output at the document&#8217;s end,
+BIBLIOGRAPHY_FIRST_PAGENUMBER tells mom what page number to put on
+the first page of the bibliography.
+</p>
+
+<p>
+However, if you&#8217;re outputting a bibliography at the end of each
+section (chapter, article, etc) of a collated document,
+you have to reset every section&#8217;s first page number after
+<a href="rectoverso.html#collate">COLLATE</a>
+and before
+<a href="docprocessing.html#start">START</a>.
+</p>
+
+<!-- -BIBLIO_NO_FIRST_PAGENUN- -->
+
+<h5 id="biblio-no-first-pagenum" class="docs" style="margin-top: -.25em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Omitting a page number on the first page of bibliographies</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_NO_FIRST_PAGENUM</b> <kbd class="macro-args">&lt;toggle&gt;</kbd>
+</div>
+
+<p>
+This macro is for use only if
+<a href="headfootpage.html#footers">FOOTERS</a>
+are on.  It tells
+<kbd><a href="#bibliography">BIBLIOGRAPHY</a></kbd>
+not to print a page number on the first bibliography page.
+Mom&#8217;s default is to print the page number.
+</p>
+
+<!-- -SUSPEND_PAGINATION- -->
+
+<h5 id="suspend-pagination" class="docs" style="margin-top: -.5em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Suspending pagination during bibliography output</h5>
+
+<div class="box-macro-args" style="margin-bottom: 1em;">
+Macro: <b>SUSPEND_PAGINATION</b>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>RESTORE_PAGINATION</b>
+</div>
+
+<p>
+SUSPEND_PAGINATION doesn&#8217;t take an argument.  Invoked
+immediately prior to
+<kbd><a href="#bibliography">BIBLIOGRAPHY</a></kbd>,
+it turns off pagination for the duration of the bibliography.  Mom
+continues, however to increment page numbers silently.
+</p>
+
+<p>
+To restore normal document pagination after bibliographies, invoke
+<kbd>.RESTORE_PAGINATION</kbd> (again, with no argument) immediately
+after you&#8217;ve finished with your bibliography.
+</p>
+
+<h4 id="biblio-header-control" class="docs" style="margin-bottom: .5em;">3. Header/footer control</h4>
+
+<h5 id="biblio-modify-hdrftr" class="docs" style="margin-top: 0; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Modifying what goes in the bibliography header/footer</h5>
+
+<p>
+If you wish to modify what appears in the header/footer that appears
+on bibliography pages, make the changes before you invoke
+<a href="#bibliography"><kbd>.BIBLIOGRAPHY</kbd></a>,
+not afterwards.
+</p>
+
+<p>
+Except in the case of
+<a href="docprocessing.html#doctype">DOCTYPE <kbd>CHAPTER</kbd></a>,
+mom prints the same header or footer used throughout the document
+on bibliography pages.  Chapters get treated differently in that,
+by default, mom does not print the header/footer centre string
+(normally the chapter number or chapter title.)  In most cases, this
+is what you want.  However, should you not want mom to remove the
+centre string from the bibliography pages headers/footers, invoke
+<kbd><a href="#bibliography-hdrftr-center">.BIBLIOGRAPHY_HEADER_CENTER</a></kbd>
+with no argument. 
+</p>
+
+<p>
+An important change you may want to make is to put the word
+&#8220;Bibliography&#8221; in the header/footer centre position.  To
+do so, invoke
+<br/>
+<span class="pre-in-pp" style="margin-bottom: -1em;">
+  .HEADER_CENTER "Endnotes"
+</span>
+or
+<span class="pre-in-pp" style="margin-top: -.5em;">
+  .FOOTER_CENTER "Endnotes"
+</span>
+prior to invoking <kbd>.BIBLIOGRAPHY</kbd>.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+If your
+<a href="docprocessing.html#doctype">DOCTYPE</a>
+is <kbd>CHAPTER</kbd>, you must also invoke
+<a href="#endnotes-hdrftr-center">BIBLIOGRAPHY_HEADER_CENTER</a>
+for the BIBLIOGRAPHY_HEADER_CENTER to appear.
+</p>
+</div>
+
+<h5 id="biblio-hdrftr-center" class="docs" style="margin-top: 0; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Header/footer centre string when doctype is CHAPTER</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_HEADER_CENTER</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+If your
+<a href="docprocessing.html#doctype">DOCTYPE</a>
+is <kbd>CHAPTER</kbd> and you want mom to include a centre
+string in the headers/footers that appear on bibliography
+pages, invoke <kbd>.BIBLIOGRAPHY_HEADER_CENTER</kbd> (or
+<kbd>.BIBLIOGRAPHY_FOOTER_CENTER</kbd>) with no argument.
+Mom&#8217;s default is NOT to print the centre string.
+</p>
+
+<p>
+If, for some reason, having enabled the header/footer centre string
+on bibliography pages, you wish to disable it, invoke the same macro
+with any argument (<kbd>OFF, QUIT, Q, X</kbd>...).
+</p>
+
+<h5 id="biblio-allows-headers" class="docs" style="margin-top: -.5em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Allow headers on bibliography pages</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_ALLOWS_HEADERS</b> <kbd class="macro-args">&lt;none&gt; | ALL</kbd>
+</div>
+
+<p>
+By default, if HEADERS are on, mom prints page headers on all
+bibliography pages except the first.  If you don&#8217;t want her to
+print headers on bibliography pages, do
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY_ALLOWS_HEADERS OFF
+</span>
+If you want headers on every page including the first, do
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY_ALLOWS_HEADERS ALL
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+If FOOTERS are on, mom prints footers on every bibliography page.
+This is a style convention.  In mom, there is no such beast as
+BIBLIOGRAPHY_ALLOWS_FOOTERS OFF.
+</p>
+</div>
+
+<h4 id="biblio-main-title" class="docs">4. Bibliography first-page title control</h4>
+
+<!-- -BIBLIO_STRING- -->
+
+<h5 id="biblio-string" class="docs" style="margin-top: 1em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Title string</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_STRING</b> <kbd class="macro-args">&quot;&lt;title to print at the top of bibliography pages&gt;&quot;</kbd>
+</div>
+
+<p>
+By default, mom prints the word &#8220;BIBLIOGRAPHY&#8221; as a title
+at the top of the first page of a bibliography.  If you want her to
+print something else, invoke <kbd>.BIBLIOGRAPHY_STRING</kbd> with
+the title you want, surrounded by double-quotes.
+</p>
+
+<p>
+If you don&#8217;t want a title at the top of the first bibliography
+page, invoke <kbd>.BIBLIOGRAPHY_STRING</kbd> with a blank argument
+(either two double-quotes side by
+side&mdash;<kbd>&quot;&quot;</kbd>&mdash;or no argument at all).
+</p>
+
+<!-- -BIBLIO_STRING_CONTROL- -->
+
+<h5 id="biblio-string-control" class="docs" style="margin-top: -.5em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Title string control macros and defaults</h5>
+
+<div class="defaults-container" style="padding-bottom: 8px;">
+<p class="defaults" style="padding-top: 6px;">
+See
+<a href="#control-macro-args">Arguments to the control macros</a>.
+</p>
+<span class="pre defaults">
+.BIBLIOGRAPHY_STRING_FAMILY  default = prevailing document family; default is Times Roman
+.BIBLIOGRAPHY_STRING_FONT    default = bold
+.BIBLIOGRAPHY_STRING_SIZE*   default = +1
+.BIBLIOGRAPHY_STRING_QUAD    default = centred
+
+*Relative to the size of the bibliography text (set with BIBLIOGRAPHY_PT_SIZE)
+</span>
+</div>
+
+<!-- -BIBLIOGRAPHY_STRING_ADVANCE- -->
+
+<h5 id="biblio-string-placement" class="docs" style="margin-top: -1em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Title string placement</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_STRING_ADVANCE</b> <kbd class="macro-args">&lt;distance from top of page&gt;</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Argument requires a <a href="definitions.html#unitofmeasure">unit of measusure</a>
+</p>
+
+<p>
+By default, mom places the title (the docheader, as it were) of
+bibliographies (typically "BIBLIOGRAPHY") on the same
+<a href="definitions.html#baseline">baseline</a>
+that is used for the start of
+<a href="definitions.html#running">running text</a>.
+If you&#8217;d prefer another location, higher or lower on the page
+(thereby also raising or lowering the starting position of the
+bibliography itself), invoke <kbd>.BIBLIOGRAPHY_STRING_ADVANCE</kbd>
+with an argument stating the distance from the top edge of the page
+at which you&#8217;d like the title placed.
+</p>
+
+<p>
+The argument requires a unit of measure, so if you&#8217;d like the title
+to appear 1-1/2 inches from the top edge of the page, you&#8217;d tell
+mom about it like this:
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY_STRING_ADVANCE 1.5i
+</span>
+</p>
+
+<!-- -BIBLIO_STRING_UNDERLINE- -->
+
+<h5 id="biblio-string-underline" class="docs" style="margin-top: -1em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Title string underscoring</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_STRING_UNDERSCORE</b> <kbd class="macro-args">[DOUBLE] [&lt;underline weight&gt; [&lt;underline gap&gt; [&lt;distance between double rules]]] | &lt;none&gt; | &lt;anything&gt;</kbd>
+</div>
+
+<p class="alias" style="margin-bottom: 0;">
+<i>Alias:</i> <b>BIBLIOGRAPHY_STRING_UNDERLINE</b>
+</p>
+
+<p class="requires">
+&bull;&nbsp;The argument
+<span style="font-style: normal"><kbd>&lt;underscore weight&gt;</kbd></span>
+must not have the
+<a href="definitions.html#unitofmeasure">unit of measure</a>,
+<span style="font-style: normal;"><kbd>p</kbd></span>, appended to it
+</p>
+
+<p>
+Invoked without an argument,
+<kbd>.BIBLIOGRAPHY_STRING_UNDERSCORE</kbd> will place a single rule
+underneath the bibliography&#8217;s first-page title.  Invoked with the
+argument, <kbd>DOUBLE</kbd>, BIBLIOGRAPHY_STRING_UNDERSCORE will
+double-underscore the thtile.  Invoked with any other non-numeric
+argument, (e.g. <kbd>OFF, NO, X</kbd>, etc.) the macro disables
+underlining of the title.
+</p>
+
+<p>
+In addition, you can use BIBLIOGRAPHY_STRING_UNDERSCORE to control
+the weight of the underscore rule(s), the gap between the title and
+the underscore, and, in the case of double-underscores, the distance
+between the two rules.
+</p>
+
+<p>
+Some examples:
+<br/>
+<span class="pre-in-pp">
+  .BIBLIOGRAPHY_STRING_UNDERLINE 1
+      - turn underlining on; set the rule weight to 1 point
+
+  .BIBLIOGRAPHY_STRING_UNDERLINE 1 3p
+      - turn underlining on; set the rule weight to 1 point; set
+        the gap between the string and the underline to 3 points
+  
+  .BIBLIOGRAPHY_STRING_UNDERLINE DOUBLE .75 3p
+      - turn double-underlining on; set the rule weight to 3/4 of
+        a point; set the gap between the string and the upper
+        underline to 3 points; leave the gap between the upper
+        and the lower underline at the default
+  
+  .BIBLIOGRAPHY_STRING_UNDERLINE DOUBLE 1.5 1.5p 1.5p
+      - turn double-underlining on; set the rule weight to 1-1/2
+        points; set the gap between the string and the upper
+        underline to 1-1/2 points; set the gap between the upper
+        and the lower underline to 1-1/2 points
+</span>
+Note, from the above, that in all instances, underscoring (single or
+double) is enabled whenever BIBLIOGRAPHY_STRING_UNDERSCORE is used
+in this way.
+</p>
+
+<p>
+Mom&#8217;s default is to double-underscore the title with 1/2-point
+rules placed 2 points apart and 2 points below the baseline of the
+title.
+</p>
+
+<!-- -BIBLIO_STRING_CAPS- -->
+
+<h5 id="biblio-string-caps" class="docs" style="margin-top: -.5em; margin-bottom: .5em; margin-left: .5em;">&bull;&nbsp;Title string capitalization</h5>
+
+<div class="box-macro-args">
+Macro: <b>BIBLIOGRAPHY_STRING_CAPS</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+Invoked by itself, <kbd>.BIBLIOGRAPHY_STRING_CAPS</kbd> will
+automatically capitalize the bibliography first-page title.  Invoked
+with any other argument, the macro disables automatic capitalization
+of the title.
+</p>
+
+<p>
+If you&#8217;re generating a table of contents, you may want the
+bibliography first-page title to be in caps, but the toc entry in
+caps/lower case.  If the argument to
+<kbd><a href="#bibliography-string">BIBLIOGRAPHY_STRING</a></kbd>
+is in caps/lower case and BIBLIOGRAPHY_STRING_CAPS is
+on, this is exactly what will happen.
+</p>
+
+<p>
+Mom&#8217;s default is to capitalize the bibliography first-page
+title.
+</p>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 33%; text-align: right;"><a href="letters.html">Next: Writing letters</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

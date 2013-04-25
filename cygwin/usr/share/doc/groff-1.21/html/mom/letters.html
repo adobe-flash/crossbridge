@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Writing letters</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="macrolist.html#top">Next: Quick reference guide</a></td>
+</tr>
+</table>
+
+<h1 class="docs">Writing letters</h1>
+
+<h2 id="letters-intro" class="docs">Introduction</h2>
+
+<p>
+Mom&#8217;s simple but effective letter-writing macros are a subset
+of the
+<a href="docprocessing.html#docprocessing">document processing macros</a>,
+designed to ease the creation of correspondence.
+</p>
+
+<p>
+Because the letter macros are a subset of the document processing
+macros, you can use
+<a href="definitions.html#controlmacro">control macros</a>
+to design correspondence to your own specifications.  However,
+mom makes no pretence of providing complete design flexibility in
+the matter of letters, which are, after all, simple communicative
+documents whose only real style requirements are that they be neat
+and professional-looking.
+</p>
+
+<div class="examples-container" style="margin-top: 1.5em; margin-bottom: 1.5em;">
+<h3 id="tutorial" class="docs">Tutorial &ndash; writing letters</h3>
+
+<p>
+Mom letters begin, like all mom-processed documents, with
+<a href="docprocessing.html#reference-macros">reference macros</a>
+(in this case,
+<a href="docprocessing.html#author">AUTHOR</a>),
+a
+<a href="docprocessing.html#doctype">DOCTYPE</a>
+(LETTER, obviously), the essential
+<a href="docprocessing.html#printstyle">PRINTSTYLE</a>
+macro, and
+<a href="docprocessing.html#start">START</a>,
+like this:
+<br/>
+<span class="pre-in-pp">
+  .AUTHOR    "Yannick P. Guique"
+  .DOCTYPE    LETTER
+  .PRINTSTYLE TYPESET
+  .START
+</span>
+PRINTSTYLE, above, could also be <kbd>TYPEWRITE</kbd>. Mom has no
+objection to creating letters that look like they were typed on an
+Underwood by a shapely secretary with 1940s gams.
+</p>
+
+<p>
+After the START macro, you enter headers pertinent to your letter:
+the date, the addressee (in business correspondence, typically both
+name and address), the addresser (that&#8217;s you; in business
+correspondence, typically both name and address), and a greeting
+(in full, e.g. &#8220;Dear Mr. Smith,&#8221; or &#8220;Dear
+Mr. Smith:&#8221;).
+</p>
+
+<p>
+The macros for entering the headers are simple (they&#8217;re not even
+<a href="definitions.html#toggle">toggles</a>):
+<br/>
+<span class="pre-in-pp">
+  .DATE
+  .TO
+  .FROM
+  .GREETING
+</span>
+You may enter them in any order you like, except for GREETING, which
+must come last.  Mom ignores any headers you omit and spaces the
+letter&#8217;s opening according to what you do include.  See
+<a href="#letters-defaults">Default for letters</a>
+to find out how mom formats the headers.
+</p>
+
+<p>
+(In pre 1.1.7-a releases of mom, the order of entering headers was
+fixed at the above.  This has been changed, although if you do
+follow the above order, mom will continue to behave exactly as she
+did in pre 1.1.7-a.)
+</p>
+
+<p>
+Once you&#8217;ve filled in what you need to get a letter started,
+simply type the letter, introducing each and every paragraph,
+including the first, with the
+<a href="docelement.html#pp">PP</a>
+macro.
+</p>
+
+<p>
+At the end of the letter, should you wish a closing (&#8220;Yours
+truly,&#8221; &#8220;Sincerely,&#8221; &#8220;Hugs and
+kisses&#8221;), invoke the macro, <kbd>.CLOSING</kbd>, on a line
+by itself, and follow it with the text of the closing. <b>N.B.</b>
+Don&#8217;t put your name here; mom supplies it automatically from
+<a href="docprocessing.html#author">AUTHOR</a>),
+with enough space to leave room for your signature.  If you omit the
+closing, mom simply adds your name (from AUTHOR), again with enough
+space for your signature.
+</p>
+
+<p>
+Assuming our tutorial letter is for business correspondence,
+here&#8217;s what the complete letter looks like.
+<br/>
+<span class="pre-in-pp">
+  .AUTHOR    "Yannick P. Guique"
+  .DOCTYPE    LETTER
+  .PRINTSTYLE TYPESET
+  .START
+  .DATE
+  August 25, 2010
+  .TO
+  GUILLAUME BARRIÈRES
+  Minidoux Corporation
+  5000 Pannes Drive
+  Redmond, Virginia
+  .FROM
+  Y.P. GUIQUE
+  022 Umask Road
+  St-Sauveur-en-dehors-de-la-mappe, Québec
+  .GREETING
+  Dear Mr. Barrières,
+  .PP
+  It has come to my attention that you have once again been
+  lobbying the US government to prohibit the use of open source
+  software by endeavouring to outlaw so-called "warranty
+  free" applications.
+  .PP
+  I feel it is my duty to inform you that the success of your
+  operating system relies heavily on open source programs and
+  protocols, notably TCP/IP.
+  .PP
+  Therefore, in the interests of your corporation&#8217;s fiscal health,
+  I strongly advise that you withdraw support for any US
+  legislation that would cripple or render illegal open source
+  development.
+  .CLOSING
+  Sincerely,
+</span>
+This produces a letter with headers that follow the North American
+standard for business correspondence.  If you&#8217;d prefer another style
+of correspondence, for example, British, you&#8217;d set up the same
+letter like this:
+<br/>
+<span class="pre-in-pp">
+  .AUTHOR    "Yannick P. Guique"
+  .DOCTYPE    LETTER
+  .PRINTSTYLE TYPESET
+  .START
+  .FROM
+  .RIGHT
+  Y.P. GUIQUE
+  022 Umask Road
+  St-Sauveur-en-dehors-de-la-mappe, Québec
+  .TO
+  GUILLAUME BARRIÈRES
+  Minidoux Corporation
+  5000 Pannes Drive
+  Redmond, Virginia
+  .DATE
+  .RIGHT
+  August 25, 2004
+  .GREETING
+  Dear Mr. Barrières,
+</span>
+Notice the use of <kbd>.RIGHT</kbd> after <kbd>.FROM</kbd> and
+<kbd>.DATE</kbd> in this example, used to change the default quad
+for these macros.
+</p>
+</div>
+
+<h2 id="letters-defaults" class="docs">Mom&#8217;s default letter style</h2>
+
+<p>
+In letters, if the order of header macros is
+</p>
+<ol style="margin-top: -.5em;">
+  <li><kbd>.DATE</kbd></li>
+  <li><kbd>.TO</kbd>&nbsp;&nbsp;(the addressee)</li>
+  <li><kbd>.FROM</kbd>&nbsp;&nbsp;(the addresser)</li>
+  <li><kbd>.GREETING</kbd>&nbsp;&nbsp;(&#8220;Dear Whoever,&#8221; &#8220;To Whom It May Concern,&#8221; etc.)</li>
+</ol>
+<p style="margin-top: -.5em;">
+mom sets
+</p>
+<ul style="margin-top: -.5em;">
+  <li>the date flush right, page right, at the top of page one,
+      with a gap of two linespaces underneath
+  </li>
+  <li>the addressee (<kbd>.TO</kbd>) in a block flush left, page
+      left, with a gap of one linespace underneath
+  </li>
+  <li>the addresser (<kbd>.FROM</kbd>) in a block flush left, page
+      left, with a gap of one linespace underneath
+  </li>
+  <li>the greeting flush left, with a gap of one linespace
+      underneath
+  </li>
+</ul>
+<p style="margin-top: -.5em;">
+which is the standard for North American business correspondence.
+</p>
+
+<p>
+If you switch the order of <kbd>.DATE</kbd>, <kbd>.TO</kbd> and/or
+<kbd>.FROM</kbd>, mom sets all the headers
+flush left, with a gap of one linespace underneath each.  (The
+default left quad of any header can be changed by invoking the
+<kbd>.RIGHT</kbd> macro, on a line by itself, immediately before
+inputting the text of the header.)
+</p>
+
+<p>
+Following the headers, mom sets
+</p>
+<ul style="margin-top: -.5em;">
+  <li>the body of the letter justified</li>
+  <li>in multi-page letters:
+  <ul style="margin-left: -.5em;">
+    <li>a footer indicating there&#8217;s a next page (of the form <kbd>.../#</kbd>)</li>
+    <li>the page number at the top of every page after page one</li>
+  </ul></li>
+  <li>the closing/signature lines flush left, indented halfway across the page</li>
+</ul>
+
+<p>
+Other important style defaults are listed below, and may be changed
+via the
+<a href="typesetting.html#top">typesetting macros</a>
+or the document processing
+<a href="definitions.html#controlmacro">control macros</a>
+prior to
+<a href="docprocessing.html#start">START</a>.
+Assume that any style parameter not listed below is the same as for
+any document processed with
+<a href="docprocessing.html#typeset-defaults">PRINTSTYLE <kbd>TYPESET</kbd></a>
+or
+<a href="docprocessing.html#typewrite-defaults">PRINTSTYLE <kbd>TYPEWRITE</kbd></a>.
+</p>
+
+<div class="defaults-container" style="padding-bottom: 8px;">
+<span class="pre defaults">
+  PARAMETER                 PRINTSTYLE TYPESET         PRINTSTYLE TYPEWRITE
+
+  Paper size                8.5 x 11 inches            8.5 x 11 inches
+  Left/right margins        1.125 inches               1.125 inches
+  Header margin             3.5 picas                  3.5 picas
+   (for page numbers)
+  Header gap                3 picas                    3 picas
+   (for page numbers)
+  Family                    Times Roman                Courier
+  Font                      roman                      roman
+  Point size                12                         12
+  Line space                13.5                       12 (i.e. singlespaced)
+  Paragraph indent          3 ems                      3 picas
+  Spaced paragraphs         yes                        no
+  Footers*                  yes                        yes
+  Footer margin             3 picas                    3 picas
+  Footer gap                3 picas                    3 picas
+  Page numbers              top, centred               top, centred
+
+  *Footers contain a &quot;next page&quot; number of the form .../#
+</span>
+</div>
+
+<div class="rule-medium"><hr/></div>
+
+
+<div class="macro-list-container">
+<h3 id="index-letters-macros" class="macro-list">The letter macros</h3>
+<p style="margin-left: 9px; margin-top: -1.5em;">
+All letter macros must come after
+<a href="docprocessing.html#start">START</a>,
+except NO_SUITE, which must come after
+<a href="docprocessin.html#start">PRINTSTYLE</a>
+and before
+<a href="docprocessing.html#start">START</a>.
+</p>
+
+<ul class="macro-list" style="margin-top: -.75em;">
+  <li><a href="#date">DATE</a></li>
+  <li><a href="#to">TO</a></li>
+  <li><a href="#from">FROM</a></li>
+  <li><a href="#greeting">GREETING</a></li>
+  <li><a href="#closing">CLOSING</a>
+  <ul style="margin-left: -.5em;">
+    <li><a href="#closing-indent">CLOSING_INDENT</a></li>
+    <li><a href="#signature-indent">SIGNATURE_INDENT</a></li>
+  </ul></li>
+  <li><a href="#no-suite">NO_SUITE</a> &ndash; turn the &#8220;next page&#8221; footer off</li>
+</ul>
+</div>
+
+<!-- -DATE- -->
+
+<div id="date" class="box-macro-args">
+Macro: <b>DATE</b>
+</div>
+
+<p>
+Invoke <kbd>.DATE</kbd> on a line by itself, with the date
+underneath, like this:
+<br/>
+<span class="pre-in-pp">
+  .DATE
+  October 31, 2012
+</span>
+If you wish to change the default quad direction for the date,
+enter <kbd>.LEFT</kbd> or <kbd>.RIGHT</kbd>, on a line by itself,
+immediately after <kbd>.DATE</kbd>.
+</p>
+
+<p>
+If you wish to insert additional space between the date and any
+letter header that comes after it, do so after inputting the date,
+not at the top of the next header macro, like this:
+<br/>
+<span class="pre-in-pp">
+  .DATE
+  October 31, 2012
+  .SPACE  \"Or, more simply, .SP
+</span>
+If you wish to remove the default space,
+<br/>
+<span class="pre-in-pp">
+  .SPACE -1v  \"Or, more simply, .SP -1v
+</span>
+will do the trick.
+</p>
+
+<!-- -TO- -->
+
+<div id="to" class="box-macro-args">
+Macro: <b>TO</b>
+</div>
+
+<p>
+Invoke <kbd>.TO</kbd> on a line by itself, with the name and address
+of the addressee underneath, like this:
+<br/>
+<span class="pre-in-pp">
+  .TO
+  JOHN SMITH
+  10 Roberts Crescent
+  Bramladesh, Ont.
+</span>
+If you wish to change the default quad direction for the address,
+enter <kbd>.LEFT</kbd> or <kbd>.RIGHT</kbd>, on a line by itself,
+immediately after <kbd>.TO</kbd>.
+</p>
+
+<p>
+If you wish to insert additional space between the address and
+any letter header that comes after it, do so after inputting the
+address, not at the top of the next header macro, like this:
+<br/>
+<span class="pre-in-pp">
+  .TO
+  JOHN SMITH
+  10 Roberts Crescent
+  Bramladesh, Ont.
+  .SPACE  \"Or, more simply, .SP
+</span>
+If you wish to remove the default space,
+<br/>
+<span class="pre-in-pp">
+  .SPACE -1v  \"Or, more simply, .SP -1v
+</span>
+will do the trick.
+</p>
+
+<!-- -FROM- -->
+
+<div id="from" class="box-macro-args">
+Macro: <b>FROM</b>
+</div>
+
+<p>
+Invoke <kbd>.FROM</kbd> on a line by itself, with the name and
+address of the addresser underneath, like this:
+<br/>
+<span class="pre-in-pp">
+  .FROM
+  JOE BLOW
+  15 Brunette Road
+  Ste-Vieille-Andouille, Québec
+</span>
+If you wish to change the default quad direction for the address,
+enter <kbd>.LEFT</kbd> or <kbd>.RIGHT</kbd>, on a line by itself,
+immediately after <kbd>.FROM</kbd>.
+</p>
+
+<p>
+If you wish to insert additional space between the address and
+any letter header that comes after it, do so after inputting the
+address, not at the top of the next header macro, like this:
+<br/>
+<span class="pre-in-pp">
+  .FROM
+  JOE BLOW
+  15 Brunette Road
+  Ste-Vieille-Andouille, Québec
+  .SPACE  \"Or, more simply, .SP
+</span>
+If you wish to remove the default space,
+<br/>
+<span class="pre-in-pp">
+  .SPACE -1v  \"Or, more simply, .SP -1v
+</span>
+will do the trick.
+</p>
+
+<!-- -GREETING- -->
+
+<div id="greeting" class="box-macro-args">
+Macro: <b>GREETING</b>
+</div>
+
+<p>
+Invoke <kbd>.GREETING</kbd> on a line by itself, with the full
+salutation you want for the letter underneath, like this:
+<br/>
+<span class="pre-in-pp">
+  .GREETING
+  Dear Mr. Smith,
+</span>
+</p>
+
+<!-- -CLOSING- -->
+
+<div id="closing" class="box-macro-args">
+Macro: <b>CLOSING</b>
+</div>
+
+<p>
+Invoke <kbd>.CLOSING</kbd> on a line by itself after the body of
+the letter, with the closing you&#8217;d like (e.g. &#8220;Yours
+truly,&#8221;) underneath, like this:
+<br/>
+<span class="pre-in-pp">
+  .CLOSING
+  Yours truly,
+</span>
+</p>
+
+<div class="box-tip" style="background-color: #E3D2B1;">
+<p class="tip">
+<span class="tip" style="display: inline-block; padding-bottom: .5em; color: #000056;">CLOSING control macros and defaults</span>
+<br/>
+Two macros control the behaviour of <kbd>.CLOSING</kbd>:
+</p>
+<ul style="margin-top: -1.25em;">
+  <li>CLOSING_INDENT</li>
+  <li>SIGNATURE_SPACE</li>
+</ul>
+
+<p id="closing-indent" style="margin-top: -.25em;">
+The first, CLOSING_INDENT, indicates the distance from the left
+margin you&#8217;d like to have your closing indented.  It takes a
+single
+<a href="definitions.html#numericargument">numeric argument</a>
+and must have a
+<a href="definitions.html#unitofmeasure">unit of measure</a>
+appended to it, unless you want an indent of 0 (zero).  Mom&#8217;s
+default is one half the width of the letter&#8217;s line length
+(i.e. halfway across the page).  If you wanted, instead, an indent of
+6
+<a href="definitions.html#picaspoints">picas</a>,
+you&#8217;d do it like this:
+<br/>
+<span class="pre-in-pp">
+  .CLOSING_INDENT 6P
+</span>
+Or, if you wanted to have no indent at all:
+<br/>
+<span class="pre-in-pp">
+  .CLOSING_INDENT 0
+</span>
+</p>
+
+<p id="signature-space" style="margin-top: -1.25em;">
+The second, SIGNATURE_SPACE, controls how much room to leave for the
+signature.  It takes a single
+<a href="definitions.html#numericargument">numeric argument</a>
+and must have a
+<a href="definitions.html#unitofmeasure">unit of measure</a>
+appended to it.  Mom&#8217;s default is 3 line spaces, but if you
+wanted to change that to, say, 2 line spaces, you&#8217;d do:
+<br/>
+<span class="pre-in-pp">
+  .SIGNATURE_SPACE 2v
+</span>
+</p>
+</div>
+
+<!-- -NO_SUITE- -->
+
+<div class="box-macro-args" style="margin-top: 2em;">
+Macro: <b>NO_SUITE</b>
+</div>
+
+<p>
+If you don&#8217;t want mom to print a &#8220;next page&#8221;
+number at the bottom of multi-page letters, invoke
+<kbd>.NO_SUITE</kbd>, on a line by itself, prior to
+<a href="docprocessing.html#start">START</a>.
+</p>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 33%; text-align: right;"><a href="macrolist.html">Next: Quick reference guide</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

@@ -1,0 +1,103 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-8.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-7.html">prev</a> | <a href="pic-9.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>8. More About Direction Changes
+<a name="8. More About Direction Changes"></a>
+</h2>
+
+
+
+<p style="margin-top: 1em"><font color="#000000">We&rsquo;ve
+already seen how to change the direction in which objects
+are composed from rightwards to downwards. Here are some
+more illustrative examples:</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic26.png" alt="Image img/pic26.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+8-1: Effects of different motion directions (right and
+left)</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic27.png" alt="Image img/pic27.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+8-2: Effects of different motion directions (up and
+down)</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Something
+that may appear surprising happens if you change directions
+in the obvious way:</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic28.png" alt="Image img/pic28.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+8-3: <b>box; arrow; circle; down; arrow;
+ellipse</b></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">You might
+have expected that program to yield this:</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic29.png" alt="Image img/pic29.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+8-4: More intuitive?</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">But, in
+fact, to get Figure 8.3 you have to do this:</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">.PS
+box;
+arrow;
+circle;
+move to last circle .s;
+down;
+arrow;
+ellipse
+.PE</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">Why is
+this? Because the exit point for the current direction is
+already set when you draw the object. The second arrow in
+Figure 8.2 dropped downwards from the circle&rsquo;s
+attachment point for an object to be joined to the
+right.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+meaning of the command <b>move to last circle .s</b> should
+be obvious. In order to see how it generalizes, we&rsquo;ll
+need to go into detail on two important topics; locations
+and object names.</font></p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-7.html">prev</a> | <a href="pic-9.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

@@ -1,0 +1,51 @@
+1.1.13 (2011-01-25)
+	* Ensure that stdout and stderr are distinct
+	* Fix segfault in symlink name lookup
+	* Remove ancient workarounds for cygwin B19 and B20: don't use
+	  CYGWIN_CONV_* macros but instead call cygwin_conv_* functions
+	  directly.
+	* For cygwin-1.7, avoid deprecated cygwin_conv_* functions.
+	  NOTE: Only the barest minimal changes were made, so (a) non-ascii
+	  characters still not supported, and (b) long pathnames are not
+	  yet supported. This will occur on the new 1.2 development stream.
+
+1.1.12 (2009-08-18)
+	* "Fix" 100% CPU usage problem reported with urxvt-X (at least, if
+	  OS < Windows 7), by ensuring that W7 workaround is employed only
+	  if OS is actually W7 or above, and
+	* Logical refactoring:
+	  - if $target is GUI, just launch it (don't worry about consoles)
+	  - if a console is already present, ensure that $target's stdio
+	    is connected to it, and launch $target.  This avoids extra
+	    pipes, and some 100% CPU problems.
+	  - Otherwise, create a new console and hide it (using various OS-
+	    dependent techniques, incl. the W7 workaround), connect the
+	    $target's stdio to it, and launch $target.
+
+1.1.11 (2009-08-10)
+	* New maintainer (Charles Wilson took over from Alexander Gottwald)
+	* Updated build machinery
+	* Added patch to support invisible consoles on Windows 7 (Corinna Vinschen)
+
+1.1.10 (2006-05-22)
+	* Create a real hidden console
+
+1.1.9 (2006-04-06)
+	* Remove quotes from search path. Fixes problem with spaces in filenames
+
+1.1.8 (2006-03-31)
+	* Remove quotes from exename. Fixes problem with spaces in filenames
+
+1.1.7 (2006-03-08)
+	* Copy cygwin environment variables to windows environment
+	* Disable WinMainCRTStartup wrapper
+
+1.1.6 (2005-11-09)
+	* The order of icons has been adjusted so the X is now at index 2
+	  again and X-start-menu-icons should display right.
+	* Manpage added
+
+1.1.5 (2005-11-26)
+	* original standalong package for the run utility, extracted
+	  from the cygwin X-startup-scripts package.
+

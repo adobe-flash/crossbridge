@@ -1,0 +1,72 @@
+alternatives creates, removes, maintains and displays information about
+the symbolic links comprising the alternatives system. The alternatives
+system is a reimplementation of the Debian alternatives system. It  was
+rewritten primarily to remove the dependence on perl; it is intended to
+be a drop in replacement for Debian's update-dependencies script.  This
+man page is a slightly modified version of the man page from the Debian
+project.
+
+It is possible for several programs  fulfilling  the  same  or  similar
+functions  to  be  installed  on a single system at the same time.  For
+example, many systems have several  text  editors  installed  at  once.
+This gives choice to the users of a system, allowing each to use a dif-
+ferent editor, if desired, but makes it difficult for a program to make
+a  good choice of editor to invoke if the user has not specified a par-
+ticular preference.
+
+The alternatives system aims to solve this problem.  A generic name  in
+the  filesystem  is shared by all files providing interchangeable func-
+tionality.   The  alternatives  system  and  the  system  administrator
+together  determine  which  actual  file  is referenced by this generic
+name.  For example, if the text  editors  ed(1)  and  nvi(1)  are  both
+installed on the system, the alternatives system will cause the generic
+name /usr/bin/editor to refer to /usr/bin/nvi by default.   The  system
+administrator  can  override  this and cause it to refer to /usr/bin/ed
+instead, and the alternatives system will not alter this setting  until
+explicitly requested to do so.
+
+The generic name is not a direct symbolic link to the selected alterna-
+tive.  Instead, it is a symbolic link to a  name  in  the  alternatives
+directory,  which  in turn is a symbolic link to the actual file refer-
+enced.  This is done so that the system administrator's changes can  be
+confined  within  the  /etc directory: the FHS (q.v.) gives reasons why
+this is a Good Thing.
+
+When each package providing a file with a particular  functionality  is
+installed,  changed or removed, alternatives is called to update infor-
+mation about that file in the  alternatives  system.   alternatives  is
+usually called from the %post or %pre scripts in RPM packages.
+
+It  is often useful for a number of alternatives to be synchronised, so
+that they are changed as a group; for example, when several versions of
+the   vi(1)   editor   are   installed,  the  man  page  referenced  by
+/usr/share/man/man1/vi.1 should correspond to the executable referenced
+by /usr/bin/vi.  alternatives handles this by means of master and slave
+links; when the master is changed, any associated  slaves  are  changed
+too.  A master link and its associated slaves make up a link group.
+
+Each  link  group is, at any given time, in one of two modes: automatic
+or manual.  When a group is in automatic mode, the alternatives  system
+will  automatically  decide,  as  packages  are  installed and removed,
+whether and how to update the links.  In manual mode, the  alternatives
+system  will  not  change the links; it will leave all the decisions to
+the system administrator.
+
+Link groups are in automatic mode when they are first introduced to the
+system.   If  the  system  administrator  makes changes to the system's
+automatic settings, this will be noticed the next time alternatives  is
+run  on  the  changed link's group, and the group will automatically be
+switched to manual mode.
+
+Each alternative has a priority associated with it.  When a link  group
+is  in  automatic  mode,  the alternatives pointed to by members of the
+group will be those which have the highest priority.
+
+When using the --config option,  alternatives  will  list  all  of  the
+choices for the link group of which given name is the master link.  You
+will then be prompted for which of the choices  to  use  for  the  link
+group. Once you make a change, the link group will no longer be in auto
+mode. You will need to use the --auto option in order to return to  the
+automatic state.
+
+See `man alternatives' for more information.

@@ -1,0 +1,2771 @@
+<html lang="en">
+<head>
+<title>sed, a stream editor</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="sed, a stream editor">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This file documents version 4.2.1 of
+GNU `sed', a stream editor.
+
+Copyright (C) 1998, 1999, 2001, 2002, 2003, 2004 Free
+Software Foundation, Inc.
+
+This document is released under the terms of the GNU Free
+Documentation License as published by the Free Software Foundation;
+either version 1.1, or (at your option) any later version.
+
+You should have received a copy of the GNU Free Documentation
+License along with GNU `sed'; see the file `COPYING.DOC'.
+If not, write to the Free Software Foundation, 59 Temple Place - Suite
+330, Boston, MA 02110-1301, USA.
+
+There are no Cover Texts and no Invariant Sections; this text, along
+with its equivalent in the printed manual, constitutes the Title Page.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">sed, a stream editor</h1>
+<div class="node">
+<a name="Top"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Introduction">Introduction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+
+</div>
+
+<h2 class="unnumbered">sed, a stream editor</h2>
+
+<p>This file documents version 4.2.1 of
+<acronym>GNU</acronym> <samp><span class="command">sed</span></samp>, a stream editor.
+
+   <p>Copyright &copy; 1998, 1999, 2001, 2002, 2003, 2004 Free
+Software Foundation, Inc.
+
+   <p>This document is released under the terms of the <acronym>GNU</acronym> Free
+Documentation License as published by the Free Software Foundation;
+either version 1.1, or (at your option) any later version.
+
+   <p>You should have received a copy of the <acronym>GNU</acronym> Free Documentation
+License along with <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>; see the file <samp><span class="file">COPYING.DOC</span></samp>. 
+If not, write to the Free Software Foundation, 59 Temple Place - Suite
+330, Boston, MA 02110-1301, USA.
+
+   <p>There are no Cover Texts and no Invariant Sections; this text, along
+with its equivalent in the printed manual, constitutes the Title Page.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Introduction">Introduction</a>:                Introduction
+<li><a accesskey="2" href="#Invoking-sed">Invoking sed</a>:                Invocation
+<li><a accesskey="3" href="#sed-Programs">sed Programs</a>:                <samp><span class="command">sed</span></samp> programs
+<li><a accesskey="4" href="#Examples">Examples</a>:                    Some sample scripts
+<li><a accesskey="5" href="#Limitations">Limitations</a>:                 Limitations and (non-)limitations of <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>
+<li><a accesskey="6" href="#Other-Resources">Other Resources</a>:             Other resources for learning about <samp><span class="command">sed</span></samp>
+<li><a accesskey="7" href="#Reporting-Bugs">Reporting Bugs</a>:              Reporting bugs
+
+<li><a accesskey="8" href="#Extended-regexps">Extended regexps</a>:            <samp><span class="command">egrep</span></samp>-style regular expressions
+
+<li><a accesskey="9" href="#Concept-Index">Concept Index</a>:               A menu with all the topics in this manual. 
+<li><a href="#Command-and-Option-Index">Command and Option Index</a>:    A menu with all <samp><span class="command">sed</span></samp> commands and
+                               command-line options.
+
+</li></ul>
+<p>--- The detailed node listing ---
+
+<p>sed Programs:
+</p>
+<ul class="menu">
+<li><a href="#Execution-Cycle">Execution Cycle</a>:                  How <samp><span class="command">sed</span></samp> works
+<li><a href="#Addresses">Addresses</a>:                        Selecting lines with <samp><span class="command">sed</span></samp>
+<li><a href="#Regular-Expressions">Regular Expressions</a>:              Overview of regular expression syntax
+<li><a href="#Common-Commands">Common Commands</a>:                  Often used commands
+<li><a href="#The-_0022s_0022-Command">The "s" Command</a>:                  <samp><span class="command">sed</span></samp>'s Swiss Army Knife
+<li><a href="#Other-Commands">Other Commands</a>:                   Less frequently used commands
+<li><a href="#Programming-Commands">Programming Commands</a>:             Commands for <samp><span class="command">sed</span></samp> gurus
+<li><a href="#Extended-Commands">Extended Commands</a>:                Commands specific of <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>
+<li><a href="#Escapes">Escapes</a>:                          Specifying special characters
+
+</li></ul>
+<p>Examples:
+</p>
+<ul class="menu">
+<li><a href="#Centering-lines">Centering lines</a>
+<li><a href="#Increment-a-number">Increment a number</a>
+<li><a href="#Rename-files-to-lower-case">Rename files to lower case</a>
+<li><a href="#Print-bash-environment">Print bash environment</a>
+<li><a href="#Reverse-chars-of-lines">Reverse chars of lines</a>
+<li><a href="#tac">tac</a>:                              Reverse lines of files
+<li><a href="#cat-_002dn">cat -n</a>:                           Numbering lines
+<li><a href="#cat-_002db">cat -b</a>:                           Numbering non-blank lines
+<li><a href="#wc-_002dc">wc -c</a>:                            Counting chars
+<li><a href="#wc-_002dw">wc -w</a>:                            Counting words
+<li><a href="#wc-_002dl">wc -l</a>:                            Counting lines
+<li><a href="#head">head</a>:                             Printing the first lines
+<li><a href="#tail">tail</a>:                             Printing the last lines
+<li><a href="#uniq">uniq</a>:                             Make duplicate lines unique
+<li><a href="#uniq-_002dd">uniq -d</a>:                          Print duplicated lines of input
+<li><a href="#uniq-_002du">uniq -u</a>:                          Remove all duplicated lines
+<li><a href="#cat-_002ds">cat -s</a>:                           Squeezing blank lines
+
+</ul>
+
+<div class="node">
+<a name="Introduction"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Invoking-sed">Invoking sed</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">1 Introduction</h2>
+
+<p><a name="index-Stream-editor-1"></a><samp><span class="command">sed</span></samp> is a stream editor. 
+A stream editor is used to perform basic text
+transformations on an input stream
+(a file or input from a pipeline). 
+While in some ways similar to an editor which
+permits scripted edits (such as <samp><span class="command">ed</span></samp>),
+<samp><span class="command">sed</span></samp> works by making only one pass over the
+input(s), and is consequently more efficient. 
+But it is <samp><span class="command">sed</span></samp>'s ability to filter text in a pipeline
+which particularly distinguishes it from other types of
+editors.
+
+<div class="node">
+<a name="Invoking-sed"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#sed-Programs">sed Programs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Introduction">Introduction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">2 Invocation</h2>
+
+<p>Normally <samp><span class="command">sed</span></samp> is invoked like this:
+
+<pre class="example">     sed SCRIPT INPUTFILE...
+</pre>
+   <p>The full format for invoking <samp><span class="command">sed</span></samp> is:
+
+<pre class="example">     sed OPTIONS... [SCRIPT] [INPUTFILE...]
+</pre>
+   <p>If you do not specify <var>INPUTFILE</var>, or if <var>INPUTFILE</var> is <samp><span class="file">-</span></samp>,
+<samp><span class="command">sed</span></samp> filters the contents of the standard input.  The <var>script</var>
+is actually the first non-option parameter, which <samp><span class="command">sed</span></samp> specially
+considers a script and not an input file if (and only if) none of the
+other <var>options</var> specifies a script to be executed, that is if neither
+of the <samp><span class="option">-e</span></samp> and <samp><span class="option">-f</span></samp> options is specified.
+
+   <p><samp><span class="command">sed</span></samp> may be invoked with the following command-line options:
+
+     <dl>
+<dt><code>--version</code><dd><a name="index-g_t_002d_002dversion-2"></a><a name="index-Version_002c-printing-3"></a>Print out the version of <samp><span class="command">sed</span></samp> that is being run and a copyright notice,
+then exit.
+
+     <br><dt><code>--help</code><dd><a name="index-g_t_002d_002dhelp-4"></a><a name="index-Usage-summary_002c-printing-5"></a>Print a usage message briefly summarizing these command-line options
+and the bug-reporting address,
+then exit.
+
+     <br><dt><code>-n</code><dt><code>--quiet</code><dt><code>--silent</code><dd><a name="index-g_t_002dn-6"></a><a name="index-g_t_002d_002dquiet-7"></a><a name="index-g_t_002d_002dsilent-8"></a><a name="index-Disabling-autoprint_002c-from-command-line-9"></a>By default, <samp><span class="command">sed</span></samp> prints out the pattern space
+at the end of each cycle through the script (see <a href="#Execution-Cycle">How <code>sed</code> works</a>). 
+These options disable this automatic printing,
+and <samp><span class="command">sed</span></samp> only produces output when explicitly told to
+via the <code>p</code> command.
+
+     <br><dt><code>-e </code><var>script</var><dt><code>--expression=</code><var>script</var><dd><a name="index-g_t_002de-10"></a><a name="index-g_t_002d_002dexpression-11"></a><a name="index-Script_002c-from-command-line-12"></a>Add the commands in <var>script</var> to the set of commands to be
+run while processing the input.
+
+     <br><dt><code>-f </code><var>script-file</var><dt><code>--file=</code><var>script-file</var><dd><a name="index-g_t_002df-13"></a><a name="index-g_t_002d_002dfile-14"></a><a name="index-Script_002c-from-a-file-15"></a>Add the commands contained in the file <var>script-file</var>
+to the set of commands to be run while processing the input.
+
+     <br><dt><code>-i[</code><var>SUFFIX</var><code>]</code><dt><code>--in-place[=</code><var>SUFFIX</var><code>]</code><dd><a name="index-g_t_002di-16"></a><a name="index-g_t_002d_002din_002dplace-17"></a><a name="index-In_002dplace-editing_002c-activating-18"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-in_002dplace-editing-19"></a>This option specifies that files are to be edited in-place. 
+<acronym>GNU</acronym> <samp><span class="command">sed</span></samp> does this by creating a temporary file and
+sending output to this file rather than to the standard
+output.<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>.
+
+     <p>This option implies <samp><span class="option">-s</span></samp>.
+
+     <p>When the end of the file is reached, the temporary file is
+renamed to the output file's original name.  The extension,
+if supplied, is used to modify the name of the old file
+before renaming the temporary file, thereby making a backup
+copy<a rel="footnote" href="#fn-2" name="fnd-2"><sup>2</sup></a>).
+
+     <p><a name="index-In_002dplace-editing_002c-Perl_002dstyle-backup-file-names-20"></a>This rule is followed: if the extension doesn't contain a <code>*</code>,
+then it is appended to the end of the current filename as a
+suffix; if the extension does contain one or more <code>*</code>
+characters, then <em>each</em> asterisk is replaced with the
+current filename.  This allows you to add a prefix to the
+backup file, instead of (or in addition to) a suffix, or
+even to place backup copies of the original files into another
+directory (provided the directory already exists).
+
+     <p>If no extension is supplied, the original file is
+overwritten without making a backup.
+
+     <br><dt><code>-l </code><var>N</var><dt><code>--line-length=</code><var>N</var><dd><a name="index-g_t_002dl-21"></a><a name="index-g_t_002d_002dline_002dlength-22"></a><a name="index-Line-length_002c-setting-23"></a>Specify the default line-wrap length for the <code>l</code> command. 
+A length of 0 (zero) means to never wrap long lines.  If
+not specified, it is taken to be 70.
+
+     <br><dt><code>--posix</code><dd><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-disabling-24"></a><acronym>GNU</acronym> <samp><span class="command">sed</span></samp> includes several extensions to <acronym>POSIX</acronym>
+sed.  In order to simplify writing portable scripts, this
+option disables all the extensions that this manual documents,
+including additional commands. 
+<a name="index-g_t_0040code_007bPOSIXLY_005fCORRECT_007d-behavior_002c-enabling-25"></a>Most of the extensions accept <samp><span class="command">sed</span></samp> programs that
+are outside the syntax mandated by <acronym>POSIX</acronym>, but some
+of them (such as the behavior of the <samp><span class="command">N</span></samp> command
+described in see <a href="#Reporting-Bugs">Reporting Bugs</a>) actually violate the
+standard.  If you want to disable only the latter kind of
+extension, you can set the <code>POSIXLY_CORRECT</code> variable
+to a non-empty value.
+
+     <br><dt><code>-b</code><dt><code>--binary</code><dd><a name="index-g_t_002db-26"></a><a name="index-g_t_002d_002dbinary-27"></a>This option is available on every platform, but is only effective where the
+operating system makes a distinction between text files and binary files. 
+When such a distinction is made&mdash;as is the case for MS-DOS, Windows,
+Cygwin&mdash;text files are composed of lines separated by a carriage return
+<em>and</em> a line feed character, and <samp><span class="command">sed</span></samp> does not see the
+ending CR.  When this option is specified, <samp><span class="command">sed</span></samp> will open
+input files in binary mode, thus not requesting this special processing
+and considering lines to end at a line feed.
+
+     <br><dt><code>--follow-symlinks</code><dd><a name="index-g_t_002d_002dfollow_002dsymlinks-28"></a>This option is available only on platforms that support
+symbolic links and has an effect only if option <samp><span class="option">-i</span></samp>
+is specified.  In this case, if the file that is specified
+on the command line is a symbolic link, <samp><span class="command">sed</span></samp> will
+follow the link and edit the ultimate destination of the
+link.  The default behavior is to break the symbolic link,
+so that the link destination will not be modified.
+
+     <br><dt><code>-r</code><dt><code>--regexp-extended</code><dd><a name="index-g_t_002dr-29"></a><a name="index-g_t_002d_002dregexp_002dextended-30"></a><a name="index-Extended-regular-expressions_002c-choosing-31"></a><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-extended-regular-expressions-32"></a>Use extended regular expressions rather than basic
+regular expressions.  Extended regexps are those that
+<samp><span class="command">egrep</span></samp> accepts; they can be clearer because they
+usually have less backslashes, but are a <acronym>GNU</acronym> extension
+and hence scripts that use them are not portable. 
+See <a href="#Extended-regexps">Extended regular expressions</a>.
+
+     <br><dt><code>-s</code><dt><code>--separate</code><dd><a name="index-Working-on-separate-files-33"></a>By default, <samp><span class="command">sed</span></samp> will consider the files specified on the
+command line as a single continuous long stream.  This <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>
+extension allows the user to consider them as separate files:
+range addresses (such as &lsquo;<samp><span class="samp">/abc/,/def/</span></samp>&rsquo;) are not allowed
+to span several files, line numbers are relative to the start
+of each file, <code>$</code> refers to the last line of each file,
+and files invoked from the <code>R</code> commands are rewound at the
+start of each file.
+
+     <br><dt><code>-u</code><dt><code>--unbuffered</code><dd><a name="index-g_t_002du-34"></a><a name="index-g_t_002d_002dunbuffered-35"></a><a name="index-Unbuffered-I_002fO_002c-choosing-36"></a>Buffer both input and output as minimally as practical. 
+(This is particularly useful if the input is coming from
+the likes of &lsquo;<samp><span class="samp">tail -f</span></samp>&rsquo;, and you wish to see the transformed
+output as soon as possible.)
+
+   </dl>
+
+   <p>If no <samp><span class="option">-e</span></samp>, <samp><span class="option">-f</span></samp>, <samp><span class="option">--expression</span></samp>, or <samp><span class="option">--file</span></samp>
+options are given on the command-line,
+then the first non-option argument on the command line is
+taken to be the <var>script</var> to be executed.
+
+   <p><a name="index-Files-to-be-processed-as-input-37"></a>If any command-line parameters remain after processing the above,
+these parameters are interpreted as the names of input files to
+be processed. 
+<a name="index-Standard-input_002c-processing-as-input-38"></a>A file name of &lsquo;<samp><span class="samp">-</span></samp>&rsquo; refers to the standard input stream. 
+The standard input will be processed if no file names are specified.
+
+<div class="node">
+<a name="sed-Programs"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Examples">Examples</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking-sed">Invoking sed</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">3 <samp><span class="command">sed</span></samp> Programs</h2>
+
+<p><a name="index-g_t_0040command_007bsed_007d-program-structure-39"></a><a name="index-Script-structure-40"></a>A <samp><span class="command">sed</span></samp> program consists of one or more <samp><span class="command">sed</span></samp> commands,
+passed in by one or more of the
+<samp><span class="option">-e</span></samp>, <samp><span class="option">-f</span></samp>, <samp><span class="option">--expression</span></samp>, and <samp><span class="option">--file</span></samp>
+options, or the first non-option argument if zero of these
+options are used. 
+This document will refer to &ldquo;the&rdquo; <samp><span class="command">sed</span></samp> script;
+this is understood to mean the in-order catenation
+of all of the <var>script</var>s and <var>script-file</var>s passed in.
+
+   <p>Each <code>sed</code> command consists of an optional address or
+address range, followed by a one-character command name
+and any additional command-specific code.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Execution-Cycle">Execution Cycle</a>:           How <samp><span class="command">sed</span></samp> works
+<li><a accesskey="2" href="#Addresses">Addresses</a>:                 Selecting lines with <samp><span class="command">sed</span></samp>
+<li><a accesskey="3" href="#Regular-Expressions">Regular Expressions</a>:       Overview of regular expression syntax
+<li><a accesskey="4" href="#Common-Commands">Common Commands</a>:           Often used commands
+<li><a accesskey="5" href="#The-_0022s_0022-Command">The "s" Command</a>:           <samp><span class="command">sed</span></samp>'s Swiss Army Knife
+<li><a accesskey="6" href="#Other-Commands">Other Commands</a>:            Less frequently used commands
+<li><a accesskey="7" href="#Programming-Commands">Programming Commands</a>:      Commands for <samp><span class="command">sed</span></samp> gurus
+<li><a accesskey="8" href="#Extended-Commands">Extended Commands</a>:         Commands specific of <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>
+<li><a accesskey="9" href="#Escapes">Escapes</a>:                   Specifying special characters
+</ul>
+
+<div class="node">
+<a name="Execution-Cycle"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Addresses">Addresses</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#sed-Programs">sed Programs</a>
+
+</div>
+
+<h3 class="section">3.1 How <samp><span class="command">sed</span></samp> Works</h3>
+
+<p><a name="index-Buffer-spaces_002c-pattern-and-hold-41"></a><a name="index-Spaces_002c-pattern-and-hold-42"></a><a name="index-Pattern-space_002c-definition-43"></a><a name="index-Hold-space_002c-definition-44"></a><samp><span class="command">sed</span></samp> maintains two data buffers: the active <em>pattern</em> space,
+and the auxiliary <em>hold</em> space. Both are initially empty.
+
+   <p><samp><span class="command">sed</span></samp> operates by performing the following cycle on each
+lines of input: first, <samp><span class="command">sed</span></samp> reads one line from the input
+stream, removes any trailing newline, and places it in the pattern space. 
+Then commands are executed; each command can have an address associated
+to it: addresses are a kind of condition code, and a command is only
+executed if the condition is verified before the command is to be
+executed.
+
+   <p>When the end of the script is reached, unless the <samp><span class="option">-n</span></samp> option
+is in use, the contents of pattern space are printed out to the output
+stream, adding back the trailing newline if it was removed.<a rel="footnote" href="#fn-3" name="fnd-3"><sup>3</sup></a> Then the next cycle starts for the next
+input line.
+
+   <p>Unless special commands (like &lsquo;<samp><span class="samp">D</span></samp>&rsquo;) are used, the pattern space is
+deleted between two cycles. The hold space, on the other hand, keeps
+its data between cycles (see commands &lsquo;<samp><span class="samp">h</span></samp>&rsquo;, &lsquo;<samp><span class="samp">H</span></samp>&rsquo;, &lsquo;<samp><span class="samp">x</span></samp>&rsquo;,
+&lsquo;<samp><span class="samp">g</span></samp>&rsquo;, &lsquo;<samp><span class="samp">G</span></samp>&rsquo; to move data between both buffers).
+
+<div class="node">
+<a name="Addresses"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Regular-Expressions">Regular Expressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Execution-Cycle">Execution Cycle</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#sed-Programs">sed Programs</a>
+
+</div>
+
+<h3 class="section">3.2 Selecting lines with <samp><span class="command">sed</span></samp></h3>
+
+<p><a name="index-Addresses_002c-in-_0040command_007bsed_007d-scripts-45"></a><a name="index-Line-selection-46"></a><a name="index-Selecting-lines-to-process-47"></a>
+Addresses in a <samp><span class="command">sed</span></samp> script can be in any of the following forms:
+     <dl>
+<dt><var>number</var><dd><a name="index-Address_002c-numeric-48"></a><a name="index-Line_002c-selecting-by-number-49"></a>Specifying a line number will match only that line in the input. 
+(Note that <samp><span class="command">sed</span></samp> counts lines continuously across all input files
+unless <samp><span class="option">-i</span></samp> or <samp><span class="option">-s</span></samp> options are specified.)
+
+     <br><dt><var>first</var><code>~</code><var>step</var><dd><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040samp_007b_0040var_007bn_007d_007e_0040var_007bm_007d_007d-addresses-50"></a>This <acronym>GNU</acronym> extension matches every <var>step</var>th line
+starting with line <var>first</var>. 
+In particular, lines will be selected when there exists
+a non-negative <var>n</var> such that the current line-number equals
+<var>first</var> + (<var>n</var> * <var>step</var>). 
+Thus, to select the odd-numbered lines,
+one would use <code>1~2</code>;
+to pick every third line starting with the second, &lsquo;<samp><span class="samp">2~3</span></samp>&rsquo; would be used;
+to pick every fifth line starting with the tenth, use &lsquo;<samp><span class="samp">10~5</span></samp>&rsquo;;
+and &lsquo;<samp><span class="samp">50~0</span></samp>&rsquo; is just an obscure way of saying <code>50</code>.
+
+     <br><dt><code>$</code><dd><a name="index-Address_002c-last-line-51"></a><a name="index-Last-line_002c-selecting-52"></a><a name="index-Line_002c-selecting-last-53"></a>This address matches the last line of the last file of input, or
+the last line of each file when the <samp><span class="option">-i</span></samp> or <samp><span class="option">-s</span></samp> options
+are specified.
+
+     <br><dt><code>/</code><var>regexp</var><code>/</code><dd><a name="index-Address_002c-as-a-regular-expression-54"></a><a name="index-Line_002c-selecting-by-regular-expression-match-55"></a>This will select any line which matches the regular expression <var>regexp</var>. 
+If <var>regexp</var> itself includes any <code>/</code> characters,
+each must be escaped by a backslash (<code>\</code>).
+
+     <p><a name="index-empty-regular-expression-56"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-modifiers-and-the-empty-regular-expression-57"></a>The empty regular expression &lsquo;<samp><span class="samp">//</span></samp>&rsquo; repeats the last regular
+expression match (the same holds if the empty regular expression is
+passed to the <code>s</code> command).  Note that modifiers to regular expressions
+are evaluated when the regular expression is compiled, thus it is invalid to
+specify them together with the empty regular expression.
+
+     <br><dt><code>\%</code><var>regexp</var><code>%</code><dd>(The <code>%</code> may be replaced by any other single character.)
+
+     <p><a name="index-Slash-character_002c-in-regular-expressions-58"></a>This also matches the regular expression <var>regexp</var>,
+but allows one to use a different delimiter than <code>/</code>. 
+This is particularly useful if the <var>regexp</var> itself contains
+a lot of slashes, since it avoids the tedious escaping of every <code>/</code>. 
+If <var>regexp</var> itself includes any delimiter characters,
+each must be escaped by a backslash (<code>\</code>).
+
+     <br><dt><code>/</code><var>regexp</var><code>/I</code><dt><code>\%</code><var>regexp</var><code>%I</code><dd><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040code_007bI_007d-modifier-59"></a>The <code>I</code> modifier to regular-expression matching is a <acronym>GNU</acronym>
+extension which causes the <var>regexp</var> to be matched in
+a case-insensitive manner.
+
+     <br><dt><code>/</code><var>regexp</var><code>/M</code><dt><code>\%</code><var>regexp</var><code>%M</code><dd><a name="index-Perl_002dstyle-regular-expressions_002c-multiline-60"></a>The <code>M</code> modifier to regular-expression matching is a <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>
+extension which causes <code>^</code> and <code>$</code> to match respectively
+(in addition to the normal behavior) the empty string after a newline,
+and the empty string before a newline.  There are special character
+sequences
+(<code>\`</code> and <code>\'</code>)
+which always match the beginning or the end of the buffer. 
+<code>M</code> stands for <cite>multi-line</cite>.
+
+   </dl>
+
+   <p>If no addresses are given, then all lines are matched;
+if one address is given, then only lines matching that
+address are matched.
+
+   <p><a name="index-Range-of-lines-61"></a><a name="index-Several-lines_002c-selecting-62"></a>An address range can be specified by specifying two addresses
+separated by a comma (<code>,</code>).  An address range matches lines
+starting from where the first address matches, and continues
+until the second address matches (inclusively).
+
+   <p>If the second address is a <var>regexp</var>, then checking for the
+ending match will start with the line <em>following</em> the
+line which matched the first address: a range will always
+span at least two lines (except of course if the input stream
+ends).
+
+   <p>If the second address is a <var>number</var> less than (or equal to)
+the line matching the first address, then only the one line is
+matched.
+
+   <p><a name="index-Special-addressing-forms-63"></a><a name="index-Range-with-start-address-of-zero-64"></a><a name="index-Zero_002c-as-range-start-address-65"></a><a name="index-g_t_0040var_007baddr1_007d_002c_002bN-66"></a><a name="index-g_t_0040var_007baddr1_007d_002c_007eN-67"></a><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-special-two_002daddress-forms-68"></a><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040code_007b0_007d-address-69"></a><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-0_002c_0040var_007baddr2_007d-addressing-70"></a><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040var_007baddr1_007d_002c_002b_0040var_007bN_007d-addressing-71"></a><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040var_007baddr1_007d_002c_007e_0040var_007bN_007d-addressing-72"></a><acronym>GNU</acronym> <samp><span class="command">sed</span></samp> also supports some special two-address forms; all these
+are <acronym>GNU</acronym> extensions:
+     <dl>
+<dt><code>0,/</code><var>regexp</var><code>/</code><dd>A line number of <code>0</code> can be used in an address specification like
+<code>0,/</code><var>regexp</var><code>/</code> so that <samp><span class="command">sed</span></samp> will try to match
+<var>regexp</var> in the first input line too.  In other words,
+<code>0,/</code><var>regexp</var><code>/</code> is similar to <code>1,/</code><var>regexp</var><code>/</code>,
+except that if <var>addr2</var> matches the very first line of input the
+<code>0,/</code><var>regexp</var><code>/</code> form will consider it to end the range, whereas
+the <code>1,/</code><var>regexp</var><code>/</code> form will match the beginning of its range and
+hence make the range span up to the <em>second</em> occurrence of the
+regular expression.
+
+     <p>Note that this is the only place where the <code>0</code> address makes
+sense; there is no 0-th line and commands which are given the <code>0</code>
+address in any other way will give an error.
+
+     <br><dt><var>addr1</var><code>,+</code><var>N</var><dd>Matches <var>addr1</var> and the <var>N</var> lines following <var>addr1</var>.
+
+     <br><dt><var>addr1</var><code>,~</code><var>N</var><dd>Matches <var>addr1</var> and the lines following <var>addr1</var>
+until the next line whose input line number is a multiple of <var>N</var>. 
+</dl>
+
+   <p><a name="index-Excluding-lines-73"></a><a name="index-Selecting-non_002dmatching-lines-74"></a>Appending the <code>!</code> character to the end of an address
+specification negates the sense of the match. 
+That is, if the <code>!</code> character follows an address range,
+then only lines which do <em>not</em> match the address range
+will be selected. 
+This also works for singleton addresses,
+and, perhaps perversely, for the null address.
+
+<div class="node">
+<a name="Regular-Expressions"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Common-Commands">Common Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Addresses">Addresses</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#sed-Programs">sed Programs</a>
+
+</div>
+
+<h3 class="section">3.3 Overview of Regular Expression Syntax</h3>
+
+<p>To know how to use <samp><span class="command">sed</span></samp>, people should understand regular
+expressions (<dfn>regexp</dfn> for short).  A regular expression
+is a pattern that is matched against a
+subject string from left to right.  Most characters are
+<dfn>ordinary</dfn>: they stand for
+themselves in a pattern, and match the corresponding characters
+in the subject.  As a trivial example, the pattern
+
+<pre class="example">     The quick brown fox
+</pre>
+   <p class="noindent">matches a portion of a subject string that is identical to
+itself.  The power of regular expressions comes from the
+ability to include alternatives and repetitions in the pattern. 
+These are encoded in the pattern by the use of <dfn>special characters</dfn>,
+which do not stand for themselves but instead
+are interpreted in some special way.  Here is a brief description
+of regular expression syntax as used in <samp><span class="command">sed</span></samp>.
+
+     <dl>
+<dt><var>char</var><dd>A single ordinary character matches itself.
+
+     <br><dt><code>*</code><dd><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-to-basic-regular-expressions-75"></a>Matches a sequence of zero or more instances of matches for the
+preceding regular expression, which must be an ordinary character, a
+special character preceded by <code>\</code>, a <code>.</code>, a grouped regexp
+(see below), or a bracket expression.  As a <acronym>GNU</acronym> extension, a
+postfixed regular expression can also be followed by <code>*</code>; for
+example, <code>a**</code> is equivalent to <code>a*</code>.  <acronym>POSIX</acronym>
+1003.1-2001 says that <code>*</code> stands for itself when it appears at
+the start of a regular expression or subexpression, but many
+non<acronym>GNU</acronym> implementations do not support this and portable
+scripts should instead use <code>\*</code> in these contexts.
+
+     <br><dt><code>\+</code><dd><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-to-basic-regular-expressions-76"></a>As <code>*</code>, but matches one or more.  It is a <acronym>GNU</acronym> extension.
+
+     <br><dt><code>\?</code><dd><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-to-basic-regular-expressions-77"></a>As <code>*</code>, but only matches zero or one.  It is a <acronym>GNU</acronym> extension.
+
+     <br><dt><code>\{</code><var>i</var><code>\}</code><dd>As <code>*</code>, but matches exactly <var>i</var> sequences (<var>i</var> is a
+decimal integer; for portability, keep it between 0 and 255
+inclusive).
+
+     <br><dt><code>\{</code><var>i</var><code>,</code><var>j</var><code>\}</code><dd>Matches between <var>i</var> and <var>j</var>, inclusive, sequences.
+
+     <br><dt><code>\{</code><var>i</var><code>,\}</code><dd>Matches more than or equal to <var>i</var> sequences.
+
+     <br><dt><code>\(</code><var>regexp</var><code>\)</code><dd>Groups the inner <var>regexp</var> as a whole, this is used to:
+
+          <ul>
+<li><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-to-basic-regular-expressions-78"></a>Apply postfix operators, like <code>\(abcd\)*</code>:
+this will search for zero or more whole sequences
+of &lsquo;<samp><span class="samp">abcd</span></samp>&rsquo;, while <code>abcd*</code> would search
+for &lsquo;<samp><span class="samp">abc</span></samp>&rsquo; followed by zero or more occurrences
+of &lsquo;<samp><span class="samp">d</span></samp>&rsquo;.  Note that support for <code>\(abcd\)*</code> is
+required by <acronym>POSIX</acronym> 1003.1-2001, but many non-<acronym>GNU</acronym>
+implementations do not support it and hence it is not universally
+portable.
+
+          <li>Use back references (see below). 
+</ul>
+
+     <br><dt><code>.</code><dd>Matches any character, including newline.
+
+     <br><dt><code>^</code><dd>Matches the null string at beginning of the pattern space, i.e. what
+appears after the circumflex must appear at the beginning of the
+pattern space.
+
+     <p>In most scripts, pattern space is initialized to the content of each
+line (see <a href="#Execution-Cycle">How <code>sed</code> works</a>).  So, it is a
+useful simplification to think of <code>^#include</code> as matching only
+lines where &lsquo;<samp><span class="samp">#include</span></samp>&rsquo; is the first thing on line&mdash;if there are
+spaces before, for example, the match fails.  This simplification is
+valid as long as the original content of pattern space is not modified,
+for example with an <code>s</code> command.
+
+     <p><code>^</code> acts as a special character only at the beginning of the
+regular expression or subexpression (that is, after <code>\(</code> or
+<code>\|</code>).  Portable scripts should avoid <code>^</code> at the beginning of
+a subexpression, though, as <acronym>POSIX</acronym> allows implementations that
+treat <code>^</code> as an ordinary character in that context.
+
+     <br><dt><code>$</code><dd>It is the same as <code>^</code>, but refers to end of pattern space. 
+<code>$</code> also acts as a special character only at the end
+of the regular expression or subexpression (that is, before <code>\)</code>
+or <code>\|</code>), and its use at the end of a subexpression is not
+portable.
+
+     <br><dt><code>[</code><var>list</var><code>]</code><dt><code>[^</code><var>list</var><code>]</code><dd>Matches any single character in <var>list</var>: for example,
+<code>[aeiou]</code> matches all vowels.  A list may include
+sequences like <var>char1</var><code>-</code><var>char2</var>, which
+matches any character between (inclusive) <var>char1</var>
+and <var>char2</var>.
+
+     <p>A leading <code>^</code> reverses the meaning of <var>list</var>, so that
+it matches any single character <em>not</em> in <var>list</var>.  To include
+<code>]</code> in the list, make it the first character (after
+the <code>^</code> if needed), to include <code>-</code> in the list,
+make it the first or last; to include <code>^</code> put
+it after the first character.
+
+     <p><a name="index-g_t_0040code_007bPOSIXLY_005fCORRECT_007d-behavior_002c-bracket-expressions-79"></a>The characters <code>$</code>, <code>*</code>, <code>.</code>, <code>[</code>, and <code>\</code>
+are normally not special within <var>list</var>.  For example, <code>[\*]</code>
+matches either &lsquo;<samp><span class="samp">\</span></samp>&rsquo; or &lsquo;<samp><span class="samp">*</span></samp>&rsquo;, because the <code>\</code> is not
+special here.  However, strings like <code>[.ch.]</code>, <code>[=a=]</code>, and
+<code>[:space:]</code> are special within <var>list</var> and represent collating
+symbols, equivalence classes, and character classes, respectively, and
+<code>[</code> is therefore special within <var>list</var> when it is followed by
+<code>.</code>, <code>=</code>, or <code>:</code>.  Also, when not in
+<samp><span class="env">POSIXLY_CORRECT</span></samp> mode, special escapes like <code>\n</code> and
+<code>\t</code> are recognized within <var>list</var>.  See <a href="#Escapes">Escapes</a>.
+
+     <br><dt><var>regexp1</var><code>\|</code><var>regexp2</var><dd><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-to-basic-regular-expressions-80"></a>Matches either <var>regexp1</var> or <var>regexp2</var>.  Use
+parentheses to use complex alternative regular expressions. 
+The matching process tries each alternative in turn, from
+left to right, and the first one that succeeds is used. 
+It is a <acronym>GNU</acronym> extension.
+
+     <br><dt><var>regexp1</var><var>regexp2</var><dd>Matches the concatenation of <var>regexp1</var> and <var>regexp2</var>. 
+Concatenation binds more tightly than <code>\|</code>, <code>^</code>, and
+<code>$</code>, but less tightly than the other regular expression
+operators.
+
+     <br><dt><code>\</code><var>digit</var><dd>Matches the <var>digit</var>-th <code>\(...\)</code> parenthesized
+subexpression in the regular expression.  This is called a <dfn>back
+reference</dfn>.  Subexpressions are implicity numbered by counting
+occurrences of <code>\(</code> left-to-right.
+
+     <br><dt><code>\n</code><dd>Matches the newline character.
+
+     <br><dt><code>\</code><var>char</var><dd>Matches <var>char</var>, where <var>char</var> is one of <code>$</code>,
+<code>*</code>, <code>.</code>, <code>[</code>, <code>\</code>, or <code>^</code>. 
+Note that the only C-like
+backslash sequences that you can portably assume to be
+interpreted are <code>\n</code> and <code>\\</code>; in particular
+<code>\t</code> is not portable, and matches a &lsquo;<samp><span class="samp">t</span></samp>&rsquo; under most
+implementations of <samp><span class="command">sed</span></samp>, rather than a tab character.
+
+   </dl>
+
+   <p><a name="index-Greedy-regular-expression-matching-81"></a>Note that the regular expression matcher is greedy, i.e., matches
+are attempted from left to right and, if two or more matches are
+possible starting at the same character, it selects the longest.
+
+<p class="noindent">Examples:
+     <dl>
+<dt>&lsquo;<samp><span class="samp">abcdef</span></samp>&rsquo;<dd>Matches &lsquo;<samp><span class="samp">abcdef</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">a*b</span></samp>&rsquo;<dd>Matches zero or more &lsquo;<samp><span class="samp">a</span></samp>&rsquo;s followed by a single
+&lsquo;<samp><span class="samp">b</span></samp>&rsquo;.  For example, &lsquo;<samp><span class="samp">b</span></samp>&rsquo; or &lsquo;<samp><span class="samp">aaaaab</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">a\?b</span></samp>&rsquo;<dd>Matches &lsquo;<samp><span class="samp">b</span></samp>&rsquo; or &lsquo;<samp><span class="samp">ab</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">a\+b\+</span></samp>&rsquo;<dd>Matches one or more &lsquo;<samp><span class="samp">a</span></samp>&rsquo;s followed by one or more
+&lsquo;<samp><span class="samp">b</span></samp>&rsquo;s: &lsquo;<samp><span class="samp">ab</span></samp>&rsquo; is the shortest possible match, but
+other examples are &lsquo;<samp><span class="samp">aaaab</span></samp>&rsquo; or &lsquo;<samp><span class="samp">abbbbb</span></samp>&rsquo; or
+&lsquo;<samp><span class="samp">aaaaaabbbbbbb</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">.*</span></samp>&rsquo;<dt>&lsquo;<samp><span class="samp">.\+</span></samp>&rsquo;<dd>These two both match all the characters in a string;
+however, the first matches every string (including the empty
+string), while the second matches only strings containing
+at least one character.
+
+     <br><dt>&lsquo;<samp><span class="samp">^main.*(.*)</span></samp>&rsquo;<dd>his matches a string starting with &lsquo;<samp><span class="samp">main</span></samp>&rsquo;,
+followed by an opening and closing
+parenthesis.  The &lsquo;<samp><span class="samp">n</span></samp>&rsquo;, &lsquo;<samp><span class="samp">(</span></samp>&rsquo; and &lsquo;<samp><span class="samp">)</span></samp>&rsquo; need not
+be adjacent.
+
+     <br><dt>&lsquo;<samp><span class="samp">^#</span></samp>&rsquo;<dd>This matches a string beginning with &lsquo;<samp><span class="samp">#</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">\\$</span></samp>&rsquo;<dd>This matches a string ending with a single backslash.  The
+regexp contains two backslashes for escaping.
+
+     <br><dt>&lsquo;<samp><span class="samp">\$</span></samp>&rsquo;<dd>Instead, this matches a string consisting of a single dollar sign,
+because it is escaped.
+
+     <br><dt>&lsquo;<samp><span class="samp">[a-zA-Z0-9]</span></samp>&rsquo;<dd>In the C locale, this matches any <acronym>ASCII</acronym> letters or digits.
+
+     <br><dt>&lsquo;<samp><span class="samp">[^ </span><kbd>tab</kbd><span class="samp">]\+</span></samp>&rsquo;<dd>(Here <kbd>tab</kbd> stands for a single tab character.) 
+This matches a string of one or more
+characters, none of which is a space or a tab. 
+Usually this means a word.
+
+     <br><dt>&lsquo;<samp><span class="samp">^\(.*\)\n\1$</span></samp>&rsquo;<dd>This matches a string consisting of two equal substrings separated by
+a newline.
+
+     <br><dt>&lsquo;<samp><span class="samp">.\{9\}A$</span></samp>&rsquo;<dd>This matches nine characters followed by an &lsquo;<samp><span class="samp">A</span></samp>&rsquo;.
+
+     <br><dt>&lsquo;<samp><span class="samp">^.\{15\}A</span></samp>&rsquo;<dd>This matches the start of a string that contains 16 characters,
+the last of which is an &lsquo;<samp><span class="samp">A</span></samp>&rsquo;.
+
+   </dl>
+
+<div class="node">
+<a name="Common-Commands"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Regular-Expressions">Regular Expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#sed-Programs">sed Programs</a>
+
+</div>
+
+<h3 class="section">3.4 Often-Used Commands</h3>
+
+<p>If you use <samp><span class="command">sed</span></samp> at all, you will quite likely want to know
+these commands.
+
+     <dl>
+<dt><code>#</code><dd>[No addresses allowed.]
+
+     <p><a name="index-g_t_0023-_0028comments_0029-82"></a><a name="index-Comments_002c-in-scripts-83"></a>The <code>#</code> character begins a comment;
+the comment continues until the next newline.
+
+     <p><a name="index-Portability_002c-comments-84"></a>If you are concerned about portability, be aware that
+some implementations of <samp><span class="command">sed</span></samp> (which are not <span class="sc">posix</span>
+conformant) may only support a single one-line comment,
+and then only when the very first character of the script is a <code>#</code>.
+
+     <p><a name="index-g_t_002dn_002c-forcing-from-within-a-script-85"></a><a name="index-Caveat-_002d_002d_002d-_0023n-on-first-line-86"></a>Warning: if the first two characters of the <samp><span class="command">sed</span></samp> script
+are <code>#n</code>, then the <samp><span class="option">-n</span></samp> (no-autoprint) option is forced. 
+If you want to put a comment in the first line of your script
+and that comment begins with the letter &lsquo;<samp><span class="samp">n</span></samp>&rsquo;
+and you do not want this behavior,
+then be sure to either use a capital &lsquo;<samp><span class="samp">N</span></samp>&rsquo;,
+or place at least one space before the &lsquo;<samp><span class="samp">n</span></samp>&rsquo;.
+
+     <br><dt><code>q [</code><var>exit-code</var><code>]</code><dd>This command only accepts a single address.
+
+     <p><a name="index-q-_0028quit_0029-command-87"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-returning-an-exit-code-88"></a><a name="index-Quitting-89"></a>Exit <samp><span class="command">sed</span></samp> without processing any more commands or input. 
+Note that the current pattern space is printed if auto-print is
+not disabled with the <samp><span class="option">-n</span></samp> options.  The ability to return
+an exit code from the <samp><span class="command">sed</span></samp> script is a <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> extension.
+
+     <br><dt><code>d</code><dd><a name="index-d-_0028delete_0029-command-90"></a><a name="index-Text_002c-deleting-91"></a>Delete the pattern space;
+immediately start next cycle.
+
+     <br><dt><code>p</code><dd><a name="index-p-_0028print_0029-command-92"></a><a name="index-Text_002c-printing-93"></a>Print out the pattern space (to the standard output). 
+This command is usually only used in conjunction with the <samp><span class="option">-n</span></samp>
+command-line option.
+
+     <br><dt><code>n</code><dd><a name="index-n-_0028next_002dline_0029-command-94"></a><a name="index-Next-input-line_002c-replace-pattern-space-with-95"></a><a name="index-Read-next-input-line-96"></a>If auto-print is not disabled, print the pattern space,
+then, regardless, replace the pattern space with the next line of input. 
+If there is no more input then <samp><span class="command">sed</span></samp> exits without processing
+any more commands.
+
+     <br><dt><code>{ </code><var>commands</var><code> }</code><dd><a name="index-g_t_0040_007b_0040_007d-command-grouping-97"></a><a name="index-Grouping-commands-98"></a><a name="index-Command-groups-99"></a>A group of commands may be enclosed between
+<code>{</code> and <code>}</code> characters. 
+This is particularly useful when you want a group of commands
+to be triggered by a single address (or address-range) match.
+
+   </dl>
+
+<div class="node">
+<a name="The-%22s%22-Command"></a>
+<a name="The-_0022s_0022-Command"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Other-Commands">Other Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Common-Commands">Common Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#sed-Programs">sed Programs</a>
+
+</div>
+
+<h3 class="section">3.5 The <code>s</code> Command</h3>
+
+<p>The syntax of the <code>s</code> (as in substitute) command is
+&lsquo;<samp><span class="samp">s/</span><var>regexp</var><span class="samp">/</span><var>replacement</var><span class="samp">/</span><var>flags</var></samp>&rsquo;.  The <code>/</code>
+characters may be uniformly replaced by any other single
+character within any given <code>s</code> command.  The <code>/</code>
+character (or whatever other character is used in its stead)
+can appear in the <var>regexp</var> or <var>replacement</var>
+only if it is preceded by a <code>\</code> character.
+
+   <p>The <code>s</code> command is probably the most important in <samp><span class="command">sed</span></samp>
+and has a lot of different options.  Its basic concept is simple:
+the <code>s</code> command attempts to match the pattern
+space against the supplied <var>regexp</var>; if the match is
+successful, then that portion of the pattern
+space which was matched is replaced with <var>replacement</var>.
+
+   <p><a name="index-Backreferences_002c-in-regular-expressions-100"></a><a name="index-Parenthesized-substrings-101"></a>The <var>replacement</var> can contain <code>\</code><var>n</var> (<var>n</var> being
+a number from 1 to 9, inclusive) references, which refer to
+the portion of the match which is contained between the <var>n</var>th
+<code>\(</code> and its matching <code>\)</code>. 
+Also, the <var>replacement</var> can contain unescaped <code>&amp;</code>
+characters which reference the whole matched portion
+of the pattern space. 
+<a name="index-g_t_0040value_007bSSEDEXT_007d_002c-case-modifiers-in-_0040code_007bs_007d-commands-102"></a>Finally, as a <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> extension, you can include a
+special sequence made of a backslash and one of the letters
+<code>L</code>, <code>l</code>, <code>U</code>, <code>u</code>, or <code>E</code>. 
+The meaning is as follows:
+
+     <dl>
+<dt><code>\L</code><dd>Turn the replacement
+to lowercase until a <code>\U</code> or <code>\E</code> is found,
+
+     <br><dt><code>\l</code><dd>Turn the
+next character to lowercase,
+
+     <br><dt><code>\U</code><dd>Turn the replacement to uppercase
+until a <code>\L</code> or <code>\E</code> is found,
+
+     <br><dt><code>\u</code><dd>Turn the next character
+to uppercase,
+
+     <br><dt><code>\E</code><dd>Stop case conversion started by <code>\L</code> or <code>\U</code>. 
+</dl>
+
+   <p>To include a literal <code>\</code>, <code>&amp;</code>, or newline in the final
+replacement, be sure to precede the desired <code>\</code>, <code>&amp;</code>,
+or newline in the <var>replacement</var> with a <code>\</code>.
+
+   <p><a name="index-s-command_002c-option-flags-103"></a><a name="index-Substitution-of-text_002c-options-104"></a>The <code>s</code> command can be followed by zero or more of the
+following <var>flags</var>:
+
+     <dl>
+<dt><code>g</code><dd><a name="index-Global-substitution-105"></a><a name="index-Replacing-all-text-matching-regexp-in-a-line-106"></a>Apply the replacement to <em>all</em> matches to the <var>regexp</var>,
+not just the first.
+
+     <br><dt><var>number</var><dd><a name="index-Replacing-only-_0040var_007bn_007dth-match-of-regexp-in-a-line-107"></a>Only replace the <var>number</var>th match of the <var>regexp</var>.
+
+     <p><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040code_007bg_007d-and-_0040var_007bnumber_007d-modifier-interaction-in-_0040code_007bs_007d-command-108"></a><a name="index-Mixing-_0040code_007bg_007d-and-_0040var_007bnumber_007d-modifiers-in-the-_0040code_007bs_007d-command-109"></a>Note: the <span class="sc">posix</span> standard does not specify what should happen
+when you mix the <code>g</code> and <var>number</var> modifiers,
+and currently there is no widely agreed upon meaning
+across <samp><span class="command">sed</span></samp> implementations. 
+For <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>, the interaction is defined to be:
+ignore matches before the <var>number</var>th,
+and then match and replace all matches from
+the <var>number</var>th on.
+
+     <br><dt><code>p</code><dd><a name="index-Text_002c-printing-after-substitution-110"></a>If the substitution was made, then print the new pattern space.
+
+     <p>Note: when both the <code>p</code> and <code>e</code> options are specified,
+the relative ordering of the two produces very different results. 
+In general, <code>ep</code> (evaluate then print) is what you want,
+but operating the other way round can be useful for debugging. 
+For this reason, the current version of <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> interprets
+specially the presence of <code>p</code> options both before and after
+<code>e</code>, printing the pattern space before and after evaluation,
+while in general flags for the <code>s</code> command show their
+effect just once.  This behavior, although documented, might
+change in future versions.
+
+     <br><dt><code>w </code><var>file-name</var><dd><a name="index-Text_002c-writing-to-a-file-after-substitution-111"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstdout_007d-file-112"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstderr_007d-file-113"></a>If the substitution was made, then write out the result to the named file. 
+As a <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> extension, two special values of <var>file-name</var> are
+supported: <samp><span class="file">/dev/stderr</span></samp>, which writes the result to the standard
+error, and <samp><span class="file">/dev/stdout</span></samp>, which writes to the standard
+output.<a rel="footnote" href="#fn-4" name="fnd-4"><sup>4</sup></a>
+
+     <br><dt><code>e</code><dd><a name="index-Evaluate-Bourne_002dshell-commands_002c-after-substitution-114"></a><a name="index-Subprocesses-115"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-evaluating-Bourne_002dshell-commands-116"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-subprocesses-117"></a>This command allows one to pipe input from a shell command
+into pattern space.  If a substitution was made, the command
+that is found in pattern space is executed and pattern space
+is replaced with its output.  A trailing newline is suppressed;
+results are undefined if the command to be executed contains
+a <span class="sc">nul</span> character.  This is a <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> extension.
+
+     <br><dt><code>I</code><dt><code>i</code><dd><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040code_007bI_007d-modifier-118"></a><a name="index-Case_002dinsensitive-matching-119"></a>The <code>I</code> modifier to regular-expression matching is a <acronym>GNU</acronym>
+extension which makes <samp><span class="command">sed</span></samp> match <var>regexp</var> in a
+case-insensitive manner.
+
+     <br><dt><code>M</code><dt><code>m</code><dd><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-_0040code_007bM_007d-modifier-120"></a>The <code>M</code> modifier to regular-expression matching is a <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>
+extension which causes <code>^</code> and <code>$</code> to match respectively
+(in addition to the normal behavior) the empty string after a newline,
+and the empty string before a newline.  There are special character
+sequences
+(<code>\`</code> and <code>\'</code>)
+which always match the beginning or the end of the buffer. 
+<code>M</code> stands for <cite>multi-line</cite>.
+
+   </dl>
+
+<div class="node">
+<a name="Other-Commands"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Programming-Commands">Programming Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#sed-Programs">sed Programs</a>
+
+</div>
+
+<h3 class="section">3.6 Less Frequently-Used Commands</h3>
+
+<p>Though perhaps less frequently used than those in the previous
+section, some very small yet useful <samp><span class="command">sed</span></samp> scripts can be built with
+these commands.
+
+     <dl>
+<dt><code>y/</code><var>source-chars</var><code>/</code><var>dest-chars</var><code>/</code><dd>(The <code>/</code> characters may be uniformly replaced by
+any other single character within any given <code>y</code> command.)
+
+     <p><a name="index-y-_0028transliterate_0029-command-121"></a><a name="index-Transliteration-122"></a>Transliterate any characters in the pattern space which match
+any of the <var>source-chars</var> with the corresponding character
+in <var>dest-chars</var>.
+
+     <p>Instances of the <code>/</code> (or whatever other character is used in its stead),
+<code>\</code>, or newlines can appear in the <var>source-chars</var> or <var>dest-chars</var>
+lists, provide that each instance is escaped by a <code>\</code>. 
+The <var>source-chars</var> and <var>dest-chars</var> lists <em>must</em>
+contain the same number of characters (after de-escaping).
+
+     <br><dt><code>a\</code><dt><var>text</var><dd><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-two-addresses-supported-by-most-commands-123"></a>As a <acronym>GNU</acronym> extension, this command accepts two addresses.
+
+     <p><a name="index-a-_0028append-text-lines_0029-command-124"></a><a name="index-Appending-text-after-a-line-125"></a><a name="index-Text_002c-appending-126"></a>Queue the lines of text which follow this command
+(each but the last ending with a <code>\</code>,
+which are removed from the output)
+to be output at the end of the current cycle,
+or when the next input line is read.
+
+     <p>Escape sequences in <var>text</var> are processed, so you should
+use <code>\\</code> in <var>text</var> to print a single backslash.
+
+     <p>As a <acronym>GNU</acronym> extension, if between the <code>a</code> and the newline there is
+other than a whitespace-<code>\</code> sequence, then the text of this line,
+starting at the first non-whitespace character after the <code>a</code>,
+is taken as the first line of the <var>text</var> block. 
+(This enables a simplification in scripting a one-line add.) 
+This extension also works with the <code>i</code> and <code>c</code> commands.
+
+     <br><dt><code>i\</code><dt><var>text</var><dd><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-two-addresses-supported-by-most-commands-127"></a>As a <acronym>GNU</acronym> extension, this command accepts two addresses.
+
+     <p><a name="index-i-_0028insert-text-lines_0029-command-128"></a><a name="index-Inserting-text-before-a-line-129"></a><a name="index-Text_002c-insertion-130"></a>Immediately output the lines of text which follow this command
+(each but the last ending with a <code>\</code>,
+which are removed from the output).
+
+     <br><dt><code>c\</code><dt><var>text</var><dd><a name="index-c-_0028change-to-text-lines_0029-command-131"></a><a name="index-Replacing-selected-lines-with-other-text-132"></a>Delete the lines matching the address or address-range,
+and output the lines of text which follow this command
+(each but the last ending with a <code>\</code>,
+which are removed from the output)
+in place of the last line
+(or in place of each line, if no addresses were specified). 
+A new cycle is started after this command is done,
+since the pattern space will have been deleted.
+
+     <br><dt><code>=</code><dd><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-two-addresses-supported-by-most-commands-133"></a>As a <acronym>GNU</acronym> extension, this command accepts two addresses.
+
+     <p><a name="index-g_t_003d-_0028print-line-number_0029-command-134"></a><a name="index-Printing-line-number-135"></a><a name="index-Line-number_002c-printing-136"></a>Print out the current input line number (with a trailing newline).
+
+     <br><dt><code>l </code><var>n</var><dd><a name="index-l-_0028list-unambiguously_0029-command-137"></a><a name="index-List-pattern-space-138"></a><a name="index-Printing-text-unambiguously-139"></a><a name="index-Line-length_002c-setting-140"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-setting-line-length-141"></a>Print the pattern space in an unambiguous form:
+non-printable characters (and the <code>\</code> character)
+are printed in C-style escaped form; long lines are split,
+with a trailing <code>\</code> character to indicate the split;
+the end of each line is marked with a <code>$</code>.
+
+     <p><var>n</var> specifies the desired line-wrap length;
+a length of 0 (zero) means to never wrap long lines.  If omitted,
+the default as specified on the command line is used.  The <var>n</var>
+parameter is a <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> extension.
+
+     <br><dt><code>r </code><var>filename</var><dd><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-two-addresses-supported-by-most-commands-142"></a>As a <acronym>GNU</acronym> extension, this command accepts two addresses.
+
+     <p><a name="index-r-_0028read-file_0029-command-143"></a><a name="index-Read-text-from-a-file-144"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstdin_007d-file-145"></a>Queue the contents of <var>filename</var> to be read and
+inserted into the output stream at the end of the current cycle,
+or when the next input line is read. 
+Note that if <var>filename</var> cannot be read, it is treated as
+if it were an empty file, without any error indication.
+
+     <p>As a <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> extension, the special value <samp><span class="file">/dev/stdin</span></samp>
+is supported for the file name, which reads the contents of the
+standard input.
+
+     <br><dt><code>w </code><var>filename</var><dd><a name="index-w-_0028write-file_0029-command-146"></a><a name="index-Write-to-a-file-147"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstdout_007d-file-148"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstderr_007d-file-149"></a>Write the pattern space to <var>filename</var>. 
+As a <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> extension, two special values of <var>file-name</var> are
+supported: <samp><span class="file">/dev/stderr</span></samp>, which writes the result to the standard
+error, and <samp><span class="file">/dev/stdout</span></samp>, which writes to the standard
+output.<a rel="footnote" href="#fn-5" name="fnd-5"><sup>5</sup></a>
+
+     <p>The file will be created (or truncated) before the
+first input line is read; all <code>w</code> commands
+(including instances of <code>w</code> flag on successful <code>s</code> commands)
+which refer to the same <var>filename</var> are output without
+closing and reopening the file.
+
+     <br><dt><code>D</code><dd><a name="index-D-_0028delete-first-line_0029-command-150"></a><a name="index-Delete-first-line-from-pattern-space-151"></a>Delete text in the pattern space up to the first newline. 
+If any text is left, restart cycle with the resultant
+pattern space (without reading a new line of input),
+otherwise start a normal new cycle.
+
+     <br><dt><code>N</code><dd><a name="index-N-_0028append-Next-line_0029-command-152"></a><a name="index-Next-input-line_002c-append-to-pattern-space-153"></a><a name="index-Append-next-input-line-to-pattern-space-154"></a>Add a newline to the pattern space,
+then append the next line of input to the pattern space. 
+If there is no more input then <samp><span class="command">sed</span></samp> exits without processing
+any more commands.
+
+     <br><dt><code>P</code><dd><a name="index-P-_0028print-first-line_0029-command-155"></a><a name="index-Print-first-line-from-pattern-space-156"></a>Print out the portion of the pattern space up to the first newline.
+
+     <br><dt><code>h</code><dd><a name="index-h-_0028hold_0029-command-157"></a><a name="index-Copy-pattern-space-into-hold-space-158"></a><a name="index-Replace-hold-space-with-copy-of-pattern-space-159"></a><a name="index-Hold-space_002c-copying-pattern-space-into-160"></a>Replace the contents of the hold space with the contents of the pattern space.
+
+     <br><dt><code>H</code><dd><a name="index-H-_0028append-Hold_0029-command-161"></a><a name="index-Append-pattern-space-to-hold-space-162"></a><a name="index-Hold-space_002c-appending-from-pattern-space-163"></a>Append a newline to the contents of the hold space,
+and then append the contents of the pattern space to that of the hold space.
+
+     <br><dt><code>g</code><dd><a name="index-g-_0028get_0029-command-164"></a><a name="index-Copy-hold-space-into-pattern-space-165"></a><a name="index-Replace-pattern-space-with-copy-of-hold-space-166"></a><a name="index-Hold-space_002c-copy-into-pattern-space-167"></a>Replace the contents of the pattern space with the contents of the hold space.
+
+     <br><dt><code>G</code><dd><a name="index-G-_0028appending-Get_0029-command-168"></a><a name="index-Append-hold-space-to-pattern-space-169"></a><a name="index-Hold-space_002c-appending-to-pattern-space-170"></a>Append a newline to the contents of the pattern space,
+and then append the contents of the hold space to that of the pattern space.
+
+     <br><dt><code>x</code><dd><a name="index-x-_0028eXchange_0029-command-171"></a><a name="index-Exchange-hold-space-with-pattern-space-172"></a><a name="index-Hold-space_002c-exchange-with-pattern-space-173"></a>Exchange the contents of the hold and pattern spaces.
+
+   </dl>
+
+<div class="node">
+<a name="Programming-Commands"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Extended-Commands">Extended Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Other-Commands">Other Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#sed-Programs">sed Programs</a>
+
+</div>
+
+<h3 class="section">3.7 Commands for <samp><span class="command">sed</span></samp> gurus</h3>
+
+<p>In most cases, use of these commands indicates that you are
+probably better off programming in something like <samp><span class="command">awk</span></samp>
+or Perl.  But occasionally one is committed to sticking
+with <samp><span class="command">sed</span></samp>, and these commands can enable one to write
+quite convoluted scripts.
+
+   <p><a name="index-Flow-of-control-in-scripts-174"></a>
+     <dl>
+<dt><code>: </code><var>label</var><dd>[No addresses allowed.]
+
+     <p><a name="index-g_t_003a-_0028label_0029-command-175"></a><a name="index-Labels_002c-in-scripts-176"></a>Specify the location of <var>label</var> for branch commands. 
+In all other respects, a no-op.
+
+     <br><dt><code>b </code><var>label</var><dd><a name="index-b-_0028branch_0029-command-177"></a><a name="index-Branch-to-a-label_002c-unconditionally-178"></a><a name="index-Goto_002c-in-scripts-179"></a>Unconditionally branch to <var>label</var>. 
+The <var>label</var> may be omitted, in which case the next cycle is started.
+
+     <br><dt><code>t </code><var>label</var><dd><a name="index-t-_0028test-and-branch-if-successful_0029-command-180"></a><a name="index-Branch-to-a-label_002c-if-_0040code_007bs_002f_002f_002f_007d-succeeded-181"></a><a name="index-Conditional-branch-182"></a>Branch to <var>label</var> only if there has been a successful <code>s</code>ubstitution
+since the last input line was read or conditional branch was taken. 
+The <var>label</var> may be omitted, in which case the next cycle is started.
+
+   </dl>
+
+<div class="node">
+<a name="Extended-Commands"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Escapes">Escapes</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Programming-Commands">Programming Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#sed-Programs">sed Programs</a>
+
+</div>
+
+<h3 class="section">3.8 Commands Specific to <acronym>GNU</acronym> <samp><span class="command">sed</span></samp></h3>
+
+<p>These commands are specific to <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>, so you
+must use them with care and only when you are sure that
+hindering portability is not evil.  They allow you to check
+for <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> extensions or to do tasks that are required
+quite often, yet are unsupported by standard <samp><span class="command">sed</span></samp>s.
+
+     <dl>
+<dt><code>e [</code><var>command</var><code>]</code><dd><a name="index-e-_0028evaluate_0029-command-183"></a><a name="index-Evaluate-Bourne_002dshell-commands-184"></a><a name="index-Subprocesses-185"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-evaluating-Bourne_002dshell-commands-186"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-subprocesses-187"></a>This command allows one to pipe input from a shell command
+into pattern space.  Without parameters, the <code>e</code> command
+executes the command that is found in pattern space and
+replaces the pattern space with the output; a trailing newline
+is suppressed.
+
+     <p>If a parameter is specified, instead, the <code>e</code> command
+interprets it as a command and sends its output to the output stream
+(like <code>r</code> does).  The command can run across multiple
+lines, all but the last ending with a back-slash.
+
+     <p>In both cases, the results are undefined if the command to be
+executed contains a <span class="sc">nul</span> character.
+
+     <br><dt><code>L </code><var>n</var><dd><a name="index-L-_0028fLow-paragraphs_0029-command-188"></a><a name="index-Reformat-pattern-space-189"></a><a name="index-Reformatting-paragraphs-190"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-reformatting-paragraphs-191"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-_0040code_007bL_007d-command-192"></a>This <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> extension fills and joins lines in pattern space
+to produce output lines of (at most) <var>n</var> characters, like
+<code>fmt</code> does; if <var>n</var> is omitted, the default as specified
+on the command line is used.  This command is considered a failed
+experiment and unless there is enough request (which seems unlikely)
+will be removed in future versions.
+
+     <br><dt><code>Q [</code><var>exit-code</var><code>]</code><dd>This command only accepts a single address.
+
+     <p><a name="index-Q-_0028silent-Quit_0029-command-193"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-quitting-silently-194"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-returning-an-exit-code-195"></a><a name="index-Quitting-196"></a>This command is the same as <code>q</code>, but will not print the
+contents of pattern space.  Like <code>q</code>, it provides the
+ability to return an exit code to the caller.
+
+     <p>This command can be useful because the only alternative ways
+to accomplish this apparently trivial function are to use
+the <samp><span class="option">-n</span></samp> option (which can unnecessarily complicate
+your script) or resorting to the following snippet, which
+wastes time by reading the whole file without any visible effect:
+
+     <pre class="example">          :eat
+          $d       <span class="roman">Quit silently on the last line</span>
+          N        <span class="roman">Read another line, silently</span>
+          g        <span class="roman">Overwrite pattern space each time to save memory</span>
+          b eat
+</pre>
+     <br><dt><code>R </code><var>filename</var><dd><a name="index-R-_0028read-line_0029-command-197"></a><a name="index-Read-text-from-a-file-198"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-reading-a-file-a-line-at-a-time-199"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-_0040code_007bR_007d-command-200"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstdin_007d-file-201"></a>Queue a line of <var>filename</var> to be read and
+inserted into the output stream at the end of the current cycle,
+or when the next input line is read. 
+Note that if <var>filename</var> cannot be read, or if its end is
+reached, no line is appended, without any error indication.
+
+     <p>As with the <code>r</code> command, the special value <samp><span class="file">/dev/stdin</span></samp>
+is supported for the file name, which reads a line from the
+standard input.
+
+     <br><dt><code>T </code><var>label</var><dd><a name="index-T-_0028test-and-branch-if-failed_0029-command-202"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-branch-if-_0040code_007bs_002f_002f_002f_007d-failed-203"></a><a name="index-Branch-to-a-label_002c-if-_0040code_007bs_002f_002f_002f_007d-failed-204"></a><a name="index-Conditional-branch-205"></a>Branch to <var>label</var> only if there have been no successful
+<code>s</code>ubstitutions since the last input line was read or
+conditional branch was taken. The <var>label</var> may be omitted,
+in which case the next cycle is started.
+
+     <br><dt><code>v </code><var>version</var><dd><a name="index-v-_0028version_0029-command-206"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-checking-for-their-presence-207"></a><a name="index-Requiring-_0040value_007bSSED_007d-208"></a>This command does nothing, but makes <samp><span class="command">sed</span></samp> fail if
+<acronym>GNU</acronym> <samp><span class="command">sed</span></samp> extensions are not supported, simply because other
+versions of <samp><span class="command">sed</span></samp> do not implement it.  In addition, you
+can specify the version of <samp><span class="command">sed</span></samp> that your script
+requires, such as <code>4.0.5</code>.  The default is <code>4.0</code>
+because that is the first version that implemented this command.
+
+     <p>This command enables all <acronym>GNU</acronym> extensions even if
+<samp><span class="env">POSIXLY_CORRECT</span></samp> is set in the environment.
+
+     <br><dt><code>W </code><var>filename</var><dd><a name="index-W-_0028write-first-line_0029-command-209"></a><a name="index-Write-first-line-to-a-file-210"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-writing-first-line-to-a-file-211"></a>Write to the given filename the portion of the pattern space up to
+the first newline.  Everything said under the <code>w</code> command about
+file handling holds here too.
+
+     <br><dt><code>z</code><dd><a name="index-z-_0028Zap_0029-command-212"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-emptying-pattern-space-213"></a><a name="index-Emptying-pattern-space-214"></a>This command empties the content of pattern space.  It is
+usually the same as &lsquo;<samp><span class="samp">s/.*//</span></samp>&rsquo;, but is more efficient
+and works in the presence of invalid multibyte sequences
+in the input stream.  <span class="sc">posix</span> mandates that such sequences
+are <em>not</em> matched by &lsquo;<samp><span class="samp">.</span></samp>&rsquo;, so that there is no portable
+way to clear <samp><span class="command">sed</span></samp>'s buffers in the middle of the
+script in most multibyte locales (including UTF-8 locales). 
+</dl>
+
+<div class="node">
+<a name="Escapes"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Extended-Commands">Extended Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#sed-Programs">sed Programs</a>
+
+</div>
+
+<h3 class="section">3.9 <acronym>GNU</acronym> Extensions for Escapes in Regular Expressions</h3>
+
+<p><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-special-escapes-215"></a>Until this chapter, we have only encountered escapes of the form
+&lsquo;<samp><span class="samp">\^</span></samp>&rsquo;, which tell <samp><span class="command">sed</span></samp> not to interpret the circumflex
+as a special character, but rather to take it literally.  For
+example, &lsquo;<samp><span class="samp">\*</span></samp>&rsquo; matches a single asterisk rather than zero
+or more backslashes.
+
+   <p><a name="index-g_t_0040code_007bPOSIXLY_005fCORRECT_007d-behavior_002c-escapes-216"></a>This chapter introduces another kind of escape<a rel="footnote" href="#fn-6" name="fnd-6"><sup>6</sup></a>&mdash;that
+is, escapes that are applied to a character or sequence of characters
+that ordinarily are taken literally, and that <samp><span class="command">sed</span></samp> replaces
+with a special character.  This provides a way
+of encoding non-printable characters in patterns in a visible manner. 
+There is no restriction on the appearance of non-printing characters
+in a <samp><span class="command">sed</span></samp> script but when a script is being prepared in the
+shell or by text editing, it is usually easier to use one of
+the following escape sequences than the binary character it
+represents:
+
+   <p>The list of these escapes is:
+
+     <dl>
+<dt><code>\a</code><dd>Produces or matches a <span class="sc">bel</span> character, that is an &ldquo;alert&rdquo; (<span class="sc">ascii</span> 7).
+
+     <br><dt><code>\f</code><dd>Produces or matches a form feed (<span class="sc">ascii</span> 12).
+
+     <br><dt><code>\n</code><dd>Produces or matches a newline (<span class="sc">ascii</span> 10).
+
+     <br><dt><code>\r</code><dd>Produces or matches a carriage return (<span class="sc">ascii</span> 13).
+
+     <br><dt><code>\t</code><dd>Produces or matches a horizontal tab (<span class="sc">ascii</span> 9).
+
+     <br><dt><code>\v</code><dd>Produces or matches a so called &ldquo;vertical tab&rdquo; (<span class="sc">ascii</span> 11).
+
+     <br><dt><code>\c</code><var>x</var><dd>Produces or matches <span class="sc">Control</span><kbd>-</kbd><var>x</var>, where <var>x</var> is
+any character.  The precise effect of &lsquo;<samp><span class="samp">\c</span><var>x</var></samp>&rsquo; is as follows:
+if <var>x</var> is a lower case letter, it is converted to upper case. 
+Then bit 6 of the character (hex 40) is inverted.  Thus &lsquo;<samp><span class="samp">\cz</span></samp>&rsquo; becomes
+hex 1A, but &lsquo;<samp><span class="samp">\c{</span></samp>&rsquo; becomes hex 3B, while &lsquo;<samp><span class="samp">\c;</span></samp>&rsquo; becomes hex 7B.
+
+     <br><dt><code>\d</code><var>xxx</var><dd>Produces or matches a character whose decimal <span class="sc">ascii</span> value is <var>xxx</var>.
+
+     <br><dt><code>\o</code><var>xxx</var><dd>Produces or matches a character whose octal <span class="sc">ascii</span> value is <var>xxx</var>.
+
+     <br><dt><code>\x</code><var>xx</var><dd>Produces or matches a character whose hexadecimal <span class="sc">ascii</span> value is <var>xx</var>. 
+</dl>
+
+   <p>&lsquo;<samp><span class="samp">\b</span></samp>&rsquo; (backspace) was omitted because of the conflict with
+the existing &ldquo;word boundary&rdquo; meaning.
+
+   <p>Other escapes match a particular character class and are valid only in
+regular expressions:
+
+     <dl>
+<dt><code>\w</code><dd>Matches any &ldquo;word&rdquo; character.  A &ldquo;word&rdquo; character is any
+letter or digit or the underscore character.
+
+     <br><dt><code>\W</code><dd>Matches any &ldquo;non-word&rdquo; character.
+
+     <br><dt><code>\b</code><dd>Matches a word boundary; that is it matches if the character
+to the left is a &ldquo;word&rdquo; character and the character to the
+right is a &ldquo;non-word&rdquo; character, or vice-versa.
+
+     <br><dt><code>\B</code><dd>Matches everywhere but on a word boundary; that is it matches
+if the character to the left and the character to the right
+are either both &ldquo;word&rdquo; characters or both &ldquo;non-word&rdquo;
+characters.
+
+     <br><dt><code>\`</code><dd>Matches only at the start of pattern space.  This is different
+from <code>^</code> in multi-line mode.
+
+     <br><dt><code>\'</code><dd>Matches only at the end of pattern space.  This is different
+from <code>$</code> in multi-line mode.
+
+   </dl>
+
+<div class="node">
+<a name="Examples"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Limitations">Limitations</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#sed-Programs">sed Programs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">4 Some Sample Scripts</h2>
+
+<p>Here are some <samp><span class="command">sed</span></samp> scripts to guide you in the art of mastering
+<samp><span class="command">sed</span></samp>.
+
+</li></ul>
+<p>Some exotic examples:
+<ul class="menu">
+<li><a accesskey="1" href="#Centering-lines">Centering lines</a>
+<li><a accesskey="2" href="#Increment-a-number">Increment a number</a>
+<li><a accesskey="3" href="#Rename-files-to-lower-case">Rename files to lower case</a>
+<li><a accesskey="4" href="#Print-bash-environment">Print bash environment</a>
+<li><a accesskey="5" href="#Reverse-chars-of-lines">Reverse chars of lines</a>
+
+</li></ul>
+<p>Emulating standard utilities:
+</p>
+<ul class="menu">
+<li><a accesskey="6" href="#tac">tac</a>:                              Reverse lines of files
+<li><a accesskey="7" href="#cat-_002dn">cat -n</a>:                           Numbering lines
+<li><a accesskey="8" href="#cat-_002db">cat -b</a>:                           Numbering non-blank lines
+<li><a accesskey="9" href="#wc-_002dc">wc -c</a>:                            Counting chars
+<li><a href="#wc-_002dw">wc -w</a>:                            Counting words
+<li><a href="#wc-_002dl">wc -l</a>:                            Counting lines
+<li><a href="#head">head</a>:                             Printing the first lines
+<li><a href="#tail">tail</a>:                             Printing the last lines
+<li><a href="#uniq">uniq</a>:                             Make duplicate lines unique
+<li><a href="#uniq-_002dd">uniq -d</a>:                          Print duplicated lines of input
+<li><a href="#uniq-_002du">uniq -u</a>:                          Remove all duplicated lines
+<li><a href="#cat-_002ds">cat -s</a>:                           Squeezing blank lines
+</ul>
+
+<div class="node">
+<a name="Centering-lines"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Increment-a-number">Increment a number</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.1 Centering Lines</h3>
+
+<p>This script centers all lines of a file on a 80 columns width. 
+To change that width, the number in <code>\{...\}</code> must be
+replaced, and the number of added spaces also must be changed.
+
+   <p>Note how the buffer commands are used to separate parts in
+the regular expressions to be matched&mdash;this is a common
+technique.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -f
+     
+     # Put 80 spaces in the buffer
+     1 {
+       x
+       s/^$/          /
+       s/^.*$/&amp;&amp;&amp;&amp;&amp;&amp;&amp;&amp;/
+       x
+     }
+     
+     # del leading and trailing spaces
+     y/<kbd>tab</kbd>/ /
+     s/^ *//
+     s/ *$//
+     
+     # add a newline and 80 spaces to end of line
+     G
+     
+     # keep first 81 chars (80 + a newline)
+     s/^\(.\{81\}\).*$/\1/
+     
+     # \2 matches half of the spaces, which are moved to the beginning
+     s/^\(.*\)\n\(.*\)\2/\2\1/
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="Increment-a-number"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Rename-files-to-lower-case">Rename files to lower case</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Centering-lines">Centering lines</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.2 Increment a Number</h3>
+
+<p>This script is one of a few that demonstrate how to do arithmetic
+in <samp><span class="command">sed</span></samp>.  This is indeed possible,<a rel="footnote" href="#fn-7" name="fnd-7"><sup>7</sup></a> but must be done manually.
+
+   <p>To increment one number you just add 1 to last digit, replacing
+it by the following digit.  There is one exception: when the digit
+is a nine the previous digits must be also incremented until you
+don't have a nine.
+
+   <p>This solution by Bruno Haible is very clever and smart because
+it uses a single buffer; if you don't have this limitation, the
+algorithm used in <a href="#cat-_002dn">Numbering lines</a>, is faster. 
+It works by replacing trailing nines with an underscore, then
+using multiple <code>s</code> commands to increment the last digit,
+and then again substituting underscores with zeros.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -f
+     
+     /[^0-9]/ d
+     
+     # replace all leading 9s by _ (any other character except digits, could
+     # be used)
+     :d
+     s/9\(_*\)$/_\1/
+     td
+     
+     # incr last digit only.  The first line adds a most-significant
+     # digit of 1 if we have to add a digit.
+     #
+     # The <code>tn</code> commands are not necessary, but make the thing
+     # faster
+     
+     s/^\(_*\)$/1\1/; tn
+     s/8\(_*\)$/9\1/; tn
+     s/7\(_*\)$/8\1/; tn
+     s/6\(_*\)$/7\1/; tn
+     s/5\(_*\)$/6\1/; tn
+     s/4\(_*\)$/5\1/; tn
+     s/3\(_*\)$/4\1/; tn
+     s/2\(_*\)$/3\1/; tn
+     s/1\(_*\)$/2\1/; tn
+     s/0\(_*\)$/1\1/; tn
+     
+     :n
+     y/_/0/
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="Rename-files-to-lower-case"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Print-bash-environment">Print bash environment</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Increment-a-number">Increment a number</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.3 Rename Files to Lower Case</h3>
+
+<p>This is a pretty strange use of <samp><span class="command">sed</span></samp>.  We transform text, and
+transform it to be shell commands, then just feed them to shell. 
+Don't worry, even worse hacks are done when using <samp><span class="command">sed</span></samp>; I have
+seen a script converting the output of <samp><span class="command">date</span></samp> into a <samp><span class="command">bc</span></samp>
+program!
+
+   <p>The main body of this is the <samp><span class="command">sed</span></samp> script, which remaps the name
+from lower to upper (or vice-versa) and even checks out
+if the remapped name is the same as the original name. 
+Note how the script is parameterized using shell
+variables and proper quoting.
+
+<!-- start- -->
+<pre class="example">     #! /bin/sh
+     # rename files to lower/upper case...
+     #
+     # usage:
+     #    move-to-lower *
+     #    move-to-upper *
+     # or
+     #    move-to-lower -R .
+     #    move-to-upper -R .
+     #
+     
+     help()
+     {
+             cat &lt;&lt; eof
+     Usage: $0 [-n] [-r] [-h] files...
+     
+     -n      do nothing, only see what would be done
+     -R      recursive (use find)
+     -h      this message
+     files   files to remap to lower case
+     
+     Examples:
+            $0 -n *        (see if everything is ok, then...)
+            $0 *
+     
+            $0 -R .
+     
+     eof
+     }
+     
+     apply_cmd='sh'
+     finder='echo "$@" | tr " " "\n"'
+     files_only=
+     
+     while :
+     do
+         case "$1" in
+             -n) apply_cmd='cat' ;;
+             -R) finder='find "$@" -type f';;
+             -h) help ; exit 1 ;;
+             *) break ;;
+         esac
+         shift
+     done
+     
+     if [ -z "$1" ]; then
+             echo Usage: $0 [-h] [-n] [-r] files...
+             exit 1
+     fi
+     
+     LOWER='abcdefghijklmnopqrstuvwxyz'
+     UPPER='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+     
+     case `basename $0` in
+             *upper*) TO=$UPPER; FROM=$LOWER ;;
+             *)       FROM=$UPPER; TO=$LOWER ;;
+     esac
+     
+     eval $finder | sed -n '
+     
+     # remove all trailing slashes
+     s/\/*$//
+     
+     # add ./ if there is no path, only a filename
+     /\//! s/^/.\//
+     
+     # save path+filename
+     h
+     
+     # remove path
+     s/.*\///
+     
+     # do conversion only on filename
+     y/'$FROM'/'$TO'/
+     
+     # now line contains original path+file, while
+     # hold space contains the new filename
+     x
+     
+     # add converted file name to line, which now contains
+     # path/file-name\nconverted-file-name
+     G
+     
+     # check if converted file name is equal to original file name,
+     # if it is, do not print nothing
+     /^.*\/\(.*\)\n\1/b
+     
+     # now, transform path/fromfile\n, into
+     # mv path/fromfile path/tofile and print it
+     s/^\(.*\/\)\(.*\)\n\(.*\)$/mv "\1\2" "\1\3"/p
+     
+     ' | $apply_cmd
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="Print-bash-environment"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Reverse-chars-of-lines">Reverse chars of lines</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Rename-files-to-lower-case">Rename files to lower case</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.4 Print <samp><span class="command">bash</span></samp> Environment</h3>
+
+<p>This script strips the definition of the shell functions
+from the output of the <samp><span class="command">set</span></samp> Bourne-shell command.
+
+<!-- start- -->
+<pre class="example">     #!/bin/sh
+     
+     set | sed -n '
+     :x
+     
+     # if no occurrence of &lsquo;<samp><span class="samp">=()</span></samp>&rsquo; print and load next line
+     /=()/! { p; b; }
+     / () $/! { p; b; }
+     
+     # possible start of functions section
+     # save the line in case this is a var like FOO="() "
+     h
+     
+     # if the next line has a brace, we quit because
+     # nothing comes after functions
+     n
+     /^{/ q
+     
+     # print the old line
+     x; p
+     
+     # work on the new line now
+     x; bx
+     '
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="Reverse-chars-of-lines"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#tac">tac</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Print-bash-environment">Print bash environment</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.5 Reverse Characters of Lines</h3>
+
+<p>This script can be used to reverse the position of characters
+in lines.  The technique moves two characters at a time, hence
+it is faster than more intuitive implementations.
+
+   <p>Note the <code>tx</code> command before the definition of the label. 
+This is often needed to reset the flag that is tested by
+the <code>t</code> command.
+
+   <p>Imaginative readers will find uses for this script.  An example
+is reversing the output of <samp><span class="command">banner</span></samp>.<a rel="footnote" href="#fn-8" name="fnd-8"><sup>8</sup></a>
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -f
+     
+     /../! b
+     
+     # Reverse a line.  Begin embedding the line between two newlines
+     s/^.*$/\
+     &amp;\
+     /
+     
+     # Move first character at the end.  The regexp matches until
+     # there are zero or one characters between the markers
+     tx
+     :x
+     s/\(\n.\)\(.*\)\(.\n\)/\3\2\1/
+     tx
+     
+     # Remove the newline markers
+     s/\n//g
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="tac"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#cat-_002dn">cat -n</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Reverse-chars-of-lines">Reverse chars of lines</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.6 Reverse Lines of Files</h3>
+
+<p>This one begins a series of totally useless (yet interesting)
+scripts emulating various Unix commands.  This, in particular,
+is a <samp><span class="command">tac</span></samp> workalike.
+
+   <p>Note that on implementations other than <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>
+this script might easily overflow internal buffers.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -nf
+     
+     # reverse all lines of input, i.e. first line became last, ...
+     
+     # from the second line, the buffer (which contains all previous lines)
+     # is *appended* to current line, so, the order will be reversed
+     1! G
+     
+     # on the last line we're done -- print everything
+     $ p
+     
+     # store everything on the buffer again
+     h
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="cat--n"></a>
+<a name="cat-_002dn"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#cat-_002db">cat -b</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#tac">tac</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.7 Numbering Lines</h3>
+
+<p>This script replaces &lsquo;<samp><span class="samp">cat -n</span></samp>&rsquo;; in fact it formats its output
+exactly like <acronym>GNU</acronym> <samp><span class="command">cat</span></samp> does.
+
+   <p>Of course this is completely useless and for two reasons:  first,
+because somebody else did it in C, second, because the following
+Bourne-shell script could be used for the same purpose and would
+be much faster:
+
+<!-- start- -->
+<pre class="example">     #! /bin/sh
+     sed -e "=" $@ | sed -e '
+       s/^/      /
+       N
+       s/^ *\(......\)\n/\1  /
+     '
+</pre>
+   <!-- end- -->
+   <p>It uses <samp><span class="command">sed</span></samp> to print the line number, then groups lines two
+by two using <code>N</code>.  Of course, this script does not teach as much as
+the one presented below.
+
+   <p>The algorithm used for incrementing uses both buffers, so the line
+is printed as soon as possible and then discarded.  The number
+is split so that changing digits go in a buffer and unchanged ones go
+in the other; the changed digits are modified in a single step
+(using a <code>y</code> command).  The line number for the next line
+is then composed and stored in the hold space, to be used in the
+next iteration.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -nf
+     
+     # Prime the pump on the first line
+     x
+     /^$/ s/^.*$/1/
+     
+     # Add the correct line number before the pattern
+     G
+     h
+     
+     # Format it and print it
+     s/^/      /
+     s/^ *\(......\)\n/\1  /p
+     
+     # Get the line number from hold space; add a zero
+     # if we're going to add a digit on the next line
+     g
+     s/\n.*$//
+     /^9*$/ s/^/0/
+     
+     # separate changing/unchanged digits with an x
+     s/.9*$/x&amp;/
+     
+     # keep changing digits in hold space
+     h
+     s/^.*x//
+     y/0123456789/1234567890/
+     x
+     
+     # keep unchanged digits in pattern space
+     s/x.*$//
+     
+     # compose the new number, remove the newline implicitly added by G
+     G
+     s/\n//
+     h
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="cat--b"></a>
+<a name="cat-_002db"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#wc-_002dc">wc -c</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#cat-_002dn">cat -n</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.8 Numbering Non-blank Lines</h3>
+
+<p>Emulating &lsquo;<samp><span class="samp">cat -b</span></samp>&rsquo; is almost the same as &lsquo;<samp><span class="samp">cat -n</span></samp>&rsquo;&mdash;we only
+have to select which lines are to be numbered and which are not.
+
+   <p>The part that is common to this script and the previous one is
+not commented to show how important it is to comment <samp><span class="command">sed</span></samp>
+scripts properly...
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -nf
+     
+     /^$/ {
+       p
+       b
+     }
+     
+     # Same as cat -n from now
+     x
+     /^$/ s/^.*$/1/
+     G
+     h
+     s/^/      /
+     s/^ *\(......\)\n/\1  /p
+     x
+     s/\n.*$//
+     /^9*$/ s/^/0/
+     s/.9*$/x&amp;/
+     h
+     s/^.*x//
+     y/0123456789/1234567890/
+     x
+     s/x.*$//
+     G
+     s/\n//
+     h
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="wc--c"></a>
+<a name="wc-_002dc"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#wc-_002dw">wc -w</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#cat-_002db">cat -b</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.9 Counting Characters</h3>
+
+<p>This script shows another way to do arithmetic with <samp><span class="command">sed</span></samp>. 
+In this case we have to add possibly large numbers, so implementing
+this by successive increments would not be feasible (and possibly
+even more complicated to contrive than this script).
+
+   <p>The approach is to map numbers to letters, kind of an abacus
+implemented with <samp><span class="command">sed</span></samp>.  &lsquo;<samp><span class="samp">a</span></samp>&rsquo;s are units, &lsquo;<samp><span class="samp">b</span></samp>&rsquo;s are
+tens and so on: we simply add the number of characters
+on the current line as units, and then propagate the carry
+to tens, hundreds, and so on.
+
+   <p>As usual, running totals are kept in hold space.
+
+   <p>On the last line, we convert the abacus form back to decimal. 
+For the sake of variety, this is done with a loop rather than
+with some 80 <code>s</code> commands<a rel="footnote" href="#fn-9" name="fnd-9"><sup>9</sup></a>: first we
+convert units, removing &lsquo;<samp><span class="samp">a</span></samp>&rsquo;s from the number; then we
+rotate letters so that tens become &lsquo;<samp><span class="samp">a</span></samp>&rsquo;s, and so on
+until no more letters remain.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -nf
+     
+     # Add n+1 a's to hold space (+1 is for the newline)
+     s/./a/g
+     H
+     x
+     s/\n/a/
+     
+     # Do the carry.  The t's and b's are not necessary,
+     # but they do speed up the thing
+     t a
+     : a;  s/aaaaaaaaaa/b/g; t b; b done
+     : b;  s/bbbbbbbbbb/c/g; t c; b done
+     : c;  s/cccccccccc/d/g; t d; b done
+     : d;  s/dddddddddd/e/g; t e; b done
+     : e;  s/eeeeeeeeee/f/g; t f; b done
+     : f;  s/ffffffffff/g/g; t g; b done
+     : g;  s/gggggggggg/h/g; t h; b done
+     : h;  s/hhhhhhhhhh//g
+     
+     : done
+     $! {
+       h
+       b
+     }
+     
+     # On the last line, convert back to decimal
+     
+     : loop
+     /a/! s/[b-h]*/&amp;0/
+     s/aaaaaaaaa/9/
+     s/aaaaaaaa/8/
+     s/aaaaaaa/7/
+     s/aaaaaa/6/
+     s/aaaaa/5/
+     s/aaaa/4/
+     s/aaa/3/
+     s/aa/2/
+     s/a/1/
+     
+     : next
+     y/bcdefgh/abcdefg/
+     /[a-h]/ b loop
+     p
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="wc--w"></a>
+<a name="wc-_002dw"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#wc-_002dl">wc -l</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#wc-_002dc">wc -c</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.10 Counting Words</h3>
+
+<p>This script is almost the same as the previous one, once each
+of the words on the line is converted to a single &lsquo;<samp><span class="samp">a</span></samp>&rsquo;
+(in the previous script each letter was changed to an &lsquo;<samp><span class="samp">a</span></samp>&rsquo;).
+
+   <p>It is interesting that real <samp><span class="command">wc</span></samp> programs have optimized
+loops for &lsquo;<samp><span class="samp">wc -c</span></samp>&rsquo;, so they are much slower at counting
+words rather than characters.  This script's bottleneck,
+instead, is arithmetic, and hence the word-counting one
+is faster (it has to manage smaller numbers).
+
+   <p>Again, the common parts are not commented to show the importance
+of commenting <samp><span class="command">sed</span></samp> scripts.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -nf
+     
+     # Convert words to a's
+     s/[ <kbd>tab</kbd>][ <kbd>tab</kbd>]*/ /g
+     s/^/ /
+     s/ [^ ][^ ]*/a /g
+     s/ //g
+     
+     # Append them to hold space
+     H
+     x
+     s/\n//
+     
+     # From here on it is the same as in wc -c.
+     /aaaaaaaaaa/! bx;   s/aaaaaaaaaa/b/g
+     /bbbbbbbbbb/! bx;   s/bbbbbbbbbb/c/g
+     /cccccccccc/! bx;   s/cccccccccc/d/g
+     /dddddddddd/! bx;   s/dddddddddd/e/g
+     /eeeeeeeeee/! bx;   s/eeeeeeeeee/f/g
+     /ffffffffff/! bx;   s/ffffffffff/g/g
+     /gggggggggg/! bx;   s/gggggggggg/h/g
+     s/hhhhhhhhhh//g
+     :x
+     $! { h; b; }
+     :y
+     /a/! s/[b-h]*/&amp;0/
+     s/aaaaaaaaa/9/
+     s/aaaaaaaa/8/
+     s/aaaaaaa/7/
+     s/aaaaaa/6/
+     s/aaaaa/5/
+     s/aaaa/4/
+     s/aaa/3/
+     s/aa/2/
+     s/a/1/
+     y/bcdefgh/abcdefg/
+     /[a-h]/ by
+     p
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="wc--l"></a>
+<a name="wc-_002dl"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#head">head</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#wc-_002dw">wc -w</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.11 Counting Lines</h3>
+
+<p>No strange things are done now, because <samp><span class="command">sed</span></samp> gives us
+&lsquo;<samp><span class="samp">wc -l</span></samp>&rsquo; functionality for free!!! Look:
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -nf
+     $=
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="head"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#tail">tail</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#wc-_002dl">wc -l</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.12 Printing the First Lines</h3>
+
+<p>This script is probably the simplest useful <samp><span class="command">sed</span></samp> script. 
+It displays the first 10 lines of input; the number of displayed
+lines is right before the <code>q</code> command.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -f
+     10q
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="tail"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#uniq">uniq</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#head">head</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.13 Printing the Last Lines</h3>
+
+<p>Printing the last <var>n</var> lines rather than the first is more complex
+but indeed possible.  <var>n</var> is encoded in the second line, before
+the bang character.
+
+   <p>This script is similar to the <samp><span class="command">tac</span></samp> script in that it keeps the
+final output in the hold space and prints it at the end:
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -nf
+     
+     1! {; H; g; }
+     1,10 !s/[^\n]*\n//
+     $p
+     h
+</pre>
+   <!-- end- -->
+   <p>Mainly, the scripts keeps a window of 10 lines and slides it
+by adding a line and deleting the oldest (the substitution command
+on the second line works like a <code>D</code> command but does not
+restart the loop).
+
+   <p>The &ldquo;sliding window&rdquo; technique is a very powerful way to write
+efficient and complex <samp><span class="command">sed</span></samp> scripts, because commands like
+<code>P</code> would require a lot of work if implemented manually.
+
+   <p>To introduce the technique, which is fully demonstrated in the
+rest of this chapter and is based on the <code>N</code>, <code>P</code>
+and <code>D</code> commands, here is an implementation of <samp><span class="command">tail</span></samp>
+using a simple &ldquo;sliding window.&rdquo;
+
+   <p>This looks complicated but in fact the working is the same as
+the last script: after we have kicked in the appropriate number
+of lines, however, we stop using the hold space to keep inter-line
+state, and instead use <code>N</code> and <code>D</code> to slide pattern
+space by one line:
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -f
+     
+     1h
+     2,10 {; H; g; }
+     $q
+     1,9d
+     N
+     D
+</pre>
+   <!-- end- -->
+   <p>Note how the first, second and fourth line are inactive after
+the first ten lines of input.  After that, all the script does
+is: exiting on the last line of input, appending the next input
+line to pattern space, and removing the first line.
+
+<div class="node">
+<a name="uniq"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#uniq-_002dd">uniq -d</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#tail">tail</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.14 Make Duplicate Lines Unique</h3>
+
+<p>This is an example of the art of using the <code>N</code>, <code>P</code>
+and <code>D</code> commands, probably the most difficult to master.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -f
+     h
+     
+     :b
+     # On the last line, print and exit
+     $b
+     N
+     /^\(.*\)\n\1$/ {
+         # The two lines are identical.  Undo the effect of
+         # the n command.
+         g
+         bb
+     }
+     
+     # If the <code>N</code> command had added the last line, print and exit
+     $b
+     
+     # The lines are different; print the first and go
+     # back working on the second.
+     P
+     D
+</pre>
+   <!-- end- -->
+   <p>As you can see, we mantain a 2-line window using <code>P</code> and <code>D</code>. 
+This technique is often used in advanced <samp><span class="command">sed</span></samp> scripts.
+
+<div class="node">
+<a name="uniq--d"></a>
+<a name="uniq-_002dd"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#uniq-_002du">uniq -u</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#uniq">uniq</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.15 Print Duplicated Lines of Input</h3>
+
+<p>This script prints only duplicated lines, like &lsquo;<samp><span class="samp">uniq -d</span></samp>&rsquo;.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -nf
+     
+     $b
+     N
+     /^\(.*\)\n\1$/ {
+         # Print the first of the duplicated lines
+         s/.*\n//
+         p
+     
+         # Loop until we get a different line
+         :b
+         $b
+         N
+         /^\(.*\)\n\1$/ {
+             s/.*\n//
+             bb
+         }
+     }
+     
+     # The last line cannot be followed by duplicates
+     $b
+     
+     # Found a different one.  Leave it alone in the pattern space
+     # and go back to the top, hunting its duplicates
+     D
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="uniq--u"></a>
+<a name="uniq-_002du"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#cat-_002ds">cat -s</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#uniq-_002dd">uniq -d</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.16 Remove All Duplicated Lines</h3>
+
+<p>This script prints only unique lines, like &lsquo;<samp><span class="samp">uniq -u</span></samp>&rsquo;.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -f
+     
+     # Search for a duplicate line --- until that, print what you find.
+     $b
+     N
+     /^\(.*\)\n\1$/ ! {
+         P
+         D
+     }
+     
+     :c
+     # Got two equal lines in pattern space.  At the
+     # end of the file we simply exit
+     $d
+     
+     # Else, we keep reading lines with <code>N</code> until we
+     # find a different one
+     s/.*\n//
+     N
+     /^\(.*\)\n\1$/ {
+         bc
+     }
+     
+     # Remove the last instance of the duplicate line
+     # and go back to the top
+     D
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="cat--s"></a>
+<a name="cat-_002ds"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#uniq-_002du">uniq -u</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Examples">Examples</a>
+
+</div>
+
+<h3 class="section">4.17 Squeezing Blank Lines</h3>
+
+<p>As a final example, here are three scripts, of increasing complexity
+and speed, that implement the same function as &lsquo;<samp><span class="samp">cat -s</span></samp>&rsquo;, that is
+squeezing blank lines.
+
+   <p>The first leaves a blank line at the beginning and end if there are
+some already.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -f
+     
+     # on empty lines, join with next
+     # Note there is a star in the regexp
+     :x
+     /^\n*$/ {
+     N
+     bx
+     }
+     
+     # now, squeeze all '\n', this can be also done by:
+     # s/^\(\n\)*/\1/
+     s/\n*/\
+     /
+</pre>
+   <!-- end- -->
+   <p>This one is a bit more complex and removes all empty lines
+at the beginning.  It does leave a single blank line at end
+if one was there.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -f
+     
+     # delete all leading empty lines
+     1,/^./{
+     /./!d
+     }
+     
+     # on an empty line we remove it and all the following
+     # empty lines, but one
+     :x
+     /./!{
+     N
+     s/^\n$//
+     tx
+     }
+</pre>
+   <!-- end- -->
+   <p>This removes leading and trailing blank lines.  It is also the
+fastest.  Note that loops are completely done with <code>n</code> and
+<code>b</code>, without relying on <samp><span class="command">sed</span></samp> to restart the
+the script automatically at the end of a line.
+
+<!-- start- -->
+<pre class="example">     #!/usr/bin/sed -nf
+     
+     # delete all (leading) blanks
+     /./!d
+     
+     # get here: so there is a non empty
+     :x
+     # print it
+     p
+     # get next
+     n
+     # got chars? print it again, etc...
+     /./bx
+     
+     # no, don't have chars: got an empty line
+     :z
+     # get next, if last line we finish here so no trailing
+     # empty lines are written
+     n
+     # also empty? then ignore it, and get next... this will
+     # remove ALL empty lines
+     /./!bz
+     
+     # all empty lines were deleted/ignored, but we have a non empty.  As
+     # what we want to do is to squeeze, insert a blank line artificially
+     i\
+     
+     bx
+</pre>
+   <!-- end- -->
+<div class="node">
+<a name="Limitations"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Other-Resources">Other Resources</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Examples">Examples</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">5 <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>'s Limitations and Non-limitations</h2>
+
+<p><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-unlimited-line-length-217"></a><a name="index-Portability_002c-line-length-limitations-218"></a>For those who want to write portable <samp><span class="command">sed</span></samp> scripts,
+be aware that some implementations have been known to
+limit line lengths (for the pattern and hold spaces)
+to be no more than 4000 bytes. 
+The <span class="sc">posix</span> standard specifies that conforming <samp><span class="command">sed</span></samp>
+implementations shall support at least 8192 byte line lengths. 
+<acronym>GNU</acronym> <samp><span class="command">sed</span></samp> has no built-in limit on line length;
+as long as it can <code>malloc()</code> more (virtual) memory,
+you can feed or construct lines as long as you like.
+
+   <p>However, recursion is used to handle subpatterns and indefinite
+repetition.  This means that the available stack space may limit
+the size of the buffer that can be processed by certain patterns.
+
+<div class="node">
+<a name="Other-Resources"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Reporting-Bugs">Reporting Bugs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Limitations">Limitations</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">6 Other Resources for Learning About <samp><span class="command">sed</span></samp></h2>
+
+<p><a name="index-Additional-reading-about-_0040command_007bsed_007d-219"></a>In addition to several books that have been written about <samp><span class="command">sed</span></samp>
+(either specifically or as chapters in books which discuss
+shell programming), one can find out more about <samp><span class="command">sed</span></samp>
+(including suggestions of a few books) from the FAQ
+for the <code>sed-users</code> mailing list, available from:
+<pre class="display">     <a href="http://sed.sourceforge.net/sedfaq.html">http://sed.sourceforge.net/sedfaq.html</a>
+</pre>
+   <p>Also of interest are
+<a href="http://www.student.northpark.edu/pemente/sed/index.htm">http://www.student.northpark.edu/pemente/sed/index.htm</a>
+and <a href="http://sed.sf.net/grabbag">http://sed.sf.net/grabbag</a>,
+which include <samp><span class="command">sed</span></samp> tutorials and other <samp><span class="command">sed</span></samp>-related goodies.
+
+   <p>The <code>sed-users</code> mailing list itself maintained by Sven Guckes. 
+To subscribe, visit <a href="http://groups.yahoo.com">http://groups.yahoo.com</a> and search
+for the <code>sed-users</code> mailing list.
+
+<div class="node">
+<a name="Reporting-Bugs"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Extended-regexps">Extended regexps</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Other-Resources">Other Resources</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">7 Reporting Bugs</h2>
+
+<p><a name="index-Bugs_002c-reporting-220"></a>Email bug reports to <a href="mailto:bonzini@gnu.org">bonzini@gnu.org</a>. 
+Be sure to include the word &ldquo;sed&rdquo; somewhere in the <code>Subject:</code> field. 
+Also, please include the output of &lsquo;<samp><span class="samp">sed --version</span></samp>&rsquo; in the body
+of your report if at all possible.
+
+   <p>Please do not send a bug report like this:
+
+<pre class="example">     <span class="roman">while building frobme-1.3.4</span>
+     $ configure
+     error--&gt; sed: file sedscr line 1: Unknown option to 's'
+</pre>
+   <p>If <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> doesn't configure your favorite package, take a
+few extra minutes to identify the specific problem and make a stand-alone
+test case.  Unlike other programs such as C compilers, making such test
+cases for <samp><span class="command">sed</span></samp> is quite simple.
+
+   <p>A stand-alone test case includes all the data necessary to perform the
+test, and the specific invocation of <samp><span class="command">sed</span></samp> that causes the problem. 
+The smaller a stand-alone test case is, the better.  A test case should
+not involve something as far removed from <samp><span class="command">sed</span></samp> as &ldquo;try to configure
+frobme-1.3.4&rdquo;.  Yes, that is in principle enough information to look
+for the bug, but that is not a very practical prospect.
+
+   <p>Here are a few commonly reported bugs that are not bugs.
+
+     <dl>
+<dt><code>N</code> command on the last line<dd><a name="index-Portability_002c-_0040code_007bN_007d-command-on-the-last-line-221"></a><a name="index-Non_002dbugs_002c-_0040code_007bN_007d-command-on-the-last-line-222"></a>
+Most versions of <samp><span class="command">sed</span></samp> exit without printing anything when
+the <samp><span class="command">N</span></samp> command is issued on the last line of a file. 
+<acronym>GNU</acronym> <samp><span class="command">sed</span></samp> prints pattern space before exiting unless of course
+the <samp><span class="command">-n</span></samp> command switch has been specified.  This choice is
+by design.
+
+     <p>For example, the behavior of
+     <pre class="example">          sed N foo bar
+</pre>
+     <p class="noindent">would depend on whether foo has an even or an odd number of
+lines<a rel="footnote" href="#fn-10" name="fnd-10"><sup>10</sup></a>.  Or, when writing a script to read the
+next few lines following a pattern match, traditional
+implementations of <code>sed</code> would force you to write
+something like
+     <pre class="example">          /foo/{ $!N; $!N; $!N; $!N; $!N; $!N; $!N; $!N; $!N }
+</pre>
+     <p class="noindent">instead of just
+     <pre class="example">          /foo/{ N;N;N;N;N;N;N;N;N; }
+</pre>
+     <p><a name="index-g_t_0040code_007bPOSIXLY_005fCORRECT_007d-behavior_002c-_0040code_007bN_007d-command-223"></a>In any case, the simplest workaround is to use <code>$d;N</code> in
+scripts that rely on the traditional behavior, or to set
+the <code>POSIXLY_CORRECT</code> variable to a non-empty value.
+
+     <br><dt>Regex syntax clashes (problems with backslashes)<dd><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-to-basic-regular-expressions-224"></a><a name="index-Non_002dbugs_002c-regex-syntax-clashes-225"></a><samp><span class="command">sed</span></samp> uses the <span class="sc">posix</span> basic regular expression syntax.  According to
+the standard, the meaning of some escape sequences is undefined in
+this syntax;  notable in the case of <samp><span class="command">sed</span></samp> are <code>\|</code>,
+<code>\+</code>, <code>\?</code>, <code>\`</code>, <code>\'</code>, <code>\&lt;</code>,
+<code>\&gt;</code>, <code>\b</code>, <code>\B</code>, <code>\w</code>, and <code>\W</code>.
+
+     <p>As in all <acronym>GNU</acronym> programs that use <span class="sc">posix</span> basic regular
+expressions, <samp><span class="command">sed</span></samp> interprets these escape sequences as special
+characters.  So, <code>x\+</code> matches one or more occurrences of &lsquo;<samp><span class="samp">x</span></samp>&rsquo;. 
+<code>abc\|def</code> matches either &lsquo;<samp><span class="samp">abc</span></samp>&rsquo; or &lsquo;<samp><span class="samp">def</span></samp>&rsquo;.
+
+     <p>This syntax may cause problems when running scripts written for other
+<samp><span class="command">sed</span></samp>s.  Some <samp><span class="command">sed</span></samp> programs have been written with the
+assumption that <code>\|</code> and <code>\+</code> match the literal characters
+<code>|</code> and <code>+</code>.  Such scripts must be modified by removing the
+spurious backslashes if they are to be used with modern implementations
+of <samp><span class="command">sed</span></samp>, like
+<acronym>GNU</acronym> <samp><span class="command">sed</span></samp>.
+
+     <p>On the other hand, some scripts use s|abc\|def||g to remove occurrences
+of <em>either</em> <code>abc</code> or <code>def</code>.  While this worked until
+<samp><span class="command">sed</span></samp> 4.0.x, newer versions interpret this as removing the
+string <code>abc|def</code>.  This is again undefined behavior according to
+<acronym>POSIX</acronym>, and this interpretation is arguably more robust: older
+<samp><span class="command">sed</span></samp>s, for example, required that the regex matcher parsed
+<code>\/</code> as <code>/</code> in the common case of escaping a slash, which is
+again undefined behavior; the new behavior avoids this, and this is good
+because the regex matcher is only partially under our control.
+
+     <p><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-special-escapes-226"></a>In addition, this version of <samp><span class="command">sed</span></samp> supports several escape characters
+(some of which are multi-character) to insert non-printable characters
+in scripts (<code>\a</code>, <code>\c</code>, <code>\d</code>, <code>\o</code>, <code>\r</code>,
+<code>\t</code>, <code>\v</code>, <code>\x</code>).  These can cause similar problems
+with scripts written for other <samp><span class="command">sed</span></samp>s.
+
+     <br><dt><samp><span class="option">-i</span></samp> clobbers read-only files<dd><a name="index-In_002dplace-editing-227"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-in_002dplace-editing-228"></a><a name="index-Non_002dbugs_002c-in_002dplace-editing-229"></a>
+In short, &lsquo;<samp><span class="samp">sed -i</span></samp>&rsquo; will let you delete the contents of
+a read-only file, and in general the <samp><span class="option">-i</span></samp> option
+(see <a href="#Invoking-sed">Invocation</a>) lets you clobber
+protected files.  This is not a bug, but rather a consequence
+of how the Unix filesystem works.
+
+     <p>The permissions on a file say what can happen to the data
+in that file, while the permissions on a directory say what can
+happen to the list of files in that directory.  &lsquo;<samp><span class="samp">sed -i</span></samp>&rsquo;
+will not ever open for writing  a file that is already on disk. 
+Rather, it will work on a temporary file that is finally renamed
+to the original name: if you rename or delete files, you're actually
+modifying the contents of the directory, so the operation depends on
+the permissions of the directory, not of the file.  For this same
+reason, <samp><span class="command">sed</span></samp> does not let you use <samp><span class="option">-i</span></samp> on a writeable file
+in a read-only directory, and will break hard or symbolic links when
+<samp><span class="option">-i</span></samp> is used on such a file.
+
+     <br><dt><code>0a</code> does not work (gives an error)<dd><a name="index-g_t_0040code_007b0_007d-address-230"></a><a name="index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040code_007b0_007d-address-231"></a><a name="index-Non_002dbugs_002c-_0040code_007b0_007d-address-232"></a>
+There is no line 0.  0 is a special address that is only used to treat
+addresses like <code>0,/</code><var>RE</var><code>/</code> as active when the script starts: if
+you write <code>1,/abc/d</code> and the first line includes the word &lsquo;<samp><span class="samp">abc</span></samp>&rsquo;,
+then that match would be ignored because address ranges must span at least
+two lines (barring the end of the file); but what you probably wanted is
+to delete every line up to the first one including &lsquo;<samp><span class="samp">abc</span></samp>&rsquo;, and this
+is obtained with <code>0,/abc/d</code>.
+
+     <br><dt><code>[a-z]</code> is case insensitive<dd><a name="index-Non_002dbugs_002c-localization_002drelated-233"></a>
+You are encountering problems with locales.  POSIX mandates that <code>[a-z]</code>
+uses the current locale's collation order &ndash; in C parlance, that means using
+<code>strcoll(3)</code> instead of <code>strcmp(3)</code>.  Some locales have a
+case-insensitive collation order, others don't.
+
+     <p>Another problem is that <code>[a-z]</code> tries to use collation symbols. 
+This only happens if you are on the <acronym>GNU</acronym> system, using
+<acronym>GNU</acronym> libc's regular expression matcher instead of compiling the
+one supplied with <acronym>GNU</acronym> sed.  In a Danish locale, for example,
+the regular expression <code>^[a-z]$</code> matches the string &lsquo;<samp><span class="samp">aa</span></samp>&rsquo;,
+because this is a single collating symbol that comes after &lsquo;<samp><span class="samp">a</span></samp>&rsquo;
+and before &lsquo;<samp><span class="samp">b</span></samp>&rsquo;; &lsquo;<samp><span class="samp">ll</span></samp>&rsquo; behaves similarly in Spanish
+locales, or &lsquo;<samp><span class="samp">ij</span></samp>&rsquo; in Dutch locales.
+
+     <p>To work around these problems, which may cause bugs in shell scripts, set
+the <samp><span class="env">LC_COLLATE</span></samp> and <samp><span class="env">LC_CTYPE</span></samp> environment variables to &lsquo;<samp><span class="samp">C</span></samp>&rsquo;.
+
+     <br><dt><code>s/.*//</code> does not clear pattern space<dd><a name="index-Non_002dbugs_002c-localization_002drelated-234"></a><a name="index-g_t_0040value_007bSSEDEXT_007d_002c-emptying-pattern-space-235"></a><a name="index-Emptying-pattern-space-236"></a>
+This happens if your input stream includes invalid multibyte
+sequences.  <span class="sc">posix</span> mandates that such sequences
+are <em>not</em> matched by &lsquo;<samp><span class="samp">.</span></samp>&rsquo;, so that &lsquo;<samp><span class="samp">s/.*//</span></samp>&rsquo; will not clear
+pattern space as you would expect.  In fact, there is no way to clear
+sed's buffers in the middle of the script in most multibyte locales
+(including UTF-8 locales).  For this reason, <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> provides a `z'
+command (for `zap') as an extension.
+
+     <p>To work around these problems, which may cause bugs in shell scripts, set
+the <samp><span class="env">LC_COLLATE</span></samp> and <samp><span class="env">LC_CTYPE</span></samp> environment variables to &lsquo;<samp><span class="samp">C</span></samp>&rsquo;. 
+</dl>
+
+<div class="node">
+<a name="Extended-regexps"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Concept-Index">Concept Index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Reporting-Bugs">Reporting Bugs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="appendix">Appendix A Extended regular expressions</h2>
+
+<p><a name="index-Extended-regular-expressions_002c-syntax-237"></a>
+The only difference between basic and extended regular expressions is in
+the behavior of a few characters: &lsquo;<samp><span class="samp">?</span></samp>&rsquo;, &lsquo;<samp><span class="samp">+</span></samp>&rsquo;, parentheses,
+and braces (&lsquo;<samp><span class="samp">{}</span></samp>&rsquo;).  While basic regular expressions require
+these to be escaped if you want them to behave as special characters,
+when using extended regular expressions you must escape them if
+you want them <em>to match a literal character</em>.
+
+<p class="noindent">Examples:
+     <dl>
+<dt><code>abc?</code><dd>becomes &lsquo;<samp><span class="samp">abc\?</span></samp>&rsquo; when using extended regular expressions.  It matches
+the literal string &lsquo;<samp><span class="samp">abc?</span></samp>&rsquo;.
+
+     <br><dt><code>c\+</code><dd>becomes &lsquo;<samp><span class="samp">c+</span></samp>&rsquo; when using extended regular expressions.  It matches
+one or more &lsquo;<samp><span class="samp">c</span></samp>&rsquo;s.
+
+     <br><dt><code>a\{3,\}</code><dd>becomes &lsquo;<samp><span class="samp">a{3,}</span></samp>&rsquo; when using extended regular expressions.  It matches
+three or more &lsquo;<samp><span class="samp">a</span></samp>&rsquo;s.
+
+     <br><dt><code>\(abc\)\{2,3\}</code><dd>becomes &lsquo;<samp><span class="samp">(abc){2,3}</span></samp>&rsquo; when using extended regular expressions.  It
+matches either &lsquo;<samp><span class="samp">abcabc</span></samp>&rsquo; or &lsquo;<samp><span class="samp">abcabcabc</span></samp>&rsquo;.
+
+     <br><dt><code>\(abc*\)\1</code><dd>becomes &lsquo;<samp><span class="samp">(abc*)\1</span></samp>&rsquo; when using extended regular expressions. 
+Backreferences must still be escaped when using extended regular
+expressions. 
+</dl>
+
+<div class="node">
+<a name="Concept-Index"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Command-and-Option-Index">Command and Option Index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Extended-regexps">Extended regexps</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="unnumbered">Concept Index</h2>
+
+<p>This is a general index of all issues discussed in this manual, with the
+exception of the <samp><span class="command">sed</span></samp> commands and command-line options.
+
+<ul class="index-cp" compact>
+<li><a href="#index-g_t_0040code_007b0_007d-address-230"><code>0</code> address</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-Additional-reading-about-_0040command_007bsed_007d-219">Additional reading about <samp><span class="command">sed</span></samp></a>: <a href="#Other-Resources">Other Resources</a></li>
+<li><a href="#index-g_t_0040var_007baddr1_007d_002c_002bN-66"><var>addr1</var>,+N</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-g_t_0040var_007baddr1_007d_002c_007eN-67"><var>addr1</var>,~N</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Address_002c-as-a-regular-expression-54">Address, as a regular expression</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Address_002c-last-line-51">Address, last line</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Address_002c-numeric-48">Address, numeric</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Addresses_002c-in-_0040command_007bsed_007d-scripts-45">Addresses, in <samp><span class="command">sed</span></samp> scripts</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Append-hold-space-to-pattern-space-169">Append hold space to pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Append-next-input-line-to-pattern-space-154">Append next input line to pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Append-pattern-space-to-hold-space-162">Append pattern space to hold space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Appending-text-after-a-line-125">Appending text after a line</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Backreferences_002c-in-regular-expressions-100">Backreferences, in regular expressions</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-Branch-to-a-label_002c-if-_0040code_007bs_002f_002f_002f_007d-failed-204">Branch to a label, if <code>s///</code> failed</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Branch-to-a-label_002c-if-_0040code_007bs_002f_002f_002f_007d-succeeded-181">Branch to a label, if <code>s///</code> succeeded</a>: <a href="#Programming-Commands">Programming Commands</a></li>
+<li><a href="#index-Branch-to-a-label_002c-unconditionally-178">Branch to a label, unconditionally</a>: <a href="#Programming-Commands">Programming Commands</a></li>
+<li><a href="#index-Buffer-spaces_002c-pattern-and-hold-41">Buffer spaces, pattern and hold</a>: <a href="#Execution-Cycle">Execution Cycle</a></li>
+<li><a href="#index-Bugs_002c-reporting-220">Bugs, reporting</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-Case_002dinsensitive-matching-119">Case-insensitive matching</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-Caveat-_002d_002d_002d-_0023n-on-first-line-86">Caveat &mdash; #n on first line</a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-Command-groups-99">Command groups</a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-Comments_002c-in-scripts-83">Comments, in scripts</a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-Conditional-branch-205">Conditional branch</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Conditional-branch-182">Conditional branch</a>: <a href="#Programming-Commands">Programming Commands</a></li>
+<li><a href="#index-Copy-hold-space-into-pattern-space-165">Copy hold space into pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Copy-pattern-space-into-hold-space-158">Copy pattern space into hold space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Delete-first-line-from-pattern-space-151">Delete first line from pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Disabling-autoprint_002c-from-command-line-9">Disabling autoprint, from command line</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-empty-regular-expression-56">empty regular expression</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Emptying-pattern-space-214">Emptying pattern space</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Emptying-pattern-space-236">Emptying pattern space</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-Evaluate-Bourne_002dshell-commands-184">Evaluate Bourne-shell commands</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Evaluate-Bourne_002dshell-commands_002c-after-substitution-114">Evaluate Bourne-shell commands, after substitution</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-Exchange-hold-space-with-pattern-space-172">Exchange hold space with pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Excluding-lines-73">Excluding lines</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Extended-regular-expressions_002c-choosing-31">Extended regular expressions, choosing</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-Extended-regular-expressions_002c-syntax-237">Extended regular expressions, syntax</a>: <a href="#Extended-regexps">Extended regexps</a></li>
+<li><a href="#index-Files-to-be-processed-as-input-37">Files to be processed as input</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-Flow-of-control-in-scripts-174">Flow of control in scripts</a>: <a href="#Programming-Commands">Programming Commands</a></li>
+<li><a href="#index-Global-substitution-105">Global substitution</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstderr_007d-file-149"><acronym>GNU</acronym> extensions, <samp><span class="file">/dev/stderr</span></samp> file</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstderr_007d-file-113"><acronym>GNU</acronym> extensions, <samp><span class="file">/dev/stderr</span></samp> file</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstdin_007d-file-201"><acronym>GNU</acronym> extensions, <samp><span class="file">/dev/stdin</span></samp> file</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstdin_007d-file-145"><acronym>GNU</acronym> extensions, <samp><span class="file">/dev/stdin</span></samp> file</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstdout_007d-file-112"><acronym>GNU</acronym> extensions, <samp><span class="file">/dev/stdout</span></samp> file</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstdout_007d-file-238"><acronym>GNU</acronym> extensions, <samp><span class="file">/dev/stdout</span></samp> file</a>: <a href="#Footnotes">Footnotes</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstdout_007d-file-148"><acronym>GNU</acronym> extensions, <samp><span class="file">/dev/stdout</span></samp> file</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040code_007b0_007d-address-231"><acronym>GNU</acronym> extensions, <code>0</code> address</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040code_007b0_007d-address-69"><acronym>GNU</acronym> extensions, <code>0</code> address</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-0_002c_0040var_007baddr2_007d-addressing-70"><acronym>GNU</acronym> extensions, 0,<var>addr2</var> addressing</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040var_007baddr1_007d_002c_002b_0040var_007bN_007d-addressing-71"><acronym>GNU</acronym> extensions, <var>addr1</var>,+<var>N</var> addressing</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040var_007baddr1_007d_002c_007e_0040var_007bN_007d-addressing-72"><acronym>GNU</acronym> extensions, <var>addr1</var>,~<var>N</var> addressing</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-branch-if-_0040code_007bs_002f_002f_002f_007d-failed-203"><acronym>GNU</acronym> extensions, branch if <code>s///</code> failed</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-case-modifiers-in-_0040code_007bs_007d-commands-102"><acronym>GNU</acronym> extensions, case modifiers in <code>s</code> commands</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-checking-for-their-presence-207"><acronym>GNU</acronym> extensions, checking for their presence</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-disabling-24"><acronym>GNU</acronym> extensions, disabling</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-emptying-pattern-space-235"><acronym>GNU</acronym> extensions, emptying pattern space</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-emptying-pattern-space-213"><acronym>GNU</acronym> extensions, emptying pattern space</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-evaluating-Bourne_002dshell-commands-116"><acronym>GNU</acronym> extensions, evaluating Bourne-shell commands</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-evaluating-Bourne_002dshell-commands-186"><acronym>GNU</acronym> extensions, evaluating Bourne-shell commands</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-extended-regular-expressions-32"><acronym>GNU</acronym> extensions, extended regular expressions</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040code_007bg_007d-and-_0040var_007bnumber_007d-modifier-interaction-in-_0040code_007bs_007d-command-108"><acronym>GNU</acronym> extensions, <code>g</code> and <var>number</var> modifier interaction in <code>s</code> command</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040code_007bI_007d-modifier-118"><acronym>GNU</acronym> extensions, <code>I</code> modifier</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040code_007bI_007d-modifier-59"><acronym>GNU</acronym> extensions, <code>I</code> modifier</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-in_002dplace-editing-228"><acronym>GNU</acronym> extensions, in-place editing</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-in_002dplace-editing-19"><acronym>GNU</acronym> extensions, in-place editing</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-_0040code_007bL_007d-command-192"><acronym>GNU</acronym> extensions, <code>L</code> command</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-_0040code_007bM_007d-modifier-120"><acronym>GNU</acronym> extensions, <code>M</code> modifier</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-modifiers-and-the-empty-regular-expression-57"><acronym>GNU</acronym> extensions, modifiers and the empty regular expression</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-_0040samp_007b_0040var_007bn_007d_007e_0040var_007bm_007d_007d-addresses-50"><acronym>GNU</acronym> extensions, &lsquo;<samp><var>n</var><span class="samp">~</span><var>m</var></samp>&rsquo; addresses</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-quitting-silently-194"><acronym>GNU</acronym> extensions, quitting silently</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-_0040code_007bR_007d-command-200"><acronym>GNU</acronym> extensions, <code>R</code> command</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-reading-a-file-a-line-at-a-time-199"><acronym>GNU</acronym> extensions, reading a file a line at a time</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-reformatting-paragraphs-191"><acronym>GNU</acronym> extensions, reformatting paragraphs</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-returning-an-exit-code-88"><acronym>GNU</acronym> extensions, returning an exit code</a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-returning-an-exit-code-195"><acronym>GNU</acronym> extensions, returning an exit code</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-setting-line-length-141"><acronym>GNU</acronym> extensions, setting line length</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-special-escapes-226"><acronym>GNU</acronym> extensions, special escapes</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-special-escapes-215"><acronym>GNU</acronym> extensions, special escapes</a>: <a href="#Escapes">Escapes</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-special-two_002daddress-forms-68"><acronym>GNU</acronym> extensions, special two-address forms</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-subprocesses-187"><acronym>GNU</acronym> extensions, subprocesses</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-subprocesses-117"><acronym>GNU</acronym> extensions, subprocesses</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-to-basic-regular-expressions-76"><acronym>GNU</acronym> extensions, to basic regular expressions</a>: <a href="#Regular-Expressions">Regular Expressions</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-to-basic-regular-expressions-224"><acronym>GNU</acronym> extensions, to basic regular expressions</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-two-addresses-supported-by-most-commands-133"><acronym>GNU</acronym> extensions, two addresses supported by most commands</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-g_t_0040acronym_007bGNU_007d-extensions_002c-unlimited-line-length-217"><acronym>GNU</acronym> extensions, unlimited line length</a>: <a href="#Limitations">Limitations</a></li>
+<li><a href="#index-g_t_0040value_007bSSEDEXT_007d_002c-writing-first-line-to-a-file-211"><acronym>GNU</acronym> extensions, writing first line to a file</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Goto_002c-in-scripts-179">Goto, in scripts</a>: <a href="#Programming-Commands">Programming Commands</a></li>
+<li><a href="#index-Greedy-regular-expression-matching-81">Greedy regular expression matching</a>: <a href="#Regular-Expressions">Regular Expressions</a></li>
+<li><a href="#index-Grouping-commands-98">Grouping commands</a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-Hold-space_002c-appending-from-pattern-space-163">Hold space, appending from pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Hold-space_002c-appending-to-pattern-space-170">Hold space, appending to pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Hold-space_002c-copy-into-pattern-space-167">Hold space, copy into pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Hold-space_002c-copying-pattern-space-into-160">Hold space, copying pattern space into</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Hold-space_002c-definition-44">Hold space, definition</a>: <a href="#Execution-Cycle">Execution Cycle</a></li>
+<li><a href="#index-Hold-space_002c-exchange-with-pattern-space-173">Hold space, exchange with pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-In_002dplace-editing-227">In-place editing</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-In_002dplace-editing_002c-activating-18">In-place editing, activating</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-In_002dplace-editing_002c-Perl_002dstyle-backup-file-names-20">In-place editing, Perl-style backup file names</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-Inserting-text-before-a-line-129">Inserting text before a line</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Labels_002c-in-scripts-176">Labels, in scripts</a>: <a href="#Programming-Commands">Programming Commands</a></li>
+<li><a href="#index-Last-line_002c-selecting-52">Last line, selecting</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Line-length_002c-setting-140">Line length, setting</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Line-length_002c-setting-23">Line length, setting</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-Line-number_002c-printing-136">Line number, printing</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Line-selection-46">Line selection</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Line_002c-selecting-by-number-49">Line, selecting by number</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Line_002c-selecting-by-regular-expression-match-55">Line, selecting by regular expression match</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Line_002c-selecting-last-53">Line, selecting last</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-List-pattern-space-138">List pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Mixing-_0040code_007bg_007d-and-_0040var_007bnumber_007d-modifiers-in-the-_0040code_007bs_007d-command-109">Mixing <code>g</code> and <var>number</var> modifiers in the <code>s</code> command</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-Next-input-line_002c-append-to-pattern-space-153">Next input line, append to pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Next-input-line_002c-replace-pattern-space-with-95">Next input line, replace pattern space with</a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-Non_002dbugs_002c-_0040code_007b0_007d-address-232">Non-bugs, <code>0</code> address</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-Non_002dbugs_002c-in_002dplace-editing-229">Non-bugs, in-place editing</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-Non_002dbugs_002c-localization_002drelated-233">Non-bugs, localization-related</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-Non_002dbugs_002c-_0040code_007bN_007d-command-on-the-last-line-222">Non-bugs, <code>N</code> command on the last line</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-Non_002dbugs_002c-regex-syntax-clashes-225">Non-bugs, regex syntax clashes</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-Parenthesized-substrings-101">Parenthesized substrings</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-Pattern-space_002c-definition-43">Pattern space, definition</a>: <a href="#Execution-Cycle">Execution Cycle</a></li>
+<li><a href="#index-Perl_002dstyle-regular-expressions_002c-multiline-60">Perl-style regular expressions, multiline</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Portability_002c-comments-84">Portability, comments</a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-Portability_002c-line-length-limitations-218">Portability, line length limitations</a>: <a href="#Limitations">Limitations</a></li>
+<li><a href="#index-Portability_002c-_0040code_007bN_007d-command-on-the-last-line-221">Portability, <code>N</code> command on the last line</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-g_t_0040code_007bPOSIXLY_005fCORRECT_007d-behavior_002c-bracket-expressions-79"><code>POSIXLY_CORRECT</code> behavior, bracket expressions</a>: <a href="#Regular-Expressions">Regular Expressions</a></li>
+<li><a href="#index-g_t_0040code_007bPOSIXLY_005fCORRECT_007d-behavior_002c-enabling-25"><code>POSIXLY_CORRECT</code> behavior, enabling</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_0040code_007bPOSIXLY_005fCORRECT_007d-behavior_002c-escapes-216"><code>POSIXLY_CORRECT</code> behavior, escapes</a>: <a href="#Escapes">Escapes</a></li>
+<li><a href="#index-g_t_0040code_007bPOSIXLY_005fCORRECT_007d-behavior_002c-_0040code_007bN_007d-command-223"><code>POSIXLY_CORRECT</code> behavior, <code>N</code> command</a>: <a href="#Reporting-Bugs">Reporting Bugs</a></li>
+<li><a href="#index-Print-first-line-from-pattern-space-156">Print first line from pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Printing-line-number-135">Printing line number</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Printing-text-unambiguously-139">Printing text unambiguously</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Quitting-89">Quitting</a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-Quitting-196">Quitting</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Range-of-lines-61">Range of lines</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Range-with-start-address-of-zero-64">Range with start address of zero</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Read-next-input-line-96">Read next input line</a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-Read-text-from-a-file-144">Read text from a file</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Read-text-from-a-file-198">Read text from a file</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Reformat-pattern-space-189">Reformat pattern space</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Reformatting-paragraphs-190">Reformatting paragraphs</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Replace-hold-space-with-copy-of-pattern-space-159">Replace hold space with copy of pattern space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Replace-pattern-space-with-copy-of-hold-space-166">Replace pattern space with copy of hold space</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Replacing-all-text-matching-regexp-in-a-line-106">Replacing all text matching regexp in a line</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-Replacing-only-_0040var_007bn_007dth-match-of-regexp-in-a-line-107">Replacing only <var>n</var>th match of regexp in a line</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-Replacing-selected-lines-with-other-text-132">Replacing selected lines with other text</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Requiring-_0040value_007bSSED_007d-208">Requiring <acronym>GNU</acronym> <samp><span class="command">sed</span></samp></a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Script-structure-40">Script structure</a>: <a href="#sed-Programs">sed Programs</a></li>
+<li><a href="#index-Script_002c-from-a-file-15">Script, from a file</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-Script_002c-from-command-line-12">Script, from command line</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_0040command_007bsed_007d-program-structure-39"><samp><span class="command">sed</span></samp> program structure</a>: <a href="#sed-Programs">sed Programs</a></li>
+<li><a href="#index-Selecting-lines-to-process-47">Selecting lines to process</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Selecting-non_002dmatching-lines-74">Selecting non-matching lines</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Several-lines_002c-selecting-62">Several lines, selecting</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Slash-character_002c-in-regular-expressions-58">Slash character, in regular expressions</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Spaces_002c-pattern-and-hold-42">Spaces, pattern and hold</a>: <a href="#Execution-Cycle">Execution Cycle</a></li>
+<li><a href="#index-Special-addressing-forms-63">Special addressing forms</a>: <a href="#Addresses">Addresses</a></li>
+<li><a href="#index-Standard-input_002c-processing-as-input-38">Standard input, processing as input</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-Stream-editor-1">Stream editor</a>: <a href="#Introduction">Introduction</a></li>
+<li><a href="#index-Subprocesses-185">Subprocesses</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Subprocesses-115">Subprocesses</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-Substitution-of-text_002c-options-104">Substitution of text, options</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-Text_002c-appending-126">Text, appending</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Text_002c-deleting-91">Text, deleting</a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-Text_002c-insertion-130">Text, insertion</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Text_002c-printing-93">Text, printing</a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-Text_002c-printing-after-substitution-110">Text, printing after substitution</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-Text_002c-writing-to-a-file-after-substitution-111">Text, writing to a file after substitution</a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-Transliteration-122">Transliteration</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Unbuffered-I_002fO_002c-choosing-36">Unbuffered I/O, choosing</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-Usage-summary_002c-printing-5">Usage summary, printing</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-Version_002c-printing-3">Version, printing</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-Working-on-separate-files-33">Working on separate files</a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-Write-first-line-to-a-file-210">Write first line to a file</a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-Write-to-a-file-147">Write to a file</a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-Zero_002c-as-range-start-address-65">Zero, as range start address</a>: <a href="#Addresses">Addresses</a></li>
+   </ul><div class="node">
+<a name="Command-and-Option-Index"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Concept-Index">Concept Index</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="unnumbered">Command and Option Index</h2>
+
+<p>This is an alphabetical list of all <samp><span class="command">sed</span></samp> commands and command-line
+options.
+
+
+
+<ul class="index-fn" compact>
+<li><a href="#index-g_t_0023-_0028comments_0029-82"><code># (comments)</code></a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-g_t_002d_002dbinary-27"><code>--binary</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002d_002dexpression-11"><code>--expression</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002d_002dfile-14"><code>--file</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002d_002dfollow_002dsymlinks-28"><code>--follow-symlinks</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002d_002dhelp-4"><code>--help</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002d_002din_002dplace-17"><code>--in-place</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002d_002dline_002dlength-22"><code>--line-length</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002d_002dquiet-7"><code>--quiet</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002d_002dregexp_002dextended-30"><code>--regexp-extended</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002d_002dsilent-8"><code>--silent</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002d_002dunbuffered-35"><code>--unbuffered</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002d_002dversion-2"><code>--version</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002db-26"><code>-b</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002de-10"><code>-e</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002df-13"><code>-f</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002di-16"><code>-i</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002dl-21"><code>-l</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002dn-6"><code>-n</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002dn_002c-forcing-from-within-a-script-85"><code>-n, forcing from within a script</code></a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-g_t_002dr-29"><code>-r</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_002du-34"><code>-u</code></a>: <a href="#Invoking-sed">Invoking sed</a></li>
+<li><a href="#index-g_t_003a-_0028label_0029-command-175"><code>: (label) command</code></a>: <a href="#Programming-Commands">Programming Commands</a></li>
+<li><a href="#index-g_t_003d-_0028print-line-number_0029-command-134"><code>= (print line number) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-a-_0028append-text-lines_0029-command-124"><code>a (append text lines) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-b-_0028branch_0029-command-177"><code>b (branch) command</code></a>: <a href="#Programming-Commands">Programming Commands</a></li>
+<li><a href="#index-c-_0028change-to-text-lines_0029-command-131"><code>c (change to text lines) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-D-_0028delete-first-line_0029-command-150"><code>D (delete first line) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-d-_0028delete_0029-command-90"><code>d (delete) command</code></a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-e-_0028evaluate_0029-command-183"><code>e (evaluate) command</code></a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-G-_0028appending-Get_0029-command-168"><code>G (appending Get) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-g-_0028get_0029-command-164"><code>g (get) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-H-_0028append-Hold_0029-command-161"><code>H (append Hold) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-h-_0028hold_0029-command-157"><code>h (hold) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-i-_0028insert-text-lines_0029-command-128"><code>i (insert text lines) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-L-_0028fLow-paragraphs_0029-command-188"><code>L (fLow paragraphs) command</code></a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-l-_0028list-unambiguously_0029-command-137"><code>l (list unambiguously) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-N-_0028append-Next-line_0029-command-152"><code>N (append Next line) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-n-_0028next_002dline_0029-command-94"><code>n (next-line) command</code></a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-P-_0028print-first-line_0029-command-155"><code>P (print first line) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-p-_0028print_0029-command-92"><code>p (print) command</code></a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-q-_0028quit_0029-command-87"><code>q (quit) command</code></a>: <a href="#Common-Commands">Common Commands</a></li>
+<li><a href="#index-Q-_0028silent-Quit_0029-command-193"><code>Q (silent Quit) command</code></a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-r-_0028read-file_0029-command-143"><code>r (read file) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-R-_0028read-line_0029-command-197"><code>R (read line) command</code></a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-s-command_002c-option-flags-103"><code>s command, option flags</code></a>: <a href="#The-_0022s_0022-Command">The &quot;s&quot; Command</a></li>
+<li><a href="#index-T-_0028test-and-branch-if-failed_0029-command-202"><code>T (test and branch if failed) command</code></a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-t-_0028test-and-branch-if-successful_0029-command-180"><code>t (test and branch if successful) command</code></a>: <a href="#Programming-Commands">Programming Commands</a></li>
+<li><a href="#index-v-_0028version_0029-command-206"><code>v (version) command</code></a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-w-_0028write-file_0029-command-146"><code>w (write file) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-W-_0028write-first-line_0029-command-209"><code>W (write first line) command</code></a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-x-_0028eXchange_0029-command-171"><code>x (eXchange) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-y-_0028transliterate_0029-command-121"><code>y (transliterate) command</code></a>: <a href="#Other-Commands">Other Commands</a></li>
+<li><a href="#index-z-_0028Zap_0029-command-212"><code>z (Zap) command</code></a>: <a href="#Extended-Commands">Extended Commands</a></li>
+<li><a href="#index-g_t_0040_007b_0040_007d-command-grouping-97"><code>{} command grouping</code></a>: <a href="#Common-Commands">Common Commands</a></li>
+   </ul>
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="#Top">sed, a stream editor</a>
+<li><a name="toc_Introduction" href="#Introduction">1 Introduction</a>
+<li><a name="toc_Invoking-sed" href="#Invoking-sed">2 Invocation</a>
+<li><a name="toc_sed-Programs" href="#sed-Programs">3 <samp><span class="command">sed</span></samp> Programs</a>
+<ul>
+<li><a href="#Execution-Cycle">3.1 How <samp><span class="command">sed</span></samp> Works</a>
+<li><a href="#Addresses">3.2 Selecting lines with <samp><span class="command">sed</span></samp></a>
+<li><a href="#Regular-Expressions">3.3 Overview of Regular Expression Syntax</a>
+<li><a href="#Common-Commands">3.4 Often-Used Commands</a>
+<li><a href="#The-_0022s_0022-Command">3.5 The <code>s</code> Command</a>
+<li><a href="#Other-Commands">3.6 Less Frequently-Used Commands</a>
+<li><a href="#Programming-Commands">3.7 Commands for <samp><span class="command">sed</span></samp> gurus</a>
+<li><a href="#Extended-Commands">3.8 Commands Specific to <acronym>GNU</acronym> <samp><span class="command">sed</span></samp></a>
+<li><a href="#Escapes">3.9 <acronym>GNU</acronym> Extensions for Escapes in Regular Expressions</a>
+</li></ul>
+<li><a name="toc_Examples" href="#Examples">4 Some Sample Scripts</a>
+<ul>
+<li><a href="#Centering-lines">4.1 Centering Lines</a>
+<li><a href="#Increment-a-number">4.2 Increment a Number</a>
+<li><a href="#Rename-files-to-lower-case">4.3 Rename Files to Lower Case</a>
+<li><a href="#Print-bash-environment">4.4 Print <samp><span class="command">bash</span></samp> Environment</a>
+<li><a href="#Reverse-chars-of-lines">4.5 Reverse Characters of Lines</a>
+<li><a href="#tac">4.6 Reverse Lines of Files</a>
+<li><a href="#cat-_002dn">4.7 Numbering Lines</a>
+<li><a href="#cat-_002db">4.8 Numbering Non-blank Lines</a>
+<li><a href="#wc-_002dc">4.9 Counting Characters</a>
+<li><a href="#wc-_002dw">4.10 Counting Words</a>
+<li><a href="#wc-_002dl">4.11 Counting Lines</a>
+<li><a href="#head">4.12 Printing the First Lines</a>
+<li><a href="#tail">4.13 Printing the Last Lines</a>
+<li><a href="#uniq">4.14 Make Duplicate Lines Unique</a>
+<li><a href="#uniq-_002dd">4.15 Print Duplicated Lines of Input</a>
+<li><a href="#uniq-_002du">4.16 Remove All Duplicated Lines</a>
+<li><a href="#cat-_002ds">4.17 Squeezing Blank Lines</a>
+</li></ul>
+<li><a name="toc_Limitations" href="#Limitations">5 <acronym>GNU</acronym> <samp><span class="command">sed</span></samp>'s Limitations and Non-limitations</a>
+<li><a name="toc_Other-Resources" href="#Other-Resources">6 Other Resources for Learning About <samp><span class="command">sed</span></samp></a>
+<li><a name="toc_Reporting-Bugs" href="#Reporting-Bugs">7 Reporting Bugs</a>
+<li><a name="toc_Extended-regexps" href="#Extended-regexps">Appendix A Extended regular expressions</a>
+<li><a name="toc_Concept-Index" href="#Concept-Index">Concept Index</a>
+<li><a name="toc_Command-and-Option-Index" href="#Command-and-Option-Index">Command and Option Index</a>
+</li></ul>
+</div>
+
+   <div class="footnote">
+<hr>
+<a name="texinfo-footnotes-in-document"></a><h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> This applies to commands such as <code>=</code>,
+<code>a</code>, <code>c</code>, <code>i</code>, <code>l</code>, <code>p</code>.  You can
+still write to the standard output by using the <code>w</code>
+<a name="index-g_t_0040value_007bSSEDEXT_007d_002c-_0040file_007b_002fdev_002fstdout_007d-file-238"></a>or <code>W</code> commands together with the <samp><span class="file">/dev/stdout</span></samp>
+special file</p>
+
+   <p class="footnote"><small>[<a name="fn-2" href="#fnd-2">2</a>]</small> Note that <acronym>GNU</acronym> <samp><span class="command">sed</span></samp> creates the backup
+file whether or not any output is actually changed.</p>
+
+   <p class="footnote"><small>[<a name="fn-3" href="#fnd-3">3</a>]</small> Actually,
+if <samp><span class="command">sed</span></samp> prints a line without the terminating newline, it will
+nevertheless print the missing newline as soon as more text is sent to
+the same output stream, which gives the &ldquo;least expected surprise&rdquo;
+even though it does not make commands like &lsquo;<samp><span class="samp">sed -n p</span></samp>&rsquo; exactly
+identical to <samp><span class="command">cat</span></samp>.</p>
+
+   <p class="footnote"><small>[<a name="fn-4" href="#fnd-4">4</a>]</small> This is equivalent to <code>p</code> unless the <samp><span class="option">-i</span></samp>
+option is being used.</p>
+
+   <p class="footnote"><small>[<a name="fn-5" href="#fnd-5">5</a>]</small> This is equivalent to <code>p</code> unless the <samp><span class="option">-i</span></samp>
+option is being used.</p>
+
+   <p class="footnote"><small>[<a name="fn-6" href="#fnd-6">6</a>]</small> All
+the escapes introduced here are <acronym>GNU</acronym>
+extensions, with the exception of <code>\n</code>.  In basic regular
+expression mode, setting <code>POSIXLY_CORRECT</code> disables them inside
+bracket expressions.</p>
+
+   <p class="footnote"><small>[<a name="fn-7" href="#fnd-7">7</a>]</small> <samp><span class="command">sed</span></samp> guru Greg
+Ubben wrote an implementation of the <samp><span class="command">dc</span></samp> <span class="sc">rpn</span> calculator! 
+It is distributed together with sed.</p>
+
+   <p class="footnote"><small>[<a name="fn-8" href="#fnd-8">8</a>]</small> This requires
+another script to pad the output of banner; for example
+
+<pre class="example">     #! /bin/sh
+     
+     banner -w $1 $2 $3 $4 |
+       sed -e :a -e '/^.\{0,'$1'\}$/ { s/$/ /; ba; }' |
+       ~/sedscripts/reverseline.sed
+</pre>
+   <p></p>
+
+   <p class="footnote"><small>[<a name="fn-9" href="#fnd-9">9</a>]</small> Some implementations
+have a limit of 199 commands per script</p>
+
+   <p class="footnote"><small>[<a name="fn-10" href="#fnd-10">10</a>]</small> which is the actual &ldquo;bug&rdquo; that prompted the
+change in behavior</p>
+
+   <hr></div>
+
+</body></html>
+

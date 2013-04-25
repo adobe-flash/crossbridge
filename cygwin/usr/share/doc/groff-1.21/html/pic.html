@@ -1,0 +1,111 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>Making Pictures With GNU PIC</title>
+
+</head>
+<body>
+
+<h1 align="center">Making Pictures With GNU PIC</h1>
+
+<a href="pic-1.html#1. Introduction to PIC">1. Introduction to PIC</a><br>
+<a href="pic-1.html#1.1. Why PIC?">1.1. Why PIC?</a><br>
+<a href="pic-1.html#1.2. PIC Versions">1.2. PIC Versions</a><br>
+<a href="pic-2.html#2. Invoking PIC">2. Invoking PIC</a><br>
+<a href="pic-2.html#2.1. PIC Error Messages">2.1. PIC Error Messages</a><br>
+<a href="pic-3.html#3. Basic PIC Concepts">3. Basic PIC Concepts</a><br>
+<a href="pic-4.html#4. Sizes and Spacing">4. Sizes and Spacing</a><br>
+<a href="pic-4.html#4.1. Default Sizes of Objects">4.1. Default Sizes of Objects</a><br>
+<a href="pic-4.html#4.2. Objects Do Not Stretch!">4.2. Objects Do Not Stretch!</a><br>
+<a href="pic-4.html#4.3. Resizing Boxes">4.3. Resizing Boxes</a><br>
+<a href="pic-4.html#4.4. Resizing Other Object Types">4.4. Resizing Other Object Types</a><br>
+<a href="pic-4.html#4.5. The &lsquo;same&rsquo; Keyword">4.5. The &lsquo;same&rsquo; Keyword</a><br>
+<a href="pic-5.html#5. Generalized Lines and Splines">5. Generalized Lines and Splines</a><br>
+<a href="pic-5.html#5.1. Diagonal Lines">5.1. Diagonal Lines</a><br>
+<a href="pic-5.html#5.2. Multi-Segment Line Objects">5.2. Multi-Segment Line Objects</a><br>
+<a href="pic-5.html#5.3. Spline Objects">5.3. Spline Objects</a><br>
+<a href="pic-6.html#6. Decorating Objects">6. Decorating Objects</a><br>
+<a href="pic-6.html#6.1. Text Special Effects">6.1. Text Special Effects</a><br>
+<a href="pic-6.html#6.2. Dashed Objects">6.2. Dashed Objects</a><br>
+<a href="pic-6.html#6.3. Dotted Objects">6.3. Dotted Objects</a><br>
+<a href="pic-6.html#6.4. Rounding Box Corners">6.4. Rounding Box Corners</a><br>
+<a href="pic-6.html#6.5. Slanted Boxes">6.5. Slanted Boxes</a><br>
+<a href="pic-6.html#6.6. Arrowheads">6.6. Arrowheads</a><br>
+<a href="pic-6.html#6.7. Line Thickness">6.7. Line Thickness</a><br>
+<a href="pic-6.html#6.8. Invisible Objects">6.8. Invisible Objects</a><br>
+<a href="pic-6.html#6.9. Filled Objects">6.9. Filled Objects</a><br>
+<a href="pic-6.html#6.10. Colored Objects">6.10. Colored Objects</a><br>
+<a href="pic-7.html#7. More About Text Placement">7. More About Text Placement</a><br>
+<a href="pic-8.html#8. More About Direction Changes">8. More About Direction Changes</a><br>
+<a href="pic-9.html#9. Naming Objects">9. Naming Objects</a><br>
+<a href="pic-9.html#9.1. Naming Objects By Order Of Drawing">9.1. Naming Objects By Order Of Drawing</a><br>
+<a href="pic-9.html#9.2. Naming Objects With Labels">9.2. Naming Objects With Labels</a><br>
+<a href="pic-10.html#10. Describing locations">10. Describing locations</a><br>
+<a href="pic-10.html#10.1. Absolute Coordinates">10.1. Absolute Coordinates</a><br>
+<a href="pic-10.html#10.2. Locations Relative to Objects">10.2. Locations Relative to Objects</a><br>
+<a href="pic-10.html#10.2.1. Locations Relative to Closed Objects">10.2.1. Locations Relative to Closed Objects</a><br>
+<a href="pic-10.html#10.2.2. Locations Relative to Open Objects">10.2.2. Locations Relative to Open Objects</a><br>
+<a href="pic-10.html#10.3. Ways of Composing Positions">10.3. Ways of Composing Positions</a><br>
+<a href="pic-10.html#10.3.1. Vector Sums and Displacements">10.3.1. Vector Sums and Displacements</a><br>
+<a href="pic-10.html#10.3.2. Interpolation Between Positions">10.3.2. Interpolation Between Positions</a><br>
+<a href="pic-10.html#10.3.3. Projections of Points">10.3.3. Projections of Points</a><br>
+<a href="pic-10.html#10.4. Using Locations">10.4. Using Locations</a><br>
+<a href="pic-10.html#10.5. The &lsquo;chop&rsquo; Modifier">10.5. The &lsquo;chop&rsquo; Modifier</a><br>
+<a href="pic-11.html#11. Object Groups">11. Object Groups</a><br>
+<a href="pic-11.html#11.1. Brace Grouping">11.1. Brace Grouping</a><br>
+<a href="pic-11.html#11.2. Block Composites">11.2. Block Composites</a><br>
+<a href="pic-12.html#12. Style Variables">12. Style Variables</a><br>
+<a href="pic-13.html#13. Expressions, Variables, and Assignment">13. Expressions, Variables, and Assignment</a><br>
+<a href="pic-14.html#14. Macros">14. Macros</a><br>
+<a href="pic-15.html#15. Import/Export Commands">15. Import/Export Commands</a><br>
+<a href="pic-15.html#15.1. File and Table Insertion">15.1. File and Table Insertion</a><br>
+<a href="pic-15.html#15.2. Debug Messages">15.2. Debug Messages</a><br>
+<a href="pic-15.html#15.3. Escape to Post-Processor">15.3. Escape to Post-Processor</a><br>
+<a href="pic-15.html#15.4. Executing Shell Commands">15.4. Executing Shell Commands</a><br>
+<a href="pic-16.html#16. Control-flow constructs">16. Control-flow constructs</a><br>
+<a href="pic-17.html#17. Interface To [gt]roff">17. Interface To [gt]roff</a><br>
+<a href="pic-17.html#17.1. Scaling Arguments">17.1. Scaling Arguments</a><br>
+<a href="pic-17.html#17.2. How Scaling is Handled">17.2. How Scaling is Handled</a><br>
+<a href="pic-17.html#17.3. PIC and [gt]roff commands">17.3. PIC and [gt]roff commands</a><br>
+<a href="pic-17.html#17.4. PIC and EQN">17.4. PIC and EQN</a><br>
+<a href="pic-17.html#17.5. Absolute Positioning of Pictures">17.5. Absolute Positioning of Pictures</a><br>
+<a href="pic-18.html#18. Interface to TeX">18. Interface to TeX</a><br>
+<a href="pic-19.html#19. Obsolete Commands">19. Obsolete Commands</a><br>
+<a href="pic-20.html#20. Some Larger Examples">20. Some Larger Examples</a><br>
+<a href="pic-21.html#21. PIC Reference">21. PIC Reference</a><br>
+<a href="pic-21.html#21.1. Lexical Items">21.1. Lexical Items</a><br>
+<a href="pic-21.html#21.2. Semi-Formal Grammar">21.2. Semi-Formal Grammar</a><br>
+<a href="pic-22.html#22. History and Acknowledgements">22. History and Acknowledgements</a><br>
+<a href="pic-23.html#23. Bibliography">23. Bibliography</a><br>
+
+<hr>
+</body>
+</html>
+
+
+<p align="center"><i>Eric S. Raymond</i> <br>
+&lang;<i>esr@snark.thyrsus.com</i>&rang;</p>
+
+
+<p align="center" style="margin-top: 1em"><i>ABSTRACT</i></p>
+
+<p style="margin-top: 1em">The <b>pic</b> language is a
+<b>troff</b> extension that makes it easy to create and
+alter box-and-arrow diagrams of the kind frequently used in
+technical papers and textbooks. This paper is both an
+introduction to and reference for <i>gpic</i>(1), the
+implementation distributed by the Free Software Foundation
+for use with <i>groff</i>(1). It also catalogs other
+implementations and explains the differences among them.</p>

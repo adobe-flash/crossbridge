@@ -1,0 +1,49 @@
+.\" -*- mode: nroff; coding: utf-8; -*-
+.\"
+.\" Japanese localization for groff
+.\"
+.\" Copyright (C) 2009, 2010 Free Software Foundation, Inc.
+.\"   Written by Fumitoshi UKAI <ukai@debian.or.jp> and
+.\"   Colin Watson <cjwatson@debian.org>
+.\"
+.\" This file is part of groff.
+.\"
+.\" groff is free software; you can redistribute it and/or modify it under
+.\" the terms of the GNU General Public License as published by the Free
+.\" Software Foundation, either version 3 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" groff is distributed in the hope that it will be useful, but WITHOUT ANY
+.\" WARRANTY; without even the implied warranty of MERCHANTABILITY or
+.\" FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+.\" for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program. If not, see <http://www.gnu.org/licenses/>.
+.\"
+.\" Please send comments to groff@gnu.org.
+.
+.
+.\" Locale string
+.
+.ds locale japanese\"
+.
+.
+.class [CJKprepunct] \
+  , : ; > } \
+  \[u3001] \[u3002] \[uFF0C] \[uFF0E] \[u30FB] \[uFF1A] \[uFF1B] \[uFF1F] \
+  \[uFF01] \[uFF09] \[u3015] \[uFF3D] \[uFF5D] \[u300D] \[u300F] \[u3011] \
+  \[u3041] \[u3043] \[u3045] \[u3047] \[u3049] \[u3063] \[u3083] \[u3085] \
+  \[u3087] \[u30FC] \
+  \[u30A1] \[u30A3] \[u30A5] \[u30A7] \[u30A9] \[u30C3] \[u30E3] \[u30E5] \
+  \[u30E7]
+.class [CJKpostpunct] \
+  \[uFF08] \[u3014] \[uFF3B] \[uFF5B] \[u300C] \[u300E] \[u3010]
+.
+.\" Hiragana, Katakana, and Kanji glyphs.
+.class [CJKnormal] \
+  \[u3041]-\[u3096] \[u30A0]-\[u30FF] \[u4E00]-\[u9FFF]
+.
+.cflags 128 \C'[CJKprepunct]'
+.cflags 266 \C'[CJKpostpunct]'
+.cflags 512 \C'[CJKnormal]'

@@ -1,0 +1,88 @@
+Version 1.3.30c:
+  - include missing man pages
+
+Version 1.3.30b:
+  - modified patch by Paul Sullivan for the maximum
+    priority allowed in a level.  Configure script now
+    tries to detect a 3-digit priority.
+  - fixed alternatives /sbin path problem, per
+    email from Mark Rosenstand.
+
+Version 1.3.30a:
+  - updated codebase to use Fedora Core 6's chkconfig-1.3.30
+  - now includes "alternatives" program
+  - added example in doc on using "--level" option,
+    at Jari's suggestion.  It's already mentioned in
+    the man-page, too.
+
+Version 1.2.24h:
+  - included patch made by Jonathan Cameron
+    to add getopt_long support.  Altered a
+    few points, and ported idea into ntsysv.
+    Added configure support for detecting getopt_long.
+
+Version 1.2.24g:
+  - included patch made by Joe Balsama (and submitted by
+    Mike Russos) to get the path right when a different
+    init-dir is used.
+  - added code to detect highest runlevel available on system
+    and use that to limit symlinks, etc.
+  - fixed up permissions of install scripts
+
+
+Version 1.2.24f:
+  - fixed bungled "--with-rcd-prefix".  Patch by Juerg Oehler.
+  - replaced "--with-rcd-prefix" with two new options:
+         "--with-rc-dir" and "--with-init-dir"
+    to support other OSes which don't keep their init.d and rc.d
+    directories together.
+  - added new options to chkconfig:  --rc.d, --init.d, and --xinetd.d
+    to mirror config options.  This allows a single executable
+    to be used on multiple distributions, by using the ~/.popt
+    file, eg:
+        chkconfig alias --rocklinux --init.d /etc/init.d --rc.d /etc/init.d
+        chkconfig alias --svr4      --init.d /etc/init.d --rc.d /etc
+    (Suggested by Jeurg Oehler <oelers@bluewin.ch>.)
+
+Version 1.2.24e:
+  - corrected discrepency between configure help and implementation.
+    Help described "--with-rcd-prefix" option, but code used "--with-rc-d".
+    Changed to match usage described in help.  Reported
+    by Juerg Oehler <oehlers@bluewin.ch>.
+  - fixed up Makefiles for "intl" and "po" directories
+    to respect the DESTDIR variable.  Reported by Juerg Oehler.
+
+Version 1.2.24d:
+  - more debian patching by Petter Reinholdtsen <pere@hungry.com>
+    * Use the new configure option.
+    * Correct the file extention to ignore, and complete the list.
+    * New target 'debian-dist'
+ 
+    * Updated the depend and conflicts section for the debian package.
+      As long as this program updates the symlinks directly, instead of
+      using the official Debian mechanism (a script called update-rc.d),
+      it will be in conflict with file-rc.  The correct fix is to
+      rewrite it to use this script when it updates the level status.
+
+
+Version 1.2.24c:
+  - Worked with code from Petter Reinholdtsen <pere@hungry.com>
+    to add support for init scripts without chkconfig headers.
+  - another Petter Reinholdtsen patch for debian packaging
+
+Version 1.2.24b:
+  - included Petter Reinholdtsen's patch for debian packaging
+
+Version 1.2.24a:
+  - updated codebase to RedHat's chkconfig-1.2.24 (included in redhat-7.2)
+
+Version 1.2.16b:
+  - added option to enable/disable ntsysv (which requires libnewt.a)
+  - now checks for libnewt.a and disables ntsysv if not found
+
+Version 1.2.16a:
+  - updated codebase to RedHat's chkconfig-1.2.16
+
+Version 1.0.7 - 1.0.8:
+  - made changes to support "configure"
+

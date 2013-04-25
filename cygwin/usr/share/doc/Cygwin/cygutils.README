@@ -1,0 +1,260 @@
+CygUtils
+========================================================================
+The cygutils package contains a collection of simple utilities from
+various sources.
+
+Runtime requirements (these, or newer)
+  cygwin-1.7.13-1
+  libintl8-0.18.1.1-2
+  libiconv2-1.14-2
+  libpopt0-1.6.4-4
+  libgcc1-4.5.3-3
+  libstdc++6-4.5.3-3
+
+Build requirements:
+  cygwin-1.7.13-1
+  cygport-0.10.10-1
+  popt-1.6.4-4
+  libpopt0-1.6.4-4
+  gettext-0.18.1.1-2
+  gettext-devel-0.18.1.1-2
+  libgettextpo0-0.18.1.1-2
+  libintl8-0.18.1.1-2
+  libiconv-1.14-2
+  libiconv2-1.14-2
+  gcc4-core-4.5.3-3
+  gcc4-g++-4.5.3-3
+  libgcc1-4.5.3-3
+  libstdc++6-4.5.3-3
+  binutils-2.22.51-2
+  autoconf-10-1
+  autoconf2.5-2.68-1
+  automake-4-10
+  automake1.11-1.11.3-1
+  cvs-1.12.13-10 (for gettext/autopoint)
+  xz-5.0.2_20110517-1 (for lzma)
+  w32api-3.17-2
+
+Canonical homepage:
+  http://cygutils.fruitbat.org/cygutils-package/
+
+Canonical download
+  http://cygutils.fruitbat.org/cygutils-package/download/
+
+License:
+  GPLv3+ (various others for icons in cygicon-0.dll)
+
+Language:
+  C, C++
+
+========================================================================
+
+Build instructions:
+  unpack cygutils-VER-REL-src.tar.bz2
+    if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+  cd /usr/src
+  cygport ./cygutils-VER-REL.cygport all
+
+This will create:
+  /usr/src/cygutils-VER-REL.tar.bz2
+  /usr/src/cygutils-VER-REL-src.tar.bz2
+
+Or use 'cygport ./cygutils-VER-REL.cygport prep' to get a patched source directory
+
+To find out the files included in the binary distribution, you can
+use "cygcheck -l cygutils", or browse the listing for the appropriate version
+at <http://cygwin.com/packages/>.
+
+========================================================================
+
+Port Notes:
+----------  cygutils-1.4.10-2 -- 2012-04-13 -----------
+* readshortcut --raw was always "on"
+* longstanding issue with lpr printer name "normalization corrected.
+* readshortcut now handles embedded "windows" environment variables
+  (%foo%) correctly.
+
+----------  cygutils-1.4.10-1 -- 2012-04-12 -----------
+* getclip and putclip now support new cygwin-1.7.13+ clipboard format.
+* cygstart now supports file:// and mailto: URLs (Yaakov Selkowitz)
+* Added -R/--raw option to readshortcut (prevents expanding embedded
+  environment variables within paths). Reported by Denis Excoffier.
+* mkshortcut, readshortcut and lpr now use cygwin-1.7 path conversion
+  functions rather than deprecated ones. However, they make only
+  minimal concessions to unicode, and operate mostly on narrow character
+  encoded pathnames. They should now be able to handle "long" pathnames
+  however.
+
+----------  cygutils-1.4.8-1 -- 2012-02-09 -----------
+* Integrate cygstart with FD.o menu and mimetype system.
+  (Yaakov Selkowitz)
+* Remove ascii utility; replaced by separate package derived
+  from ESR's implementation http://catb.org/~esr/ascii/
+* Remove realpath utility; replaced by new implementation
+  provided by coreutils (8.15 and above).
+
+----------  cygutils-1.4.6-1 -- 2011-04-28 -----------
+* conv: no longer distribute as dos2unix, unix2dos, u2d, or d2u.
+  Those programs now available from the separate dos2unix package.
+* ascii: by default, now only prints characters 0..127. Use new
+  option --extended/-e for old behavior, printing characters 0..255.
+  See this thread: http://cygwin.com/ml/cygwin/2010-04/msg00600.html
+* cygstart: Fix --reference. Allow relative paths (enables, e.g.
+  'cygstart calc'). Reported by Ken Hirsch.
+  http://cygwin.com/ml/cygwin/2010-01/msg01101.html
+* cygdrop: Minor fixes (Christian Franke)
+* mkshortcut: Minor fixes (Jon TURNEY)
+* Updated licenses for all apps to GPLv3+ (with permission from
+  all original contributors).
+
+----------  cygutils-1.4.4-1 -- 2010-08-15 -----------
+* Fix longstanding bug in mkshortcut, in which failure was
+  reported even on success (Andy Koppe).
+* --help, --license, --usage, and --version output now goes
+  to stdout instead of stderr
+* Add standard command line options to cygdrop (--version,
+  --help, --license, --usage)
+* Various internal code cleanups
+
+----------  cygutils-1.4.2-1 -- 2009-12-28 -----------
+* Add hippo icon to cygicon-0.dll.
+
+----------  cygutils-1.4.1-2 -- 2009-12-03 -----------
+* Fix bug in mkshortcut (Reported by Ken Brown; Patch by Dave Korn)
+
+----------  cygutils-1.4.1-1 -- 2009-11-21 -----------
+* Add --help option to lpr.
+* Build system improvements.
+* Add new cygdrop utility (Christian Franke; requires w2k or better)
+* Many of the utilities have been relicensed as GPLv3+.
+* Compile using gcc4
+
+----------  cygutils-1.4.0-1 -- 2009-05-06 -----------
+* First release from cygwin-1.7-specific branch. 
+  cygutils-1.4.0 and above require functions not present
+  in cygwin-1.5 and earlier. Legacy systems should use
+  the BRANCH_1_3_x branch tag.
+* Support in cygstart for unicode arguments/filenames
+  (from IWAMURO Motonori).
+* All applications that have a --version option now
+  report the package version number with uniform format.
+* All code reformatted to follow (mostly) GNU standards.
+
+----------  cygutils-1.3.4-10 -- 2009-04-22 -----------
+* Fix installation bug exposed by new libtool. Reported
+  by Jerry Hedden and David Rothenberger)
+
+----------  cygutils-1.3.3-10 -- 2009-04-21 -----------
+* Fork for cygwin-1.7 development.
+
+----------  cygutils-1.3.3-1 -- 2009-04-21 -----------
+* cygstart now accepts -w/--wait option (Barry Kelly, Alex Smith)
+* Update build infrastructure to latest autoconf, automake,
+  libtool, and gettext.
+
+----------  cygutils-1.3.2-1 -- 2007-08-25 -----------
+* Now installs "package" documentation in addition to typical
+  cygwin README.
+* New "utility": the cygicons DLL provides a number of cygwin-
+  related icons, collected from free (as in speech) sources.
+  This includes the traditional black and green cygwin 'C' --
+  in several colors -- as well as the angular 'cygwing' icons,
+  the hand-rendered 'cygwinshiny' icon, and a fully
+  GIMPified icon from the kde-looks website. 
+
+----------  cygutils-1.3.1-1 -- 2006-12-12 -----------
+* Bugfix for cygstart with new cygwin snapshots (1.5.22+)
+  from Michael Schaap.
+* Update to latest autotools (ac-2.61, am-1.10, gt-0.15)
+* Many other improvements to internal build system -- now
+  passes 'make distcheck'
+* Switch to cygport build framework for cygwin packages
+
+----------  cygutils-1.3.0-1 -- 2006-03-20 -----------
+* Remove many programs now offered by the util-linux package
+  including: cal     col      colcrt  colrm   column  ddate 
+             getopt  mcookie  namei   rename  rev
+
+----------  cygutils-1.2.10-1 -- 2006-02-10 -----------
+* cygstart - properly convert environment variables to Win32
+* cygstart - don't parse options listed after the command
+
+1.2.9-1 -----------------
+* fix coredump and memleak in readshortcut (cgf)
+
+1.2.8-1 -----------------
+* updates to cygstart (Michael Schaap)
+* mingw compatibility for dump (Kees Zeelenberg)
+
+1.2.7-1 -----------------
+* updates to cygstart (Anthony Derosa, Michael Schaap)
+* added 'rename' program (Christopher Faylor)
+
+1.2.6-1 -----------------
+* remove readlink (now provided by coreutils)
+* add new --force/--safe options to conv/d2u/u2d.  Change behavior
+  for "mixed" file; always convert line endings to desired target, 
+  unless input file is binary (identified by presence of '\0' bytes).
+
+1.2.5-1 -----------------
+* Add new -s (startup norm|max|min mode) to mkshortcut
+* Add new -d|--desc option for mkshortcut (to control the
+  'description' field == tooltip text)
+
+1.2.4-1 -----------------
+* Remove ipcs and ipcrm (now provided by cygwin itself)
+* update ipck to work both with ipcs/ipcrm from cygwin/cygsever,
+  and with ipcscygipc/ipcrmcygipc from cygipc.
+* Only build IPC utilities against cygserver, not cygipc
+  (cygipc versions now provided by the cygipc package itself)
+
+1.2.3-1 -----------------
+unreleased
+1.2.2-1 -----------------
+* Major rewrite of the getclip/putclip programs --
+  now supports --dos/--unix/--noconv modes for
+  translation of clips (Rob Siklos)
+
+1.2.1-2 -----------------
+* This is the cygwin-1.5.2 FLAG DAY release.
+
+1.2.1-1 -----------------
+* Update to 1.2.1 release.  This is the cygwin-1.5.1 FLAG DAY
+  release.  This package requires cygwin-1.5.1 to work.
+* Moved documentation to /usr/share/*
+* Because cygipc is now a DLL, we SHOULD list cygipc as
+  a requirement for cygutils.  But, I don't really want
+  to do that.  So I won't.  It shouldn't matter, anyway: the
+  other progs will be fine without libcygipc, and the ipc tools
+  don't work if ipc-daemon2.exe isn't running.  But, the
+  only way for ipc-daemon2.exe to run, is if libcygipc is
+  installed.  So, we're covered.
+
+1.2.0-1 -----------------
+* Update to 1.2.0 release.  This is the cygwin-1.5.0 FLAG DAY
+  release.  This package requires cygwin-1.5.0 to work.
+* Added ipc utilities, now that cygipc is part of the 
+  official distribution.  I still hope that cygipc becomes
+  obsolete soon, but when it does these utilities will be
+  compiled against the cygserver libraries instead.
+  - Of course, these utilities won't work properly if 
+  ipc-daemon2.exe is not running, but as libcygipc is static
+  we do not need to list the cygipc package as a *requirement*
+  for this one.
+
+1.1.4-2 -----------------
+* Fix slight bug in lpr (gilles civario)
+
+1.1.4-1 -----------------
+* Rick Rankin provided a reimplementation of lpr.
+* mkshortcut supports a new -w/--workingdir option.
+
+1.1.3-----------------
+* removed last and utmpdump (now provided by the sysvinit package)
+* removed the postinstall script (only last/utmpdump needed it)
+* mkshortcut now uses popt
+
+========================================================================
+Cygwin port maintained by: Charles Wilson <cygwin@cygwin.com>
+

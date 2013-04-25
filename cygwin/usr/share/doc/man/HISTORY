@@ -1,0 +1,128 @@
+man-1.6g - 'Murcielago'
+
+- Fixed "man cut cut" throwing an error (Fedora #542852) (Ivana Varekova, flc).
+- Corrections to the man.man German locale translation (Stefan Bacher). 
+- flawed treatment of Awk in configure script (Elias Pipping).
+- announcement mailing list set up (man-announce@googlegroups.com) (flc).
+- Minor fix to LZMA support (Per Øyvind Karlsen - Mandriva team).
+- Added XZ compression support (Per Øyvind Karlsen).
+- Improvements to extension handling (R. Urban, V. Zell - CYGWIN project).
+- Releases now gpg signed. Validation instructions on primary distribution 
+  site (flc).
+- DOAP.rdf enabled on primary distribution site (flc).
+- EXPERIMENTAL: SPDX.rdf enabled on primary distro site (flc).
+- Changes to LSM file (flc).
+
+man-1.6f - 'Flying Fox'
+
+- Fixed incorrect shell-unsafe verification alphabet missing ampersand simbol. 
+  This was being caught by another part of the code but yet still a bug (flc).
+- Unified Posix locale to the C one (J. Pello, flc).  
+- Additional checks for defined but empty PAGER environment variable (flc).
+- Don't update whatis files on read-only partitions (Mike Frysinger).
+- Added bzip support to man2dvi (Charles Clément).
+- Added bzip support to man2html (Fabiano Castro Pereira).
+- EXPERIMENTAL: added LZMA suport to man (Per Øyvind Karlsen - Mandriva team).
+- EXPERIMENTAL: added LZMA suport to makewhatis (Per Øyvind Karlsen, flc).
+- README updates: cygwin (Volker Zell).
+- Added "MANUAL SECTIONS" header to man.man (flc).
+- Fixes to avoid shebang mangling in generated scripts (Mike Frysinger).
+- makewhatis fix allowing spaces in pathnames for CYGWIN project (Volker Zell).
+- Minor corrections to the German message catalog (Volker Zell). 
+- Updated Dutch Message catalog (Benno Schulenberg).
+- Minor doc changes (flc).
+
+man-1.6e - 'Dracula'
+
+- Sections used by makewhatis set via environment variable MANSECT, falling 
+  back to man.conf's MANSECT setting as man does (Mike Frysinger).
+- Removed use of implicit prototypes - besides being sloppy, it leads to issues
+  on 64 bit platforms (Mike frysinger, flc). 
+- Building will now honor pre-existing LDFLAGS if set (Mike Frysinger).
+- Updated Italian man pages (Giulio Daprelá).
+- Updated Spanish man pages (B. Albiñana, flc).
+- Corrected a minor bug in makewhatis' tempdir generation (flc).
+- EXPERIMENTAL: support for Plan 9 rc shell lists (Michael Haardt).
+- Overdue LSM v4 format compliance (flc).
+- Minor corrections and cleanup (flc). 
+
+man-1.6d
+
+- Fixed freeing of unallocated memory in '-K' under unsafe flag (flc).
+- Corrected a bug introduced in 1.6c makewhatis - thanks to the packagers 
+  that promptly pointed it out (flc).
+- corrected off-by-one in LANG splitting code (no security aspect) (flc).
+- added support for DESTDIR in man2html's Makefile (Claudio Fontana).
+- Fixed -D option (flc).
+- Header fix for variable header location of TIOCGWINSZ (Eugene Kotlyarov). 
+- Corrected erroneous encoding of FR locale man pages translation (flc).
+- EXEEXT and DESTDIR fixes for gencat (Volker Zell). 
+- Minor correction of CYGWIN support (Volker Zell).
+- Updated Polish message catalog and select man pages (M. Garski).
+- Minor corrections to man pages, and the German message catalog 
+  (flc, Volker Zell, others).
+- Constricted locale settings for gencat (Fedora Project).
+- Corrections to makewhatis exit codes and signal handling (flc).
+- Fixes in man2html parsing (Fedora Project).
+- Minor additional corrections (flc).
+
+man-1.6c
+
+- Corrected missing format string, but no privilege escalation was involved 
+  (flc, Ville-Skyttä).
+- pscan format string audit run - nothing further found (flc).
+- Updated Bulgarian locale man pages translation and message catalog 
+  (Alexander Shopov). 
+- makewhatis and other minor changes to support BG locale 
+  (Alexander Shopov, flc).
+- Updated Italian locale message catalog translation (flc).
+- Updated French man pages, with new man2html page (Alain Portal).
+
+man-1.6b
+
+- Additional changes for parallel Make (Octavio Ruiz).
+- New French locale man pages translation (Alain Portal).
+- New French locale message catalog translation (Alain Portal).
+- Minor changes in manual pages (Giorgos Keramidas, flc).
+- Minor corrections in the docs (flc).
+
+man-1.6a
+
+- Fixes to support parallel Make (Mike Frysinger).
+- Fixes in mess.en message catalog (Martin von Gagern).
+- Corrections and updates to the manual (flc).
+
+man-1.6
+
+- New Maintainer Federico Lucifredi (flucifredi@acm.org).
+- Ability to hand HTML man pages off to a browser added (Eric S. Raymond).
+
+man-1.5p
+
+- Chinese messages (CHAO, Wei-Lun) - unused
+- Russian messages
+- Set DEFAULT_NLSPATH to "/usr/share/locale/%L/%N"
+- Prefer LC_MESSAGES over LANG
+- Don't (potentially) use a pager with apropos and whatis
+- Superfluous security fix
+- Filter .iX macros out when constructing whatis database
+- Allow globbed MANPATH items like /opt/*/man
+- Return a correct status
+- Continue search when an appropriate page was found to be inaccessible
+
+man-1.5o2:
+
+- Fixed man -k segfault
+- Allow man -k "text with spaces"
+
+man-1.5o1:
+
+- Fixed man2html array overflow
+
+man-1.5o:
+
+- Polish messages, non-dummy codesets (Jakub Bogusz <qboosh@pld-linux.org>)
+- CYGWIN fix for perl manpages (with :: in filename)
+- Fix for certain awk versions in mansec (NISHIMURA Daisuke)
+- When asked for a nonexisting page in section 1p, do not also try section 1
+

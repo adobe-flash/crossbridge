@@ -1,0 +1,83 @@
+People tell me that HP uses compressed man pages named like
+	/usr/man/man1.Z/ls.1
+that is, the directory instead of the file has an extension.
+I have no access to HP machines, and do not know the details
+of this situation (what happens to cat files? to .so files?),
+but perhaps this man is usable in such a situation if one puts
+	MAN_HP_DIREXT=.Z
+in the environment. Untested.
+
+Tell me if this works, and if not what is wrong. 
+I may yet gain access to an HP-UX box and verify this myself.
+flc - flucifredi@acm.org
+
+P.S.
+
+A report mentions cat1.Z cat1m.Z cat2.Z ... cat8.Z
+man1 man1.Z man1m man1m.Z ... man8 man8.Z man9.Z
+subdirectories of /usr/share/man,
+where the cat dirs are owned by bin:bin with mode 0777
+and the man dirs are owned by bin:bin with mode 0555.
+
+Scott Marovich adds:
+
+As far as your GNU software is concerned, the first very important point is:
+The paths used for compressed manual pages represent only the tip of a very
+deep iceberg:  Historically, HP-UX derives from A.T.&T. UNIX System V (and
+System III before that) with some selected BSD features added later, and it
+doesn't even purport to be GNU-compatible.  For many years HP sold a binary
+HP-UX port of the A.T.&T. Documenter's Work Bench as an optional product, and
+HP-UX's versions of "man(1)" and "nroff(1)" (etc.) strive to be DWB-compatible.
+Similarly, the manual pages use only plain, old, simple A.T.&T. "man(7)" macros,
+HP-UX's standard data-compression utility command is "compress(1)"/"zcat(1)"
+instead "gzip(1)", and HP-UX follows System V conventions about where to cache
+formatted pages: they go into directories such as "/usr[/share]/man/cat*"
+instead of "/var/cache/man" like under Linux.  System V "man(1)" can optionally
+accept compressed input and/or produce compressed output, and it has a built-in
+algorithm for deciding which directories to use.  Assuming, for example, that
+manual page "foo.1" is requested, the algorithm works like this:
+
+(Output-directory search:)
+If a "/usr[/share]/man/cat1.Z" directory exists, look for a cached (formatted,
+compressed) "foo.1" file in it; otherwise, if a "/usr[/share]/man/cat1"
+directory exists, look for a cached (formatted, uncompressed) "foo.1" file in
+it; otherwise, no formatted-and-cached form of the page exists.  After an input
+page is formatted, it will be compressed and cached if the "cat1.Z" directory
+exists, or cached without compression if only the "cat1" directory exists, or
+discarded if neither exist.
+
+(Input-directory search:)
+If "/usr[/share]/man/man1.Z/foo.1" exists, then decompress and format this file;
+otherwise, if "/usr[/share]/man/foo.1" exists, then format this uncompressed
+file; otherwise, assume that the manual page is missing.
+
+Notice that:
+
+1. Priority is automatically given to fetching and storing manual pages in
+   compressed form if the necessary directories exist.
+
+2. Unlike GNU-compatible path naming schemes, the "regular" files containing
+   [un]formatted manual-page text do *not* have ".Z" (let alone ".gz") suffixes;
+only their containing directories do.
+
+As far as these file's protection modes are concerned, that's partly up to a
+local HP-UX system administrator.  If one prefers not to have "man(1)" be a
+set-UID/GID binary, then the usual custom is:
+
+     man?[.Z] directories   : mode 555
+     man?[.Z]/<name>.* files: mode 444
+     cat?[.Z] directories   : mode 777
+     cat?[.Z]/<name>.* files: mode 666
+
+i.e., any user can delete any other user's cached, formatted pages.  If one
+prefers to run "man(1)" as a set-UID/GID program for a little more control,
+then an alternative scheme is, say:
+
+     cat?[.Z] directories   : mode 755/575
+     cat?[.Z]/<name>.* files: mode 644/464
+
+You also expressed some curiousity about the treatment of ".so" directives in
+compressed manual pages.  The answer is simple: there aren't any.  ".so" is
+rarely used in general, so the HP department responsible for producing HP-UX's
+manual pages decided to "soelim(1)" the small number of exceptions (before
+compressing the result) in order to avoid dealing with this problem.

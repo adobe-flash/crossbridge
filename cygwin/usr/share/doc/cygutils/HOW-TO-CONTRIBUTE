@@ -1,0 +1,339 @@
+So, you have a utility that you believe would 
+be a good addition to cygutils, do you?  You 
+probably want to know how you could contribute it,
+don't you?  Well, first:
+
+  Not every spiffy utility belongs in cygutils. We
+  don't want cygutils to become a huge grab bag of
+  hundreds of small programs...in many cases, your
+  spiffy new program should become a standalone package
+  and a full-fledged member of the cygwin distribution.
+  (Don't worry -- that's not hard.  It's probably 
+  easier than integrating your spiffy program into
+  cygutils).
+
+  So, your first step is to post a message to the
+  cygwin-apps mailing list, present your program, and 
+  ASK if it should be included in cygutils, or turned
+  into a standalong package.  If you believe it should
+  become part of cygutils, explain why.  I will not
+  add any program to cygutils without a consensus
+  from the cygwin-apps list.
+   
+  In the body of your email, describe what your program 
+  does, why it's needed, and why you think it should be 
+  added to the cygutils package.  Also explain why (or 
+  state that) existing tools will not meet the need your 
+  program does.
+
+Second, once you're obtained agreement that yourfile.c
+should be added to cygutils:
+
+  Don't just send me yourfile.c and expect me to
+  do all the integration work.
+
+You need to do more than merely insure that it builds
+on your machine with a simple
+
+  gcc -o yourfile.exe yourfile.c -lthislibrary -lthatlibrary
+
+In addition to that, you need to check out the cygutils 
+source and integrate yourfile into the whole system.  Instructions
+follow below.  However, you'll notice that it's quite a bit
+of work.  Again, are you SURE you want it to become part 
+of cygutils?  Making a standalone program is a lot easier...
+
+Also, note that I will not fix your bugs.  If, at some time
+after your program is accepted into cygutils, I (as cygutils
+maintainer) get a bug report on your program, I will forward
+it to you.  If you don't fix it or respond within a reasonable
+time, I will remove it from the distribution.
+
+------------------------------------------------------
+
+Okay, now that we're past that unpleasantness, here's how to
+integrate your spiffy new utility.  First, let's assume that 
+your spiffy utility is called 'foo', and its source is in 'foo.c'.
+
+The simple 12 step program:
+---------------------------
+
+1) Get the cygutils source
+
+   cvs -d:pserver:anoncvs@sources.redhat.com:/cvs/cygwin-apps login
+      use 'anoncvs' as the password
+   cvs -z3 -d:pserver:anoncvs@sources.redhat.com:/cvs/cygwin-apps co cygutils
+
+   you now have a 'cygutils' directory with the existing source.
+
+2) License information
+
+   make sure that all .c and .h files in your contribution
+   have license information: preferably GPL, but other
+   open licenses are acceptable, too.  See the top of
+   src/lpr/lpr.c for an example.
+	
+   a) if your license is not GPL or BSD-no-advert, then
+      you must also include a copy of the ENTIRE license
+      in the licenses subdirectory.  (Most of the time,
+      the blurb in the .c or .h file is just that: a short
+      blurb, with a reference to the full text elsewhere)
+
+      You should also add it to the licenses variable in 
+      the toplevel Makefile.am: e.g.
+
+      licenses = ... licenses/COPYING.MPL ...
+
+3) Make a home 
+
+   create a new directory for your contribution underneath 'src'
+   In our case, we will do this:
+     cd cygutils/src
+     mkdir foo
+
+   copy your source into the new directory
+     cp <location>/foo.c <cygutils>/src/foo/
+
+4) Modify your source code
+
+   Add the following snippet to the beginning of your .c and .h(*) 
+   files, just after the license information:
+
+     #if HAVE_CONFIG_H
+     #include "config.h"
+     #endif
+     #include "common.h"
+	
+   a) If your contribution has its own .h file(s), the entire .h file
+      should be "guarded" as follows:
+		
+        /* license information */
+        #ifndef _FOO_H
+        #define _FOO_H
+        /* the config.h/common.h stuff */
+        /* your header stuff */
+        #endif /* !_FOO_H */
+
+      the "_FOO_H" identifier should be changed to match the filename
+      of your header file.  Thus, "bob.h" would be guarded with _BOB_H.
+
+      Naturally, the header files should also be copied into src/foo/.
+
+5) Modify cygutils/Makefile.am
+
+  a) Add your program to the list of progs to be built.  If your 
+     program will build on non-windows platforms in addition to cygwin,
+     then you can add your program to the "bin_PROGRAMS" variable:
+
+     bin_PROGRAMS = ... src/foo/foo ...
+
+     If your contribution is windows-specific, then you should add it
+     to BOTH the "windows_progs" and the EXTRA_PROGRAMS variables:
+
+     windows_progs = ... src/foo/foo ...
+     EXTRA_PROGRAMS = ... src/foo/foo ...
+
+  b) Special link libraries
+	
+     If you need to link to special *WINDOWS* libraries, then obviously
+     your program is windows-specific, but also you should add a line 
+     in your Makefile.am like this:
+
+     src_foo_foo_LDADD = -lwinlib
+
+     Where "src_foo_foo" is the path to your program, where the '/' 
+     characters are replaced with '_' characters.  Yes, it looks a little
+     funny -- but because our subdirectory has the same name as our
+     program, we get double foo's...  Also, 'winlib' is the library 
+     that you need.  See the src_lpr_lpr_LDADD variable in Makefile.am
+     for an example.
+	  
+     If, on the other hand, you need to link to some other (cygwin)
+     library that is also more generally available -- like libreadline
+     or libncurses -- then you'll need to do a little more work. 
+     For your initial submission, just create an LDADD variable in 
+     Makefile.am with -lreadline (or whatever).  We'll figure out how
+     to handle it better further down the road.  However, make sure
+     to let me know about your special link requirements.
+
+     src_foo_foo_LDADD = -lreadline
+
+     One special case is the gettext internationalization libraries.
+     If your program must link with -lintl, then all you need to
+     do is create an LDADD variable as follows:
+
+     src_foo_foo_LDADD = @LIBINTL@
+
+     The configuration process will replace @LIBINTL@ with the 
+     appropriate -lintl -liconv invocation.
+
+     Note that you do NOT need to include the popt library in
+     a 'src_foo_foo_LDADD' line; -lpopt will be added automatically...
+
+     If your app depends on IPC functions, then add @IPCLIBS@ 
+     to the 'src_foo_foo_LDADD' line.
+
+  c) man pages and other documentation
+
+     If you got 'em, copy 'em to your src/foo directory, and add the
+     manpage to the man_MANS variable in Makefile.am like this:
+
+     man_MANS = ... src/foo/foo.1 ...
+
+     If there are non-man-page documentation files, you should do 
+     one of the following:
+       i) if your app is windows-specific, then create a new
+          variable inside the 'if WITH_WINDOWS_PROGRAMS' section 
+          suffixed with '_docs', and list the documentation files
+             foo_docs = src/foo/README src/foo/TODO
+          Also, add those files to the extra_docs variable (which
+          gets automatically included in EXTRA_DIST)
+             extra_docs = src/foo/README src/foo/TODO
+      ii) otherwise, simply create the 'foo_docs' variable
+          outside of the 'if WITH_WINDOWS_PROGRAMS' section
+     These files will be installed into $(docdir)/foo/ so there
+     is no worry that your README will conflict with any other
+     component's README.
+
+  d) Extra files
+
+     If your contribution consists of more source files than a single
+     .c, then you need to add a variable to Makefile.am that lists all 
+     of them:
+
+     src_foo_foo_SOURCES = foo.c otherfoo.c foo.h
+
+     Note that this variable should NOT be specified if your program 
+     consists merely of a single .c file whose name is the same as
+     your program + '.c'.
+
+     If there are .h files in your SOURCES list, then you need to 
+     add those .h files to the noinst_HEADERS variable, or the headers 
+     would get installed into /usr/include/src/foo/ -- and we don't 
+     want that!
+
+     noinst_HEADERS = ... src/foo/foo.h ...
+
+  If you have other questions about the Makefile.am file, try to 
+  follow the "patterns" established in it by the other programs, 
+  or (gasp) read the automake documentation.
+
+  Libraries are quite complicated to deal with in the cygutils 
+  build framework. Fortunately I doubt there will be many of
+  these to worry about, other than cygicons.
+
+6) Simplify your #includes.
+
+   Take a good look at the #include statements in your .c and .h
+   files.  If the dependencies are listed in <cygutils>/common.h,
+   then you shouldn't re-include them.  If a dependency is NOT
+   listed in common.h, then leave it in your .h/.c file -- for 
+   now.  We may choose to add them to common.h and add new tests
+   to configure.ac, or we may choose to let your .c file 
+   include it directly.  However, anything that's already in 
+   common.h, remove from your .c/.h file.  It's okay to just
+   comment them out, rather than deleting them entirely, if 
+   you prefer.
+
+7) Add information to cygutils documentation files:
+
+   Add a short blurb about your app to <cygutils>/PROGLIST
+   Add your app to the list at the end of the README file
+   Add your name to the AUTHORS file.  Don't worry about NEWS;
+   I do that before each release.
+
+8) Bootstrap
+
+   (You need to have autoconf, autoconf-devel, automake, and
+   automake-devel installed for this to work).  Change dir
+   to the top of your checked-out source, and run bootstrap:
+
+   cd <cygutils>
+   ./bootstrap
+
+   If you haven't made any mistakes, you should (a) see no
+   errors, and (b) see some new rules in Makefile.in that
+   correspond to your program.
+
+9) Build and test
+
+   Now, just run './configure ; make' as usual.  Somewhere 
+   amongst the flurry of messages, you should see your application
+   being built.  If so, you're almost done.  If not, then you
+   need to figure out why.  Time to read the auto* documentation...
+
+10) Create a patch and ChangeLog entry
+
+   a) PATCH
+	
+      cd <cygutils>
+      cvs diff -u > foo.patch
+
+      If you've already edited the ChangeLog file, make sure to
+      *remove* that chunk from foo.patch.  I don't want a PATCH
+      for the ChangeLog, I want the ChangeLog entry itself (ChangeLog
+      patches rarely apply cleanly; it's easier to cut-n-paste.  More
+      below).
+  
+   b) NEW FILES
+
+      However, you'll notice that none of the files in your src/foo
+      directory are represented in the patch.  That's normal.  Remove 
+      any .o and .exe files from src/foo, and then just make a tarball
+
+      cd <cygutils>
+      tar cvjf foo.tar.bz2 src/foo
+
+   c) CHANGELOG
+
+      You should also create a ChangeLog entry.  Don't actually edit
+      the ChangeLog itself; create a new file (foo.changelog?) and
+      put your stuff there.  It should look like this:
+
+      2002-03-02  Your Name  <your_email_address@domain.com>
+
+         * src/foo: new directory
+         * src/foo/foo.c: new file
+         * Makefile.am: add program 'foo'
+         * Makefile.in: regenerate
+         * AUTHORS: add yourname for foo
+         * PROGLIST: add foo
+         * README: add foo
+
+      Don't list src/foo/Makefile.  Do list every original
+      file in src/foo/ (like your man pages, or extra documentation
+      files, or headers)
+
+11) Send a notice email to cygwin-apps@cygwin.com, that says "Hey, I
+   finished the integration work neceesary to include 'foo' in the
+   'cygutils' package, as previously agreed on this list."  Paste 
+   the ChangeLog into that notice.  But do NOT send the patch or 
+   tarball to the mailing list.  
+	
+   Instead, send that to ME, cygwin@cwilson.fastmail.fm.  The patch
+   and tarball should be attachments, but paste the ChangeLog entry
+	into the body of the message.  Do NOT paste your patch into the 
+	body of the email; most mail programs will horrendously distort 
+   it if you do).  Also, be sure and warn of any special link 
+   requirements (cf. section 5a and 5b above).
+
+12) Bask in the glow of a job well done.
+
+--
+Chuck Wilson
+cygutils maintainer
+
+Note to self: how to commit contributions:
+  apply the patch
+  untar the contribution
+  Add the Changelog entry
+  ./bootstrap
+  cvs add src/directory
+  cvs add src/directory/srcfiles
+  cvs commit -m "Add foo contribution"
+  ./bootstrap
+  cvs diff | grep Index > foo
+  >>> use 'foo' to add another Changelog entry
+  cvs commit -m "Add foo contribution"
+  cvs tag something
+

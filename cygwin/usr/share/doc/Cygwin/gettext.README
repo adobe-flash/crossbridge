@@ -1,0 +1,453 @@
+gettext
+========================================================================
+GNU Internationalization library and utilities.  Contains the import
+library, static library, header files, core utilities, and core
+documentation.
+
+Runtime requirements (these, or newer)
+  cygwin-1.7.9-1
+  libiconv2-1.14-1
+  libncursesw10-5.7-18
+  libexpat1-2.0.1-1
+  libgcc1-4.5.3-2
+  libstdc++6-4.5.3-2
+  libgomp1-4.5.3-2
+  texinfo (for installing info files)
+  git     (for autopoint)
+
+Build requirements (these, or newer)
+  cygwin-1.7.9-1
+  gcc4-core-4.5.3-2
+  gcc4-g++-4.5.3-2
+  binutils-2.21.53-2
+  expat-2.0.1-1
+  libexpat1-devel-2.0.1-1
+  libiconv-1.14-1
+  libiconv2-1.14-1
+  libcharset1-1.14-1
+  libncursesw-devel-5.7-18
+  make-3.81-2
+  cygport-0.10.5-1
+  libtool-2.4-1
+  gcc-tools-epoch2-autoconf-2.64-1   (*)
+  gcc-tools-epoch2-automake-1.11.1-1 (*)
+
+(*) gettext-0.18.1.1's autogen.sh and the included gnulib .m4 files
+    support only autoconf-2.60 thru 2.65.  Using newer autoconf
+    causes a world of hurt. Since we have a satisfactory version
+    of autoconf available...use it.
+
+Canonical homepage:
+  http://www.gnu.org/software/gettext/
+
+Canonical download:
+  ftp://ftp.gnu.org/pub/gnu/gettext/
+
+License:
+  GPL
+
+Language:
+  C, C++, C#, CLisp, Java, ObjC, Pascal, Perl, Python, Php, Shell, Smalltak, tcl, 
+
+========================================================================
+
+Build instructions:
+  unpack gettext-0.18.1.1-X-src.tar.bz2
+    if you use setup to install this src package, it will be unpacked
+    under /usr/src automatically
+  cd /usr/src
+  cygport ./gettext-0.18.1.1-X.cygport all
+
+This will create:
+  /usr/src/gettext-0.18.1.1-X-src.tar.bz2
+  /usr/src/gettext-0.18.1.1-X.tar.bz2
+  /usr/src/gettext-devel-0.18.1.1-X.tar.bz2
+  /usr/src/libintl8-0.18.1.1-X.tar.bz2
+  /usr/src/libgettextpo0-0.18.1.1-X.tar.bz2
+  /usr/src/libasprintf0-0.18.1.1-X.tar.bz2
+
+Or use 'cygport ./gettext-0.18.1.1-X.cygport prep' to get a patched
+source directory
+
+To find out the files included in the binary distribution, you can
+use "cygcheck -l gettext gettext-devel libintl8 libgettextpo0
+libasprintf0", or browse the listing for the appropriate version at 
+<http://cygwin.com/packages/>.
+
+========================================================================
+
+Port Notes:
+* No java support.  gcj doesn't support the necessary options; need
+  OpenJDK? Or an improved form of the Win32 java wrappers
+  http://cygwin.com/cgi-bin/cvsweb.cgi/wrappers/java/?cvsroot=cygwin-apps
+  The standard GNU build-aux/javacomp.sh.in and build-aux/javaexec.sh.in
+  do not appear to be sufficient to allow cygwin+win32java without
+  additional help -- especially cygpath conversion.
+
+* See CHECK_NOTES for info on regression test results
+
+* LOTS of warnings like this, for various symbols (both data and funcs):
+  .../gettext-0.18.1.1/gettext-tools/../gettext-runtime/intl/version.c:26:
+  warning: 'libintl_version' redeclared with out dllimport attribute:
+  previous dllimport ignored
+  This is part of the One True Bruno Way, I assume it is ok.
+
+* Also see the opposite warning:
+  .../gettext-0.18.1.1/gettext-tools/src/po-lex.c:600: warning:
+  'gram_max_allowed_errors' redeclared without dllimport attribute
+  after being referenced with dll linkage
+
+* msgmerge.c and xgettext.c warn about "deprecated conversion from string
+  constant to ‘char*’
+
+* libgrep has problems with the __libc_lock_* symbols:
+  .../gettext-0.18.1.1/gettext-tools/libgrep/regex_internal.h:45:1:
+  warning: "__libc_lock_init" redefined
+  ../config.h:2192:1: warning: this is the location of the previous
+  definition
+
+----------  gettext-0.18.1.1-2 -- 15 Oct 2011 -----------
+* Built using gcc-4.5
+* No longer override cygwin default locale behavior
+* Incorporated patch from upstream gnulib to improve efficiency of
+  libintl_relocate() for the --disable-relocation case.
+
+----------  gettext-0.18.1.1-1 -- 28 Aug 2011 -----------
+* Update to latest upstream release
+* Built using gcc4 (new dependencies on libgcc, libstdc++, and libgomp
+  runtime DLLs). The downside of this is that it may trigger even more
+  "*** unable to remap ***" errors; use rebaseall.
+* autopoint now uses git instead of cvs
+* Link xgettext against "wide" version of ncurses
+* Build note: autoreconf'ed using gcc-tools-epoch2-auto{conf,make}
+  That package provides ac-2.64+am-1.11.1, which are old enough that
+  gettext's m4 files don't trigger warnings; significantly cuts down on
+  the amount of patching needed...
+* Installed emacs .el files into /usr/share/doc/Cygwin/gettext/ -- user
+  can copy to $site_emacs or whatever is appropriate.
+
+----------  gettext-0.17-11 -- 02 Apr 2009 -----------
+* Enable -V option for autopoint (helps work around bug with packages
+  that use both libtool and gettext, but specify AM_GNU_GETTEXT_VERSION
+  < 0.17. Because older gettext had a bug that caused difficulties with
+  libtool, the -V option allows to automatically update the package to
+  this version of gettext during the auto-reconf process, without
+  manually patching the target package's configure.in.
+
+----------  gettext-0.17-10 -- 31 Dec 2008 -----------
+* Fork for 1.7.0 development
+* Uses stock cygport-0.9.3
+* compiled using gcc/g++ 3.4.4
+
+----------  gettext-0.17-3 -- 31 Dec 2008 -----------
+* Fixed the lib-link.m4 bug using a variation of the
+  patch employed upstream (in gettext-0.18pre). See
+  http://lists.gnu.org/archive/html/bug-gnu-utils/2008-12/msg00061.html
+* Fixed an issue in the rpath test suite where only
+  the installed .m4 files were tested, rather than
+  the in-package ones. This explains (and corrects) the
+  odd rpath test results in gettext-0.17-1. See
+  http://cygwin.com/ml/cygwin-announce/2008-11/msg00015.html
+
+----------  gettext-0.17-2 -- 29 Dec 2008 -----------
+* Modified test suite so that rpath tests pass when
+  gettext-0.17 is (re)built while gettext-0.17 is 
+  installed. Previously, the rpath tests in gettext-0.17
+  passed only when an older version of gettext was actually
+  installed.
+* Identified a bug in lib-link.m4 and reported upstream.
+  (not fixed; incidence should be rare -- will wait for
+  upstream fix). See
+  http://lists.gnu.org/archive/html/bug-gnu-utils/2008-12/index.html
+  Dec 29, "Bug in lib-link.m4 (gettext-0.17)". Once this bug is fixed,
+* Fixed bug in libasprintf0.hint
+
+----------  gettext-0.17-1 -- 08 Nov 2008 -----------
+* Update to latest official release
+* Removed all references to 'relocatable' from .cygport
+  so that it can be used with stock cygport-0.4.2.
+
+----------  gettext-0.15-1 -- 21 Oct 2006 -----------
+* Update to latest official release
+* Uses the True Bruno Method for dealing with Woe32
+* built using cygport framework
+
+This is NOT built using --enable-relocatable, because Bruno sez:
+  "I hope that people will learn when to use --enable-relocatable
+   by themselves. For example, I don't think a Linux distributor 
+   should use --enable-relocatable for anything installed in 
+   /usr - it would only be bloat that makes the system slower."
+  http://mail.gnu.org/archive/html/bug-gnulib/2003-04/msg00014.html
+Since I am the defacto "Linux distributor" for gettext-on-cygwin,
+and the package is installed into /usr, I figure this admonishment
+applies here.  So, no --enable-relocatable.
+
+----------  gettext-0.15.pre2-1 -- 01May2006 ----------- UNRELEASED
+* Update to the latest release
+* Adapt to The One True Bruno Way: --disable-auto-import
+  = alternate solution for .rdata 'const struct'
+  = alternate solution to reloc fixes
+  = But incomplete, so needed more cygwin-foo provided here.
+* java removed.
+* new sub-package: libasprintf0 contains cygasprintf-0.dll
+  Although the header, import, and static libraries have long
+  been, and still are, included in the gettext subpackage, they
+  were fairly useless without the runtime library.  </shame>
+ 
+----------  gettext-0.14.5-1 -- 10Nov2005 -----------
+* Update to the latest release.
+* Built with gcj installed -- /usr/share/gettext/gnu.gettext.*.exe
+  demo programs (compiled java).
+* Internal build changes -- private getopt functions no longer
+  in static convenience lib, but are part of libgettextsrc.la 
+  shared lib.  This magic made possible by gnulib m4 stuff now
+  present in upstream release.  Still need a little cygwin-foo,
+  but not as much.
+* Use /proc/self/exe instead of /proc/<pid>/exename, now that the
+  former is available (cygwin-1.5.13+) [falls back to the latter
+  if necessary]
+* Other fixes necessary for working around .rdata 'const struct'
+  problem (http://www.cygwin.com/ml/cygwin/2004-09/msg01101.html)
+  especially with getopt long_options structures.
+
+0.14.1-1:
+---------------------
+Update to the latest release.  DLL version number of libintl was
+bumped to '3' (upstream change).
+
+0.12.1-1:
+---------------------
+Update to the latest release.  Also, now that libtool doesn't relink
+forever, use cyggettextlib-0-12-1.dll and cyggettextsrc-0-12-1.dll.
+Now, the odd thing about this is, cyggettext*-0-12-1 are PRIVATE
+libraries.  Their version number will change with every new release,
+but since nobody (outside of this package) is allowed to use them,
+there's no need to worry about backwards compatibility and keeping
+old versions around and -- you would think -- no need to put them
+into their own package.
+
+BUT.  cyggettextpo-0.dll provides the PUBLIC interface to those 
+two private libraries.  Thus, external packages might depend on
+cyggettextpo-0.dll (which in turn depends on cyggettextlib-X-Y-Z
+and cyggettextsrc-X-Y-Z, but they don't know that).  Thus, 
+cyggettextpo-0.dll needs to be in its own package -- AND 
+cyggettextsrc-X-Y-Z.dll / cyggettextlib-X-Y-Z.dll need to be with
+it.  Thus, later versions of gettextpo will look like this:
+
+  libgettextpo0 (first)
+    cyggettextpo-0.dll
+    cyggettextsrc-0-12-1.dll
+    cyggettextlib-0-12-1.dll
+  libgettextpo0 (next, but public interface gettextpo hasn't changed)
+    cyggettextpo-0.dll
+    cyggettextsrc-0-12-2.dll
+    cyggettextlib-0-12-2.dll
+  etc.
+
+External packages keep seeing cyggettextpo-0.dll, but behind the scenes
+the private library versions keep changing.  But they MUST be 
+distributed together with the public lib, or the whole thing breaks.
+
+Sigh.
+
+0.11.5-1:
+---------------------
+Updated to the latest release, which includes the new "autopoint" 
+program.  Added the CYGWIN-PATCHES/javac and the CYGWIN-PATCHES/java
+wrapper scripts, to help in building the .jar files.
+  -- this requires manual intervention: edit the scripts as appropriate
+     and then copy them into your path -- ahead of the "real" javac.exe
+     and java.exe.
+  -- also, I ran the following commands manually:
+       cd <topsrc>/intl-java
+       javadoc -d javadoc1 gnu/gettext/*.java
+       javadoc -d javadoc2 gnu/gettext/*.java
+
+0.11.2-2:
+---------------------
+Rebuilt against the new libiconv package, as well as expat.
+Updated the requires: lines in the hints.
+
+0.11.2-1:
+---------------------
+Between 0.10.40 and 0.11.2, there were massive changes in the
+gettext package.  Much of the code for the development tools
+was pulled out and placed into two additional libraries,
+libgettextlib and libgettextsrc.  These are NOT for use by 
+outside programs, but only by the gettext tools themselves --
+so the header files, static lib, and import lib are NOT 
+included in the binary package (this ommission is actually
+*recommended* by Bruno in the PACKAGING file).
+  However, in general these two support libraries are built as
+shared libraries (DLLs), so the cyggettextlib-0.11.2.dll and
+cyggettextsrc-0.11.2.dll files are installed.  Also, these
+libraries are NOT versioned according to the normal libtool
+method (--version-info x:y:z), but instead are versioned
+using the --release 0.11.2 method.  That means that every
+new release of gettext will ship new versions (0.11.3, etc)
+of these two libs -- and since no package other than 
+gettext itself uses them, we don't need to worry about 
+keeping old versions around for compatibility and stuff.
+  So, I've made all of the necessary changes to enable
+these two libs to be built as DLLs -- which include:
+  1) use the functional, not macro, form of po_gram_error
+     and po_gram_error_at_line.  Otherwise, our client
+     programs msg*.exe will attempt, via the macro, to
+     directly access fields of the imported structure variable
+     gram_pos.
+       changes: src/po-lex.h src/po-lex.c
+  2) provide an accessor function for the imported 
+     array-of-structures variable plural_table[] (otherwise
+     our client programs will attempt to directly access
+     elements of the table -- a no-no for auto-import).
+       changes: src/plural-table.h src/plural-table.c
+                src/msgfmt.c src/msginit.c
+  3) pull out the getopt functions from these libraries, 
+     and put them into their own libgetopt.a convenience
+     library.   This is because cygwin itself provides the
+     getopt functions, and 
+       (a) if a function is listed in TWO import libs, ld
+           reports an error.  /usr/lib/libcygwin.a and
+           libgettextlib.dll.a would both contain the getopt
+           symbols, so we remove them.
+       (b) BUT, we CAN'T use the version provided by cygwin!!
+           Cygwin's version hardcodes the POSIXLY_CORRECT variable,
+           which means we cannot reorder options and arguments --
+           but gettext's tests rely on reordering.
+       (c) We CAN override functions that might be imported from
+           a dll via an import lib by using an explicit STATIC
+           lib.  So, 
+     getopt.c getopt.h getopt1.c  all go into the convenience lib
+     libgetopt.la instead of the regular lib libgettextlib.la.
+     (Recall that convenience libs are always built statically).
+	  Add libgetopt.la as a dependence for all exe's.
+	    changes: src/Makefile.am  lib/Makefile.am  tests/Makefile.am
+
+However, as it turned out, this was all for naught.  Because
+libtool still has problems on cygwin when relinking DLL's for
+installation, I finally just forced libgettextsrc.la and libgettextlib.la
+to be built statically as convenience libs themselves.  The above
+changes WERE enough to build working exe's and dll's that passed
+most of the selftests -- but 'make install' wouldn't work because
+libtool kept trying to relink the DLLs against /usr/lib, not
+$(DESTDIR)/usr/lib.  It's a libtool problem, not a gettext problem.
+
+So, ultimately, we don't ship or build cyggettext*.dll.  This means
+that the msg*.exe and xgettext.exe programs are slightly bigger
+than necessary, but only by about 300k or so, total.
+
+Also, the gettext package was split into three packages instead of
+just two: 
+  'gettext' contains the core utilities
+  'libintl2' (yes, the DLL version got bumped) contains just the 
+             single cygintl-2.dll file -- and even if we DID build 
+             cyggettext*.dll, they wouldn't go in the libintl package. 
+  'gettext-devel' contains development utilities, autotool macros, 
+             additional documentation, etc.
+This split was recommended by Bruno in the PACKAGING file.
+
+0.10.40-1:
+---------------------
+  Note that the configure step (if you use the build script) will 
+  erroneously report that the autotools are missing.  This is 
+  because the cygwin auto-wrappers fail when the build directory 
+  doesn't contain configure.in|ac.  We could correct this by
+  copying configure.in into our .build dir, (manually or inside
+  the build script) but why bother?
+
+As of 0.10.38-3, the dll has been renamed to cygintl-1.dll; the new dll
+  is not backward compatible with previous versions because it is now
+  built using auto-export/auto-import functionality.  Benefit: no more
+  need for -DGETTEXT_STATIC when linking client libs statically.
+
+The utility and test programs are statically linked.  To build dynamically
+  linked versions, follow these steps:
+
+  short version :-)
+    gettext-0.10.38-X.sh all_dyn
+ 
+  long version:
+    gettext-0.10.38-X.sh prep
+    gettext-0.10.38-X.sh conf
+    gettext-0.10.38-X.sh build
+    gettext-0.10.38-X.sh check (tests static lib & exe's)
+    Then
+
+    edit <topsrc>/.build/src/Makefile and remove the '-static' flag from LDFLAGS
+    edit <topsrc>/.build/tests/Makefile and remove the '-static' flag from LDFLAGS
+    cp <topsrc>/.build/intl/libintl.dll.a <topsrc>/.build/intl/.libs/libintl.a
+    cp <topsrc>/.build/intl/cygintl.dll   <topsrc>/.build/src/
+    cp <topsrc>/.build/intl/cygintl.dll   <topsrc>/.build/tests/
+    cd <topsrc>/.build/src
+    rm *.exe
+    cd <topsrc>/.build/tests
+    rm *.exe
+
+    And finally
+
+    gettext-0.10.38-X.sh build
+    gettext-0.10.38-X.sh check (tests dynamic lib & exe's)
+
+  Because this is so kludgy -- even when automated by the build_dyn 
+  option -- the default build (and the shipped version) is linked
+  statically.
+
+
+Both static and dynamic librarys pass all 25 tests.
+
+------------------
+Old, possibly out of data notes:
+
+As of 0.10.35-2, the dll is named "cygintl.dll" NOT "libintl.dll".  This 
+  helps to avoid dll naming conflicts between cygwin dll's and 
+  dlls from other platforms (native, pw, etc).  If you have an
+  executable that depends on "libintl.dll" you may either recompile 
+  your app so that it links with libintl.dll.a/cygintl.dll, or install
+  *just* the dll from gettext-0.10.35-1.tar.gz into your /usr/bin 
+  directory.
+
+The dll is NOT versioned. (i.e. "cygintl.dll" NOT "cygintl1.dll") because
+  the libintl package and interface is quite stable, and its interface
+  is not anticipated to change in the foreseeable future.
+
+I have built the utility programs using dynamic linking, and they
+pass the 'make check' tests.  However, doing this requires manual 
+intervention during the build process, and is IMO just not worth it. 
+The problem is libtool -- when configure decides that a platform 
+doesn't support dynamic linking, a libtool-ized package will go
+*out of its way* to make sure you don't try it.
+
+I adjusted the Makefile.am and Makefile.in files *just enough*
+so that a working .dll and import library are built, but it's
+just too ugly to force the executables that come with gettext
+to link to them.  This does NOT, repeat does NOT, imply that it's
+harder or less beneficial to use the dll when building *external*
+programs that depend on gettext.  It's just hard to do from *inside*
+the gettext package.
+
+For those who are interested, to force dynamic linking of the tools:
+After building everything else, as directed above, 
+
+  edit src/Makefile.in and remove the '-static' flag from LDFLAGS
+  edit src/Makefile.in and remove the '-DGETTEXT_STATIC' flag from DEFS
+  edit tests/Makefile.in and remove the '-static' flag from LDFLAGS
+  edit tests/Makefile.in and remove the '-DGETTEXT_STATIC' flag from DEFS
+    (you may need to do this to src/Makefile; tests/Makefile instead)
+  cp lib/libnlsutdyn.a lib/libnlsut.a
+  cp intl/libintl.dll.a intl/libintl.a
+  cp intl/cygintl.dll src/
+  cp intl/cygintl.dll tests/
+  cd src
+  rm *.o *.exe
+  make
+  cd ../tests
+  rm *.o *.exe
+  make
+  cd ..
+  make check
+
+Both the statically-linked versions of the tools and the 
+dynamically-linked versions pass all 25 'make check' tests.
+
+========================================================================
+Cygwin port maintained by: Charles Wilson  <cygwin@cygwin.com>

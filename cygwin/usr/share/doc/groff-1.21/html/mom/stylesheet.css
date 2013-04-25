@@ -1,0 +1,653 @@
+/* stylesheet for the mom macros documentation */
+
+a:link    { color: blue; text-decoration: none; }
+a:hover   { color: red; text-decoration: underline; }
+a:visited { color: purple; text-decoration: none; }
+a:visited:hover { color: purple; text-decoration: underline; }
+a.header-link:visited { color: #6e70cc ; }
+a.header-link:visited:hover { color: #6e70cc ; }
+
+a:link.quick { text-decoration: underline; }
+.version /* version number for top of toc.html */
+{
+  font-size: 90% ;
+  text-align: center ;
+}
+
+.page /* Page setup: page color, size and border */
+{
+  width: 760px ;
+  position: relative ;
+  top: 12px ;
+  bottom: 12px ;
+  margin: auto ;
+  padding: 12px ; 
+  border: solid 1px #ceac8d ;
+  color: #302419 ;
+  background-color: #ffffeb ;
+  font: 1em/1.5em arial,sans-serif ;
+}
+
+/* Heads */
+
+h1.docs
+{
+  font-family: arial,sans-serif ;
+  font-size: 175% ;
+  text-align: center ;
+  color: #002b56 ;
+  background-color: #e2f1ff ;
+  outline: solid 1px #99cccc ;
+  padding: 6px ;
+}
+h2.docs
+{
+  margin-bottom: -.25em ;
+  font-size: 120% ;
+  color: #000056 ;
+}
+h2.macro-group /* ie "Page setup" or "Indents" or "Multi-columns" */
+{
+  margin-top: 1em ;
+  font-size: 120% ;
+  color: #000056 ;
+  background-color: #dfccad ;
+  padding: 6px ;
+}
+h3.docs
+{
+  margin-bottom: -.5em ;
+  font-size: 95% ;
+  color: #000056 ;
+  text-transform: uppercase ;
+}
+h3.appendices
+{
+ font-size: 100% ;
+ text-transform: none ;
+}
+h3.notes
+{
+  display: inline-block ;
+  margin-top: .5em ;
+}
+h3.control
+{
+  padding-top: .5em ;
+  font-size: 100% ;
+  text-transform: none ;
+}
+h3.numbered
+{
+  font-size: 100% ;
+  margin-bottom: -.5em ;
+}
+h3.macro-id
+{
+  font-size: 105% ;
+  color: #000056 ;
+  text-transform: uppercase ;
+  margin-top: 3px ;
+  margin-bottom: 0px ;
+}
+h4.docs
+{
+  margin-bottom: -.5em ;
+  color: #000056 ;
+}
+h4.doc-param-macros
+{
+  margin-top: -.5em ;
+}
+h4.arg-list
+{
+  margin-top: -.5em ;
+}
+h4.fields
+{
+  color: #302419 ;
+}
+h5.docs
+{
+  margin-bottom: -.5em ;
+  font-size: 95% ;
+  color: #000056 ;
+  text-transform: uppercase ;
+}
+ul.doc-param-macros
+{
+  margin-top: .75em ;
+  margin-left: -.5em ;
+}
+.control-macros-header
+{
+  display: inline-block ;
+  margin-bottom: -.25em ;
+  padding: 2px 6px 0 6px ;
+  outline: 1px solid #000058 ;
+  font-size: 100% ;
+  background-color: #e2f1ff ;
+}
+.control-macro
+{
+  font-size: 100% ;
+  margin-bottom: -.75em ;
+  color: #2f2f71 ;
+}
+.macro-id-overline
+{
+  display: inline-block ;
+  border-top: solid 2px #8d8775 ;
+  margin-bottom: .5em ;
+}
+
+/* Paragraphs */
+
+p.no-indent
+{
+  text-indent: 0px ;
+}
+p.requires
+{
+  font-family: arial,sans-serif ;
+  font-style: italic ;
+  text-indent: 0px ;
+  margin-top: .25em ;
+}
+p.alias
+{
+  font-family: arial,sans-serif ;
+  font-style: normal ;
+  text-indent: 0px ;
+  margin-top: .25em ;
+}
+
+/* Horizontal rules */
+
+hr /* horizontal rules need a border to be colorized) */
+{
+  border: solid 1px #8d8775 ;
+}
+div.rule-short /* for section breaks; top/bottom margins set manually */
+{
+  display: block ;
+  width: 25% ;
+  margin: auto;
+  clear: both ;
+}
+div.rule-medium /* underneath mini-tocs; top/bottom margins set manually */
+{
+  display: block ;
+  width: 40% ;
+  margin: auto;
+  clear: both ;
+}
+div.rule-long /* precedes nav bar at bottom of page */
+{
+  display: block ;
+  width: 90% ;
+  margin: auto;
+}
+
+/* Boxed text */
+
+.box-macro-args /* Macro name+args */
+{
+  display: block ;
+  width: 736px ;
+  max-width: 736px ;
+  border: solid 1px #302419 ;
+  padding-top: 5px ;
+  padding-bottom: 3px ;
+  padding-left: 12px ;
+  padding-right: 12px ;
+  background-color: #ffffff ;
+  white-space: nowrap ;
+  overflow: auto ;
+}
+.box-code
+{
+  display: block ;
+  width: 679px ;
+  max-width: 679px ;
+  border: solid 1px #302419 ;
+  padding-top: 5px ;
+  padding-bottom: 18px ;
+  padding-left: 15px ;
+  padding-right: 15px ;
+  color: #6f614a ;
+  background-color: #ffffff ;
+  white-space: nowrap ;
+}
+.box-tip
+{
+  outline: solid 1px #ceac8d ;
+  padding-left: 15px ; 
+  padding-right: 15px ; 
+  text-align: justify ;
+  background-color: #f9f9d9 ;
+  margin-bottom: 1.5em ;
+  }
+.box-example-layout
+{
+  outline: solid 1px #ceac8d ;
+  padding-left: 15px ; 
+  padding-right: 15px ; 
+  text-align: justify ;
+  background-color: #f9f9d9 ;
+  margin-bottom: 2.5em ;
+  }
+.box-notes
+{
+  outline: solid 1px #ceac8d ;
+  padding-left: 15px ; 
+  padding-right: 15px ; 
+  text-align: justify ;
+  background-color: #f9f9d9 ;
+  margin-bottom: 1.5em ;
+  }
+.box-important
+{
+  outline: solid 1px #ce7a65 ;
+  padding-left: 15px ; 
+  padding-right: 15px ; 
+  text-align: justify ;
+  background-color: #f9f9d9 ;
+  margin-bottom: 1.5em ;
+}
+p.tip
+{
+  padding-top: 9px ;
+  padding-bottom: 9px ;
+  text-indent: 0px ;
+}
+p.tip-top
+{
+  padding-top: 9px ;
+  text-indent: 0px ;
+}
+p.tip-bottom
+{
+  padding-bottom: 9px ;
+  text-indent: 0px ;
+}
+
+/* Pre-formatted code */
+
+span.pre /* pre-formatted multi-line blocks; indent must be exactly 2 spaces */
+{
+  display: block ;
+  position: relative ;
+  top: -1em ;
+  margin-bottom: -1.5em ;
+  font-family: "Lucida Console",monospace ;
+  font-weight: bolder ;
+  font-size: 100% ;
+  white-space: pre ;
+  overflow: auto ;
+}
+span.defaults
+{
+  margin-left: 6px ;
+  padding-bottom: 1em ;
+  font-size: 95% ;
+}
+span.pre-in-pp
+{
+  display: block ;
+  position: relative ;
+  top: -1em ;
+  margin-bottom: -.5em ;
+  font-family: "Lucida Console",monospace ;
+  font-weight: bolder ;
+  font-size: 100% ;
+  white-space: pre ;
+  overflow: auto ;
+}
+span.important
+{
+  font-family: arial,sans-serif ;
+  font-weight: bolder ;
+  color: #8b0000 ;
+}
+span.note
+{
+  font-family: arial,sans-serif ;
+  font-weight: bolder ;
+  color: #443526 ;
+}
+span.additional-note
+{
+  font-family: arial,sans-serif ;
+  font-weight: bolder ;
+  font-style: italic ;
+  color: #443526 ;
+}
+span.tip
+{
+  font-family: arial,sans-serif ;
+  font-weight: bolder ;
+  color: #443526 ;
+}
+span.experts
+{
+  font-family: arial,sans-serif ;
+  font-weight: bolder ;
+  color: #443526 ;
+}
+/* Mini-tocs (usually at top of page) */
+
+/* 1-column, centered mini-toc */
+ul.mini-toc-centered
+{
+  text-align: center ;
+  list-style-type: none ;
+  margin-left: -40px ;
+}
+
+/* 2-column mini-toc column defs*/
+.mini-toc-col-1
+{
+  float: left ;
+  width: 50% ;
+  margin-left: -6px ;
+}
+.mini-toc-col-2
+{
+  float: left ;
+  width: 50% ;
+  clear: right ;
+}
+
+/* 3-column mini-toc column defs */
+.col-1-definitions
+{
+  float: left ;
+  width: 32% ;
+  height: 52em ;
+  padding-bottom: 9px;
+  background-color: #ded4bd ;
+  margin-right: 2% ;
+}
+.col-2-definitions
+{
+  float: left ;
+  width: 32% ;
+  height: 52em ;
+  padding-bottom: 9px;
+  background-color: #ded4bd ;
+  margin-right: 2% ;
+}
+.col-3-definitions
+{
+  float: left ;
+  width: 32% ;
+  height: 52em ;
+  padding-bottom: 9px;
+  background-color: #ded4bd ;
+  margin-bottom: 24px ;
+}
+
+/* List styles */
+
+ul.toc
+{
+  margin-top: .5em ;
+}
+ul.no-enumerator
+{
+  list-style-type: none ;
+}
+.list-head
+{
+  font-family: arial,sans-serif ;
+  font-weight: bolder ;
+  font-size: 110% ;
+  color: #000056 ;
+}
+.list-head-goodies
+{
+  font-family: arial,sans-serif ;
+  font-weight: normal ;
+  font-size: 110% ;
+  color: #000056 ;
+}
+.no-anchor
+{
+  color: #302419 ;
+  font-weight: bold ;
+}
+.text-color
+{
+  color: #302419 ;
+}
+li.item
+{
+  font-family: arial,sans-serif ;
+  font-weight: normal ;
+  font-size: 100% ;
+  margin-left: -10px ;
+  list-style-type: disc ;
+}
+.mini-toc
+{
+  margin-top: -1em ;
+  font-size: 90% ;
+}
+.sublist
+{
+  margin-left: -1em ;
+  font-size: 90% ;
+  color: #302419 ;
+  list-style-type: disc ;
+}
+.sub
+{
+  list-style-type: circle ;
+}
+.normal
+{
+  font-style: normal ;
+  font-size: 100% ;
+}
+.normal-smaller
+{
+  font-weight: normal ;
+  color: #302419 ;
+  font-size: 90% ;
+}
+.normal-sub-sub
+{
+  font-weight: normal ;
+  color: #302419 ;
+  font-size: 90% ;
+}
+
+/* Macro lists / defaults */
+
+div.macro-list-container
+{
+  background-color: #ded4bd ;
+  margin-bottom: 1.5em ;
+}
+h3.macro-list
+{
+  font-size: 100% ;
+  color: #000056 ;
+  text-transform: uppercase ;
+  padding: 9px ;
+}
+ul.macro-list
+{
+  margin-left: -21px ;
+  list-style-type: none ;
+  font-family: arial,sans-serif ;
+  margin-top: -1.25em ;
+  padding-bottom: 6px ;
+}
+ol.macro-list
+{
+  font-family: arial,sans-serif ;
+  margin-top: -1.25em ;
+  padding-bottom: 6px ;
+}
+
+.defaults-container
+{
+  background-color: #e3d2b1 ;
+  border: 1px solid #3f2c00 ;
+  margin-bottom: 2.5em ;
+}
+h3.defaults
+{
+  font-size: 100% ;
+  color: #000056 ;
+  text-transform: uppercase ;
+  padding: 9px ;
+}
+p.defaults
+{
+  margin-top: .25em ;
+  margin-left: 6px ;
+  margin-bottom: 0 ;
+}
+#toc-title, #toc-head, #toc-subhead, #toc-parahead
+{
+  display: block ;
+  margin-top: -1em ;
+  margin-bottom: -1em ;
+}
+
+/* Bottom of page spacer */
+
+div.bottom-spacer
+{
+  display: block ;
+  height: 24px ;
+}
+
+/* General markup */
+
+kbd
+{
+  font-family: "Lucida Console",monospace ;
+  font-weight: bold ;
+  font-size: 100% ;
+}
+kbd.macro-args
+{
+  margin-right: .5em ;
+  color: #6f614a ;
+  white-space: nowrap ;
+  overflow: auto ;
+}
+
+/* tocs */
+
+h1.toc
+{
+  font-family: arial,sans-serif ;
+  font-size: 175% ;
+  text-align: center ;
+  color: #002b56 ;
+  background-color: #e2f1ff ;
+  outline: solid 1px #99cccc ;
+  padding: 6px ;
+}
+h2.toc
+{
+  font-size: 120% ;
+  color: #000056 ;
+}
+h3.toc
+{
+  margin-top: -.5em ;
+  margin-bottom: -.5em ;
+  font-size: 100% ;
+  color: #6e70cc ;
+}
+.highlight
+{
+  font-weight: bold ;
+}
+.fourth-level
+{
+  margin-left: -1.25em ;
+  list-style-type: none ;
+}
+ul.toc-docproc
+{
+  margin-left: -1em ;
+}
+.toc-docproc-header
+{
+  margin-top: -.5em ;
+  text-transform: uppercase ;
+}
+a.header-link
+{
+  color: #6e70cc ;
+  font-size: 95% ;
+}
+
+/* Examples */
+
+.examples-container
+{
+  border: solid 1px #917963 ;
+  background-color: #f9f9d9 ;
+  padding-left: 24px ;
+  padding-right: 24px ;
+  padding-top: 3px ;
+  padding-bottom: 3px ;
+}
+
+.examples
+{
+  font-weight: bolder ;
+  font-size: 98% ;
+  color: #524b3f ;
+  margin-top: 12px ;
+  margin-bottom: 3px ;
+}
+
+/* definitions.html */
+
+table.definitions /* mini-toc is set up as a table */
+{
+  margin-top: 12px ;
+  text-align: left ;
+  margin-left: 12px ;
+}
+th.definitions
+{
+  padding-bottom: 6px ;
+  font-size: 120% ;
+  color: #000056 ;
+}
+dt /* definition terms in italic*/
+{
+  font-style: italic ;
+}
+dt.no-italic
+{
+  font-style: normal ;
+}
+
+/* Tables */
+table.quick-ref
+{
+  margin-top: .25em ;
+}
+table.quick-ref, th.quick-ref
+{
+  padding-bottom: .25em ;
+  font-family: "Lucida Console",monospace ;
+  font-weight: bold ;
+  text-align: left ;
+}
+td
+{
+  padding: 0 ;
+  padding-left: .5em ;
+}

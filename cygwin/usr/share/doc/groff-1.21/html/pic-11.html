@@ -1,0 +1,163 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-11.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-10.html">prev</a> | <a href="pic-12.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>11. Object Groups
+<a name="11. Object Groups"></a>
+</h2>
+
+
+<p style="margin-top: 1em"><font color="#000000">There are
+two different ways to group objects in <b>pic</b>; <i>brace
+grouping</i> and <i>block composites</i>.</font></p>
+
+<h3>11.1. Brace Grouping
+<a name="11.1. Brace Grouping"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+simpler method is simply to group a set of objects within
+curly bracket or brace characters. On exit from this
+grouping, the current position and direction are restored to
+their value when the opening brace was
+encountered.</font></p>
+
+<h3>11.2. Block Composites
+<a name="11.2. Block Composites"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">A block
+composite object is created a series of commands enclosed by
+square brackets. The composite can be treated for most
+purposes like a single closed object, with the size and
+shape of its bounding box. Here is an example. The program
+fragment</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">A: [
+    circle;
+    line up 1 at last circle .n;
+    line down 1 at last circle .s;
+    line right 1 at last circle .e;
+    line left 1 at last circle .w;
+    box dashed with .nw at last circle .se + (0.2, -0.2);
+    Caption: center of last box;
+]</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">yields the
+block in figure 11-1, which we show both with and without
+its attachment points. The block&rsquo;s location becomes
+the value of <b>A</b>.</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic39.png" alt="Image img/pic39.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+11-1: A sample composite object</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">To refer
+to one of the composite&rsquo;s attachment points, you can
+say (for example) <b>A .s</b>. For purposes of object
+naming, composites are a class. You could write <b>last []
+.s</b> as an equivalent reference, usable anywhere a
+location is needed. This construction is very important for
+putting together large, multi-part diagrams.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Blocks are
+also a variable-scoping mechanism, like a <i>groff</i>(1)
+environment. All variable assignments done inside a block
+are undone at the end of it. To get at values within a
+block, write a name of the block followed by a dot, followed
+by the label you want. For example, we could refer the the
+center of the box in the above composite as <b>last []
+.Caption</b> or <b>A.Caption</b>.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">This kind
+of reference to a label can be used in any way any other
+location can be. For example, if we added <b>&quot;Hi!&quot;
+at A.Caption</b> the result would look like this:</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic40.png" alt="Image img/pic40.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+11-2: Adding a caption using interior labeling</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">You can
+also use interior labels in either part of a <b>with</b>
+modifier. This means that the example composite could be
+placed relative to its caption box by a command containing
+<b>with A.Caption at</b>.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Note that
+both width and height of the block composite object are
+always positive:</font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic41.png" alt="Image img/pic41.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+11-3: Composite block objects always have positive width and
+height</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Blocks may
+be nested. This means you can use block attachment points to
+build up complex diagrams hierarchically, from the inside
+out. Note that <b>last</b> and the other sequential naming
+mechanisms don&rsquo;t look inside blocks, so if you have a
+program that looks like</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">.PS
+P: [box &quot;foo&quot;; ellipse &quot;bar&quot;];
+Q: [
+     [box &quot;baz&quot;; ellipse &quot;quxx&quot;]
+     &quot;random text&quot;;
+   ]
+arrow from 2nd last [];
+.PE</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">the arrow
+in the last line is attached to object <b>P</b>, not object
+<b>Q</b>.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">In DWB
+<b>pic</b>, only references one level deep into enclosed
+blocks were permitted. GNU <b>gpic</b> removes this
+restriction.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+combination of block variable scoping, assignability of
+labels and the macro facility that we&rsquo;ll describe
+later on can be used to simulate functions with local
+variables (just wrap the macro body in block
+braces).</font></p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-10.html">prev</a> | <a href="pic-12.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

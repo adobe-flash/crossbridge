@@ -1,0 +1,212 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-3.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-2.html">prev</a> | <a href="pic-4.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>3. Basic PIC Concepts
+<a name="3. Basic PIC Concepts"></a>
+</h2>
+
+
+<p style="margin-top: 1em">Pictures are described
+procedurally, as collections of objects connected by
+motions. Normally, <b>pic</b> tries to string together
+objects left-to-right in the sequence they are described,
+joining them at visually natural points. Here is an example
+illustrating the flow of data in <b>pic</b> processing:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic1.png" alt="Image img/pic1.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 3-1: Flow
+of <b>pic</b> data</p>
+
+<p style="margin-top: 1em">This was produced from the
+following <b>pic</b> program:</p>
+
+<pre style="margin-left:10%; margin-top: 1em">.PS
+ellipse &quot;document&quot;;
+arrow;
+box width 0.6 &quot;\fIpic\/\fP(1)&quot;
+arrow;
+box width 1.1 &quot;\fIgtbl\/\fP(1) or \fIgeqn\/\fP(1)&quot; &quot;(optional)&quot; dashed;
+arrow;
+box width 0.6 &quot;\fIgtroff\/\fP(1)&quot;;
+arrow;
+ellipse &quot;PostScript&quot;
+.PE</pre>
+
+
+<p style="margin-top: 1em">This little program illustrates
+several <b>pic</b> basics. Firstly, we see how to invoke
+three object types; ellipses, arrows, and boxes. We see how
+to declare text lines to go within an object (and that text
+can have font changes in it). We see how to change the line
+style of an object from solid to dashed. And we see that a
+box can be made wider than its default size to accommodate
+more text (we&rsquo;ll discuss this facility in detail in
+the next section).</p>
+
+<p style="margin-top: 1em">We also get to see
+<b>pic</b>&rsquo;s simple syntax. Statements are ended by
+newlines or semicolons. String quotes are required around
+all text arguments, whether or not they contain spaces. In
+general, the order of command arguments and modifiers like
+&ldquo;width 1.2&rdquo; or &ldquo;dashed&rdquo;
+doesn&rsquo;t matter, except that the order of text
+arguments is significant.</p>
+
+<p style="margin-top: 1em">Here are all but one of the
+basic <b>pic</b> objects at their default sizes:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic2.png" alt="Image img/pic2.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 3-2: Basic
+<b>pic</b> objects</p>
+
+<p style="margin-top: 1em">The missing simple object type
+is a <i>spline</i>. There is also a way to collect objects
+into <i>block composites</i> which allows you to treat the
+whole group as a single object (resembling a box) for many
+purposes. We&rsquo;ll describe both of these later on.</p>
+
+<p style="margin-top: 1em">The box, ellipse, circle, and
+block composite objects are <i>closed</i>; lines, arrows,
+arcs and splines are <i>open</i>. This distinction is often
+important in explaining command modifiers.</p>
+
+<p style="margin-top: 1em">Figure 3-2 was produced by the
+following <b>pic</b> program, which introduces some more
+basic concepts:</p>
+
+<pre style="margin-left:10%; margin-top: 1em">.PS
+box &quot;box&quot;;
+move;
+line &quot;line&quot; &quot;&quot;;
+move;
+arrow &quot;arrow&quot; &quot;&quot;;
+move;
+circle &quot;circle&quot;;
+move;
+ellipse &quot;ellipse&quot;;
+move;
+arc; down; move; &quot;arc&quot;
+.PE</pre>
+
+
+<p style="margin-top: 1em">The first thing to notice is the
+<i>move</i> command, which moves a default distance (1/2
+inch) in the current movement direction.</p>
+
+<p style="margin-top: 1em">Secondly, see how we can also
+decorate lines and arrows with text. The line and arrow
+commands each take two arguments here, specifying text to go
+above and below the object. If you wonder why one argument
+would not do, contemplate the output of <b>arrow
+&quot;ow!&quot;</b>:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic3.png" alt="Image img/pic3.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 3-3: Text
+centered on an arrow</p>
+
+<p style="margin-top: 1em">When a command takes one text
+string, <b>pic</b> tries to place it at the object&rsquo;s
+geometric center. As you add more strings, <b>pic</b> treats
+them as a vertical block to be centered. The program</p>
+
+<pre style="margin-left:10%; margin-top: 1em">line &quot;1&quot;;
+line &quot;1&quot; &quot;2&quot;;
+line &quot;1&quot; &quot;2&quot; &quot;3&quot;;
+line &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot;;
+line &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; &quot;5&quot;;</pre>
+
+
+<p style="margin-top: 1em">for example, gives you this:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic4.png" alt="Image img/pic4.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 3-4:
+Effects of multiple text arguments</p>
+
+<p style="margin-top: 1em">The last line of Figure
+3.2&rsquo;s program, &lsquo;<b>arc; down; move;
+&quot;arc&quot;</b>&rsquo;, describing the captioned arc,
+introduces several new ideas. Firstly, we see how to change
+the direction in which objects are joined. Had we written
+<b>arc; move; &quot;arc&quot;</b>, omitting <b>down</b> the
+caption would have been joined to the top of the arc, like
+this:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic5.png" alt="Image img/pic5.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 3-5:
+Result of <b>arc; move;</b></p>
+
+<p style="margin-top: 1em">This is because drawing an arc
+changes the default direction to the one its exit end points
+at. To reinforce this point, consider:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic6.png" alt="Image img/pic6.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 3-6:
+Result of <b>arc cw; move;</b></p>
+
+<p style="margin-top: 1em">All we&rsquo;ve done differently
+here is specify &ldquo;cw&rdquo; for a clockwise arc
+(&ldquo;ccw&rdquo; specifies counter-clockwise direction).
+Observe how it changes the default direction to down, rather
+than up.</p>
+
+<p style="margin-top: 1em">Another good way to see this via
+with the following program:</p>
+
+<pre style="margin-left:10%; margin-top: 1em">line; arc; arc cw; line</pre>
+
+
+<p style="margin-top: 1em">which yields:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic7.png" alt="Image img/pic7.png"></p>
+
+<p align="center">Figure 3-7: Result of <b>line; arc; arc
+cw; line</b></p>
+
+<p style="margin-top: 1em">Notice that we did not have to
+specify &ldquo;up&rdquo; for the second arc to be joined to
+the end of the first.</p>
+
+<p style="margin-top: 1em">Finally, observe that a string,
+alone, is treated as text to be surrounded by an invisible
+box of a size either specified by width and height
+attributes or by the defaults <b>textwid</b> and
+<b>textht</b>. Both are initially zero (because we
+don&rsquo;t know the default font size).</p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-2.html">prev</a> | <a href="pic-4.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

@@ -1,0 +1,126 @@
+dump.exe [file]
+  hex dump of file to stdout, using a nice
+  format (GPLv3+)
+
+putclip.exe
+  copies stdin to the Windows clipboard
+  does NOT use Cygwin's /dev/clipboard 
+  Not built unless on a WIN32 platform
+  (GPLv3+)
+  
+getclip.exe
+  copies the Windows clipboard to stdout
+  does NOT use Cygwin's /dev/clipboard
+  Not built unless on a WIN32 platform
+  (GPLv3+)
+  
+conv.exe
+  program for converting line endings of text
+  files between DOS and UNIX format.
+  (GPLv3+)
+  
+  HEAVILY modified, but core routine is based on 
+  the hd2u-0.5.12 distribution, available here:
+  http://www.megaloman.com/~hany/_data/hd2u/
+  by Peter Hanecak.
+
+msgtool.exe / shmtool.exe / semtool.exe / semstat.exe
+  These programs were taken from "Linux Programmer's
+  Guide - Chapter 6" with a few changes so that they 
+  build cleanly.  The original versions were written
+  by (C)opyright 1994-1995, Scott Burkett.
+  ** MODULE: msgtool
+     A command line tool for tinkering with SysV style 
+	  Message Queues
+  ** MODULE: semtool
+     A command line tool for tinkering with SysV style 
+	  Semaphore Sets
+  ** MODULE: semstat
+     Another tool for tinkering with Semaphore Sets
+  ** MODULE: shmtool
+     A command line tool for tinkering with shared memory 
+  For information on how to use these tools, call them
+  with the '-?' option.  Also, see the Linux Programmer's
+  Guide -- the IPC chapter is included with the cygipc 
+  distribution.
+
+  
+  These tools can only be built if IPC functions are 
+  available.  On cygwin, that (currently) means "only if
+  the cygipc package is installed" or "if using a cygwin
+  kernel newer than 1.5.5"
+  (GPLv3+)
+  
+banner.exe
+  prints a large banner to stdout.  From Joerg Schaible.
+  (GPLv3+)
+  
+lpr.exe
+  can be used to spool to a windows printer
+  (GPLv3+)
+
+mkshortcut.exe
+  can be used to create "full featured" windows 
+  shortcuts (as opposed to cygwin-symlinks implemented
+  using .lnk files, which aren't really "full-featured")
+  (GPLv3+)
+
+readshortcut.exe
+  can be used to read information from windows shortcuts (such
+  as target, icon, window state, etc)
+  (GPLv3+)
+
+cygstart.exe
+  A command-line tool which allows you to let Windows start a program or open
+  a file or URL in its associated application. It is similar to the Windows
+  command-line start command.
+  (GPLv3+)
+
+cygdrop.exe
+  A command-line tool which allows you to let start a Cygwin or Windows
+  program with a restricted access token. All administrative rights are dropped
+  by default. The tool also provides options for finer control of groups and
+  privileges.
+  (GPLv3+)
+
+ipck:
+  IPC utility brought over from cygipc.
+  (GPLv3+)
+
+cygicons:
+  DLL containing cygwin-related icons
+  (GPLv3+)
+
+(*) originally BSD+advert, but falls under the blanket 
+    conversion to BSD-no-advert, because it was originally
+	 part of the UCB BSD distro. 
+    <http://www.opensource.org/licenses/bsd-license.html>:
+    Note: The advertising clause in the license appearing 
+    on BSD Unix files was officially rescinded by the 
+    Director of the Office of Technology Licensing of the 
+    University of California on July 22 1999. He states 
+    that clause 3 is "hereby deleted in its entirety."
+
+Note1: "last.exe" and "utmpdump.exe" were previously provided by
+cygutils.  However, once the `sysvinit' package was added to
+the cygwin distribution, they were removed.  They are now
+provided by `sysvinit' -- which is where we took them from
+in the first place.
+
+Note2: "cal.exe"   "col.exe"    "colcrt.exe"  "colrm.exe" "column.exe"
+       "ddate.exe" "getopt.exe" "mcookie.exe" "namei.exe" "rename.exe"
+       "rev.exe" 
+were previously provided by cygutils.  However, they were removed in
+version 1.3.0 because the `util-linux' package was added to the
+cygwin distribution, and it provides those utilities.  In fact,
+it was from util-linux that the versions in cygutils were originally
+derived.
+
+Note3: "ascii.exe" was previously provided by cygutils. However, it
+was removed in version 1.4.8 because the separate ascii package was
+added to the cygwin distribution.
+
+Note4: "realpath.exe" was previously provided by cygutils. It was
+removed in version 1.4.8 because newer releases of coreutils (>=8.15)
+now provide that utility.
+

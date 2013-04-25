@@ -1,0 +1,148 @@
+$Id: NEWS,v 1.6 2012/03/26 19:13:13 jlt63 Exp $
+
+4.1.0
+==============================================================================
+    * Add rebase/rebaseall touch file (i.e., -t option) support.
+
+    * Add rebaseall setup (i.e., -p option) support.
+
+    * Add .oct to the default rebaseall suffix list.
+
+4.0.1
+==============================================================================
+    * Change rebaseall to call rebase instead of ./rebase.
+
+    * Configure with --sysconfdir=/etc.
+
+4.0.0
+==============================================================================
+    * rebase and peflags now support operations on 64 bit objects.
+
+    * New rebase database functionality (see README).
+
+    * New developer application rebase-dump for displaying database contents.
+
+    * New platform support: x86_64-w64-mingw32, i686-pc-msys.
+
+    * peflags now supports short options for almost all flags.
+      peflags -v prints detailed information about the flags set in the
+      file header.
+
+    * rebase now supports long options including improved -h/--help
+      information.
+
+    * rebase -s/--database allows to keep a database of rebased DLLs.
+      This information is used in subsequent calls with the -s/--database
+      option to keep the entire list of DLLs in a good shape, address-wise.
+
+    * rebase -i/--info prints base address and size of DLLs given on
+      the command line, sorted by base address.  A trailing '*' in the
+      last column is printed if a DLL collides with another adjacent DLL
+      in the list.  rebase -i -s can be used to check if the DLLs in the
+      database are still in a good shape.
+
+    * On Cygwin, rebase actively avoids colliding with the Cygwin DLL
+      it is running under.
+
+    * rebaseall skips mingw directories automatically.
+
+    * rebaseall now uses the new rebase database facility.
+
+    * The imagehelper library has been much improved:
+      - Now supports reading and rebasing 64 bit binaries.
+      - New functions ReBaseImage64 and GetImageInfos64.
+      - Support long paths up to 32K characters.
+      - General API cleanup.
+
+3.0.2
+==============================================================================
+    * Autoconfify. Silence build warnings. Add support for building (natively,
+      for each platform) on mingw, msys, and cygwin. Support dash/ash usage.
+      Add workaround for broken getopt_long on MSYS.
+
+3.0.1
+==============================================================================
+    * Placeholder.
+
+3.0:
+==============================================================================
+    * New peflags utility allows to manipulate the following
+      flags in DLLs:
+           peflags [OPTIONS] [-T filelist | -] file(s)...
+      
+          -d, --dynamicbase [BOOL]  Image base address may be
+                                    relocated using address space
+                                    layout randomization (ASLR)
+          -t, --tsaware     [BOOL]  Image is Terminal Server aware
+
+      as well as a number of other flags (see --help output).
+
+      By default, cygwin DLLs have 0 for both flags. Setting -d1
+      for all DLLs (except cygwin1.dll) may be useful on Windows
+      Vista and above. Setting -t1 on all executables may be useful
+      on Windows Terminal Server.
+
+      Use '-v' (or any of the flag arguments with no BOOL) to
+      see the current flag settings for a given DLL or list of
+      DLLs.
+
+    * New peflagsall utility. You remember your SATs, right:
+      peflagsall:peflags::rebaseall:rebase
+
+The following are the changes to rebaseall:
+
+    * Exclude cyglsa64.dll from rebase list
+
+2.4.4:
+==============================================================================
+    * Change rebaseall to prevent "Argument list too long" errors as
+      reported in:
+
+      http://www.cygwin.com/ml/cygwin/2005-09/msg00836.html
+
+    * Change rebase to use modern method to find the image's
+      IMAGE_NT_SIGNATURE as suggested in:
+    
+      http://www.cygwin.com/ml/cygwin/2006-02/msg00645.html
+
+    * Change imagehelper library so it compiles under gcc 3.4.x
+      (and hopefully later) as suggested in an email from Jens Dill.
+
+    * Change rebaseall to use a tighter regular expression when
+      creating the rebase list.
+
+2.4.3:
+==============================================================================
+The following are the changes to rebaseall:
+
+    * Changes to support Cygwin's CYGWIN=transparent_exe option.
+
+2.4.2:
+==============================================================================
+The following are the changes to rebaseall:
+
+    * Change zcat to "gzip -d -c" and egrep to "grep -E" to avoid the possibly
+      of invoking a (bash) shell script.
+
+2.4.1:
+==============================================================================
+The following are the changes to rebaseall:
+
+    * Change the "only ash processes are running" check to support 9X/Me.
+    * Add setting PATH to support environments that do not have Cygwin's bin
+      in the Windows' system PATH.
+
+2.4:
+==============================================================================
+The following are the changes to rebaseall:
+
+    * Change to exit with rebase's exit code instead of unconditionally
+      exiting with zero (Axel Naumann).
+    * Convert from bash to ash script.
+    * Remove obsolete Apache hack.
+    * Add support for spaces in file and directory paths.
+    * Add rebasing of .so files too.
+    * Add suffix option (i.e., -s) to support rebasing of DLLs with
+      non-standard extensions.
+    * Add support to verify that only ash processes are running or exit.
+

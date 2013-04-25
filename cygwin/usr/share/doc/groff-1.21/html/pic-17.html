@@ -1,0 +1,175 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-17.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-16.html">prev</a> | <a href="pic-18.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>17. Interface To [gt]roff
+<a name="17. Interface To [gt]roff"></a>
+</h2>
+
+
+<p style="margin-top: 1em"><font color="#000000">The output
+of <b>pic</b> is <b>[gt]roff</b> drawing commands. The GNU
+<i>gpic</i>(1) command warns that it relies on drawing
+extensions present in <i>groff</i>(1) that are not present
+in <i>troff</i>(1).</font></p>
+
+<h3>17.1. Scaling Arguments
+<a name="17.1. Scaling Arguments"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">The DWB
+<i>pic</i>(1) program accepts one or two arguments to
+<b>.PS</b>, which is interpreted as a width and height in
+inches to which the results of <i>pic</i>(1) should be
+scaled (width and height scale independently). If there is
+only one argument, it is interpreted as a width to scale the
+picture to, and height is scaled by the same
+proportion.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">GNU
+<b>gpic</b> is less general; it accepts a single width to
+scale to, or a zero width and a maximum height to scale to.
+With two non-zero arguments, it scales to the maximum
+height.</font></p>
+
+<h3>17.2. How Scaling is Handled
+<a name="17.2. How Scaling is Handled"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">When
+<b>pic</b> processes a picture description on input, it
+passes <b>.PS</b> and <b>.PE</b> through to the
+postprocessor. The <b>.PS</b> gets decorated with two
+numeric arguments which are the X and Y&nbsp;dimensions of
+the picture in inches. The post-processor can use these to
+reserve space for the picture and center it.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The GNU
+incarnation of the <b>ms</b> macro package, for example,
+includes the following definitions:</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">.de PS
+.br
+.sp \\n[DD]u
+.ie \\n[.$]&lt;2 .@error bad arguments to PS (not preprocessed with pic?)
+.el \{\
+.    ds@need (u;\\$1)+1v
+.    in +(u;\\n[.l]-\\n[.i]-\\$2/2&gt;?0)
+.\}
+..
+.de PE
+.par@reset
+.sp \\n[DD]u+.5m
+..</pre>
+
+
+
+<p style="margin-top: 1em"><font color="#000000">Equivalent
+definition is supplied by GNU <i>pic</i>(1) if you use the
+&minus;mpic option; this should make it usable with macro
+pages other than <i>ms</i>(1).</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">If
+<b>.PF</b> is used instead of <b>.PE</b>, the <b>troff</b>
+position is restored to what it was at the picture start
+(Kernighan notes that the&nbsp;F stands for
+&ldquo;flyback&rdquo;).</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+invocation</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><b>.PS
+&lt;</b><i>file</i></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">causes the
+contents of <i>file</i> to replace the <b>.PS</b> line. This
+feature is deprecated; use &lsquo;<b>copy</b>
+<i>file</i>&rsquo; instead).</font></p>
+
+<h3>17.3. PIC and [gt]roff commands
+<a name="17.3. PIC and [gt]roff commands"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">By
+default, input lines that begin with a period are passed to
+the postprocessor, embedded at the corresponding point in
+the output. Messing with horizontal or vertical spacing is
+an obvious recipe for bugs, but point size and font changes
+are usually safe.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Point
+sizes and font changes are also safe within text strings, as
+long as they are undone before the end of string.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The state
+of <b>[gt]roff</b>&rsquo;s fill mode is preserved across
+pictures.</font></p>
+
+<h3>17.4. PIC and EQN
+<a name="17.4. PIC and EQN"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">The
+Kernighan paper notes that there is a subtle problem with
+complicated equations inside <b>pic</b> pictures; they come
+out wrong if <i>eqn</i>(1) has to leave extra vertical space
+for the equation. If your equation involves more than
+subscripts and superscripts, you must add to the beginning
+of each equation the extra information <b>space&nbsp;0</b>.
+He gives the following example:</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">arrow
+box &quot;$space 0 {H( omega )} over {1 - H( omega )}$&quot;
+arrow</pre>
+
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic47.png" alt="Image img/pic47.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+17-1: Equations within pictures</font></p>
+
+<h3>17.5. Absolute Positioning of Pictures
+<a name="17.5. Absolute Positioning of Pictures"></a>
+</h3>
+
+
+<p style="margin-top: 1em"><font color="#000000">A
+<b>pic</b> picture is positioned vertically by troff at the
+current position. The topmost position possible on a page is
+not the paper edge but a position which is one baseline
+lower so that the first row of glyphs is visible. To make a
+picture really start at the paper edge you have to make the
+baseline-to-baseline distance zero, this is, you must set
+the vertical spacing to&nbsp;0 (using <b>.vs</b>) before
+starting the picture.</font></p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-16.html">prev</a> | <a href="pic-18.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

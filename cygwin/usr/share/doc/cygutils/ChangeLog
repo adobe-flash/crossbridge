@@ -1,0 +1,2634 @@
+2012-04-12  Charles Wilson  <cwilson@...>
+
+	Release 1.4.10
+	* configure.ac: Bump version number to 1.4.10.
+	* BRANCHES: Ditto.
+	* PROGLIST: Update.
+
+2012-04-12  Charles Wilson  <cwilson@...>
+
+	Modernize pathname handling in readshortcut, mkshortcut, and lpr.
+	* src/readshortcut/readshortcut.c (formatPath): Now always returns
+	a newly-allocated char*.
+	(readshortcut): Use cygwin-1.7 path conversion functions
+	throughout. Adapt to new formatPath signature; handle memory
+	allocation and path conversion errors.
+	* src/mkshortcut/mkshortcut.c (main): Use cygwin-1.7 path
+	conversion function for icon_name.
+	(xstrndup, xstrncat): New static utility functions.
+	(mkshortcut): Use cygwin-1.7 path conversion functions throughout.
+	Handle allocation issues for link_name, exe_name, dir_name, and
+	desc, which were previously static arrays of [MAX_PATH]. buf_str
+	memory allocation is now strictly local to each block.
+	* src/lpr/lpr.cc (main): Use cygwin-1.7 path conversion function
+	for winPrinter. Convert char* result to std::string immediately.
+	* NEWS: Document.
+	* TODO: Update.
+
+2012-04-10  Charles Wilson  <cwilson@...>
+
+	Add new -R/--raw option to readshortcut.
+	* src/readshortcut/readshortcut.c: Don't redefine SLGP_RAWPATH
+	Win32 macro. Added new show_raw member to optvals struct.
+	(main): Added -R/--raw option to popt array.
+	(readshortcut): Implement -R/--raw option.
+	* src/readshortcut/readshortcut.1: Document new commandline option.
+	* NEWS: Document.
+
+2012-03-30  Yaakov Selkowitz  <yselkowitz@...>
+
+	* src/cygstart/cygstart.c (cygStart): Handle file: and mailto: URIs.
+	* NEWS: Document.
+
+2012-04-09  Charles Wilson  <cwilson@...>
+
+	Support new cygwin-1.7.13+ clipboard format.
+	* src/clip/getclip.c (getCygVer): New utility function.
+	(getclip): If cygwin version >= 1.7.13, expect clipboard
+	data to use new format.
+	* src/clip/putclip.c (getCygVer): New utility function.
+	(putclip): If cygwin version >= 1.7.13, use new format.
+	* NEWS: Document.
+
+2012-04-09  Charles Wilson  <cwilson@...>
+
+	Post-release version bump 1.4.9
+	* configure.ac: Bump version number to 1.4.9.
+	* BRANCHES: Ditto.
+
+2012-02-09  Charles Wilson  <cwilson@...>
+
+	Release 1.4.8
+	* configure.ac: Bump version number to 1.4.8.
+	* BRANCHES: Ditto.
+
+2012-02-05  Charles Wilson  <cwilson@...>
+
+	Remove realpath in deference to coreutils(>=8.15) implementation.
+	* Makefile.am: Remove mentions of realpath.
+	* PROGLIST: Ditto.
+	* README: Ditto.
+	* NEWS: Update.
+	* src/realpath/realpath.c: Remove.
+
+2011-10-30  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	Remove ascii in deference to new (external) package.
+	* Makefile.am: Remove mentions of ascii.
+	* PROGLIST: Ditto.
+	* README: Ditto.
+	* NEWS: Update.
+	* src/ascii/ascii.c: Remove.
+
+2011-10-27  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	Integrate cygstart with FD.o menu and mimetype system.
+	* src/cygstart/cygstart.desktop: New file.
+	* src/cygstart/cygutils.xml: New file.
+	* Makefile.am: Dist and install these files.
+	* NEWS: Update documentation.
+
+2011-10-27  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	Update bootstrap for libtool-2.[2,4]
+	* bootstrap: Don't do libtoolize's work for it.
+
+2011-10-27  Charles Wilson  <cwilson@...>
+
+	Post-release version bump (1.4.7)
+	* configure.ac: Bump version number to 1.4.7.
+	* NEWS: Update documentation.
+	* BRANCHES: Ditto.
+
+2011-04-28  Charles Wilson  <cwilson@...>
+
+	Release 1.4.6
+	* configure.ac: Bump version number to 1.4.6.
+	* NEWS: Update documentation.
+	* TODO: Ditto.
+	* BRANCHES: Ditto.
+
+2011-04-21  Jon TURNEY  <jon.turney@dronecode.org.uk>
+            Charles Wilson  <cwilson@...>
+
+	* src/mkshortcut/mkshortcut.c (mkshortcut): If we are
+	creating shortcut for all users, ensure it is readable by
+	all users.
+
+2011-04-28  Christian Franke  <franke@computer.org>
+
+	* src/cygdrop/cygdrop.cc: Don't permute options.
+	Add missing fflush(). Fix typo. Print author.
+
+2011-04-28  Charles Wilson  <cwilson@...>
+
+	Don't distribute dos2unix, unix2dos, u2d, or d2u.
+	* Makefile.am: Don't install conv.exe as dos2unix,
+	unix2dos, d2u, or u2d any longer. Those programs are
+	now provided by the separate dos2unix package.
+	* PROGLIST: Remove references to dos2unix/unix2dos.
+	* README: Ditto.
+	* NEWS: Document changes.
+
+2010-09-05  Charles Wilson  <cwilson@...>
+
+	Change license for banner to GPLv3+
+	* src/banner/banner.c: Update license to GPLv3+.
+	* AUTHORS: Update licensing info for banner.
+	* NEWS: Ditto.
+	* PROGLIST: Ditto.
+	* README: Ditto.
+	* TODO: Ditto.
+
+2010-08-18  Charles Wilson  <cwilson@...>
+
+	Change license for cygicons.dll to GPLv3+
+	* src/cygicons/cygicons.rc.in: Update license to GPLv3+.
+	* AUTHORS: Update licensing info for cygicons.dll.
+	* NEWS: Ditto.
+	* PROGLIST: Ditto.
+	* README: Ditto.
+	* TODO: Ditto.
+
+2010-08-18  Charles Wilson  <cwilson@...>
+
+	Change license for mkshortcut to GPLv3+
+	* src/mkshortcut/mkshortcut.c: Update license to GPLv3+.
+	* src/mkshortcut/mkshortcut.1: Ditto.
+	* AUTHORS: Update licensing info for mkshortcut.
+	* NEWS: Ditto.
+	* PROGLIST: Ditto.
+	* README: Ditto.
+	* TODO: Ditto.
+
+2010-08-16  Charles Wilson  <cwilson@...>
+
+	* cygstart.c (cygstart_posix_to_win_w): Use CCP_RELATIVE
+	when converting paths; enables 'cygstart calc'. Reported
+	by Ken Hirsch.
+	* NEWS: Document.
+
+2010-08-16  Charles Wilson  <cwilson@...>
+
+	* cygstart.1: Update URL for reference to MS 'ShellExecute'
+	documentation.
+	* cygstart.c: Ditto (fixes --reference option).
+
+2010-08-16  Charles Wilson  <cwilson@...>
+
+	Change license for cygdrop to GPLv3+
+	* src/cygdrop/cygdrop.cc: Update license to GPLv3+.
+	* AUTHORS: Update licensing info for cygdrop.
+	* NEWS: Ditto.
+	* PROGLIST: Ditto.
+	* README: Ditto.
+	* TODO: Ditto.
+
+2010-08-16  Charles Wilson  <cwilson@...>
+
+	Correct licensing oversights.
+	* clip/getclip.c (printLicense): Update internal license
+	text to GPLv3+.
+	* clip/putclip.c (printLicense): Ditto.
+	* conv/conv.c (printLicense): Ditto.
+	* cygstart/cygstart.c (printLicense): Ditto.
+	* realpath/realpath.c (printLicense): Ditto.
+	* readshortcut/readshortcut.c (printLicense): Ditto.
+	* dump/dump.c (printLicense): Ditto.
+	(printBottomDescription): Add reference to 'od'.
+	* readshortcut/readshortcut.1: Update license to GPLv3+.
+
+2010-08-16  Charles Wilson  <cwilson@...>
+
+	ascii: display only lower 128 chars by default.
+	* src/ascii/ascii.c (license): Update internal license
+	text to GPLv3+.
+	(main): Accept new option '--extended'; new option flag.
+	(ascii): Accept new option flag; only display characters
+	128..255 if enabled.
+	NEWS: Document.
+
+2010-08-16  Charles Wilson  <cwilson@...>
+
+	Change license for cygstart to GPLv3+
+	* src/cygstart/cygstart.c: Update license to GPLv3+.
+	* src/cygstart/cygstart.1: Ditto.
+	* AUTHORS: Update licensing info for cygstart.
+	* NEWS: Ditto.
+	* PROGLIST: Ditto.
+	* README: Ditto.
+	* TODO: Ditto.
+
+2010-08-16  Charles Wilson  <cwilson@...>
+
+	Change license for readshortcut to GPLv3+
+	* src/readshortcut/readshortcut.c: Update license
+	to GPLv3+.
+	* AUTHORS: Update licensing info for readshortcut.
+	* NEWS: Ditto.
+	* PROGLIST: Ditto.
+	* README: Ditto.
+	* TODO: Ditto.
+
+2010-08-15  Charles Wilson  <cwilson@...>
+
+	Change license for lpr to GPLv3+.
+	* src/lpr/lpr.cc: Update license to GPLv3+.
+	* src/lpr/Printer.hh: Ditto.
+	* src/lpr/Printer.cc: Ditto.
+	* src/lpr/PrinterException.hh: Ditto.
+	* src/lpr/Win32Utils.hh: Ditto.
+	* src/lpr/Win32Utils.cc: Ditto.
+	* AUTHORS: Update licensing info for lpr.
+	* NEWS: Ditto.
+	* PROGLIST: Ditto.
+	* README: Ditto.
+	* TODO: Ditto.
+
+2010-08-15  Charles Wilson  <cwilson@...>
+
+	Devel 1.4.5
+	* configure.ac: Post-release version bump.
+
+2010-08-15  Charles Wilson  <cwilson@...>
+
+	Release 1.4.4 (tag moved to this checkin).
+	* BRANCHES: Update documentation.
+	* NEWS: Add entries for 1.4.4
+
+2010-08-15  Charles Wilson  <cwilson@...>
+
+	Release 1.4.4
+	* configure.ac: Bump version number to 1.4.4.
+
+2010-08-15  Charles Wilson  <cwilson@...>
+
+	Add standard cmdline options to cygdrop:
+	* src/cygdrop/cygdrop.cc (license, version, help,
+	printLicense, printBottomDescription, printTopDescription,
+	getVersion): New functions.
+	(usage): Implementation moved to usageCore; this function
+	now delegates.
+	(usageCore): This, and signature changed to accept FILE*
+	and progname as arguments.
+	(main): Use getopt_long and new struct option to support
+	--version, --license, --usage, and --help.
+
+2010-08-15  Charles Wilson  <cwilson@...>
+
+	* src/realpath/realpath.c: Correct licensing info.
+	Original code was GPLv2+, not GPLv2 only (see
+	http://lists.gnu.org/archive/html/bug-sh-utils/2001-10/msg00002.html)
+	As all subsequent modifications to this file were by
+	me, this reversion to the original licensing terms is OK.
+	* AUTHORS: Ditto.
+	* TODO: Ditto.
+
+2010-08-15  Charles Wilson  <cwilson@...>
+
+	Various code cleanups
+	* Makefile.am: Hack to work around conflict between
+	/usr/lib/libuuid* and /usr/lib/w32api/libuuid.
+	* src/ascii/ascii.c (main): Make optCon a global static.
+	When information is explicitly requested by the user, it
+	is not an error: invoke usage, help, version, license with
+	stdout not stderr.
+	(usage, help, version, license): Remove optCon function
+	argument throughout.
+	* src/banner/banner.c: Ditto.
+	* src/clip/getclip.c: Ditto.
+	* src/clip/putclip.c: Ditto.
+	* src/conv/conv.c: Ditto.
+	* src/cygstart/cygstart.c: Ditto.
+	* src/dump/dump.c: Ditto.
+	* src/mkshortcut/mkshortcut.c: Ditto.
+	* src/readshortcut/readshortcut.c: Ditto.
+	* src/realpath/realpath.c: Ditto.
+
+2010-08-15  Charles Wilson  <cwilson@...>
+
+	* INSTALL: Remove from source control.
+
+2010-08-15  Andy Koppe  <andy.koppe@gmail.com>
+
+	* src/mkshortcut/mkshortcut.c (mkshortcut):
+	Add missing return statement.
+
+2009-12-28  Charles Wilson  <cwilson@...>
+
+	Release 1.4.2
+	* configure.ac: Update version.
+	* BRANCHES: Update documentation.
+
+2009-12-28  Charles Wilson  <cwilson@...>
+
+	Add hippo.ico to cygicons DLL.
+	* src/cygicons/hippo.svg: New file.
+	* src/cygicons/hippo.ico: New file.
+	* src/cygicons/README: Update documentation.
+	* src/cygicons/cygicons.h: Add hippo.ico.
+	* src/cygicons/cygicons.rc.in: Add hippo.ico. Update
+	copyright date.
+	* Makefile.am: Add hippo.svg and hippo.ico.
+	* NEWS: Update documentation.
+
+2009-12-03  Dave Korn  <dave.korn.cygwin@googlemail.com>
+
+	Fix mkshortcut bug.
+	* src/mkshortcut/mkshortcut.c (mkshortcut): Fix off-
+	by-one error.
+
+2009-11-21  Charles Wilson  <cwilson@...>
+
+	Release 1.4.1
+	* configure.ac: Update version.
+	* NEWS: fix typo.
+	* BRANCHES: Update documentation.
+
+2009-11-21  Charles Wilson  <cwilson@...>
+
+	Convert many programs to GPLv3+.
+	* COPYING: Update to GPLv3 (applies to compilation).
+	* licenses/COPYING.GPL: Renamed to...
+	* licenses/COPYING.GPLv2: this.
+	* licenses/COPYING.GPLv3: New.
+	* Makefile.am: Update file list.
+	* ascii/ascii.c: Switch to GPLv3+. Update copyright years.
+	* clip/getclip.c: Ditto.
+	* clip/putclip.c: Ditto.
+	* conv/conv.c: Ditto.
+	* dump/dump.c: Ditto.
+	* ipc/ipck: Ditto.
+	* ipc/msgtool.c: Ditto.
+	* ipc/semstat.c: Ditto.
+	* ipc/semtool.c: Ditto.
+	* ipc/shmtool.c: Ditto.
+	* PROGLIST: Update license information for each utility.
+	* README: Ditto.
+	* AUTHORS: Ditto. Also reorganize.
+	* TODO: Add notes concerning utilities that have not
+	been converted to GPLv3+.
+	* NEWS: Note license change.
+
+2009-11-21  Charles Wilson  <cwilson@...>
+
+	Only build cygdrop when $host is cygwin.
+	* configure.ac: Arrange to build cygdrop only when CYGWIN.
+	* Makefile.am: Ditto.
+	* NEWS: Add cygdrop.
+
+2009-11-21  Christian Franke  <franke@computer.org>
+
+	Add cygdrop utility.
+	* src/cygdrop: New directory.
+	* src/cygdrop/cygdrop.cc: New file.
+	* Makefile.am: Add program cygdrop.
+	* AUTHORS: Add Christian Franke for cygdrop.
+	* PROGLIST: Add cygdrop.
+	* README: Add cygdrop.
+
+2009-09-13  Charles Wilson  <cwilson@...>
+
+	* src/lpr/Printer.cc: Silence compiler warnings.
+
+2009-09-13  Charles Wilson  <cwilson@...>
+
+	Branch-specific fixes for building on MinGW
+	* configure.ac: Only error if cygwin && !cygwin-1.7; it
+	is okay if !cygwin.
+	* src/cygstart/cygstart.c (cygStart): Refactor much
+	of this code to the following two functions. If !cygwin,
+	always use cygstart_mbs_to_wcs. Retain existing logic for
+	context-dependent use of the two functions, for cygwin.
+	(cygstart_mbs_to_wcs): New function.
+	(cygstart_posix_to_win_w): New function. Guard so that
+	it is only compiled on cygwin.
+	* NEWS: Update.
+
+2009-09-13  Charles Wilson  <cwilson@...>
+
+	Build and distribution fixes.
+	* Makefile.am: Support silent-rules when building
+	libicons. Don't distributed cygicons.rc.
+
+2009-09-13  Charles Wilson  <cwilson@...>
+
+	Import relevant changes from MinGW and MSYS port
+	* Makefile.am: Specify --major-image-version and
+	--minor-image-version for DLL and EXEs.
+	* common.h: Compatibility macros for cygwin-specific
+	functions on MinGW.
+	* configure.ac: Force automake-1.11, enable silent rules.
+	* src/conv/conv.c (convert): Use mkstemp instead of tmpnam
+	(the latter fails horribly on MinGW+Vista).
+	* src/conv/mkstemp.c: New file (ported from an old NetBSD
+	version: svn://svn.debian.org/svn/pkg-discover/discover/trunk/)
+	* src/cygstart/cygstart.c: Guard cygwin.h include, and
+	cygwin-specific function calls.
+	* src/realpath/realpath.c: Guard cygwin.h include.
+	* src/readshortcut/readshortcut.c: Guard cygwin-specific
+	function forward declarations.
+	* src/lpr/lpr.cc: Guard cygwin.h include. Fix typo in help
+	text; extend help and usage text to reflect new options.
+	(usage): Accept errcode instead of always exit(1).
+	(help): New function.
+	(scan_for_help): New function.
+	(main): Add support for -help|--help long options; search
+	first for these and exit early, before allowing getopt().
+	Fix handling of getopt error states.
+	* NEWS: Update.
+
+2009-05-06  Charles Wslson  <cwilson@...>
+
+	Release 1.4.0
+	* BRANCHES: Document new branch information.
+	* TODO: Add new items.
+	* configure.ac: Check for cygwin_conv_path (which
+	exists only on cygwin-1.7); error if missing.
+	Bump version number.
+	* config.h.in: Regenerate.
+
+2009-05-06  Charles Wilson  <cwilson@...>
+
+	Make coding style consistent throughout.
+	* ascii/ascii.c: Format using 'indent -gnu
+	-nut -ppi 1'.
+	* banner/banner.c: Ditto.
+	* clip/getclip.c: Ditto.
+	* clip/putclip.c: Ditto.
+	* cygstart/cygstart.c: Ditto.
+	* dump/dump.c: Ditto.
+	* ipc/msgtool.c: Ditto.
+	* ipc/semstat.c: Ditto.
+	* ipc/semtool.c: Ditto.
+	* ipc/shmtool.c: Ditto.
+	* mkshortcut/mkshortcut.c: Ditto.
+	* readshortcut/readshortcut.c: Ditto.
+	* realpath/realpath.c: Ditto.
+	* Printer.hh: Format using 'astyle --style=gnu -c'.
+	Move 'using namespace' from hh to cc.
+	* Printer.cc: Ditto.
+	* Win32Utils.cc: Ditto.
+	* Win32Utils.hh: Ditto.
+	* PrinterException.hh: Format using 'astyle --style=gnu
+	-c'. Removed 'using namespace' statement.
+	* lpr.cc: Format  using 'astyle --style=gnu -c'
+
+2009-05-06  Charles Wilson  <cwilson@...>
+
+	Ensure uniformity for --version option.
+	* src/ascii/ascii.c: Ensure --version output
+	reports package version; harmonize formats.
+	* src/banner/banner.c: Ditto.
+	* src/clip/getclip.c: Ditto.
+	* src/clip/putclip.c: Ditto.
+	* src/conv/conv.c: Ditto.
+	* src/cygstart/cygstart.c: Ditto.
+	* src/dump/dump.c: Ditto.
+	* src/mkshortcut/mkshortcut.c: Ditto.
+	* src/realpath/realpath.c: Ditto.
+	* src/readshortcut/readshortcut.c: Ditto, and
+	fix line endings.
+	* src/readshortcut/readshortcut.c: Fix line
+	endings.
+
+2009-05-06  Charles Wilson  <cwilson@...>
+
+	* PROGLIST: Fix typo.
+
+2009-05-05  IWAMURO Motonori  <deenheart@gmail.com>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	Support UTF pathnames in cygstart
+	* src/cygstart/cygstart.c (mbstowcs_noerr): New.
+	(mbstowcs_dup): New.
+	(main): Changed *action and *args to wchar_t*.
+	Transcode and dup from argv, rather than strdup.
+	When constructing args, use appropriate wide
+	constants and transoding operations.
+	(skipLocalUNCPart): New.
+	(cygStart): Rewrite to handle wchar_t and new
+	cygwin-1.7 path conversion functions.
+	(winStart): Use ShellExecute[Ex]W, wprintf, and L""
+	throughout.
+
+2009-05-05  Charles Wilson  <cwilson@...>
+
+	Branch for 1.3.x (cygwin-1.5 only)
+	* BRANCHES: Update documentation
+
+2009-04-22  Charles Wilson  <cwilson@...>
+
+	Release 1.3.4
+	* configure.ac: Bump version number.
+	* Makefile.am: Fix post-install.
+	* BRANCHES: Update.
+	* NEWS: Update.
+
+2009-04-21  Charles Wilson  <cwilson@...>
+
+	* src/cygicons/README: Remove trailing spaces.
+	* NEWS: Update.
+	* PROGLIST: Fix typos.
+	* BRANCHES: Update.
+	* configure.ac: Bump version number. Update
+	to libtool-2.2 idioms. Require ac-2.63. Require
+	gettext-0.17. Modify dist to use lzma. 
+	* ABOUT-NLS: Regenerate.
+	* INSTALL: Regenerate.
+	* config.h.in: Regenerate.
+	* po/Makefile.in.in: Regenerate.
+
+2008-09-04  Alex Smith  <madalexonline@yahoo.co.uk>
+
+	If cygstart -w, then propagate child exit status.
+	* src/cygstart/cygstart.c (main): exit with
+	value returned by cygStart().
+	(cygStart): If -w/--wait, then get exit status
+	of child process and return it.
+
+2008-08-10  Barry Kelly  <bkelly.ie@gmail.com>
+
+	Add -w/--wait option to cygstart.
+	* src/cygstart/cygstart.c: New enum StartFlags.
+	(main): Add startup options category, containing
+	new -w/--wait option. Use it to set StartFlags.
+	Modify -v/--verbose to set StartFlags.
+	Pass StartFlags to cygStart().
+	(printLastError): New.
+	(cygStart): Change signature to accept StartFlags.
+	Propagate StartFlags to winStart().
+	(winStart): Change signature to accept StartFlags.
+	Wait for child process to finish if SF_WAIT flag
+	is set in StartFlags.
+
+2007-08-24  Charles Wilson  <cwilson@...>
+
+	Bump version number to 1.3.2
+
+	* bootstrap: copy libtool.m4 to m4/.
+	* configure.ac: Bumped version number. Created
+	VERSION_* AC_SUBSTS for use by cygicons.rc.in.
+	Created AC_SUBST value for cygicon dll vernum.
+	Added libtool. Don't force -lpopt into LIBS.
+	Added cygicons.rc to list of generated files.
+	* Makefile.am: Added rules for building cygicons
+	DLL (but only on win32). Added doc_DATA target for
+	installing documentation.  Added licenses_DATA
+	target for installing component licenses into 
+	subdir of $(docdir).  Added include_HEADERS target
+	for installing cygicons header (but only on win32).
+	Added lpr_doc_DATA and cygicons_doc_DATA targets 
+	for installing component documentation into separate
+	subdirs of $(docdir).  Added -lpopt to the *_LDADD
+	rules for the targets that need it, now that -lpopt
+	is not added to LIBS (created *_LDADD if not exist).
+	Added install-hook/uninstall-hook commands to force
+	the cygicons import and libtool libraries to have 
+	the desired name. Added necessary variables, targets,
+	flags, and custom rules for building cygicons (special
+	care needed to deal with .rc files).
+	* src/cygicons/README: new file.
+	* src/cygicons/cygicons.h: new file.
+	* src/cygicons/cygicons.rc.in: new file.
+	* src/cygicons/cygwin-kde.ico: new file.
+	* src/cygicons/cygwin.ico: new file.
+	* src/cygicons/cygwinblue.ico: new file.
+	* src/cygicons/cygwincyan.ico: new file.
+	* src/cygicons/cygwing.ico: new file.
+	* src/cygicons/cygwings.ico: new file.
+	* src/cygicons/cygwinpurple.ico: new file.
+	* src/cygicons/cygwinred.ico: new file.
+	* src/cygicons/cygwinshiny.ico: new file.
+	* src/cygicons/cygwinyellow.ico: new file.
+	* config.h.in: regenerated.
+	* AUTHORS: updated documentation.
+	* NEWS: updated documentation.
+	* PROGLIST: updated documentation.
+	* README: updated documentation.
+	* HOW-TO-INSTALL: updated documentation.
+	* BRANCHES: updated documentation.
+
+2006-12-12  Charles Wilson  <cwilson@...>
+	
+	Release 1.3.1
+	Update build machinery to ac-2.61, am-1.10, gt-0.15
+
+	* configure.ac: bump version number
+	Move auxilliary files to build-aux dir.
+	Move .m4 files to m4/ dir.
+	* Makefile.am: Make sure aclocal can find m4 files.
+	* BRANCHES: update documentation
+	* NEWS: update documentation
+	* config.rpath: remove from CVS control
+	* acinclude.m4: moved to...
+	* m4/check_stdcall_func.m4: here.
+	* INSTALL: update to latest automake
+	* bootstrap: use autoreconf
+	* config.h.in: regenerate with latest autoconf
+	* ABOUT-NLS: update to latest gettext
+	* po/Makefile.in.in: update to latest gettext
+	* po/Rules-quot: update to latest gettext
+	* po/Makevars.template: new file due to gettext update
+
+2006-12-12  Michael Schaap  <cygwin@mscha.nl>
+
+	* src/cygstart/cygstart.c (winstart): use 
+	cygwin_internal(CW_SYNC_WINENV) instead of own
+	code to sync environment
+	(main): add --verbose option to show actual 
+	ShellExecute call made
+
+2006-03-20  Charles Wilson  <cwilson@...>
+
+	bump version number to 1.3.0
+	
+	* Makefile.am: remove programs, code, and documentation for
+	cal, col, colcrt, colrm, column, ddate, getopt, mcookie,
+	namei, rename, and rev.  These programs now provided by
+	util-linux package.
+	* configure.ac: bump version number
+	* BRANCHES: update documentation
+	* NEWS: update documentation
+	* PROGLIST: update documentation
+	* README: update documentation
+	* src/cal/README.cal: removed
+	* src/cal/cal.1: removed
+	* src/cal/cal.c: removed
+	* src/cal/err.c: removed
+	* src/cal/errs.h: removed
+	* src/cal/widechar.h: removed
+	* src/col/README.col: removed
+	* src/col/col.1: removed
+	* src/col/col.c: removed
+	* src/col/err.c: removed
+	* src/col/err.h: removed
+	* src/colcrt/colcrt.1: removed
+	* src/colcrt/colcrt.c: removed
+	* src/colcrt/widechar.h: removed
+	* src/colrm/colrm.1: removed
+	* src/colrm/colrm.c: removed
+	* src/colrm/widechar.h: removed
+	* src/column/column.1: removed
+	* src/column/column.c: removed
+	* src/column/err.c: removed
+	* src/column/errs.h: removed
+	* src/column/widechar.h: removed
+	* src/ddate/ddate.1: removed
+	* src/ddate/ddate.c: removed
+	* src/ddate/ddate.doc: removed
+	* src/getopt/getopt.1: removed
+	* src/getopt/getopt.c: removed
+	* src/getopt/parse.bash: removed
+	* src/getopt/parse.tcsh: removed
+	* src/getopt/test.bash: removed
+	* src/getopt/test.tcsh: removed
+	* src/mcookie/mcookie.1: removed
+	* src/mcookie/mcookie.c: removed
+	* src/mcookie/md5.c: removed
+	* src/mcookie/md5.h: removed
+	* src/namei/README.namei: removed
+	* src/namei/README1.namei: removed
+	* src/namei/namei.1: removed
+	* src/namei/namei.c: removed
+	* src/rename/nls.h: removed
+	* src/rename/rename.1: removed
+	* src/rename/rename.c: removed
+	* src/rev/rev.1: removed
+	* src/rev/rev.c: removed
+	* src/rev/widechar.h: removed
+
+2006-02-10  Charles Wilson  <cwilson@...>
+
+	bump version number - 1.2.10
+	* configure.ac: ditto
+	* NEWS: update documentation
+	* BRANCHES: ditto
+	* INSTALL: update from autotools
+
+2006-02-10  Michael Schaap  <cygwin@mscha.org>
+
+	* src/cygstart/cygstart.c (setup_win_environ): properly convert 
+	environment variables to Win32.
+
+2006-02-10  Eric Blake  <ebb9@byu.net>
+
+	* src/cygstart/cygstart.c (main): Don't permute options
+
+2005-07-09  Charles Wilson  <cwilson@...>
+
+	bump version number - 1.2.9
+	* configure.ac: ditto
+	* NEWS: update documentation
+	* BRANCHES: ditto
+
+2005-07-08  Christopher Faylor  <cgf@timesys.com>
+
+	* src/readshortcut.c (readshortcut): Pass opts by reference so that
+	changes made to the opts contents are reflected in the caller to
+	accommodate freeing of malloced fields.
+
+2005-05-16  Charles Wilson  <cwilson@...>
+
+	bump version number - 1.2.8
+	* configure.ac: bump version
+	* BRANCHES: update documentation
+
+2005-05-16  Kees Zeelenberg  <kzlq@...>
+
+	* src/dump/dump.c: fixes for -mno-cygwin/mingw
+	compatibility.
+	* common.h: ditto
+	* NEWS: update documentation
+
+2005-05-16  Michael Schaap  <cygstart@...>
+
+	* src/cygstart/cygstart.c: improve compatibility with
+	'mount -X' by syncing env between cygwin and windows.
+	* NEWS: update documentation
+
+2005-04-12  Charles Wilson <cwilson@...>
+
+	bump version number - 1.2.7
+
+	* configure.ac: bump version
+	* BRANCHES: update documentation
+	* NEWS: ditto
+	* AUTHORS: ditto
+	* PROGLIST: ditto
+
+2005-04-12  Christopher Faylor  <cgf@timesys.com>
+
+	* Makefile.am: Add rename.
+	* src/rename/rename.c: New file.
+	* src/rename/nls.h: Ditto.
+	* src/rename/rename.1: Ditto.
+
+2005-03-07  Michael Schaap  <cygstart@...>
+
+	* src/cygstart/cygstart.c: reorganize around previous
+	patch.
+	* NEWS: document.
+
+2005-03-03  Anthony Derosa  <anthony.derosa1@...>
+
+	* src/cygstart/cygstart.c: fix memory leak, and improve
+	handling of long command lines.
+
+2005-02-01  Charles Wilson  <cwilson@....>
+
+	bump version number - 1.2.6
+
+	* configure.ac: bump version number
+	* src/conv/conv.c (exitOnZero): new function
+	(main): add new options --force, --safe
+	(conv): look for '\0' to signify binary files, not
+	"early" other-style line endings.  Always convert 
+	to specified type, unless '\0' found and --force not
+	given.  But if disobeying user, print reason.
+	See thread: http://www.cygwin.com/ml/cygwin/2004-04/msg00080.html
+	* NEWS: document new behavior
+	* BRANCHES: update
+
+2005-01-31  Charles Wilson  <cwilson@....>
+
+	* src/readlink/readlink.1: remove
+	* src/readlink/readlink.c: remove
+	* Makefile.am: remove readlink.1 and readlink.c
+	* NEWS: document it
+	* README: document it; also fix typo
+	* AUTHORS: remove references to readlink
+	* PROGLIST: remove readlink
+	* configure: regenerate
+
+2004-03-12  Charles Wilson  <cwilson@....>
+
+	bump version number
+
+	* src/mkshortcut/mkshortcut.c: fix some
+	memory leaks in mkshortcut().
+	* configure.ac: bump version number
+	* BRANCHES: update
+
+2004-03-10  Harold L Hunt II  <huntharo@....>
+
+	* src/mkshortcut/mkshortcut.c: add -d|--desc
+	option to set the description field (==tooltip
+	text) of the shortcut.
+	* src/mkshortcut/mkshortcut.1: document it.
+	* NEWS: document it
+
+2004-02-14  Dick Repansky  <rrepasky@....>
+            Joshua Danial Franklin  <joshuadfranklin@....>
+
+	* src/mkshortcut/mkshortcut.c: add -s option 	
+	to control normal|minimized|maximized state
+	of the launched application.
+	* src/mkshortcut/mkshortcut.1: document it.
+	* NEWS: document it
+
+2004-01-31  Charles Wilson  <cwilson@....>
+
+	bump version number
+
+	* src/ipc/ipcrm.c: remove
+	* src/ipc/ipcrm.8: remove
+	* src/ipc/ipcs.c: remove
+	* src/ipc/ipcs.8: remove
+	* src/ipc/semtool.c: compensate for interface differences
+	in cygserver vs. cygipc
+	* configure.ac: don't look for cygipc; just look for shmget
+	* Makefile.am: remove src/ipc/ipcs and src/ipc/ipcrm and their
+	manpages.  Don't use extra libs (IPCLIBS) to build ipc programs
+	-- rely on cygserver support.
+	* README: update
+	* PROGLIST: update
+	* NEWS: update
+	* BRANCHES: update
+
+2003-12-01  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	bump version number
+
+	* src/ipc/ipck: fix typo, adapt for cygserver 
+	compatibility
+	* NEWS: update
+	* BRANCHES: update
+
+2003-11-25  Rick Rankin <rick_rankin@yahoo.com>
+
+	* src/lpr/Printer.cc: fix bug in print() operation that was
+	  causing duplication of the last character of a file.
+	* src/lpr/lpr.cc: add description of -l option to help message.
+
+2003-10-23  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* src/mkshortcut/mkshortcut.1: update to reflect
+	new -w/--workingdir option.
+
+2003-09-13  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/clip/getclip.c: Handle /dev/clipboard
+	native format.  Add --no-conv option.  Make it
+	the default.
+	* src/clip/putclip.c: Handle /dev/clipboard
+	native format.  Add --no-conv option.  Make it
+	the default.
+
+2003-09-12  Rob Siklos  <rob3@siklos.ca>
+
+	* src/clip/getclip.c: implemented --dos and --unix,
+	renamed putclip() to getclip()
+	* src/clip/putclip.c: implemented --dos and --unix,
+	fixed segfault on null input,
+	fixed indentation spacing,
+	return FALSE instead of TRUE on failed GlobalAlloc and GlobalLock
+	* TODO: removed --unix --dos flag item for getclip and putclip
+
+2003-09-04  Chalres Wilson  <cwilson@ece.gatech.edu>
+
+	* NEWS: update
+
+2003-09-04  Rob Siklos <rob3@siklos.ca>
+
+	* src/readshortcut: new directory
+	* src/readshortcut/readshortcut.c: new file
+	* src/readshortcut/readshortcut.1: new file
+	* Makefile.am: add program 'readshortcut'
+	* AUTHORS: add Rob Siklos for readshortcut
+	* PROGLIST: add readshortcut
+	* README: add readshortcut
+
+2003-08-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	tag and release v1_2_1
+
+	* configure.ac: don't add cygipc to libs; put 
+	value in a separate variable IPCLIBS
+	* Makefile.am: use @IPCLIBS@
+	* HOW-TO-CONTRIBUTE: update
+	* PROGLIST: update
+
+2003-07-13  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	tag and release v1_2_0
+
+	* BRANCHES: add v1_2_0
+
+2003-07-13  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* Makefile.am: correct some mistakes with
+	optionally-built progs.
+
+2003-06-16  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/mkshortcut/mkshortcut.1: fix ^M problem.
+
+2003-06-13  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* Makefile.am: add ipcs, ipcrm, and ipck
+	* configure.ac: change search method for libcygipc,
+	bump version number.
+	* src/ipc/ipcs.c: new file
+	* src/ipc/ipcs.8: new file
+	* src/ipc/ipcrm.c: new file
+	* src/ipc/ipcrm.8: new file
+	* src/ipc/ipck: new file
+	* NEWS: add info about ipcs, ipcrm, ipck
+	* PROGLIST: ditto
+	* README: ditto
+	* config.h.in: regenerate
+	
+2003-06-12  gilles civario  <gilles.civario@cea.fr>
+
+	* src/lpr/Printer.cc (Printer::open): correct
+	access mode.
+
+2003-06-10  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* BRANCHES: new file.
+
+2003-06-10  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* Bump version to 1.1.4.  Release.
+
+2003-06-07  Rick Rankin  <rick_rankin@yahoo.com>
+
+	* src/lpr/Printer.hh: Added m_rawFlag attribute. If true, no CR/LF
+	translation is done. Defaults to false. Also added accessor 
+	operations getRawFlag(), setRawFlag().
+	* src/lpr/Printer.cc: ditto.
+	* src/lpr/lpr.cc: added -l option to suppress CR/LF translation.
+	* src/lpr/lpr.1: added documentation for -l option.
+
+2003-05-20  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* NEWS: update lpr entry
+
+2003-05-20  Rick Rankin  <rick_rankin@yahoo.com>
+	* src/lpr/lpr.c: removed file
+	* src/lpr/Printer.cc: new file
+	* src/lpr/Printer.hh: new file
+	* src/lpr/PrinterException.hh: new file
+	* src/lpr/README: new file
+	* src/lpr/Win32Utils.cc: new file
+	* src/lpr/Win32Utils.hh: new file
+	* src/lpr/lpr.1: new file
+	* src/lpr/lpr.cc: new file
+	* Makefile.am: add macro src_lpr_lpr_SOURCES
+	updated macros noinst_HEADERS, man_MANS
+	* configure.ac: added AC_PROG_CXX to compile C++ files
+
+2003-05-17  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* configure.ac: correct a problem with newer 
+	autoconf
+	* config.h.in: regenerate
+
+2003-02-05  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* NEWS: announce mkshortcut changes
+
+2003-02-05  David G. Baur  <dgbaur@idmicro.com>
+
+	Added --workdir option to mkshortcut to set working directory
+	specified directory.
+
+	* mkshortcut.c (main): added dir_name_arg to opts
+	set dir_name to dir_name_arg if option was set 
+	otherwise obtained from exe_name.
+	* mkshortcut.1: update
+
+2002-11-11  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Convert mkshortcut to popt.  Bump to version 1.1.3
+
+	* mkshortcut.c (license): new function
+	(version): popt version() function
+	(version): static variable renamed to versionStr
+	(help): new function
+	(usage): popt usage() function; the old usage()
+	function eliminated
+	(printLicense): new function
+	(printBottomDescription): new function
+	(printTopDescription): new function
+	(getVersion): new function
+	(mkshortcut): new function, contains core code
+	(print_version): removed.
+   (main): almost completely rewritten to use popt
+	instead of getopt
+	* TODO: remove note about mkshortcut.
+
+2002-11-10  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Fix things so that 'make dist' works
+
+	* Makefile.am: split up EXTRA_DIST into several
+	variables.  Add a lot of files.  Remove reference
+	to the m4/ directory.
+	* HOW-TO-CONTRIBUTE: correct a few things affected
+	by the above change.
+
+2002-11-10  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Tired of long 'cvs diff' times over my modem, I
+	removed the files generated by bootstrap from 
+	CVS.  tarballs will have them, but cvs checkouts
+	will need to always run bootstrap.  Since gettextize
+	is too intrusive, leave ABOUT-NLS and config.rpath
+	so we don't have to include gettext in bootstrap.
+	Also, don't bother with autoheader, so leave config.h.in
+	in CVS as well.
+
+	* missing: remove
+	* mkinstalldirs: remove
+	* install-sh: remove
+	* config.guess: remove
+	* config.sub: remove
+	* depcomp: remove
+	* compile: remove
+	* Makefile.in: remove
+	* aclocal.m4: remove
+	* configure: remove
+	* stamp-h.in: remove (not used by newer autotools)
+
+2002-11-10  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Because utmpdump and last are now provided by the new
+	sysvinit package, those programs have been removed 
+	from cygutils.  Also, update to recent autotools &
+	gettext, plus a few cleanups.
+
+	* src/last/last.c: remove
+	* src/last/utmpdump.c: remove
+	* src/last/oldutmp.h: remove
+	* src/last/last.1: remove
+	* src/last/lastb.1: remove
+	* src/last/: remove directory
+	* intl/Makefile.in: remove
+	* intl/: remove directory
+
+	* src/cal/cal.c: cygwin provides langinfo.h, but
+	not the nl_langinfo function.  Make sure both exist
+	before calling nl_langinfo.
+	* configure.ac: remove references to system header files
+	needed only by utmpdump or last. Don't try to generate
+	intl/Makefile. 
+	* Makefile.am: remove intl/ directory; add po/ directory
+	to make new gettext happy.  Remove last and utmpdump from
+	bin_PROGRAMS; remove last.1 and lastb.1 from man_MANS.
+	change _LDADD vars from @INTLLIBS@ to @LIBINTL@.  Remove
+	references to last and utmpdump _SOURCES.
+	* po/LINGUAS: new file (needed by new gettext)
+	* po/POTFILES.in: new file (needed by new gettext)
+	* common.h: remove references to system header files used
+	only by utmpdump or last
+	* bootstrap: add `force' options
+	* NEWS: docu update
+	* PROGLIST: docu update
+	* README: dpcu update
+	* TODO: docu update
+	* HOW-TO-CONTRIBUTE: docu update
+	
+	* aclocal.m4: regenerate
+	* configure: regenerate
+	* Makefile.in: regenerate
+	* config.h.in: regenerate
+	* ABOUT-NLS: new version
+	* COPYING: new version
+	* INSTALL: new version
+	* mkinstalldirs: new version
+	* missing: new version
+	* install-sh: new version
+	* depcomp: new version
+	* config.sub: new version
+	* config.guess: new version
+	
+2002-07-17  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	At Bruno Haible's suggestion, don't include all of
+	gettext.  Just have an intl/ directory with a null
+	Makefile.in, and a populated po/ directory.  m4/
+	is no longer necessary.  Later, when automake bug
+	is fixed, we can remove the intl/ directory entirely,
+	but we'll still need the po/ directory and the ABOUT-NLS
+	file.
+
+	* intl/*: remove
+	* intl/Makefile.in: turn this into a null file
+	* m4/*: remove
+	* configure.ac: remove m4/Makefile from AC_CONFIG_FILES
+	* Makefile.am: remove m4/ from SUBDIRS
+	* Makefile.in: regenerate
+	* configure: regenerate
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* configure.ac: bump version to 1.1.2
+	* configure: regenerate
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Add 'mcookie' program.  Tag "v1_1_1d"
+
+	* src/mcookie: new directory
+	* src/mcookie/mcookie.c: new file
+	* src/mcookie/mcookie.1: new file
+	* src/mcookie/md5.h: new file
+	* src/mcookie/md5.c: new file
+	* Makefile.am: add program 'mcookie'
+	* configure.ac: add test for gettimeofday
+	* config.h.in: regenerate
+	* Makefile.in: regenerate
+	* PROGLIST: add mcookie
+	* README: add mcookie
+	* NEWS: mention mcookie
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Add 'colrm' program.  Tag "v1_1_1c"
+
+	* src/colrm: new directory
+	* src/colrm/colrm.c: new file
+	* src/colrm/colrm.1: new file
+	* src/colrm/widechar.h: new file
+	* Makefile.am: add program 'colrm'
+	* Makefile.in: regenerate
+	* PROGLIST: add colrm
+	* README: add colrm
+	* NEWS: hasn't been updated in a while...
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Add 'colcrt' program.  Tag "v1_1_1b"
+
+	* src/colcrt: new directory
+	* src/colcrt/colcrt.c: new file
+	* src/colcrt/colcrt.1: new file
+	* src/colcrt/widechar.h: new file
+	* Makefile.am: add program 'colcrt'
+	* Makefile.in: regenerate
+	* PROGLIST: add colcrt
+	* README: add colcrt
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Add 'column' program.  Tag "v1_1_1a"
+
+	* src/column: new directory
+	* src/column/column.c: new file
+	* src/column/column.1: new file
+	* src/column/err.c: new file
+	* src/column/errs.h: new file
+	* src/column/widechar.h: new file
+	* Makefile.am: add program 'column'
+	* configure.ac: add check for TIOCGWINSZ, termios.h, and ioctl.h.
+	* common.h: use TIOCGWINSZ to include sys/termios.h or sys/ioctl.h.
+	* Makefile.in: regenerate
+	* config.h.in: regenerate
+	* configure: regenerate
+	* PROGLIST: add column
+	* README: add column
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* TODO: remove gettext reminder
+	* HOW-TO-CONTRIBUTE: explain how to handle programs
+	that need -lintl, given the gettextize changes below.
+	* Makefile.in: regenerate
+
+2002-07-12  gettextize  <bug-gnu-gettext@gnu.org>
+
+	Bug in automake means that we have to gettextize -- even tho
+	we will never actually build gettext ourselves ('external'
+	option in AM_GNU_GETTEXT).  Reported to automake list.
+
+	Bug in gettext means that we have to explicitly set and AC_SUBST
+	BUILD_INCLUDED_LIBINTL and USE_INCLUDED_LIBINTL in configure.ac.
+	Reported to Bruno.
+
+	* Makefile.am (SUBDIRS): Add intl, m4.
+	(ACLOCAL_AMFLAGS): New variable.
+	(EXTRA_DIST): Add config.rpath.
+	* configure.ac (AC_CONFIG_FILES): Add intl/Makefile, po/Makefile.in,
+	m4/Makefile.
+	* intl/: new directory
+	* intl/*: new files
+	* po/: new directory
+	* po/*: new files
+	* m4/: new directory
+	* m4/*: new files
+	* config.rpath: new file
+	* ABOUT-NLS: new file
+	* aclocal.m4: regenerate
+	* Makefile.in: regenerate
+	* configure: regenerate
+	* bootstrap: add -I m4 to aclocal command; copy files
+	* config.guess: new file
+	* config.sub: new file
+	* compile: new file
+	* config.h.in: regenerate
+	* TODO: note to remove all this garbage when it becomes
+	possible; need bugfix to automake and gettext.m4
+
+2002-07-12  Charles S. Wilson  <cwilson@ece.gatech.edu>
+
+	Adjust to cygwin's libintl library now depending on libiconv.
+	Easiest way: remove explicit search for -lintl and libintl.h;
+	instead use AM_GNU_GETTEXT.
+
+	Add 'rev' program
+
+	* configure.ac: don't look for -lintl and libintl.h 'by hand';
+	use AM_GNU_GETTEXT instead.  Unfortunately, even 'external'
+	option requires po/ and intl/ directories.  See gettextize above.
+	* src/rev: new directory
+	* src/rev/rev.c: new file
+	* src/rev/rev.1: new file
+	* src/rev/widechar.h: new file
+	* Makefile.am: add program 'rev'.  Add LDADD variables for
+	the programs that use gettext, since -lintl is no longer 
+	automatically included in LIBS (use @INTLLIBS@)
+	* Makefile.in: regenerate
+	* PROGLIST: add rev
+	* README: add rev
+
+2002-06-06  Charles S. Wilson  <cwilson@ece.gatech.edu>
+            Egor Duda
+
+   Add getopt.exe, readlink.exe.  Bump to 1.1.1.
+
+	* AUTHORS: add Egor, Kenneth Stailey, and Frodo Looijaard
+	* configure.ac: bump to 1.1.1
+	* Makefile.am: add getopt and readlink
+	* PROGLIST: ditto
+	* README: ditto
+	* Makefile.in: regenerate
+	* configure: regenerate
+	* src/Makefile.am: delete (forgot to do so in previous commit)
+	* src/Makefile.in: delete (ditto)
+	* src/readlink/readlink.1: new file
+	* src/readlink/readlink.c: new file
+	* src/getopt/getopt.1: new file
+	* src/getopt/getopt.c: new file
+	* src/getopt/parse.bash: new file
+	* src/getopt/parse.tcsh: new file
+	* src/getopt/test.bash: new file
+	* src/getopt/test.tcsh: new file
+
+2002-06-05  Charles S. Wilson  <cwilson@ece.gatech.edu>
+            Robert Collins  <robert.collins@itdomain.com.au>
+
+	Convert to one-big-makefile style.  cf "Recursive make
+	considered harmful".  Bump to 1.1.0
+
+	* HOW-TO-CONTRIBUTE: update to reflect one-big-makefile style.
+	* Makefile.am: consolidate from src/*/Makefile.am
+	* configure.ac: remove src/*/Makefile from AC_CONFIG_FILES list.
+	bump version.
+	* NEWS: Note one-file-to-build-them-all
+	* TODO: update
+	* aclocal.m4: regenerate
+	* Makefile.in: regenerate
+	* configure: regenerate
+	* /src/realpath/Makefile.in: delete
+	* /src/realpath/Makefile.am: delete
+	* /src/namei/Makefile.in: delete
+	* /src/namei/Makefile.am: delete
+	* /src/mkshortcut/Makefile.in: delete
+	* /src/mkshortcut/Makefile.am: delete
+	* /src/lpr/Makefile.in: delete
+	* /src/lpr/Makefile.am: delete
+	* /src/last/Makefile.in: delete
+	* /src/last/Makefile.am: delete
+	* /src/ipc/Makefile.in: delete
+	* /src/ipc/Makefile.am: delete
+	* /src/dump/Makefile.in: delete
+	* /src/dump/Makefile.am: delete
+	* /src/ddate/Makefile.in: delete
+	* /src/ddate/Makefile.am: delete
+	* /src/cygstart/Makefile.in: delete
+	* /src/cygstart/Makefile.am: delete
+	* /src/conv/Makefile.in: delete
+	* /src/conv/Makefile.am: delete
+	* /src/col/Makefile.in: delete
+	* /src/col/Makefile.am: delete
+	* /src/cal/Makefile.in: delete
+	* /src/cal/Makefile.am: delete
+	* /src/banner/Makefile.in: delete
+	* /src/banner/Makefile.am: delete
+	* /src/ascii/Makefile.in: delete
+	* /src/ascii/Makefile.am: delete
+	* /src/Makefile.in: delete
+	* /src/Makefile.am: delete
+
+2002-05-23  Charles S. Wilson  <cwilson@ece.gatech.edu>
+
+	* Makefile.in: regenerate
+	* src/Makefile.in: regenerate
+	* src/*/Makefile.in: regenerate
+	* configure: regenerate
+	* aclocal.m4: regenerate
+
+2002-05-22  David A. Willis  <dawillis1214@yahoo.com>
+
+	* src/col: new directory
+	* src/col/Makefile.am: new file
+	* src/col/Makefile.in: new file
+	* src/col/col.c: new file
+	* src/col/err.c: new file
+	* src/col/err.h: new file
+	* src/col/col.1: new file
+	* src/col/README.col: new file
+	* src/Makefile.am: add subdirectory col
+	* src/Makefile.in: regenerate
+	* AUTHORS: add David A. Willis for col
+	* PROGLIST: add col
+	* README: add col
+
+2002-04-16  Chris January  <chris@atomice.net>
+
+	* src/conv/conv.c (convert): Use correct type to store the
+	return value of fgetc()
+
+2002-03-15  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* Makefile.in: rebootstrap
+	* aclocal.m4: ditto
+	* configure: ditto
+	* src/Makefile.in: ditto
+	* src/ascii/Makefile.in: ditto
+	* src/banner/Makefile.in: ditto
+	* src/cal/Makefile.in: ditto
+	* src/clip/Makefile.in: ditto
+	* src/conv/Makefile.in: ditto
+	* src/ddate/Makefile.in: ditto
+	* src/dump/Makefile.in: ditto
+	* src/ipc/Makefile.in: ditto
+	* src/last/Makefile.in: ditto
+	* src/lpr/Makefile.in: ditto
+	* src/mkshortcut/Makefile.in: ditto
+	* src/namei/Makefile.in: ditto
+	* src/realpath/Makefile.in: ditto
+
+2002-03-15  Michael Schaap  <cygwin_start@mscha.org>
+
+	* src/cygstart: new directory
+	* src/cygstart/Makefile.am: new file
+	* src/cygstart/Makefile.in: new file
+	* src/cygstart/cygstart.c: new file
+	* src/cygstart/cygstart.1: new file
+	* src/Makefile.am: add subdirectory cygstart
+	* src/Makefile.in: regenerate
+	* AUTHORS: add Michael Schaap for cygstart
+	* PROGLIST: add cygstart
+	* README: add cygstart
+
+2002-03-13  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* HOW-TO-CONTRIBUTE: fix typos
+
+2002-03-13  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* src/mkshortcut/mkshortcut.c: fix NULL pointer problem
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* TODO: remove 'reorg' note
+	* configure.ac: mark as version 1.0.0
+	* configure: regenerate
+	* HOW-TO-CONTRIBUTE: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* configure.ac: build Makefiles in new directories
+	* configure.in: regenerate
+	* Makefile.am: change subdirs
+	* Makefile.in: regenerate
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src: new directory
+	* src/Makefile.am: new file
+	* src/Makefile.in: new file
+	* src-gpl/Makefile.am: removed
+	* src-gpl/Makefile.in: removed
+	* src-pd/Makefile.am: removed
+	* src-pd/Makefile.in: removed
+	* src-bsd/Makefile.am: removed
+	* src-bsd/Makefile.in: removed
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/ascii: new directory
+	* src-gpl/ascii.c: moved to src/ascii/ascii.c
+	* src/ascii/ascii.c: moved from src-gpl/ascii.c
+	* src/ascii/Makefile.am: new file
+	* src/ascii/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/banner: new directory
+	* src-gpl/banner.c: moved to src/banner/banner.c
+	* src/banner/banner.c: moved from src-gpl/banner.c
+	* src/banner/Makefile.am: new file
+	* src/banner/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/cal: new directory
+	* src-bsd/cal.c: moved to src/cal/cal.c
+	* src/cal/cal.c: moved from src-bsd/cal.c
+	* src-bsd/cal.1: moved to src/cal/cal.1
+	* src/cal/cal.1: moved from src-bsd/cal.1
+	* src-bsd/err.c: moved to src/cal/err.c
+	* src/cal/err.c: moved from src-bsd/err.c
+	* src-bsd/errs.h: moved to src/cal/errs.h
+	* src/cal/errs.h: moved from src-bsd/errs.h
+	* src-bsd/widechar.h: moved to src/cal/widechar.h
+	* src/cal/widechar.h: moved from src-bsd/widechar.h
+	* src-bsd/README.cal: moved to src/cal/README.cal
+	* src/cal/README.cal: moved from src-bsd/README.cal
+	* src/cal/Makefile.am: new file
+	* src/cal/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/clip: new directory
+	* src-gpl/putclip.c: moved to src/clip/putclip.c
+	* src/clip/putclip.c: moved from src-gpl/putclip.c
+	* src-gpl/getclip.c: moved to src/clip/getclip.c
+	* src/clip/getclip.c: moved from src-gpl/getclip.c
+	* src/clip/Makefile.am: new file
+	* src/clip/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/conv: new directory
+	* src-gpl/conv.c: moved to src/conv/conv.c
+	* src/conv/conv.c: moved from src-gpl/conv.c
+	* src/conv/Makefile.am: new file
+	* src/conv/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/ddate: new directory
+	* src-pd/ddate.c: moved to src/ddate/ddate.c
+	* src/ddate/ddate.c: moved from src-pd/ddate.c
+	* src-pd/ddate.1: moved to src/ddate/ddate.1
+	* src/ddate/ddate.1: moved from src-pd/ddate.1
+	* src-pd/ddate.doc: moved to src/ddate/ddate.doc
+	* src/ddate/ddate.doc: moved from src-pd/ddate.doc
+	* src/ddate/Makefile.am: new file
+	* src/ddate/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/dump: new directory
+	* src-gpl/dump.c: moved to src/dump/dump.c
+	* src/dump/dump.c: moved from src-gpl/dump.c
+	* src/dump/Makefile.am: new file
+	* src/dump/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/ipc: new directory
+	* src-gpl/msgtool.c: moved to src/ipc/msgtool.c
+	* src/ipc/msgtool.c: moved from src-gpl/msgtool.c
+	* src-gpl/semstat.c: moved to src/ipc/semstat.c
+	* src/ipc/semstat.c: moved from src-gpl/semstat.c
+	* src-gpl/semtool.c: moved to src/ipc/semtool.c
+	* src/ipc/semtool.c: moved from src-gpl/semtool.c
+	* src-gpl/shmtool.c: moved to src/ipc/shmtool.c
+	* src/ipc/shmtool.c: moved from src-gpl/shmtool.c
+	* src/ipc/Makefile.am: new file
+	* src/ipc/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/last: new directory
+	* src-gpl/last.c: moved to src/last/last.c
+	* src/last/last.c: moved from src-gpl/last.c
+	* src-gpl/last.1: moved to src/last/last.1
+	* src/last/last.1: moved from src-gpl/last.1
+	* src-gpl/lastb.1: moved to src/last/lastb.1
+	* src/last/lastb.1: moved from src-gpl/lastb.1
+	* src-gpl/oldutmp.h: moved to src/last/oldutmp.h
+	* src/last/oldutmp.h: moved from src-gpl/oldutmp.h
+	* src-gpl/utmpdump.c: moved to src/last/utmpdump.c
+	* src/last/utmpdump.c: moved from src-gpl/utmpdump.c
+	* src/last/Makefile.am: new file
+	* src/last/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/lpr: new directory
+	* src-gpl/lpr.c: moved to src/lpr/lpr.c
+	* src/lpr/lpr.c: moved from src-gpl/lpr.c
+	* src/lpr/Makefile.am: new file
+	* src/lpr/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/mkshortcut: new directory
+	* src-gpl/mkshortcut.c: moved to src/mkshortcut/mkshortcut.c
+	* src/mkshortcut/mkshortcut.c: moved from src-gpl/mkshortcut.c
+	* src-gpl/mkshortcut.1: moved to src/mkshortcut/mkshortcut.1
+	* src/mkshortcut/mkshortcut.1: moved from src-gpl/mkshortcut.1
+	* src/mkshortcut/Makefile.am: new file
+	* src/mkshortcut/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/namei: new directory
+	* src-pd/namei.c: moved to src/namei/namei.c
+	* src/namei/namei.c: moved from src-pd/namei.c
+	* src-pd/namei.1: moved to src/namei/namei.1
+	* src/namei/namei.1: moved from src-pd/namei.1
+	* src-pd/README.namei: moved to src/namei/README.namei
+	* src/namei/README.namei: moved from src-pd/README.namei
+	* src-pd/README1.namei: moved to src/namei/README1.namei
+	* src/namei/README1.namei: moved from src-pd/README1.namei
+	* src/namei/Makefile.am: new file
+	* src/namei/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/realpath: new directory
+	* src-gpl/realpath.c: moved to src/realpath/realpath.c
+	* src/realpath/realpath.c: moved from src-gpl/realpath.c
+	* src/realpath/Makefile.am: new file
+	* src/realpath/Makefile.in: new file
+
+
+2002-02-23  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src-gpl/Makefile.am: add lpr and mkshortcut 
+	* src-gpl/Makefile.in: regenerate
+	* configure.ac: update version number
+	* configure: regenerate
+	* AUTHORS: add Rick and Joshua
+	* PROGLIST: add lpr and mkshortcut
+	* NEWS: add lpr and mkshortcut
+	* README: add lpr and mkshortcut
+	* TODO: add some notes...
+	* src-gpl/mkshortcut.c: Reformat comment block. Explicitly
+	include config.h and common.h.  Move other #inludes to
+	common.h.  Add some static strings for later use (version,
+	Id, copyright).
+	* src-gpl/lpr.c: Add license reference. Explicitly include
+	config.h and common.h.  Move other #includes to common.h.
+	Add some static strings for later use (version, Id, copyright).
+	Change programName to program_name (to match style of other
+	programs).  Strdup from argv[0] instead of hardcoding.  Use 
+	VA_START macro instead of va_start.
+
+2002-02-23  Rick Rankin  <rick_rankin@yahoo.com>
+
+	* src-gpl/lpr.c: new file
+
+2002-02-23  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* src-gpl/mkshortcut.c: new file
+	* src-gpl/mkshortcut.1: new file
+
+2002-02-23  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src-pd/ddate.c: add explicit license reference
+	and move #includes to common.h.  Guard setlocale. 
+	Explicitly include config.h, common.h
+	* src-pd/namei.c: ditto
+	* src-bsd/cal.c: ditto
+	* src-bsd/err.c: ditto
+	* src-bsd/errs.h: explicitly include config.h, common.h
+	* src-bsd/widechar.h: explicitly include config.h (NOT common.h)
+	* src-gpl/ascii.c: explicitly include config.h
+	* src-gpl/banner.c: reformat license notice. explicitly 
+	include config.h
+	* src-gpl/conv.c: explictly include config.h
+	* src-gpl/dump.c: explictly include config.h; move other
+	includes into common.h
+	* src-gpl/getclip.c: explicitly include config.h
+	* src-gpl/last.c: reformat license notice. explicitly include
+	config.h.  Move other #includes into common.h
+	* src-gpl/oldutmp.h: add explicit license reference.
+	* src-gpl/putclip.c: include config.h.  Move other #includes
+	into common.h
+	* src-gpl/realpath.c: Reformat license reference. Explicitly 
+	include config.h.
+	* src-gpl/msgtool.c: add explicit license reference. include
+	config.h.  Guard ipc #includes.  Move other includes into common.h
+	* src-gpl/semstat.c: ditto
+	* src-gpl/semtool.c: ditto
+	* src-gpl/shmtool.c: ditto
+	* src-gpl/utmpdump.c: Reformat license reference.  Explicitly 
+	include config.h.  Move other includes into common.h.
+	* config.h.in: regenerate
+	* configure.ac: Add the new checks 
+	* common.h: Migrate other includes from .c files here.
+	* configure: regenerate
+
+2002-01-28  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src-bsd/cal.c: fix spelling
+
+2002-01-27  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* acinclude.m4: new file
+	* common.h: new file
+	* configure.ac: add conditionals for windows-only,
+	cygipc-only programs
+	* src-gpl/Makefile.am: use conditionals
+	* aclocal.m4: regenerate
+	* config.h.in: regenerate
+	* Makefile.in: regenerate
+	* src-gpl/Makefile.in: regenerate
+	* configure: regenerate
+	* README: minor changes
+	* src-bsd/cal.c: use common.h
+	* src-pd/ddate.c: use common.h
+	* src-pd/namei.c: use common.h
+	* src-gpl/ascii.c: use common.h
+	* src-gpl/banner.c: use common.h
+	* src-gpl/conv.c: use common.h
+	* src-gpl/dump.c: use common.h
+	* src-gpl/getclip.c: use common.h
+	* src-gpl/last.c: use common.h
+	* src-gpl/msgtool.c: use common.h
+	* src-gpl/putclip.c: use common.h
+	* src-gpl/realpath.c: use common.h
+	* src-gpl/semstat.c: use common.h
+	* src-gpl/semtool.c: use common.h
+	* src-gpl/shmtool.c: use common.h
+	* src-gpl/utmpdump.c: use common.h
+
+2002-01-26  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* NEWS: add entries for 0.9.6, .7, and .8
+	* ChangeLog: fix tabs
+	* release version 0.9.8
+
+2002-01-26  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src-pd/ddate.c: new file
+	* src-pd/ddate.1: new file
+	* src-pd/ddate.doc: new file
+	* AUTHORS: add Druel the Chaotic
+	* PROGLIST: add ddate
+	* README: mention ddate
+	* src-pd/Makefile.am: add ddate to proglist, ddate.1
+	to manlist
+	* src-bsd/Makefile.in: regenerate
+
+2002-01-26  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src-gpl/realpath.c: new file
+	* AUTHORS: add Steven Barker
+	* PROGLIST: add realpath
+	* README: mention realpath
+	* src-gpl/Makefile.am: add realpath to proglist
+	* src-gpl/Makefile.in: regenerate
+
+2002-01-18  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+	* src-gpl/utmpdump.c: new file
+	* AUTHORS: add Mark Bradshaw
+	* PROGLIST: add utmpdump
+	* README: mention utmpdump
+	* src-gpl/Makefile.am: add utmpdump to proglist
+	* src-gpl/Makefile.in: regenerate
+
+2002-01-16  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* bootstrap: new file
+	* src-gpl/Makefile.am: add last to proglist
+	* src-gpl/Makefile.in: regenerate
+	* PROGLIST: add last
+	* README: mention last
+	* AUTHORS: add Mark Bradshaw
+
+2002-01-16  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+	* src-gpl/last.c: new file
+	* src-gpl/last.1: new file
+	* src-gpl/lastb.1: new file
+	* src-gpl/oldutmp.h: new file
+
+2001-12-05  Joerg Schaible  <joerg.schaible@gft.com>
+
+	* src-gpl/banner.c: fix the -c option, use ANSI
+	font to print the extended charset
+
+2001-12-04  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* licenses: new subdir
+	* licenses/COPYING.GPL: new file (GPL text)
+	* licenses/COPYING.BSD-no-advert: new file (BSD license,
+	without the advertising clause)
+	* src-pd: new subdir (for public domain source code that
+	I've taken, modified, and released under the GPL)
+	* src-bsd: new subdir (for source code that is covered 
+	by the BSD-no-advert license)  Note that BSD-w-advert
+	code is disallowed -- can't legally be linked to 
+	cygwin1.dll.
+	* src: removed (renamed to src-gpl for consistency)
+	* src-gpl: new (renamed from src)
+	* PROGLIST: new file (contains descriptions of the 
+	various programs)
+	* README: proglist stuff removed.  README is more general.
+	* src-bsd/Makefile.am: new file
+	* src-bsd/Makefile.in: new file
+	* src-bsd/README.cal: new file
+	* src-bsd/cal.1: new file
+	* src-bsd/cal.c: new file
+	* src-bsd/err.c: new file
+	* src-bsd/errs.h: new file
+	* src-bsd/widechar.h: new file
+	* src-pd/Makefile.am: new file
+	* src-pd/Makefile.in: new file
+	* src-pd/README.namei: new file
+	* src-pd/README1.namei: new file
+	* src-pd/namei.1: new file
+	* src-pd/namei.c: new file
+	* configure.ac: add new tests to support namei and cal
+	* Makefile.am: add new subdirs
+	* config.h.in: regenerate
+	* aclocal.m4: regenerate
+	* Makefile.in: regenerate
+	* src/Makefile.in: regenerate
+
+2001-11-28  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* package renamed to 'cygutils'
+	* README: update
+	* NEWS: update
+	* AUTHORS: add Joerg Schaible
+	* configure.ac: package name change
+	* src/Makefile.am: add 'banner'
+	* src/banner.c: new file.  Modified from Joerg's
+	original to use popt for argument processing.
+	* configure: regenerate
+	* config.h.in: regenerate
+	* aclocal.m4: regenerate
+	* Makefile.in: regenerate
+	* src/Makefile.in: regenerate
+
+2001-11-26  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/semtool.c: added
+	* src/semstat.c: added
+	* src/msgtool.c: added
+	* src/shmtool.c: added
+	* src/Makefile.am: add semtool, semstat, msgtool,
+	and shmtool targets.
+	* configure.ac: add check for cygipc, and for 
+	ipc headers
+	* configure: regenerate
+	* config.h.in: regenerate
+	* aclocal.m4: regenerate
+	* Makefile.in: regenerate
+	* src/Makefile.in: regenerate
+	
+2001-11-25  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* uuencode.1: deleted
+	* uuencode.c: deleted
+	* uudecode.1: deleted
+	* uudecond.c: deleted (get these from GNU sharutils)
+	* mktemp.1: deleted
+	* mktemp.c: deleted (get these from 
+	http://www.courtesan.com/mktemp/)
+	* autoconfiscated -- lots of new files
+	* moved remaining .c files into src subdir
+   * src/conv.c: now recognize 'dos2unix.exe' and
+	'unix2dos.exe' as special argv[0] values, along
+	with 'd2u.exe' and 'u2d.exe'
+	* src/Makefile.in: install conv.exe as itself but
+	also as d2u.exe, u2d.exe, dos2unix.exe and unix2dos.exe
+
+0.9.2
+
+	* link with /usr/lib/libpopt.a ('official' version)
+	* add mktemp implementation
+	* add friendly help/option handling to dump, putclip,
+	getclip, and ascii.
+
+0.9.1 ----  baseline
+
+
+2002-11-11  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Convert mkshortcut to popt.  Bump to version 1.1.3
+
+	* mkshortcut.c (license): new function
+	(version): popt version() function
+	(version): static variable renamed to versionStr
+	(help): new function
+	(usage): popt usage() function; the old usage()
+	function eliminated
+	(printLicense): new function
+	(printBottomDescription): new function
+	(printTopDescription): new function
+	(getVersion): new function
+	(mkshortcut): new function, contains core code
+	(print_version): removed.
+	(main): almost completely rewritten to use popt
+	instead of getopt
+	* TODO: remove note about mkshortcut.
+
+2002-11-10  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Fix things so that 'make dist' works
+
+	* Makefile.am: split up EXTRA_DIST into several
+	variables.  Add a lot of files.  Remove reference
+	to the m4/ directory.
+	* HOW-TO-CONTRIBUTE: correct a few things affected
+	by the above change.
+
+2002-11-10  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Tired of long 'cvs diff' times over my modem, I
+	removed the files generated by bootstrap from 
+	CVS.  tarballs will have them, but cvs checkouts
+	will need to always run bootstrap.  Since gettextize
+	is too intrusive, leave ABOUT-NLS and config.rpath
+	so we don't have to include gettext in bootstrap.
+	Also, don't bother with autoheader, so leave config.h.in
+	in CVS as well.
+
+	* missing: remove
+	* mkinstalldirs: remove
+	* install-sh: remove
+	* config.guess: remove
+	* config.sub: remove
+	* depcomp: remove
+	* compile: remove
+	* Makefile.in: remove
+	* aclocal.m4: remove
+	* configure: remove
+	* stamp-h.in: remove (not used by newer autotools)
+
+2002-11-10  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Because utmpdump and last are now provided by the new
+	sysvinit package, those programs have been removed 
+	from cygutils.  Also, update to recent autotools &
+	gettext, plus a few cleanups.
+
+	* src/last/last.c: remove
+	* src/last/utmpdump.c: remove
+	* src/last/oldutmp.h: remove
+	* src/last/last.1: remove
+	* src/last/lastb.1: remove
+	* src/last/: remove directory
+	* intl/Makefile.in: remove
+	* intl/: remove directory
+
+	* src/cal/cal.c: cygwin provides langinfo.h, but
+	not the nl_langinfo function.  Make sure both exist
+	before calling nl_langinfo.
+	* configure.ac: remove references to system header files
+	needed only by utmpdump or last. Don't try to generate
+	intl/Makefile. 
+	* Makefile.am: remove intl/ directory; add po/ directory
+	to make new gettext happy.  Remove last and utmpdump from
+	bin_PROGRAMS; remove last.1 and lastb.1 from man_MANS.
+	change _LDADD vars from @INTLLIBS@ to @LIBINTL@.  Remove
+	references to last and utmpdump _SOURCES.
+	* po/LINGUAS: new file (needed by new gettext)
+	* po/POTFILES.in: new file (needed by new gettext)
+	* common.h: remove references to system header files used
+	only by utmpdump or last
+	* bootstrap: add `force' options
+	* NEWS: docu update
+	* PROGLIST: docu update
+	* README: dpcu update
+	* TODO: docu update
+	* HOW-TO-CONTRIBUTE: docu update
+	
+	* aclocal.m4: regenerate
+	* configure: regenerate
+	* Makefile.in: regenerate
+	* config.h.in: regenerate
+	* ABOUT-NLS: new version
+	* COPYING: new version
+	* INSTALL: new version
+	* mkinstalldirs: new version
+	* missing: new version
+	* install-sh: new version
+	* depcomp: new version
+	* config.sub: new version
+	* config.guess: new version
+	
+2002-07-17  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	At Bruno Haible's suggestion, don't include all of
+	gettext.  Just have an intl/ directory with a null
+	Makefile.in, and a populated po/ directory.  m4/
+	is no longer necessary.  Later, when automake bug
+	is fixed, we can remove the intl/ directory entirely,
+	but we'll still need the po/ directory and the ABOUT-NLS
+	file.
+
+	* intl/*: remove
+	* intl/Makefile.in: turn this into a null file
+	* m4/*: remove
+	* configure.ac: remove m4/Makefile from AC_CONFIG_FILES
+	* Makefile.am: remove m4/ from SUBDIRS
+	* Makefile.in: regenerate
+	* configure: regenerate
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* configure.ac: bump version to 1.1.2
+	* configure: regenerate
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Add 'mcookie' program.  Tag "v1_1_1d"
+
+	* src/mcookie: new directory
+	* src/mcookie/mcookie.c: new file
+	* src/mcookie/mcookie.1: new file
+	* src/mcookie/md5.h: new file
+	* src/mcookie/md5.c: new file
+	* Makefile.am: add program 'mcookie'
+	* configure.ac: add test for gettimeofday
+	* config.h.in: regenerate
+	* Makefile.in: regenerate
+	* PROGLIST: add mcookie
+	* README: add mcookie
+	* NEWS: mention mcookie
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Add 'colrm' program.  Tag "v1_1_1c"
+
+	* src/colrm: new directory
+	* src/colrm/colrm.c: new file
+	* src/colrm/colrm.1: new file
+	* src/colrm/widechar.h: new file
+	* Makefile.am: add program 'colrm'
+	* Makefile.in: regenerate
+	* PROGLIST: add colrm
+	* README: add colrm
+	* NEWS: hasn't been updated in a while...
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Add 'colcrt' program.  Tag "v1_1_1b"
+
+	* src/colcrt: new directory
+	* src/colcrt/colcrt.c: new file
+	* src/colcrt/colcrt.1: new file
+	* src/colcrt/widechar.h: new file
+	* Makefile.am: add program 'colcrt'
+	* Makefile.in: regenerate
+	* PROGLIST: add colcrt
+	* README: add colcrt
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	Add 'column' program.  Tag "v1_1_1a"
+
+	* src/column: new directory
+	* src/column/column.c: new file
+	* src/column/column.1: new file
+	* src/column/err.c: new file
+	* src/column/errs.h: new file
+	* src/column/widechar.h: new file
+	* Makefile.am: add program 'column'
+	* configure.ac: add check for TIOCGWINSZ, termios.h, and ioctl.h.
+	* common.h: use TIOCGWINSZ to include sys/termios.h or sys/ioctl.h.
+	* Makefile.in: regenerate
+	* config.h.in: regenerate
+	* configure: regenerate
+	* PROGLIST: add column
+	* README: add column
+
+2002-07-12  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* TODO: remove gettext reminder
+	* HOW-TO-CONTRIBUTE: explain how to handle programs
+	that need -lintl, given the gettextize changes below.
+	* Makefile.in: regenerate
+
+2002-07-12  gettextize  <bug-gnu-gettext@gnu.org>
+
+	Bug in automake means that we have to gettextize -- even tho
+	we will never actually build gettext ourselves ('external'
+	option in AM_GNU_GETTEXT).  Reported to automake list.
+
+	Bug in gettext means that we have to explicitly set and AC_SUBST
+	BUILD_INCLUDED_LIBINTL and USE_INCLUDED_LIBINTL in configure.ac.
+	Reported to Bruno.
+
+	* Makefile.am (SUBDIRS): Add intl, m4.
+	(ACLOCAL_AMFLAGS): New variable.
+	(EXTRA_DIST): Add config.rpath.
+	* configure.ac (AC_CONFIG_FILES): Add intl/Makefile, po/Makefile.in,
+	m4/Makefile.
+	* intl/: new directory
+	* intl/*: new files
+	* po/: new directory
+	* po/*: new files
+	* m4/: new directory
+	* m4/*: new files
+	* config.rpath: new file
+	* ABOUT-NLS: new file
+	* aclocal.m4: regenerate
+	* Makefile.in: regenerate
+	* configure: regenerate
+	* bootstrap: add -I m4 to aclocal command; copy files
+	* config.guess: new file
+	* config.sub: new file
+	* compile: new file
+	* config.h.in: regenerate
+	* TODO: note to remove all this garbage when it becomes
+	possible; need bugfix to automake and gettext.m4
+
+2002-07-12  Charles S. Wilson  <cwilson@ece.gatech.edu>
+
+	Adjust to cygwin's libintl library now depending on libiconv.
+	Easiest way: remove explicit search for -lintl and libintl.h;
+	instead use AM_GNU_GETTEXT.
+
+	Add 'rev' program
+
+	* configure.ac: don't look for -lintl and libintl.h 'by hand';
+	use AM_GNU_GETTEXT instead.  Unfortunately, even 'external'
+	option requires po/ and intl/ directories.  See gettextize above.
+	* src/rev: new directory
+	* src/rev/rev.c: new file
+	* src/rev/rev.1: new file
+	* src/rev/widechar.h: new file
+	* Makefile.am: add program 'rev'.  Add LDADD variables for
+	the programs that use gettext, since -lintl is no longer 
+	automatically included in LIBS (use @INTLLIBS@)
+	* Makefile.in: regenerate
+	* PROGLIST: add rev
+	* README: add rev
+
+2002-06-06  Charles S. Wilson  <cwilson@ece.gatech.edu>
+            Egor Duda
+
+   Add getopt.exe, readlink.exe.  Bump to 1.1.1.
+
+	* AUTHORS: add Egor, Kenneth Stailey, and Frodo Looijaard
+	* configure.ac: bump to 1.1.1
+	* Makefile.am: add getopt and readlink
+	* PROGLIST: ditto
+	* README: ditto
+	* Makefile.in: regenerate
+	* configure: regenerate
+	* src/Makefile.am: delete (forgot to do so in previous commit)
+	* src/Makefile.in: delete (ditto)
+	* src/readlink/readlink.1: new file
+	* src/readlink/readlink.c: new file
+	* src/getopt/getopt.1: new file
+	* src/getopt/getopt.c: new file
+	* src/getopt/parse.bash: new file
+	* src/getopt/parse.tcsh: new file
+	* src/getopt/test.bash: new file
+	* src/getopt/test.tcsh: new file
+
+2002-06-05  Charles S. Wilson  <cwilson@ece.gatech.edu>
+            Robert Collins  <robert.collins@itdomain.com.au>
+
+	Convert to one-big-makefile style.  cf "Recursive make
+	considered harmful".  Bump to 1.1.0
+
+	* HOW-TO-CONTRIBUTE: update to reflect one-big-makefile style.
+	* Makefile.am: consolidate from src/*/Makefile.am
+	* configure.ac: remove src/*/Makefile from AC_CONFIG_FILES list.
+	bump version.
+	* NEWS: Note one-file-to-build-them-all
+	* TODO: update
+	* aclocal.m4: regenerate
+	* Makefile.in: regenerate
+	* configure: regenerate
+	* /src/realpath/Makefile.in: delete
+	* /src/realpath/Makefile.am: delete
+	* /src/namei/Makefile.in: delete
+	* /src/namei/Makefile.am: delete
+	* /src/mkshortcut/Makefile.in: delete
+	* /src/mkshortcut/Makefile.am: delete
+	* /src/lpr/Makefile.in: delete
+	* /src/lpr/Makefile.am: delete
+	* /src/last/Makefile.in: delete
+	* /src/last/Makefile.am: delete
+	* /src/ipc/Makefile.in: delete
+	* /src/ipc/Makefile.am: delete
+	* /src/dump/Makefile.in: delete
+	* /src/dump/Makefile.am: delete
+	* /src/ddate/Makefile.in: delete
+	* /src/ddate/Makefile.am: delete
+	* /src/cygstart/Makefile.in: delete
+	* /src/cygstart/Makefile.am: delete
+	* /src/conv/Makefile.in: delete
+	* /src/conv/Makefile.am: delete
+	* /src/col/Makefile.in: delete
+	* /src/col/Makefile.am: delete
+	* /src/cal/Makefile.in: delete
+	* /src/cal/Makefile.am: delete
+	* /src/banner/Makefile.in: delete
+	* /src/banner/Makefile.am: delete
+	* /src/ascii/Makefile.in: delete
+	* /src/ascii/Makefile.am: delete
+	* /src/Makefile.in: delete
+	* /src/Makefile.am: delete
+
+2002-05-23  Charles S. Wilson  <cwilson@ece.gatech.edu>
+
+	* Makefile.in: regenerate
+	* src/Makefile.in: regenerate
+	* src/*/Makefile.in: regenerate
+	* configure: regenerate
+	* aclocal.m4: regenerate
+
+2002-05-22  David A. Willis  <dawillis1214@yahoo.com>
+
+	* src/col: new directory
+	* src/col/Makefile.am: new file
+	* src/col/Makefile.in: new file
+	* src/col/col.c: new file
+	* src/col/err.c: new file
+	* src/col/err.h: new file
+	* src/col/col.1: new file
+	* src/col/README.col: new file
+	* src/Makefile.am: add subdirectory col
+	* src/Makefile.in: regenerate
+	* AUTHORS: add David A. Willis for col
+	* PROGLIST: add col
+	* README: add col
+
+2002-04-16  Chris January  <chris@atomice.net>
+
+	* src/conv/conv.c (convert): Use correct type to store the
+	return value of fgetc()
+
+2002-03-15  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* Makefile.in: rebootstrap
+	* aclocal.m4: ditto
+	* configure: ditto
+	* src/Makefile.in: ditto
+	* src/ascii/Makefile.in: ditto
+	* src/banner/Makefile.in: ditto
+	* src/cal/Makefile.in: ditto
+	* src/clip/Makefile.in: ditto
+	* src/conv/Makefile.in: ditto
+	* src/ddate/Makefile.in: ditto
+	* src/dump/Makefile.in: ditto
+	* src/ipc/Makefile.in: ditto
+	* src/last/Makefile.in: ditto
+	* src/lpr/Makefile.in: ditto
+	* src/mkshortcut/Makefile.in: ditto
+	* src/namei/Makefile.in: ditto
+	* src/realpath/Makefile.in: ditto
+
+2002-03-15  Michael Schaap  <cygwin_start@mscha.org>
+
+	* src/cygstart: new directory
+	* src/cygstart/Makefile.am: new file
+	* src/cygstart/Makefile.in: new file
+	* src/cygstart/cygstart.c: new file
+	* src/cygstart/cygstart.1: new file
+	* src/Makefile.am: add subdirectory cygstart
+	* src/Makefile.in: regenerate
+	* AUTHORS: add Michael Schaap for cygstart
+	* PROGLIST: add cygstart
+	* README: add cygstart
+
+2002-03-13  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* HOW-TO-CONTRIBUTE: fix typos
+
+2002-03-13  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* src/mkshortcut/mkshortcut.c: fix NULL pointer problem
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* TODO: remove 'reorg' note
+	* configure.ac: mark as version 1.0.0
+	* configure: regenerate
+	* HOW-TO-CONTRIBUTE: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* configure.ac: build Makefiles in new directories
+	* configure.in: regenerate
+	* Makefile.am: change subdirs
+	* Makefile.in: regenerate
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src: new directory
+	* src/Makefile.am: new file
+	* src/Makefile.in: new file
+	* src-gpl/Makefile.am: removed
+	* src-gpl/Makefile.in: removed
+	* src-pd/Makefile.am: removed
+	* src-pd/Makefile.in: removed
+	* src-bsd/Makefile.am: removed
+	* src-bsd/Makefile.in: removed
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/ascii: new directory
+	* src-gpl/ascii.c: moved to src/ascii/ascii.c
+	* src/ascii/ascii.c: moved from src-gpl/ascii.c
+	* src/ascii/Makefile.am: new file
+	* src/ascii/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/banner: new directory
+	* src-gpl/banner.c: moved to src/banner/banner.c
+	* src/banner/banner.c: moved from src-gpl/banner.c
+	* src/banner/Makefile.am: new file
+	* src/banner/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/cal: new directory
+	* src-bsd/cal.c: moved to src/cal/cal.c
+	* src/cal/cal.c: moved from src-bsd/cal.c
+	* src-bsd/cal.1: moved to src/cal/cal.1
+	* src/cal/cal.1: moved from src-bsd/cal.1
+	* src-bsd/err.c: moved to src/cal/err.c
+	* src/cal/err.c: moved from src-bsd/err.c
+	* src-bsd/errs.h: moved to src/cal/errs.h
+	* src/cal/errs.h: moved from src-bsd/errs.h
+	* src-bsd/widechar.h: moved to src/cal/widechar.h
+	* src/cal/widechar.h: moved from src-bsd/widechar.h
+	* src-bsd/README.cal: moved to src/cal/README.cal
+	* src/cal/README.cal: moved from src-bsd/README.cal
+	* src/cal/Makefile.am: new file
+	* src/cal/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/clip: new directory
+	* src-gpl/putclip.c: moved to src/clip/putclip.c
+	* src/clip/putclip.c: moved from src-gpl/putclip.c
+	* src-gpl/getclip.c: moved to src/clip/getclip.c
+	* src/clip/getclip.c: moved from src-gpl/getclip.c
+	* src/clip/Makefile.am: new file
+	* src/clip/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/conv: new directory
+	* src-gpl/conv.c: moved to src/conv/conv.c
+	* src/conv/conv.c: moved from src-gpl/conv.c
+	* src/conv/Makefile.am: new file
+	* src/conv/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/ddate: new directory
+	* src-pd/ddate.c: moved to src/ddate/ddate.c
+	* src/ddate/ddate.c: moved from src-pd/ddate.c
+	* src-pd/ddate.1: moved to src/ddate/ddate.1
+	* src/ddate/ddate.1: moved from src-pd/ddate.1
+	* src-pd/ddate.doc: moved to src/ddate/ddate.doc
+	* src/ddate/ddate.doc: moved from src-pd/ddate.doc
+	* src/ddate/Makefile.am: new file
+	* src/ddate/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/dump: new directory
+	* src-gpl/dump.c: moved to src/dump/dump.c
+	* src/dump/dump.c: moved from src-gpl/dump.c
+	* src/dump/Makefile.am: new file
+	* src/dump/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/ipc: new directory
+	* src-gpl/msgtool.c: moved to src/ipc/msgtool.c
+	* src/ipc/msgtool.c: moved from src-gpl/msgtool.c
+	* src-gpl/semstat.c: moved to src/ipc/semstat.c
+	* src/ipc/semstat.c: moved from src-gpl/semstat.c
+	* src-gpl/semtool.c: moved to src/ipc/semtool.c
+	* src/ipc/semtool.c: moved from src-gpl/semtool.c
+	* src-gpl/shmtool.c: moved to src/ipc/shmtool.c
+	* src/ipc/shmtool.c: moved from src-gpl/shmtool.c
+	* src/ipc/Makefile.am: new file
+	* src/ipc/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/last: new directory
+	* src-gpl/last.c: moved to src/last/last.c
+	* src/last/last.c: moved from src-gpl/last.c
+	* src-gpl/last.1: moved to src/last/last.1
+	* src/last/last.1: moved from src-gpl/last.1
+	* src-gpl/lastb.1: moved to src/last/lastb.1
+	* src/last/lastb.1: moved from src-gpl/lastb.1
+	* src-gpl/oldutmp.h: moved to src/last/oldutmp.h
+	* src/last/oldutmp.h: moved from src-gpl/oldutmp.h
+	* src-gpl/utmpdump.c: moved to src/last/utmpdump.c
+	* src/last/utmpdump.c: moved from src-gpl/utmpdump.c
+	* src/last/Makefile.am: new file
+	* src/last/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/lpr: new directory
+	* src-gpl/lpr.c: moved to src/lpr/lpr.c
+	* src/lpr/lpr.c: moved from src-gpl/lpr.c
+	* src/lpr/Makefile.am: new file
+	* src/lpr/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/mkshortcut: new directory
+	* src-gpl/mkshortcut.c: moved to src/mkshortcut/mkshortcut.c
+	* src/mkshortcut/mkshortcut.c: moved from src-gpl/mkshortcut.c
+	* src-gpl/mkshortcut.1: moved to src/mkshortcut/mkshortcut.1
+	* src/mkshortcut/mkshortcut.1: moved from src-gpl/mkshortcut.1
+	* src/mkshortcut/Makefile.am: new file
+	* src/mkshortcut/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/namei: new directory
+	* src-pd/namei.c: moved to src/namei/namei.c
+	* src/namei/namei.c: moved from src-pd/namei.c
+	* src-pd/namei.1: moved to src/namei/namei.1
+	* src/namei/namei.1: moved from src-pd/namei.1
+	* src-pd/README.namei: moved to src/namei/README.namei
+	* src/namei/README.namei: moved from src-pd/README.namei
+	* src-pd/README1.namei: moved to src/namei/README1.namei
+	* src/namei/README1.namei: moved from src-pd/README1.namei
+	* src/namei/Makefile.am: new file
+	* src/namei/Makefile.in: new file
+
+2002-03-02  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/realpath: new directory
+	* src-gpl/realpath.c: moved to src/realpath/realpath.c
+	* src/realpath/realpath.c: moved from src-gpl/realpath.c
+	* src/realpath/Makefile.am: new file
+	* src/realpath/Makefile.in: new file
+
+
+2002-02-23  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src-gpl/Makefile.am: add lpr and mkshortcut 
+	* src-gpl/Makefile.in: regenerate
+	* configure.ac: update version number
+	* configure: regenerate
+	* AUTHORS: add Rick and Joshua
+	* PROGLIST: add lpr and mkshortcut
+	* NEWS: add lpr and mkshortcut
+	* README: add lpr and mkshortcut
+	* TODO: add some notes...
+	* src-gpl/mkshortcut.c: Reformat comment block. Explicitly
+	include config.h and common.h.  Move other #inludes to
+	common.h.  Add some static strings for later use (version,
+	Id, copyright).
+	* src-gpl/lpr.c: Add license reference. Explicitly include
+	config.h and common.h.  Move other #includes to common.h.
+	Add some static strings for later use (version, Id, copyright).
+	Change programName to program_name (to match style of other
+	programs).  Strdup from argv[0] instead of hardcoding.  Use 
+	VA_START macro instead of va_start.
+
+2002-02-23  Rick Rankin  <rick_rankin@yahoo.com>
+
+	* src-gpl/lpr.c: new file
+
+2002-02-23  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* src-gpl/mkshortcut.c: new file
+	* src-gpl/mkshortcut.1: new file
+
+2002-02-23  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src-pd/ddate.c: add explicit license reference
+	and move #includes to common.h.  Guard setlocale. 
+	Explicitly include config.h, common.h
+	* src-pd/namei.c: ditto
+	* src-bsd/cal.c: ditto
+	* src-bsd/err.c: ditto
+	* src-bsd/errs.h: explicitly include config.h, common.h
+	* src-bsd/widechar.h: explicitly include config.h (NOT common.h)
+	* src-gpl/ascii.c: explicitly include config.h
+	* src-gpl/banner.c: reformat license notice. explicitly 
+	include config.h
+	* src-gpl/conv.c: explictly include config.h
+	* src-gpl/dump.c: explictly include config.h; move other
+	includes into common.h
+	* src-gpl/getclip.c: explicitly include config.h
+	* src-gpl/last.c: reformat license notice. explicitly include
+	config.h.  Move other #includes into common.h
+	* src-gpl/oldutmp.h: add explicit license reference.
+	* src-gpl/putclip.c: include config.h.  Move other #includes
+	into common.h
+	* src-gpl/realpath.c: Reformat license reference. Explicitly 
+	include config.h.
+	* src-gpl/msgtool.c: add explicit license reference. include
+	config.h.  Guard ipc #includes.  Move other includes into common.h
+	* src-gpl/semstat.c: ditto
+	* src-gpl/semtool.c: ditto
+	* src-gpl/shmtool.c: ditto
+	* src-gpl/utmpdump.c: Reformat license reference.  Explicitly 
+	include config.h.  Move other includes into common.h.
+	* config.h.in: regenerate
+	* configure.ac: Add the new checks 
+	* common.h: Migrate other includes from .c files here.
+	* configure: regenerate
+
+2002-01-28  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src-bsd/cal.c: fix spelling
+
+2002-01-27  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* acinclude.m4: new file
+	* common.h: new file
+	* configure.ac: add conditionals for windows-only,
+	cygipc-only programs
+	* src-gpl/Makefile.am: use conditionals
+	* aclocal.m4: regenerate
+	* config.h.in: regenerate
+	* Makefile.in: regenerate
+	* src-gpl/Makefile.in: regenerate
+	* configure: regenerate
+	* README: minor changes
+	* src-bsd/cal.c: use common.h
+	* src-pd/ddate.c: use common.h
+	* src-pd/namei.c: use common.h
+	* src-gpl/ascii.c: use common.h
+	* src-gpl/banner.c: use common.h
+	* src-gpl/conv.c: use common.h
+	* src-gpl/dump.c: use common.h
+	* src-gpl/getclip.c: use common.h
+	* src-gpl/last.c: use common.h
+	* src-gpl/msgtool.c: use common.h
+	* src-gpl/putclip.c: use common.h
+	* src-gpl/realpath.c: use common.h
+	* src-gpl/semstat.c: use common.h
+	* src-gpl/semtool.c: use common.h
+	* src-gpl/shmtool.c: use common.h
+	* src-gpl/utmpdump.c: use common.h
+
+2002-01-26  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* NEWS: add entries for 0.9.6, .7, and .8
+	* ChangeLog: fix tabs
+	* release version 0.9.8
+
+2002-01-26  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src-pd/ddate.c: new file
+	* src-pd/ddate.1: new file
+	* src-pd/ddate.doc: new file
+	* AUTHORS: add Druel the Chaotic
+	* PROGLIST: add ddate
+	* README: mention ddate
+	* src-pd/Makefile.am: add ddate to proglist, ddate.1
+	to manlist
+	* src-bsd/Makefile.in: regenerate
+
+2002-01-26  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src-gpl/realpath.c: new file
+	* AUTHORS: add Steven Barker
+	* PROGLIST: add realpath
+	* README: mention realpath
+	* src-gpl/Makefile.am: add realpath to proglist
+	* src-gpl/Makefile.in: regenerate
+
+2002-01-18  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+	* src-gpl/utmpdump.c: new file
+	* AUTHORS: add Mark Bradshaw
+	* PROGLIST: add utmpdump
+	* README: mention utmpdump
+	* src-gpl/Makefile.am: add utmpdump to proglist
+	* src-gpl/Makefile.in: regenerate
+
+2002-01-16  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* bootstrap: new file
+	* src-gpl/Makefile.am: add last to proglist
+	* src-gpl/Makefile.in: regenerate
+	* PROGLIST: add last
+	* README: mention last
+	* AUTHORS: add Mark Bradshaw
+
+2002-01-16  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+	* src-gpl/last.c: new file
+	* src-gpl/last.1: new file
+	* src-gpl/lastb.1: new file
+	* src-gpl/oldutmp.h: new file
+
+2001-12-05  Joerg Schaible  <joerg.schaible@gft.com>
+
+	* src-gpl/banner.c: fix the -c option, use ANSI
+	font to print the extended charset
+
+2001-12-04  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* licenses: new subdir
+	* licenses/COPYING.GPL: new file (GPL text)
+	* licenses/COPYING.BSD-no-advert: new file (BSD license,
+	without the advertising clause)
+	* src-pd: new subdir (for public domain source code that
+	I've taken, modified, and released under the GPL)
+	* src-bsd: new subdir (for source code that is covered 
+	by the BSD-no-advert license)  Note that BSD-w-advert
+	code is disallowed -- can't legally be linked to 
+	cygwin1.dll.
+	* src: removed (renamed to src-gpl for consistency)
+	* src-gpl: new (renamed from src)
+	* PROGLIST: new file (contains descriptions of the 
+	various programs)
+	* README: proglist stuff removed.  README is more general.
+	* src-bsd/Makefile.am: new file
+	* src-bsd/Makefile.in: new file
+	* src-bsd/README.cal: new file
+	* src-bsd/cal.1: new file
+	* src-bsd/cal.c: new file
+	* src-bsd/err.c: new file
+	* src-bsd/errs.h: new file
+	* src-bsd/widechar.h: new file
+	* src-pd/Makefile.am: new file
+	* src-pd/Makefile.in: new file
+	* src-pd/README.namei: new file
+	* src-pd/README1.namei: new file
+	* src-pd/namei.1: new file
+	* src-pd/namei.c: new file
+	* configure.ac: add new tests to support namei and cal
+	* Makefile.am: add new subdirs
+	* config.h.in: regenerate
+	* aclocal.m4: regenerate
+	* Makefile.in: regenerate
+	* src/Makefile.in: regenerate
+
+2001-11-28  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* package renamed to 'cygutils'
+	* README: update
+	* NEWS: update
+	* AUTHORS: add Joerg Schaible
+	* configure.ac: package name change
+	* src/Makefile.am: add 'banner'
+	* src/banner.c: new file.  Modified from Joerg's
+	original to use popt for argument processing.
+	* configure: regenerate
+	* config.h.in: regenerate
+	* aclocal.m4: regenerate
+	* Makefile.in: regenerate
+	* src/Makefile.in: regenerate
+
+2001-11-26  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* src/semtool.c: added
+	* src/semstat.c: added
+	* src/msgtool.c: added
+	* src/shmtool.c: added
+	* src/Makefile.am: add semtool, semstat, msgtool,
+	and shmtool targets.
+	* configure.ac: add check for cygipc, and for 
+	ipc headers
+	* configure: regenerate
+	* config.h.in: regenerate
+	* aclocal.m4: regenerate
+	* Makefile.in: regenerate
+	* src/Makefile.in: regenerate
+	
+2001-11-25  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* uuencode.1: deleted
+	* uuencode.c: deleted
+	* uudecode.1: deleted
+	* uudecond.c: deleted (get these from GNU sharutils)
+	* mktemp.1: deleted
+	* mktemp.c: deleted (get these from 
+	http://www.courtesan.com/mktemp/)
+	* autoconfiscated -- lots of new files
+	* moved remaining .c files into src subdir
+   * src/conv.c: now recognize 'dos2unix.exe' and
+	'unix2dos.exe' as special argv[0] values, along
+	with 'd2u.exe' and 'u2d.exe'
+	* src/Makefile.in: install conv.exe as itself but
+	also as d2u.exe, u2d.exe, dos2unix.exe and unix2dos.exe
+
+0.9.2
+
+	* link with /usr/lib/libpopt.a ('official' version)
+	* add mktemp implementation
+	* add friendly help/option handling to dump, putclip,
+	getclip, and ascii.
+
+0.9.1 ----  baseline
+

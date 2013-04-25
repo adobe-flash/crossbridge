@@ -1,0 +1,83 @@
+alternatives
+===========================================================
+This package provides mechanisms for maintaining a database of, and 
+managing, other packages which might be in conflict with each other.
+The end user can easily switch between the desired versions.
+
+Runtime requirements:
+  cygwin-1.7.0-45
+  libintl8
+  libiconv2
+
+Build requirements:
+  cygwin-1.7.0-45
+  gcc-core-3.4.4-999
+  binutils-20080624-2
+  gettext-0.17
+
+Canonical homepage:
+  http://www.fastcoder.net/software/chkconfig/
+
+Canonical download:
+  http://www.fastcoder.net/downloads/
+
+(package derived from chkconfig-1.3.30c)
+
+===========================================================
+
+Build instructions:
+  unpack alternatives-1.3.30c-REL-src.tar.bz2
+    if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+  cd /usr/src
+  cygport ./alternatives-1.3.30c-REL.cygport all
+
+This will create:
+  /usr/src/alternatives-1.3.30c-REL.tar.bz2
+  /usr/src/alternatives-1.3.30c-REL-src.tar.bz2
+
+Or use 'cygport ./alternatives-1.3.30c-REL.cygport prep' to get
+a patched source directory
+
+===========================================================
+
+Files included in alternatives-1.3.30c-REL: see cygcheck -l output.
+
+===========================================================
+
+Port Notes:
+
+----------  alternatives-1.3.30c-10 -- 05 Apr 2009 ---------
+* Fork for cygwin-1.7 development
+
+----------  alternatives-1.3.30c-3 -- 05 Apr 2009 ---------
+* Add /etc/alternatives/README file, as suggested by
+  Phil Betts (http://cygwin.com/ml/cygwin/2009-03/msg00926.html)
+* Move new files into CYGWIN-PATCHES/, instead of top-level.
+  This helps to clarify the .src.patch vs the cygwin.patch.
+* Update to gettext-0.17
+* configure with --disable-rpath, to avoid inline-patching
+  of config.rpath. (This inline-patching may ALSO have been
+  obsoleted by the move to gettext-0.17, but I didn't test).
+
+----------  alternatives-1.3.30c-2 -- 01 May 2008 ---------
+* Fix packaging bug: /etc/alternatives and /var/lib/alternatives
+  directories were not included.
+
+----------  alternatives-1.3.30c-1 -- 15 Apr 2008 ---------
+* Resync with fastcoder.net chkconfig 1.3.30c
+* Fix bug with parsing data files
+
+----------  alternatives-1.3.29a-1 -- 18 Oct 2006 ---------
+* Resync with Red Hat chkconfig 1.3.29
+* Update to latest autotools
+* Fix null pointer crash in --display
+* Switch to cygport build framework
+
+----------  alternatives-1.3.20a-1 -----------
+Initial release; forked from Red Hat chkconfig-1.3.20.
+
+
+Cygwin port maintained by: Charles Wilson  <cygwin@cygwin.com>
+Please address all questions to the Cygwin mailing list at <cygwin@cygwin.com>
+

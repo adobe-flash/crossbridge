@@ -1,0 +1,26 @@
+This small utility allows Windows NT user rights and privileges
+to be set from the command line.
+
+Build:
+
+To build editrights, run "make".
+To install it, run "make install".
+
+Usage:
+
+To list the access rights granted to a user (e.g. FRED)
+	editrights -u FRED -l
+
+To do this more verbosely
+	editrights -u FRED -l -v
+
+To give FRED the SeTcbPrivilege ("Act as part of the operating system") 
+	editrights -u FRED -a SeTcbPrivilege
+
+To remove this right from FRED
+	editrights -u FRED -r SeTcbPrivilege
+
+To test whether FRED has the SeTcbPrivilege
+	editrights -u FRED -t SeTcbPrivilege && echo 'FRED has SeTcb...'
+
+CTR 23/Sep/2003.

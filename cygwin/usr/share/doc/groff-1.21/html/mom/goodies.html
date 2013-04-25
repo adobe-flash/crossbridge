@@ -1,0 +1,1448 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Goodies</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="inlines.html#top">Next: Inline escapes</a></td>
+</tr>
+</table>
+
+<h1 id="goodies" class="docs">Goodies</h1>
+
+<p>
+The macros in this section are a collection of useful (and sometimes
+nearly indispensable) routines to simplify typesetting.
+</p>
+
+<div id="goodies-macros-mini-toc" style="margin-top: -1em; font-size: 95%;">
+<div class="mini-toc-col-1">
+<ul class="no-enumerator">
+<li class="list-head-goodies"><a href="#alias">ALIAS</a> <span class="normal-smaller">&ndash; rename macros</span></li>
+<li class="list-head-goodies"><a href="#silent">SILENT</a> <span class="normal-smaller">&ndash; &#8220;hide&#8221; input lines from output</span></li>
+<li class="list-head-goodies"><a href="#trap">TRAP</a> <span class="normal-smaller">&ndash; suspend/re-invoke traps</span></li>
+<li class="list-head-goodies"><a href="#smartquotes">SMARTQUOTES</a> <span class="normal-smaller">&ndash; convert typewriter doublequotes to proper doublequotes</span></li>
+<li class="list-head-goodies"><a href="#caps">CAPS</a> <span class="normal-smaller">&ndash; convert to upper case</span></li>
+<li class="list-head-goodies"><a href="#string">STRING</a> <span class="normal-smaller">&ndash; user-definable strings</span></li>
+<li class="list-head-goodies"><a href="#esc-char">ESC_CHAR</a> <span class="normal-smaller">&ndash; change the escape character to something other than a backslash</span></li>
+<li class="list-head-goodies"><a href="#sizespecs">SIZESPECS</a> <span class="normal-smaller">&ndash; get cap-height, x-height and descender depth of a font</span></li>
+<li class="list-head-goodies no-anchor"><span style="font-size: 90%;">Underscoring/underlining</span>
+<ul class="sublist">
+  <li class="list-head-goodies text-color"><a href="#underscore">UNDERSCORE</a> <span class="normal-smaller">&ndash; single underscore</span>
+  <ul class="sublist sub">
+    <li class="list-head-goodies text-color"><a href="#underscore-weight">Controlling the weight of underscores</a></li>
+    <li class="list-head-goodies text-color"><a href="#underscore-color">Colorizing underscores</a></li>
+  </ul></li>
+  <li class="list-head-goodies text-color"><a href="#underscore2">UNDERSCORE2</a> <span class="normal-smaller">&ndash; double underscore</span></li>
+  <li class="list-head-goodies text-color"><a href="#underline">UNDERLINE</a>
+  <ul class="sublist sub">
+    <li class="list-head-goodies text-color"><a href="#ul">\*[UL]</a> <span class="normal-sub-sub">&ndash; inline escape to underline</span></li>
+  </ul></li>
+</ul></li>
+<li class="list-head-goodies no-anchor"><span style="font-size: 90%;">Padding</span>
+<ul class="sublist">
+  <li class="list-head-goodies text-color"><a href="#pad">PAD</a> <span class="normal-smaller">&ndash; insert equalized space into lines</span>
+  <ul class="sublist sub">
+    <li class="list-head-goodies text-color"><a href="#pad-marker">PAD_MARKER</a> <span class="normal-sub-sub">&ndash; change/set the marker used with PAD</span></li>
+  </ul></li>
+</ul></li>
+</ul>
+</div>
+<div class="mini-toc-col-2">
+<ul class="no-enumerator">
+<li class="list-head-goodies no-anchor"><span style="font-size: 90%;">Leaders</span>
+<ul class="sublist">
+  <li class="list-head-goodies text-color"><a href="#leader">\*[LEADER]</a> <span class="normal-smaller">&ndash; inline escape to add leaders to a line</span></li>
+  <li class="list-head-goodies text-color"><a href="#leader-character">LEADER_CHARACTER</a> <span class="normal-smaller">&ndash; change/set the leader character</span></li>
+</ul></li>
+<li class="list-head-goodies no-anchor"><span style="font-size: 90%;">Drop caps</span>
+<ul class="sublist">
+  <li class="list-head-goodies text-color"><a href="#dropcap">DROPCAP</a> <span class="normal-smaller">&ndash; set a drop cap</span></li>
+  <li class="list-head-goodies text-color" style="list-style-type: none;"><a href="#dropcap-support"><span class="normal-smaller" style="font-weight: bold;">Support macros for DROPCAP</span></a>
+  <ul class="sublist sub">
+    <li class="list-head-goodies text-color"><a href="#dropcap-family">DROPCAP_FAMILY</a> <span class="normal-sub-sub">&ndash; change drop cap family</span></li>
+    <li class="list-head-goodies text-color"><a href="#dropcap-font">DROPCAP_FONT</a> <span class="normal-sub-sub">&ndash; change drop cap font</span></li>
+    <li class="list-head-goodies text-color"><a href="#dropcap-adjust">DROPCAP_ADJUST</a> <span class="normal-sub-sub">&ndash; alter size of drop cap</span></li>
+    <li class="list-head-goodies text-color"><a href="#dropcap-color">DROPCAP_COLOR</a> <span class="normal-sub-sub">&ndash; change colour of drop cap</span></li>
+    <li class="list-head-goodies text-color"><a href="#dropcap-gutter">DROPCAP_GUTTER</a> <span class="normal-sub-sub">&ndash; change space between drop cap and running text</span></li>
+  </ul></li>
+</ul></li>
+<li class="list-head-goodies text-color no-anchor"><span style="font-size: 90%;">Superscripts</span>
+<ul class="sublist">
+  <li class="list-head-goodies text-color"><a href="#sup">\*[SUP]</a> <span class="normal-smaller">&ndash; inline escape to set superscripts</span>
+  <ul class="sublist sub">
+    <li class="list-head-goodies text-color"><a href="#sup-raise">SUPERSCRIPT_RAISE_AMOUNT</a> <span class="normal-sub-sub">(control superscript raise amount</span></li>
+    <li class="list-head-goodies text-color"><a href="#cond-or-ext-sup">\*[CONDSUP]</a> <span class="normal-sub-sub">&ndash; condensed superscripts</span></li>
+    <li class="list-head-goodies text-color"><a href="#cond-or-ext-sup">\*[EXTSUP]</a> <span class="normal-sub-sub">&ndash; extended superscripts</span></li>
+  </ul></li>
+</ul></li>
+</ul>
+</div>
+</div>
+
+<div class="rule-medium" style="padding-bottom: 1em;"><hr/></div>
+
+<!-- -ALIAS- -->
+
+<div class="macro-id-overline">
+<h3 id="alias" class="macro-id">Rename macros</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>ALIAS</b> <kbd class="macro-args">&lt;new name&gt; &lt;old name&gt;</kbd>
+</div>
+
+<p>
+The ALIAS macro may well be your best friend.  With it, you can
+change the name of a macro to anything you like (provided the new
+name is not already being used by mom; see the
+<a href="reserved.html#reserved">list of reserved words</a>).
+</p>
+
+<p>
+Groff has always been a bit intimidating for new users because
+its standard macro packages use very terse macro names.  Mom
+doesn&#8217;t like people to feel intimidated; she wants them
+to feel welcome.  Consequently, she tries for easy-to-grasp,
+self-explanatory macro names.  However, mom knows that people have
+their own ways of thinking, their own preferences, their own habits.
+Some of her macro names may not suit you; they might be too long,
+or aren&#8217;t what you automatically think of when you want to
+do a particular thing, or might conflict with habits you&#8217;ve
+developed over the years.
+</p>
+
+<p>
+If you don&#8217;t like one of mom&#8217;s macro names, say,
+PAGEWIDTH, change it, like this:
+<br/>
+<span class="pre-in-pp">
+  .ALIAS PW PAGEWIDTH
+         |      |
+    new--+      +--official
+    name             name
+</span>
+The first argument to ALIAS is the new name you want for a macro.
+The second is the &#8220;official&#8221; name by which the macro is
+normally invoked.  After ALIAS, either can be used.
+</p>
+
+<p>
+Note that in ALIAS, you do NOT include the period (dot) that
+precedes the macro when it&#8217;s a
+<a href="definitions.html#controllines">control line</a>.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="tip">Tip:</span>
+A particularly good candidate for ALIAS is the macro,
+<a href="typesetting.html#ps">PT_SIZE</a>.
+A more natural name for it (at least to old-school phototypesetters)
+would simply be PS, but PS conflicts with the <b>eqn</b> equation
+preprocessor and thus mom uses the longer form.  However, if
+you&#8217;re not using <b>eqn</b>, you can happily rename PT_SIZE to
+PS:
+<br/>
+<span class="pre-in-pp">
+  .ALIAS PS PT_SIZE
+</span>
+</p>
+</div>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+If you use ALIAS a lot, and always for the same things, consider
+creating an aliases file of the form
+<br/>
+<span class="pre-in-pp">
+  .ALIAS &lt;new name&gt; &lt;old name&gt;
+  .ALIAS &lt;new name&gt; &lt;old name&gt;
+  .ALIAS &lt;new name&gt; &lt;old name&gt;
+  ...etc
+</span>
+Put the file someplace convenient and source it (include it) at the
+beginning of your documents with the
+<a href="docprocessing.html#include">INCLUDE</a>
+macro.  Assuming that you&#8217;ve created an aliases file called
+<b>mom-aliases</b> in your home directory under a directory called
+<b>Mom</b>, you&#8217;d source it by placing
+<br/>
+<span class="pre-in-pp">
+  .INCLUDE /home/&lt;username&gt;/Mom/mom-aliases
+</span>
+at the top of your documents.
+</p>
+
+<p class="tip-bottom">
+If you share documents that make use of an alias file, remember that
+other people don&#8217;t have the file.  Paste the whole thing at
+the top of your documents, please.
+</p>
+</div>
+
+<div class="box-tip">
+<p class="tip">
+<span class="experts">Experts:</span>
+ALIAS is an alias of <kbd>.als</kbd>.  You can use either, or mix
+'n' match with impunity.
+</p>
+</div>
+
+<!-- -SILENT- --> 
+<div class="macro-id-overline">
+<h3 id="silent" class="macro-id">Hide input lines from output</h3>
+</div>
+
+<div class="box-macro-args">
+ Macro: <b>SILENT</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p class="alias" style="margin-bottom: 0;">
+<i>Alias:</i> <b>COMMENT</b>
+</p>
+
+<p>
+Sometimes, you want to &#8220;hide&#8221;
+<a href="definitions.html#inputline">input lines</a>
+from final output.  This is most likely to be the case when setting
+up string tabs (see the
+<a href="typesetting.html#string-tabs-tut">quickie tutorial on string tabs</a>
+for an example), but there are other places where you might want
+input lines to be invisible as well.  Any place you don&#8217;t want
+input lines to appear in the output, use the SILENT macro.
+</p>
+
+<p>
+SILENT is a toggle.  Invoking it without an argument turns it on;
+any argument turns it off.  E.g.,
+<br/>
+<span class="pre-in-pp">
+  .SILENT
+  A line of text
+  .SILENT OFF
+</span>
+The line &#8220;A line of text&#8221; will not appear in the
+output copy.
+</p>
+
+<p>
+SILENT is aliased as COMMENT.  If you want to insert non-printing
+comments into your documents, you may prefer this.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="tip">Tip:</span>
+SILENT does not automatically break an
+<a href="definitions.html#inputline">input line</a>
+(see
+<a href="typesetting.html#br">BR</a>)
+when you&#8217;re in one of the
+<a href="definitions.html#filled">fill modes</a>
+(<a href="typesetting.html#justify">JUSTIFY</a>
+or
+<a href="typesetting.html#quad">QUAD L | R | C | J</a>).
+The same applies to tabs
+(<a href="typesetting.html#tab-set">typesetting</a>
+or
+<a href="typesetting.html#st">string</a>)
+to which you&#8217;ve passed the J or QUAD argument.  You must
+insert <kbd>.BR</kbd> yourself, or risk a portion of your text
+disappearing into a black hole.
+</p>
+</div>
+
+<!-- -TRAP- -->
+
+<div class="macro-id-overline">
+<h3 id="trap" class="macro-id">Suspend/re-invoke traps</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>TRAP</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+Traps are vertical positions on the output page at which you or
+mom have instructed groff to start doing something automatically.
+Commonly, this is near the bottom of the page, where automatic
+behind-the-scenes processing is needed in order for one page to
+finish and another to start.
+</p>
+
+<p>
+Sometimes, traps get sprung when you don&#8217;t want them.  If this
+happens, surround just the offending macros and input lines with
+<br/>
+<span class="pre-in-pp">
+    .TRAP OFF
+    ...
+    .TRAP
+</span>
+TRAP is a toggle, therefore any argument turns it off (i.e. suspends
+the trap), and no argument turns it (back) on.
+</p>
+
+<!-- -SMARTQUOTES- -->
+
+<div class="macro-id-overline">
+<h3 id="smartquotes" class="macro-id">Convert typewriter doublequotes to proper doublequotes</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>SMARTQUOTES</b> <kbd class="macro-args">[&lt;off&gt;] [ ,, | &gt;&gt; | &lt;&lt; ]</kbd>
+</div>
+
+<span style="margin-left: .5em">or</span>
+
+<div class="box-macro-args">
+Macro: <b>SMARTQUOTES</b> <kbd class="macro-args">DA | DE | ES | FR | IT | NL | NO | PT | SV</kbd>
+</div>
+
+<p>
+If you invoke SMARTQUOTES without an argument, mom converts all
+instances of the inch-mark, (<kbd>"</kbd>), also called
+a doublequote, into the appropriate instances of true Anglo-American
+open-and close-doublequotes.  (See
+<a href="#sq-international">Internationalization</a>
+for how to get SMARTQUOTES to behave correctly for non-English
+quoting styles.)
+</p>
+
+<p>
+Typographically, there is a difference between the inch-mark and
+quotation marks&mdash;a BIG difference.  Sadly, typewriters and computer
+keyboards supply only one: the inch-mark.  While using inches for
+doublequotes is, and always has been, acceptable in typewriter-style
+copy, it has never been, and, God willing, never will be acceptable in
+typeset copy.  Failure to turn inches into quotes is the first thing
+a professional typesetter notices in documents prepared by amateurs.
+And you don&#8217;t want to look like an amateur, do you?
+</p>
+
+<h3 id="sq-international" class="docs">Internationalization</h3>
+<p>
+If you invoke SMARTQUOTES with one of the optional arguments
+(<kbd>,,</kbd> or <kbd>&gt;&gt;</kbd>
+or <kbd>&lt;&lt;</kbd>) you can use
+<kbd>&quot;</kbd> (i.e. the inch-mark/doublequotes key)
+as &#8220;cheap&#8221; open-and close-quotes when inputting text in
+a language other than English, and have mom convert them, on output,
+into the chosen open-and close-quote style.
+</p>
+
+<p>
+<kbd>,,</kbd> opens quotes with &#8220;lowered
+doublequotes&#8221; and closes them with &#8220;raised
+doublequotes&#8221;, as in this ascii approximation:
+<br/>
+<span class="pre-in-pp">
+  ,,Hilfe !``
+</span>
+
+<kbd>&gt;&gt;</kbd> opens quotes with guillemets
+pointing to the right, and closes them with guillemets pointing to
+the left, as in this ascii approximation:
+<br/>
+<span class="pre-in-pp">
+  &gt;&gt;Zurück !&lt;&lt;
+</span>
+<kbd>&lt;&lt;</kbd> opens quotes with guillemets
+pointing to the left, and closes them with guillemets pointing to
+the right, as in this ascii approximation:
+<br/>
+<span class="pre-in-pp">
+  &lt;&lt;Mais monsieur! Je ne suis pas ce genre de fille!&gt;&gt;
+</span>
+Please note: the above arguments to SMARTQUOTES are literal
+ASCII characters. <kbd>,,</kbd> is two commas;
+<kbd>&lt;&lt;</kbd> is two less-than signs;
+<kbd>&gt;&gt;</kbd> is two greater-than signs.
+</p>
+
+<p>
+Alternatively, you can pass SMARTQUOTES the two-letter, ISO 639
+abbreviation for the language you&#8217;re writing in, and mom will
+output the correct quotes.
+<br/>
+<span class="pre-in-pp">
+  .SMARTQUOTES DA     = Danish      &gt;&gt;text&lt;&lt;
+  .SMARTQUOTES DE     = German      ,,text``
+  .SMARTQUOTES ES     = Spanish     ``text´´
+  .SMARTQUOTES FR     = French      &lt;&lt; text &gt;&gt;
+  .SMARTQUOTES IT     = Italian     &lt;&lt; text &gt;&gt;
+  .SMARTQUOTES NL     = Dutch       ´´text´´
+  .SMARTQUOTES NO     = Norwegian   &lt;&lt;text&gt;&gt;
+  .SMARTQUOTES PT     = Portuguese  &lt;&lt;text&gt;&gt;
+  .SMARTQUOTES SV     = Swedish     &gt;&gt;text&gt;&gt;
+</span>
+</p>
+
+<p>
+Turn SMARTQUOTES off by passing it any argument not in the argument
+list (e.g. OFF, QUIT, X, etc.)
+</p>
+
+<p>
+If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+with
+<a href="docprocessing.html#printstyle">PRINTSTYLE TYPESET</a>,
+SMARTQUOTES is on by default (in the Anglo-American style); with
+<a href="docprocessing.html#printstyle">PRINTSTYLE TYPEWRITE</a>,
+it&#8217;s off by default (and should probably stay that way).
+</p>
+
+<p>
+Finally, if you&#8217;re fussy about the kerning of quote marks in
+relation to the text they surround, or have special quoting needs,
+you have to enter quote marks by hand using groff&#8217;s native
+<a href="definitions.html#inlines">inline escapes</a>
+for special characters (see <kbd>man groff-char</kbd>
+for a complete list of special characters).  Entering quote marks
+this way allows you to use mom&#8217;s
+<a href="inlines.html#inline-kerning-mom">inline kerning escapes</a>
+to fine-tune the look of quotes.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+SMARTQUOTES does not work on single quotes, which most people
+input with the apostrophe (found at the right-hand end of the
+&#8220;home row&#8221; on a QWERTY keyboard).  Groff will interpret
+all instances of the apostrophe as an apostrophe, making the symbol
+useless as an open-single-quote.  For open single quotes, input
+the backtick character typically found under the tilde on most
+keyboards.  (Pour nous autres, &#8220;backtick&#8221; veut dire
+l&#8217;accent grave.)  Here&#8217;s an example of correct input
+copy with single quotes:
+<br/>
+<span class="pre-in-pp">
+  "But she said, `I don&#8217;t want to!'"    
+</span>
+</p>
+
+<p class="tip-bottom" style="margin-top: -1em;">
+<span class="additional-note">Additional note:</span>
+Whether or not you have SMARTQUOTES turned on, get into the habit of
+entering the foot-and inch-marks, when you need them, with the
+<a href="definitions.html#inlines">inline escapes</a>
+<kbd>\*[FOOT]</kbd> and
+<kbd>\*[INCH]</kbd>, instead of
+<kbd>'</kbd> and <kbd>"</kbd>.
+</p>
+</div>
+
+<!-- -CAPS- -->
+
+<div class="macro-id-overline">
+<h3 id="caps" class="macro-id">Convert to upper case</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>CAPS</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+CAPS converts all lower case letters to upper case.
+Primarily, it&#8217;s a support macro used by the
+<a href="docprocessing.html#docprocessing">document processing macros</a>,
+but you may find it helpful on occasion. CAPS is a toggle, therefore
+no argument turns it on, any argument (OFF, QUIT, X, etc.) turns
+it off.
+<br/>
+<span class="pre-in-pp">
+  .CAPS
+  All work and no play makes Jack a dull boy.
+  .CAPS OFF
+</span>
+
+produces, on output
+<br/>
+<span class="pre-in-pp">
+  ALL WORK AND NO PLAY MAKES JACK A DULL BOY.
+</span>
+If you wish to capitalise a section of type inline, use the
+<a href="definitions.html#inlines">inline escapes</a>,
+<a href="inlines.html#uc-lc"><kbd>\*[UC]...\*[LC]</kbd></a>
+like this:
+<br/>
+<span class="pre-in-pp">
+  All work \*[UC]and\*[LC] no play makes Jack a dull boy.
+</span>
+
+The above produces, on output
+<br/>
+<span class="pre-in-pp">
+  All work AND no play makes Jack a dull boy.
+</span>
+</p>
+
+<!-- -STRING- -->
+
+<div class="macro-id-overline">
+<h3 id="string" class="macro-id">User-defined strings</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>STRING</b> <kbd class="macro-args">&lt;name&gt; &lt;what you want in the string&gt;</kbd>
+</div>
+
+<p>
+You may find sometimes that you have to type out portions of text
+repeatedly.  If you&#8217;d like not to wear out your fingers, you can
+define a string that, whenever you call it by name, outputs whatever
+you put into it.
+</p>
+
+<p>
+For example, say you&#8217;re creating a document that repeatedly uses
+the phrase &#8220;the Montreal/Windsor corridor&#8221;.  Instead
+of typing all that out every time, you could define a string, like
+this:
+<br/>
+<span class="pre-in-pp">
+  .STRING mw the Montreal/Windsor corridor
+</span>
+Once a string is defined, you can call it any time with the
+<a href="definitions.html#inlines">inline escape</a>
+<kbd>\*[&lt;stringname&gt;]</kbd>.  Using the example
+string above
+<br/>
+<span class="pre-in-pp">
+  The schedule for trains along \*[mw]:
+</span>
+produces, on output
+<br/>
+<span class="pre-in-pp">
+  The schedule for trains along the Montreal/Windsor corridor:
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Be very careful not to put any spaces at the ends of strings
+you&#8217;re defining, unless you want them.  Everything after
+the name argument you pass to STRING goes into the string,
+including trailing spaces.  It&#8217;s a good idea to get into the
+habit of using groff&#8217;s native commenting mechanism, <kbd
+class="bold">\"</kbd>, immediately following any string definition
+in order to avoid spaces you can&#8217;t see, like this
+<br/>
+<span class="pre-in-pp">
+  .STRING mw the Montreal/Windsor corridor\"
+</span>
+</p>
+</div>
+
+<div class="box-tip">
+<p class="tip">
+<span class="experts">Experts:</span>
+STRING is an alias for
+<b>ds</b>.  You can use either, or mix 'n' match with impunity.
+</p>
+</div>
+
+<!-- -ESC_CHAR- -->
+
+<div class="macro-id-overline">
+<h3 id="esc-char" class="macro-id">Change the escape character</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>ESC_CHAR</b> <kbd class="macro-args">&lt;new character&gt; | &lt;anything&gt;</kbd>
+</div>
+
+<p>
+Groff&#8217;s and mom&#8217;s default escape character is
+the backslash.  Sometimes, you may want to include a literal
+backslash in your document.  There are two ways to accomplish
+this.  One is simply to double the backslash character (<kbd
+class="bold">\\</kbd>), which is convenient if you don&#8217;t have
+a lot of backslashes to input.  If you need to input a whole batch
+of backslashes (say, when including code snippets in your document),
+you can use ESC_CHAR to make the change permanent (until you decide
+to restore the escape character to its default, the backslash).
+</p>
+
+<p>
+ESC_CHAR with a single character argument changes the escape
+character to whatever the argument is.  ESC_CHAR with no argument
+restores the escape character to the backslash.
+</p>
+
+
+<div class="box-tip">
+<p class="tip">
+<span class="experts">Experts:</span>
+ESC_CHAR is an alias of <kbd>.ec</kbd>.  Mix 'n' match
+the two with impunity.
+</p>
+</div>
+
+<!-- -SIZESPECS- -->
+
+<div class="macro-id-overline">
+<h3 id="sizespecs" class="macro-id">Get cap-height, x-height and descender depth of a font</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>SIZESPECS</b>
+</div>
+
+<p>
+Whenever you need to get the
+<a href="definitions.html#capheight">cap-height</a>,
+<a href="definitions.html#xheight">x-height</a>
+or
+<a href="definitions.html#descender">descender</a>
+depth of type at the current point size, invoke <kbd
+class="bold">.SIZESPECS</kbd>, which takes no argument.
+The dimensions are stored in the string registers
+<b>\*[$CAP_HEIGHT]</b>, <b>\*[$X_HEIGHT]</b> and
+<b>\*[$DESCENDER]</b>, respectively, in
+<a href="definitions.html#units">machine units</a>
+to which the
+<a href="definitions.html#unitofmeasure">unit of measure</a>,
+<b>u</b>, is already appended.
+</p>
+
+<p>
+Thus, if you wanted to advance 2 inches from your current position
+on the page plus the cap-height of the current point size of type
+<br/>
+<span class="pre-in-pp">
+  .PT_SIZE &lt;n&gt;
+  .SIZESPECS
+  .ALD 2i+\*[$CAP_HEIGHT]
+</span>
+would do the trick.
+</p>
+
+<!-- -UNDERSCORE- -->
+
+<div class="macro-id-overline">
+<h3 id="underscore" class="macro-id">Single underscore</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>UNDERSCORE</b> <kbd class="macro-args">[ &lt;distance below baseline&gt; ] &quot;&lt;string&gt;&quot;</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Optional argument requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+By default, UNDERSCORE places an underscore 2 points beneath the
+required
+<a href="definitions.html#stringargument">string argument</a>.
+The string must be enclosed in double-quotes, like this:
+<br/>
+<span class="pre-in-pp">
+  .UNDERSCORE "Unmonitored monopolies breed high prices and poor products."&nbsp;
+</span>
+If you wish to change the distance of the rule from the baseline,
+use the optional argument
+<kbd>&lt;distance&nbsp;below&nbsp;baseline&gt;</kbd>
+(with a unit of measure).
+<br/>
+<span class="pre-in-pp">
+  .UNDERSCORE 3p "Unmonitored monopolies breed high prices and poor products."&nbsp;
+</span>
+The above places upper edge of the underscore 3 points below the
+<a href="definitions.html#baseline">baseline</a>.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+UNDERSCORE does not work across line breaks in output copy, which is
+to say that you can&#8217;t underscore a multi-line passage simply
+by putting the text of the whole thing in the string you pass to
+UNDERSCORE.  If you need to several lines of type, use
+<a href="#underline">UNDERLINE</a>.
+</p>
+</div>
+
+<h3 id="underscore-weight" class="docs">Controlling the weight of underscores</h3>
+<p>
+The weight (thickness) of underscores may be controlled with the
+macro, UNDERSCORE_WEIGHT.  Thus, if you want underscores with a
+weight of 1-1/2 points, you&#8217;d invoke:
+<br/>
+<span class="pre-in-pp">
+  .UNDERSCORE_WEIGHT 1.5
+</span>
+prior to invoking <kbd>.UNDERSCORE</kbd>.  Every
+subsequent instance of <kbd>.UNDERSCORE</kbd> will use
+this weight.
+</p>
+
+<p>
+Mom&#8217;s default underscore weight is 1/2 point.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+UNDERSCORE_WEIGHT also sets the weight of
+<a href="#UNDERSCORE2">double underscores.</a>
+</p>
+</div>
+
+<h3 id="underscore-color" class="docs">Colorizing underscored text</h3>
+<p>
+If you want underscored text to be in a different colour from the
+text around it, use the
+<a href="color.html#color">COLOR</a>
+macro, rather than the
+<a href="color.html#color-inline">inline escape for changing color</a>.
+In other words, assuming your prevailing text color is black and
+you want underscored text in red
+<br/>
+<span class="pre-in-pp">
+  .COLOR red
+  .UNDERSCORE "text to underscore"
+  .COLOR black
+</span>
+rather than
+<br/>
+<span class="pre-in-pp">
+  .UNDERSCORE "\*[red]text to underscore\*[black]"
+</span>
+The latter will render the text in red, and the underscore in black.
+You can use this to create truly rainbow effects if you want, e.g.
+text in red, underscore in blue, and prevailing type in black:
+<br/>
+<span class="pre-in-pp">
+  .UNDERSCORE "\*[red]text to underscore\*[blue]"
+  .COLOR black
+</span>
+</p>
+
+<!-- -UNDERSCORE2- -->
+
+<div class="macro-id-overline">
+<h3 id="underscore2" class="macro-id">Double underscore</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>UNDERSCORE2</b> <kbd class="macro-args">[ &lt;distance below baseline&gt; [ &lt;distance between rules&gt; ] ] &quot;&lt;string&gt;&quot;</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Optional arguments require a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+By default, UNDERSCORE2 places a double underscore 2 points beneath
+the required
+<a href="definitions.html#stringargument">string argument</a>.
+The string must be enclosed in double-quotes, like this:
+<br/>
+<span class="pre-in-pp">
+  .UNDERSCORE2 "Unmonitored monopolies breed high prices and poor products."
+</span>
+The default distance between the two rules is 2 points, measured
+from the bottom edge of the upper rule to the top edge of the lower
+one.
+</p>
+
+<p>
+If you wish to change the distance of the double underscore from the
+<a href="definitions.html#baseline">baseline</a>,
+use the optional argument
+<kbd>&lt;distance&nbsp;below&nbsp;baseline&gt;</kbd>
+(with a unit of measure), e.g.,
+<br/>
+<span class="pre-in-pp">
+  .UNDERSCORE2 3p "Unmonitored monopolies breed high prices and poor products."
+</span>
+which places the upper edge of the first rule of the double
+underscore 3 points below the baseline.
+</p>
+
+<p>
+If you wish to change the distance between the two rules as well,
+use the second optional argument
+<kbd>&lt;distance&nbsp;between&nbsp;rules&gt;</kbd>
+(with a unit of measure).  Be aware that you must give a value for
+the first optional argument if you want to use the second.  The
+distance between the two rules is measured from the bottom edge of
+the upper rule to the top edge of the lower one.
+</p>
+
+<p>
+The weight (thickness) of double underscores may be controlled with
+the macro
+<a href="#underscore-weight">UNDERSCORE_WEIGHT</a>
+(q.v).
+</p>
+
+<!-- -UNDERLINE- --> 
+<div class="macro-id-overline">
+<h3 id="underline" class="macro-id">Underline</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>UNDERLINE</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+The distinction between underscoring and underlining is that
+underscoring is suitable for occasional effects (a word here, a word
+there), whereas underlining underlines whole passages of type.
+Furthermore, you cannot colorize underlining, and there&#8217;s a
+special macro,
+<a href="#underline-specs">UNDERLINE_SPECS</a>,
+to control the weight and distance from the baseline of the
+underline.
+</p>
+
+<p>
+UNDERLINE is a toggle macro, therefore you invoke it by itself (i.e.
+with no argument) to initiate underlining, and with any argument
+(<kbd>OFF, QUIT, X,</kbd> etc) to turn it off.
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span>
+Underlining may also be turned on and off
+<a href="definitions.html#inlines">inline</a>
+with the escapes
+<kbd><a href="#ul">\*[UL]...\*[ULX]</a></kbd>.
+</p>
+
+<p class="tip-bottom">
+<span class="additional-note">Additional note:</span>
+Neither <kbd>.UNDERLINE</kbd> nor <kbd>\*[UL]</kbd> persist past the
+current document element tag.  For example, if you turn underlining
+on in a paragraph
+(<kbd><a href="docelement.html#pp">.PP</a></kbd>),
+your next paragraph will not be underlined (nor your next head,
+subhead, etc), regardless of whether you explicitly turn underlining
+off.
+</p>
+</div>
+
+<h4 id="underline-specs" class="docs">UNDERLINE_SPECS</h4>
+
+<p>
+The weight of underlining and the distance from the baseline is
+set with
+<br/>
+<span class="pre-in-pp">
+  .UNDERLINE_SPECS &lt;weight&gt; &lt;distance&gt;
+</span>
+The <kbd>&lt;weight&gt;</kbd> argument can be expressed in any
+<a href="definitions.html#unitofmeasure">unit of measure</a>
+you like, but points is the most usual.  Mom&#8217;s default is 1/2 point
+(.5p).  The same holds for the <kbd>&lt;distance&gt;</kbd> argument;
+mom&#8217;s default is 1-1/4 points (1.25p).
+</p>
+
+<!-- -UL- -->
+
+<h4 id="ul" class="docs">INLINE ESCAPE FOR UNDERLINING</h4>
+
+<p>
+The macro pair,
+<kbd><a href="#underline">.UNDERLINE</a></kbd> /
+<kbd>.UNDERLINE&nbsp;OFF</kbd>, and the inline escapes,
+<kbd>\*[UL]</kbd> / <kbd>\*[ULX]</kbd>, are functionally identical,
+hence, in
+<a href="definitions.html#filled">fill</a>
+modes
+<br/>
+<span class="pre-in-pp">
+  Which should I heed?
+  .UNDERLINE
+  Just do it
+  .UNDERLINE OFF
+  or
+  .UNDERLINE
+  just say no?
+  .UNDERLINE OFF
+</span>
+produces the same result as
+<br/>
+<span class="pre-in-pp">
+  Which should I heed? \*[UL]Just do it\*[ULX] or \*[UL]just say no?\*[ULX]
+</span>
+</p>
+
+<!-- -PAD- -->
+
+<div class="macro-id-overline">
+<h3 id="pad" class="macro-id">Insert space into lines</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>PAD</b> <kbd class="macro-args">&quot;&lt;string with pad markers inserted&gt;&quot; [ NOBREAK ]</kbd>
+</div>
+
+<p>
+With PAD, you can insert proportional amounts of whitespace into a
+line.  The optional <kbd id="nobreak" class="bold">NOBREAK</kbd>
+argument tells mom not to advance on the page after the PAD macro
+has been invoked.
+</p>
+
+<p>
+PAD calculates the difference between the length of text on the line
+and the distance remaining to its end, then inserts the difference
+(as whitespace) at the place(s) you specify.
+</p>
+
+<p>
+Take, for example, the following relatively common typesetting
+situation, found at the bottom of legal agreements:
+<br/>
+<span class="pre">
+  Date             Signature                               |
+</span>
+</p>
+
+<p>
+The person signing the agreement is supposed to fill in the date
+as well as a signature.  Space needs to be left for both, but the
+exact amount is neither known, nor important.  All that matters is
+that there be a little space after Date, and rather more space after
+Signature.  (In the above, <kbd>|</kbd> represents the
+end of the line at the prevailing line length.)
+</p>
+
+<p>
+The
+<a href="goodies.html#pad-marker">pad marker</a>
+(see below) is <kbd>#</kbd> (the pound or number sign
+on your keyboard) and can be used multiple times in a line.  With
+that in mind, here&#8217;s how you&#8217;d input the Date/Signature line
+(assuming a length of 30 picas):
+<br/>
+<span class="pre">
+  .LL 30P
+  .PAD "Date#Signature###"
+</span>
+</p>
+
+<p>
+When the line is output, the space remaining on the line, after
+&quot;Date&quot; and &quot;Signature&quot; have been taken into
+account, is split into four (because there are four # signs).  One
+quarter of the space is inserted between Date and Signature, the
+remainder is inserted after Signature.
+</p>
+
+<div class="examples-container">
+<h3 id="pad-example" class="docs notes">Example of PAD usage</h3>
+<p style="margin-top: .5em;">
+One rarely wants merely to insert space in a line; one usually wants
+to fill it with something, hence PAD is particularly useful in
+conjunction with
+<a href="typesetting.html#string-tabs">string tabs</a>.
+The following uses the Date/Signature example, above, but adds
+rules into the whitespace through the use of string tabs and
+mom&#8217;s
+<a href="definitions.html#inlines">inline escape</a>
+<kbd><a href="inlines.html#inline-rule-mom">\*[RULE]</a></kbd>.
+(Instead of <kbd>\*[RULE]</kbd>, groff&#8217;s line
+drawing function,
+<kbd><a href="inlines.html#inline-linedrawing-groff">\l'&lt;distance&gt;'</a></kbd>
+could be used.)
+<br/>
+<span class="pre-in-pp">
+  .LL 30P
+  .PAD "Date \*[ST1]#\*[ST1X] Signature \*[ST2]###\*[ST2X]" NOBREAK
+  .ST 1 J
+  .ST 2 J
+  .TAB 1
+  \*[RULE]
+  .TN
+  \*[RULE]
+  .TQ
+</span>
+If you&#8217;re not a typesetter, and if you&#8217;re new to groff,
+the example probably looks like gibberish.  My apologies.  However,
+remember that typesetting is a craft, and without having studied the
+craft, it takes a while to grasp its concepts.
+</p>
+
+<p>
+Basically, what the example does is:
+</p>
+<ol style="margin-top: -.5em; margin-bottom: -.5em;">
+  <li>Pads the Date/Signature line with a shorter space for Date
+     (<kbd>#</kbd>) and a longer space for Signature
+     (<kbd>###</kbd>), encloses the padded space with string tabs
+     markers, and outputs the line without advancing on the page.
+  </li>
+  <li>Sets the quad for the two string tabs (in this instance, justified).
+  </li>
+  <li>Calls the first string tab and draws a rule to its full
+      length.
+  </li>
+  <li>Calls the second tab with
+      <a href="typesetting.html#tn">TN</a>
+      (which moves to tab 2 and stays on the same baseline)
+      then draws a rule to the full length of string tab 2.
+  </li>
+</ol>
+
+<p>
+Often, when setting up string tabs this way, you don&#8217;t want the
+padded line to print immediately.  To accomplish this, use
+<kbd><a href="#silent">SILENT</a></kbd>.
+See the
+<a href="typesetting.html#string-tabs-tut">quickie tutorial on string tabs</a>
+for an example.
+</p>
+</div>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span>
+Because the pound sign
+(<kbd>#</kbd>) is used as the pad marker, you
+can&#8217;t use it as a literal part of the pad string.  If you need
+the sign to appear in the text of a padded line, change the pad
+marker with
+<kbd><a href="#pad-marker">PAD_MARKER</a></kbd>.
+Also, be aware that <kbd>#</kbd> as a pad marker
+only applies within the PAD macro; at all other times it prints
+literally, just as you&#8217;d expect.
+</p>
+
+<p class="tip-bottom">
+Another important consideration when using PAD is that because the
+string must be enclosed in double-quotes, you can&#8217;t use the
+double-quote (<kbd>"</kbd>) as part of the string.  The
+way to circumvent this is to use the groff
+<a href="definitions.html#inlines">inline escapes</a>
+<kbd>\(lq</kbd> and <kbd>\(rq</kbd>
+(leftquote and rightquote respectively) whenever double-quotes are
+required in the string passed to PAD.
+</p>
+</div>
+
+<!-- -PAD_MARKER- -->
+
+<div class="macro-id-overline">
+<h3 id="pad-marker" class="macro-id">Change/set the marker used with PAD</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>PAD_MARKER</b> <kbd class="macro-args">"&lt;character to use as the pad marker&gt;</kbd>
+</div>
+
+<p>
+If you need to change mom&#8217;s default pad marker (<kbd
+class="bold">#</kbd>), either because you want a literal # in
+the padded line, or simply because you want to use another character
+instead, use PAD_MARKER, whose argument is the new pad marker
+character you want.
+<br/>
+<span class="pre-in-pp">
+  .PAD_MARKER @
+</span>
+changes the pad marker to <kbd>@</kbd>.
+</p>
+
+<p>
+Once you&#8217;ve changed the pad marker, the new marker remains in effect
+for every instance of
+<a href="#pad">PAD</a>
+until you change it again (say, back to the pound sign).
+</p>
+
+<!-- -\*[LEADER]- -->
+
+<div class="macro-id-overline">
+<h3 id="leader" class="macro-id">Inline escape to add leaders to a line</h3>
+</div>
+
+<div class="box-macro-args">
+Inline: <b>\*[LEADER]</b>
+</div>
+
+<p>
+Whenever you want to fill a line or tab with
+<a href="definitions.html#leader">leaders</a>,
+use the
+<a href="definitions.html#inlines">inline escape</a>
+<kbd>\*[LEADER]</kbd>.  The remainder of the line or
+tab will be filled with the leader character. Mom&#8217;s default
+leader character is a period (dot), but you can change it to any
+character you like with
+<kbd><a href="#leader-character">LEADER_CHARACTER</a></kbd>.
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span>
+<kbd>\*[LEADER]</kbd> fills lines or tabs right to
+their end.  You cannot insert leaders into a line or tab and have
+text following the leader on the same line or in the same tab.
+Should you wish to achieve such an effect typographically, create
+tabs for each element of the line and fill them appropriately with
+the text and leaders you need.
+<a href="typesetting.html#string-tabs">String tabs</a>
+are perfect for this.  An example follows.
+<br/>
+<span class="pre">
+  .LL 30P
+  .PAD "Date\*[ST1]#\*[ST1X]Signature\*[ST2]###\*[ST2X]"
+  .EL
+  .ST 1 J
+  .ST 2 J
+  .TAB 1
+  \*[LEADER]
+  .TN
+  \*[LEADER]
+  .TQ
+</span>
+</p>
+
+<p class="tip-bottom">
+The PAD line sets the words Date and Signature, and marks string
+tabs around the pad space inserted in the line.  The string tabs are
+then &quot;set&quot;, called, and filled with leaders.  The result
+looks like this:
+<br/>
+<span class="pre" style="margin-bottom: -1em;">
+  Date.............Signature.....................................
+</span>
+</p>
+</div>
+
+<!-- -LEADER_CHARACTER- -->
+
+<div class="macro-id-overline">
+<h3 id="leader-character" class="macro-id">Change/set the leader character</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>LEADER_CHARACTER</b> <kbd class="macro-args">&lt;character&gt;</kbd>
+</div>
+
+<p>
+LEADER_CHARACTER takes one argument: a single character you would
+like to be used for
+<a href="definitions.html#leader">leaders</a>.
+(See
+<kbd><a href="#leader">\*[LEADER]</a></kbd>
+for an explanation of how to fill lines with leaders.)
+</p>
+
+<p>
+For example, to change the leader character from mom&#8217;s
+default (a period) to the underscore character, enter
+<br/>
+<span class="pre-in-pp">
+  .LEADER_CHARACTER _
+</span>
+</p>
+
+<!-- -DROPCAP- -->
+
+<div class="macro-id-overline">
+<h3 id="dropcap" class="macro-id">Drop caps</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>DROPCAP</b> <kbd class="macro-args">&lt;dropcap letter&gt; &lt;number of lines to drop&gt; [ COND &lt;percentage&gt; | EXT &lt;percentage&gt; ]</kbd>
+</div>
+
+<p>
+The first two arguments to DROPCAP are the letter you want to be the
+<a href="definitions.html#dropcap">drop cap</a>
+and the number of lines you want it to drop.  By default, mom uses
+the current family and font for the drop cap.
+</p>
+
+<p>
+The optional argument (<kbd>COND</kbd> or <kbd>EXT</kbd>) indicates
+that you want the drop cap condensed (narrower) or extended (wider).
+If you use <kbd class="bold">COND</kbd> or <kbd>EXT</kbd>, you must
+follow the argument with the percentage of the letter&#8217;s normal
+width you want it condensed or extended.  No percent sign
+(<kbd>%</kbd>) is required.
+</p>
+
+<p>
+Mom will do her very best to get the drop cap to line up with the
+first line of text indented beside it, then set the correct number
+of indented lines, and restore your left margin when the number of
+drop cap lines has been reached.
+</p>
+
+<p>
+Beginning a paragraph with a drop cap &#8220;T&#8221; looks like this:
+<br/>
+<span class="pre">
+  .DROPCAP T 3 COND 90
+  he thousand injuries of Fortunato I had borne as best I
+  could, but when he ventured upon insult, I vowed revenge.
+  You who so well know the nature of my soul will not suppose,
+  however, that I gave utterance to a threat...
+</span>
+</p>
+
+<p>
+The drop cap, slightly condensed but in the current family and font,
+will be three lines tall, with whatever text fills those three
+lines indented to the right of the letter.  The remainder of the
+paragraph&#8217;s text will revert to the left margin.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+When using the
+<a href="docprocessing.html#docprocessing">document processing macro</a>
+<a href="docelement.html#pp">PP</a>,
+DROPCAP only works
+</p>
+<ul style="margin-top: -1em; margin-bottom: 0;">
+  <li>with initial paragraphs (i.e. at the start of the document,
+      or after
+      <a href="docelement.html#head">HEAD</a>),</li>
+  <li>when <kbd>.DROPCAP</kbd> comes immediately after <kbd>.PP</kbd>,</li>
+  <li>the
+      <a href="docprocessing.html#printstyle">PRINTSTYLE</a>
+      is TYPESET.</li>
+</ul>
+<p class="tip-bottom">
+If these conditions aren&#8217;t met, DROPCAP is silently ignored.
+</p>
+</div>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">Warning:</span>
+DROPCAP puts a bit of a strain on resource-challenged systems.  If
+you have such a system and use drop caps extensively in a document,
+be prepared for a wait while mom does her thing.
+</p>
+</div>
+
+<h3 id="dropcap-support" class="docs control-macros-header">Support macros for DROPCAP</h3>
+<p>
+Drop caps are the bane of most typesetters&#8217; existence.
+It&#8217;s very difficult to get the size of the drop cap right
+for the number of drop lines, especially if the drop cap is in a
+different family from the prevailing family of running text.  Not
+only that, but there&#8217;s the gutter around the drop cap to take
+into account, plus the fact that the letter may be too wide or too
+narrow to look anything but odd or misplaced.
+</p>
+
+<p>
+Mom solves the last of these problems with the <kbd>COND</kbd> and
+<kbd>EXT</kbd> arguments.  The rest she solves with macros that
+change the default behaviour of DROPCAP, namely
+</p>
+<ul class="no-enumerator" style="margin-top: -.5em; margin-left: -.5em;">
+  <li><a href="#dropcap-family">DROPCAP_FAMILY</a></li>
+  <li><a href="#dropcap-font">DROPCAP_FONT</a></li>
+  <li><a href="#dropcap-color">DROPCAP_COLOR</a></li>
+  <li><a href="#dropcap-adjust">DROPCAP_ADJUST</a></li>
+  <li><a href="#dropcap-gutter">DROPCAP_GUTTER</a></li>
+</ul>
+
+<p style="margin-top: -.5em;">
+These macros must, of course, come before you invoke DROPCAP.
+</p>
+
+<h3 id="dropcap-family" class="control-macro">&bull;&nbsp;DROPCAP_FAMILY</h3>
+<p style="margin-left: .66em;">
+Set the drop cap family by giving DROPCAP_FAMILY the name of the
+family you want, e.g.
+<br/>
+<span class="pre-in-pp">
+  .DROPCAP_FAMILY H
+</span>
+which will set the family to Helvetica for the drop cap only.
+</p>
+
+<h3 id="dropcap-font" class="control-macro">&bull;&nbsp;DROPCAP_FONT</h3>
+<p style="margin-left: .66em;">
+Set the drop cap font by giving DROPCAP_FONT the name of the font
+you want, e.g.
+<br/>
+<span class="pre-in-pp">
+  .DROPCAP_FONT I
+</span>
+which will set the font to italic for the drop cap only.
+</p>
+
+<h3 id="dropcap-adjust" class="control-macro">&bull;&nbsp;DROPCAP_ADJUST</h3>
+<p style="margin-left: .66em;">
+If the size mom calculates for the drop cap isn&#8217;t precisely
+what you want, you can increase or decrease it with DROPCAP_ADJUST,
+like this: e.g.
+<br/>
+<span class="pre-in-pp">
+  .DROPCAP_ADJUST +1
+</span>
+or
+<br/>
+<span class="pre">
+  .DROPCAP_ADJUST -.75
+</span>
+</p>
+
+<p style="margin-left: .66em;">
+DROPCAP_ADJUST only understands
+<a href="definitions.html#picaspoints">points</a>,
+therefore do not append any
+<a href="definitions.html#unitofmeasure">unit of measure</a>
+to the argument.  And always be sure to prepend the plus or
+minus sign, depending on whether you want the drop cap larger or
+smaller.
+</p>
+
+<h3 id="dropcap-color" class="control-macro">&bull;&nbsp;DROPCAP_COLOR</h3>
+<p style="margin-left: .66em;">
+If you&#8217;d like your drop cap colourized, simply invoke
+<kbd>.DROPCAP_COLOR&nbsp;&lt;color&gt;</kbd> with the name of a
+colour you&#8217;ve already created (&#8220;initialized&#8221;) with
+<a href="color.html#newcolor">NEWCOLOR</a>
+or
+<a href="color.html#xcolor">XCOLOR</a>.
+Only the drop cap will be colourized; all other text will remain at
+the current colour default (usually black).
+</p>
+
+<h3 id="dropcap-gutter" class="control-macro">&bull;&nbsp;DROPCAP_GUTTER</h3>
+<p style="margin-left: .66em;">
+By default, mom puts three points of space between the drop cap
+and the text indented beside it.  If you want another value, use
+DROPCAP_GUTTER (with a unit of measure), like this:
+<br/>
+<span class="pre-in-pp">
+  .DROPCAP_GUTTER 6p
+</span>
+</p>
+
+<!-- -\*[SUP]- -->
+
+<div class="macro-id-overline">
+<h3 id="sup" class="macro-id">Superscript</h3>
+</div>
+
+<div class="box-macro-args">
+Inlines: <kbd>\*[SUP]...\*[SUPX]</kbd>
+</div>
+
+<p>
+Superscripts are accomplished
+<a href="definitions.html#inlines">inline</a>.
+Whenever you need one, typically for numerals, all you need to do is
+surround the superscript with the inlines above. <kbd>\*[SUP]</kbd>
+begins superscripting; <kbd>\*[SUPX]</kbd> turns it off.
+</p>
+
+<p id="cond-or-ext-sup">
+If your running type is
+<a href="typesetting.html#cond-inline">pseudo-condensed</a>
+or
+<a href="typesetting.html#ext-inline">pseudo-extended</a>
+and you want your superscripts to be equivalently pseudo-condensed
+or -extended, use <kbd>\*[CONDSUP]...\*[CONDSUPX]</kbd> or
+<kbd>\*[EXTSUP]...\*[EXTSUPX]</kbd>.
+</p>
+
+<p>
+The superscript inlines are primarily used by the
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+for automatic generation of numbered footnotes.  However, you may
+find them useful for other purposes.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Mom does a pretty fine job of making superscripts look good in any
+font and at any size.  If you&#8217;re fussy, though (and I am),
+about precise vertical placement, kerning, weight, size, and so on,
+you may want to roll your own solution.  And sorry, there&#8217;s
+no mom equivalent for subscripts.  I'm neither a mathematician
+nor a chemist, so I don&#8217;t need them.  Of course, anyone who
+wishes to contribute a subscript routine to mom will receive
+blessings not only in this lifetime, but in all lifetimes to come.
+</p>
+</div>
+
+<h3 id="sup-raise" class="docs">SUPERSCRIPT RAISE AMOUNT</h3>
+<p>
+By default, mom raises superscripts 1/3 of an
+<a href="definitions.html#ems">em</a>
+above the baseline.  If you&#8217;re not happy with this default,
+you can change it by invoking SUPERSCRIPT_RAISE_AMOUNT with the
+amount you want them raised.  A
+<a href="definitions.html#unitofmeasure">unit of measure</a>
+must be appended directly to the amount.  Thus, you want
+superscripts raised by 3
+<a href="definitions.html#picaspoints">points</a>
+instead of 1/3 em, you&#8217;d do
+<br/>
+<span class="pre-in-pp">
+  .SUPERSCRIPT_RAISE_AMOUNT 3p
+</span>
+and all subsequent superscripts would be raised by 3 points.
+</p>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 33%; text-align: right;"><a href="inlines.html#top">Next: Inline escapes</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

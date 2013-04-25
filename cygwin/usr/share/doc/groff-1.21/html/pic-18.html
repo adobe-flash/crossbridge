@@ -1,0 +1,107 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-18.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-17.html">prev</a> | <a href="pic-19.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>18. Interface to TeX
+<a name="18. Interface to TeX"></a>
+</h2>
+
+
+<p style="margin-top: 1em"><font color="#000000">TeX mode
+is enabled by the <b>&minus;t</b> option. In TeX mode, pic
+defines a vbox called <b>\graph</b> for each picture; the
+name can be changed with the pseudo-variable <b>figname</b>
+(which is actually a specially parsed command). You must
+yourself print that vbox using, for example, the
+command</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><tt>\centerline{\box\graph}</tt></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Actually,
+since the vbox has a height of zero (it is defined with
+\vtop) this produces slightly more vertical space above the
+picture than below it;</font></p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><font color="#000000"><tt>\centerline{\raise
+1em\box\graph}</tt></font></p>
+
+<p style="margin-top: 1em"><font color="#000000">would
+avoid this.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">To make
+the vbox having a positive height and a depth of zero (as
+used e.g. by LaTeX&rsquo;s <tt>graphics.sty</tt>), define
+the following macro in your document:</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">\def\gpicbox#1{%
+  \vbox{\unvbox\csname #1\endcsname\kern 0pt}}</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">Now you
+can simply say <b>\gpicbox{graph}</b> instead of
+\box\graph.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">You must
+use a TeX driver that supports the <b>tpic</b> specials,
+version&nbsp;2.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Lines
+beginning with <b>\</b> are passed through transparently; a
+<b>%</b> is added to the end of the line to avoid unwanted
+spaces. You can safely use this feature to change fonts or
+to change the value of <b>\baselineskip</b>. Anything else
+may well produce undesirable results; use at your own risk.
+Lines beginning with a period are not given any special
+treatment.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The TeX
+mode of <i>pic</i>(1) does <i>not</i> translate <b>troff</b>
+font and size changes included in text strings!</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Here an
+example how to use <b>figname</b>.</font></p>
+<pre style="margin-left:10%; margin-top: 1em">.PS
+figname = foo;
+...
+.PE
+
+.PS
+figname = bar;
+...
+.PE
+
+\centerline{\box\foo \hss \box\bar}</pre>
+
+<p style="margin-top: 1em"><font color="#000000">Use this
+feature sparsingly and only if really needed: A different
+name means a new box register in TeX, and the maximum number
+of box registers is only 256. Also be careful not to use a
+predefined TeX or LaTeX macro name as an argument to
+<b>figname</b> since this inevitably causes an
+error.</font></p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-17.html">prev</a> | <a href="pic-19.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

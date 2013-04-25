@@ -1,0 +1,1280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Quick reference guide</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="appendices.html#top">Next: Appendices</a></td>
+</tr>
+</table>
+
+<h1 class="docs">Quick reference guide</h1>
+
+<p>
+Once you know your way around mom, you may find this guide
+preferable to using the Table of Contents.  It lists mom&#8217;s
+major user-space macros.  The links point to references found
+elsewhere in the documentation.
+</p>
+
+
+<div class="macro-list-container" style="padding-left: 9px; padding-right: 9px; padding-bottom: 1px;">
+<h2 class="docs" style="text-align: center; padding-top: 15px;">Index to the quick reference guide</h2>
+<div style="width: 50%; float: left; margin-right: 9px;">
+<h3 class="docs" style="margin-top: 1.25em;">TYPESETTING MACROS</h3>
+<ul style="margin-top: .5em; margin-left: 0; padding-left: 0; list-style-type: none;">
+  <li><a href="#qr-1">Paper size, margins, line length</a></li>
+  <li><a href="#qr-2">Family, font, point size</a></li>
+  <li><a href="#qr-3">Font modifications</a></li>
+  <li><a href="#qr-4">Linespacing (leading)</a></li>
+  <li><a href="#qr-5">Justification, quad, breaking lines</a></li>
+  <li><a href="#qr-6">Hyphenation</a></li>
+  <li><a href="#qr-7">Word and sentence spacing</a></li>
+  <li><a href="#qr-8">Kerning, ligatures, smartquotes</a></li>
+  <li><a href="#qr-9">Horizontal/vertical motions, columns</a></li>
+  <li><a href="#qr-10">Indents</a></li>
+  <li><a href="#qr-11">Tabs</a></li>
+  <li><a href="#qr-12">Underscoring, underlining</a></li>
+  <li><a href="#qr-13">Superscipts</a></li>
+  <li><a href="#qr-14">Nested lists</a></li>
+  <li><a href="#qr-15">Colour</a></li>
+  <li><a href="#qr-16">Dropcaps</a></li>
+  <li><a href="#qr-17">Utilities</a></li>
+  <li><a href="#qr-18">Graphical Objects</a></li>
+</ul>
+<h3 class="docs" style="margin-top: -.5em;">DOCUMENT PROCESSING MACROS</h3>
+<ul style="margin-top: .5em; margin-left: 0; padding-left: 0; list-style-type: none;">
+  <li><a href="#qr-19">Reference macros</a></li>
+  <li><a href="#qr-20">General document formatting directives</a></li>
+  <li><a href="#qr-21">Line numbering</a></li>
+  <li><a href="#qr-22">Set documents in columns</a></li>
+  <li><a href="#qr-23">TYPEWRITE control macros</a></li>
+  <li><a href="#qr-24">Initiate document processing</a></li>
+</ul>
+</div>
+<ul style="margin-top: 1.75em; margin-left: 0; padding-left: 0; list-style-type: none;">
+  <li><a href="#qr-25">Epigraphs</a></li>
+  <li><a href="#qr-26">Main heads</a></li>
+  <li><a href="#qr-27">Subheads</a></li>
+  <li><a href="#qr-28">Paragraph heads</a></li>
+  <li><a href="#qr-19">Reference macros</a></li>
+  <li><a href="#qr-29">Paragraphs</a></li>
+  <li><a href="#qr-30">Quotes (line for line quotes)</a> </li>
+  <li><a href="#qr-31">Blockquotes (cited passages of text)</a></li>
+  <li><a href="#qr-32">Code snippets (inserting bits of programming code)</a></li>
+  <li><a href="#qr-33">Author linebreaks (section breaks)</a></li>
+  <li><a href="#qr-34">Document termination string</a></li>
+  <li><a href="#qr-35">Footnotes</a></li>
+  <li><a href="#qr-36">Endnotes</a></li>
+  <li><a href="#qr-37">Margin notes</a></li>
+  <li><a href="#qr-38">Bibliographic references</a></li>
+  <li><a href="#qr-39">Tables of contents</a></li>
+  <li><a href="#qr-40">Letter (correspondence) macros</a></li>
+  <li><a href="#qr-41">Changing global print style parameters after<br/><span style="margin-left: 1.25em;">START</span></a></li>
+  <li><a href="#qr-42">Managing a document&#8217;s first-page header<br/><span style="margin-left: 1.25em;">(the &#8220;docheader&#8221;)</span></a></li>
+  <li><a href="#qr-43">Managing page headers and footers</a></li>
+  <li><a href="#qr-44">Recto/verso page headers and footers</a></li>
+  <li><a href="#qr-45">Pagination</a></li>
+  <li><a href="#qr-46">Document and section cover (title) pages</a></li>
+  <li><a href="#qr-47">Utilities</a></li>
+</ul>
+</div>
+
+<h2 class="docs">Quick reference guide</h2>
+
+<div style="display: inline-block; margin-top: 1em; margin-bottom: .5em; border-bottom: 2px solid #302419;"><kbd>TYPESETTING MACROS</kbd></div>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-1" class="quick-ref" colspan="2" >+++ Paper size, margins, line length</th>
+</tr>
+<tr>
+<td><a href="typesetting.html#paper">PAPER</a></td><td>-- set common paper sizes (letter, A4, etc)</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#pagewidth">PAGEWIDTH</a></td><td>-- set a custom page width</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#pagelength">PAGELENGTH</a></td><td>-- set a custom page length</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#page">PAGE</a></td><td>-- set explicit page dimensions and margins</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#t-margin">T_MARGIN</a></td><td>-- set a top margin</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#b-margin">B_MARGIN</a></td><td>-- set a bottom margin</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#l-margin">L_MARGIN</a></td><td>-- set a left margin (page offset)</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#r-margin">R_MARGIN</a></td><td>-- set a right margin</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#linelength">LL</a></td><td>-- set a line length</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr><th id="qr-2" class="quick-ref" colspan="2">+++ Family, font, point size</th></tr>
+<tr>
+<td><a href="typesetting.html#family">FAMILY</a></td><td>-- set the family of type</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#font">FT</a></td><td>-- set the font style (roman, italic, etc)</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#fallback-font">FALLBACK_FONT</a></td><td>-- establish a fallback font (for missing fonts)</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#ps">PT_SIZE</a></td><td>-- set the point size</td>
+</tr>
+<tr>
+<td><a href="inlines.html#inline-size-mom">\*[SIZE n]</a></td><td>-- change the point size inline</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-3" class="quick-ref" colspan="2" >+++ Font modifications</th>
+</tr>
+<tr><td style="padding-left: 0;">Pseudo italic</td></tr>
+<tr>
+<td><a href="typesetting.html#setslant">SETSLANT</a></td><td>-- set the degree of slant</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#slant-inline">\*[SLANT]</a></td><td>-- invoke pseudo italic inline</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#slant-inline">\*[SLANTX]</a></td><td>-- off pseudo italic inline</td>
+</tr>
+<tr><td style="padding-left: 0;">Pseudo bold</td></tr>
+<tr>
+<td><a href="typesetting.html#setbolder">SETBOLDER</a></td><td>-- set the amount of emboldening</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#bolder-inline">\*[BOLDER]</a></td><td>-- invoke pseudo bold inline</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#bolder-inline">\*[BOLDERX]</a></td><td>-- off pseudo bold inline</td>
+</tr>
+<tr><td style="padding-left: 0;">Pseudo condensed</td></tr> 
+<tr>
+<td><a href="typesetting.html#condense">CONDENSE</a></td><td>-- set the amount to pseudo condense</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#cond-inline">\*[COND]</a></td><td>-- invoke pseudo condensing inline</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#cond-inline">\*[CONDX]</a></td><td>-- off pseudo condensing inlines</td>
+</tr>
+<tr><td style="padding-left: 0;">Pseudo extended</td></tr>
+<tr>
+<td><a href="typesetting.html#extend">EXTEND</a></td><td>-- set the amount to pseudo extend</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#ext-inline">\*[EXT]</a></td><td>-- invoke pseudo extending inline</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#ext-inline">\*[EXTX]</a></td><td>-- off pseudo condensing inlinee</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-4" class="quick-ref" colspan="2" >+++ Linespacing (leading)</th>
+</tr>
+<tr>
+<td><a href="typesetting.html#leading">LS</a></td><td>-- set the linespacing (leading)</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#autolead">AUTOLEAD</a></td><td>-- set the linespacing relative to the point size</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-5" class="quick-ref" colspan="2" >+++ Justification, quad direction, line-by-line setting, breaking lines</th>
+</tr>
+<tr>
+<td><a href="typesetting.html#justify">JUSTIFY</a></td><td>-- justify text to both margins</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#quad">QUAD</a></td><td>-- "justify" text left, centre, or right</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#lrc">LEFT</a></td><td>-- set line-by-line quad left</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#lrc">CENTER</a></td><td>-- set line-by-line quad centre</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#lrc">RIGHT</a></td><td>-- set line-by-line quad right</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#br">BR</a></td><td>-- break a justified line</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#spread">SPREAD</a></td><td>-- force justify a line</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#el">EL</a></td><td>-- break a line without advancing on the page</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-6" class="quick-ref" colspan="2" >+++ Hyphenation</th>
+</tr>
+<tr>
+<td><a href="typesetting.html#hy">HY</a></td><td>-- automatic hyphenation on or off</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#hy-set">HY_SET</a></td><td>-- set automatic hyphenation parameters</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-7" class="quick-ref" colspan="2" >+++ Word and sentence spacing</th>
+</tr>
+<tr>
+<td><a href="typesetting.html#ws">WS</a></td><td>-- set the minimum word space size</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#ss">SS</a></td><td>-- set the sentence space size</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-8" class="quick-ref" colspan="2" >+++ Kerning, ligatures, smartquotes</th>
+</tr>
+<tr>
+<td><a href="typesetting.html#kern">KERN</a></td><td>-- automatic character pair kerning on or off</td>
+</tr>
+<tr>
+<td><a href="inlines.html#inline-kerning-mom">\*[BU n]</a></td><td>-- move characters pairs closer together inline</td>
+</tr>
+<tr>
+<td><a href="inlines.html#inline-kerning-mom">\*[FU n]</a></td><td>-- move character pairs further apart inline</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#rw">RW</a></td><td>-- uniformly reduce space between characters (tighten)</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#ew">EW</a></td><td>-- uniformly increase space between characters (loosen)</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#br-at-line-kern">BR_AT_LINE_KERN</a></td><td>-- break previous line every time RW or EW is invoked</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#ligatures">LIGATURES</a></td><td>-- automatic generation of ligatures on or off</td>
+</tr>
+<tr>
+<td><a href="goodies.html#smartquotes">SMARTQUOTES</a></td><td>-- smartquoting on or off</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-9" class="quick-ref" colspan="2" >+++ Horizontal and vertical movements, columnar setting</th>
+</tr>
+<tr>
+<td><a href="typesetting.html#ald">ALD</a></td><td>-- move downards on the page</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#rld">RLD</a></td><td>-- move upwards on the page</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#space">SPACE</a></td><td>-- insert space between lines on a page</td>
+</tr>
+<tr>
+<td><a href="inlines.html#down">\*[DOWN n]</a></td><td>-- temporarily move downwards in a line</td>
+</tr>
+<tr>
+<td><a href="inlines.html#up">\*[UP n]</a></td><td>-- temporarily move upwards in a line</td>
+</tr>
+<tr>
+<td><a href="inlines.html#fwd">\*[FWD n]</a></td><td>-- move forward in a line</td>
+</tr>
+<tr>
+<td><a href="inlines.html#bck">\*[BCK n]</a></td><td>-- move backwards in a line</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#mco">MCO</a></td><td>-- multiple columns on</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#mcr">MCR</a></td><td>-- recto vertical position of column start</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#mcx">MCX</a></td><td>-- multiple columns off, advance past longest column</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-10" class="quick-ref" colspan="2" >+++ Indents</th>
+</tr>
+<tr>
+<td><a href="typesetting.html#il">IL</a></td><td>-- set and turn on a left indent</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#ir">IR</a></td><td>-- set and turn on a right indent</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#ib">IB</a></td><td>-- set and turn on indents both left and right</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#iq">IQ</a></td><td>-- quit (exit) all indents</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#ti">TI</a></td><td>-- set and turn on a temporary (one line) indent</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#hi">HI</a></td><td>-- set and turn on a hanging indent</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#iq">ILX</a></td><td>-- left indents off</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#iq">IRX</a></td><td>-- right indents off</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#iq">IBX</a></td><td>-- both left and right indents off</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-11" class="quick-ref" colspan="2" >+++ Tabs</th>
+</tr>
+<tr>
+<td><a href="typesetting.html#tab-set">TAB_SET</a></td><td>-- set up a typesetting tab</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#tab">TAB &lt;n&gt;</a></td><td>-- call tab &lt;n&gt;</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#tq">TQ</a></td><td>-- quit (exit) tabs</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#inline-st">\*[STn]...\*[STnX]</a></td><td>-- string tabs (mark tab positions inline)</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#tn">TN</a></td><td>-- move to tab &lt;n+1&gt; without advancing on the page</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#st">ST</a></td><td>-- set quad/fill for string tabs</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-12" class="quick-ref" colspan="2" >+++ Underscoring, underlining</th>
+</tr>
+<tr>
+<td><a href="goodies.html#underscore">UNDERSCORE</a></td><td>-- underscore</td>
+</tr>
+<tr>
+<td><a href="goodies.html#UNDERSCORE2">UNDERSCORE2</a></td><td>-- double underscore</td>
+</tr>
+<tr>
+<td><a href="goodies.html#underline">UNDERLINE</a></td><td>-- underline (fixed width fonts only)</td>
+</tr>
+<tr>
+<td><a href="goodies.html#ul">\*[UL]...\*[ULX]</a></td><td>-- invoke underling inline (fixed width fonts only)</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-13" class="quick-ref" colspan="2" >+++ Superscipts</th>
+</tr>
+<tr>
+<td><a href="goodies.html#sup">\*[SUP]...\*[SUPX]</a></td><td>-- superscript (inline)</td>
+</tr>
+<tr>
+<td><a href="goodies.html#sup">\*[CONDSUP]...\*[CONDSUPX]</a></td><td>-- pseudo-condensed superscript (inline)</td>
+</tr>
+<tr>
+<td><a href="goodies.html#sup">\*[EXTSUP]...\*[EXTSUPX]</a></td><td>-- pseudo extended supercript (inline)</td>
+</tr>
+<tr>
+<td><a href="goodies.html#sup-raise">SUPERSCRIPT_RAISE_AMOUNT</a></td><td>-- vertical offset of superscripts</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-14" class="quick-ref" colspan="2" >+++ Nested lists</th>
+</tr>
+<tr>
+<td><a href="docelement.html#list">LIST</a></td><td>-- begin a list</td>
+</tr>
+<tr>
+<td><a href="docelement.html#item">ITEM</a></td><td>-- begin an item in a list</td>
+</tr>
+<tr>
+<td><a href="docelement.html#shift-list">SHIFT_LIST</a></td><td>-- change the indent of a list</td>
+</tr>
+<tr>
+<td><a href="docelement.html#reset-list">RESET_LIST</a></td><td>-- clear and reset a list&#8217;s enumerator</td>
+</tr>
+<tr>
+<td><a href="docelement.html#pad-list-digits">PAD_LIST_DIGITS</a></td><td>-- space to leave for digits in a digit-enumerated list</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-15" class="quick-ref" colspan="2" >+++ Colour</th>
+</tr>
+<tr>
+<td><a href="color.html#newcolor">NEWCOLOR</a></td><td>-- initialize (define) a colour</td>
+</tr>
+<tr>
+<td><a href="color.html#color">COLOR</a></td><td>-- begin using an initialized colour</td>
+</tr>
+<tr>
+<td><a href="color.htmlxcolor">XCOLOR</a></td><td>-- initialize a "named" X colour</td>
+</tr>
+<tr>
+<td><a href="color.html#color-inline">\*[&lt;colorname&gt;]</a></td><td>-- begin using an initialized colour inline</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-16" class="quick-ref" colspan="2" >+++ Dropcaps</th>
+</tr>
+<tr>
+<td><a href="goodies.html#dropcap">DROPCAP</a></td><td>-- set a dropcap</td>
+</tr>
+<tr>
+<td><a href="goodies.html#dropcap-family">DROPCAP_FAMILY</a></td><td>-- set a dropcap&#8217;s family</td>
+</tr>
+<tr>
+<td><a href="goodies.html#dropcap-font">DROPCAP_FONT</a></td><td>-- set a dropcap&#8217;s font style</td>
+</tr>
+<tr>
+<td><a href="goodies.html#dropcap-color">DROPCAP_COLOR</a></td><td>-- set a dropcap&#8217;s colour</td>
+</tr>
+<tr>
+<td><a href="goodies.html#dropcap-adjust">DROPCAP_ADJUST</a></td><td>-- adjust size of a dropcap</td>
+</tr>
+<tr>
+<td><a href="goodies.html#dropcap-gutter">DROPCAP_GUTTER</a></td><td>-- adjust space between a dropcap and regular text</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-17" class="quick-ref" colspan="2" >+++ Utilities</th>
+</tr>
+<tr>
+<td><a href="goodies.html#alias">ALIAS</a></td><td>-- give a macro a new name</td>
+</tr>
+<tr>
+<td><a href="goodies.html#caps">CAPS</a></td><td>-- set type all caps</td>
+</tr>
+<tr>
+<td><a href="goodies.html#silent">COMMENT</a></td><td>-- silently embed comments in a document</td>
+</tr>
+<tr>
+<td><a href="goodies.html#esc-char">ESC_CHAR</a></td><td>-- change the default escape character</td>
+</tr>
+<tr>
+<td><a href="goodies.html#leader">\*[LEADER]</a></td><td>-- insert leaders at the end of a line</td>
+</tr>
+<tr>
+<td><a href="goodies.html#leader-character">LEADER_CHARACTER</a></td><td>-- change the character used for leaders</td>
+</tr>
+<tr>
+<td><a href="typesetting.html#newpage">NEWPAGE</a></td><td>-- break to a new page</td>
+</tr>
+<tr>
+<td><a href="goodies.html#pad">PAD</a></td><td>-- insert equalized regions of whitespace into a line</td>
+</tr>
+<tr>
+<td><a href="goodies.html#pad-marker">PAD_MARKER</a></td><td>-- change the pad marker</td>
+</tr>
+<tr>
+<td><a href="inlines.html#inline-rule-mom">\*[RULE]</a></td><td>-- draw a full measure rule</td>
+</tr>
+<tr>
+<td><a href="goodies.html#sizespecs">SIZESPECS</a></td><td>-- get font's cap-height, x-height and descender depth</td>
+</tr>
+<tr>
+<td><a href="goodies.html#silent">SILENT</a></td><td>-- output processing off or on</td>
+</tr>
+<tr>
+<td><a href="goodies.html#trap">TRAP</a></td><td>-- enable or disable page position traps</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-18" class="quick-ref" colspan="2" >+++ Graphical objects</th>
+</tr>
+<tr>
+<td><a href="graphical.html#drh">DRH</a></td><td>-- draw a horizontal rule</td>
+</tr>
+<tr>
+<td><a href="graphical.html#drv">DRV</a></td><td>-- draw a vertical rule</td>
+</tr>
+<tr>
+<td><a href="graphical.html#dbx">DBX</a></td><td>-- draw a box</td>
+</tr>
+<tr>
+<td><a href="graphical.html#dcl">DCL</a></td><td>-- draw a circle (ellipse)</td>
+</tr>
+<tr>
+<td><a href="inlines.html#rule-weight">RULE_WEIGHT</a></td><td>-- set weight of rules drawn with \*[RULE]</td>
+</tr>
+<tr>
+<td><a href="docelement.html#pspic">PSPIC</a></td><td>-- insert a PostScript image</td>
+</tr>
+</table>
+
+<div style="display: inline-block; margin-top: 1em; margin-bottom: .5em; border-bottom: 2px solid #302419;"><kbd>DOCUMENT PROCESSING MACROS</kbd></div>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-19" class="quick-ref" colspan="2" >+++ Reference macros</th>
+</tr>
+<tr>
+<td><a href="docprocessing.html#title">TITLE</a></td><td>-- document title</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#doctitle">DOCTITLE</a></td><td>-- overall document title (if different from TITLE)</td>
+</tr>
+<tr>
+<td><a href="docelement.html#endnote-title">ENDNOTE_TITLE</a></td><td>-- document/chapter identification string for endnotes</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#chapter">CHAPTER</a></td><td>-- chapter number</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#chapter">CHAPTER_TITLE</a></td><td>-- chapter title</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#draft-string">CHAPTER_STRING</a></td><td>-- what to use in place of &#8220;Chapter&#8221;</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#subtitle">SUBTITLE</a></td><td>-- document subtitle</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#author">AUTHOR</a></td><td>-- document author(s)</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#covertitle">DOC_COVERTITLE</a></td><td>-- document title cover</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#covertitle">COVERTITLE</a></td><td>-- section cover title</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#covertitle">COPYRIGHT</a></td><td>-- copyright</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#covertitle">MISC</a></td><td>-- miscellaneous cover information</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#draft">DRAFT</a></td><td>-- document&#8217;s draft number</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#draft-string">DRAFT_STRING</a></td><td>-- what to use in place of &#8220;Draft&#8221;</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#revision">REVISION</a></td><td>-- document&#8217;s revision number</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#revision-string">REVISION_STRING</a></td><td>-- what to use in place of &#8220;Revision&#8221;</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-20" class="quick-ref" colspan="2" >+++ General document formatting directives</th>
+</tr>
+<tr>
+<td><a href="docprocessing.html#doctype">DOCTYPE</a></td><td>-- general document type</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#copystyle">COPYSTYLE</a></td><td>-- draft or final copy</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#printstyle">PRINTSTYLE</a></td><td>-- typeset or &#8220;typewritten&#8221;</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-21" class="quick-ref" colspan="2" >+++ Line numbering</th>
+</tr>
+<tr>
+<td><a href="docelement.html#number-lines">NUMBER_LINES</a></td><td>-- automatic line numbering on or off</td>
+</tr>
+<tr>
+<td><a href="docelement.html#number-lines-control">Control macros</a></td>
+</tr>
+<tr>
+<td><a href="docelement.html#number-quote-lines">&nbsp;NUMBER_QUOTE_LINES</a></td><td>-- numbering of QUOTE lines on or off</td>
+</tr>
+<tr>
+<td><a href="docelement.html#number-blockquote-lines">&nbsp;NUMBER_BLOCKQUOTE_LINES</a></td><td>-- numbering of BLOCKQUOTE lines on or off</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-22" class="quick-ref" colspan="2" >+++ Set documents in columns</th>
+</tr>
+<tr>
+<td><a href="docprocessing.html#columns">COLUMNS</a></td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#col-next">COL_NEXT</a></td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#col-break">COL_BREAK</a></td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-23" class="quick-ref" colspan="2" >+++ TYPEWRITE control macros</th>
+</tr>
+<tr>
+<td><a href="docprocessing.html#typewrite-control">UNDERLINE_ITALIC</a></td><td>--  underlining of italics on</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#underline-quotes">UNDERLINE_QUOTES</a></td><td>--  underlining of QUOTEs on or off</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#typewrite-control">ITALIC_MEANS_ITALIC</a></td><td>--  use real italics (not underlining)</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#typewrite-control">UNDERLINE_SLANT</a></td><td>--  underlining of pseudo-italics on</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#typewrite-control">SLANT_MEANS_SLANT</a></td><td>--  use pseudo italics (not underlining)</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-24" class="quick-ref" colspan="2" >+++ Initiate document processing</th>
+</tr>
+<tr>
+<td><a href="docprocessing.html#start">START</a></td><td>-- begin document processing</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-25" class="quick-ref" colspan="2" >+++ Epigraphs</th>
+</tr>
+<tr>
+<td><a href="docelement.html#epigraph">EPIGRAPH</a></td><td>-- set an epigraph underneath the docheader</td>
+</tr>
+<tr>
+<td><a href="docelement.html#epigraph-control">Control macros</a></td><td>-- change default style of epigraphs</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-26" class="quick-ref" colspan="2" >+++ Main heads</th>
+</tr>
+<tr>
+<td><a href="docelement.html#head">HEAD</a></td><td>-- set a main head</td>
+</tr>
+<tr>
+<td><a href="docelement.html#head-general">Control macros</a></td><td>-- change default style of heads</td>
+</tr>
+<tr>
+<td><a href="docelement.html#head-space">&nbsp;HEAD_SPACE</a></td><td>-- control vertical space around heads</td>
+</tr>
+<tr>
+<td><a href="docelement.html#number-heads">&nbsp;NUMBER_HEADS</a></td><td>-- number heads</td>
+</tr>
+<tr>
+<td><a href="docelement.html#prefix-chapter-number">&nbsp;PREFIX_CHAPTER_NUMBER</a></td><td>-- prefix chapter number to head numbers</td>
+</tr>
+<tr>
+<td><a href="docelement.html#reset-head-number">&nbsp;RESET_HEAD_NUMBER</a></td><td>-- reset head number to "1"</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-27" class="quick-ref" colspan="2" >+++ Subheads</th>
+</tr>
+<tr>
+<td><a href="docelement.html#subhead">SUBHEAD</a></td><td>-- set a subhead</td>
+</tr>
+<tr>
+<td><a href="docelement.html#subhead-general">Control macros</a></td><td>-- change default style of subheads</td>
+</tr>
+<tr>
+<td><a href="docelement.html#number-subheads">&nbsp;NUMBER_SUBHEADS</a></td><td>-- number subheads</td>
+</tr>
+<tr>
+<td><a href="docelement.html#prefix-chapter-number">&nbsp;PREFIX_CHAPTER_NUMBER</a></td><td>-- prefix chapter number to subhead numbers</td>
+</tr>
+<tr>
+<td><a href="docelement.html#reset-subhead-number">&nbsp;RESET_SUBHEAD_NUMBER</a></td><td>-- reset subhead number to "1"</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-28" class="quick-ref" colspan="2" >+++ Paragraph heads</th>
+</tr>
+<tr>
+<td><a href="docelement.html#parahead">PARAHEAD</a></td><td>-- set a paragraph head</td>
+</tr>
+<tr>
+<td><a href="docelement.html#parahead-general">Control macros</a></td><td>-- change default style of paraheads</td>
+</tr>
+<tr>
+<td><a href="docelement.html#number-paraheads">&nbsp;NUMBER_PARAHEADS</a></td><td>-- number paraheads</td>
+</tr>
+<tr>
+<td><a href="docelement.html#prefix-chapter-number">&nbsp;PREFIX_CHAPTER_NUMBER</a></td><td>-- prefix chapter number to parahead numbers</td>
+</tr>
+<tr>
+<td><a href="docelement.html#reset-parahead-number">&nbsp;RESET_PARAHEAD_NUMBER</a></td><td>-- reset parahead number to "1"</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-29" class="quick-ref" colspan="2" >+++ Paragraphs</th>
+</tr>
+<tr>
+<td><a href="docelement.html#pp">PP</a></td><td>-- set a paragraph</td>
+</tr>
+<tr>
+<td><a href="docelement.html#pp-control">Control macros</a></td><td>-- managing paragraph style concerns</td>
+</tr>
+<tr>
+<td><a href="docelement.html#pp-font">&nbsp;PP_FONT</a></td><td>-- globally change font of regular paragraphs</td>
+</tr>
+<tr>
+<td><a href="docelement.html#para-indent">&nbsp;PARA_INDENT</a></td><td>-- set the paragraph first-line indent</td>
+</tr>
+<tr>
+<td><a href="docelement.html#indent-first-paras">&nbsp;INDENT_FIRST_PARAS</a></td><td>-- indenting of paragraph first-lines on or off</td>
+</tr>
+<tr>
+<td><a href="docelement.html#pp-space">&nbsp;PARA_SPACE</a></td><td>-- linespace between paragraphs on or off</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-30" class="quick-ref" colspan="2" >+++ Quotes (line for line verbatim quotes)</th>
+</tr>
+<tr>
+<td><a href="docelement.html#quote">QUOTE</a></td><td>-- set quoted text line for line </td>
+</tr>
+<tr>
+<td><a href="docelement.html#quote-general">Control macros</a></td><td>-- change default style of quotes</td>
+</tr>
+<tr>
+<td><a href="docelement.html#always-fullspace-quotes">&nbsp;ALWAYS_FULLSPACE_QUOTES</a></td><td>-- control vertical space around quotes</td>
+</tr>
+<tr>
+<td><a href="docelement.html#break-quote">&nbsp;BREAK_QUOTE</a></td><td>-- deprecated</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-31" class="quick-ref" colspan="2" >+++ Blockquotes (cited passages of text)</th>
+</tr>
+<tr>
+<td><a href="docelement.html#blockquote">BLOCKQUOTE</a></td><td>-- set longer passages of cited text</td>
+</tr>
+<tr>
+<td><a href="docelement.html#blockquote-general">Control macros</a></td><td>-- change default style of blockquotes</td>
+</tr>
+<tr>
+<td><a href="docelement.html#always-fullspace-quotes">&nbsp;ALWAYS_FULLSPACE_BLOCKQUOTES</a></td><td>-- control vertical space around quotes</td>
+</tr>
+<tr>
+<td><a href="docelement.html#break-quote">&nbsp;BREAK_BLOCKQUOTE</a></td><td>-- deprecated</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-32" class="quick-ref" colspan="2" >+++ Code snippets</th>
+</tr>
+<tr>
+<td><a href="docelement.html#code">CODE</a></td><td>-- set a code snippet</td>
+</tr>
+<tr>
+<td><a href="docelement.html#code-control">Control macros</a></td><td>-- change default style of code snippets</td>
+</tr>
+<tr>
+<td><a href="docelement.html#code-general">&nbsp;General</a></td><td>-- family, font, and colour</td>
+</tr>
+<tr>
+<td><a href="docelement.html#code-size">&nbsp;CODE_SIZE</a></td><td>-- code size as a percentage of prevailing text</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-33" class="quick-ref" colspan="2" >+++ Author linebreaks (section breaks)</th>
+</tr>
+<tr>
+<td><a href="docelement.html#linebreak">LINEBREAK</a></td><td>-- insert an author linebreak (section break)</td>
+</tr>
+<tr>
+<td><a href="docelement.html#linebreak-control">Control macros</a></td><td>-- change default style of linebreaks</td>
+</tr>
+<tr>
+<td><a href="docelement.html#linebreak-char">&nbsp;LINEBREAK_CHAR</a></td><td>-- character to use for author linebreaks</td>
+</tr>
+<tr>
+<td><a href="docelement.html#linebreak-color">&nbsp;LINEBREAK_COLOR</a></td><td>-- colour of author linebreak character</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-34" class="quick-ref" colspan="2" >+++ Document termination string</th>
+</tr>
+<tr>
+<td><a href="docelement.html#finis">FINIS</a></td><td>-- insert a document termination string (e.g. --END--)</td>
+</tr>
+<tr>
+<td><a href="docelement.html#finis-control">Control macros</a></td><td>-- change default style finis string</td>
+</tr>
+<tr>
+<td><a href="docelement.html#finis-string">&nbsp;FINIS_STRING</a></td><td>-- set the document termination string</td>
+</tr>
+<tr>
+<td><a href="docelement.html#finis-color">&nbsp;FINIS_COLOR</a></td><td>-- set the document termination string colour</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-35" class="quick-ref" colspan="2" >+++ Footnotes</th>
+</tr>
+<tr>
+<td><a href="docelement.html#footnote">FOOTNOTE</a></td><td>-- set a footnote</td>
+</tr>
+<tr>
+<td><a href="docelement.html#footnote-general">Control macros</a></td><td>-- change default style of footnotes</td>
+</tr>
+<tr>
+<td><a href="docelement.html#footnote-markers">&nbsp;FOOTNOTE_MARKERS</a></td><td>-- footnote markers on or off</td>
+</tr>
+<tr>
+<td><a href="docelement.html#footnote-marker-style">&nbsp;FOOTNOTE_MARKER_STYLE</a></td><td>-- type of footnote marker to use</td>
+</tr>
+<tr>
+<td><a href="docelement.html#reset-footnote-number">&nbsp;RESET_FOOTNOTE_NUMBER</a></td><td>-- reset footnote numbering</td>
+</tr>
+<tr>
+<td><a href="docelement.html#footnote-rule">&nbsp;FOOTNOTE_RULE</a></td><td>-- footnote separator rule on or off</td>
+</tr>
+<tr>
+<td><a href="docelement.html#footnote-rule-adj">&nbsp;FOOTNOTE_RULE_ADJ</a></td><td>-- adjust vertical position of footnote rule</td>
+</tr>
+<tr>
+<td><a href="docelement.html#footnote-rule-length">&nbsp;FOOTNOTE_RULE_LENGTH</a></td><td>-- adjust length of footnote rule</td>
+</tr>
+<tr>
+<td style="vertical-align: top;"><a href="docelement.html#footnotes-run-on">&nbsp;FOOTNOTES_RUN_ON</a></td>
+  <td>-- instruct footnotes to be continuous (i.e. not to<br />
+&nbsp;&nbsp;&nbsp;begin on a new line; only for use with footnotes<br />
+&nbsp;&nbsp;&nbsp;identified by document line number)</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-36" class="quick-ref" colspan="2" >+++ Endnotes</th>
+</tr>
+<tr>
+<td><a href="docelement.html#endnote">ENDNOTE</a></td><td>-- set an endnote</td>
+</tr>
+<tr>
+<td style="vertical-align: top;"><a href="docelement.html#EN-mark">\*[EN-MARK]</a></td>
+  <td>-- mark initial line of a range of line numbers<br />
+&nbsp;&nbsp;&nbsp;(for use with line numbered endnotes)</td>
+</tr>
+<tr>
+<td><a href="docelement.html#endnotes">ENDNOTES</a></td><td>-- output endnotes</td>
+</tr>
+<tr>
+<td><a href="docelement.html#endnote-control">Control macros</a></td><td>-- change just about anything to do with endnotes</td>
+</tr>
+</table>
+
+<table class="quick-ref" style="margin-top: -.5em; margin-left: 1em;">
+<tr>
+<td><a href="docelement.html#endnotes-general">General style control</a></td>
+</tr>
+<tr>
+<td><a href="docelement.html#endnotes-pagination">Pagination</a></td>
+</tr>
+<tr>
+<td><a href="docelement.html#endnotes-header-control">Header/footer control</a></td>
+</tr>
+<tr>
+<td><a href="docelement.html#endnotes-main-title">Title control</a></td>
+</tr>
+<tr>
+<td><a href="docelement.html#endnotes-main-title">Document/section identification control</a></td>
+</tr>
+<tr>
+<td><a href="docelement.html#endnotes-numbering">Identification style</a></td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-37" class="quick-ref" colspan="2" >+++ Margin notes</th>
+</tr>
+<tr>
+<td><a href="docelement.html#mn-init">MN_INIT</a></td><td>-- initialize margin notes</td>
+</tr>
+<tr>
+<td><a href="docelement.html#mn">MN</a></td><td>-- set a margin note</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-38" class="quick-ref" colspan="2" >+++ Bibliographic references</th>
+</tr>
+<tr>
+<td><a href="refer.html#ref">REF</a></td><td>-- begin a reference</td>
+</tr>
+<tr>
+<td><a href="refer.html#footnote-refs">FOOTNOTE_REFS</a></td><td>-- place references in footnotes</td>
+</tr>
+<tr>
+<td><a href="refer.html#endnote-refs">ENDNOTE_REFS</a></td><td>-- place references in endnotes</td>
+</tr>
+<tr>
+<td><a href="refer.html#bracket-refs">REF( / REF)</a></td><td>-- put parentheses around embedded references</td>
+</tr>
+<tr>
+<td><a href="refer.html#bracket-refs">REF[ / REF]</a></td><td>-- put square brackets around embedded references</td>
+</tr>
+<tr>
+<td><a href="refer.html#bracket-refs">REF{ / REF}</a></td><td>-- put curly braces around mbedded references</td>
+</tr>
+<tr>
+<td><a href="refer.html#bibliography">BIBLIOGRAPHY</a></td><td>-- output a bibliography</td>
+</tr>
+<tr>
+<td><a href="refer.html#biblio-control">Control macros</a></td><td>-- change just about anything to do with bibliographies</td>
+</tr>
+</table>
+
+<table class="quick-ref" style="margin-top: -.5em; margin-left: 1em;">
+<tr>
+<td><a href="refer.html#bibliography-type">BIBLIOGRAPHY_TYPE</a>&nbsp;-- "plain" or enumerated list</td>
+</tr>
+<tr>
+<td><a href="refer.html#biblio-general">General style control</a></td>
+</tr>
+<tr>
+<td><a href="refer.html#biblio-header-control">Header/footer control</a></td>
+</tr>
+<tr>
+<td><a href="refer.html#biblio-main-title">Main head control</a></td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-39" class="quick-ref" colspan="2" >+++ Tables of contents</th>
+</tr>
+<tr>
+<td><a href="docelement.html#toc">TOC</a></td><td>-- output a table of contents</td>
+</tr>
+<tr>
+<td><a href="docelement.html#toc-control">Control macros</a></td><td>-- change just about anything to do with tables of contents</td>
+</tr>
+</table>
+
+<table class="quick-ref" style="margin-top: -.5em; margin-left: 1em;">
+<tr>
+<td><a href="docelement.html#toc-general">General style control</a></td>
+</tr>
+<tr>
+<td><a href="docelement.html#toc-pagenumbering">Page numbering</a></td>
+</tr>
+<tr>
+<td><a href="docelement.html#toc-header">Title control</a></td>
+</tr>
+<tr>
+<td><a href="docelement.html#toc-style">Changing the style of the different table of contents entry types</a></td>
+</tr>
+<tr>
+<td><a href="docelement.html#toc-additional">Additional table of contents control macros</a></td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-40" class="quick-ref" colspan="2" >+++ Letter (correspondence) macros</th>
+</tr>
+<tr>
+<td><a href="letters.html#date">DATE</a></td><td>-- letter&#8217;s date</td>
+</tr>
+<tr>
+<td><a href="letters.html#from">FROM</a></td><td>-- letter&#8217;s addresser</td>
+</tr>
+<tr>
+<td><a href="letters.html#to">TO</a></td><td>-- letter&#8217;s addressee</td>
+</tr>
+<tr>
+<td><a href="letters.html#greeting">GREETING</a></td><td>-- letter&#8217;s salutation</td>
+</tr>
+<tr>
+<td><a href="letters.html#closing">CLOSING</a></td><td>-- letter&#8217;s closing salutation</td>
+</tr>
+<tr>
+<td><a href="letters.html#closing-indent">CLOSING_INDENT</a></td><td>-- indentation of the closing salutation</td>
+</tr>
+<tr>
+<td><a href="letters.html#signature-space">SIGNATURE_SPACE</a></td><td>-- room to leave for the signature</td>
+</tr>
+<tr>
+<td><a href="letters.html#no-suite">NO_SUITE</a></td><td>-- printing of &quot;next page number&quot; off or on</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-41" class="quick-ref" colspan="2" >+++ Changing global print style parameters after START</th>
+</tr>
+<tr>
+<td><a href="docprocessing.html#doc-left-margin">DOC_LEFT_MARGIN</a></td><td>-- left margin of everything on the page</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#doc-right-margin">DOC_RIGHT_MARGIN</a></td><td>-- right margin of everything on the page</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#doc-line-length">DOC_LINE_LENGTH</a></td><td>-- document&#8217;s base line length</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#doc-family">DOC_FAMILY</a></td><td>-- document&#8217;s base family</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#doc-pt-size">DOC_PT_SIZE</a></td><td>-- document&#8217;s base point size</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#doc-lead">DOC_LEAD</a></td><td>-- document&#8217;s base lead</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#doc-quad">DOC_QUAD</a></td><td>-- document&#8217;s base quad directions</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-42" class="quick-ref" colspan="2" >+++ Managing a document&#8217;s first-page header</th>
+</tr>
+<tr>
+<td><a href="docprocessing.html#docheader">DOCHEADER</a></td><td>-- document first-page header on or off</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#docheader-control-index">Control macros</a></td><td>-- change default style of docheader elements</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-43" class="quick-ref" colspan="2" >+++ Managing page headers and footers</th>
+</tr>
+<tr>
+<td><a href="headfootpage.html#headers">HEADERS</a></td><td>-- page headers on or off</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#footers">FOOTERS</a></td><td>-- page footers on or off</td>
+</tr>
+<tr>
+<td style="vertical-align: top;"><a href="headfootpage.html#headers-and-footers">HEADERS_AND_FOOTERS</a></td><td>-- enable generation of both headers and footers</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#index-reference">Control macros</a></td>
+</tr>
+</table>
+
+<table class="quick-ref" style="margin-top: -.5em; margin-left: 1em;">
+<tr>
+<td><a href="headfootpage.html#strings">Strings</a></td><td>-- left-right-center strings</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#style">Style</a></td><td>-- change style defaults for headers and/or footers</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#global">Global</a></td><td>-- global style changes</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#part-by-part">Part-by-part</a></td><td>-- part-by-part style changes</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#vertical">Vertical placement</a></td><td>-- adjust postion of headers and/or footers</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#separator-rule">Separator rule</a></td><td>-- manage the header/footer separator rule</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-44" class="quick-ref" colspan="2" >+++ Recto/verso page headers and footers</th>
+</tr>
+<tr>
+<td><a href="rectoverso.html#recto-verso">RECTO_VERSO</a></td><td>-- recto/verso headers and/or footers on or off</td>
+</tr>
+<tr>
+<td><a href="rectoverso.html#switch-hdrftr">SWITCH_HEADERS</a></td><td>-- switch recto or verso header</td>
+</tr>
+<tr>
+<td><a href="rectoverso.html#switch-hdrftr">SWITCH_FOOTERS</a></td><td>-- switch recto or verso footer</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#hdrftr-rectoverso">HEADER_RECTO</a></td><td>-- string that constitutes a recto header</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#hdrftr-rectoverso">HEADER_VERSO</a></td><td>-- string that constitutes a verso header</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#hdrftr-rectoverso">FOOTER_RECTO</a></td><td>-- string that constitutes a recto footer</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#hdrftr-rectoverso">FOOTER_VERSO</a></td><td>-- string that constitutes a recto footer</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-45" class="quick-ref" colspan="2" >+++ Pagination</th>
+</tr>
+<tr>
+<td><a href="headfootpage.html#paginate">PAGINATE</a></td><td>-- pagination on or off</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#paginate-control">Control macros</a></td><td>-- change default style for pagination</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#pagenumber">&nbsp;PAGENUMBER</a></td><td>-- user-defined (starting) page number</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#pagenum-style">&nbsp;PAGENUM_STYLE</a></td><td>-- digits, roman numerals, etc</td>
+</tr>
+<tr>
+<td><a href="headfootpage.html#pagenum-on-first-page">&nbsp;PAGENUM_ON_FIRST_PAGE</a></td><td>-- when footers are enabled</td>
+</tr>
+<tr>
+<td style="vertical-align: top;"><a href="headfootpage.html#draft-with-pagenumber">&nbsp;DRAFT_WITH_PAGENUMBER</a></td><td>-- attach draft/revision information to page<br />
+&nbsp;&nbsp;&nbsp;numbers</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-46" class="quick-ref" colspan="2" >+++ Document and section cover (title) pages</th>
+</tr>
+<tr>
+<td><a href="cover.html#cover">COVER</a></td><td>-- information to include in a section cover</td>
+</tr>
+<tr>
+<td><a href="cover.html#cover">DOC_COVER</a></td><td>-- information to include in a document cover</td>
+</tr>
+<tr>
+<td><a href="cover.html#on-off">COVERS</a></td><td>-- printing of section covers on or off</td>
+</tr>
+<tr>
+<td><a href="cover.html#on-off">DOC_COVERS</a></td><td>-- printing of document covers on or off</td>
+</tr>
+<tr>
+<td><a href="cover.html#cover-control-index">Control macros</a></td><td>-- change style defaults for covers</td>
+</tr>
+</table>
+
+<table class="quick-ref">
+<tr>
+<th id="qr-47" class="quick-ref" colspan="2" >+++ Utilities</th>
+</tr>
+<tr>
+<td><a href="docprocessing.html#add-space">ADD_SPACE</a></td><td>-- add space to the top of a page</td>
+</tr>
+<tr>
+<td><a href="docelement.html#blank-page">BLANKPAGE</a></td><td>-- output one or more blank pages</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#doc-lead-adjust">DOC_LEAD_ADJUST</a></td><td>-- adjust document linespacing (lead) to fill pages</td>
+</tr>
+<tr>
+<td><a href="rectoverso.html#collate">COLLATE</a></td><td>-- join documents or chapters of a document together</td>
+</tr>
+<tr>
+<td><a href="docprocessing.html#shim">SHIM</a></td><td>-- move vertical position to next valid baseline</td>
+</tr>
+</table>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 33%; text-align: right;"><a href="appendices.html">Next: Appendices</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

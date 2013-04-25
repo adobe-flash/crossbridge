@@ -1,0 +1,331 @@
+
+gcc4-4.5.3-3
+------------------------------------------
+
+This is the second stable production release from the GCC 4.5 compiler
+series for Cygwin.  It fixes a single issue in the 4.5.3-2 release: the
+language runtime DLLs were incorrectly linked, owing to a bug in binutils,
+with the result that exception handling was broken after rebasing.  All
+the major runtime libraries are implemented as DLLs as well as static
+archives.  It can fully co-exist side-by-side with the older Cygwin gcc-3.4.4
+series compiler.  All languages are supported, although Ada and Java remain
+works-in-progress.
+
+End-of-life for Cygwin-1.5.
+===========================
+
+This version is not released for the Cygwin-1.5 series.  All future effort
+will go into developing the compiler for Cygwin-1.7 and beyond.  Building
+the compiler from source under 1.5 is unsupported and unmaintained, but
+possible; however, you would need to build yourself an updated version of
+binutils from the sourceware.org CVS repository, and you would need to
+apply the modern-binutils-on-cygwin-1.5-default-pseudo-reloc-fix.diff patch
+found in the CYGWIN-PATCHES directory of this source release.  Also it
+would be unsupported and unmaintained, so if you're not comfortable doing
+this sort of thing on your own, you probably don't want to start.
+
+Now would be a good time to try 1.7, anyway :) It works really well.
+
+What happened to gcc4-4.5.3-1?
+==============================
+
+This release number was used for the initial cygwinports version of the
+gcc4-4.5.3 packages.  Skipping it in the main release series avoids any
+problems for cygwinports users.
+
+What happened to gcc4-4.3.4-2?
+==============================
+
+I skipped a release number.  The -2 release is reserved for any theoretical
+upgrade to the 1.5 compiler that might ever be needed somewhere sometime.
+
+Java users need an additional download to compile source to bytecode.
+=====================================================================
+
+As part of its infrastructure, GCJ uses the Eclipse Compiler for Java (ECJ)
+to compile .java sources files to bytecode .class files.  ECJ is shipped as
+a JAR file, and is not supplied in this distribution (pending resolution of
+licensing status and any self-hosting issues).  It can be downloaded after
+installation by running the supplied "/usr/sbin/download_ecj.sh" script, or
+can be manually downloaded from ftp://sourceware.org/pub/java/ecj-latest.jar,
+and moved and renamed to /usr/share/java/ecj.jar, which is where GCJ expects
+to find it.
+
+Known issues in Ada and Java.
+=============================
+
+The Ada compiler is currently implemented as a Frankenstein-like hybrid of
+Cygwin/POSIX and MinGw/w32api code.  This just barely hangs together, but
+does not play nicely with Cygwin's pthread library functions; the outcome
+is problems in the tasking implementation, including race conditions that
+may lead to failure in early startup or termination.
+
+There are problems with the Java compiler that are less well understood,
+but also manifest themselves as testsuite failures in the thread- and
+process-related tests.
+
+These issues will be addressed in a future release of the compiler; for
+now, Java and Ada cannot be considered first-class languages, but remain
+somewhat experimental.  It is likely however that both perform better than
+the old 3.4 series compilers.
+
+Static and shared linking of applications.
+==========================================
+
+By default, user applications will be linked against these DLLs. unless the
+option '-static' is supplied to GCC during the build.  If linking statically
+against libstdc++, you should also use '-static-libgcc' to link likewise
+against libgcc, or you will experience segfaults on program termination.
+
+This compiler should be stable and production-ready, but as is always the
+case with software, there may yet be bugs.  Anything abnormal should be
+reported, in the first instance, to the main Cygwin mailing list.
+
+    ------------------------------ooOOOoo------------------------------
+    PLEASE SEND BUG REPORTS, PROBLEMS, ETC. TO THE CYGWIN MAILING LIST.
+    ------------------------------ooOOOoo------------------------------
+
+------------------------------------------
+
+Runtime requirements:
+  cygwin-1.7.9-1 or newer.  (Probably works with older versions too, but
+                            not all features may be supported).
+  libgmp3, libmpfr1.
+  bash - Used for postinstall/preremove scripts.
+  w32api - System headers and import libs.
+  binutils - For assembler and linker.
+  libcloog0-0.15.7-1
+  libgmp3-4.3.2-1
+  libiconv2-1.13.1-2
+  libintl8-0.17-11
+  libmpc1-0.8-1
+  libmpfr4-3.0.1-1
+  libppl-0.10.2-1
+ - The following are required only to support the Java AWT and GTK peers.
+  libcairo2-1.8.10-1
+  libfreetype6-2.3.12-1
+  libgdk_pixbuf2.0_0-2.20.1-1
+  libglib2.0_0-2.24.1-1
+  libgtk2.0_0-2.20.1-1
+  libpango1.0_0-1.28.1-1
+  libX11_6-1.3.3-1
+  libXrandr2-1.3.0-10
+  libXrender1-0.9.6-1
+  libXtst6-1.1.0-1
+  zlib0-1.2.5-1
+
+
+Build requirements:
+  cygwin-1.7.9-1 or newer.  (Probably works with older versions too, but
+                            not all features may be supported).
+  gcc4-4.3.4-4 or newer     (Older versions may also work but untested).
+  binutils-2.21.53-2 or newer
+  autoconf-2.64 and automake-1.11.1 precisely (available in the 
+  gcc-tools-autoconf and gcc-tools-automake packages).
+  gmp-4.3.2                 (Lib and -devel packages)
+  mpfr-3.0.1                (Lib and -devel packages)
+  mpclib-0.8                (Lib and -devel packages)
+  ppl-0.10.2                (Lib and -devel packages)
+  cloog-ppl-0.15.7          (Lib and -devel packages)
+  Recent autotools, tar, make, awk, grep, perl, makeinfo, tetex, and
+  probably some others, depending whether you modify the sources.
+  Recent coreutils, findutils, diffutils.
+  Jamvm, antlr and ecj packages from cygwinports (only needed for gjdoc).
+  (For the definitive list of gcc-specific requirements, see 
+  http://gcc.gnu.org/install/prerequisites.html)
+
+Canonical homepage:
+  http://gcc.gnu.org/
+
+Canonical download:
+  http://ftp.gnu.org/gnu/gcc/gcc-4.5.3/gcc-4.5.3.tar.bz2
+
+License:
+  GPL
+
+Language:
+  C (for the most part), various Perl, shell, etc. scripts during build.
+
+------------------------------------
+
+Build instructions:
+  Before beginning, you must ensure your registry heap_chunk_in_mb
+  value is set, or linking the libgcj DLL may fail out-of-memory.  I
+  have had success with a range of values from 0x00000400 (1024) to 
+  0x00000600 (1536).  You must also ensure there is no trace of GCC-3
+  in your path anywhere, or GNAT will somehow manage to sniff it out.
+  In order to correctly build ADA I had to copy all the gnat*-4.exe
+  files in /bin to gnat*.exe (non-suffixed) names, and likewise replace
+  /bin/gcc.exe and /bin/g++.exe with copies of gcc-4.exe and g++-4.exe.
+  Alternatively, you could use alternatives (pun intended), which are
+  introduced by this version.  GCC-4 is now the default, or you could
+  switch over compilers by running the set-gcc-default-4.sh script
+  shipped with this version.
+
+  A case-sensitive filesystem is required to build libjava.  If you
+  see an error message along the lines of:
+    make[3]: *** No rule to make target `classpath/tools/tools.zip', needed 
+    by `classpath/tools/libgcj_tools_la-tools.lo'.  Stop.
+  your filesystem is not case-sensitive, and you need to ensure it is
+  by following the instructions in Chapter 3 ("Using Cygwin") of the
+  Cygwin User Guide, in the "Case-sensitive filenames" part of the
+  "Special filenames" section.  This is currently online at:
+http://www.cygwin.com/cygwin-ug-net/using-specialnames.html#pathnames-casesensitive
+
+  tar -xfvj gcc4-4.5.3-3-src.tar.bz2
+      if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+
+  cd /usr/src (if needed)
+      or you can build in another directory if you unpacked there
+
+  cygport gcc4-4.5.3-3 all
+      or whatever other cygport option may be required
+
+This will create:
+  ./gcc4-4.5.3-3.tar.bz2
+  ./gcc4-ada-4.5.3-3.tar.bz2
+  ./gcc4-core-4.5.3-3.tar.bz2
+  ./gcc4-fortran-4.5.3-3.tar.bz2
+  ./gcc4-g++-4.5.3-3.tar.bz2
+  ./gcc4-java-4.5.3-3.tar.bz2
+  ./gcc4-objc-4.5.3-3.tar.bz2
+  ./libffi4-4.5.3-3.tar.bz2
+  ./libgcc1-4.5.3-3.tar.bz2
+  ./libgcj-common-4.5.3-3.tar.bz2
+  ./libgcj9-4.5.3-3.tar.bz2
+  ./libgfortran3-4.5.3-3.tar.bz2
+  ./libgnat4.3-4.5.3-3.tar.bz2
+  ./libgomp1-4.5.3-3.tar.bz2
+  ./libobjc2-4.5.3-3.tar.bz2
+  ./libssp0-4.5.3-3.tar.bz2
+  ./libstdc++6-4.5.3-3.tar.bz2
+  ./libstdc++6-devel-4.5.3-3.tar.bz2
+  ./gcc4-4.5.3-3-src.tar.bz2
+
+Or use 'cygport gcc4-4.5.3-3 prep' to get a patched source directory
+
+To find out the files included in the binary distribution, you can
+use "cygcheck -l gcc4-<subpackage>", or browse the listing for the
+appropriate version at <http://cygwin.com/packages/>.
+
+------------------
+
+Port Notes:
+
+----------  gcc4-4.5.3-3 -- 20111026 -----------
+
+Rapid respin to fix DLL rebasing problem
+
+  - No changes to GCC, simple rebuild using fixed binutils to
+  solve the DLL base reloc problem that caused failures during
+  exception handling when the standard library DLLS were rebased.
+
+----------  gcc4-4.5.3-2 -- 20110831 -----------
+
+First stable release from 4.5 series.
+
+  - Fixes from Yaakov for config rpath and classpath problems.
+
+----------  gcc4-4.3.4-4 -- 20110322 -----------
+
+Trivial respin of 4.3.4-3
+
+  - No changes to source.
+
+  - Removed unset CHOST from cygport script.
+
+  - Built against latest Cygwin environment, so includes
+    support for C++ fenv.h wrapping.  (Avoided dependency
+    on _feinitialise by using snapshot 20110318).
+
+----------  gcc4-4.5.0-1 -- 20100723 -----------
+
+First release from 4.5 series.
+
+ - Restructured cygport diff files into individual patches.
+
+ - Added fixes for PR43888 and prune_options SEGV.
+
+ - Backported LTO.
+
+ - Major Ada revamp, got rid of MinGW hybridisation, causing
+   regressions that will not be fixed until the next release.
+
+ - Built Java with GTK-based AWT, and new alternatives structure
+   (with thanks to Yaakov).
+
+----------  gcc4-4.3.4-3 -- 20091212 -----------
+
+Minor respin of 4.3.4-1.
+
+ - Added patch for PR38579
+
+ - Added script to fix up libtool .la control scripts.
+
+ - GCC now passes the -tsaware flag to the linker.
+
+ - Added ecj JAR file download script.
+
+ - Fixed libstdc++ wrapper configury vs. cross-compiler builds.
+
+ - Compiled with updated binutils patched to fix libstdc++
+   weak reference non-rebaseability problem.
+
+----------  gcc4-4.3.4-1 -- 20090928 -----------
+
+First fully stable feature-complete and production ready release!
+
+ - Imported fixed libffi version from upstream.
+
+ - Backported upstream patch for libgcj as separate DLLs, and a
+   number of other libjava bug fixes.
+
+ - Fixed infinite loop on exit bug in Ada compiler gnat1.
+
+ - Backported patch for aligned COMMON variables.
+
+ - Backported support for libstdc++ malloc wrappers.
+
+ - Fixed missing dependency that was breaking parallel builds.
+
+ - Backported libtool -patch from upstream to fix DLL installation.
+
+----------  gcc4-4.3.2-2 -- 20090312 -----------
+
+Major update.
+
+ - Add libjava, libgnat, libgomp, libssp, libffi.
+
+ - Shared libraries for runtimes.
+
+ - Packaging restructured.
+
+ - De-forkify cygport usage and remove related local scripts.
+
+----------  gcc4-4.3.2-1 -- 20080912 -----------
+
+Upstream sources updated to version 4.3.2.
+
+ - "-mno-cygwin" option deleted.
+
+ - Program-suffix set to "-4" for isolation from series 3 compiler.
+
+
+----------  gcc4-4.3.0-1 -- 20080910 -----------
+
+Initial release.  Major new platform features:
+
+ - Shared libgcc 
+      (selectable by --shared-libgcc/--static-libgcc flag)
+ - Dwarf-2 EH
+      (no SjLj at all; if using EH and DLLs, --shared-libgcc is mandatory)
+
+Plus all the GCC enhancements since series 3.
+
+For more information about this package, see the upstream documentation in
+/usr/share/doc/gcc4
+
+Cygwin port maintained by: Dave Korn  <dave.korn.cygwin@gmail.com.use.the.list.please>
+Please address all questions to the Cygwin mailing list at <cygwin@cygwin.com>
+

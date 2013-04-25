@@ -1,0 +1,327 @@
+2011-01-25  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	Release 1.1.13
+	* configure.ac: Bump version.
+	* TODO: Update documentation.
+
+2011-01-25  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	* src/run.h: Remove ancient workarounds for cygwin
+	B19 and B20 (CYGWIN_CONV_* macros for cygwin[32]_conv_*
+	functions).
+	* src/run.c (xemacs_special): Remove ancient workarounds
+	for cygwin B19 and B20: don't use CYGWIN_CONV_* macros
+	but instead call cygwin_conv_* functions directly. If
+	replacement is available, avoid obsolete cygwin_conv_*
+	functions.
+	(process_execname): Ditto.
+	(get_exec_name_and_path): Ditto.
+	(addPathCygwin): Ditto.
+	(fileExists): Ditto.
+	* NEWS: Update documentation.
+
+2011-01-25  Jonathan Kamens  <jik@kamens.us>
+
+	* src/run.c (process_execname): Validate symlink
+	lookup to avoid segfault.
+
+2009-12-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* src/run.c (configure_startupinfo): Ensure stdout
+	and stderr are distinct. Open with corrent flags.
+
+2009-08-18  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	Release 1.1.12
+	* configure.ac: Bump version.
+	* src/resource.rc.in: Fix typo in copyright date. Run
+	was first rewritten and released as an entity separate
+	from xemacs' runemacs in 1998, not 1988.
+
+2009-08-18  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	Only create (and hide) a console if absolutely necessary.
+	* src/run.h: Test $target.exe before $target. Pass $target
+	name, as well as cmdline, to start_child.  Pass argc by
+	reference to build_cmdline.
+	* src/run.c (target_is_gui): New function.
+	(have_console): New function:
+	(build_cmdline): Modify *argc and argv in-place, to remove
+	-wait if present, before constructing cmdline.
+	(WinMain): Ripple from run.h changes. If $target is GUI, then
+	do not call start_child nor worry about the console; instead,
+	launch $target directly using: if not -wait, a lobotomized call
+	to CreateProcess; if -wait, then _spawn with the modified argv.
+	(setup_invisible_console): Do nothing if already have console.
+	(configure_startupinfo): If we have a console, and have not
+	requested pipes, then ensure that stdio of child will be the
+	non-redirected CONOUT$ and CONIN$ of that console (avoids 100%
+	CPU issue).
+	(start_child): Change bHaveInvisConsole to bHaveConsole, and
+	initialize it using explicit test via have_console(). Refactor
+	W7 workaround. Only set bForceUsingPipes if DEBUG_FORCE_PIPES.
+	* NEWS: Update.
+	* README: UPdate.
+
+2009-08-16  Corinna Vinschen <corinna@vinschen.de>
+
+	* src/resource.rc.in: Fix filename case to accommodate case sensitive
+	filesystems.
+
+2009-08-15  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	* build-aux/.cvsignore: Update.
+
+2009-08-14  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	More 100% CPU fixes
+	* src/run.c (configure_startupinfo): Accept new parameter
+	bForceUsingPipes, to force setting up new handles for child
+	stdio.
+	(start_child): Set bForceUsingPipes TRUE for WinXP and above.
+	* NEWS: Update documentation.
+
+2009-08-14  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	Fix performance problems wrt urxvt-X (for < Windows 7)
+	* src/run.c: Only use Windows 7 workaround ON Windows 7.
+	* README: Document limitations on Windows 7.
+	* TODO: Add Windows 7 entry.
+	* AUTHORS: Recognize Corinna Vinschen's current and
+	previous contributions to invisiconsole support.
+	* NEWS: Update documentation.
+
+2009-08-10  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	Release version 1.1.11.
+
+2009-08-10  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	Windows 7: Enable proper invisiconsole operation.
+	* TODO: New file.
+	* Makefile.am: Add TODO. Fixup distribution perms; ensure
+	autoreconf works on distributed tarball.
+	* configure.ac: Detect cygwin-1.7; use a config.h. Use
+	ustar format for distributed tarball, for empty m4/ directory.
+	Check for setenv function.
+	* src/resource.rc.in: Include config.h.
+	* src/run.h: Declare new function run_setenv.
+	* src/run.c: Include config.h.
+	(start_child): On cygwin-1.7, expect cygwin's startup code to
+	automatically create an invisible console for us (works around
+	bug in Windows 7, but employed regardless of OS version). On
+	cygwin-1.5 and mingw, use a different workaround (but employ it
+	on WinXP and above, not just Windows 7). (Corinna Vinschen).
+	(run_setenv): New function.
+	(addPath): Use run_setenv (restores MinGW support).
+
+2009-08-10  Charles Wilson  <cygwin@cwilson.fastmail.fm>
+
+	Updated build machinery and documentation.
+	* build-aux: New directory.
+	* m4: New directory.
+	* configure.ac: Update to latest autotools. Bump
+	version number.
+	* Makefile.am: Added -I m4.
+	* src/Makefile.am: Refine rules for invoking windres.
+	* src/resource.rc.in: Fix line endings.
+	* NEWS: Add actual content.
+	* README: Add actual content.
+	* .cvsignore: New.
+	* src/.cvsignore: New.
+	* build-aux/.cvsignore: New.
+	* m4/.cvsignore: New.
+
+2006-05-22  Charles Wilson  <cygwin@cwilson.fastmail.fm> 
+
+	Release 1.1.10
+
+	* src/run.c: Create invisible console. Reworked and
+	incorporated pipe handling code from Alexander Gottwald.
+	Changed comments to C style.
+	* configure.ac: Bump version.
+
+2006-04-06  Alexander Gottwald  <ago at freedesktop dot org>
+
+	Release 1.1.9
+
+	* src/run.c: Remove quotes from search path.
+	* configure.ac: Bump version.
+
+2006-03-31  Alexander Gottwald  <ago at freedesktop dot org>
+
+	Release 1.1.8
+
+	* src/run.c: Remove quotes from programname.
+	* configure.ac: Bump version.
+
+2006-03-08  Alexander Gottwald  <ago at freedesktop dot org>
+
+	Release 1.1.7
+
+	* src/run.c: Copy cygwin environment variables to
+	windows environment. Disable WinMainCRTStartup wrapper.
+	* configure.ac: Bump version.
+
+2005-11-09  Alexander Gottwald  <ago at freedesktop dot org>
+
+	Release 1.1.6
+
+	* src/resource.rc: Preserve the order of icons.
+	* src/run.1.in: New.
+	* configure.ac: Bump version. Generate man page.
+	* src/Makefile.am: Add man page.
+
+2009-08-15  Charles Wilson
+
+	Release 1.1.5
+
+	* ChangeLog_: renamed to...
+	* ChangeLog: here.
+
+2005-11-01  Alexander Gottwald  <ago at freedesktop dot org>
+
+	Maintaining run.exe separately. Removed all X-startup-scripts
+	files from this package.
+
+	* CHANGELOG: renamed to...
+	* ChangeLog_: this (as a sop to case-insensitive fs)
+	* X-boxed.ico: Moved to...
+	* src/X-boxed.ico: here.
+	* X.ico: Moved to...
+	* src/X.ico: here.
+	* file.ico: Moved to...
+	* src/file.ico: here.
+	* lisp.ico: Moved to...
+	* src/lisp.ico: here.
+	* run.ico: Moved to...
+	* src/run.ico: here.
+	* rxvt.ico: Moved to...
+	* src/rxvt.ico: here.
+	* xemacs.ico: Moved to...
+	* src/xemacs.ico: here.
+	* run.c: Moved to...
+	* src/run.c: here.
+	* run.h: Moved to...
+	* src/run.h: here.
+	* resource.rc: Moved to...
+	* src/resource.rc.in: here. Generate correct version
+	information.
+
+	* configure.ac: New.
+	* Makefile.am: New.
+	* src/Makefile.am: New.
+	* src/vim.ico: New.
+	* AUTHORS: New.
+	* NEWS: New.
+	* COPYING: Update.
+	* README: Delete out of date information; leave empty
+	placeholder.
+
+	* TODO: Removed.
+	* Makefile.cygwin: Removed.
+	* INSTALL: Removed.
+
+2005-10-26  Alexander Gottwald  <ago at freedesktop dot org>
+
+	* run.c: Pipe stdin, stdout and stderr to child process
+
+2005-04-20  Alexander Gottwald  <ago at freedesktop dot org>
+
+	Released as x-startup-scripts-1.0.10
+
+	NOTE: as run was released as a component of x-startup-scripts,
+	the standalone directory included a Makefile.am but no
+	configure.ac, and as such is unbuildable.  This repository
+	instead introduces new modifications to Makefile.cygwin
+	to allow this version to compile for historical purposes.
+	Furthermore, various icons that were not part of ago's
+	release are still present, because they were added right
+	back in run-1.1.5...
+
+	Finally, ALL of these changes, from this point down to 
+	the release of version 1.1.4 below, are one single checkin
+	in the repository, because we no longer have access to
+	the development repository of the time.
+
+2009-08-15  Charles Wilson
+
+	Artificial changes to allow building this old version
+	with existing (non-subproject) build infrastructure.
+	Of course, you'd need a contemporaneous gcc, because
+	modern gcc's provide a crt0.o startup object that includes
+	a conflicting symbol...so you STILL can't actually build
+	this version.
+
+	* Makefile.cygwin: Modify build procedure.
+	* Makefile.vc: Removed.
+
+2004-10-25  Alexander Gottwald  <ago at freedesktop dot org>
+
+	* run.c: Fixing buffer overflow reported by Kirby
+	Kuehl <kkuehl at cisco dot com>
+
+2004-10-06  Alexander Gottwald  <ago at freedesktop dot org>
+
+	* run.c: Added ability to expand PATH variable with
+	-p <dir> parameter 
+
+2004-03-11    <harold@codeweavers.com>
+
+	* X.ico: Update X.ico in run.exe with Jehan Bing's latest.
+	* X-boxed.ico,resource.rc: Add Benjamin Riefenstahl's boxed X
+	icon to run.exe.
+
+2004-03-10    <harold@codeweavers.com>
+
+	* run.rc: Renamed to...
+	* resource.rc: this. Change the XEmacs icon to the XWin icon.
+	Eliminate other icons.
+
+Version 1.1.4 - 19-Dec-98
+--------------------------
+	- No code changes
+	- CYGWIN: tested under 20.1, new binary included in package
+	- CYGWIN: tested "rungnuclient" functionality under Cygwin B20.1
+	- CYGWIN: tested "rungnuclient" functionality under Cygwin B19.x
+	    Thanks to Raymond Toy
+	- documentation changes
+
+Version 1.1.3 -  8-Dec-98
+--------------------------
+	- No code changes
+	- added icons
+	- NATIVE: added version info properties page
+
+Version 1.1.2 -  5-Dec-98 (NOT RELEASED)
+--------------------------
+	- BOTH: more code cleanup
+	- CYGWIN: removed some unnecessary calls to cygwin_conv functions
+	  When cygwin_conv_to_posix_path() and _posix_path_list() functions
+	  are called on paths/pathlists that are already in posix format
+	  they return garbage in B19. So don't call them when you don't
+	  have to.
+	- CYGWIN: added #defines to enable building under both B19 and 
+	  B20 without modifying the source code. UNTESTED under B20.
+
+Version 1.1.1 - 30-Nov-98 (NOT RELEASED)
+--------------------------
+	- cleaned up code a little bit (and you thought the code
+	  was messy NOW!)
+	- fixed all known bugs
+
+Version 1.1.0 - 18-Nov-98 (NOT RELEASED)
+--------------------------
+	- added ability to search PATH for the target
+	- added ability to specify explicit path information for
+	  the target, which removed requirement that run.exe and 
+	  the target be in the same directory
+	- added "simple" mode of operation, where run.exe is
+	  renamed to runXXXXXX.exe, to run target XXXXXX
+	- SHOWSTOPPER: cygwin version gets confused if '\\' character
+	  appears in the argument list 
+
+Version 1.0.0 - 29-Sept-98
+--------------------------
+	initial release

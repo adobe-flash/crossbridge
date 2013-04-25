@@ -1,0 +1,4924 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Typesetting Macros</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="goodies.html#top">Next: Goodies</a></td>
+</tr>
+</table>
+
+<h1 id="typesetting" class="docs">The typesetting macros</h1>
+
+<div id="typesetting-macros-mini-toc" class="mini-toc">
+<div class="mini-toc-col-1">
+<ul class="no-enumerator">
+  <li class="list-head"><a href="#typesetting-macros">Introduction</a></li>
+  <li class="list-head"><a href="#page-setup-intro">Paper and page setup</a>
+  <ul>
+    <li class="item"><a href="#page-setup-note"><i>Important note on page dimensions &amp; papersize</i></a></li>
+    <li class="item"><a href="#index-page-setup">Macro list</a></li>
+  </ul></li>
+  <li class="list-head"><a href="#basic-params-intro">Basic typesetting parameters</a>
+  <ul>
+    <li class="item"><a href="#index-basic">Macro list</a></li>
+  </ul></li>
+  <li class="list-head"><a href="#justification-intro">Justification and quadding/
+    <br/>
+    <span style="margin-left: 1em;">breaking and joining lines</span></a>
+  <ul>
+    <li class="item"><a href="#index-justification">Macro list</a></li>
+  </ul></li>
+  <li class="list-head"><a href="#refinements-intro">Typographic refinements</a>
+  <ul>
+    <li class="item"><a href="#index-refinements">Macro list</a></li>
+  </ul></li>
+  <li class="list-head"><a href="#modifications-intro">Type modifications (pseudo font styles)</a>
+  <ul class="no-enumerator">
+    <li class="item"><a href="#index-modifications">Macro list</a></li>
+  </ul></li>
+  <li class="list-head"><a href="#aldrld-intro">Vertical movements</a>
+  <ul class="no-enumerator">
+    <li class="item"><a href="#index-aldrld">Macro list</a>
+    </li>
+  </ul></li>
+</ul>
+</div>
+<div class="mini-toc-col-2">
+  <ul class="no-enumerator">
+  <li class="list-head"><a href="#tabs-intro">Tabs</a>
+  <ul class="no-enumerator">
+    <li class="item"><a href="#typesetting-tabs">Typesetting tabs</a>
+    <ul style="margin-left: -.5em;">
+      <li class="item" style="margin-left: -.5em; list-style-type: circle;"><a href="#typesetting-tabs-tut">Quickie tutorial on typesetting tabs</a></li>
+    </ul></li>
+    <li class="item"><a href="#string-tabs">String tabs</a>
+    <ul style="margin-left: -.5em;">
+      <li class="item" style="margin-left: -.5em; list-style-type: circle;"><a href="#string-tabs-tut">Quickie tutorial on string tabs</a></li>
+    </ul></li>
+    <li class="item"><a href="#index-tabs">Macro list</a></li>
+  </ul></li>
+  <li class="list-head"><a href="#multicolumns-intro">Multiple columns</a>
+  <ul class="no-enumerator">
+    <li class="item"><a href="#index-multicolumns">Macro list</a>
+    </li>
+  </ul></li>
+  <li class="list-head"><a href="#indents-intro">Indents</a>
+  <ul class="no-enumerator">
+    <li class="item"><a href="#indents-handling">How mom handles indents</a></li>
+    <li class="item"><a href="#index-indents">Macro list</a>
+    </li>
+  </ul></li>
+  <li class="list-head"><a href="goodies.html#goodies">Goodies</a>
+  <ul class="no-enumerator">
+    <li class="item"><a href="goodies.html#goodies-macros">Macro list</a>
+    </li>
+  </ul></li>
+  <li class="list-head"><a href="inlines.html#top">Inline escapes</a>
+  <ul class="no-enumerator">
+    <li class="item"><a href="inlines.html#index-inlines">List of inline escapes</a>
+    </li>
+  </ul></li>
+  <li class="list-head"><a href="color.html#colored-text-intro">Coloured text</a>
+  <ul class="no-enumerator">
+    <li class="item"><a href="color.html#colored-text-macros">Macro list</a></li>
+  </ul></li>
+</ul>
+</div>
+</div>
+
+<div class="rule-medium"><hr/></div>
+
+<h2 id="typesetting-intro" class="docs">Introduction</h2>
+
+<p>
+Mom&#8217;s typesetting macros provide access to groff&#8217;s
+typesetting capabilities.  Aside from controlling basic type
+parameters (family, font, line length, point size, leading),
+mom&#8217;s macros fine-tune wordspacing, letterspacing, kerning,
+hyphenation, and so on.  In addition, mom has true typesetting tabs,
+string tabs, multiple indent styles, line padding, and a batch of
+other goodies.
+</p>
+
+<p>
+In some cases, mom&#8217;s typesetting macros merely imitate groff
+primitives.  In others, they approach typesetting concerns in
+conceptually new ways (for groff, at least).  This should present
+no problem for newcomers to groff who are learning mom.  Old groff
+hands should be careful.  Just because it looks like a duck and
+walks like a duck does not, in this instance, mean that it is a
+duck.  When using mom, stay away from groff primitives if mom
+provides a macro that accomplishes the same thing.
+</p>
+
+<p>
+Mom&#8217;s typesetting macros can be used as a standalone package,
+independent of the
+<a href="docprocessing.html#top">document processing macros</a>.
+With them, you can typeset on-the-fly.  Book covers, your best
+friend&#8217;s résumé, a poster for a lost dog&mdash;none of these
+requires structured document processing (page headers, paragraphs,
+heads, footnotes, etc).  What they do demand is precise control over
+every element on the page.  The typesetting macros give you that
+control.
+</p>
+
+<div class="rule-short" style="margin-bottom: 24px;"><hr/></div>
+
+<!-- ==================================================================== -->
+
+<h2 id="page-setup-intro" class="macro-group">Paper and page setup: paper size &amp; page margins</h2>
+
+<p>
+The page setup macros establish the physical dimensions of your page
+and the margins you want it to have. Groff has defaults for these,
+but I recommend setting them at the top of your files anyway unless
+you&#8217;re using mom&#8217;s
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+and are content with her defaults.
+</p>
+
+<p>
+The
+<a href="#paper">PAPER</a>
+macro provides a shortcut for setting the page to the correct
+dimensions for a number of common paper sizes.  The
+<a href="#page">PAGE</a>
+macro provides a convenient way of setting the page dimensions and
+some or all of the page margins with a single macro.
+</p>
+
+<div class="box-notes">
+<h3 id="page-setup-note" class="docs notes">Important note on page dimensions and papersize</h3>
+
+<p style="margin-top: .5em;">
+Mom&#8217;s macros for setting up the desired size of printer sheets
+tell mom and groff about the page dimensions, but not the driver
+responsible for generating the final PostScript file.  You must take
+care of this yourself.
+</p>
+
+<p>
+If you routinely print documents on the same size paper (you
+probably do), the easiest way to make sure the PostScript driver
+knows about your papersize is to edit the file
+<br/>
+<span class="pre-in-pp">
+  &lt;path to groff&gt;/font/devps/DESC
+</span>
+In it, you will see a line that reads:
+<span class="pre-in-pp">
+  papersize &lt;papersize&gt;
+</span>
+Change <kbd>&lt;papersize&gt;</kbd> to the name of your papersize
+(e.g. a4, letter, legal, etc.; a full list of valid named papersizes
+that can be used in DESC is found in <kbd>man papersize</kbd>).  If
+your routine papersize is non-standard (i.e. doesn&#8217;t have a
+&#8220;name&#8221;) you can give the dimensions for your papersize,
+separated by a comma.  The dimensions must have a
+<a href="definitions.html#unitofmeasure">unit of measure</a>
+appended.  Valid units of measure for papersize are
+inches (<kbd>i</kbd>),
+centimeters (<kbd>c</kbd>),
+picas (<kbd>P</kbd>) and
+points (<kbd>p</kbd>).
+For example, to set up a routine papersize of 8 inches by 10 inches,
+the line would look like this:
+<br/>
+<span class="pre-in-pp">
+  papersize 8i,10i
+</span>
+Having set up your routine papersize, if you occasionally need to
+print on sheets that do not conform to its dimensions, you must, in
+addition to setting the page dimensions in your mom file, invoke
+groff on the command line with the <kbd>-P-p&lt;papersize&gt;</kbd>
+option.
+</p>
+
+<p>
+For example, suppose your routine papersize is &#8220;letter&#8221;,
+and you need to print something on a legal-sized sheet.  After
+telling mom about the legal-size sheet (with either
+<a href="#pagelength">PAGELENGTH</a>
+and
+<a href="#pagewidth">PAGEWIDTH</a>
+or
+<a href="#paper">PAPER</a>,
+or
+<a href="#page">PAGE</a>)
+in your mom file, when you invoke groff to process the file, the
+command would look like this:
+<br/>
+<span class="pre-in-pp">
+  groff -mom -P-plegal
+</span>
+</p>
+
+<p class="tip-bottom" style="margin-top: -1em;">
+Consult <kbd>man groff</kbd>, <kbd>man grops</kbd> and <kbd>man
+groff-font</kbd> for additional information concerning papersizes,
+as well as information on printing in &#8220;landscape&#8221;
+orientation.
+</p>
+</div>
+
+<div class="macro-list-container">
+<h3 id="index-page-setup" class="macro-list">Paper and page setup macros</h3>
+
+<ul class="macro-list">
+  <li><a href="#pagewidth">PAGEWIDTH</a> &ndash; page width</li>
+  <li><a href="#pagelength">PAGELENGTH</a> &ndash; page length</li>
+  <li><a href="#paper">PAPER</a> &ndash; common paper sizes</li>
+  <li><a href="#l-margin">L_MARGIN</a> &ndash; left margin</li>
+  <li><a href="#r-margin">R_MARGIN</a> &ndash; right margin</li>
+  <li><a href="#t-margin">T_MARGIN</a> &ndash; top margin</li>
+  <li><a href="#b-margin">B_MARGIN</a> &ndash; bottom margin</li>
+  <li><a href="#page">PAGE</a> &ndash; page dimensions and margins all in one fell swoop</li>
+  <li><a href="#newpage">NEWPAGE</a> &ndash; start a new page</li>
+</ul>
+</div>
+
+<!-- -PAGEWIDTH- -->
+
+<div class="macro-id-overline">
+<h3 id="pagewidth" class="macro-id">Page width</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>PAGEWIDTH</b> <kbd class="macro-args">&lt;width of printer sheet&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+The argument to PAGEWIDTH is the width of your printer sheet.
+PAGEWIDTH requires a unit of measure.  Decimal fractions are
+allowed.  Hence, to tell mom that the width of your printer sheet is
+8-1/2 inches, you enter
+<br/>
+<span class="pre-in-pp">
+  .PAGEWIDTH 8.5i
+</span>
+Please read the
+<a href="#page-setup-note">Important note on page dimensions and papersize</a>
+for information on ensuring groff respects your
+PAGEWIDTH.
+</p>
+
+<!-- -PAGELENGTH- -->
+
+<div class="macro-id-overline">
+<h3 id="pagelength" class="macro-id">Page length</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>PAGELENGTH</b> <kbd class="macro-args">&lt;length of printer sheet&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+PAGELENGTH tells mom how long your printer sheet is.  It works just
+like PAGEWIDTH.  Therefore, to tell mom your printer sheet is 11
+inches long, you enter
+<br/>
+<span class="pre-in-pp">
+  .PAGELENGTH 11i
+</span>
+Please read the
+<a href="#page-setup-note">Important note on page dimensions and papersize</a>
+for information on ensuring groff respects your PAGELENGTH.
+</p>
+
+<!-- -PAPER- -->
+
+<div class="macro-id-overline">
+<h3 id="paper" class="macro-id">Paper</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>PAPER</b> <kbd class="macro-args">&lt;paper type&gt;</kbd>
+</div>
+
+<p>
+PAPER provides a convenient way to set the page dimensions for some
+common printer sheet sizes. <kbd>&lt;paper&nbsp;type&gt;</kbd> can
+be one of:
+<br/>
+<span class="pre-in-pp">
+  LETTER       EXECUTIVE
+  LEGAL        10x14
+  STATEMENT    A3
+  TABLOID      A4
+  LEDGER       A5
+  FOLIO        B4 
+  QUARTO       B5
+</span>
+Say, for example, you have A4-sized sheets in your printer.  It&#8217;s
+shorter (and easier) to enter
+<br/>
+<span class="pre-in-pp">
+  .PAPER A4
+</span>
+than to remember the correct dimensions and enter
+<br/>
+<span class="pre-in-pp">
+  .PAGEWIDTH  595p
+  .PAGELENGTH 842p
+</span>
+Please read the
+<a href="#page-setup-note">Important note on page dimensions and papersize</a>
+for information on ensuring groff respects your PAPER size.
+</p>
+
+<!-- -L_MARGIN- -->
+
+<div class="macro-id-overline">
+<h3 id="l-margin" class="macro-id">Left margin</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>L_MARGIN</b> <kbd class="macro-args">&lt;left margin&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+L_MARGIN establishes the distance from the left edge of the printer
+sheet at which you want your type to start.  It may be used any
+time, and remains in effect until you enter a new value.
+</p>
+
+<p>
+<a href="#il">Left indents</a>
+and
+<a href="#tabs">tabs</a>
+are calculated from the value you pass to L_MARGIN, hence it&#8217;s
+always a good idea to invoke it before starting any serious
+typesetting.  A unit of measure is required.  Decimal fractions are
+allowed.  Therefore, to set the left margin at 3 picas (1/2 inch),
+you&#8217;d enter either
+<br/>
+<span class="pre-in-pp">
+  .L_MARGIN 3P
+</span>
+or
+<span class="pre-in-pp">
+  .L_MARGIN .5i
+</span>
+If you use the macros
+<a href="#page">PAGE</a>,
+<a href="#pagewidth">PAGEWIDTH</a>
+or
+<a href="#paper">PAPER</a>
+without invoking L_MARGIN (either before or afterwards), mom
+automatically sets L_MARGIN to 1 inch.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> L_MARGIN behaves in a special way
+when you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>.
+See
+<a href="docprocessing.html#behaviour">Typesetting macros during document processing</a>
+for an explanation.
+</p>
+</div>
+
+<!-- -R_MARGIN- -->
+
+<div class="macro-id-overline">
+<h3 id="r-margin" class="macro-id">Right margin</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>R_MARGIN</b> <kbd class="macro-args">&lt;right margin&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">IMPORTANT:</span> R_MARGIN, if used, must
+come after
+<a href="#paper">PAPER</a>,
+<a href="#pagewidth">PAGEWIDTH</a>,
+<a href="#l-margin">L_MARGIN</a>
+and/or
+<a href="#page">PAGE</a>
+(if a right margin isn&#8217;t given to PAGE).  The reason is that
+R_MARGIN calculates line length from the overall page dimensions and
+the left margin.  Obviously, it can&#8217;t make the calculation if
+it doesn&#8217;t know the page width and the left margin.
+</p>
+</div>
+
+<p>
+R_MARGIN establishes the amount of space you want between the end
+of typeset lines and the right hand edge of the printer sheet.  In
+other words, it sets the line length.  R_MARGIN requires a unit of
+measure.  Decimal fractions are allowed.
+</p>
+
+<p>
+The line length macro
+(<a href="#linelength">LL</a>)
+can be used in place of R_MARGIN.  In either case, the last one
+invoked sets the line length.  The choice of which to use is up
+to you.  In some instances, you may find it easier to think of a
+section of type as having a right margin.  In others, giving a line
+length may make more sense.
+</p>
+
+<p>
+For example, if you&#8217;re setting a page of type you know should
+have 6-pica margins left and right, it makes sense to enter a left
+and right margin, like this:
+<br/>
+<span class="pre-in-pp">
+  .L_MARGIN 6P
+  .R_MARGIN 6P
+</span>
+That way, you don&#8217;t have to worry about calculating the line
+length.  On the other hand, if you know the line length for a patch
+of type should be 17 picas and 3 points, entering the line length
+with LL is much easier than calculating the right margin, e.g.
+<br/>
+<span class="pre-in-pp">
+  .LL 17P+3p
+</span>
+If you use the macros
+<a href="#page">PAGE</a>,
+<a href="#pagewidth">PAGEWIDTH</a>
+or
+<a href="#paper">PAPER</a>
+without invoking <kbd>.R_MARGIN</kbd> afterwards, mom automatically
+sets R_MARGIN to 1 inch.  If you set a line length after these
+macros (with
+<a href="#linelength">LL</a>),
+the line length calculated by R_MARGIN is, of course, overridden.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> R_MARGIN behaves in a special way when you&#8217;re
+using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>.
+See
+<a href="docprocessing.html#behaviour">Typesetting macros during document processing</a>
+for an explanation.
+</p>
+</div>
+
+<!-- -T_MARGIN- -->
+
+<div class="macro-id-overline">
+<h3 id="t-margin" class="macro-id">Top margin</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>T_MARGIN</b> <kbd class="macro-args">&lt;top margin&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+T_MARGIN establishes the distance from the top of the printer
+sheet at which you want your type to start.  It requires a unit of
+measure, and decimal fractions are allowed.  To set a top margin of
+2-1/2 centimetres, you&#8217;d enter
+<br/>
+<span class="pre-in-pp">
+   .T_MARGIN 2.5c
+</span>
+T_MARGIN calculates the vertical position of the first line of type
+on a page by treating the top edge of the printer sheet as a
+<a href="definitions.html#baseline">baseline</a>.  Therefore,
+<br/>
+<span class="pre-in-pp">
+  .T_MARGIN 1.5i
+</span>
+puts the baseline of the first line of type 1-1/2 inches beneath the
+top of the page.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> T_MARGIN means something slightly
+different when you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>.
+See
+<a href="docprocessing.html#tb-margins">Top and bottom margins in document processing</a>
+for an explanation.
+</p>
+</div>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">IMPORTANT:</span> T_MARGIN does two
+things: it establishes the top margin for pages that come after
+it <i>and</i> it moves to that position on the current page.
+Therefore, T_MARGIN should only be used at the top of a file (prior
+to entering text) or after
+<a href="#newpage">NEWPAGE</a>,
+like this:
+<br/>
+<span class="pre-in-pp" style="margin-bottom: -1em;">
+  .NEWPAGE
+  .T_MARGIN 6P
+  &lt;text&gt;
+</span>
+</p>
+</div>
+
+<!-- -B_MARGIN- -->
+
+<div class="macro-id-overline">
+<h3 id="b-margin" class="macro-id">Bottom margin</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>B_MARGIN</b> <kbd class="macro-args">&lt;bottom margin&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+B_MARGIN sets a nominal position at the bottom of the page beyond
+which you don&#8217;t want your type to go.  When the bottom margin
+is reached, mom starts a new page.  B_MARGIN requires a unit of
+measure.  Decimal fractions are allowed.  To set a nominal bottom
+margin of 3/4 inch, enter
+<br/>
+<span class="pre-in-pp">
+  .B_MARGIN .75i
+</span>
+Obviously, if you haven&#8217;t spaced the type on your pages so
+that the last lines fall perfectly at the bottom margin, the margin
+will vary from page to page.  Usually, but not always, the last line
+of type that fits on a page before the bottom margin causes mom to
+start a new page.
+</p>
+
+<p>
+Occasionally, owing to a peculiarity in groff, an extra line will
+fall below the nominal bottom margin.  If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>,
+this is unlikely to happen; the document processing macros are very
+hard-nosed about aligning bottom margins.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> The meaning of B_MARGIN is slightly
+different when you&#8217;re using the document processing macros.
+See
+<a href="docprocessing.html#tb-margins">Top and bottom margins in document processing</a>
+for an explanation.
+</p>
+</div>
+
+<!-- -PAGE- -->
+
+<div class="macro-id-overline">
+<h3 id="page" class="macro-id">Page</h3>
+</div>
+
+<div class="box-macro-args" style="overflow: auto;">
+Macro: <b>PAGE</b> <kbd class="macro-args">&lt;width&gt;&nbsp;[ &lt;length&gt; [ &lt;lm&gt; [ &lt;rm&gt; [ &lt;tm&gt; [ &lt;bm&gt; ] ] ] ] ]</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;All arguments require a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">IMPORTANT:</span> If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>,
+PAGE must come after
+<a href="docprocessing.html#start">START</a>.
+Otherwise, it should go at the top of a document, prior to any
+text.  And remember, when you&#8217;re using the document processing
+macros, top margin and bottom margin mean something slightly
+different than when you&#8217;re using just the typesetting macros
+(see
+<a href="docprocessing.html#tb-margins">Top and bottom margins in document processing</a>).
+</p>
+</div>
+
+<p>
+PAGE lets you establish paper dimensions and page margins with a
+single macro.  The only required argument is page width.  The rest
+are optional, but they must appear in order and you can&#8217;t
+skip over any. <kbd>&lt;lm&gt;, &lt;rm&gt;, &lt;tm&gt;</kbd> and
+<kbd>&lt;bm&gt;</kbd> refer to the left, right, top and bottom
+margins respectively.
+</p>
+
+<p>
+Assuming your page dimensions are 11 inches by 17 inches, and
+that&#8217;s all you want to set, enter
+<br/>
+<span class="pre-in-pp">
+  .PAGE 11i 17i
+</span>
+If you want to set the left margin as well, say, at 1 inch, PAGE
+would look like this:
+<br/>
+<span class="pre-in-pp">
+  .PAGE 11i 17i 1i
+</span>
+Now suppose you also want to set the top margin, say, at 1-1/2
+inches. &lt;tm&gt; comes after &lt;rm&gt; in the optional arguments,
+but you can&#8217;t skip over any arguments, therefore to set the
+top margin, you must also give a right margin.  The PAGE macro would
+look like this:
+<br/>
+<span class="pre-in-pp">
+  .PAGE 11i 17i 1i 1i 1.5i
+                   |   |
+  required right---+   +---top margin
+      margin
+</span>
+Clearly, PAGE is best used when you want a convenient way to tell
+mom just the dimensions of your printer sheet (width and length), or
+when you want to tell her everything about the page (dimensions and
+all the margins), for example
+<br/>
+<span class="pre-in-pp">
+  .PAGE 8.5i 11i 45p 45p 45p 45p
+</span>
+This sets up an 8-1/2 by 11 inch page with margins of 45 points
+(5/8-inch) all around.
+</p>
+
+<p>
+Additionally, if you invoke <kbd>.PAGE</kbd> with a top margin
+argument, any macros you invoke after <kbd>.PAGE</kbd> will almost
+certainly move the
+<a href="definitions.html#baseline">baseline</a>
+of the first line of text down by one linespace.  To compensate, do
+<br/>
+<span class="pre-in-pp">
+  .RLD 1v
+</span>
+immediately before entering any text, or, if it&#8217;s feasible,
+make PAGE the last macro you invoke prior to entering text.
+</p>
+
+<p>
+Please read the
+<a href="#page-setup-note">Important note on page dimensions and papersize</a>
+for information on ensuring groff respects your PAGE dimensions and
+margins.
+</p>
+
+<!-- -NEWPAGE- -->
+
+<div class="macro-id-overline">
+<h3 id="newpage" class="macro-id">Start a new page</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>NEWPAGE</b>
+</div>
+
+<p>
+Whenever you want to start a new page, use NEWPAGE, by itself with
+no argument. Mom will finish up processing the current page and move
+you to the top of a new one (subject to the top margin set with
+<a href="#t-margin">T_MARGIN</a>).
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="experts">Experts:</span>
+Prior to version 1.1.9, NEWPAGE was simply an alias of
+<kbd>.bp</kbd>.  As of 1.1.9, NEWPAGE, is its own mom macro.  While
+the new macro should be backwardly compatible with documents created
+using pre-1.1.9 moms, I suggest that from this version onward, if
+you were in the habit of using <kbd>.bp</kbd> whenever you wanted to
+break to a new page, you now begin to use NEWPAGE instead.
+</p>
+</div>
+
+<div class="rule-short" style="margin-bottom: 24px;"><hr/></div>
+
+<!-- ==================================================================== -->
+
+<h2 id="basic-params-intro" class="macro-group">Basic typesetting parameters</h2>
+
+<p>
+The basic typesetting parameter macros deal with fundamental
+requirements for setting type: family, font, point size, leading and
+line length.
+</p>
+
+<p>
+If you&#8217;re using the typesetting macros only, the arguments
+passed to the basic parameter macros remain in effect until
+you change them.  The document processing macros handle things
+differently.  See
+<a href="docprocessing.html#behaviour">Typesetting macros during document processing</a>
+for an explanation.
+</p>
+
+<div id="index-basic" class="macro-list-container">
+<h3 class="macro-list">Basic parameter macros</h3>
+<ul class="macro-list">
+  <li><a href="#family">FAMILY</a> &ndash; type family</li>
+  <li><a href="#font">FT</a> &ndash; font</li>
+  <li><a href="#fallback-font">FALLBACK_FONT</a> &ndash; for invalid fonts</li>
+  <li><a href="#ps">PT_SIZE</a> &ndash; point size of type</li>
+  <li><a href="#leading">LS</a> &ndash; line spacing/leading</li>
+  <li><a href="#autolead">AUTOLEAD</a> &ndash; automatic line spacing</li>
+  <li><a href="#linelength">LL</a> &ndash; line length</li>
+</ul>
+</div>
+
+<!-- -FAMILY- -->
+
+<div class="macro-id-overline">
+<h3 id="family" class="macro-id">Type family</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>FAMILY</b> <kbd class="macro-args">&lt;family&gt;</kbd>
+</div>
+<p class="alias">
+<i>Alias:</i> <b>FAM</b>
+</p>
+
+<p>
+FAMILY takes one argument: the name of the
+<a href="definitions.html#family">family</a>
+you want.  Groff comes with a number of PostScript families, each
+identified by a 1-, 2-or 3-letter mnemonic.  The standard families
+are:
+<br/>
+<span class="pre-in-pp">
+  A   = Avant Garde
+  BM  = Bookman
+  H   = Helvetica
+  HN  = Helvetica Narrow
+  N   = New Century Schoolbook
+  P   = Palatino
+  T   = Times Roman
+  ZCM = Zapf Chancery
+</span>
+The argument you pass to FAMILY is the identifier at left, above.
+For example, if you want Helvetica, enter
+<br/>
+<span class="pre-in-pp">
+  .FAMILY H
+</span>
+</p>
+
+<div class="box-tip" style="margin-top: -1em;">
+<p class="tip-top">
+<span class="note">Note:</span> The font macro
+(<a href="#font">FT</a>)
+lets you specify both the type family and the desired font with
+a single macro.  While this saves a few keystrokes, I recommend
+using FAMILY for family, and FT for font, except where doing
+so is genuinely inconvenient. <kbd>ZCM</kbd>, for example,
+only exists in one style: Italic (<kbd>I</kbd>).  Therefore,
+<kbd>.FT&nbsp;ZCMI</kbd> makes more sense than setting the family to
+<kbd>ZCM</kbd>, then setting the font to <kbd>I</kbd>.
+</p>
+
+<p id="fam-add-note" class="tip-bottom">
+<span class="additional-note">Additional note:</span> As of mom,
+version 1.1.9-a, if you are running a version of groff lower than
+1.19.2, you must follow all FAMILY requests with a FT request,
+otherwise mom will set all type up to the next FT request in the
+<a href="#fallback-font">fallback font</a>.
+</p>
+</div>
+
+<p style="margin-top: -.5em;">
+If you are running a version of groff greater than or
+equal to 1.19.2, when you invoke the FAMILY macro, mom
+&#8220;remembers&#8221; the font style (Roman, Italic, etc)
+currently in use (if the font style exists in the new family) and
+will continue to use the same font style in the new family.  For
+example:
+<br/>
+<span class="pre-in-pp">
+  .FAMILY BM   \" Bookman family
+  .FT     I    \" Medium Italic
+  &lt;some text&gt;  \" Bookman Medium Italic
+  .FAMILY H    \" Helvetica family
+  &lt;more text&gt;  \" Helvetica Medium Italic
+</span>
+However, if the font style does not exist in the new family, mom
+will set all subsequent type in the
+<a href="#fallback-font">fallback font</a>
+(by default, Courier Medium Roman) until she encounters a
+<a href="#font">.FT</a>
+request that&#8217;s valid for the family.  For example, assuming
+you don&#8217;t have the font &#8220;Medium Condensed Roman&#8221;
+(mom extension &#8220;CD&#8221;) in the Helvetica family:
+<br/>
+<span class="pre-in-pp">
+  .FAMILY UN    \" Univers family
+  .FT     CD    \" Medium Condensed
+  &lt;some text&gt;   \" Univers Medium Condensed
+  .FAMILY H     \" Helvetica family
+  &lt;more text&gt;   \" Courier Medium Roman!
+</span>
+In the above example, you must follow
+<kbd>.FAMILY&nbsp;H</kbd> with a FT request
+that&#8217;s valid for Helvetica.
+</p>
+
+<p>
+Please see the Appendices,
+<a href="appendices.html#fonts">Adding PostScript fonts to groff</a>,
+for information on adding fonts and families to groff, as well as
+to see a list of the extensions mom provides to groff&#8217;s basic
+<b>R</b>, <b>I</b>, <b>B</b>, <b>BI</b> styles.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="experts">Experts:</span> If you add other PostScript
+families to groff&#8217;s /font/devps directory, I recommend
+following the groff standard for naming families and fonts.  For
+example, if you add the Garamond family, name the font files
+<br/>
+<span class="pre-in-pp">
+  GARAMONDR
+  GARAMONDI
+  GARAMONDB
+  GARAMONDBI
+</span>
+GARAMOND then becomes a valid family name you can pass to FAMILY.
+(You could, of course, shorten GARAMOND to just G, or GD.) <b>R</b>,
+<b>I</b>, <b>B</b>, and <b>BI</b> after GARAMOND are the roman,
+italic, bold and bold-italic fonts respectively.
+</p>
+</div>
+
+<!-- -FT- -->
+
+<div class="macro-id-overline">
+<h3 id="font" class="macro-id">FT</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>FT</b> <kbd class="macro-args">R | I | B | BI | &lt;any other valid font style&gt;</kbd>
+</div>
+<p class="alias">
+<i>Alias:</i> <b>FONT</b>
+</p>
+
+<p>
+By default, groff permits FT to take one of four possible arguments
+specifying the desired font:
+<br/>
+<span class="pre-in-pp">
+  R  = (Medium) Roman
+  I  = (Medium) Italic
+  B  = Bold (Roman)
+  BI = Bold Italic
+</span>
+For example, if your
+<a href="definitions.html#family">family</a>
+is Helvetica, entering
+<br/>
+<span class="pre-in-pp">
+  .FT B
+</span>
+will give you the Helvetica bold
+<a href="definitions.html#font">font</a>.
+If your family were Palatino, you&#8217;d get the Palatino bold
+font.
+</p>
+
+<p>
+(As of mom, version 1.1.9-a, the range of arguments that can be
+passed to FT has been considerably extended, allowing access to a
+greater variety of font
+<a href="definitions.html#weight">weights</a>
+and
+<a href="definitions.html#shape">shapes</a>.
+Please see the
+<kbd><a href="#font-note">NOTE</a></kbd>,
+below.)
+</p>
+
+<p>
+How mom reacts to an invalid argument to FT depends on which version
+of groff you&#8217;re using.  If your groff version is greater than
+or equal to 1.19.2, mom will issue a warning and, depending on how
+you&#8217;ve set up the
+<a href="#fallback-font">fallback font</a>,
+either continue processing using the fallback font, or abort
+(allowing you to correct the problem).  If your groff version is
+less than 1.19.2, mom will silently continue processing, using
+either the fallback font or the font that was in effect prior to the
+invalid FT call.
+</p>
+
+<p>
+FT will also accept, as an argument, a full family+font name.  For
+example,
+<br/>
+<span class="pre-in-pp">
+  .FT HB
+</span>
+will set subsequent type in Helvetica Bold.  However, I strongly
+recommend keeping family and font separate except where doing so is
+genuinely inconvenient.
+</p>
+
+<p>
+For inline control of fonts, see
+<a href="inlines.html#inline-fonts-mom">Inline Escapes, font control</a>.
+</p>
+
+<div id="font-note" class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> mom, versions 1.1.9-a and higher,
+considerably extends the range of arguments you can pass to FT,
+making it more convenient to add and access fonts of differing
+<a href="definitions.html#weight">weights</a>
+and
+<a href="definitions.html#shape">shapes</a>
+within the same family.  Have a look
+<a href="appendices.html#style-extensions">here</a>
+for a list of the weight/style arguments mom
+allows.
+</p>
+</div>
+
+<p>
+Be aware, though, that you must have the fonts, correctly installed
+and named, in order to use the arguments.  (See
+<a href="appendices.html#howto">How to create a PostScript font for use with groff</a>
+for how to add fonts to groff.)  Please also read the
+<a href="#fam-add-note">ADDITIONAL NOTE</a>
+found in the description of the FAMILY macro.
+</p>
+
+<!-- -FALLBACK_FONT- -->
+
+<div class="macro-id-overline">
+<h3 id="fallback-font" class="macro-id">Fallback font</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>FALLBACK_FONT</b> <kbd class="macro-args">&lt;fallback font&gt; [ ABORT | WARN ]</kbd>
+</div>
+
+<p>
+In the event that you pass an invalid argument to
+<a href="#font">.FAMILY</a>
+(i.e. a non-existent family), mom, by default, uses the fallback
+font, Courier Medium Roman (CR), in order to continue processing
+your file.
+</p>
+
+<p>
+If you&#8217;d prefer another fallback font, pass FALLBACK_FONT the
+full family+font name of the font you&#8217;d like.  For example, if
+you&#8217;d rather the fallback font were Times Roman Medium Roman,
+<br/>
+<span class="pre-in-pp">
+  .FALLBACK_FONT TR
+</span>
+would do the trick.
+</p>
+
+<p>
+Additionally, if your version of groff accepts accepts &#8221;<kbd>.if
+F</kbd>&#8221; and &#8221;<kbd>.if S</kbd>&#8221; (see
+<a href="#fam-add-note">above</a>),
+mom issues a warning whenever a font style set with
+<a href="#font">FT</a>
+does not exist, either because you haven&#8217;t registered the
+style (see
+<a href="appendices.html#register-style">here</a>
+for instructions on registering styles), or because the font style
+does not exist in the current family set with
+<a href="#family">FAMILY</a>.
+By default, mom then aborts, which allows you to correct the
+problem.
+</p>
+
+<p>
+If you&#8217;d prefer that mom not abort on non-existent fonts,
+but rather continue processing using a fallback font, you can pass
+FALLBACK_FONT the argument <kbd>WARN</kbd>, either by itself, or in
+conjunction with your chosen fallback font.
+</p>
+
+<p>
+Some examples of invoking FALLBACK_FONT:
+</p>
+
+<ul class="no-enumerator" style="margin-left: -1em;">
+<li style="margin-top: -.5em;">
+<kbd>.FALLBACK_FONT WARN</kbd>
+<br/>
+mom will issue a warning whenever you try to access a non-existent
+font but will continue processing your file with the default
+fallback font, Courier Medium Roman.
+<br/>
+</li>
+<li style="margin-top: .5em;">
+<kbd>.FALLBACK_FONT TR WARN</kbd>
+<br/>
+mom will issue a warning whenever you try to access a non-existent
+font but will continue processing your file with a fallback font of
+Times Roman Medium Roman; additionally, &#8220;TR&#8221; will be
+the fallback font whenever you try to access a family that does not
+exist.
+</li>
+<li style="margin-top: .5em;">
+<kbd>.FALLBACK_FONT TR ABORT</kbd>
+<br/>
+mom will abort whenever you try to access a non-existent font, and
+will use the fallback font &#8220;TR&#8221; whenever you try to
+access a family that does not exist.
+</li>
+</ul>
+
+<p>
+If, for some reason, you want to revert to ABORT, just enter
+<kbd>.FALLBACK_FONT&nbsp;ABORT</kbd> and mom will once again abort
+on font errors.
+</p>
+
+<!-- -PT_SIZE- -->
+
+<div class="macro-id-overline">
+<h3 id="ps" class="macro-id">Point size of type</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>PT_SIZE</b> <kbd class="macro-args">&lt;size of type in points&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Does not require a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+PT_SIZE (Point Size) takes one argument: the size of type in points.
+Unlike most other macros that establish the size or measure of
+something, PT_SIZE does not require that you supply a unit of
+measure since it&#8217;s a near universal convention that type size
+is measured in points.  Therefore, to change the type size to, say,
+11 points, enter
+<br/>
+<span class="pre-in-pp">
+  .PT_SIZE 11
+</span>
+Point sizes may be fractional (e.g.  10.25 or 12.5).
+</p>
+
+<p>
+You can prepend a plus or a minus sign to the argument to PT_SIZE,
+in which case the point size will be changed by + or - the original
+value.  For example, if the point size is 12, and you want 14, you
+can do
+<br/>
+<span class="pre-in-pp">
+  .PT_SIZE +2
+</span>
+then later reset it to 12 with
+<span class="pre-in-pp">
+  .PT_SIZE -2
+</span>
+The size of type can also be changed inline.  See
+<a href="inlines.html#inline-size-mom">Inline Escapes, changing point size</a>.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> It is unfortunate that the
+<kbd>pic</kbd> preprocessor has already taken the name,
+<kbd>PS</kbd>, and thus mom&#8217;s macro for setting point
+sizes can&#8217;t use it.  However, if you aren&#8217;t using
+<kbd>pic</kbd>, you might want to
+<a href="goodies.html#alias">alias</a>
+PT_SIZE as PS, since there&#8217;d be no conflict.  For example
+<br/>
+<span class="pre-in-pp">
+  .ALIAS PS PT_SIZE
+</span>
+would allow you to set point sizes with <kbd>.PS</kbd>.
+</p>
+</div>
+
+<!-- -LS- -->
+
+<div class="macro-id-overline">
+<h3 id="leading" class="macro-id">Line spacing/leading</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>LS</b> <kbd class="macro-args">&lt;distance between lines&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Does not require a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+LS (Line Space) takes one argument: the distance you want, typically
+in points, from baseline to baseline of type.  The argument may be
+fractional (e.g. 12.25 or 14.5).  Like PT_SIZE, LS does not require
+a unit of measure, since
+<a href="definitions.html#leading">leading</a>
+is most often given in points.  Therefore, to set the linespace to
+14 points, you would enter
+<br/>
+<span class="pre-in-pp">
+  .LS 14
+</span>
+However, if you wish, you may specify a unit of measure by appending
+it directly to the argument passed to LS.  For example, if you want
+a linespace of 1/4 of an inch, enter
+<br/>
+<span class="pre-in-pp">
+  .LS .25i
+</span>
+You can prepend a plus or a minus sign to the argument to LS, in
+which case the line spacing will be changed by + or - the original
+value.  For example, if the line spacing is 14 points, and you want
+17 points, you can do
+<br/>
+<span class="pre-in-pp">
+  .LS +3
+</span>
+then later reset it to 14 points with
+<br/>
+<span class="pre-in-pp">
+  .LS -3
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="experts">Experts:</span> LS should not be confused with
+the groff primitive <kbd>.ls</kbd>. LS acts like
+<kbd>.vs</kbd>. mom does not provide a macro analogous to
+<kbd>.ls</kbd>.
+</p>
+</div>
+
+<!-- -AUTOLEAD- -->
+
+<div class="macro-id-overline">
+<h3 id="autolead" class="macro-id">Automatic line spacing</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>AUTOLEAD</b> <kbd class="macro-args">&lt;amount of automatic leading&gt; [FACTOR]</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Does not require a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+Without the <kbd>FACTOR</kbd> argument, AUTOLEAD calculates the
+linespace for you by adding its argument to the current point size
+of type. All subsequent
+<a href="#ps">PT_SIZE</a>
+requests automatically update the linespacing by the autolead amount.
+</p>
+
+<p>
+Used in this way, AUTOLEAD does not require a unit of measure;
+points is assumed.  However, you may use an alternate unit of
+measure by appending it to the argument.  The argument may be a
+decimal fraction (e.g. .5 or 2.75).
+</p>
+
+<p>
+As an example, if your current point size of type is 12, entering
+<br/>
+<span class="pre-in-pp">
+  .AUTOLEAD 2
+</span>
+changes the linespace to 14 points, regardless any linespacing
+already in effect.  From here on, every change to the size of type
+(with PT_SIZE, not
+<a href="definitions.html#inlines">inline</a>)
+changes the linespace as well.  If you decrease the type size to 9
+points, the leading decreases to 11 points.  If you increase the
+type size to 16 points, the leading increases to 18 points.
+</p>
+
+<p>
+Automatic updating of the linespacing continues until you enter a
+&#8220;manual&#8221; line space value with
+<a href="#leading">LS</a>.
+</p>
+
+<p>
+If you give AUTOLEAD the optional FACTOR argument, AUTOLEAD
+calculates the line space as a factor of the
+<a href="definitions.html#numericargument">numeric argument</a>
+you gave AUTOLEAD.  For example, if your point size is 12,
+<br/>
+<span class="pre-in-pp">
+  .AUTOLEAD 1.125 FACTOR
+</span>
+sets the leading at 13.5 points.  If you change the point size to
+14, the leading automatically changes to 15.75 (14 x 1.125).
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> There&#8217;s no need to prepend a
+plus sign
+(<kbd>+</kbd>)
+to AUTOLEAD&#8217;s argument, although you may do so if you wish.
+</p>
+</div>
+
+<!-- -LL- -->
+
+<div class="macro-id-overline">
+<h3 id="linelength" class="macro-id">Line length</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>LL</b> <kbd class="macro-args">&lt;line length&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+LL (Line Length) takes one argument: the distance from the left
+margin of the page to the maximum allowable point on the right at
+which groff should place type.  The line length, in other words, as
+the macro suggests.
+</p>
+
+<p>
+LL requires a unit of measure.  Therefore, to set the line length to
+39 picas, you would enter
+<br/>
+<span class="pre-in-pp">
+  .LL 39P
+</span>
+As with other macros that require a unit of measure, the argument to
+LL may be fractional.  For example,
+<br/>
+<span class="pre-in-pp">
+  .LL 4.5i
+</span>
+sets the line length to 4-1/2 inches.
+</p>
+
+<p>
+Additionally, you may express a new line length relative to the
+current line length by prepending a plus or minus sign to the
+argument.  Thus, if you wanted to increase the line length by 3
+<a href="definitions.html#picaspoints">points</a>, you could
+do
+<br/>
+<span class="pre-in-pp">
+  .LL +3p
+</span>
+This is especially handy when you want to &#8220;hang&#8221;
+punctuation outside the right margin since you can pass
+groff&#8217;s
+<a href="inlines.html#inline-stringwidth-groff"><kbd>\w</kbd></a>
+escape as the argument to LL, like this:
+<br/>
+<span class="pre=in-pp">
+  .LL +\w'.'u
+</span>
+The above example increases the current line length by the width of
+a period.  Notice that you must append the
+<a href="definitions.html#unitofmeasure">unit of measure</a>,
+<b>u</b>, to the escape since LL requires a unit of measure.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> The right margin macro,
+<a href="#r-margin">(R_MARGIN)</a>,
+can also be used to set line length.
+</p>
+</div>
+
+<div class="rule-short"><hr/></div>
+
+<!-- ==================================================================== -->
+
+<h2 id="justification-intro" class="macro-group">Justification and quadding/breaking and joining lines</h2>
+
+<p>
+The justification and quadding macros deal with how type aligns
+along the left and right margins.  In a nutshell, type either aligns
+at the left margin, at the right margin, at both margins, or at
+neither margin (centred).
+</p>
+
+<p>
+These macros also determine whether or not
+<a href="definitions.html#inputline">input lines</a>
+are joined and
+<a href="definitions.html#filled">filled</a>
+during output.
+</p>
+
+<p>
+Additionally, macros that deal with how to break
+<a href="definitions.html#outputline">output lines</a>
+are covered in this section, as is the
+<a href="definitions.html#inlines">inline escape</a>
+for joining input lines.
+</p>
+
+<p>
+You may encounter some words here that are unfamiliar.  Refer to
+<a href="definitions.html#typesetting">Typesetting terms</a>
+and
+<a href="definitions.html#groff">Groff terms</a>
+for an explanation.
+</p>
+
+<div id="index-justification" class="macro-list-container">
+<h3 class="macro-list">Justification and quadding/breaking and joining lines macros</h3>
+<ul class="macro-list">
+  <li>Fill modes
+  <ul style="list-style-type: none; margin-left: -1em;">
+    <li><a href="#justify">JUSTIFY</a> &ndash; set lines justified</li>
+    <li><a href="#quad">QUAD</a> &ndash; set filled lines flush left, right or centred</li>
+  </ul></li>
+  <li>Nofill modes
+  <ul style="list-style-type: none; margin-left: -1em;">
+    <li><a href="#lrc">LEFT</a> &ndash; set non-filled lines flush left</li>
+    <li><a href="#lrc">RIGHT</a> &ndash; set non-filled lines flush right</li>
+    <li><a href="#lrc">CENTER</a> &ndash; set non-filled lines centred</li>
+  </ul></li>
+  <li>Breaking lines
+  <ul style="list-style-type: none; margin-left: -1em;">
+    <li><a href="#br">BR</a> &ndash; manually break an output line</li>
+    <li><a href="#el">EL</a> &ndash; break a line without advancing to the next output line</li>
+    <li><a href="#space">SPACE</a> &ndash; break a line and add space before the next output line</li>
+    <li><a href="#spread">SPREAD</a> &ndash; break and force-justify an output line</li>
+  </ul></li>
+  <li>Joining input lines in <a href="definitions.html#filled">nofill mode</a>
+  <ul style="list-style-type: none; margin-left: -1em;">
+    <li><a href="#join">\c</a> inline escape</li>
+  </ul></li>
+</ul>
+</div>
+
+<!-- -JUSTIFY- -->
+
+<div class="macro-id-overline">
+<h3 id="justify" class="macro-id">Justify lines</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>JUSTIFY</b>
+</div>
+
+<p class="requires">
+(See
+<a href="definitions.html#filled">fill mode</a>
+for a definition of the difference between &#8220;fill&#8221; and
+&#8220;no-fill&#8221; modes.)
+</p>
+
+<p>
+JUSTIFY doesn&#8217;t take an argument. 
+<a href="definitions.html#inputline">Input lines</a>
+after JUSTIFY are
+<a href="definitions.html#filled">filled</a>
+and
+<a href="definitions.html#just">justified</a>
+upon output.
+</p>
+
+<p>
+To break lines and prevent them from being filled and justified, use
+the
+<a href="#br">BR</a>
+macro.
+</p>
+
+<!-- -QUAD- -->
+
+<div class="macro-id-overline">
+<h3 id="quad" class="macro-id">Quad lines left, right, or centre</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>QUAD</b> <kbd class="macro-args">L | LEFT | R | RIGHT | C | CENTER | J | JUSTIFY</kbd>
+</div>
+
+<p class="alias" style="margin-bottom: 0;">
+<i>Alias:</i> <b>FILL</b>
+</p>
+
+<p class="requires">(See
+<a href="definitions.html#filled">fill mode</a>
+for a definition of the difference between &#8220;fill&#8221; and
+&#8220;no-fill&#8221; modes.)
+</p>
+
+<p>
+QUAD takes one argument: the direction in which lines should be
+<a href="definitions.html#quad">quadded</a>.
+<a href="definitions.html#inputline">Input lines</a>
+after QUAD are 
+<a href="definitions.html#filled">filled</a>
+upon output.
+</p>
+
+<p>
+If <kbd>L</kbd> or <kbd>LEFT</kbd>, type is set flush along the left
+margin.
+</p>
+
+<p>
+If <kbd>R</kbd> or <kbd>RIGHT</kbd>, type is set flush along the
+right margin.
+</p>
+
+<p>
+If <kbd>C</kbd> or <kbd>CENTER</kbd> type is set centred on the
+current line length.
+</p>
+
+<p>
+<kbd>J</kbd> and <kbd>JUSTIFY</kbd> justify text, and are
+included as a convenience only.  Obviously, if text is
+justified, it isn&#8217;t quadded. <kbd>.QUAD&nbsp;J</kbd> and
+<kbd>.QUAD&nbsp;JUSTIFY</kbd> have exactly the same effect as
+<a href="#justify">JUSTIFY</a>.
+</p>
+
+<p>
+To break lines and prevent them from being filled, use the
+<a href="#br">BR</a>
+macro.
+</p>
+
+<!-- -LEFT, RIGHT, CENTER- -->
+
+<div class="macro-id-overline">
+<h3 id="lrc" class="macro-id">Set lines flush left, right or centered in no-fill mode</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>LEFT</b>
+<br/>
+Macro: <b>RIGHT</b>
+<br/>
+Macro: <b>CENTER</b> &nbsp;(alias CENTRE)
+</div>
+
+<p class="requires">
+(See
+<a href="definitions.html#filled">no-fill mode</a>
+for a definition of the difference between &#8220;fill&#8221; and
+&#8220;no-fill&#8221; modes.)
+</p>
+
+<p>
+LEFT, RIGHT and CENTER let you enter text on a line for line basis
+without having to use the
+<a href="#br">BR</a>
+macro after each line.  Consider the following:
+<br/>
+<span class="pre-in-pp">
+  .QUAD LEFT
+  So runs my dream, but what am I?
+  .BR
+  An infant crying in the night
+  .BR
+  An infant crying for the light
+  .BR
+  And with no language but a cry.
+  .BR
+</span>
+Because text after <kbd>.QUAD LEFT</kbd> is
+<a href="definitions.html#filled">filled</a>,
+you have to use the
+<a href="#br">BR</a>
+macro to prevent the lines from running together.  Not only is this
+annoying to type, it&#8217;s awkward to read in a text editor.  Much
+better to do
+<br/>
+<span class="pre-in-pp">
+  .LEFT
+  So runs my dream, but what am I?
+  An infant crying in the night
+  An infant crying for the light
+  And with no language but a cry.
+</span>
+</p>
+
+<div class="box-important" style="margin-top: -.5em;">
+<p class="tip">
+<span class="important">IMPORTANT:</span> Because LEFT,
+RIGHT and CENTER are nofill modes, groff does not always respect the
+current line length.
+<a href="definitions.html#inputline">Input lines</a>
+that run long may exceed it, or get broken in undesirable ways.
+Therefore, when using these three macros, you should preview your
+work to ensure that all lines fit as expected.
+</p>
+</div>
+
+<!-- -BR- -->
+
+<div class="macro-id-overline">
+<h3 id="br" class="macro-id">Manually break lines</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>BR</b>
+</div>
+
+<p>
+When using
+<a href="#justify">JUSTIFY</a>
+or
+<a href="#quad">QUAD</a>,
+BR tells mom about partial lines that you want broken (as opposed to
+<a href="definitions.html#filled">filled</a>).
+Any partial
+<a href="definitions.html#outputline">output line</a>
+that immediately precedes BR will be
+<a href="definitions.html#quad">quadded</a>
+in the direction of the current quad, or set flush left if text is
+<a href="definitions.html#just">justified</a>.
+</p>
+
+<p>
+Most of the time, you won&#8217;t need the BR macro.  In fill modes,
+mom tries to be sensible about where breaks are needed.  If the
+nature of a macro is such that under most circumstances you&#8217;d
+expect a break, mom puts it in herself.  Equally, in macros where a
+break isn&#8217;t normally desirable, no break occurs.  This means
+text files don&#8217;t get cluttered with annoying BR&#8217;s.
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span> Lines of text in
+<a href="definitions.html#filled">nofill mode</a>
+never require a BR.  Furthermore, in nofill mode, ALL macros cause a
+break.  If a break is not desired, use the
+<a href="#join"><kbd>\c</kbd></a>
+<a href="definitions.html#inlines">inline escape</a>.
+</p>
+
+<p class="tip-bottom" style="margin-top: -1em">
+<span class="experts">Experts:</span> BR is an alias for
+<kbd>.br</kbd>.  You can use either, or mix
+&#8217;n&#8217; match with impunity.
+</p>
+</div>
+
+<!-- -EL- -->
+
+<div class="macro-id-overline">
+<h3 id="el" class="macro-id">Manually break a line without advancing on the page</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>EL</b>
+</div>
+
+<p class="requires">
+In nofill modes
+<span style="font-style: normal;">
+(<a href="#left">LEFT</a>,
+<a href="#right">RIGHT</a>,
+<a href="#center">CENTER</a>)
+</span>
+you must terminate the line input preceding
+<span style="font-style: normal;">EL</span>
+with the
+<span style="font-style: normal;">
+<kbd>\c</kbd> inline escape.
+</span>
+See
+<span style="font-style: normal;">
+<a href="#el-notes">NOTES</a>,
+</span>
+below.
+</p>
+
+<p style="margin-top: -.5em">
+<i><b>Suggestion:</b> If you find remembering whether to put in the</i>
+<kbd>\c</kbd>
+<i>bothersome, you may prefer to use the</i>
+<a href="definitions.html#inlines">inline escape</a>
+<i>alternative to</i> EL,
+<a href="inlines.html#b"><kbd>\*[B]</kbd></a>,
+<i>which works consistently regardless of the fill mode.
+</i>EL <i>does not work after the</i>
+<a href="goodies.html#pad">PAD</a>
+<i>macro.  See</i>
+<a href="goodies.html#nobreak"><kbd>.PAD&nbsp;NOBREAK</kbd></a>
+<i>for the way around this.</i>
+</p>
+
+<p>
+The mnemonic &#8220;EL&#8221; is borrowed from old Compugraphic
+typesetting systems, where it stood for
+"<span style="text-decoration: underline;">E</span>nd <span style="text-decoration: underline;">L</span>ine."
+Conceptually, EL is equivalent to the notion of a carriage return
+with no linefeed.
+</p>
+
+<p id="el-example">
+EL&#8217;s function is simple: it breaks a line without advancing
+on the page.  As an example of where you might use it, imagine that
+you&#8217;re working from marked-up copy.  The markup indicates 24
+points of space between two given lines, but the prevailing line
+spacing is 12.5 points.  You may find it more convenient to break
+the first line with EL and instruct mom to advance 24 points to the
+next line instead of calculating the lead that needs to be added to
+12.5 to get 24.  To demonstrate:
+<br/>
+<span class="pre-in-pp">
+  .LEFT
+  .LS 12.5
+  A line of text.\c
+  .EL
+  .ALD 24p
+  The next line of text.
+</span>
+may be more intuitive than
+<br/>
+<span class="pre-in-pp">
+  .LEFT
+  .LS 12.5
+  A line of text.
+  .ALD 11.5p
+  The next line of text.
+</span>
+The first example has the further advantage that should you wish to
+change the prevailing line space but keep the 24 points lead, you
+don&#8217;t have to recalculate the extra space.
+</p>
+
+<p>
+ALD in the above examples stands for
+&#8220;<span style="text-decoration: underline;">A</span>dvance
+<span style="text-decoration: underline;">L</span>ea<span style="text-decoration: underline;">D</span>&#8221;
+(another mnemonic borrowed from Compugraphic), which is covered in
+the section
+<a href="#vertical-movements-intro">Vertical movements</a>.
+</p>
+
+<div class="box-notes">
+<h3 id="el-notes" class="docs notes">Notes</h3>
+
+<p style="margin-top: .5em;">
+In versions of mom prior to 1.1.9, EL did not always work as
+advertised on the last
+<a href="definitions.html#outputline">output line</a>
+of pages that contained a footer trap (e.g. one set with
+<a href="#b-margin">B_MARGIN</a>
+or in  documents formatted using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>).
+</p>
+
+<p>
+EL has been re-written so that this should no longer be the case.
+However, in order for it to work in the
+<a href="definitions.html#filled">nofill</a>
+modes
+(<a href="#lrc">LEFT</a>,
+<a href="#lrc">RIGHT</a>
+or
+<a href="#lrc">CENTER</a>),
+you must always &#8220;join&#8221; <kbd>.EL</kbd> to
+the line before it using the
+<kbd><a href="#join">\c</a></kbd>
+<a href="definitions.html#inlines">inline escape</a>,
+like this:
+<br/>
+<span class="pre-in-pp">
+  .LEFT
+  A line I don&#8217;t want to advance\c
+  .EL
+</span>
+Conversely, in
+<a href="definitions.html#filled">fill modes</a>
+(<a href="#quad">QUAD LEFT</a>,
+<a href="#quad">QUAD RIGHT</a>,
+<a href="#quad">QUAD CENTER</a>
+or
+<a href="#justify">JUSTIFY</a>),
+the <kbd>\c</kbd> must not be used.
+</p>
+
+<p>
+If EL is used after most macros or groff
+<a href="definitions.html#primitives">primitives</a>
+(see the exception, below), you don&#8217;t have to worry about
+this, regardless of the fill mode.  Just type
+<kbd>.EL</kbd>
+</p>
+
+<p class="tip-bottom">
+<span class="experts">Experts:</span> EL is unrelated to
+groff&#8217;s <kbd>.el</kbd>.  If you find the similarity confusing,
+you may want to alias EL as something else (but don&#8217;t use EOL;
+mom uses it internally.)
+</p>
+</div>
+
+<!-- -SP- -->
+
+<div class="macro-id-overline">
+<h3 id="space" class="macro-id">Break lines and add space between</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>SPACE</b> <kbd class="macro-args">&lt;space to add between lines&gt;</kbd>
+</div>
+<p class="alias">
+<i>Alias:</i> <b>SP</b>
+</p>
+
+<p>
+SPACE breaks a line, just like
+<a href="#br">BR</a>,
+then adds space after the line.  With no argument, it adds an extra
+line space of a value equal to the current
+<a href="definitions.html#leading">leading</a>.
+If you pass it a numeric argument without supplying a
+<a href="definitions.html#unitofmeasure">unit of measure</a>,
+it advances that number of extra line spaces.  For example:
+<br/>
+<span class="pre-in-pp">
+  .SPACE
+</span>
+breaks the line then adds an extra linespace, whereas
+<br/>
+<span class="pre-in-pp">
+  .SPACE 2
+</span>
+breaks the line and adds two extra linespaces.
+</p>
+
+<p>
+If you supply a unit of measure, SPACE breaks the line then advances
+one linespace (at the current
+<a href="definitions.html#leading">leading</a>)
+PLUS the specified amount of extra space given to SPACE, as in
+<br/>
+<span class="pre-in-pp">
+  .SPACE 6p
+</span>
+which breaks the line and advances one full linespace plus six
+points.
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="tip">Tip:</span> SPACE and
+<a href="#ald">ALD</a>
+can be used interchangeably (<kbd>.SPACE&nbsp;6p</kbd> and
+<kbd>.ALD&nbsp;6p</kbd> are equivalent).  However, ALD without an
+argument does nothing, whereas SPACE without an argument adds an
+extra line space.  I recommend using SPACE when you want an extra
+line space (or multiple thereof), and ALD whenever you want some
+other value of space after a line.
+</p>
+
+<p class="tip-bottom">
+<span class="experts">Experts:</span> SPACE is an alias of
+<kbd>.sp</kbd>.  You can use either, or mix &#8217;n&#8217; match
+with impunity.
+</p>
+</div>
+
+<!-- -SPREAD- -->
+
+<div class="macro-id-overline">
+<h3 id="spread" class="macro-id">Break and force justify (spread) lines</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>SPREAD</b>
+</div>
+
+<p>
+Sometimes, you need to break a line of
+<a href="definitions.html#just">justified</a>
+text and have it come out fully justified, not
+<a href="definitions.html#quad">quadded</a>
+left the way it would be with the
+<a href="#br">BR</a>
+macro.  An example of where you&#8217;d do this would be when you
+want to prevent a word at the end of a line from being hyphenated
+(say, a proper name). SPREAD is the macro that lets you break the
+line and have it came out fully justified.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="experts">Experts:</span> SPREAD is an alias for
+<kbd>.brp</kbd> You can use either, or mix
+&#8217;n&#8217; match with impunity.
+</p>
+</div>
+
+<!-- -JOIN- -->
+
+<div class="macro-id-overline">
+<h3 id="join" class="macro-id">Join input lines</h3>
+</div>
+
+<div class="box-macro-args">
+Inline: <kbd class="macro-args">\c</kbd>
+</div>
+
+<p>
+Sometimes, especially when in one of the
+<a href="definitions.html#filled">nofill modes</a>,
+a macro will cause a break where you don&#8217;t want one.  In order
+to prevent this from happening (in other words, to join
+<a href="definitions.html#inputline">input lines</a>
+together, forming one
+<a href="definitions.html#outputline">output line</a>),
+use the groff
+<a href="definitions.html#inlines">inline escape</a>
+<kbd>\c</kbd> at the end of each input line to be
+joined to another, like this:
+<br/>
+<span class="pre-in-pp">
+  .LEFT
+  .FAMILY T
+  .FT R
+  Some lines of text to be \c
+  .FAMILY H
+  .FT B
+  joined \c
+  .FAMILY T
+  .FT R
+  together.
+</span>
+Upon output, the lines will be joined together to read
+<br/>
+<span class="pre-in-pp">
+  Some lines of text to be joined together.
+</span>
+with the word &#8220;joined&#8221; in Helvetica bold.  Note the
+spaces before <kbd>\c</kbd>.  Without them, the last three words of
+the output line would read
+<br/>
+<span class="pre-in-pp">
+  bejoinedtogether
+</span>
+Please also note that had the example been in one of the
+<a href="definitions.html#filled">fill modes</a>,
+there&#8217;d have been no need for the <kbd>\c</kbd>.  
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<b>Addendum:</b> The example, above, is designed to demonstrate the
+use of <kbd>\c</kbd>.  An easier and more intuitive way
+to accomplish the family/font change in the example would be with
+the groff
+<a href="definitions.html#inlines">inline escape</a>,
+<kbd><a href="inlines.html#inline-fonts-groff">\f</a></kbd>,
+like this:
+<br/>
+<span class="pre-in-pp" style="padding-bottom: 0px;">
+  Some lines of text to be \f[HB]joined\*[PREV] together.
+</span>
+</p>
+</div>
+
+<div class="rule-short" style="margin-bottom: 24px;"><hr/></div>
+
+<!-- ==================================================================== -->
+
+<h2 id="refinements-intro" class="macro-group">Typographic refinements</h2>
+
+<p>
+The macros in this section help you tweak groff&#8217;s behaviour,
+ensuring that your documents look typographically professional.
+</p>
+
+<div id="index-refinements" class="macro-list-container">
+<h3 class="macro-list">Typographic refinements macros</h3>
+
+<ul class="macro-list">
+  <li>Word and sentence spacing
+  <ul style="list-style-type: none; margin-left: -1em;">
+    <li><a href="#ws">WS</a> &ndash; word spacing</li>
+    <li><a href="#ss">SS</a> &ndash; sentence space</li>
+  </ul></li>
+  <li>Letter spacing (track kerning)
+  <ul style="list-style-type: none; margin-left: -1em;">
+    <li><a href="#rw">RW</a> &ndash; reduce whitespace</li>
+    <li><a href="#ew">EW</a> &ndash; expand whitespace</li>
+    <li><a href="#br-at-line-kern">BR_AT_LINE_KERN</a></li>
+  </ul></li>
+  <li>Hyphenation
+  <ul style="list-style-type: none; margin-left: -1em;">
+    <li><a href="#hy">HY</a> &ndash; turn auto hyphenation on/off, or set specific hyphenation parameters</li>
+    <li><a href="#hy-set">HY_SET</a> &ndash; set all hyphenation parameters</li>
+  </ul></li>
+  <li>Automatic kerning and ligatures
+  <ul style="list-style-type: none; margin-left: -1em;">
+    <li><a href="#kern">KERN</a> &ndash; turn automatic pairwise kerning on or off</li>
+    <li><a href="#ligatures">LIGATURES</a> &ndash; turn automatic generation of ligatures on or off</li>
+  </ul></li>
+</ul>
+</div>
+
+<!-- -WS- -->
+
+<div class="macro-id-overline">
+<h3 id="ws" class="macro-id">Word spacing</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>WS</b> <kbd class="macro-args">&lt;+|-wordspace&gt; | DEFAULT</kbd>
+</div>
+
+<p>
+WS (Word Space) increases or decreases the amount of space between
+words.  In
+<a href="definitions.html#filled">nofill modes</a>,
+or if
+<a href="#quad">QUAD</a>
+is in effect, the space between words is fixed.  Therefore, if you
+change the word spacing with WS, the change applies uniformly to the
+space between every word on every line.  However, when text is
+<a href="definitions.html#just">justified</a>,
+the space between words varies from line to line (in order to
+justify the text).  Consequently, the change you make with WS
+represents the minimum (and ideal) space groff will try to put
+between words before deciding whether to hyphenate a final word or
+to stretch the word spacing.
+</p>
+
+<p>
+Word space is relative to type size.  Knowing how it&#8217;s
+calculated is unimportant. What matters is having a sense of how
+the value passed to WS affects the look of your type.  Generally,
+in/decreasing the word space by a value of 1 or 2 produces a
+difference that in many cases is scarcely visible; in/decreasing by
+a value of 5 or so produces a subtle but noticeable difference; and
+in/decreasing by a value greater than 10 is always apparent.  You
+should preview your work to assess the effect of WS.
+</p>
+
+<p id="ws-usage">
+WS takes as its argument a number (decimal fractions are allowed)
+preceded by a plus or minus sign.  Therefore, to decrease the word
+space slightly, you might enter <br/>
+<span class="pre-in-pp">
+  .WS -4
+</span>
+To increase it by a noticeable amount, you might enter
+<br/>
+<span class="pre-in-pp">
+  .WS +12
+</span>
+You can reset the word spacing to its previous value by switching
+the plus or minus sign, like this:
+<br/>
+<span class="pre-in-pp">
+  .WS +4
+  A line of text
+  .WS -4
+</span>
+The <kbd>.WS&nbsp;-4</kbd> undoes the effect of
+<kbd>.WS&nbsp;+4</kbd>.  You can also reset WS to its groff default
+by entering
+<br/>
+<span class="pre-in-pp">
+  .WS DEFAULT
+</span>
+This can be particularly useful if you&#8217;ve been playing around
+with plus and minus values, and can&#8217;t remember by how much you
+have to in/decrease the word space to get it back to normal.
+</p>
+
+<!-- -SS- -->
+
+<div class="macro-id-overline">
+<h3 id="ss" class="macro-id">Sentence space</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>SS</b> <kbd class="macro-args">&lt;+sentence space&gt; | 0 | DEFAULT</kbd>
+</div>
+
+<p>
+SS (Sentence Space) tells groff how to treat double spaces it
+encounters between sentences in
+<a href="definitions.html#inputline">input lines</a>.
+If you use SS, input sentences with two spaces after them <i>and</i>
+input sentences that fall at the end of input lines all receive a
+normal word space plus an additional amount of space whose size is
+determined by the + value passed as an argument to SS.  Thus,
+<br/>
+<span class="pre-in-pp">
+  .SS +2
+</span>
+means that input sentences with two spaces after them receive a
+normal word space PLUS the +2 value passed to SS.
+</p>
+
+<p>
+Like
+<a href="#ws">WS</a>,
+increasing the sentence space by a value of 1 or 2 produces a
+difference that in many cases is scarcely visible; increasing by a
+value of 5 or so produces a subtle but noticeable difference (i.e.
+the space between double-spaced input sentences will be slightly but
+visibly greater than the space between words); and increasing by a
+value greater than 10 is always apparent.  You should preview your
+work to assess the effect of SS.
+</p>
+
+<p>
+There&#8217;s an additional argument you can pass SS: the number
+zero (without the + sign).  It&#8217;s the argument you&#8217;ll
+use most often.  Typeset copy should never have two spaces between
+sentences, and the "zero" argument tells groff to give the extra
+spaces no space at all (effectively removing them).  Therefore, if
+you double-space your sentences (as you should when writing in a
+text editor), get in the habit of putting
+<br/>
+<span class="pre-in-pp">
+  .SS 0
+</span>
+at the top of your files.
+</p>
+
+<p>
+If you do use SS for something other than ensuring that you
+don&#8217;t get unwanted sentence spaces in output copy, you can set
+or reset the sentence space to the groff default (the same width
+as a word space, i.e. double-spaced input sentences will appear
+double-spaced on output as well) with
+<br/>
+<span class="pre-in-pp">
+  .SS DEFAULT
+</span>
+If you&#8217;re using the
+<a href="docprocessing.html">document processing macros</a>
+and your
+<a href="docprocessing.html#printstyle">PRINTSTYLE</a>
+is <kbd>TYPEWRITE</kbd>, <kbd>.SS&nbsp;DEFAULT</kbd> is the
+default, because you do want double spaces between sentences in copy
+that imitates the look of a typewritten document.
+</p>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">IMPORTANT:</span> SS with an argument other
+than <kbd>0</kbd> (zero) should only be used if you&#8217;re of
+the old (and wise) school of typists that puts two spaces between
+sentences.  If you ignore this advice and use SS when you habitually
+put only one space between sentences, you risk producing output
+where the space between sentences is not equal.
+</p>
+</div>
+
+<!-- -HY- -->
+
+<div class="macro-id-overline">
+<h3 id="hy" class="macro-id">Automatic hyphenation control</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>HY</b> <kbd class="macro-args">LINES &lt;max. number of consecutive hyphenated lines&gt;</kbd>
+  <br/>
+Macro: <b>HY</b> <kbd class="macro-args">MARGIN &lt;size of hyphenation margin&gt;</kbd>
+  <br/>
+Macro: <b>HY</b> <kbd class="macro-args">SPACE &lt;extra interword spacing to prevent hyphenation&gt;</kbd>
+  <br/>
+Macro: <b>HY</b> <kbd class="macro-args">DEFAULT</kbd>
+  <br/>
+Macro: <b>HY</b> <kbd class="macro-args">toggle</kbd>
+</div>
+<p class="alias">
+<i>Aliases:</i> <b>HYPHENATE, HYPHENATION</b>
+</p>
+
+<p>
+HY, as you can see, can be invoked with a number of arguments.  In
+all cases, the aliases HYPHENATE or HYPHENATION can be used in place
+of HY.  To aid in understanding the various arguments you can pass
+to HY, I&#8217;ve broken them down into separate sections.
+</p>
+
+<h3 class="docs">1.&nbsp;&nbsp;HY</h3>
+
+<p>
+HY by itself (i.e. with no argument) simply turns automatic
+hyphenation on.  Any argument other than LINES, MARGIN, SPACE or
+DEFAULT, turns automatic hyphenation off.  For example, as explained
+in
+<a href="intro.html#macro-args">How to read macro arguments</a>,
+you could turn HY off by entering
+<br/>
+<span class="pre-in-pp">
+  .HY OFF
+</span>
+or
+<span class="pre-in-pp">
+  .HY X
+</span>
+or
+<span class="pre-in-pp">
+  .HY END
+</span>
+HY observes the following default hyphenation rules:
+</p>
+<ul style="margin-top: -.5em; margin-left: 18px;">
+  <li>Last lines (i.e. ones that will spring a trap&mdash;typically
+      the last line on a page) will not be hyphenated.
+  </li>
+  <li>The first and last two characters of a word are never
+      split off.
+  </li>
+</ul>
+
+<h3 class="docs numbered">2.&nbsp;&nbsp;HY LINES</h3>
+
+<p>
+HY LINES sets the maximum number of consecutive hyphenated lines
+that will appear in output copy.  2 is a very good choice, and
+you&#8217;d set it with
+<br/>
+<span class="pre-in-pp">
+  .HY LINES 2
+</span>
+By default, when you turn automatic hyphenation on, there is no
+limit to the number of consecutive hyphenated lines.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+<a href="definitions.html#discretionaryhyphen">Discretionary hyphens</a>
+count when groff is figuring out how many lines to hyphenate;
+explicit hyphens do not.
+</p>
+</div>
+
+<h3 class="docs numbered">3.&nbsp;&nbsp;HY MARGIN</h3>
+
+<p>
+HY MARGIN sets the amount of room allowed at the end of a line
+before hyphenation is tripped (e.g. if there&#8217;s only 6 points
+left at the end of a line, groff won&#8217;t try to hyphenate the
+next word).  HY MARGIN only applies if you&#8217;re using
+<a href="#quad">QUAD</a>,
+and is really only useful if you&#8217;re using QUAD LEFT.
+</p>
+
+<p>
+As an example, if you don&#8217;t want groff to hyphenate words
+when there&#8217;s only 18 points of space left at the end of a
+left-quadded line, you&#8217;d enter
+<br/>
+<span class="pre-in-pp" style="margin-bottom: -1em">
+  .HY MARGIN 18p
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> The numeric argument after HY
+MARGIN requires a
+<a href="definitions.html#unitofmeasure">unit of measure</a>.
+</p>
+</div>
+
+<h3 class="docs numbered">4.&nbsp;&nbsp;HY SPACE</h3>
+
+<p>
+HY SPACE sets an amount of extra interword space that groff will try
+to put between words on a line in order to PREVENT hyphenation.  HY
+SPACE applies only to
+<a href="definitions.html#just">justified lines</a>.
+Generally speaking, you&#8217;ll want this value to be quite small,
+since too big a value will result in lines with gaping holes between
+the words.  A reasonable value might be half a point, or one point,
+which you&#8217;d set with
+<br/>
+<span class="pre-in-pp">
+  .HY SPACE .5p
+</span>
+or
+<span class="pre-in-pp" style="margin-bottom: -1em">
+  .HY SPACE 1p
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> The numeric argument after HY SPACE
+requires a
+<a href="definitions.html#unitofmeasure">unit of measure</a>.
+</p>
+</div>
+
+<h3 class="docs numbered">5.&nbsp;&nbsp;HY DEFAULT</h3>
+
+<p>
+HY DEFAULT resets automatic hyphenation to its default behaviour,
+cancelling any changes made with HY <kbd>LINES</kbd>, HY
+<kbd>MARGIN</kbd>, and/or HY <kbd>SPACE</kbd>.
+</p>
+
+<div class="box-notes">
+<h3 id="hyphenation-thoughts" class="docs notes">Thoughts on hyphenation in general</h3>
+
+<p style="margin-top: .5em">
+Hyphenation is a necessary evil.  If it can be avoided, it
+should be.  If it can&#8217;t be, it should occur infrequently.
+That&#8217;s the reason for the number of parameters you can set
+with HY.
+</p>
+
+<p class="tip-bottom">
+Furthermore, hyphenation in
+<a href="definitions.html#rag">rag</a>
+copy requires a great deal of attention.  At best, it should be
+avoided completely by individually adjusting the number of words
+on consecutive lines to achieve a pleasing, natural-looking rag.
+Since such adjustments are often too fussy for document processing,
+I recommend playing around with HY MARGIN a bit if your copy looks
+hyphen-heavy.
+</p>
+</div>
+
+<!-- -HY_SET- -->
+
+<div class="macro-id-overline">
+<h3 id="hy-set" class="macro-id">Set hyphenation parameters all at once</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>HY_SET</b> <kbd class="macro-args">&lt;lines&gt; [ &lt;margin&gt; [ &lt;space&gt; ] ]</kbd>
+</div>
+
+<p class="alias">
+<i>Alias:</i> <b>HYSET</b>
+</p>
+
+<p>
+HY_SET lets you set the parameters for hyphenation
+with a single macro. <kbd>&lt;lines&gt;,</kbd>
+<kbd>&lt;margin&gt;</kbd> and
+<kbd>&lt;space&gt;</kbd> correspond to the numeric
+values required by <kbd>LINES</kbd>,
+<kbd>MARGIN</kbd> and <kbd>SPACE</kbd> as described
+<a href="#hy">above</a>.
+</p>
+
+<p>
+To set just the maximum number of consecutive hyphenated lines,
+you&#8217;d enter
+<br/>
+<span class="pre-in-pp">
+  .HY_SET 2
+</span>
+If you wanted the same number of maximum consecutive hyphenated
+lines and a hyphenation margin for use with
+<a href="definitions.html#rag">rag</a>
+copy,
+<br/>
+<span class="pre-in-pp">
+  .HY_SET 2 36p
+</span>
+would set the hyphenation margin to 36 points.
+</p>
+
+<p>
+If you wanted the same number of maximum consecutive hyphenated
+lines and a hyphenation space of 2 points for use with
+<a href="definitions.html#just">justified</a>
+copy, 
+<br/>
+<span class="pre-in-pp">
+  .HYSET 2 0 2p
+</span>
+is how you&#8217;d do it.
+</p>
+
+<!-- -RW- -->
+
+<div class="macro-id-overline">
+<h3 id="rw" class="macro-id">Reduce whitespace</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>RW</b> <kbd class="macro-args">&lt;amount of whitespace reduction between letters&gt;</kbd>
+</div>
+
+<p>
+RW (<span style="text-decoration: underline;">R</span>educe <span style="text-decoration: underline;">W</span>hitespace)
+and its corresponding macro,
+EW (<span style="text-decoration: underline;">E</span>xpand <span style="text-decoration: underline;">W</span>hitespace),
+allow you to tighten (or loosen)
+<a href="definitions.html#outputline">output lines</a>
+by uniformly reducing or expanding the space between characters.
+This is particularly useful when you want to squeeze or stretch
+lines on a narrow measure.
+</p>
+
+<p>
+The value passed to RW may be a whole number or a decimal fraction.
+Since a value of 1 produces a noticeable reduction in the space
+between letters at text sizes, you&#8217;ll most likely use small
+decimal values when tightening lines.  For example,
+<br/>
+<span class="pre-in-pp">
+  .RW .1
+</span>
+or
+<span class="pre-in-pp">
+  .RW .2
+</span>
+may be just enough to squeeze an extra character or two on a line
+without the change in letter spacing being obvious.  I highly
+recommend previewing your work to assess the effect of RW.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> By default, RW does not deposit a 
+<a href="#br">break</a>
+when it&#8217;s invoked if you&#8217;re in one of the
+<a href="definitions.html#fill">fill</a>
+modes (i.e.
+<a href="#quad">QUAD</a>
+L, R, C, J or
+<a href="#justify">JUSTIFY</a>).
+If you want
+RW to break at the ends of the previous
+<a href="definitions.html#inputline">input lines</a>
+while you&#8217;re in a fill mode, tell mom
+that&#8217;s what you want by invoking
+<kbd><a href="#br-at-line-kern">.BR_AT_LINE_KERN</a></kbd>.
+</p>
+</div>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">IMPORTANT:</span> In versions prior to
+1.1.9-a, RW affected all
+<a href="definitions.html#font">fonts</a>
+in the
+<a href="definitions.html#family">family</a>
+current at the time it was invoked.  As of 1.1.9-a, this behaviour
+has been changed. RW affects only the font current at the time
+it&#8217;s invoked, and remains in effect for that font every time
+the font is called, hence must be reset to zero to cancel its effect
+(<kbd>.RW&nbsp;0</kbd>) on that font.
+</p>
+</div>
+
+<!-- -EW- -->
+
+<div class="macro-id-overline">
+<h3 id="ew" class="macro-id">Expand whitespace</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>EW</b> <kbd class="macro-args">&lt;amount of whitespace expansion between letters&gt;</kbd>
+</div>
+
+<p>
+EW (<span style="text-decoration: underline;">E</span>xpand <span style="text-decoration: underline;">W</span>hitespace)
+expands the amount of whitespace between letters, effectively
+&#8220;loosening&#8221; lines of type.
+</p>
+
+<p>
+The value passed to EW may be a whole number or a decimal fraction.
+Since a value of 1 produces a noticeable expansion in the space
+between letters at text sizes, you&#8217;ll most likely use small
+decimal values when loosening lines.  For example,
+<br/>
+<span class="pre-in-pp">
+  .EW .1
+</span>
+or
+<span class="pre-in-pp">
+  .EW .2
+</span>
+may be just enough to open up a line without the change in letter
+spacing being obvious.  I highly recommend previewing your work to
+assess the effect of EW.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> By default, EW does not deposit a 
+<a href="#br">break</a>
+when it&#8217;s invoked if you&#8217;re in one of the
+<a href="definitions.html#fill">fill</a>
+modes (i.e.
+<a href="#quad">QUAD</a>
+L, R, C, J or
+<a href="#justify">JUSTIFY</a>).
+If you want
+EW to break at the ends of the previous
+<a href="definitions.html#inputline">input lines</a>
+while you&#8217;re in a fill mode, tell mom that&#8217;s what you
+want by invoking the
+<kbd><a href="#br-at-line-kern">.BR_AT_LINE_KERN</a></kbd>
+toggle macro.
+</p>
+</div>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">IMPORTANT:</span> In versions prior to
+1.1.9-a, EW affected all
+<a href="definitions.html#font">fonts</a>
+in the
+<a href="definitions.html#family">family</a>
+current at the time it was invoked.  As of 1.1.9-a, this behaviour
+has been changed.  EW affects only the font current at the time
+it&#8217;s invoked, and remains in effect for that font every time
+the font is called, hence must be reset to zero to cancel its effect
+(<kbd>.EW&nbsp;0</kbd>) on that font.
+</p>
+</div>
+
+<!-- -BR_AT_LINE_KERN- -->
+
+<div class="macro-id-overline">
+<h3 id="br-at-line-kern" class="macro-id">Break before line kerning</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>BR_AT_LINE_KERN</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+By default, in
+<a href="definitions.html#filled">fill</a>
+modes (i.e.
+<a href="#quad">QUAD</a>
+L, R, C, J or
+<a href="#justify">JUSTIFY</a>)
+mom does not break
+<a href="definitions.html#inputline">input lines</a>
+when you invoke
+<a href="#rw">RW</a>
+or
+<a href="#ew">EW</a>.
+If you&#8217;d like her to break input lines prior to RW or EW,
+invoke <kbd>.BR_AT_INPUT_LINE</kbd> without any argument.  To
+disable the breaks, invoke <kbd>.BR_AT_INPUT_LINE</kbd> with any
+argument (OFF, QUIT, Q, X...), like this
+<br/>
+<span class="pre-in-pp">
+  .BR_AT_LINE_KERN OFF
+</span>
+or
+<span class="pre-in-pp">
+  .BR_AT_LINE_KERN X
+</span>
+With QUAD L, R or C, mom simply breaks the line.  With QUAD J (or
+just JUSTIFY, which is the same thing), she breaks and
+<a href="definitions.html#force">force justifies</a>
+the line prior to <kbd>.EW</kbd> or <kbd>.RW</kbd>.
+</p>
+
+<!-- -KERN- -->
+
+<div class="macro-id-overline">
+<h3 id="kern" class="macro-id">Automatic kerning</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>KERN</b> <kbd class="macro-args">toggle</kbd>
+</div>
+
+<p>
+By itself (i.e. with no argument), KERN turns automatic pairwise
+<a href="definitions.html#kern">kerning</a>
+on.  With any argument (e.g. OFF, Q, X), pairwise kerning is turned
+off.
+</p>
+
+<p>
+Kerning of individual character pairs can be controlled with the
+<a href="definitions.html#inlines">inline escapes</a>
+<kbd>\*[BU &lt;n&gt;]</kbd> and
+<kbd>\*[FU &lt;n&gt;]</kbd>.  See
+<a href="inlines.html#inline-kerning-mom">Inline Escapes, kerning</a>.
+</p>
+
+<!-- -LIGATURES- -->
+
+<div class="macro-id-overline">
+<h3 id="ligatures" class="macro-id">Automatic ligature generation</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>LIGATURES</b> <kbd class="macro-args">toggle</kbd>
+</div>
+<p class="alias">
+<i>Alias:</i> <b>LIG</b>
+</p>
+
+<p>
+Provided your current font has
+<a href="definitions.html#ligatures">ligatures</a>,
+LIGATURES, by itself, turns on automatic generation of ligatures.
+When automatic ligature generation is on, simply typing the letters
+of a ligature combination will produce the correct ligature upon
+output.  For example, if you type the word &#8220;finally&#8221;,
+the fi combination will be output as an fi ligature.  Generally
+speaking, ligatures are A Good Thing, hence mom has them on by
+default.
+</p>
+
+<p>
+LIGATURES with any argument turns automatic ligature generation off.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> Not all fonts support ligatures.
+</p>
+</div>
+
+<div class="rule-short"><hr/></div>
+
+<!-- ==================================================================== -->
+
+<h2 id="modifications-intro" class="macro-group">Type modifications (pseudo font styles)</h2>
+
+<p>
+It sometimes happens that a PostScript 
+<a href="definitions.html#family">family</a>
+doesn&#8217;t contain all the fonts you need.  You might, for
+example, be missing an italic font, or a bold font.  Or you might
+not be able to get your hands on a condensed family.  That&#8217;s
+where these macros and inline escapes come in.  With them, you
+can fake the fonts you&#8217;re missing.  A word of caution,
+though: &#8220;faked&#8221; fonts are just that&mdash;faked.  You
+should only use them as a last resort, and then only sparingly.  A
+word or two or a line or two in a faked font will pass unnoticed;
+large patches of type in a faked font look typographically cheap.
+</p>
+
+<div id="index-modifications" class="macro-list-container">
+<h3 class="macro-list">Type modifications macros</h3>
+
+<ul class="macro-list">
+  <li>Pseudo italic
+  <ul style="list-style: none; margin-left: -1em;">
+    <li><a href="#setslant">SETSLANT</a> &ndash; degree of pseudo-italicizing</li>
+    <li><a href="#slant-inline">\*[SLANT]</a> &ndash; inline escape for pseudo-italicizing type</li>
+  </ul></li>
+  <li>Pseudo bold
+  <ul style="list-style: none; margin-left: -1em;">
+    <li><a href="#setbolder">SETBOLDER</a> &ndash; amount of emboldening</li>
+    <li><a href="#bolder-inline">\*[BOLDER]</a> &ndash; inline escape for emboldening type</li>
+  </ul></li>
+  <li>Pseudo condensed
+  <ul style="list-style: none; margin-left: -1em;">
+    <li><a href="#condense">CONDENSE</a> &ndash; percentage for pseudo-condensed type</li>
+    <li><a href="#cond-inline">\*[COND]</a> &ndash; inline escape for pseudo-condensed type</li>
+  </ul></li>
+  <li>Pseudo extended
+  <ul style="list-style: none; margin-left: -1em;">
+    <li><a href="#extend">EXTEND</a> &ndash; percentage for pseudo-extended type</li>
+    <li><a href="#ext-inline">\*[EXT]</a> &ndash; inline escape for pseudo-extending</li>
+  </ul></li>
+</ul>
+</div>
+
+<!-- -SETSLANT- -->
+
+<div class="macro-id-overline">
+<h3 id="setslant" class="macro-id">Set degree of slant for pseudo-italicizing</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>SETSLANT</b> <kbd class="macro-args">&lt;degrees to slant type&gt; | RESET</kbd>
+</div>
+
+<p>
+Pseudo-italicizing of type is accomplished by slanting a roman font
+a certain number of degrees to the right. SETSLANT lets you fix the
+number of degrees. Mom&#8217;s default is 15, which produces an
+acceptable approximation of an italic font.  If you want another
+value&mdash;say, 13 degrees&mdash;you&#8217;d set it by entering
+<br/>
+<span class="pre-in-pp">
+  .SETSLANT 13
+</span>
+If you change the degree of slant and later want to set it back to
+the mom default, do
+<br/>
+<span class="pre-in-pp">
+  .SETSLANT RESET
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> By itself, SETSLANT will not start
+pseudo-italicizing type; it merely tells mom what degree of slant
+you want.  To start pseudo-italicizing, use the
+<a href="definitions.html#inlines">inline escape</a>
+<kbd>\*[SLANT]</kbd>.
+</p>
+</div>
+
+<!-- -\*[SLANT]- -->
+
+<div class="macro-id-overline">
+<h3 id="slant-inline" class="macro-id">Pseudo italic on/off</h3>
+</div>
+
+<div class="box-macro-args">
+Inline: <kbd class="macro-args">\*[SLANT]</kbd>
+<br/>
+Inline: <kbd class="macro-args">\*[SLANTX</kbd>]
+</div>
+
+<p>
+<kbd class="macro-args">\*[SLANT]</kbd> begins pseudo-italicizing type.
+<kbd class="macro-args">\*[SLANTX]</kbd> turns the feature off.  Both are
+<a href="definitions.html#inlines">inline escapes</a>,
+therefore they should not appear as separate lines, but rather be
+embedded in text lines, like this:
+<br/>
+<span class="pre-in-pp">
+  Not \*[SLANT]everything\*[SLANTX] is as it seems.
+</span>
+Alternatively, if you wanted the whole line pseudo-italicized,
+you&#8217;d do
+<br/>
+<span class="pre-in-pp">
+  \*[SLANT]Not everything is as it seems.\*[SLANTX]
+</span>
+Once <kbd>\*[SLANT]</kbd> is invoked, it remains in effect until
+turned off.
+</p>
+
+<div class="box-tip" style="margin-top: .5em;">
+<p class="tip">
+<span class="note">Note:</span> If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+with
+<a href="docprocessing.html#printstyle">PRINTSTYLE TYPEWRITE</a>,
+mom underlines pseudo-italics by default.  To change this behaviour,
+use the special macro
+<a href="docprocessing.html#typewrite-control">SLANT_MEANS_SLANT</a>.
+</p>
+</div>
+
+<!-- -SETBOLDER- -->
+
+<div class="macro-id-overline">
+<h3 id="setbolder" class="macro-id">Set amount of emboldening</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>SETBOLDER</b> <kbd class="macro-args">&lt;amount of emboldening, in machine units&gt; | RESET</kbd>
+</div>
+
+<p>
+Emboldening of type is accomplished by printing characters twice;
+the second printing is slightly offset from the first, effectively
+&#8220;thickening&#8221; the character.  SETBOLDER lets you set the
+number of
+<a href="definitions.html#units">machine units</a>
+for the offset.  Mom&#8217;s default is 700 units, which produces an
+acceptable approximation of a bold font.  If you want another
+value&mdash;say, 500 units&mdash;you&#8217;d set it by entering
+<br/>
+<span class="pre-in-pp">
+  .SETBOLDER 500
+</span>
+If you change the emboldening offset and later want to set it back
+to the mom default, do
+<br/>
+<span class="pre-in-pp">
+  .SETBOLDER RESET
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> By itself, SETBOLDER will not start
+emboldening type; it merely tells mom what you want the emboldening
+offset to be.  To start emboldening, use the
+<a href="definitions.html#inlines">inline escape</a>
+<kbd>\*[BOLDER]</kbd>.
+</p>
+</div>
+
+<!-- -\*[BOLDER]- -->
+
+<div class="macro-id-overline">
+<h3 id="bolder-inline" class="macro-id">Emboldening on/off</h3>
+</div>
+
+<div class="box-macro-args">
+Inline: <kbd class="macro-args">\*[BOLDER]</kbd>
+<br/>
+Inline: <kbd class="macro-args">\*[BOLDERX]</kbd>
+</div>
+
+<p>
+<kbd class="macro-args">\*[BOLDER]</kbd> begins emboldening type.
+<kbd class="macro-args">\*[BOLDERX]</kbd> turns the feature off.  Both are
+<a href="definitions.html#inlines">inline escapes</a>,
+therefore they should not appear as separate lines, but rather be
+embedded in text lines, like this:
+<br/>
+<span class="pre-in-pp">
+  Not \*[BOLDER]everything\*[BOLDERX] is as it seems.
+</span>
+Alternatively, if you wanted the whole line emboldened,
+you&#8217;d do
+<br/>
+<span class="pre-in-pp">
+  \*[BOLDER]Not everything is as it seems.\*[BOLDERX]
+</span>
+Once <kbd>\*[BOLDER]</kbd> is invoked, it remains in effect
+until turned off.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+with
+<a href="docprocessing.html#printstyle">PRINTSTYLE TYPEWRITE</a>,
+mom ignores <kbd>\*[BOLDER]</kbd> requests.
+</p>
+</div>
+
+<!-- -CONDENSE- -->
+
+<div class="macro-id-overline">
+<h3 id="condense" class="macro-id">Set percentage for pseudo-condensed type</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>CONDENSE</b> <kbd class="macro-args">&lt;pseudo-condense percentage&gt;</kbd>
+</div>
+
+<p>
+Pseudo-condensing of type is accomplished by reducing the width of
+characters at a given point size without reducing their height,
+effectively narrowing them so they look like condensed type.
+CONDENSE tells mom what percentage of the normal character width you
+want the characters to be condensed.
+</p>
+
+<p>
+Mom has no default value for CONDENSE, therefore you must set it
+before using the
+<a href="definitions.html#inlines">inline escape</a>
+<kbd><a href="#cond-inline">\*[COND]</a></kbd>.
+80 percent of the normal character width is a good value, and
+you&#8217;d set it like this:
+<br/>
+<span class="pre-in-pp">
+  .CONDENSE 80
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span> By itself, CONDENSE will not start
+pseudo-condensing type; it merely tells mom what percentage of the
+normal character width you want characters to be condensed.  To
+start pseudo-condensing, use the
+<a href="definitions.html#inlines">inline escape</a>
+<kbd>\*[COND]</kbd>.
+</p>
+
+<p class="tip-bottom">
+<span class="additional-note">Additional note:</span> Make sure that
+pseudo-condensing is off (with
+<kbd><a href="#cond-inline">\*[CONDX]</a></kbd>)
+before before making any changes to the pseudo-condense percentage
+with CONDENSE.
+</p>
+</div>
+
+<!-- -\*[COND]- -->
+
+<div class="macro-id-overline">
+<h3 id="cond-inline" class="macro-id">Pseudo-condensing on/off</h3>
+</div>
+
+<div class="box-macro-args">
+Inline: <kbd class="macro-args">\*[COND]</kbd>
+<br/>
+Inline: <kbd class="macro-args">\*[CONDX]</kbd>
+</div>
+
+<p>
+<kbd>\*[COND]</kbd> begins pseudo-condensing type.
+<kbd>\*[CONDX]</kbd> turns the feature off.  Both are
+<a href="definitions.html#inlines">inline escapes</a>,
+therefore they should not appear as separate lines, but rather be
+embedded in text lines, like this:
+<br/>
+<span class="pre-in-pp">
+  \*[COND]Not everything is as it seems.\*[CONDX]
+</span>
+<kbd>\*[COND]</kbd> remains in effect until you turn it
+off with <kbd>\*[CONDX]</kbd>.
+</p>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">IMPORTANT:</span> You must turn
+<kbd>\*[COND]</kbd>
+off before making any changes to the point size of your type, either
+via the
+<a href="#ps">PT_SIZE</a>
+macro or with the <kbd>\s</kbd> inline escape.  If you wish
+the new point size to be pseudo-condensed, simply reinvoke
+<kbd>\*[COND]</kbd> afterwards.  Equally, <kbd>\*[COND]</kbd> must
+be turned off before changing the condense percentage with
+<kbd><a href="#condense">.CONDENSE</a></kbd>.
+</p>
+</div>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+with
+<a href="docprocessing.html#printstyle">PRINTSTYLE TYPEWRITE</a>,
+mom ignores <kbd>\*[COND]</kbd> requests.
+</p>
+</div>
+
+<!-- -EXTEND- -->
+
+<div class="macro-id-overline">
+<h3 id="extend" class="macro-id">Set percentage for pseudo-extended type</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>EXTEND</b> <kbd class="macro-args">&lt;pseudo-extend percentage&gt;</kbd>
+</div>
+
+<p>
+Pseudo-extending of type is accomplished by increasing the width of
+characters at a given point size without increasing their height,
+effectively widening them so they look like extended type. EXTEND
+tells mom what percentage of the normal character width you want the
+characters to be extended.
+</p>
+
+<p>
+Mom has no default value for EXTEND, therefore you must set it
+before using the
+<a href="definitions.html#inlines">inline escape</a>
+<kbd><a href="#ext-inline">\*[EXT]</a></kbd>.
+120% of the normal character width is a good value, and you&#8217;d
+set it like this:
+<br/>
+<span class="pre-in-pp">
+  .EXTEND 120
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span> By itself, EXTEND will not start
+pseudo-extending type; it merely tells mom what percentage of the
+normal character width you want characters to be extended.  To start
+pseudo-extending, use the
+<a href="definitions.html#inlines">inline escape</a>
+<kbd>\*[EXT]</kbd>.
+</p>
+
+<p class="tip-bottom">
+<span class="additional-note">Additional note:</span> Make sure that
+pseudo-extending is off (with
+<a href="#ext-inline"><kbd>\*[EXTX]</kbd></a>)
+before before making any changes to the pseudo-extend percentage
+with EXTEND.
+</p>
+</div>
+
+<!-- -\*[EXT]- -->
+
+<div class="macro-id-overline">
+<h3 id="ext-inline" class="macro-id">Pseudo-extending on/off</h3>
+</div>
+
+<div class="box-macro-args">
+Inline: <kbd class="macro-args">\*[EXT]</kbd>
+<br/>
+Inline: <kbd class="macro-args">\*[EXTX]</kbd>
+</div>
+
+<p>
+<kbd>\*[EXT]</kbd> begins pseudo-extending type.
+<kbd>\*[EXTX]</kbd> turns the feature off.  Both are
+<a href="definitions.html#inlines">inline escapes</a>,
+therefore they should not appear as separate lines, but rather be
+embedded in text lines, like this:
+<br/>
+<span class="pre-in-pp">
+  \*[EXT]Not everything is as it seems.\*[EXTX]
+</span>
+<kbd>\*[EXT]</kbd> remains in effect until you turn it off with
+<kbd>\*[EXTX]</kbd>.
+</p>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">IMPORTANT:</span> You must turn
+<kbd>\*[EXT]</kbd> off before making any changes to the point size
+of your type, either via the
+<a href="#ps">PT_SIZE</a>
+macro or with the <kbd>\s</kbd> inline escape.  If you wish the new
+point size to be pseudo-extended, simply reinvoke <kbd>\*[EXT]</kbd>
+afterwards.  Equally, <kbd>\*[EXT]</kbd> must be turned off before
+changing the extend percentage with
+<a href="#extend">EXTEND</a>.
+</p>
+</div>
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+with
+<a href="docprocessing.html#printstyle">PRINTSTYLE TYPEWRITE</a>,
+mom ignores <kbd>\*[EXT]</kbd> requests.
+</p>
+</div>
+
+<div class="rule-short" style="margin-bottom: 24px;"><hr/></div>
+
+<!-- ==================================================================== -->
+
+<h2 id="aldrld-intro" class="macro-group">Vertical movements</h2>
+
+The two macros in this section allow you to move down or up on the
+page relative to the current
+<a href="definitions.html#baseline">baseline</a>.
+
+<div id="index-aldrld" class="macro-list-container">
+<h3 class="macro-list">Vertical movements macros</h3>
+<ul class="macro-list">
+  <li><a href="#ald">ALD</a> &ndash; Advance Lead</li>
+  <li><a href="#rld">RLD</a> &ndash; Reverse Lead</li>
+</ul>
+</div>
+
+<!-- -ALD- -->
+
+<div class="macro-id-overline">
+<h3 id="ald" class="macro-id">Advance Lead (move downward)</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>ALD</b> <kbd class="macro-args">&lt;distance to move downward&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+ALD takes one argument: the distance to move downward on the page
+relative to the current vertical position.
+</p>
+
+<p>
+Used by itself, or preceded by
+<a href="#br">BR</a>,
+ALD will advance by one line space plus the distance you specify.
+Preceded by
+<a href="#el">EL</a>,
+it will advance by exactly the distance you specify.
+</p>
+
+<p>
+ALD requires a unit of measure.  Decimal fractions are allowed, and
+values may be combined.  Therefore, to move down on the page by 1/4
+of an inch, you could enter either
+<br/>
+<span class="pre-in-pp">
+  .ALD .25i
+</span>
+or
+<br/>
+<span class="pre-in-pp">
+  .ALD 1P+6p
+</span>
+As the mnemonic
+(<span style="text-decoration: underline;">A</span>dvance <span style="text-decoration: underline;">L</span>ea<span style="text-decoration: underline;">D</span>)
+suggests, you&#8217;ll most often use ALD with
+<a href="definitions.html#picaspoints">points</a>
+of lead.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> if you want to use ALD at the top
+of a page (i.e. to advance to the starting position of type on a
+page), combine the value you want with <kbd>-1v</kbd> (minus one
+line space), like this:
+<br/>
+<span class="pre-in-pp">
+  .ALD 1i-1v
+</span>
+At the top of a page, this will advance one inch from the top edge
+of the paper.  Without the -1v, the same command would advance one
+inch from the top of the page plus the distance of one line space.
+</p>
+</div>
+
+<!-- -RLD- -->
+
+<div class="macro-id-overline">
+<h3 id="rld" class="macro-id">Reverse Lead (move upward)</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>RLD</b> <kbd class="macro-args">&lt;distance to move upward&gt;</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+RLD takes one argument: the distance to move upward on the page
+relative to the current vertical position.
+</p>
+
+<p>
+Used by itself, or preceded by
+<a href="#br">BR</a>,
+RLD will advance by one line space, then reverse by the distance you
+specify.  Preceded by
+<a href="#el">EL</a>,
+it will reverse by exactly the distance you specify.
+</p>
+
+<p>
+RLD requires a unit of measure.  Decimal fractions are allowed, and
+values may be combined.  Therefore, to move up on the page by 1/4 of
+an inch, you could enter either
+<br/>
+<span class="pre-in-pp">
+  .RLD .25i
+</span>
+or
+<span class="pre-in-pp">
+  .RLD 1P+6p
+</span>
+As the mnemonic
+(<span style="text-decoration: underline;">R</span>everse <span style="text-decoration: underline;">L</span>ea<span style="text-decoration: underline;">D</span>)
+suggests, you&#8217;ll most often use RLD with
+<a href="definitions.html#picaspoints">points</a>
+of lead.
+</p>
+
+<div class="rule-short" style="margin-bottom: 24px;"><hr/></div>
+
+<!-- ==================================================================== -->
+
+<h2 id="tabs-intro" class="macro-group">Tabs</h2>
+
+<p>
+Mom provides two different kinds of tab setup: typesetting tabs
+and string tabs.  Neither one has anything to do with the tab key
+on your keyboard, and both are utterly divorced from groff&#8217;s
+notion of tabs.  I recommend reading this section carefully in order
+to understand how mom handles tabs.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> see the section
+<a href="docprocessing.html#behaviour">Typesetting macros during document processing</a>
+for re-assuring information on the use of tabs during
+<a href="docprocessing.html#docprocessing">document processing</a>.
+</p>
+</div>
+
+<h3 id="typesetting-tabs" class="docs">Typesetting tabs</h3>
+
+<p>
+Typesetting tabs are defined by both an indent from the left margin
+and a line length.  This is quite different from typewriter-style
+tab stops (the groff norm) that only define the left indent.  In
+conjunction with the
+<a href="#multicolumns-intro">multi-column macros</a>,
+typesetting tabs significantly facilitate tabular and columnar work.
+</p>
+
+<p>
+Typesetting tabs are created with the
+<a href="#tab-set">TAB_SET</a>
+macro. TAB_SET identifies the tab (by number), establishes its left
+indent and line length, and optionally sets a quad direction and
+fill mode.  After tabs have been created with TAB_SET, they can be
+called at any time with the
+<a href="#tab">TAB</a>
+macro.
+</p>
+
+<div class="examples-container">
+<h3 id="typesetting-tabs-tut" class="docs notes">Quickie tutorial on typesetting tabs</h3>
+
+<p style="margin-top: .5em;">
+Say you want to set up three tabs to produce an employee evaluation
+that looks something like this:
+</p>
+
+<div class="box-code" style="padding-bottom: 0;">
+<span id="typsetting-tabs-sample" class="pre-in-pp" style="color: #302419">
+CRITERION       EVALUATION     COMMENTS
+
+Service           Good         Many clients specifically request
+                               support from Joe by name.
+
+Punctuality    Satisfactory    Tends to arrive after 8:00am, but
+                               often works through lunch hour.
+
+Team spirit     Needs work     Persistently gives higher priority
+                               to helping clients than respecting
+                               organizational hierarchy.
+</span>
+</div>
+
+<p>
+You want the first tab, CRITERION,
+</p>
+<ul style="margin-top: -.5em; margin-bottom: -.5em;">
+<li>to begin at the left margin of the page &ndash; i.e. no indent</li>
+<li>to have a line length of 5 picas</li>
+<li>to be set flush left</li>
+</ul>
+
+<p>
+Tabs must be numbered, and each has to be set up with a separate
+<a href="#tab-set">TAB_SET</a>
+line.  Therefore, to set up tab 1, you enter
+<br/>
+<span class="pre-in-pp">
+  .TAB_SET  1  0  5P  L
+            |  |  |   |
+     tab #--+  |  |   +--direction
+               |  |
+       indent--+  +--length
+</span>
+You want the second tab, EVALUATION,
+</p>
+<ul style="margin-top: -.5em; margin-bottom: -.5em;">
+<li>to begin 8 picas from the left margin</li>
+<li>to have a length of 9 picas</li>
+<li>to be set centered</li>
+</ul>
+
+<p>
+You set it up like this:
+<br/>
+<span class="pre-in-pp">
+  .TAB_SET  2  8P  9P  C
+            |  |   |   |
+     tab #--+  |   |   +--direction
+               |   |
+       indent--+   +--length
+</span>
+You want the third tab, COMMENTS,
+</p>
+<ul style="margin-top: -.5em; margin-bottom: -.5em;">
+<li>to begin 19 picas from the left margin</li>
+<li>to have a length of 17 picas</li>
+<li>to be set flush left, <a href="definitions.html#filled">filled</a></li>
+</ul>
+
+<p>
+The setup looks like this:
+<br/>
+<span class="pre-in-pp">
+  .TAB_SET  3  19P  17P  L  QUAD
+            |   |    |   |    |
+            |   |    |   |    +--fill output lines
+            |   |    |   |
+     tab #--+   |    |   +--direction
+                |    |
+        indent--+    +--length
+</span>
+Once the tabs are set up, you can call them in one of two ways:
+</p>
+<ul style="margin-top: -.5em; margin-bottom: -.5em;">
+<li>with <kbd><a href="#tab">.TAB</a></kbd> (passing the tab
+    number as an argument), which breaks the current line,
+    advances one linespace and calls the tab.</li>
+<li>with <kbd><a href="#tn">.TN</a></kbd> (Tab Next), which keeps
+    you on the current line and moves over to the next
+    tab in sequence (i.e. from 1 to 2, 2 to 3, etc.).</li>
+</ul>
+
+<p>
+To exit from tabs and restore your original left margin, line
+length, quad direction and fill mode, use
+<kbd><a href="#tq">.TQ</a></kbd>
+(Tab Quit).
+</p>
+
+<p>
+Here&#8217;s how the input for our sample employee evaluation looks
+(with some introductory parameters):
+</p>
+
+<div class="examples" style="margin-bottom: 0px;">Code:</div>
+<div class="box-code" style="height: 324px; padding-bottom: 18px; overflow: auto;">
+<span class="pre-in-pp">
+.PAGE 8.5i 11i 1i 1i 1i
+.FAMILY  T
+.FT      R
+.PT_SIZE 14
+.LS      16
+.QUAD    LEFT
+.KERN
+.HY OFF
+.SS 0
+.TAB_SET 1 0   5P  L
+.TAB_SET 2 8P  9P  C
+.TAB_SET 3 19P 17P L QUAD
+.TAB 1
+CRITERION
+.TN
+EVALUATION
+.TN
+COMMENTS
+.SP
+.TAB 1
+Service
+.TN
+Good
+.TN
+Many clients specifically request support from Joe by name.
+.SP
+.TAB 1
+Punctuality
+.TN
+Satisfactory
+.TN
+Tends to arrive after 8:00am, but often works through lunch hour.
+.SP
+.TAB 1
+Team spirit
+.TN
+Needs work
+.TN
+Persistently gives higher priority to helping clients
+than respecting organizational hierarchy.
+.TQ
+</span>
+</div>
+
+<p>
+Try setting this up and processing it it with
+<br/>
+<span class="pre-in-pp">
+  groff -mom &lt;filename&gt; &gt; &lt;filename&gt;.ps
+</span>
+then previewing the .ps file.  Notice how <kbd>.TN</kbd>
+simply moves over to the next tab, while the combination
+<kbd>.SP/.TAB&nbsp;1</kbd> breaks the line, advances by one extra
+linespace, and calls the first tab.
+</p>
+
+<p>
+Notice, too, how the <kbd>QUAD</kbd> argument passed to tab 3 means
+you don&#8217;t have to worry about the length of
+<a href="definitions.html#inputline">input lines</a>;
+mom
+<a href="definitions.html#filled">fills</a>
+the tab and sets the type flush left.
+</p>
+</div>
+
+<h3 id="string-tabs" class="docs">String tabs (autotabs)</h3>
+
+<p>
+String tabs let you mark off tab positions with
+<a href="definitions.html#inlines">inline escapes</a>
+embedded in
+<a href="definitions.html#inputline">input lines</a>.
+Left indents and line lengths are calculated from the beginning and
+end positions of the marks.  This is especially useful when tab
+indents and lengths need to be determined from the text that goes in
+each tab.
+</p>
+
+<p>
+Setting up string tabs is a two-step procedure.  First, you enter an
+input line in which you mark off where you want tabs to begin and
+end.  (This is often best done in conjunction with the
+<a href="goodies.html#silent">SILENT</a>
+macro.)
+</p>
+
+<p>
+Next, you invoke the
+<a href="#st">ST</a>
+macro for every string tab you defined, and optionally pass quad and
+fill information to it.  That done, string tabs are called with the
+<a href="#tab">TAB</a>
+macro, just like typesetting tabs.
+</p>
+
+<p>
+In combination with the
+<a href="goodies.html#pad">PAD</a>
+macro and the groff inline escape
+<kbd><a href="inlines.html#inline-horizontal-groff">\h</a></kbd>
+(move horizontally across the page) or mom&#8217;s
+<kbd><a href="inlines.html#inline-horizontal-mom">\*[FWD &lt;distance&gt;]</a></kbd>
+(move forward) inline, string tabs provide tremendous flexibility in
+setting up complex tab structures.
+</p>
+
+<div class="examples-container">
+<h3 id="string-tabs-tut" class="docs notes">Quickie tutorial on string tabs</h3>
+<p style="margin-top: .5em;">
+Say you want to set up tabs for the
+<a href="#typsetting-tabs-sample">employee evaluation form</a>
+used as an example in the
+<a href="#typesetting-tabs-tut">typesetting tabs tutorial</a>.
+This time, though, you want to play around with the point size of
+type, so you can&#8217;t know exactly how long the tabs will be or
+where they should start.  All you know is
+</p>
+<ul style="margin-top: -.5em; margin-bottom: -.5em;">
+<li>CRITERION is the longest line in tab 1</li>
+<li>EVALUATION is the longest line in tab 2</li>
+<li>tab 3 should extend to the current right margin</li>
+<li>you want a 1 pica gutter between each tab</li>
+</ul>
+
+<p>
+This is an ideal job for string tabs.
+</p>
+
+<p>
+The first thing you need for string tabs is an
+<a href="definitions.html#inputline">input line</a>
+with tab positions marked on it.  Tabs are marked with the
+<a href="definitions.html#inlines">inline escapes</a>
+<kbd><a href="#inline-st">\*[ST&lt;n&gt;]</a></kbd>
+and
+<kbd><a href="#inline-st">\*[ST&lt;n&gt;X]</a></kbd>,
+where <kbd>&lt;n&gt;</kbd>
+is the number you want the tab to have.  (In this example, we
+enclose the input line with the
+<a href="goodies.html#silent">SILENT</a>
+macro so the line doesn&#8217;t print.  We also use the
+<a href="goodies.html#pad">PAD</a>
+macro to permit defining tab 3 as simply &#8220;the amount of space
+remaining on the input line.&#8221;)
+</p>
+
+<p>
+The setup looks like this:
+</p>
+
+<div class="examples" style="margin-bottom: 0px;">Code:</div>
+
+<div class="box-code">
+<span class="pre-in-pp">
+.SILENT
+.PAD "\*[ST1]CRITERION\*[ST1X]\*[FWD 12p]\*[ST2]EVALUATION\*[ST2X]\*[FWD 12p]\*[ST3]#\*[ST3X]"
+.SILENT OFF
+</span>
+</div>
+
+<p>
+The long line after <kbd>.PAD</kbd> looks scary, but
+it isn&#8217;t really.  Here&#8217;s what it means when broken down
+into its component parts:
+</p>
+<ul style="margin-bottom: -1em;">
+<li>The longest line in tab 1 is &#8220;CRITERION&#8221;, so we
+    enclose CRITERION with begin/end markers for string tab 1:
+<br/>
+<span class="pre-in-pp" style="margin-bottom: -.25em;">
+  \*[ST1]CRITERION\*[ST1X]
+</span>
+</li>
+<li>We want a 1 pica (12 points) gutter between tab 1 and 2,
+    so we insert 12 points of space with \*[FWD 12p]
+    (ForWarD 12 points):
+<br/>
+<span class="pre-in-pp" style="margin-bottom: -.25em;">
+  \*[FWD 12p]
+</span>
+</li>
+<li>The longest line in tab 2 is &#8220;EVALUATION&#8221;, so
+    we enclose EVALUATION with begin/end markers for string
+    tab 2:
+<span class="pre-in-pp" style="margin-bottom: -.25em;">
+  \*[ST2]EVALUATION\*[ST2X]
+</span>
+</li>
+<li>We want 1 pica (12 points) between tab 2 and 3, so we
+    insert it with: 
+<br/>
+<span class="pre-in-pp" style="margin-bottom: -.25em;">
+  \*[FWD 12p]
+</span>
+</li>
+<li>We want tab 3 to be as long as whatever space remains on
+    the current line length, so we enclose the
+    <a href="goodies.html#pad-marker">pad marker</a>
+    (#) with begin/end markers for string tab 3:
+<span class="pre-in-pp">
+  \*[ST3]#\*[ST3X]
+</span>
+   </li>
+</ul>
+
+<p>
+The tabs are now defined, but they require
+<a href="definitions.html#quad">quad direction</a>
+and
+<a href="definitions.html#filled">fill</a>
+information.  For each string tab defined above, enter a separate
+<kbd><a href="#st">.ST</a></kbd>
+line, like this:
+<br/>
+<span class="pre-in-pp">
+  .ST  1  L
+  .ST  2  L
+  .ST  3  L  QUAD
+       |  |   |
+       |  |   +--fill output lines
+       |  |
+  tab #--+  +--direction
+</span>
+From here on in, you call the tabs with
+<kbd><a href="#tab">.TAB</a></kbd>
+and
+<kbd><a href="#tn">.TN</a></kbd>
+just like typesetting tabs (see
+<a href="#typesetting-tabs-tut">typesetting tabs tutorial</a>).
+</p>
+
+<p>
+Here&#8217;s the complete setup and entry for the sample employee
+evaluation form utilizing string tabs.
+</p>
+
+<div class="examples" style="margin-bottom: 0px;">Code:</div> 
+<div class="box-code" style="height: 324px; padding-bottom: 18px; overflow: scroll;">
+<span class="pre-in-pp">
+.PAGE 8.5i 11i 1i 1i 1i
+.FAMILY  T
+.FT      R
+.PT_SIZE 14
+.LS      16
+.QUAD    LEFT
+.KERN
+.HY OFF
+.SS 0
+.SILENT
+.PAD "\*[ST1]CRITERION\*[ST1X]\*[FWD 12p]\*[ST2]EVALUATION\*[ST2X]\*[FWD 12p]\*[ST3]#\*[ST3X]"
+.SILENT OFF
+.ST  1  L
+.ST  2  L
+.ST  3  L  QUAD
+.TAB 1
+CRITERION
+.TN
+EVALUATION
+.TN
+COMMENTS
+.SP
+.TAB 1
+Service
+.TN
+Good
+.TN
+Many clients specifically request support from Joe by name.
+.SP
+.TAB 1
+Punctuality
+.TN
+Satisfactory
+.TN
+Tends to arrive after 8:00am, but often works through lunch hour.
+.SP
+.TAB 1
+Team spirit
+.TN
+Needs work
+.TN
+Persistently gives higher priority to helping clients
+than respecting organizational hierarchy.
+.TQ
+</span>
+</div>
+
+<p>
+Try setting this up and processing it with
+<br/>
+<span class="pre-in-pp">
+  groff -mom &lt;filename&gt; &gt; &lt;filename&gt;.ps 
+</span>
+and previewing the .ps file.
+</p>
+
+<p>
+Now, change the point size of the above sample to 12 and preview it
+again.  You&#8217;ll see that the tab structure remains identical
+(tab 1=CRITERION, tab 2=EVALUATION, tab 3=space remaining, and the
+gutter between tabs is still 1 pica), while the position and length
+of the tabs have altered because of the new point size.
+</p>
+
+<p>
+Now try increasing the gutters to 2 picas
+(<kbd>\*[FWD&nbsp;24p]</kbd> or <kbd>\*[FWD&nbsp;2P]</kbd> instead
+of <kbd>\*[FWD&nbsp;12p]</kbd>).  Preview the file again, and notice
+how the tab structure remains the same, but the gutters are wider.
+</p>
+</div>
+
+<div id="index-tabs" class="macro-list-container">
+<h3 class="macro-list">Tabs macros</h3>
+
+<ul class="macro-list">
+  <li><a href="#tab-set">TAB_SET</a> &ndash; create typesetting tabs</li>
+  <li><a href="#inline-st">\*[ST]...\*[STX]</a> &ndash; inline escapes for marking String Tabs</li>
+  <li><a href="#st">ST</a> &ndash; set String Tabs</li>
+  <li><a href="#tab">TAB</a> &ndash; call tabs</li>
+  <li><a href="#tn">TN</a> &ndash; Tab Next; call next tab in a sequence</li>
+  <li><a href="#tq">TQ</a> &ndash; Tab Quit</li>
+</ul>
+
+</div>
+
+<!-- -TAB_SET- -->
+
+<div class="macro-id-overline">
+<h3 id="tab-set" class="macro-id">Set up typesetting tabs</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>TAB_SET</b> <kbd class="macro-args">&lt;tab number&gt; &lt;indent&gt; &lt;length&gt;  L | R | C | J [ QUAD ]</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;<kbd style="font-style: normal;">&lt;indent&gt;</kbd> and <kbd style="font-style: normal;">&lt;length&gt;</kbd> require a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p style="margin-bottom: -.5em;">
+TAB_SET creates typesetting tabs that later can be called with
+<kbd><a href="#tab">.TAB</a></kbd>.
+Typesetting tabs are numbered, and defined by an indent, a length,
+and a quad direction, hence TAB_SET has four required arguments:
+</p>
+<ul style="margin-top: .5em; margin-bottom: -.5em;">
+<li>a tab number</li>
+<li>an indent (measured from the left margin of the page,
+    or, if you&#8217;re already in a tab, from the left margin of the tab)</li>
+<li>a length</li>
+<li>a direction</li>
+</ul>
+
+<p>
+To set up a centred tab 6 picas long and 9 points from the left
+margin, you&#8217;d enter
+<br/>
+<span class="pre-in-pp">
+  .TAB_SET 1 9p 6P C
+</span>
+The tab number in the above (&#8221;1&#8221;) is simply an
+identifier.  It could have been 4, or 17, or 296.  There&#8217;s no
+need to set up tabs in numerical sequence.
+</p>
+
+<p>
+By default, tabs are in
+<a href="definitions.html#filled">nofill</a>
+mode, meaning you can enter text in tabs on a line-for-line basis
+without having to use the
+<a href="#br">BR</a>
+macro.  If you want a tab to be
+<a href="definitions.html#filled">filled</a>,
+pass the optional argument <kbd>QUAD</kbd>,
+which will make the tab behave as if you&#8217;d entered
+<kbd class="bold">.QUAD&nbsp;L&nbsp;|&nbsp;R&nbsp;|&nbsp;C</kbd>.
+</p>
+
+<p>
+For
+<a href="definitions.html#just">justified</a>
+tabs, simply pass the argument J (without the QUAD argument), like
+this:
+<br/>
+<span class="pre-in-pp">
+  .TAB 1 9p 6P J
+</span>
+Once tabs are set, they can be called at any time with the
+<a href="#tab">TAB &lt;n&gt;</a>
+macro, where &lt;n&gt; is the number of the desired tab.
+</p>
+
+<p>
+You can set up any number of typesetting tabs.  However, be aware
+that
+<a href="#string-tabs">string tabs</a>
+are also called with TAB &lt;n&gt;, so be careful that you
+don&#8217;t set up a typesetting tab numbered, say, 4, when you
+already have a string tab numbered 4.  Every tab, typesetting or
+string, must have a unique numeric identifier. </p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> If you use TAB_SET while
+you&#8217;re currently inside a tab, the indent argument is the
+distance from the tab&#8217;s left margin, not the left margin of
+the page.  Therefore, you should exit tabs (with
+<kbd><a href="#tq">.TQ</a></kbd>)
+before creating new tabs (unless, of course, you want to set up a
+tab structure within the confines of an existing tab).
+</p>
+</div>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">IMPORTANT:</span> Turn all indents off (see
+<a href="#indents">Indents</a>)
+before setting up tabs with TAB_SET, or mom may get confused.
+</p>
+</div>
+
+<!-- -INLINE_ST- -->
+
+<div class="macro-id-overline">
+<h3 id="inline-st" class="macro-id">Mark positions of string tabs</h3>
+</div>
+
+<div class="box-macro-args">
+Inlines: <kbd class="macro-args">\*[ST&lt;number&gt;]...\*[ST&lt;number&gt;X]</kbd>
+</div>
+
+<p class="requires">
+The <a href="definitions.html#quad">quad</a>
+direction must be
+<span style="font-style: normal">LEFT</span>
+or
+<span style="font-style: normal">JUSTIFY</span>
+(see
+<a href="#quad"><span style="font-style: normal">QUAD</span></a>
+and
+<a href="#justify"><span style="font-style: normal">JUSTIFY</span></a>)
+or the
+<a href="definitions.html#filled">no-fill mode</a>
+set to
+<a href="#lrc"><span style="font-style: normal">LEFT</span></a>
+in order for these inlines to function properly.  Please see
+<a href="#important"><span style="font-style: normal">IMPORTANT</span></a>,
+below.
+</p>
+
+<p>
+String tabs need to be marked off with
+<a href="definitions.html#inlines">inline escapes</a>
+before being set up with the
+<a href="#st">ST</a>
+macro.  Any input line may contain string tab markers. <kbd
+class="bold">&lt;number&gt;</kbd>, above, means the numeric
+identifier of the tab.  The following shows a sample input line with
+string tab markers.
+<br/>
+<span class="pre-in-pp">
+  \*[ST1]Now is the time\*[ST1X] for all \*[ST2]good men\*ST2X] to come to the aid of the party.
+</span>
+String tab 1 begins at the start of the line and ends after the word
+&#8220;time&#8221;.  String tab 2 starts at &#8220;good&#8221; and
+ends after &#8220;men&#8221;.  Inline escapes (e.g. font or point
+size changes, or horizontal movements, including
+<a href="goodies.html#pad">padding</a>)
+are taken into account when mom determines the position and length
+of string tabs.
+</p>
+
+<p>
+Up to nineteen string tabs may be marked (not necessarily all on the
+same line, of course), and they must be numbered between 1 and 19.
+</p>
+
+<p>
+Once string tabs have been marked in input lines, they have to be
+&#8220;set&#8221; with
+<kbd><a href="#st">.ST</a></kbd>,
+after which they may be called, by number, with
+<kbd><a href="#tab">.TAB</a></kbd>.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> Lines with string tabs marked off
+in them are normal input lines, i.e. they get printed, just like
+any input line.  If you want to set up string tabs without the line
+printing, use the
+<a href="goodies.html#silent">SILENT</a>
+macro.
+</p>
+</div>
+
+<div class="box-important">
+<p class="tip-top">
+<span id="important" class="important">IMPORTANT:</span>
+Owing to the way groff processes
+<a href="definitions.html#inputline">input lines</a>
+and turns them into
+<a href="definitions.html#outputline">output lines</a>,
+it is not possible for mom to &#8220;guess&#8221; the correct
+starting position of string tabs marked off in lines that are
+centered or set flush right.
+</p>
+
+<p>
+Equally, she cannot guess the starting position if a line is fully
+justified and broken with
+<a href="#spread">SPREAD</a>.
+</p>
+
+<p>
+In other words, in order to use string tabs,
+<a href="#lrc">LEFT</a>
+must be active, or, if
+<a href="#quad">QUAD LEFT</a>
+or
+<a href="#justify">JUSTIFY</a>
+are active, the line on which the string tabs are marked must be
+broken &#8220;manually&#8221; with
+<kbd><a href="#br">.BR</a></kbd>
+(but not
+<kbd><a href="#spread">.SPREAD</a></kbd>).
+</p>
+
+<p class="tip-bottom">
+To circumvent this behaviour, I recommend using the
+<a href="goodies.html#pad">PAD</a>
+to set up string tabs in centered or flush right lines.  Say, for
+example, you want to use a string tab to underscore the text of a
+centered line with a rule.  Rather than this,
+<br/>
+<span class="pre-in-pp">
+  .CENTER
+  \*[ST1]A line of text\*[ST1X]\c
+  .EL
+  .ST 1
+  .TAB 1
+  .PT_SIZE 24
+  .ALD 3p
+  \*[RULE]
+  .RLD 3p
+  .TQ
+</span>
+you should do:
+<br/>
+<span class="pre-in-pp">
+  .QUAD CENTER
+  .PAD "#\*[ST1]A line of text\*[ST1X]#"
+  .EL
+  .ST 1
+  .TAB 1
+  .PT_SIZE 24
+  .ALD 3p
+  \*[RULE] \" Note that you can&#8217;t use \*[UP ] or \*[DOWN] with \*[RULE]
+  .RLD 3p
+  .TQ
+</span>
+</p>
+</div>
+
+<!-- -ST- -->
+
+<div class="macro-id-overline">
+<h3 id="st" class="macro-id">Set string tabs</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>ST</b> <kbd class="macro-args">&lt;tab number&gt;  L | R | C | J [ QUAD ]</kbd>
+</div>
+
+<p>
+After string tabs have been marked off on an input line (see
+<a href="#inline-st"><kbd>\*[ST]...\*[STX]</kbd></a>),
+you need to &#8220;set&#8221; them by giving them a direction and,
+optionally, the <kbd>QUAD</kbd> argument.  In this respect, ST is
+like
+<a href="#tab-set">TAB_SET</a>
+except that you don&#8217;t have to give ST an indent or a
+line length (that&#8217;s already taken care of, inline, by
+<kbd>\*[ST]...\*[STX]</kbd>).  If you want string tab 1 to be left,
+enter
+<br/>
+<span class="pre-in-pp">
+  .ST 1 L
+</span>
+If you want it to be left and
+<a href="definitions.html#filled">filled</a>, enter
+<br/>
+<span class="pre-in-pp">
+  .ST 1 L QUAD
+</span>
+If you want it to be justified, enter
+<br/>
+<span class="pre-in-pp">
+  .ST 1 J
+</span>
+See the
+<a href="#string-tabs-tut">Quickie tutorial on string tabs</a>
+for a full explanation of setting up string tabs.
+</p>
+
+<!-- -TAB- -->
+
+<div class="macro-id-overline">
+<h3 id="tab" class="macro-id">Call tabs</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>TAB</b> <kbd class="macro-args">&lt;tab number&gt;</kbd>
+</div>
+<p class="alias">
+<i>Alias:</i> <b>TB</b>
+</p>
+
+<p>
+After tabs have been defined (either with
+<a href="#tab-set">TAB_SET</a>
+or
+<a href="#st">ST</a>),
+TAB moves to whatever tab number you pass it as an argument.  For
+example,
+<br/>
+<span class="pre-in-pp">
+  .TAB 3
+</span>
+<br/>
+moves you to tab 3.
+</p>
+
+<div id="note-tn" class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span> TAB breaks the line preceding it and
+advances 1 linespace.  Hence,
+<br/>
+<span class="pre-in-pp">
+  .TAB 1
+  A line of text in tab 1.
+  .TAB 2
+  A line of text in tab 2.
+</span>
+produces, on output
+<br/>
+<span class="pre-in-pp">
+  A line of text in tab 1.
+  A line of text in tab 2.
+</span>
+If you want the tabs to line up, use
+<a href="#tn">TN</a>
+(Tab Next), like this:
+<br/>
+<span class="pre-in-pp">
+  .TAB 1
+  A line of text in tab 1.
+  .TN
+  A line of text in tab 2.
+</span>
+which produces
+<br/>
+<span class="pre-in-pp">
+  A line of text in tab 1.   A line of text in tab 2.
+</span>
+If the text in your tabs runs to several lines, and you want the
+first lines of each tab to align, you must use the
+<a href="#multicolumns-intro">multi-column</a> macros.
+</p>
+
+<p id="tab-add-note" class="tip-bottom">
+<span class="additional-note">Additional note:</span> Any indents
+in effect prior to calling a tab are automatically turned off by
+TAB.  If you were happily zipping down the page with a left indent
+of 2 picas turned on, and you call a tab whose indent from the left
+margin is 6 picas, your new distance from the left margin will be 6
+picas, not 6 picas plus the 2 pica indent.
+</p>
+</div>
+
+<!-- -TN- -->
+
+<div class="macro-id-overline">
+<h3 id="tn" class="macro-id">Tab Next</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>TN</b>
+</div>
+<p class="requires">
+In tabs that aren&#8217;t given the <kbd class="normal">QUAD</kbd>
+argument when they&#8217;re set up with
+<a href="#tab-set" class="normal">TAB_SET</a>
+or
+<a href="#st" class="normal">ST</a>,
+you must terminate the line preceding <kbd class="normal">.TN</kbd>
+with the <kbd class="normal">\c</kbd> inline escape.  See the
+<a href="#tn-note" class="normal">ADDITIONAL NOTE</a>.
+If you find remembering whether to put in the
+<kbd class="normal">\c</kbd> bothersome, you may prefer to use the
+<a href="definitions.html#inlines" class="normal">inline escape</a>
+alternative to
+<kbd class="normal">.TN</kbd>,
+<kbd class="normal"><a href="inlines.html#TB+">\*[TB+]</a></kbd>,
+which works consistently regardless of the fill mode.
+</p>
+
+<p>
+TN moves over to the next tab in numeric sequence (tab n+1) without
+advancing on the page.  See the
+<a href="#note-tn">NOTE</a>
+in the description of the TAB macro for an example of how TN works.
+</p>
+
+<div id="tn-note" class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span> You must put text in the
+<a href="definitions.html#inputline">input line</a>
+immediately after TN. &#8220;Stacking&#8221; of TN&#8217;s is not
+allowed.  In other words, you cannot do
+<br/>
+<span class="pre-in-pp">
+  .TAB 1
+  Some text
+  .TN
+  Some more text
+  .TN
+  .TN
+  Yet more text
+</span>
+The above example, assuming tabs numbered from 1 to 4, should be entered
+<br/>
+<span class="pre-in-pp">
+  .TAB 1
+  Some text
+  .TN
+  Some more text
+  .TAB 4
+  Yet more text
+</span>
+<span class="additional-note">Additional note:</span>
+In versions of mom prior to 1.1.9, TN did not always work as
+advertised on the last
+<a href="definitions.html#outputline">output line</a>
+of pages that contained a footer trap (e.g. one set with
+<a href="#b-margin">B_MARGIN</a>
+or in  documents formatted using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>).
+</p>
+
+<p>
+TN has been re-written so that this should no longer be the case.
+However, in order for it to work in tabs that have not been given a
+<kbd>QUAD</kbd> argument (see
+<a href="#tab-set">TAB_SET</a>
+and
+<a href="#st">ST</a>)
+you must always &#8220;join&#8221; <kbd>.TN</kbd> to
+the line before it using the
+<kbd><a href="#join">\c</a></kbd>
+<a href="definitions.html#inlines">inline escape</a>,
+as in the following example:
+<br/>
+<span class="pre-in-pp">
+  .TAB_SET 1 0  1P  L
+  .TAB_SET 2 1P 20P L
+  .TAB 1
+  1.\c
+  .TN
+  The first rule of survival is &#8220;make and keep good friends.&#8221;
+</span>
+When output, the example will look like this:
+<br/>
+<span class="pre-in-pp">
+  1.  The first rule of survival is &#8220;make and keep good friends.&#8221;
+</span>
+</p>
+
+<p class="tip-bottom">
+Conversely, if you did give a <kbd>QUAD</kbd> argument
+to TAB_SET or ST, the
+<kbd>\c</kbd> must not be used.
+</p>
+</div>
+
+<!-- -TQ- -->
+
+<div class="macro-id-overline">
+<h3 id="tq" class="macro-id">Tab Quit</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>TQ</b>
+</div>
+
+<p>
+TQ takes you out of whatever tab you were in, advances 1 linespace,
+and restores the left margin, line length, quad direction and
+<a href="definitions.html#filled">fill mode</a>
+that were in effect prior to invoking any tabs.
+</p>
+
+<div class="rule-short" style="margin-bottom: 24px;"><hr/></div>
+
+<!-- ==================================================================== -->
+
+<h2 id="multicolumns-intro" class="macro-group">Multiple columns</h2>
+
+<p>
+Tabs are not by nature columnar, which is to say that if the text
+inside a tab runs to several lines, calling another tab does not
+automatically move to the
+<a href="definitions.html#baseline">baseline</a>
+of the first line in the previous tab.  To demonstrate:
+<br/>
+<span class="pre-in-pp">
+  .TAB 1
+  Carrots
+  Potatoes
+  Broccoli
+  .TAB 2
+  $1.99/5 lbs
+  $0.25/lb
+  $0.99/bunch
+</span>
+produces, on output
+<br/>
+<span class="pre-in-pp">
+  Carrots
+  Potatoes
+  Broccoli
+            $1.99/5 lbs
+            $0.25/lb
+            $0.99/bunch
+</span>
+The multi-column macros allow you to set tabs in columnar fashion,
+rather than line by line.  When you invoke multi-column mode (with
+<kbd><a href="#mco">.MCO</a></kbd> &ndash;
+<span style="text-decoration: underline">M</span>ulti-<span style="text-decoration: underline">C</span>olumn <span style="text-decoration: underline">O</span>n),
+mom saves the position of the current baseline.
+<kbd><a href="#mcr">.MCR</a></kbd>
+(<span style="text-decoration: underline">M</span>ulti-<span style="text-decoration: underline">C</span>olumn <span style="text-decoration: underline">R</span>eturn)
+at any point while multi-columns are on returns you to the saved
+position.  Exiting multi-columns
+(<kbd><a href="#mcx">.MCX</a></kbd> &ndash;
+<span style="text-decoration: underline">M</span>ulti-<span style="text-decoration: underline">C</span>olumn e<span style="text-decoration: underline">X</span>it)
+quits the current tab (if you&#8217;re in one) and moves you to the
+bottom of the longest column.  (Note that you do not have to use
+multi-columns in conjunction with tabs.)
+</p>
+
+<p>
+Using our example above, but setting it in multi-column mode,
+<br/>
+<span class="pre-in-pp">
+  .MCO
+  .TAB 1
+  Carrots
+  Potatoes
+  Broccoli
+  .MCR
+  .TAB 2
+  $1.99/5 lbs
+  $0.25/lb
+  $0.99/bunch
+  .MCX
+</span>
+produces
+<br/>
+<span class="pre-in-pp">
+  Carrots   $1.99/5 lbs
+  Potatoes  $0.25/lb
+  Broccoli  $0.99/bunch
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> Do not confuse MCO with
+the
+<a href="docprocessing.html#columns">COLUMNS</a>
+macro in the
+<a href="docprocessing.html#docprocessing">document processing macros</a>.
+</p>
+</div>
+
+<div id="index-multicolumns" class="macro-list-container">
+<h3 class="macro-list">Multi-columns macros</h3>
+
+<ul class="macro-list">
+  <li><a href="#mco">MCO</a> &ndash; begin multi-column setting</li>
+  <li><a href="#mcr">MCR</a> &ndash; return to top of column</li>
+  <li><a href="#mcx">MCX</a> &ndash; exit multi-columns</li>
+</ul>
+</div>
+
+<!-- -MCO- -->
+
+<div class="macro-id-overline">
+<h3 id="mco" class="macro-id">Begin multi-column setting</h3>
+</div>
+
+<div class="box-macro-args">
+	Macro: <b>MCO</b>
+</div>
+
+<p>
+MCO (<span style="text-decoration: underline;">M</span>ulti-<span style="text-decoration: underline;">C</span>olumn <span style="text-decoration: underline;">O</span>n) is the macro you use to begin multi-column
+setting.  It marks the current
+<a href="definitions.html#baseline">baseline</a>
+as the top of your columns, for use later with
+<a href="#mcr">MCR</a>.
+See the
+<a href="#multicolumns-intro">introduction to columns</a>
+for an explanation of multi-columns and some sample
+input.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> Do not confuse MCO with
+the
+<a href="docprocessing.html#columns">COLUMNS</a>
+macro in the
+<a href="docprocessing.html#docprocessing">document processing macros</a>.
+</p>
+</div>
+
+<!-- -MCR- -->
+
+<div class="macro-id-overline">
+<h3 id="mcr" class="macro-id">Return to top of column</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>MCR</b>
+</div>
+
+<p>
+Once you&#8217;ve turned multi-columns on (with
+<kbd><a href="#mco">.MCO</a></kbd>),
+<kbd>.MCR</kbd>, at any time, returns you to the top of
+your columns.
+</p>
+
+<!-- -MCX- -->
+
+<div class="macro-id-overline">
+<h3 id="mcx" class="macro-id">Exit multi-columns</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>MCX</b> <kbd class="macro-args">[ &lt;distance to advance below longest column&gt; ]</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;Optional argument requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+MCX takes you out of any tab you were in (by silently invoking
+<kbd><a href="#tq">.TQ</a></kbd>)
+and advances to the bottom of the longest column.
+</p>
+
+<p>
+Without an argument, MCX advances 1 linespace below the longest
+column.  Linespace, in this instance, is the
+<a href="definitions.html#leading">leading</a>
+in effect at the moment MCX is invoked.
+</p>
+
+<p>
+If you pass the <kbd>&lt;distance&gt;</kbd> argument to MCX, it
+advances 1 linespace below the longest column (see above) PLUS the
+distance specified by the argument.  The argument requires a unit
+of measure; therefore, to advance an extra 6 points below where MCX
+would normally place you, you&#8217;d enter
+<br/>
+<span class="pre-in-pp">
+  .MCX 6p
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> If you wish to advance a precise
+distance below the
+<a href="definitions.html#baseline">baseline</a>
+of the longest column, use MCX with an argument of 0 (zero; no unit
+of measure required) in conjunction with the
+<a href="#ald">ALD</a>
+macro, like this:
+<br/>
+<span class="pre-in-pp" style="margin-bottom: -12px;">
+  .MCX 0
+  .ALD 24p
+</span>
+</p>
+</div>
+
+<p>
+The above advances to precisely 24 points below the baseline
+of the longest column.
+</p>
+
+<div class="rule-short" style="margin-bottom: 24px;"><hr/></div>
+
+<!-- ==================================================================== -->
+
+<h2 id="indents-intro" class="macro-group">Indents</h2>
+
+<p>
+With mom&#8217;s indents, you can indent from the left, the right,
+or both margins.  In addition, mom provides temporary left indents
+(i.e. only one line is indented, as at the start of a paragraph)
+and &#8220;hanging&#8221; left indents (the reverse of a temporary
+indent; the first line isn&#8217;t indented, subsequent lines are).
+</p>
+
+<h3 id="indents-handling" class="docs">How mom handles indents</h3>
+
+<p>
+Mom provides five kinds of indents: left, right, both, temporary,
+and hanging.  Each is invoked by its own name:
+</p>
+<ul style="margin-top: -.5em; margin-bottom: -.5em;">
+<li>IL &ndash; Indent Left</li>
+<li>IR &ndash; Indent Right</li>
+<li>IB &ndash; Indent Both</li>
+<li>HI &ndash; Hanging Indent</li>
+<li>TI &ndash; Temporary Indent</li>
+</ul>
+
+<p>
+In addition, there are four macros to control exiting from
+indents:
+</p>
+<ul style="margin-top: -.5em; margin-bottom: -.5em;">
+<li>IQ &ndash; quit all active indents</li>
+<li>ILX &ndash; exit indent style left</li>
+<li>IRX &ndash; exit indent style right</li>
+<li>IBX &ndash; exit indent style both</li>
+</ul>
+
+<p>
+This section deals exclusively with IL, IR and IB.  For an
+explanation of hanging and temporary indents&mdash;how they work and
+how to use them&mdash;see
+<a href="#hi">Hanging indents</a>
+and
+<a href="#ti">Temporary indents</a>.
+</p>
+
+<p>
+The first time you invoke any of mom&#8217;s indents, you must
+supply a measure.  For example,
+<br/>
+<span class="pre-in-pp">
+  .IL 2P
+</span>
+indents text 2 picas from the left margin (or current tab indent).
+</p>
+
+<p>
+When you want to exit the above indent, use either
+<br/>
+<span class="pre-in-pp" style="margin-bottom: -1em;">
+  .IQ
+</span>
+or
+<span class="pre-in-pp" style="margin-top: -.5em;">
+  .ILX
+</span>
+The next time you want the same indent, invoke it without the
+argument, like this:
+<br/>
+<span class="pre-in-pp">
+  .IL
+</span>
+As you can see, once you&#8217;ve supplied a measure to an indent
+macro mom stores the value, obviating the need to repeat it on
+subsequent invocations.  And mom doesn&#8217;t just store the
+measure&mdash;she hangs on to it tenaciously.  Arguments passed to
+IL, IR and IB are additive.  Consider the following:
+<br/>
+<span class="pre-in-pp">
+  .LL 20P
+  .IR 2P    \"Indent right by 2 picas
+  A first block of text...
+  ...
+  ...
+  .IQ       \"Turn indent off
+  A second block of text...
+  ...
+  ...
+  .IR 2P    \"Indent right by an additional 2 picas (i.e. 4 picas)
+  A third block of text...
+  ...
+  ...
+</span>
+The first block of text is right indented by 2 picas (i.e. the line
+length is shortened by 2 picas to 18 picas).  The second block of
+text, after IQ, is, as you&#8217;d expect, set to the full measure.
+The third block of text&mdash;the one to pay attention to&mdash;is
+not right indented by 2 picas, but rather by 4 picas.  Mom adds
+the value of arguments to IL, IR and IB to whatever value is already
+in effect.
+</p>
+
+<p>
+If you wanted the third block of text in the example above to be
+right indented by just 2 picas (the original measure given to IR),
+you would enter <kbd>.IR</kbd> without an argument.
+</p>
+
+<p>
+Because indent arguments are additive, putting a minus sign in front
+of the argument can be used to subtract from the current value.
+In the following example, the first line is indented 18 points,
+the second is indented 36 points (18 + 18), and the third is again
+indented 18 points (36 - 18).
+<br/>
+<span class="pre-in-pp">
+  .IL 18p     \"Indent left by 18 points      = 18 points
+  Now is the time
+  .IL 18p     \"Indent left by 18 points more = 36 points
+  for all good men to come
+  .IL -18p    \"Indent left by 18 points less = 18 points
+  to the aid of the party.
+</span>
+Sometimes, you may want to clear out the stored indent
+values&mdash;let mom start indenting with a clean slate, as it
+were.  Giving the optional argument <kbd>CLEAR</kbd> to any of the
+&#8220;indent quit&#8221; macros resets them to zero.
+</p>
+<ul style="margin-top: -.5em; margin-bottom: -.5em;">
+  <li>IQ CLEAR &ndash; quit and clear all indents</li>
+  <li>ILX CLEAR &ndash; quit and clear indent style left</li>
+  <li>IRX CLEAR &ndash; quit and clear indent style right</li>
+  <li>IBX CLEAR &ndash; quit and clear indent style both</li>
+</ul>
+
+<p>
+Indent styles may be combined and manipulated separately.  You
+could, for example, have a left indent of 4 picas and a right indent
+of 6 picas and control each separately, as in the following example.
+<br/>
+<span class="pre-in-pp">
+  .IL 4P     \"Indent left 4 picas
+  .IR 6P     \"Indent right 6 picas
+  Some text
+  .IRX       \"Turn off the right indent only
+  More text  \"Text is still indented 4 picas left
+</span>
+If, at <kbd>.IRX</kbd>, you wanted the text afterwards to have no
+indents (either left or right), you would enter <kbd>.IQ</kbd>,
+which exits all indent styles at once.
+</p>
+
+<p>
+A word of advice: Indents are best used only when you have a
+compelling reason not to change the current left margin or line
+length.  In many instances where indents might seem expedient,
+it&#8217;s better to use tabs, or actually change the left margin
+or the line length. Mom&#8217;s indenting macros are flexible and
+powerful, but easy to get tangled up in.  Personally, I don&#8217;t
+use them much, except for cutarounds and multi-level lists à la
+html, at which they excel.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span> see the section
+<a href="docprocessing.html#behaviour">Typesetting macros during document processing</a>
+for information and advice on using indents with the
+<a href="docprocessing.html#docprocessing">document processing macros</a>.
+</p>
+</div>
+
+<div id="index-indents" class="macro-list-container">
+<h3 class="macro-list">Indents macros</h3>
+
+<ul class="macro-list">
+  <li><a href="#il">IL</a> &ndash; Indent left</li>
+  <li><a href="#ir">IR</a> &ndash; Indent right</li>
+  <li><a href="#ib">IB</a> &ndash; Indent both</li>
+  <li><a href="#ti">TI</a> &ndash; Temporary indent, left</li>
+  <li><a href="#hi">HI</a> &ndash; Hanging Indent
+  <ul style="margin-left: -.5em; list-style-type: disc;">
+    <li><a href="#num-lists">Recipe: a numbered list using hanging indents</a></li>
+  </ul></li>
+  <li><a href="#iq">IQ</a> &ndash; Quit indents, all</li>
+  <li><a href="#iq">ILX</a> &ndash; Exit indent style left</li>
+  <li><a href="#iq">IRX</a> &ndash; Exit indent style right</li>
+  <li><a href="#iq">IBX</a> &ndash; Exit indent style both</li>
+</ul>
+</div>
+
+<!-- -IL- -->
+
+<div class="macro-id-overline">
+<h3 id="il" class="macro-id">Indent left</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>IL</b> <kbd class="macro-args">[ &lt;measure&gt; ]</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;The optional argument requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+IL indents text from the left margin of the page, or if you&#8217;re
+in a tab, from the left edge of the tab.  Once IL is on, the left
+indent is applied uniformly to every subsequent line of text, even
+if you change the line length.
+</p>
+
+<p>
+The first time you invoke <kbd>.IL</kbd>, you must give it a
+measure.  Subsequent invocations with a measure add to the previous
+measure.  A minus sign may be prepended to the argument to subtract
+from the current measure.  The
+<kbd><a href="inlines.html#inline-stringwidth-groff">\w</a></kbd>
+<a href="definitions.html#inlines">inline escape</a>
+may be used to specify a text-dependent measure, in which case no
+unit of measure is required.  For example,
+<br/>
+<span class="pre-in-pp">
+  .IL \w'margarine'
+</span>
+indents text by the width of the word &#8220;margarine&#8221;.
+</p>
+
+<p>
+With no argument, IL indents by its last active value.  See the
+<a href="#indents-explanation">brief explanation of how mom handles indents</a>
+for more details.
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span> Calling a tab (with
+<kbd><a href="#tab">.TAB &lt;n&gt;</a></kbd>)
+automatically cancels any active indents.
+</p>
+
+<p class="tip-bottom">
+<span class="additional-note">Additional note:</span> Invoking IL
+automatically turns off IB.
+</p>
+</div>
+
+<!-- -IR- -->
+
+<div class="macro-id-overline">
+<h3 id="ir" class="macro-id">Indent right</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>IR</b> <kbd class="macro-args">[ &lt;measure&gt; ]</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;The optional argument requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+IR indents text from the right margin of the page, or if
+you&#8217;re in a tab, from the end of the tab.
+</p>
+
+<p>
+The first time you invoke <kbd>.IR</kbd>, you must give it a
+measure.  Subsequent invocations with a measure add to the previous
+indent measure.  A minus sign may be prepended to the argument to
+subtract from the current indent measure.  The
+<kbd><a href="inlines.html#inline-stringwidth-groff">\w</a></kbd>
+<a href="definitions.html#inlines">inline escape</a>
+may be used to specify a text-dependent measure, in which case no
+unit of measure is required.  For example, <br/>
+<span class="pre-in-pp">
+  .IR \w'jello'
+</span>
+indents text by the width of the word &#8220;jello&#8221;.
+</p>
+
+<p>
+With no argument, IR indents by its last active value.  See the
+<a href="#indents-explanation">brief explanation of how mom handles indents</a>
+for more details.
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span> Calling a tab (with
+<kbd><a href="#tab">.TAB &lt;n&gt;</a></kbd>)
+automatically cancels any active indents.
+</p>
+
+<p class="tip-bottom">
+<span class="additional-note">Additional note:</span> Invoking IR
+automatically turns off IB.
+</p>
+</div>
+
+<!-- -IB- -->
+
+<div class="macro-id-overline">
+<h3 id="ib" class="macro-id">Indent both</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>IB</b> <kbd class="macro-args">[ &lt;left measure&gt; &lt;right measure&gt; ]</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;The optional arguments require a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+IB allows you to set or invoke a left and a right indent at the same
+time.
+</p>
+
+<p>
+At its first invocation, you must supply a measure for both indents;
+at subsequent invocations when you wish to supply a measure, both
+must be given again.  As with IL and IR, the measures are added to
+the values previously passed to the macro.  Hence, if you wish to
+change just one of the values, you must give an argument of zero to
+the other.
+</p>
+
+<p>
+A word of advice: If you need to manipulate left and right
+indents separately, use a combination of IL and IR instead of IB.
+You&#8217;ll save yourself a lot of grief.
+</p>
+
+<p>
+A minus sign may be prepended to the arguments to subtract from
+their current values.  The
+<a href="inlines.html#inline-stringwidth-groff"><kbd>\w</kbd></a>
+<a href="definitions.html#inlines">inline escape</a>
+may be used to specify text-dependent measures, in which case no
+unit of measure is required.  For example,
+<br/>
+<span class="pre-in-pp">
+  .IB \w&#8217;margarine&#8217; \w'jello'
+</span>
+left indents text by the width of the word &#8220;margarine&#8221;
+and right indents by the width of &#8220;jello&#8221;.
+</p>
+
+<p>
+Like IL and IR, IB with no argument indents by its last active
+values.  See the
+<a href="#indents-explanation">brief explanation of how mom handles indents</a>
+for more details.
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span> Calling a tab (with
+<kbd><a href="#tab">.TAB &lt;n&gt;</a></kbd>)
+automatically cancels any active indents.
+</p>
+
+<p class="tip-bottom">
+<span class="additional-note">Additional note:</span> Invoking IB
+automatically turns off IL and IR.
+</p>
+</div>
+
+<!-- -TI- -->
+
+<div class="macro-id-overline">
+<h3 id="ti" class="macro-id">Temporary (left) indent</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>TI</b> <kbd class="macro-args">[ &lt;measure&gt; ]</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;The optional argument requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+A temporary indent is one that applies only to the first line of
+text that comes after it.  Its chief use is indenting the first line
+of paragraphs.  (Mom&#8217;s
+<a href="docelement.html#pp">PP</a>
+macro, for example, uses a temporary indent.)
+</p>
+
+<p>
+The first time you invoke <kbd>.TI</kbd>, you must give
+it a measure.  If you want to indent the first line of a paragraph
+by, say, 2
+<a href="definitions.html#em">ems</a>,
+do
+<br/>
+<span class="pre-in-pp">
+  .TI 2m
+</span>
+Subsequent invocations of TI do not require you to supply a measure;
+mom keeps track of the last measure you gave it.
+</p>
+
+<p>
+Because temporary indents are temporary, there&#8217;s no need to
+turn them off.
+</p>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">IMPORTANT:</span> Unlike IL, IR and IB,
+measures given to TI are NOT additive.  In the following example,
+the second <kbd>.TI&nbsp;2P</kbd> is exactly 2 picas.
+<br/>
+<span class="pre-in-pp" style="margin-bottom: -18px;">
+  .TI 1P
+  The beginning of a paragraph...
+  .TI 2P
+  The beginning of another paragraph...
+</span>
+</p>
+</div>
+
+<!-- -HI- -->
+
+<div class="macro-id-overline">
+<h3 id="hi" class="macro-id">Hanging indent</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>HI</b> <kbd class="macro-args">[ &lt;measure&gt; ]</kbd>
+</div>
+<p class="requires">
+&bull;&nbsp;The optional argument requires a <a href="definitions.html#unitofmeasure">unit of measure</a>
+</p>
+
+<p>
+A hanging indent looks like this:
+<br/>
+<span class="pre-in-pp">
+  The thousand injuries of Fortunato I had borne as best I
+    could, but when he ventured upon insult, I vowed
+    revenge.  You who so well know the nature of my soul
+    will not suppose, however, that I gave utterance to a
+    threat, at length I would be avenged...
+</span>
+The first line of text &#8220;hangs&#8221; outside the left margin.
+</p>
+
+<p>
+In order to use hanging indents, you must first have a left indent
+active (set with either
+<kbd><a href="#il">.IL</a></kbd>
+or
+<kbd><a href="#ib">.IB</a></kbd>).
+Mom will not hang text outside the left margin set with
+<kbd><a href="#l-margin">.L_MARGIN</a></kbd>
+or outside the left margin of a tab.
+</p>
+
+<p>
+The first time you invoke <kbd>.HI</kbd>, you must give
+it a measure.  If you want the first line of a paragraph to hang by,
+say, 1 pica, do
+<br/>
+<span class="pre-in-pp">
+  .IL 1P
+  .HI 1P
+</span>
+Subsequent invocations of HI do not require you to supply a measure;
+mom keeps track of the last measure you gave it.
+</p>
+
+<p>
+Generally speaking, you should invoke HI immediately prior to the
+line you want hung (i.e. without any intervening
+<a href="definitions.html#controllines">control lines</a>).
+And because hanging indents affect only one line, there&#8217;s no
+need to turn them off.
+</p>
+
+<h4 id="num-lists" class="macro-id">Recipe: Numbered lists using hanging indents</h4>
+
+<div class="box-tip" style="margin-top: -.5em; margin-bottom: -.5em;">
+<p class="tip">
+<span class="note">Note:</span> mom has macros for setting lists (see
+<a href="docelement.html#list-intro">Nested lists</a>).
+This recipe exists to demonstrate the use of hanging indents only.
+</p>
+</div>
+
+<p style="margin-top: 1.5em;">
+Consider the following example:
+<br/>
+<span class="pre-in-pp">
+  .PAGE 8.5i 11i 1i 1i 1i 1i
+  .FAMILY  T
+  .FT      R
+  .PT_SIZE 12
+  .LS      14
+  .JUSTIFY
+  .KERN
+  .SS 0
+  .IL \w'\0\0.'  \"Indent left by 2 figure spaces and a period
+  .HI \w'\0\0.'  \"Hang first line back by 2 figure spaces and a period
+  1.\0The most important point to be considered is whether the
+  answer to the meaning of Life, the Universe, and Everything
+  really is 42.  We have no-one&#8217;s word on the subject except
+  Mr. Adams&#8217;.
+  .HI
+  2.\0If the answer to the meaning of Life, the Universe,
+  and Everything is indeed 42, what impact does this have on
+  the politics of representation?  42 is, after all not a
+  prime number.  Are we to infer that prime numbers don&#8217;t
+  deserve equal rights and equal access in the universe?
+  .HI
+  3.\0If 42 is deemed non-exclusionary, how do we present it
+  as the answer and, at the same time, forestall debate on its
+  exclusionary implications?
+</span>
+First, we invoke a left indent with a measure equal to the width of
+2
+<a href="definitions.html#figurespace">figures spaces</a>
+plus a period (using the
+<a href="inlines.html#inline-stringwidth-groff"><kbd>\w</kbd></a>
+inline escape).  At this point, the left indent is active; text
+afterwards would normally be indented.  However, we invoke a
+hanging indent of exactly the same width, which hangs the first
+line (and first line only!) to the left of the indent by the
+same distance (in this case, that means &#8220;out to the left
+margin&#8221;).  Because we begin the first line with a number,
+a period, and a figure space, the actual text (&#8220;The most
+important point...&#8221;) starts at exactly the same spot as the
+indented lines that follow.
+</p>
+
+<p>
+Notice that subsequent invocations of <kbd>.HI</kbd> without a
+measure produce exactly the same effect.
+</p>
+
+<p>
+Paste the example above into a file and preview it with <kbd>groff
+-mom -X &lt;filename&gt;</kbd> to see hanging indents in action.
+</p>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">IMPORTANT:</span> Unlike IL, IR and IB,
+measures given to HI are NOT additive.  Each time you pass a measure
+to HI, the measure is treated literally.
+</p>
+</div>
+
+<!-- -IX- -->
+
+<div class="macro-id-overline">
+<h3 id="iq" class="macro-id">Quitting indents</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>IQ</b> <kbd class="macro-args">[ CLEAR ]</kbd> (quit any/all indents &mdash; see IMPORTANT NOTE)
+</div>
+<br/>
+
+Macro: <b>ILX</b> <kbd class="macro-args">[ CLEAR ]</kbd> (exit Indent Left)
+<br/>
+
+Macro: <b>IRX</b> <kbd class="macro-args">[ CLEAR ]</kbd> (exit Indent Right)
+<br/>
+
+Macro: <b>IBX</b> <kbd class="macro-args">[ CLEAR ]</kbd> (exit Indent Both)
+
+<div class="box-important">
+<p class="tip-top">
+<span class="important">IMPORTANT NOTE:</span> Formerly, the macro
+for quitting all indents was IX.  This usage is now deprecated, in
+favour of IQ.  IX will continue to behave as before, but mom will
+issue a warning to stderr indicating that you should update your
+documents.
+</p>
+
+<p class="tip-bottom">
+As a consequence of this change, ILX, IRX and IBX may now also be
+invoked as ILQ, IRQ and IBQ.  Both forms are acceptable.
+</p>
+</div>
+
+<p>
+Without an argument, the macros to quit indents merely restore your
+original margins and line length.  The measures stored in the indent
+macros themselves are saved so you can call them again without
+having to supply a measure.
+</p>
+
+<p>
+If you pass these macros the optional argument <kbd>CLEAR</kbd>,
+they not only restore your original left margin and line length, but
+also clear any values associated with a particular indent style.
+The next time you need an indent of the same style, you have to
+supply a measure again.
+</p>
+
+<p>
+<kbd>.IQ&nbsp;CLEAR</kbd>, as you&#8217;d suspect,
+quits and clears the values for all indent styles at once.
+</p>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 33%; text-align: right;"><a href="goodies.html#top">Next: Goodies</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

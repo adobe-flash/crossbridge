@@ -1,0 +1,23 @@
+#!/bin/sh
+# This script will create a symbolic link for old curses apps
+# with a hardcoded TERMINFO search path. Also, ensure that all
+# database files are readable.
+prefix=/usr
+terminfodir=${prefix}/share/terminfo
+libdir=${prefix}/lib
+
+(cd ${libdir} && rm -f terminfo && ln -fs ${terminfodir} terminfo)
+
+for d in ${terminfodir}/* ; do
+	if [ -d ${d} ]; then
+		(cd $d && chmod 644 *)
+		chmod 755 ${d}
+	fi
+done
+chmod 755 ${terminfodir}
+
+for f in ${prefix}/share/tabset/* ; do
+	chmod 644 $f
+done
+chmod 755 ${prefix}/share/tabset
+

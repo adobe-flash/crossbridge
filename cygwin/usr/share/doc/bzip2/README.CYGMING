@@ -1,0 +1,52 @@
+This distribution was built using an alternate build system.
+The original distribution used a simple Makefile, which had to
+be heavily customized to meet the needs of modern cygwin and
+MinGW systems.  Furthermore, it was wholly unsuited for building
+the distribution in a cross-hosted environment.
+
+Keith Marshall <keithmarshall@users.sf.net> implemented an
+autoconf-based build system, to facilitate cross-hosted building
+for use with MinGW.  This build system consists of the following
+original files:
+	configure.ac
+	Makefile.in
+	aclocal.m4
+	libbz2.def.in
+found in the 'cygming-autotools-buildfiles.tar.gz' tarball included
+within the bzip2-$VER-$REL-mingw-src tarball.
+
+The source preparation phase of the build runs autoconf, which creates
+the following file(s):
+	configure
+In addition, the source preparation phase explicitly removes the
+original Makefile from the $srcdir, as a new Makefile will be generated
+in the $builddir by the configure phase of the build.
+
+This configure script is NOT distributed in this package; it is assumed
+that the 'autoconf' tool is available.  The proper (non-automated)
+procedure is:
+
+	unpack bzip2-$VER-$REL-mingw-src.tar.gz
+
+This will create a number of new files, included several additional
+tarballs and patches.
+
+	unpack the upstream source tarbal bzip2-$VER.tar.gz
+	unpack the extra 'cygming-autotools-buildfiles.tar.gz' tarball
+	cd bzip2-$VER
+	autoconf
+	mkdir ../build
+	cd ../build
+	../bzip2-$VER/configure [various options]
+	make
+
+However, the automated procedure, which can be used to exactly reproduce
+the official mingw package, is:
+
+	./pkgbuild
+
+which performs all of the above steps, as well as applying the various
+patches, installing into a local staging area, and generating the mingw-get
+compatible installation packages.  See mingw-bzip2.RELEASE_NOTES.txt for
+more information.
+

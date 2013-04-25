@@ -1,0 +1,169 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-4.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-3.html">prev</a> | <a href="pic-5.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>4. Sizes and Spacing
+<a name="4. Sizes and Spacing"></a>
+</h2>
+
+
+<p style="margin-top: 1em">Sizes are specified in inches.
+If you don&rsquo;t like inches, it&rsquo;s possible to set a
+global style variable <b>scale</b> that changes the unit.
+Setting <b>scale = 2.54</b> effectively changes the internal
+unit to centimeters (all other size variable values are
+scaled correspondingly).</p>
+
+<h3>4.1. Default Sizes of Objects
+<a name="4.1. Default Sizes of Objects"></a>
+</h3>
+
+
+<p style="margin-top: 1em">Here are the default sizes for
+<b>pic</b> objects:</p>
+
+
+<p align="center"><img src="img/pic8.png" alt="Image img/pic8.png"></p>
+
+<p>The simplest way to think about these defaults is that
+they make the other basic objects fit snugly into a
+default-sized box.</p>
+
+<p style="margin-top: 1em"><i>pic2plot</i>(1) does not
+necessarily emit a physical inch for each virtual inch in
+its drawing coordinate system. Instead, it draws on a canvas
+8&nbsp;virtual inches by 8&nbsp;virtual inches wide. If its
+output page size is &ldquo;letter&rdquo;, these virtual
+inches will map to real ones. Specifying a different page
+size (such as, say, &ldquo;a4&rdquo;) will scale virtual
+inches so they are output as one eighth of the page width.
+Also, <i>pic2plot</i>(1) centers all images by default,
+though the <b>&minus;n</b> option can be used to prevent
+this.</p>
+
+<h3>4.2. Objects Do Not Stretch!
+<a name="4.2. Objects Do Not Stretch!"></a>
+</h3>
+
+
+<p style="margin-top: 1em">Text is rendered in the current
+font with normal troff line spacing. Boxes, circles, and
+ellipses do <i>not</i> automatically resize to fit enclosed
+text. Thus, if you say <b>box &quot;this text far too long
+for a default box&quot;</b> you&rsquo;ll get this:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic9.png" alt="Image img/pic9.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 4-1: Boxes
+do not automatically resize</p>
+
+<p style="margin-top: 1em">which is probably not the effect
+you want.</p>
+
+<h3>4.3. Resizing Boxes
+<a name="4.3. Resizing Boxes"></a>
+</h3>
+
+
+<p style="margin-top: 1em">To change the box size, you can
+specify a box width with the &ldquo;width&rdquo;
+modifier:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic10.png" alt="Image img/pic10.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 4-2:
+Result of <b>box width 3</b></p>
+
+<p style="margin-top: 1em">This modifier takes a dimension
+in inches. There is also a &ldquo;height&rdquo; modifier
+that changes a box&rsquo;s height. The <b>width</b> keyword
+may be abbreviated to <b>wid</b>; the <b>height</b> keyword
+to <b>ht</b>.</p>
+
+<h3>4.4. Resizing Other Object Types
+<a name="4.4. Resizing Other Object Types"></a>
+</h3>
+
+
+<p style="margin-top: 1em">To change the size of a circle,
+give it a <b>rad[ius]</b> or <b>diam[eter]</b> modifier;
+this changes the radius or diameter of the circle, according
+to the numeric argument that follows.</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic11.png" alt="Image img/pic11.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 4-3:
+Circles with increasing radii</p>
+
+<p style="margin-top: 1em">The <b>move</b> command can also
+take a dimension, which just tells it how many inches to
+move in the current direction.</p>
+
+<p style="margin-top: 1em">Ellipses are sized to fit in the
+rectangular box defined by their axes, and can be resized
+with <b>width</b> and <b>height</b> like boxes.</p>
+
+<p style="margin-top: 1em">You can also change the radius
+of curvature of an arc with <b>rad[ius]</b> (which specifies
+the radius of the circle of which the arc is a segment).
+Larger values yield flatter arcs.</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic12.png" alt="Image img/pic12.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 4-4:
+<b>arc rad</b> with increasing radii</p>
+
+<p style="margin-top: 1em">Observe that because an arc is
+defined as a quarter circle, increasing the radius also
+increases the size of the arc&rsquo;s bounding box.</p>
+
+<h3>4.5. The &lsquo;same&rsquo; Keyword
+<a name="4.5. The &lsquo;same&rsquo; Keyword"></a>
+</h3>
+
+
+<p style="margin-top: 1em">In place of a dimension
+specification, you can use the keyword <b>same</b>. This
+gives the object the same size as the previous one of its
+type. As an example, the program</p>
+
+<pre style="margin-left:10%; margin-top: 1em">.PS
+box; box wid 1 ht 1; box same; box
+.PE</pre>
+
+
+<p style="margin-top: 1em">gives you</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic13.png" alt="Image img/pic13.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 4-5: The
+<b>same</b> keyword</p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-3.html">prev</a> | <a href="pic-5.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

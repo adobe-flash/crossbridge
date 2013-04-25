@@ -1,0 +1,312 @@
+man
+-------------------------------------------------------------------------------
+Man, apropos and whatis.
+
+Runtime requirements:
+  cygwin-1.7.5-1
+  bash-4.1.10-4
+  gawk-4.0.0-1
+  coreutils-8.14-1
+  less-444-1
+  groff-1.20.1-2
+  sed-4.2.1-1
+  gzip-1.4-1
+  bzip2-1.0.6-2
+
+Build requirements:
+  cygwin-1.7.9-1
+  cygport-0.10.6-1
+  bash-4.1.10-4
+  gcc4-4.5.3-3
+  binutils-2.22.51-1
+  make-3.81-2
+  sed-4.2.1-1
+  gawk-4.0.0-1
+  coreutils-8.14-1
+  findutils-4.5.9-2
+  autoconf2.5-2.68-1
+  autoconf-10-1
+  automake1.11-1.11.1-1
+  automake-4-10
+  libtool-2.4-1
+  pkg-config-0.23b-10
+  lndir-1.0.2-1
+  ...
+  and corresponding <XXX>-devel-<y.y.y> packages from the runtime section
+
+Canonical homepage:
+  http://primates.ximian.com/~flucifredi/man/
+
+Canonical download:
+  http://primates.ximian.com/~flucifredi/man/
+
+License:
+  GPL
+
+Language:
+  C
+
+-------------------------------------------------------------------------------
+
+Build instructions:
+  unpack man-<Pack-Ver>-<Cyg-Rel>-src.tar.bz2
+    if you use setup to install this src package, it will be
+        unpacked under /usr/src automatically
+  cd /usr/src
+  cygport ./man-<Pack-Ver>-<Cyg-Rel>.cygport all
+
+This will create:
+  /usr/src/man-<Pack-Ver>-<Cyg-Rel>-src.tar.bz2
+  /usr/src/man-<Pack-Ver>-<Cyg-Rel>.tar.bz2
+
+Or use 'cygport ./man-<Pack-Ver>-<Cyg-Rel>.cygport prep' to get a patched source directory
+
+To find out the files included in the binary distribution, you can
+use "cygcheck -l man", or browse the listing for the appropriate version
+at <http://cygwin.com/packages/>.
+
+-------------------------------------------------------------------------------
+
+Port Notes:
+
+----- version man-1.6g-1 ----- Tue 15 Nov 00:54:33 2011 --
+
+ - Switched to latest upstream version
+ - Rebuild for cygwin 1.7 with gcc-4
+
+----- version man-1.6f-1 ----- Mon 17 May 20:50:05 2010 --
+
+ - Rebuild for cygwin 1.7 with gcc-4
+ - Added Reini Urban's EXEEXT magic to man makefiles
+ - Moved man.conf from /usr/share/misc to /etc
+ - Switched to latest upstream version
+
+----- version man-1.6e-1 -----
+
+ - Switched to latest upstream version
+ - Added mingw manual section
+   (see also: http://cygwin.com/ml/cygwin-apps/2007-04/msg00023.html and related thread)
+
+----- version man-1.6d-2 -----
+
+ - Fixed a problem with setup.hint
+ - Documented new dependencies in man.README
+
+----- version man-1.6d-1 -----
+
+ - Routine update
+ - Switched to cygport build framework
+ - Most patches accepted upstream
+ - Fixed bug reported in http://sourceware.org/ml/cygwin/2006-04/msg00616.html
+ - Switched back to man version from Frederico Lucifredi which is now
+   actively maintained
+   - makewhatis again creates its whatis databases below the base directories from
+     MANPATH instead of one big database below /var/cache/man
+   - makewhatis again does not depend on iconv and mktemp
+ - Added /usr/share/qt3/doc/man to man.conf
+
+----- version man-1.5p-1 -----
+
+ - Routine update
+
+Upgrade to the latest version man-1.5p-4.src.rpm found at
+
+ o http://download.fedora.redhat.com/pub/fedora/linux/core/development/SRPMS/
+
+This version includes almost all of the fixes found in the above rpm
+archive. Some of them are not relevant for cygwin.
+
+More details about the individuell bugs can be found under the URL
+
+ o http://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=XXXXX
+
+where XXXXX represents the numeric bug id.
+
+
+Upstream Changelog:
+===================
+
+- fix bug 140178 - correct one typo
+- fix bug 140202 - problem with makewhatis exit (patch 13)
+- fix bug 140207 - problem with makewhatis -u  (patch 14)
+  the fixed version update information about man-pages which
+  are less then one day old (it is used in day update)
+
+----- version man-1.5o1-2 -----
+
+ - Patch for variable page width in man
+   (http://cygwin.com/ml/cygwin/2005-03/msg00306.html)
+
+----- version man-1.5o1-1 -----
+
+ - Fixed postinstall bug 571 (see http://sourceware.org/bugzilla/show_bug.cgi?id=571)
+
+ - The following problem with not honoring MANWIDTH seems to be fixed upstream
+   (http://sources.redhat.com/ml/cygwin/2004-11/msg00867.html)
+
+
+Upgrade to the latest version man-1.5o1-7.src.rpm found at
+
+ o http://download.fedora.redhat.com/pub/fedora/linux/core/development/SRPMS/
+
+This version includes almost all of the fixes found in the above rpm
+archive. Some of them are not relevant for cygwin.
+
+More details about the individuell bugs can be found under the URL
+
+ o http://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=XXXXX
+
+where XXXXX represents the numeric bug id.
+
+
+Upstream Changelog:
+===================
+
+- upgrade to 1.5o1: update patches, remove gencat iconv and posix
+  page hacks as they're upstream fixed (#128691, #129882)
+- nroff not called with -rLL=, -rLT= parameters which should contain
+  value from get_line_width()/MANWIDTH (#80893)
+- append ".color" request to groff output to control color/monochrome
+  control via the new man "-b" switch (#120112)
+- reverse iconv catmsgs for legacy enc support (#138199) Thanks to
+  Andy Shevchenko
+- update English man page: remove obsolete LESSCHARSET reference (#133521);
+  add -b switch and NOCOLOR conf directive
+- "Welche Handbuchseite soll angezeigt werden?" (#135995)
+- replace russian messages (#134387) Thanks to Leonid Kanter
+
+----- version man-1.5o-1 -----
+
+ - Update to latest upstream release
+ - makewhatis -s patch made it upstream
+ - Patch for displaying man pages with :: in their filenames made it upstream
+ - Fixed postinstall script:
+   Added chmod 644 ${datadir}/misc/man.conf
+ - Additions for makewhatis man page
+ - Added -s sections to output for makewhatis -h
+ - Changed reference for man.config to man.conf in various man pages
+ - Problem reported by Hannu E K Nevalainen is fixed
+   See also:
+
+     o http://cygwin.com/ml/cygwin/2004-06/msg01158.html
+
+----- version man-1.5k-3 -----
+
+ - Fixed problem of allowing man pages for directories with spaces in them
+   Thanks to Elvin Peterson <elvin_peterson at yahoo.com>
+
+   See also:
+
+     o http://www.cygwin.com/ml/cygwin/2004-02/msg01451.html
+
+ - Added the line
+
+     MANPATH /usr/X11R6/share/man
+
+   to /usr/share/misc/man.conf.default as some of the X man pages are
+   using it
+
+----- version man-1.5k-2 -----
+
+ - Fixed problem of makewhatis -s
+   It couldn't take more than one parameter
+   Thanks to Matthew Carter
+
+   See also:
+
+     o http://cygwin.com/ml/cygwin/2003-12/msg00394.html
+
+ - Applied a patch from Rafael Kitover
+   Man can now display man pages with :: in their filenames
+   Usefull for displaying perl man pages
+
+    See also:
+
+     o http://cygwin.com/ml/cygwin-apps/2003-12/msg00348.html
+
+----- version man-1.5k-1 -----
+
+Upgrade to the latest version man-1.5k-12.src.rpm found at
+
+ o http://download.fedora.redhat.com/pub/fedora/linux/core/development/SRPMS/
+
+This version includes almost all of the fixes found in the above rpm
+archive. Some of them are not relevant for cygwin.
+
+More details about the individuell bugs can be found under the URL
+
+ o http://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=XXXXX
+
+where XXXXX represents the numeric bug id.
+
+
+Changelog:
+==========
+
+* Thu Oct 09 2003 Adrian Havill <havill@redhat.com> 1.5k-12
+- force utf locale with jnroff (#105764)
+- don't let awk in makewhatis scan files that aren't man pages (#105594)
+
+* Wed Oct 01 2003 Adrian Havill <havill@redhat.com> 1.5k-11
+- Use UTF-8 in makewhatis when searching for non-English versions of the
+  phrase "NAME" in man pages
+- add "-o" option to makewhatis to specify an alternate whatis db location
+
+* Fri Aug 08 2003 Adrian Havill <havill@redhat.com> 1.5k-9
+- cleaned up apropos script bugs (#97006)
+- merged all apropos changes into one cleaner patch
+
+* Thu May 22 2003 Jeremy Katz <katzj@redhat.com> 1.5k-7
+- fix build with gcc 3.3
+
+* Mon Feb 10 2003 Adrian Havill <havill@redhat.com> 1.5k-6
+- added patch for korean (#83934)
+
+* Thu Feb 06 2003 Adrian Havill <havill@redhat.com> 1.5k-5
+- removed bad argcat patch which made bogus grep queries (#82684)
+
+* Mon Jan 13 2003 Adrian Havill <havill@redhat.com> 1.5k-2
+- bump version from j to k
+- adjust patches to reflect upstream integration
+
+
+Cygwin specific changes:
+========================
+
+ o added m and 8c to the default man sections list, cygwin has man pages
+   in directories /usr/share/man/man8c and /usr/X11R6/man/manm
+ o fixed italian man page
+ o added /usr/X11R6/man:/usr/local/share/man:/usr/local/man to the default
+   manpath in makewhatis
+ o postinstall script adds symlinks from man to manpath for binary and
+   manpage
+
+Additionally the following things have been changed since the interim
+version man-1.5m2-1:
+
+ o The following two lines in man.conf
+
+   NROFF                /usr/bin/nroff -c -mandoc
+   PAGER                /usr/bin/less -isrR
+
+   seem to fix the output of ESC sequences
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Certain versions of the FHS recommend putting formatted versions of
+
+ /usr/.../share/man/[locale/]manx/page.x
+
+into
+
+ /var/cache/man/.../[locale/]catx/page.x.
+
+The keyword FHS in man.conf will cause this behaviour and is now the default.
+Explicitly given catdirs override. See comments in the man.conf file.
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+Cygwin port was originally done by: Christoper Faylor
+And is now maintained by: Dr. Volker Zell  <dr.volker.zell@oracle.com>

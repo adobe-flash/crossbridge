@@ -1,0 +1,129 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-13.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-12.html">prev</a> | <a href="pic-14.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>13. Expressions, Variables, and Assignment
+<a name="13. Expressions, Variables, and Assignment"></a>
+</h2>
+
+
+<p style="margin-top: 1em"><font color="#000000">A number
+is a valid expression, of course (all numbers are stored
+internally as floating-point). Decimal-point notation is
+acceptable; in GNU <b>gpic</b>, scientific notation in
+C&rsquo;s &lsquo;e&rsquo; format (like <tt>5e-2</tt>) is
+accepted.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Anywhere a
+number is expected, the language also accepts a variable.
+Variables may be the built-in style variable described in
+the last section, or new variables created by
+assignment.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">DWB
+<b>pic</b> supports only the ordinary assignment via
+<b>=</b>, which defines the variable (on the left side of
+the equal sign) in the current block if it is not already
+defined there, and then changes the value (on the right
+side) in the current block. The variable is not visible
+outside of the block. This is similar to the
+C&nbsp;programming language where a variable within a block
+shadows a variable with the same name outside of the
+block.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">GNU
+<b>gpic</b> supports an alternate form of assignment using
+<b>:=</b>. The variable must already be defined, and the
+value is assigned to that variable without creating a
+variable local to the current block. For example,
+this</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">x=5
+y=5
+[
+  x:=3
+  y=3
+]
+print x &quot; &quot; y</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">prints
+<b>3 5</b>.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">You can
+use the height, width, radius, and x and y coordinates of
+any object or corner in expressions. If <b>A</b> is an
+object label or name, all the following are
+valid:</font></p>
+
+<pre style="margin-left:10%; margin-top: 1em">A.x                  # x coordinate of the center of A
+A.ne.y               # y coordinate of the northeast corner of A
+A.wid                # the width of A
+A.ht                 # and its height
+2nd last circle.rad  # the radius of the 2nd last circle</pre>
+
+
+<p style="margin-top: 1em"><font color="#000000">Note the
+second expression, showing how to extract a corner
+coordinate.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Basic
+arithmetic resembling those of C operators are available;
+<b>+</b>, <b>*</b>, <b>-</b>, <b>/</b>, and <b>%</b>. So is
+<b>^</b> for exponentiation. Grouping is permitted in the
+usual way using parentheses. GNU <b>gpic</b> allows logical
+operators to appear in expressions; <b>!</b> (logical
+negation, not factorial), <b>&amp;&amp;</b>, <b>||</b>,
+<b>==</b>, <b>!=</b>, <b>&gt;=</b>, <b>&lt;=</b>,
+<b>&lt;</b>, <b>&gt;</b>.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">Various
+built-in functions are supported:
+<b>sin(</b><i>x</i><b>)</b>, <b>cos(</b><i>x</i><b>)</b>,
+<b>log(</b><i>x</i><b>)</b>, <b>exp(</b><i>x</i><b>)</b>,
+<b>sqrt(</b><i>x</i><b>)</b>,
+<b>max(</b><i>x</i><b>,</b><i>y</i><b>)</b>,
+<b>atan2(</b><i>x</i><b>,</b><i>y</i><b>)</b>,
+<b>min(</b><i>x</i><b>,</b><i>y</i><b>)</b>,
+<b>int(</b><i>x</i><b>)</b>, <b>rand()</b>, and
+<b>srand()</b>. Both <b>exp</b> and <b>log</b> are
+base&nbsp;10; <b>int</b> does integer truncation;
+<b>rand()</b> returns a random number in [0-1), and
+<b>srand()</b> sets the seed for a new sequence of
+pseudo-random numbers to be returned by <b>rand()</b>
+(<b>srand()</b> is a GNU extension).</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">GNU
+<b>gpic</b> also documents a one-argument form or rand,
+<b>rand(</b><i>x</i><b>)</b>, which returns a random number
+between 1 and <i>x</i>, but this is deprecated and may be
+removed in a future version.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+function <b>sprintf()</b> behaves like a C <i>sprintf</i>(3)
+function that only takes %, %e, %f, and %g format
+strings.</font></p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-12.html">prev</a> | <a href="pic-14.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

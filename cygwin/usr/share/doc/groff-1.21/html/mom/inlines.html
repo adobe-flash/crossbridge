@@ -1,0 +1,1076 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Inline escapes</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="color.html#top">Next: Coloured text</a></td>
+</tr>
+</table>
+
+<h1 id="inline-escapes" class="docs">Inline escapes</h1>
+
+<div style="text-align: center;">
+<a href="#index-inlines">List of inline escapes</a>
+</div>
+
+<div class="rule-medium"><hr/></div>
+
+<h2 id="intro-inlines" class="docs">Introduction</h2>
+<p>
+Inline escapes, as described in the
+<a href="definitions.html#inlines">groff terms</a>
+section of this manual, are typesetting commands that appear in text
+<a href="definitions.html#inputline">input lines</a>,
+as opposed to macros and other
+<a href="definitions.html#controllines">control lines</a>
+that must appear on lines by themselves.
+</p>
+
+<p>
+Aside from altering type parameters within a line, inlines also tell
+groff about special characters&mdash;em-dashes, bullets,
+<a href="definitions.html#figurespace">figure/digit-width spaces</a>,
+and so on.  It is beyond the scope of this manual to provide
+a complete list of groff&#8217;s inline functions and special
+characters.  I recommend having a look at the
+<a href="intro.html#canonical">canonical reference materials</a>
+should you need more information than is contained herein.
+</p>
+
+<p>
+In groff, the escape character is the backslash (<kbd>\</kbd>).
+Groff interprets everything following the backslash as instructions,
+not literal text, until the escape sequence is complete.  Should
+you need the actual backslash character as part of a line of text,
+simply enter it twice (<kbd>\\</kbd>).  Groff understands that this
+means "please print a backslash character."
+</p>
+
+<p>
+You can also use <kbd>\e</kbd> to print a literal backslash, or use
+<a href="goodies.html#esc-char">ESC_CHAR</a> to change the escape
+character to something other than the backslash, which lets you
+use a single backslash as a literal backslash.
+</p>
+
+<p>
+Groff has a number of ways of recognizing what constitutes a
+complete escape sequence.  This is both a boon and a curse; some
+escape sequences have no terminating delimiter and consequently
+become difficult to distinguish from real input text.  Others
+require the use of an opening parenthesis with no corresponding
+closing parenthesis.  Still others need to be enclosed in square
+brackets.
+</p>
+
+<p>
+Mom recognizes that certain escapes get used more often than others.
+For these, she has a consistent input style that takes the form
+<kbd>\*[...]</kbd>, which makes them stand out well from the text of
+your documents.  These escapes are the ones listed under
+<a href="#inlines-mom">Mom&#8217;s personal inline escapes</a>.
+</p>
+
+<p>
+Despite mom&#8217;s best intentions, there are still
+a number of typesetting functions that can only be accomplished
+with groff&#8217;s native inline escapes.  I've listed the ones that
+strike me as essential, but there are many others.  If you want
+to know what they are, please read the
+<a href="intro.html#canonical">canonical reference materials</a>
+pertaining to groff.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="tip">Helpful bit of information:</span>
+Inline escapes can be used in
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+that take
+<a href="definitions.html#stringargument">string arguments</a>.
+</p>
+</div>
+
+<div class="macro-list-container">
+<h3 id="index-inlines" class="macro-list">List of inline escapes</h3>
+
+<ul class="macro-list">
+<li id="inlines-mom"><a href="#inlines-mom-top">Mom&#8217;s personal inline escapes</a>
+<ul class="no-enumerator" style="margin-left: -1.5em;">
+  <li><a href="#inline-fonts-mom">Changing fonts</a></li>
+  <li><a href="#inline-size-mom">Changing point size</a></li>
+  <li><a href="#uc-lc">Capitalise a section of type</a></li>
+  <li><a href="#inline-kerning-mom">Pairwise kerning</a></li>
+  <li><a href="#inline-horizontal-mom">Horizontal movement</a></li>
+  <li><a href="#inline-vertical-mom">Vertical movement</a></li>
+  <li><a href="#inline-b-mom">Terminate a line without advancing on the page</a></li>
+  <li><a href="#tb-plus-mom">Call the next sequential tab without advancing on the page</a></li>
+  <li><a href="#inline-rule-mom">Full measure rules</a>
+  <ul class="sublist" style="font-size: 100%;">
+    <li><a href="#rule-weight">Macro to control the weight of rules</a></li>
+  </ul></li>
+</ul></li>
+<li id="inlines-groff"><a href="#inlines-groff-top">Commonly-used groff inline escapes</a>
+<ul class="no-enumerator" style="margin-left: -1.5em;">
+  <li><kbd>\f</kbd>&nbsp;<a href="#inline-fonts-groff">Font control</a></li>
+  <li><kbd>\h</kbd>&nbsp;<a href="#inline-horizontal-groff">Inline horizontal motions</a></li>
+  <li><kbd>\v</kbd>&nbsp;<a href="#inline-vertical-groff">Inline vertical motions</a></li>
+  <li><kbd>\w</kbd>&nbsp;<a href="#inline-stringwidth-groff">String width function</a></li>
+  <li><kbd>\l</kbd>&nbsp;<a href="#inline-linedrawing-groff">Horizontal line drawing function</a></li>
+  <li style="margin-left: 1.6em;"><a href="#inline-characters-groff">Special characters</a></li>
+</ul></li>
+</ul>
+</div>
+
+<div class="rule-medium"><hr/></div>
+
+<!-- -INLINE_FONTS_MOM- -->
+
+<h2 id="inlines-mom-top" class="macro-group">Mom&#8217;s personal inline escapes</h2>
+
+<h3 id="inline-fonts-mom" class="docs">Changing fonts</h3>
+
+<p>
+Mom provides five escapes for changing fonts inline:
+<br/>
+<span class="pre-in-pp">
+  \*[ROM]   Change to the medium roman font
+  \*[IT]    Change to the medium italic font
+  \*[BD]    Change to the bold roman font
+  \*[BDI]   Change to the bold italic font
+  \*[PREV]  Revert to the previous font (once only)*
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+<kbd>\*[PREV]</kbd> does not operate "stack style".  It returns
+to the previous font once only, and afterwards has no effect.  In
+other words, in the case of <kbd>\*[PREV]\*[PREV]</kbd>, only the
+first <kbd>\*[PREV]</kbd> is respected; the second one is silently
+ignored.
+</p>
+</div>
+
+<p>
+These escapes are provided for merely for convenience, legibility,
+and consistency when typesetting with mom.  For more complete and
+flexible inline font control, please see
+<a href="#inline-fonts-groff">font control with <kbd>\f</kbd></a>.
+</p>
+
+<div class="box-notes">
+<h3 id="inlines-docprocessing-fonts" class="docs notes">Notes concerning document processing</h3>
+<p style="margin-top: .5em;">
+If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>,
+inline font changes remain in effect only for the duration of the
+current document element tag.
+</p>
+
+<p class="tip-bottom">
+Additionally, if you&#8217;re designing your own
+<a href="headfootpage.html#headfootpage-intro">HEADERS or FOOTERS</a>
+and want to use mom&#8217;s inline escapes for changing fonts as
+part of the the left, centre and/or right strings, or in the strings
+for
+<a href="headfootpage.html#hdrftr-rectoverso">recto</a>
+and/or
+<a href="headfootpage.html#hdrftr-rectoverso">verso</a>
+HEADERS or FOOTERS, or in the strings passed to
+<a href="headfootpage.html#headers-and-footers">HEADERS_AND_FOOTERS</a>,
+you must enter the inlines beginning with <kbd>\E*</kbd>
+rather than just <kbd>\*</kbd>, e.g. <kbd>\E*[BD]</kbd>.
+</p>
+</div>
+
+<!-- -INLINE_SIZE_MOM- -->
+
+<h3 id="inline-size-mom" class="docs">Changing point size</h3>
+<p>
+Mom has two inline escapes for changing point size:
+<br/>
+<span class="pre-in-pp">
+  \*[SIZE &lt;size&gt;]
+</span>
+and
+<br/>
+<span class="pre-in-pp">
+  \*S[&lt;size&gt;]
+</span>
+where &#8220;size&#8221; is the new size you want.  You can use
+either; they behave exactly the same way.  For example, to change
+the point size of type inline to 12 points, you could enter either
+<br/>
+<span class="pre-in-pp">
+  \*[SIZE 12]
+</span>
+or
+<br/>
+<span class="pre-in-pp">
+  \*S[12]
+</span>
+</p>
+
+<p>
+The advantage of the first form is that it&#8217;s easy to remember,
+and follows mom&#8217;s usual inline syntax.  The advantage of the
+second is that it&#8217;s more concise.
+</p>
+
+<p>
+Notice that in both cases, the new size does not require a
+<a href="definitions.html#unitofmeasure">unit of measure</a>;
+<a href="definitions.html#picaspoints">points</a>
+is assumed.  However, a unit of measure may be appended to the size
+if that&#8217;s what you wish.  Fractional sizes are, of course,
+allowed.
+</p>
+
+<p>
+The size given to <kbd>\*[SIZE&nbsp;&lt;size&gt;]</kbd> or
+<kbd>\*S[&lt;size&gt;]</kbd> may be expressed in plus or minus
+terms, which can be very useful.  In the following examples, the
+word &#8220;mom&#8221; will be output 2 points larger than the point
+size of the rest of the line.
+<br/>
+<span class="pre-in-pp">
+  While she isn't perfect, \*S[+2]mom\*S[-2] isn't half bad.
+  While she isn't perfect, \*[SIZE +2]mom\*[SIZE -2] isn't half bad.
+</span>
+</p>
+
+<div class="box-notes">
+<h3 id="inline-docprocessing-ps" class="docs notes">NOTE CONCERNING DOCUMENT PROCESSING</h3>
+<p style="margin-top: .5em;">
+If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+and wish to design your own
+<a href="headfootpage.html#headfootpage-intro">HEADERS or FOOTERS</a>
+using mom&#8217;s inline escape for changing point size as part of
+the left, centre and/or right strings, or in the strings for
+<a href="headfootpage.html#hdrftr-rectoverso">recto</a>
+and/or
+<a href="headfootpage.html#hdrftr-rectoverso">verso</a>
+HEADERS or FOOTERS, or in the strings passed to
+<a href="headfootpage.html#headers-and-footers">HEADERS_AND_FOOTERS</a>,
+you <i>must</i> use the form <kbd>\*S[&lt;n&gt;]</kbd>
+and enter the inline beginning with <kbd>\E*</kbd>, like this:
+<kbd>\E*S[&lt;+|-&gt;&lt;n&gt;]</kbd>.
+</p>
+
+<p class="tip-bottom">
+<span class="additional-note">Additional note:</span>
+If you&#8217;re accustomed to groff&#8217;s usual way of handling
+inline size requests <kbd>(\sN, \s±N, \s(NN, \s±(NN, \s[NNN],
+\s±[NNN]),</kbd> feel free to continue with your old habits.  Mom
+doesn&#8217;t care.
+</p>
+</div>
+
+<!-- -CAPITALISATION- -->
+
+<h3 id="uc-lc" class="docs">Capitalise a section of type</h3>
+<p>
+If you need to capitalise a region of type inline, bracket the
+region of type with the inline escapes, <kbd>\*[UC]</kbd> (Upper Case)
+and <kbd>\*[LC]</kbd> (Lower Case), like this:
+<br/>
+<span class="pre-in-pp">
+  All work \*[UC]and\*[LC] no play makes Jack a dull boy.
+</span>
+The above produces, on output
+<br/>
+<span class="pre-in-pp">
+  All work AND no play makes Jack a dull boy.
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+<kbd>\*[UC]</kbd> and <kbd>\*[LC]</kbd> must not be used inside the
+<a href="definitions.html#stringargument">string arguments</a>
+passed to the
+<a href="headfootpage.html#hdrftr-strings">HEADER_&lt;POSITION&gt;</a>
+macro.  Instead, use the control macro
+<a href="headfootpage.html#_caps">HEADER_&lt;POSITION&gt;_CAPS.</a>
+For
+<a href="headfootpage.html#hdrftr-rectoverso">HEADER_RECTO</a>
+(or _VERSO) or
+<a href="headfootpage.html#hdrftr-rectoverso">FOOTER_RECTO</a>
+(or _VERSO), supply the <kbd>CAPS</kbd> option to the appropriate
+macro.
+</p>
+</div>
+
+<!-- -INLINE_KERNING_MOM- -->
+
+<h3 id="inline-kerning-mom" class="docs">Pairwise kerning</h3>
+<p>
+Pairwise kerning means moving specific letter pairs closer
+together or further apart (see
+<a href="definitions.html#kern">Typesetting terms, kerning</a>
+for more details).
+</p>
+
+<p>
+Mom permits inline pairwise kerning through the use of the inline
+escapes
+<br/>
+<span class="pre-in-pp">
+  \*[BU &lt;n&gt;]&nbsp;Closes the space between letters (Back Units).
+  \*[FU &lt;n&gt;]&nbsp;Opens the space between letters (Forward Units).
+</span>
+&#8220;<b>&lt;n&gt;</b>&#8221; is the number of
+<a href="definitions.html#kernunit">kern units</a>
+by which to close or open the space between letters.
+</p>
+
+<p>
+For example,
+<br/>
+<span class="pre-in-pp">
+  THE HUMAN COST OF COMMODIF\*[FU 1]YING FRESH W\*[BU 4]A\*[BU 5]TER
+</span>
+moves the letter Y in &#8220;COMMODIFYING&#8221; one kern unit away from
+the letter F, and the letter A in &#8220;WATER&#8221; four kern units
+closer to the letter W.  Additionally, the letter T in "WATER" is
+moved five kern units closer to the letter A.
+</p>
+
+<p>
+For backward compatibility, the forms
+<br/>
+<span class="pre-in-pp">
+  \*[BU1]...\*[BU36]&nbsp;Move backward 1...36 <a href="definitions.html#kernunit">kern units</a>
+  \*[FU1]...\*[FU36]&nbsp;Move forward  1...36 <a href="definitions.html#kernunit">kern units</a>
+</span>
+also exist (i.e. with no space before the number of kern units desired,
+up to a limit of 36).
+</p>
+
+<div class="box-notes">
+<h3 id="inlines-docprocessing-kerning" class="docs notes">Notes concerning document processing</h3>
+<p style="margin-top: .5em;">
+If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+and wish to design your own
+<a href="headfootpage.html#headfootpage-intro">HEADERS or FOOTERS</a>
+using mom&#8217;s inline escapes for kerning as part of the left,
+centre and/or right strings, or in the strings for
+<a href="headfootpage.html#hdrftr-rectoverso">recto</a>
+and/or
+<a href="headfootpage.html#hdrftr-rectoverso">verso</a>
+HEADERS or FOOTERS, or in the strings passed to
+<a href="headfootpage.html#headers-and-footers">HEADERS_AND_FOOTERS</a>,
+you <i>must</i> use the forms <kbd>\E*[BU&lt;n&gt;]</kbd>
+and <kbd>\E*[FU&lt;n&gt;]</kbd> (i.e. with no space), and enter the
+inline beginning with <kbd>\E*</kbd> rather than just <kbd>\*</kbd>,
+e.g. <kbd>\E*[BU4]</kbd>.
+</p>
+ 
+<p class="tip-bottom">
+<span class="additional-note">Additional note:</span>
+Using the <kbd>BU</kbd> or <kbd>FU</kbd> escapes between characters
+pairs that are already automatically kerned (see
+<a href="typesetting.html#kern">KERN</a>)
+disables the automatic
+kerning and uses the value you give to BU or FU instead.
+</p>
+</div>
+
+<!-- -INLINE_HORIZONTAL_MOM- -->
+
+<h3 id="inline-horizontal-mom" class="docs">Horizontal inline movement</h3>
+<p>
+Sometimes, you may need to insert a specified amount amount of white
+space into an
+<a href="definitions.html#outputline">output line</a>,
+or&mdash;occasionally&mdash;back up to a previous position on an
+<a href="definitions.html#inputline">output</a>
+line in order to create special typographic effects.
+</p>
+
+<p>
+Mom&#8217;s inline escapes for these horizontal movements are
+<br/>
+<span id="bck" class="pre-in-pp">
+  \*[BCK &lt;n unit&gt;]&nbsp;&nbsp;Move backward inline the specified number of
+                    <a href="definitions.html#unitofmeasure">units of measure</a>; decimal fractions are allowed.
+</span>
+and
+<span id="fwd" class="pre-in-pp">
+  \*[FWD &lt;n unit&gt;]&nbsp;&nbsp;Move forward inline the specified number of
+                    <a href="definitions.html#unitofmeasure">units of measure</a>; decimal fractions are allowed.
+</span>
+</p>
+
+<p>
+For example,
+<br/>
+<span class="pre-in-pp">
+    1.\*[FWD 12p]The Free Trade Play-Offs: WalMart 100, Mexico 0
+</span>
+puts 12 points of space between <kbd>1.</kbd> and
+<kbd>The</kbd>.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+For backward compatibility, the forms
+<br/>
+<span class="pre-in-pp">
+  \*[BP.25]...\*[BP12.75]&nbsp;Move backward .25...12.75 points
+  \*[FP.25]...\*[FP12.75]&nbsp;Move forward  .25...12.75 points
+</span>
+also exist (i.e. with no space before the digit and points being
+the unit of measure, hence no unit of measure required).  Both
+accept quarter points, so it&#8217;s possible to do, for example,
+<kbd>\*[FP.5]</kbd> or <kbd>\*[BP1.25]</kbd> up to a limit
+of 12.75 points.
+</p>
+</div>
+
+<div class="box-notes">
+<h3 id="inlines-docprocessing-horizontal" class="docs notes">Note concerning document processing</h3>
+<p style="margin-top: .5em; padding-bottom: .5em;">
+If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+and wish to design your own
+<a href="headfootpage.html#headfootpage-intro">HEADERS or FOOTERS</a>
+using mom&#8217;s inline escapes for horizontal movements as part of
+the left, centre and/or right strings, or in the strings for
+<a href="headfootpage.html#hdrftr-rectoverso">recto</a>
+and/or
+<a href="headfootpage.html#hdrftr-rectoverso">verso</a>
+HEADERS or FOOTERS, or in the strings passed to
+<a href="headfootpage.html#headers-and-footers">HEADERS_AND_FOOTERS</a>,
+you <i>must</i> use the forms <kbd>\E*[BP&lt;n&gt;]</kbd>
+and <kbd>\E*[FP&lt;n&gt;]</kbd> (i.e. with no space), and enter the
+inline beginning with <kbd>\E*</kbd> rather than just <kbd>\*</kbd>,
+e.g. <kbd>\E*[BP.755]</kbd>.
+</p>
+</div>
+
+<!-- -INLINE_VERTICAL_MOM- -->
+
+<h3 id="inline-vertical-mom" class="docs">Vertical inline movement</h3>
+<p>
+If you need to move portions of type up or down on a line, mom
+provides the following inline escapes:
+<br/>
+<span id="down" class="pre-in-pp">
+  \*[DOWN &lt;n unit&gt;]&nbsp;Move down inline the specified number of
+                    <a href="definitions.html#unitofmeasure">units of measure</a>
+
+  <span id="up">\*[UP &lt;n unit&gt;]&nbsp;Move up inline the specified number of
+                  <a href="definitions.html#unitofmeasure">units of measure</a></span>
+</span>
+For example,
+<br/>
+<span class="pre-in-pp">
+  Tel: 905\*[UP 1p]-\*[DOWN 1p]4072
+</span>
+moves the hyphen in the telephone number up by 1 point, then
+moves back down by the same amount.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+<kbd>\*[UP]</kbd> and <kbd>\*[DOWN]</kbd> do not work in conjunction
+with the inline escape,
+<kbd><a href="#inline-rule-mom">\*[RULE]</a></kbd>.
+</p>
+
+<p>
+<span class="additional-note">Additional note:</span>
+For backward compatibility, the following are also available:
+<br/>
+<span class="pre-in-pp">
+  \*[ALD.25]...\*[ALD12.75]   Advance lead .25...12.75 points (move downward)
+  \*[RLD.25]...\*[RLD12.75]   Reverse lead .25...12.75 points (move upward)
+</span>
+</p>
+
+<p class="tip-bottom">
+Both <kbd>\*[ALD]</kbd> and <kbd>\*[RLD]</kbd> work in points, hence
+you mustn&#8217;t use a unit of measure.
+</p>
+</div>
+
+<div class="box-notes">
+<h3 id="inline-docprocessing-vertical" class="docs notes">Note concerning document processing</h3>
+<p style="margin-top: .5em; padding-bottom: .5em;">
+If you&#8217;re using the
+<a href="docprocessing.html#docprocessing">document processing macros</a>
+and wish to design your own
+<a href="headfootpage.html#headfootpage-intro">HEADERS or FOOTERS</a>
+using mom&#8217;s inline escapes for vertical movements as part of
+the left, centre and/or right strings, or in the strings for
+<a href="headfootpage.html#hdrftr-rectoverso">recto</a>
+and/or
+<a href="headfootpage.html#hdrftr-rectoverso">verso</a>
+HEADERS or FOOTERS, or in the strings passed to
+<a href="headfootpage.html#headers-and-footers">HEADERS_AND_FOOTERS</a>,
+you <i>must</i> use the forms <kbd>\E*[ALD&lt;n&gt;]</kbd>
+and <kbd>\E*[RLD&lt;n&gt;]</kbd> (i.e. with no space), and enter the
+inline beginning with <kbd>\E*</kbd> rather than just <kbd>\*</kbd>,
+e.g. <kbd>\E*[ALD.5]</kbd>.
+</p>
+</div>
+
+<!-- -INLINE_B_MOM- -->
+
+<h3 id="inline-b-mom" class="docs">Terminate a line without advancing on the page</h3>
+<p>
+Sometimes, you want mom to break a line but not advance on the page.
+See
+<a href="typesetting.html#el-example">here</a>
+for an example of when you might want to do this.
+</p>
+
+<p>
+In versions of mom prior to 1.2-f, this was accomplished through the
+use of the
+<a href="typesetting.html#el">EL</a>
+macro.  As of 1.2-f, you can, if you prefer, accomplish the same
+thing by using the inline escape, <kbd>\*[B]</kbd>.  Simply attach
+the escape to the end of any input line.  Using the example given in
+the document entry for EL, you'd use <kbd>\*[B]</kbd> like this:
+<br/>
+<span class="pre-in-pp">
+  .LEFT
+  .LS 12.5
+  A line of text.\*[B]
+  .ALD 24p
+  The next line of text.
+</span>
+
+<kbd>\*[B]</kbd> works reliably regardless of the current
+<a href="definitions.html#filled">fill mode</a>.
+</p>
+
+<!-- -INLINE_TB+_MOM- -->
+
+<h3 id="tb-plus-mom" class="docs">Call the next sequential tab without advancing on the page</h3>
+<p>
+Sometimes, you want mom to move to the next tab in sequence (e.g.
+from TAB 1 to TAB 2, or TAB 8 to TAB 9) without mom advancing on the
+page.  (See the NOTE
+<a href="typesetting.html#note-tn">here</a>
+if you&#8217;re not clear how mom manages tabs and linebreaks.)
+</p>
+
+<p>
+In versions of mom prior to 1.2-f, this was accomplished through the
+use of
+<a href="typesetting.html#tn">TN</a>.
+As of 1.2-f, you can, if you prefer, accomplish the same thing by
+using the inline escape, <kbd>\*[TB+]</kbd>.  Simply attach the
+escape to the end of any input line in a tab, like this:
+<br/>
+<span class="pre-in-pp">
+  .TAB 1
+  Some text\*[TB+]  \" This line is in tab 1
+  Some more text    \" This line is in tab 2, on the same baseline as tab 1
+</span>
+
+<kbd>\*[TB+]</kbd> works reliably regardless of the current
+<a href="definitions.html#filled">fill mode</a>.
+</p>
+
+<!-- -INLINE_RULE_MOM- -->
+
+<h3 id="inline-rule-mom" class="docs">Full measure rules</h3>
+<p>
+I find I often need rules drawn to the full measure of the current line
+or tab length.  The official way to do this is <kbd>\l'\n[.lu]'</kbd>,
+which is annoying to type, and doesn&#8217;t mean a whole heck of a lot if
+you&#8217;re new to groff.  The inline, <kbd>\*[RULE]</kbd>, is a simple
+replacement for <kbd>\l'\n[.lu]'</kbd>.  Use it whenever you need
+a rule drawn to the full measure of the current line or tab length, for
+example:
+<br/>
+<span class="pre-in-pp">
+  .LL 6P
+  \*[RULE]
+</span>
+
+The above draws a rule the full measure of the 6-pica line length.
+For another way to draw full measure rules, see the macro,
+<a href="graphical.html#drh">DRH</a>.
+</p>
+
+<p>
+<kbd>\*[RULE]</kbd> must appear on an
+<a href="definitions.html#inputline">input line</a>
+by itself, and always causes a break when entered after a normal
+input line of text.  It does not, however, deposit a break when used
+immediately after a macro.
+</p>
+
+<p>
+The weight of the rule drawn with <kbd>\*[RULE]</kbd> is controlled
+with the macro
+<a href="#rule-weight">RULE_WEIGHT</a>.
+Mom&#8217;s default is 1/2 point.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+<kbd>\*[RULE]</kbd> draws the rule to the full measure, hence it
+cannot be used to fill the remainder of a partial line with a rule
+in this way:
+<br/>
+<span class="pre-in-pp">
+  Signature__________________________________________
+</span>
+If you wish to accomplish this effect, you have to use
+<kbd>\*[RULE]</kbd> in conjunction with the
+<a href="goodies.html#pad">PAD</a>
+macro and
+<a href="typesetting.html#string-tabs">string tabs</a>.
+(See the
+<a href="goodies.html#pad-example">example</a>
+provided with PAD.)
+<a name="RULE_EXCEPTION"></a>
+</p>
+
+<p>
+Please also note that the inline escapes
+<a href="#up"><kbd>\*[UP]</kbd></a>
+and
+<a href="#down"><kbd>\*[DOWN]</kbd></a>
+cannot be used in conjunction with <kbd>\*[RULE]</kbd>.
+</p>
+
+<p>This <i>doesn&#8217;t</i> work:
+<br/>
+<span class="pre-in-pp">
+  \*[DOWN 2p]\*[RULE]\*[UP 2p]
+</span>
+whereas this does:
+<br/>
+<span class="pre-in-pp">
+  .ALD 2p
+  \*[RULE]
+  .RLD 2p
+</span>
+</p>
+
+<p class="tip-bottom">
+See groff&#8217;s
+<a href="#inline-linedrawing-groff">Horizontal line drawing function</a>
+for more information on drawing horizontal rules.
+</p>
+</div>
+
+<!-- -RULE_WEIGHT- -->
+
+<div id="rule-weight" class="box-macro-args">
+Macro: <b>RULE_WEIGHT</b> <kbd>&lt;weight in points&gt;</kbd>
+</div>
+
+<p class="requires">
+&bull;&nbsp;Must <span class="normal">not</span> have a
+<a href="definitions.html#unitofmeasure">unit of measure</a>
+appended.
+<br/>
+&nbsp;&nbsp;Argument must be greater than 0 and less than 100; decimal
+fractions are allowed.
+</p>
+
+<p>
+RULE_WEIGHT allows you to tell mom how heavy (in other words, how
+&#8220;thick&#8221;) you want the rules drawn with the inline
+escape,
+<a href="#inline-rule-mom"><kbd>\*[RULE]</kbd></a>.
+It takes a single argument: the weight of the rule in
+<a href="definitions.html#picaspoints">points</a>
+<i>but without the</i>
+<a href="definitions.html#unitofmeasure">unit of measure</a>
+<kbd>p</kbd> <i>attached</i>.  Thus, to set the weight of rules
+drawn with <kbd>\*[RULE]</kbd> to 1-1/4 points, you'd do
+<br/>
+<span class="pre-in-pp">
+  .RULE_WEIGHT 1.25
+</span>
+</p>
+
+<p>
+RULE_WEIGHT also sets the weight of rules drawn
+with
+<a href="graphical.html#drh"><kbd>.DRH</kbd></a>
+when DRH is not given any arguments.
+</p>
+
+<div class="rule-medium"><hr/></div>
+
+<!-- -INLINE_FONT_GROFF- -->
+
+<h2 id="inlines-groff-top" class="macro-group">Commonly-used groff inline escapes</h2>
+
+<h3 id="inline-fonts-groff" class="docs">Font control (<kbd style="text-transform: none">\f</kbd>)</h3>
+
+<p>
+Groff&#8217;s basic mechanism for inline font control is the escape
+<kbd>\f[&lt;font&gt;]</kbd>. 
+<br/>
+<span class="pre-in-pp">
+  \f[R]   Change to the medium roman font  (equivalent to mom's \*[ROM])
+  \f[I]   Change to the medium italic font (equivalent to mom's \*[IT])
+  \f[B]   Change to the bold roman font    (equivalent to mom's \*[BD])
+  \f[BI]  Change to the bold italic font   (equivalent to mom's \*[BDI])
+  \f[P]   Revert to the previous font      (equivalent to mom's \*[PREV])
+</span>
+</p>
+
+<p>
+<kbd>\f[&lt;font&gt;]</kbd> can be used with any valid
+<a href="definitions.html#font">font style</a>
+registered with groff.  (See
+<a href="appendices.html#style-extensions">here</a>
+for a list of pre-registered font styles provided by mom).
+</p>
+
+<p>
+<kbd>\f[&lt;font&gt;]</kbd> can also take a complete valid
+family+font name combo.  This is especially useful should you
+need to change both family and font inline.  For example, if your
+prevailing family and font are Times Roman and you want a few words
+in Courier Bold Italic, you could do this:
+<br/>
+<span class="pre-in-pp">
+  .FAM T
+  .FT  R
+  The command \f[CBI]ls -l\f[P] gives a "long" directory listing.
+</span>
+The Unix command <kbd>ls -l</kbd> will appear in Courier Bold Italic
+in a line that is otherwise in Times Roman.
+</p>
+
+<!-- -INLINE_HORIZONTAL_GROFF- -->
+
+<h3 id="inline-horizontal-groff" class="docs">Inline horizontal motions (<kbd style="text-transform: none;">\h</kbd>)</h3>
+
+<p>
+Whenever you need to move forward or backward on a line, use the
+inline
+<br/>
+<span class="pre-in-pp">
+  \h'&lt;distance&gt;'
+</span>
+In order to avoid unpleasant surprises, always append a
+<a href="definitions.html#unitofmeasure">unit of measure</a>
+to <kbd>&lt;distance&gt;</kbd>.  For example,
+<br/>
+<span class="pre-in-pp">
+  \h'1.25i'
+</span>
+moves you 1.25 inches to the right (forward) of the horizontal
+position on the current
+<a href="definitions.html#outputline">output line</a>.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+<kbd>\h'&lt;distance&gt;'</kbd> is exactly equivalent to
+<a href="#fwd"><kbd>\*[FWD n&lt;unit&gt;]</kbd></a>.
+</p>
+</div>
+
+<p>
+To move backwards by the same amount, do
+<br/>
+<span class="pre-in-pp">
+  \h'-1.25i'
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip" style="margin-top: -1em;">
+<span class="note">Note:</span>
+<kbd>\h'-&lt;distance&gt;'</kbd> is exactly equivalent to
+<a href="#bck"><kbd>\*[BCK n&lt;unit&gt;]</kbd></a>.
+</p>
+</div>
+
+<!-- -INLINE_VERTICAL_GROFF- -->
+
+<h3 id="inline-vertical-groff" class="docs">Inline vertical motions (<kbd style="text-transform: none;">\v</kbd>)</h3>
+
+<p>
+If you need to raise or lower type on a line (say, for sub- or
+superscripts, or any other special effect), use
+<br/>
+<span class="pre-in-pp">
+  \v'&lt;distance&gt;'
+</span>
+In order to avoid unpleasant surprises, always append a
+<a href="definitions.html#unitofmeasure">unit of measure</a>
+to <kbd>&lt;distance&gt;</kbd>.  For example, 
+<br/>
+<span class="pre-in-pp">
+  \v'.6m'
+</span>
+moves you (approx.) 2/3 of an
+<a href="definitions.html#em">em</a>
+downward on the current
+<a href="definitions.html#outputline">output line</a>.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+<kbd>\v'&lt;distance&gt;'</kbd> is exactly equivalent to
+<a href="#down"><kbd>\*[DOWN n&lt;unit&gt;]</kbd></a>.
+</p>
+</div>
+
+<p style="margin-top: -.5em;">
+To move upward an equivalent amount, do
+<br/>
+<span class="pre-in-pp">
+  \v'-.6m'
+</span>
+</p>
+
+<div class="box-tip" style="margin-top: -1em;">
+<p class="tip">
+<span class="note">Note:</span>
+<kbd>\v'&lt;-distance&gt;'</kbd> is exactly equivalent to
+<a href="#up"><kbd>\*[UP n&lt;unit&gt;]</kbd></a>.
+</p>
+</div>
+
+<div class="box-important">
+<p class="tip">
+<span class="important">Important:</span>
+The vertical motion of <kbd>\v</kbd> affects ONLY type on the
+current
+<a href="definitions.html#outputline">output line</a>.
+When groff breaks the output line, the effect of
+<kbd>\v</kbd> is cancelled; the baseline of the next output line
+is where it would be if you hadn&#8217;t used <kbd>\v</kbd>.
+</p>
+</div>
+
+<div class="box-tip">
+<p class="tip">
+<span class="tip">Tip:</span>
+When using <kbd>\v</kbd> for occasional effects in a line,
+don&#8217;t forget to reverse it when you've done what you want to
+do.  Otherwise, the remaining type will be set too high (if you
+used <kbd>\v</kbd> with the minus sign) or too low (if you used
+<kbd>\v</kbd> without the minus sign).
+</p>
+</div>
+
+<!-- -INLINE_STRINGWIDTH_GROFF- -->
+
+<h3 id="inline-stringwidth-groff" class="docs">String width function (<kbd style="text-transform: none;">\w</kbd>)</h3>
+
+<p>
+In the context of mom, the string width inline
+<kbd>\w'&lt;string&gt;'</kbd> primarily serves to let you establish the
+horizontal measure of something (e.g. indents) based on the length
+of a bit of text.  For example, if you want a left indent the length
+of the word &#8220;Examples:&#8221; plus a space, you can set it with
+the <kbd>\w</kbd> inline escape:
+<br/>
+<span class="pre-in-pp">
+  .IL "\w'Examples: '"
+</span>
+</p>
+
+<div class="box-tip" style="margin-top: -1em;">
+<p class="tip">
+<span class="note">Note:</span>
+Whenever you pass <kbd>\w'string'</kbd>
+to a macro that normally requires a
+<a href="definitions.html#unitofmeasure">unit of measure</a>,
+<i>do NOT add a unit of measure to the</i>
+<kbd>\w'string'</kbd> <i>argument.</i>
+</p>
+
+<p class="tip-bottom">
+Furthermore, if the string is composed of several words separated
+by spaces, you MUST surround the whole escape with double quotes,
+as in the example above.
+</p>
+</div>
+
+<!-- -INLINE_LINEDRAWING_GROFF- -->
+
+<h3 id="inline-linedrawing-groff" class="docs">Horizontal line drawing function (<kbd style="text-transform: none;">\l</kbd>)</h3>
+
+<p>
+The <kbd>\l'distance'</kbd> inline allows you to draw a horizontal
+rule of the specified distance.  You must supply a
+<a href="definitions.html#unitofmeasure">unit of measure</a>.
+Therefore, to set a 3-pica rule into a line of text, you'd do
+<br/>
+<span class="pre-in-pp">
+  A line of text with a superfluous \l'3P' 3-pica rule in it.
+</span>
+<kbd>\l'3P'</kbd>, above, not only draws the rule, but advances 3
+picas horizontally as well, just as you'd expect.
+</p>
+
+<p>
+For an easy way of drawing rules to the full measure of the current
+line or tab length, see
+<a href="#inline-rule-mom">Full measure rules</a>.
+</p>
+
+<p>
+The weight (thickness) of rules varies according to the point
+size in effect when you invoke <kbd>\l</kbd>, but you can&#8217;t fix
+the weight with any real precision.  A point size of 12 produces
+a tastefully moderate rule weight of between one-half and one
+point (depending on your printer).
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+Besides <kbd>\l</kbd>, <b>groff</b> provides a number of more
+sophisticated &#8220;drawing&#8221; escapes.  It is well beyond
+the scope of this documentation to demonstrate their usage; see
+<br/>
+<span class="pre-in-pp">
+  info groff =&gt; Escape index =&gt; \D
+</span>
+for directions concerning their use.  The drawing escapes can be a
+bit unwieldy, so mom provides &#8220;user-friendly&#8221; macros for
+the
+<a href="graphical.html#top">graphical objects</a>
+most commonly enountered in typesetting: horizontal and vertical
+rules, boxes, and circles (ellipses).
+</p>
+
+<p class="tip-bottom">
+Additionally, groff comes with two &#8220;preprocessors&#8221; that
+let you create ruled tables and vector diagrams (line drawings):
+<b>tbl</b> and <b>pic</b>.  The documentation for <b>tbl</b> can be
+downloaded from
+<br/>
+  <a style="display: inline-block; margin-left: 2em; margin-top: .5em; margin-bottom: .5em" href="http://cm.bell-labs.com/cm/cs/doc/76/tbl.ps.gz">http://cm.bell-labs.com/cm/cs/doc/76/tbl.ps.gz</a>
+<br/>
+and <b>pic</b> from
+<br/>
+  <a style="display: inline-block; margin-left: 2em; margin-top: .5em; margin-bottom: .5em" href="http://www.kohala.com/start/troff/gpic.raymond.ps">http://www.kohala.com/start/troff/gpic.raymond.ps</a>
+<br/>
+Both are powerful tools, but they can be nasty to learn&mdash;at
+first, anyway.  You may prefer to use a vector drawing program
+to create diagrams and tables; inserting the results into a
+document is easy enough with <kbd>.PSPIC</kbd> (consult
+<kbd>man groff-tmac</kbd> for information on this indispensable and
+easy-to-use macro).
+</p>
+</div>
+
+<!-- -INLINE_CHARACTERS_GROFF- -->
+
+<h3 id="inline-characters-groff" class="docs">Special characters and symbols</h3>
+<p>
+Here follows a short list of commonly-used special characters
+available via inline escapes.  If you&#8217;re not sure of the
+meaning of some of these characters, consult the
+<a href="definitions.html#top">Definitions of Terms</a>.
+</p>
+
+<p>
+For a complete list of special characters and glyphs (i.e. just
+about anything you'd ever want to appear on the printed page,
+including mathematical symbols, accented characters, unusual
+ligatures and letters unique to various European languages), consult
+<kbd>man groff-char</kbd>.
+</p>
+
+<span class="pre">
+  CHARACTER                   ESCAPE SEQUENCE
+  ---------                   ---------------
+  Comment line                \# or .\"
+  Fixed-width space           \&lt;space&gt; (ie backslash followed by a space)
+  Unbreakable space           \~
+  Digit-width (figure) space  \0
+  Zero-width character        \&amp;
+  Discretionary hyphen        \%
+  Backslash                   \\ or \e
+  Plus&#47;minus (arithmetic)     \(+-
+  Subtract (arithmetic)       \(mi
+  Multiply (arithmetic)       \(mu
+  Divide (arithmetic)         \(di
+  Em-dash                     \(em
+  En-dash                     \(en
+  Left double-quote           \(lq
+  Right double-quote          \(rq
+  Bullet                      \(bu
+  Ballot box                  \(sq
+  One-quarter                 \(14
+  One-half                    \(12
+  Three-quarters              \(34
+  Degree sign                 \(de
+  Dagger                      \(dg
+  Foot mark                   \(fm
+  Cent sign                   \(ct
+  Registered trademark        \(rg
+  Copyright                   \(co
+  Section symbol              \(se
+</span>
+<br/>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 33%; text-align: right;"><a href="color.html#top">Next: Coloured text</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

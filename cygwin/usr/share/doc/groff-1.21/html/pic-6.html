@@ -1,0 +1,343 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:40 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-6.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-5.html">prev</a> | <a href="pic-7.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>6. Decorating Objects
+<a name="6. Decorating Objects"></a>
+</h2>
+
+
+<h3>6.1. Text Special Effects
+<a name="6.1. Text Special Effects"></a>
+</h3>
+
+
+<p style="margin-top: 1em">All <b>pic</b> implementations
+support the following font-styling escapes within text
+objects:</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="16%">
+
+
+<p style="margin-top: 1em">\fR, \f1</p></td>
+<td width="84%">
+</td></tr>
+</table>
+
+<p style="margin-left:10%;">Set Roman style (the
+default)</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="16%">
+
+
+<p style="margin-top: 1em">\fI, \f2</p></td>
+<td width="84%">
+</td></tr>
+</table>
+
+<p style="margin-left:10%;">Set Italic style</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="16%">
+
+
+<p style="margin-top: 1em">\fB, \f3</p></td>
+<td width="84%">
+</td></tr>
+</table>
+
+<p style="margin-left:10%;">Set Bold style</p>
+
+<table width="100%" border="0" rules="none" frame="void"
+       cellspacing="0" cellpadding="0">
+<tr valign="top" align="left">
+<td width="18%">
+
+
+
+<p style="margin-top: 1em">\fP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p> </td>
+<td width="82%">
+</td></tr>
+</table>
+
+<p style="margin-left:10%;">Revert to previous style; only
+works one level deep, does not stack.</p>
+
+<p style="margin-top: 1em">In the <b>pic</b>
+implementations that are preprocessors for a toolchain that
+include <b>[gtn]roff</b>, text objects may also contain
+<b>[gtn]roff</b> vertical- and horizontal-motion escapes
+such as \h or \v. Troff special glyphs are also available.
+All \-escapes will be passed through to the postprocessing
+stage and have their normal effects. The base font family is
+set by the <b>[gtn]roff</b> environment at the time the
+picture is rendered.</p>
+
+<p style="margin-top: 1em"><b>pic2plot</b> replaces
+<b>[gtn]roff</b> horizontal- and vertical-motion escapes
+with \-escapes of its own. Troff special glyphs are not
+available, but in most back ends Latin-1 special characters
+and a square-root radical will be. See the <b>pic2plot</b>
+documentation for full details.</p>
+
+<h3>6.2. Dashed Objects
+<a name="6.2. Dashed Objects"></a>
+</h3>
+
+
+<p style="margin-top: 1em">We&rsquo;ve already seen that
+the modifier <b>dashed</b> can change the line style of an
+object from solid to dashed. GNU <b>gpic</b> permits you to
+dot or dash ellipses, circles, and arcs (and splines in TeX
+mode only); some versions of DWB may only permit dashing of
+lines and boxes. It&rsquo;s possible to change the dash
+interval by specifying a number after the modifier.</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic18.png" alt="Image img/pic18.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 6-1:
+Dashed objects</p>
+
+<h3>6.3. Dotted Objects
+<a name="6.3. Dotted Objects"></a>
+</h3>
+
+
+<p style="margin-top: 1em">Another available qualifier is
+<b>dotted</b>. GNU <b>gpic</b> permits you to dot or dash
+ellipses, circles, and arcs (and splines in TeX mode only);
+some versions of DWB may only permit dashing of lines and
+boxes. It too can be suffixed with a number to specify the
+interval between dots:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic19.png" alt="Image img/pic19.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 6-2:
+Dotted objects</p>
+
+<h3>6.4. Rounding Box Corners
+<a name="6.4. Rounding Box Corners"></a>
+</h3>
+
+
+<p style="margin-top: 1em">It is also possible, in GNU
+<b>gpic</b> only, to modify a box so it has rounded
+corners:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic20.png" alt="Image img/pic20.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 6-3:
+<b>box rad</b> with increasing radius values</p>
+
+<p style="margin-top: 1em">Radius values higher than half
+the minimum box dimension are silently truncated to that
+value.</p>
+
+<h3>6.5. Slanted Boxes
+<a name="6.5. Slanted Boxes"></a>
+</h3>
+
+
+<p style="margin-top: 1em">GNU <b>gpic</b> supports slanted
+boxes:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic21.png" alt="Image img/pic21.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 6-4:
+Various slanted boxes.</p>
+
+<p style="margin-top: 1em">The <b>xslanted</b> and
+<b>yslanted</b> attributes specify the x and y&nbsp;offset,
+respectively, of the box&rsquo;s upper right corner from its
+default position.</p>
+
+<h3>6.6. Arrowheads
+<a name="6.6. Arrowheads"></a>
+</h3>
+
+
+<p style="margin-top: 1em">Lines and arcs can be decorated
+as well. Any line or arc (and any spline as well) can be
+decorated with arrowheads by adding one or more as
+modifiers:</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic22.png" alt="Image img/pic22.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 6-5:
+Double-headed line made with <b>line &lt;- -&gt;</b></p>
+
+<p style="margin-top: 1em">In fact, the <b>arrow</b>
+command is just shorthand for <b>line -&gt;</b>. And there
+is a double-head modifier &lt;-&gt;, so the figure above
+could have been made with <b>line &lt;-&gt;</b>.</p>
+
+<p style="margin-top: 1em">Arrowheads have a <b>width</b>
+attribute, the distance across the rear; and a <b>height</b>
+attribute, the length of the arrowhead along the shaft.</p>
+
+<p style="margin-top: 1em">Arrowhead style is controlled by
+the style variable <b>arrowhead</b>. The DWB and GNU
+versions interpret it differently. DWB defaults to open
+arrowheads and an <b>arrowhead</b> value of&nbsp;2; the
+Kernighan paper says a value of&nbsp;7 makes solid
+arrowheads. GNU <b>gpic</b> defaults to solid arrowheads and
+an <b>arrowhead</b> value of&nbsp;1; a value of&nbsp;0
+produces open arrowheads. Note that solid arrowheads are
+always filled with the current outline color.</p>
+
+<h3>6.7. Line Thickness
+<a name="6.7. Line Thickness"></a>
+</h3>
+
+
+<p style="margin-top: 1em">It&rsquo;s also possible to
+change the line thickness of an object (this is a GNU
+extension, DWB <b>pic</b> doesn&rsquo;t support it). The
+default thickness of the lines used to draw objects is
+controlled by the <b>linethick</b> variable. This gives the
+thickness of lines in points. A negative value means use the
+default thickness: in TeX output mode, this means use a
+thickness of 8 milliinches; in TeX output mode with the
+<b>-c</b> option, this means use the line thickness
+specified by <b>.ps</b> lines; in troff output mode, this
+means use a thickness proportional to the pointsize. A zero
+value means draw the thinnest possible line supported by the
+output device. Initially it has a value of -1. There is also
+a <b>thickness</b> attribute (which can be abbreviated to
+<b>thick</b>). For example, <b>circle thickness 1.5</b>
+would draw a circle using a line with a thickness of 1.5
+points. The thickness of lines is not affected by the value
+of the <b>scale</b> variable, nor by any width or height
+given in the <b>.PS</b> line.</p>
+
+<h3>6.8. Invisible Objects
+<a name="6.8. Invisible Objects"></a>
+</h3>
+
+
+<p style="margin-top: 1em">The modifier <b>invis[ible]</b>
+makes an object entirely invisible. This used to be useful
+for positioning text in an invisible object that is properly
+joined to neighboring ones. Newer DWB versions and GNU
+<b>pic</b> treat stand-alone text in exactly this way.</p>
+
+<h3>6.9. Filled Objects
+<a name="6.9. Filled Objects"></a>
+</h3>
+
+
+<p style="margin-top: 1em">It is possible to fill boxes,
+circles, and ellipses. The modifier <b>fill[ed]</b>
+accomplishes this. You can suffix it with a fill value; the
+default is given by the style variable <b>fillval</b>.</p>
+
+<p style="margin-top: 1em">DWB <b>pic</b> and <b>gpic</b>
+have opposite conventions for fill values and different
+defaults. DWB <b>fillval</b> defaults to 0.3 and smaller
+values are darker; GNU <b>fillval</b> uses 0 for white and 1
+for black.</p>
+
+
+<p align="center" style="margin-top: 1em"><img src="img/pic23.png" alt="Image img/pic23.png"></p>
+
+<p align="center" style="margin-top: 1em">Figure 6-6:
+<b>circle fill; move; circle fill 0.4; move; circle fill
+0.9;</b></p>
+
+<p style="margin-top: 1em">GNU <b>gpic</b> makes some
+additional guarantees. A fill value greater than 1 can also
+be used: this means fill with the shade of gray that is
+currently being used for text and lines. Normally this is
+black, but output devices may provide a mechanism for
+changing this. The invisible attribute does not affect the
+filling of objects. Any text associated with a filled object
+is added after the object has been filled, so that the text
+is not obscured by the filling.</p>
+
+<p style="margin-top: 1em">The closed-object modifier
+<b>solid</b> is equivalent to <b>fill</b> with the darkest
+fill value (DWB <b>pic</b> had this capability but mentioned
+it only in a reference section).</p>
+
+<h3>6.10. Colored Objects
+<a name="6.10. Colored Objects"></a>
+</h3>
+
+
+<p style="margin-top: 1em">As a GNU extension, three
+additional modifiers are available to specify colored
+objects. <b>outline</b> sets the color of the outline,
+<b>shaded</b> the fill color, and <b>color</b> sets both.
+All three keywords expect a suffix specifying the color.
+Example:</p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000"><img src="img/pic24.png" alt="Image img/pic24.png"></font></p>
+
+
+<p align="center" style="margin-top: 1em"><font color="#000000">Figure
+6-7: <b>box color &quot;yellow&quot;; arrow color
+&quot;cyan&quot;; circle shaded &quot;green&quot; outline
+&quot;black&quot;;</b></font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000">Alternative
+spellings are <b>colour</b>, <b>colored</b>,
+<b>coloured</b>, and <b>outlined</b>.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000">Predefined
+color names for <i>[gtn]roff</i>-based <b>pic</b>
+implementations are defined in the device macro files, for
+example <tt>ps.tmac</tt>; additional colors can be defined
+with the <b>.defcolor</b> request (see the manual page of
+GNU <i>troff</i>(1) for more details). Currently, color
+support is not available at all in TeX mode.</font></p>
+
+<p style="margin-top: 1em"><font color="#000000">The
+<i>pic2plot</i>(1) carries with its own set of color names,
+essentially those recognized by the X&nbsp;window system
+with &ldquo;grey&rdquo; accepted as a variant of
+&ldquo;gray&rdquo;.</font></p>
+
+
+<p style="margin-top: 1em"><font color="#000000"><b>pic</b>
+assumes that at the beginning of a picture both glyph and
+fill color are set to the default value.</font></p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-5.html">prev</a> | <a href="pic-7.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

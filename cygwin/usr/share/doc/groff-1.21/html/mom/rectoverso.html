@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Mom -- Recto/verso printing, collating</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+<tr>
+  <td><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="text-align: right;"><a href="cover.html#top">Next: Cover pages</a></td>
+</tr>
+</table>
+
+<h1 class="docs">Recto/verso printing, collating</h1>
+
+<div style="width: 37%; margin: auto;">
+<ul class="no-enumerator" style="margin-left: -1em;">
+  <li><a href="#rectoverso-intro">Introduction to recto/verso printing</a>
+  <ul style="margin-left: -.5em; list-style-type: disc;">
+    <li><a href="#rectoverso-list">Macro list</a></li>
+  </ul></li>
+  <li><a href="#collate-intro">Introduction to collating</a>
+  <ul style="margin-left: -.5em; list-style-type: disc;">
+    <li><a href="#collate">The COLLATE macro</a></li>
+  </ul></li>
+</ul>
+</div>
+
+<div class="rule-medium"><hr/></div>
+
+<h2 id="rectoverso-intro" class="docs">Introduction to recto/verso printing</h2>
+
+<p>
+Recto/verso printing allows you to set up a mom document in such
+a way that it can be printed on both sides of a printer sheet and
+subsequently bound.
+</p>
+
+<p>
+With recto/verso, mom automatically takes control of the following
+aspects of alternating page layout:
+</p>
+<ul style="margin-top: -.5em; margin-left: -.5em; margin-bottom: -.5em;">
+  <li>switching left and right margins (if they&#8217;re not equal)</li>
+  <li>switching the left and right parts of the default 3-part
+      <a href="definitions.html#header">headers</a>
+      or
+      <a href="definitions.html#footer">footers</a>
+      (see the
+      <a href="headfootpage.html#description-general">General description of headers</a>)
+  </li>
+  <li>switching
+      <a href="headfootpage.html#hdrftr-rectoverso">HEADER_RECTO</a>
+      and
+      <a href="headfootpage.html#hdrftr-rectoverso">HEADER_VERSO</a>
+      if user-defined, single string recto/verso headers
+      or footers are used in place of the default 3-part
+      headers or footers
+  </li>
+  <li>switching the page number position (if page numbers are not centred)</li>
+</ul>
+
+<p>
+It is beyond the scope of this documentation to cover the different
+ways in which you can make your printer print on both sides of
+a sheet.  A simple but effective method for those of us with
+&#8220;dumb&#8221; printers is to open the document (after
+it&#8217;s been processed into PostScript by groff&mdash;see
+<a href="using.html#using-invoking">How to invoke groff with mom</a>)
+in <b>gv</b> (ghostview), click the &#8220;odd pages&#8221; icon,
+then click &#8220;Print Marked&#8220;.  After printing is complete,
+rearrange the sheets appropriately, put them back in your printer,
+and have <b>gv</b> print the &#8220;even pages&#8220;.  If you
+prefer to work from the command line, check out the man pages for
+<kbd>pstops</kbd> and <kbd>psbook</kbd>.  There are other programs
+out there as well to help with two-sided printing.
+</p>
+
+<div class="macro-list-container">
+<h3 id="rectoverso-list" class="macro-list">Recto/verso macros</h3>
+<ul class="macro-list">
+  <li><a href="#recto-verso">RECTO_VERSO</a></li>
+  <li><a href="#switch-hdrftr">SWITCH_HEADERS (also FOOTERS)</a>
+      &ndash; switch starting position of the header parts (left and right)
+  </li>
+</ul>
+</div>
+
+<!-- -RECTO_VERSO- -->
+
+<div id="recto-verso" class="box-macro-args">
+Macro: <b>RECTO_VERSO</b>
+</div>
+
+<p>
+If you want mom to set up alternating pages for recto/verso
+printing, simply invoke RECTO_VERSO, with no argument, anywhere in
+your document (most likely before
+<a href="docprocessing.html#start">START</a>).
+</p>
+
+<div class="box-tip">
+<p class="tip-top">
+<span class="note">Note:</span>
+Recto/verso always switches the left and right parts of
+<a href="definitions.html#header">headers</a>
+or
+<a href="definitions.html#footer">footers</a>
+on odd/even pages.  However, it only switches the left and right
+margins if the margins aren&#8217;t equal.  Consequently, it is
+your responsibility to set the appropriate differing left and right
+margins with
+<a href="typesetting.html#l-margin">L_MARGIN</a>
+and
+<a href="typesetting.html#r-margin">R_MARGIN</a>
+(prior to
+<a href="docprocessing.html#start">START</a>)
+or with
+<a href="docprocessing.html#doc-left-margin">DOC_LEFT_MARGIN</a>
+and
+<a href="docprocessing.html#doc-right-margin">DOC_RIGHT_MARGIN</a>
+(before or after START).
+</p>
+
+<p class="tip-bottom">
+Equally, recto/verso only switches the page number position if page
+numbers aren&#8217;t centred, which means you have to set the page
+number position with
+<a href="headfootpage.html#pagenum-pos">PAGENUM_POS</a>
+(before or after START).
+</p>
+</div>
+
+<!-- -SWITCH_HDRFTR- -->
+
+<div id="switch-hdrftr" class="box-macro-args" style="margin-top: 1em;">
+Macro: <b>SWITCH_HEADERS</b>
+</div>
+
+<p>
+SWITCH_HEADERS switches the location of the header left string
+(by default, the author) and the header right string (by default,
+the document title).  If you don&#8217;t like mom&#8217;s default
+placement of author and title, use SWITCH_HEADERS to reverse it.
+</p>
+
+<p>
+SWITCH_HEADERS can also be useful in conjunction with
+<a href="#recto-verso">RECTO_VERSO</a>.
+The assumption of RECTO_VERSO is that the first page of a document
+(i.e. recto/odd) represents the norm for header-left and header-right,
+meaning that the second (and all subsequent verso/even) pages of the
+document will reverse the order of header-left and header-right.
+</p>
+
+<p>
+If mom&#8217;s behaviour in this matter is not what you want, simply
+invoke SWITCH_HEADERS on the first page of your recto/verso document
+to reverse her default treatment of header parts.  The remainder of
+your document (with respect to headers) will come out as you want.
+</p>
+
+<div class="rule-medium"><hr/></div>
+
+<!-- ===================================================================== -->
+
+<h2 id="collate-intro" class="docs">Introduction to collating</h2>
+
+<p>
+Many people wisely keep chapters of a long work in separate
+files, previewing or printing them as needed during the draft
+phase.  However, when it comes to the final version, mom requires
+a single, collated file in order to keep track of page numbering
+and recto/verso administration, generating tables of contents and
+endnotes, ensuring that
+<a href="definitions.html#docheader">docheaders</a>
+get printed correctly, and a host of other details.
+</p>
+
+<p>
+The COLLATE macro, which can be used with any
+<a href="docprocessing.html#doctype">DOCTYPE</a>
+except <kbd>LETTER</kbd>, lets you glue mom-formatted text files
+together.  You need only concatenate chapters into a single file
+(most likely with the <kbd>cat</kbd> command), put <kbd>.COLLATE</kbd> at the end of each
+concatenated chapter, follow it with the
+<a href="docprocessing.html#reference-macros">reference macros</a>
+needed for the new chapter, e.g.
+<a href="docprocessing.html#chapter">CHAPTER</a>
+or
+<a href="docprocessing.html#chapter-string">CHAPTER_STRING</a>,
+make any pertinent style changes to the upcoming chapter (unlikely,
+but possible), and re-invoke the
+<a href="docprocessing.html#start">START</a>
+macro.  (Most likely, the reference macros and <kbd>.START</kbd> are
+already there.)  Each chapter will begin on a fresh page and behave
+as expected.
+</p>
+
+<p>
+Even if you always work with monolithic, multi-chapter files, every
+chapter and its associated reference macros plus <kbd>.START</kbd>
+still needs to be preceded by a <kbd>.COLLATE</kbd> command.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+COLLATE assumes you are collating documents/files with similar
+type-style parameters hence there&#8217;s no need for PRINTSTYLE
+to appear after COLLATE, although if you&#8217;re collating
+documents that were created as separate files, chances are the
+PRINTSTYLE&#8217;s already there.
+</p>
+</div>
+
+<div class="box-tip">
+<p id="caution" class="tip">
+<b>Two words of caution:</b>
+</p>
+<ol style="margin-top: -1.25em; margin-left: -1.25em; padding-bottom: .5em;">
+  <li>Do not collate documents of differing
+      PRINTSTYLES (i.e. don&#8217;t try to
+      collate a <kbd>TYPESET</kbd> document and <kbd>TYPEWRITE</kbd>
+      document).
+  </li>
+  <li>Use <kbd>.DOC_FAMILY</kbd> instead of
+      <kbd>.FAMILY</kbd> if, for some reason, you want to
+      change the family of all the document elements after
+      <kbd>.COLLATE</kbd>. <kbd>.FAMILY</kbd>, by itself, will
+      change the family of paragraph text only.
+  </li>
+</ol>
+</div>
+
+<!-- -COLLATE- -->
+
+<div class="macro-id-overline">
+<h3 id="collate" class="macro-id">collate</h3>
+</div>
+
+<div class="box-macro-args">
+Macro: <b>COLLATE</b>
+</div>
+
+<p>
+The most basic (and most likely) collating situation looks like
+this:
+<br/>
+<span class="pre-in-pp">
+  .COLLATE
+  .CHAPTER 17
+  .START
+</span>
+</p>
+
+<p>
+A slightly more complex version of the same thing, for chapters
+that require their own titles, looks like this:
+<br/>
+<span class="pre-in-pp">
+  .COLLATE
+  .CHAPTER_TITLE "Geek Fatigue: Symptoms and Causes"
+  .START
+</span>
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="tip">Tip:</span>
+If the last
+<a href="definitions.html#outputline">output line</a>
+of a document before COLLATE falls too close to the bottom margin
+for running text, mom may output a blank page with only a header
+or footer between collated documents.  In order to avoid this, I
+recommend always preceding COLLATE with
+<kbd><a href="typesetting.html#el">.EL</a></kbd>,
+like this
+<br/>
+<span class="pre-in-pp">
+  .EL
+  .COLLATE
+</span>
+</p>
+</div>
+
+<div class="box-tip">
+<p class="tip">
+<span class="note">Note:</span>
+See the
+<a href="#caution">two words of caution</a>,
+above.
+</p>
+</div>
+
+<div class="rule-long"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+<tr>
+  <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+  <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+  <td style="width: 33%; text-align: right;"><a href="cover.html">Next: Cover pages</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

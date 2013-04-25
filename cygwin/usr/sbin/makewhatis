@@ -1,0 +1,460 @@
+#!/bin/sh
+# Generated automatically from makewhatis.in by the
+# configure script.
+#
+#!/bin/sh
+# makewhatis: create the whatis database
+# Created: Sun Jun 14 10:49:37 1992
+# Revised: Sat Jan  8 14:12:37 1994 by faith@cs.unc.edu
+# Revised: Sat Mar 23 17:56:18 1996 by micheal@actrix.gen.nz
+# Copyright 1992, 1993, 1994 Rickard E. Faith (faith@cs.unc.edu)
+# May be freely distributed and modified as long as copyright is retained.
+#
+# Wed Dec 23 13:27:50 1992: Rik Faith (faith@cs.unc.edu) applied changes
+# based on Mitchum DSouza (mitchum.dsouza@mrc-apu.cam.ac.uk) cat patches.
+# Also, cleaned up code and make it work with NET-2 doc pages.
+#
+# makewhatis-1.4: aeb 940802, 941007, 950417
+# Fixed so that the -c option works correctly for the cat pages
+# on my machine. Fix for -u by Nan Zou (nan@ksu.ksu.edu).
+# Many minor changes.
+# The -s option is undocumented, and may well disappear again.
+#
+# Sat Mar 23 1996: Michael Hamilton (michael@actrix.gen.nz).
+# I changed the script to invoke gawk only once for each directory tree.
+# This speeds things up considerably (from 30 minutes down to 1.5 minutes
+# on my 486DX66).
+# 960401 - aeb: slight adaptation to work correctly with cat pages.
+# 960510 - added fixes by brennan@raven.ca.boeing.com, author of mawk.
+# 971012 - replaced "test -z" - it doesnt work on SunOS 4.1.3_U1.
+# 980710 - be more careful with TMPFILE.
+# 000323 - do not change PATH, better treatment of catpages - Bryan Henderson.
+# 011117 - avoid suspicious filenames.
+# 030310 - find files only; fix LAPACK cruft; no /usr/man default;
+#	use /dev/stderr instead of /dev/tty; handle files with strange names;
+#	add support for chinese, hungarian, indonesian, japanese, korean,
+#	polish, russian (Thierry Vignaud).
+#
+# makewhatis 1.6: Federico Lucifredi
+# 060608 - Corrected traps.
+# 060719 - section choosing behavior to match man's (Mike frysinger).
+#
+# Note for Slackware users: "makewhatis -v -w -c" will work.
+#
+# makewhatis flc 060719 (from man-1.6g)
+
+program=`basename $0`
+
+# In case both /usr/man and /usr/share/man exist, the former is local
+# and should be first.
+# It is a bug to add /var/cache/man to DEFCATPATH.
+dm=
+for d in /usr/man /usr/share/man /usr/X11R6/man /usr/local/man
+do
+    if [ -d $d ]; then
+	if [ x$dm = x ]; then dm=$d; else dm=$dm:$d; fi
+    fi
+done
+DEFMANPATH=$dm
+dc=
+for d in /usr/man/preformat /usr/man /usr/share/man/preformat /usr/share/man
+do
+    if [ -d $d ]; then
+	if [ x$dc = x ]; then dc=$d; else dc=$dc:$d; fi
+    fi
+done
+DEFCATPATH=$dc
+
+# In case /usr is read-only, make /usr/foo/whatis (etc) a symlink to
+# something like /var/cache/man/foo-whatis.
+# Some distributions make a single big /var/cache/man/whatis file,
+# but that leads to problems and bugs.
+
+# AWK=/usr/bin/gawk
+AWK=/usr/bin/awk
+
+# Find a place for our temporary files. If security is not a concern, use
+#	TMPFILE=/tmp/whatis$$; TMPFILEDIR=none
+# Of course makewhatis should only have the required permissions
+# (for reading and writing directories like /usr/man).
+# We try here to be careful (and avoid preconstructed symlinks)
+# in case makewhatis is run as root, by creating a subdirectory of /tmp.
+
+TMPFILEDIR=/tmp/whatis.tmp.dir.$$
+rm -rf $TMPFILEDIR
+if ! mkdir -m 0700 $TMPFILEDIR; then
+    echo Could not create $TMPFILEDIR
+    exit 1;
+fi
+TMPFILE=$TMPFILEDIR/w
+
+# make sure TMPFILEDIR is deleted if program is killed or terminates
+# (just delete this line if your shell doesnt know about trap)
+trap "rm -rf $TMPFILEDIR" 0
+trap "rm -rf $TMPFILEDIR; exit 255" 1 2 3 15
+
+# default find arg: no directories, no empty files
+findarg0="-type f -size +0"
+
+topath=manpath
+
+defmanpath=$DEFMANPATH
+defcatpath=
+
+if [ -n "$MANSECT" ]; then
+	sections=$MANSECT
+else
+	sections=`$AWK '($1 == "MANSECT") { print $2 }' /etc/man.conf`
+	if [ x"$sections" = x ]; then
+		sections="1:1p:8:2:3:3p:4:5:6:7:9:0p:tcl:n:l:p:o:m:8c:mingw"
+	fi
+fi
+sections=`echo $sections | sed -e 's/:/ /g'`
+
+for name in "$@"
+do
+if [ -n "$setsections" ]; then
+	setsections=
+	sections=$name
+	continue
+fi
+case $name in
+    --version|-V)
+	echo "$program from man-1.6g"
+	exit 0;;
+    -c) topath=catpath
+	defmanpath=
+	defcatpath=$DEFCATPATH
+	continue;;
+    -s) setsections=1
+	continue;;
+    -u) findarg="-ctime 0"
+	update=1
+	continue;;
+    -v) verbose=1
+	continue;;
+    -w) manpath=`man --path`
+	catpath=$manpath
+	continue;;
+    -*) echo "Usage: makewhatis [-s sections] [-u] [-v] [-w] [manpath] [-c [catpath]]"
+	echo "       This will build the whatis database for the man pages"
+	echo "       found in manpath and the cat pages found in catpath."
+        echo "       -s: sections (default: $sections)"
+	echo "       -u: update database with new pages"
+	echo "       -v: verbose"
+	echo "       -w: use manpath obtained from \`man --path\`"
+	echo "       [manpath]: man directories (default: $DEFMANPATH)"
+	echo "       [catpath]: cat directories (default: the first existing"
+	echo "           directory in $DEFCATPATH)"
+	exit;;
+     *) if [ -d $name ]
+	then
+	    eval $topath="\$$topath":$name
+	else
+	    echo "No such directory $name"
+	    exit
+	fi;;
+esac
+done
+
+manpath=`echo ${manpath-$defmanpath} | tr : ' '`
+if [ x"$catpath" = x ]; then
+   for d in `echo $defcatpath | tr : ' '`
+   do
+      if [ -d $d ]; then catpath=$d; break; fi
+   done
+fi
+catpath=`echo ${catpath} | tr : ' '`
+
+# first truncate all the whatis files that will be created new,
+# then only update - we might visit the same directory twice
+if [ x$update = x ]; then
+   for pages in man cat
+   do
+      eval path="\$$pages"path
+      for mandir in $path
+      do
+	 cp /dev/null $mandir/whatis
+      done
+   done
+fi
+
+for pages in man cat
+do
+   export pages
+   eval path="\$$pages"path
+   for mandir in $path
+   do
+     if [ x$verbose != x ]; then
+	echo "about to enter $mandir" > /dev/stderr
+     fi
+
+     # kludge for Slackware's /usr/man/preformat
+     if [ $mandir = /usr/man/preformat ]
+     then
+	mandir1=/usr/man
+     else
+	mandir1=$mandir
+     fi
+
+     # if $mandir is on a readonly partition, and the whatis file
+     # is not a symlink, then let's skip trying to update it
+     if [ ! -L ${mandir1}/whatis ]
+     then
+	if [ -e ${mandir1}/whatis ] && [ ! -w ${mandir1}/whatis ]
+	then
+	   if [ x$verbose != x ]; then
+	      echo skipping $mandir - whatis file is readonly > /dev/stderr
+	   fi
+	   continue
+	elif [ ! -e ${mandir1}/whatis ] && [ ! -w ${mandir1} ]
+	then
+	   if [ x$verbose != x ]; then
+	      echo skipping $mandir - directory is readonly > /dev/stderr
+	   fi
+	   continue
+	fi
+     fi
+
+     if [ -s ${mandir}/whatis -a $pages = man -a x$update = x ]; then
+	if [ x$verbose != x ]; then
+	   echo skipping $mandir - we did it already > /dev/stderr
+	fi
+     else      
+       here=`pwd`
+       cd $mandir
+       for i in $sections
+       do
+	 if [ -d ${pages}$i ]
+	 then
+	    cd ${pages}$i
+	    section=$i
+	    curdir=$mandir/${pages}$i
+	    export section verbose curdir
+	    find $mandir/${pages}$i/. -name '*' $findarg0 $findarg -print | $AWK '
+
+	    function readline() {
+              if (use_zcat || use_bzcat || use_lzcat) {
+		result = (pipe_cmd | getline);
+		if (result < 0) {
+		  print "Pipe error: " pipe_cmd " " ERRNO > "/dev/stderr";
+		}
+	      } else {
+		result = (getline < filename);
+		if (result < 0) {
+		  print "Read file error: " filename " " ERRNO > "/dev/stderr";
+		}
+	      }
+	      return result;
+	    }
+	    
+	    function closeline() {
+              if (use_zcat || use_bzcat || use_lzcat) {
+		return close(pipe_cmd);
+	      } else {
+		return close(filename);
+	      }
+	    }
+	    
+	    function do_one() {
+	      insh = 0; thisjoin = 1; done = 0;
+	      entire_line = "";
+
+	      if (verbose) {
+		print "adding " filename > "/dev/stderr"
+	      }
+	      
+	      use_zcat = match(filename,"\\.Z$") ||
+			 match(filename,"\\.z$") || match(filename,"\\.gz$");
+	      if (!use_zcat)
+		use_bzcat = match(filename,"\\.bz2");
+              if(!use_bzcat)
+                use_lzcat = match(filename,"\\.lzma");
+              if (use_zcat || use_bzcat || use_lzcat ) {
+		filename_no_gz = substr(filename, 0, RSTART - 1);
+	      } else {
+		filename_no_gz = filename;
+	      }
+	      match(filename_no_gz, "/[^/]+$");
+	      progname = substr(filename, RSTART + 1, RLENGTH - 1);
+	      if (match(progname, "\\." section "[A-Za-z]+")) {
+		actual_section = substr(progname, RSTART + 1, RLENGTH - 1);
+	      } else {
+		actual_section = section;
+	      }
+	      sub(/\..*/, "", progname);
+              if (use_zcat || use_bzcat || use_lzcat) {
+		if (use_zcat) {
+		  pipe_cmd = "zcat \"" filename "\"";
+                } else if (use_bzcat) {
+		  pipe_cmd = "bzcat \"" filename "\"";
+                } else {
+                  pipe_cmd = "lzcat \"" filename "\"";
+                }
+		# try to avoid suspicious stuff
+		if (filename ~ /[;&|`$(]/) {
+		  print "ignored strange file name " filename " in " curdir > "/dev/stderr";
+		  return;
+		}
+	      }
+	    
+	      while (!done && readline() > 0) {
+		gsub(/.\b/, "");
+		if (($1 ~ /^\.[Ss][Hh]/ &&
+		  ($2 ~ /[Nn][Aa][Mm][Ee]/ ||
+		   $2 ~ /^JMÉNO/ || $2 ~ /^NAVN/ || $2 ~ /^NUME/ ||
+		   $2 ~ /^BEZEICHNUNG/ || $2 ~ /^NOMBRE/ ||
+		   $2 ~ /^NIMI/ || $2 ~ /^NOM/ || $2 ~ /^IME/ ||
+		   $2 ~ /^N[ÉE]V/ || $2 ~ /^NAMA/ || $2 ~ /^Ì¾Á°/ ||
+		   $2 ~ /^Ì¾¾Î/ || $2 ~ /^ÀÌ¸§/ || $2 ~ /^NAZWA/ ||
+		   $2 ~ /^îáú÷áîéå/ || $2 ~ /^Ãû³Æ/ || $2 ~ /^¦WºÙ/ ||
+		   $2 ~ /^NOME/ || $2 ~ /^NAAM/ || $2 ~ /^ÈÌÅ/)) ||
+		  (pages == "cat" && $1 ~ /^NAME/)) {
+		    if (!insh) {
+		      insh = 1;
+		    } else {
+		      done = 1;
+		    }
+		} else if (insh) {
+		  if ($1 ~ /^\.[Ss][HhYS]/ ||
+		    (pages == "cat" &&
+		    ($1 ~ /^S[yYeE]/ || $1 ~ /^DESCRIPTION/ ||
+		     $1 ~ /^COMMAND/ || $1 ~ /^OVERVIEW/ ||
+		     $1 ~ /^STRUCTURES/ || $1 ~ /^INTRODUCTION/ ||
+		     $0 ~ /^[^ ]/))) {
+		      # end insh for Synopsis, Syntax, but also for
+		      # DESCRIPTION (e.g., XFree86.1x),
+		      # COMMAND (e.g., xspread.1)
+		      # OVERVIEW (e.g., TclCommandWriting.3)
+		      # STRUCTURES (e.g., XEvent.3x)
+		      # INTRODUCTION (e.g., TclX.n)
+		      # and anything at all that begins in Column 1, so 
+		      # is probably a section header.
+		    done = 1;
+		  } else {
+		    if ($0 ~ progname"-") {  # Fix old cat pages
+			sub(progname"-", progname" - ");
+		    }
+		    if ($0 ~ /[^ \\]-$/) {
+		      sub(/-$/, "");	  # Handle Hyphenations
+		      nextjoin = 1;
+		    } else if ($0 ~ /\\c$/) {
+		      sub(/\\c$/, "");	  # Handle Continuations
+		      nextjoin = 1;
+		    } else
+		      nextjoin = 0;
+
+		    sub(/^.[IB] /, "");       # Kill bold and italics
+		    sub(/^.BI /, "");         #
+		    sub(/^.SM /, "");         # Kill small
+		    sub(/^.Nm /, "");         # Kill bold
+		    sub(/^.Tn /, "");         # Kill normal
+	            sub(/^.Li /, "");         # Kill .Li
+	            sub(/^.Dq /, "");         # Kill .Dq
+	            sub(/^.Nd */, "- ");      # Convert .Nd to dash
+		    sub(/\\\".*/, "");        # Trim pending comments
+		    sub(/  *$/, "");          # Trim pending spaces
+		    sub(/^\.$/, "");          # Kill blank comments
+		    sub(/^'"'"'.*/, "");      # Kill comment/troff lines
+		    sub(/^.in .*/, "");       # Kill various macros
+		    sub(/^.ti .*/, "");
+		    sub(/^.ta .*/, "");
+		    sub(/^.Vb .*/, "");
+		    sub(/^.[PLTH]P$/, "");    # .PP/.LP/.TP/.HP
+		    sub(/^.Pp$/, "");
+		    sub(/^.[iI]X .*$/, "");
+		    sub(/^.nolinks$/, "");
+		    sub(/^.B$/, "");
+		    sub(/^.nf$/, "");
+
+		    if (($1 ~ /^\.../ || $1 == "") &&
+		        (entire_line ~ / - / || entire_line ~ / \\- /)) {
+		      # Assume that this ends the description of one line
+		      # Sometimes there are several descriptions in one page,
+		      # as in outb(2).
+		      handle_entire_line();
+		      entire_line = "";
+		      thisjoin = 1;
+		    } else {
+		      if (thisjoin) {
+			entire_line = entire_line $0;
+		      } else {
+			entire_line = entire_line " " $0;
+		      }
+		      thisjoin = nextjoin;
+		    }
+		  }
+		}
+	      }
+	      handle_entire_line();
+	      closeline();
+	    }
+
+	    function handle_entire_line() {
+	      x = entire_line;             # Keep it short
+
+	      gsub(/\015/, "", x);         # Kill DOS remains
+	      gsub(/	/, " ", x);        # Translate tabs to spaces
+	      gsub(/  +/, " ", x);         # Collapse spaces
+	      gsub(/ *, */, ", ", x);      # Fix comma spacings
+	      sub(/^ /, "", x);            # Kill initial spaces
+	      sub(/ $/, "", x);            # Kill trailing spaces
+	      sub(/__+/, "_", x);          # Collapse underscores
+
+	      gsub(/\\f\(../, "", x);         # Kill font changes
+	      gsub(/\\f[PRIB0123]/, "", x);   # Kill font changes
+	      gsub(/\\s[-+0-9]*/, "", x);     # Kill size changes
+	      gsub(/\\&/, "", x);             # Kill \&
+	      gsub(/\\\|/, "", x);            # Kill \|
+	      gsub(/\\\((ru|ul)/, "_", x);    # Translate
+	      gsub(/\\\((mi|hy|em)/, "-", x); # Translate
+	      gsub(/\\\*\(../, "", x);        # Kill troff strings
+	      gsub(/\\/, "", x);              # Kill all backslashes
+	      gsub(/"/, "", x);               # Kill quotes (from .Nd "foo bar")
+	      sub(/<h1 align=center>/, "", x);# Yuk! HTML cruft
+	      gsub(/\000.*/, "X", x);         # Binary cruft in LAPACK pages
+	      gsub(/  +/, " ", x);            # Collapse spaces (again)
+	      sub(/^ /, "", x);               # Kill initial spaces (again)
+	      sub(/ $/, "", x);               # Kill trailing spaces (again)
+	      sub(/\.$/, "", x);              # Kill trailing period
+
+	      if (!match(x, / - /))
+		return;
+
+	      after_dash = substr(x, RSTART);
+	      head = substr(x, 1, RSTART-1) ", ";
+	      while (match(head, /, /)) {
+		prog = substr(head, 1, RSTART-1);
+		head = substr(head, RSTART+2);
+		if (prog != progname)
+		  prog = prog " [" progname "]";
+		printf "%-*s (%s) %s\n", 20, prog, actual_section, after_dash;
+	      }
+	    }
+
+	    {			# Main action - process each filename read in.
+	      filename = $0;
+	      do_one();
+	    }
+	    ' pages=$pages section=$section verbose=$verbose curdir=$curdir
+	    cd ..
+	 fi
+       done > $TMPFILE
+
+       cd "$here"
+
+       if [ -f ${mandir1}/whatis ]
+       then
+	 cat ${mandir1}/whatis >> $TMPFILE
+       fi
+       tr -s '\n' < $TMPFILE | sort -u > ${mandir1}/whatis
+
+       chmod 644 ${mandir1}/whatis
+       rm $TMPFILE
+     fi
+   done
+done
+
+# remove tempdir
+rm -rf $TMPFILEDIR
+

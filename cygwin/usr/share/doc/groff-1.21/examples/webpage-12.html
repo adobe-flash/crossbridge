@@ -1,0 +1,322 @@
+<!-- Creator     : groff version 1.21 -->
+<!-- CreationDate: Tue Apr 24 10:21:42 2012 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>webpage-12.html</title>
+
+ <link rel="stylesheet" type="text/css" href="groff.css" >
+</head>
+[ <a href="webpage.html">top</a> ]
+
+
+<h2>NEWS VERSION 1.19
+<a name="heading12"></a>
+</h2>
+ <hr><table><tr><td valign="top" width="30%" bgcolor="#eeeeee">
+<a href="webpage-1.html#heading1">License</a><br>
+<a href="webpage-2.html#heading2">README</a><br>
+<a href="webpage-3.html#heading3">CVS and FTP access</a><br>
+<a href="webpage-4.html#heading4">Groff dependencies</a><br>
+<a href="webpage-5.html#heading5">Bug reports</a><br>
+<a href="webpage-6.html#heading6">Mailing lists</a><br>
+<a href="webpage-7.html#heading7">NEWS VERSION 1.21</a><br>
+<a href="webpage-8.html#heading8">NEWS VERSION 1.20.1</a><br>
+<a href="webpage-9.html#heading9">NEWS VERSION 1.20</a><br>
+<a href="webpage-10.html#heading10">NEWS VERSION 1.19.2</a><br>
+<a href="webpage-11.html#heading11">NEWS VERSION 1.19.1</a><br>
+<a href="webpage-12.html#heading12">NEWS VERSION 1.19</a><br>
+<a href="webpage-13.html#heading13">NEWS VERSION 1.18.1</a><br>
+<a href="webpage-14.html#heading14">NEWS VERSION 1.18</a><br>
+
+</td><td valign="top" width="70%">
+
+<p>troff</p><ul>
+
+<p><li>Input encoding files for latin-9 (a.k.a. latin-0 and
+ISO 8859-15) and latin-2 (ISO 8859-2) have been added.
+Example use:</p>
+
+<p style="margin-left:3%; margin-top: 1em"><tt>groff -Tdvi
+-mlatin9 my_file &gt; my_file.dvi</tt></p>
+
+<p style="margin-top: 1em">You still need proper fonts with
+the necessary glyphs. Out of the box, the groff package
+supports latin-9 only for &minus;Tps, &minus;Tdvi, and
+&minus;Tutf8, and latin-2 only for &minus;Tdvi and
+&minus;Tutf8.</p>
+
+<p style="margin-top: 1em"></li><li>Composite glyphs are
+now supported. To do this, a subset of the Adobe Glyph List
+(AGL) Algorithm as described in
+<a href="http://partners.adobe.com/public/developer/opentype/index_glyph.html">http://partners.adobe.com/public/developer/opentype/index_glyph.html</a>
+is used to construct glyph names based on Unicode character
+codes. The existing groff glyph names are frozen; no glyph
+names which can&rsquo;t be constructed algorithmically will
+be added in the future.</p>
+
+<p style="margin-top: 1em">The \[...] escape sequence has
+been extended to specify multiple glyph components.
+Example:</p>
+
+<p style="margin-left:3%; margin-top: 1em"><tt>\[A
+ho]</tt></p>
+
+<p style="margin-top: 1em">this accesses a glyph with the
+name &lsquo;u0041_0328&rsquo;.</p>
+
+<p style="margin-top: 1em">Some groff glyphs which are
+useful as composites map to &lsquo;wrong&rsquo; Unicode code
+points. For example, &lsquo;ho&rsquo; maps to U+02DB which
+is a spacing ogonek, whereas a non-spacing ogonek U+0328 is
+needed for composite glyphs. The new request</p>
+
+<p style="margin-left:3%; margin-top: 1em"><tt>.composite
+from to</tt></p>
+
+<p style="margin-top: 1em">changes the mapping while a
+composite glyph name is constructed. To make \[A&nbsp;ho]
+yield the expected result,</p>
+
+<p style="margin-left:3%; margin-top: 1em"><tt>.composite
+ho u0328</tt></p>
+
+<p style="margin-top: 1em">is needed. [The new file
+&lsquo;composite.tmac&rsquo; loaded at start-up already
+contains proper calls to &lsquo;.composite&rsquo;.]</p>
+
+<p style="margin-top: 1em">Please refer to the info pages
+of groff and to the groff_char man page for more
+details.</p>
+
+<p style="margin-top: 1em"></li><li>A new request
+&lsquo;fschar&rsquo; has been added to define font-specific
+fallback characters. They are searched after the list of
+fonts declared with the &lsquo;fspecial&rsquo; request but
+before the list of fonts declared with
+&lsquo;special&rsquo;.</p>
+
+<p style="margin-top: 1em"></li><li>Fallback characters
+defined with &lsquo;fschar&rsquo; can be removed with the
+new &lsquo;rfschar&rsquo; request.</p>
+
+<p style="margin-top: 1em"></li><li>A new request
+&lsquo;schar&rsquo; has been added to define global fallback
+characters. They are searched after the list of fonts
+declared with the &lsquo;special&rsquo; request but before
+the already mounted special fonts.</p>
+
+<p style="margin-top: 1em"></li><li>In groff versions 1.18
+and 1.18.1, \D&rsquo;f&nbsp;...&rsquo; didn&rsquo;t move the
+current point horizontally. Despite of being silly, this
+change has been reverted for backwards compatibility.
+Consequently, the intermediate output command
+&lsquo;Df&rsquo; also moves the position horizontally
+again.</p>
+
+<p style="margin-top: 1em">\D&rsquo;f&nbsp;...&rsquo; is
+deprecated since it depends on the horizontal resolution of
+the output device (given with the &lsquo;hor&rsquo;
+parameter in the DESC file). Use the new
+\D&rsquo;Fg&nbsp;...&rsquo; escape instead.</p>
+
+<p style="margin-top: 1em"></li><li>For orthogonality, new
+\D subcommands to change the fill color are available:</p>
+
+<p style="margin-left:3%; margin-top: 1em"><tt>\D&rsquo;Fr
+...&rsquo;</tt> (rgb) <tt><br>
+\D&rsquo;Fc ...&rsquo;</tt> (cmy) <tt><br>
+\D&rsquo;Fg ...&rsquo;</tt> (gray) <tt><br>
+\D&rsquo;Fk ...&rsquo;</tt> (cmyk) <tt><br>
+\D&rsquo;Fd&rsquo;</tt> (default color)</p>
+
+<p style="margin-top: 1em">The arguments are the same as
+with the &lsquo;defcolor&rsquo; request. The current
+position is <i>not</i> changed.</p>
+
+<p style="margin-top: 1em"></li><li>The values set with \H
+and \S are now available in number registers \n[.height] and
+\n[.slant], respectively.</p>
+
+<p style="margin-top: 1em"></li><li>The &lsquo;.pe&rsquo;
+number register isn&rsquo;t new but hasn&rsquo;t been
+documented before. It is set to&nbsp;1 during a page
+ejection caused by the &lsquo;bp&rsquo; request.</p>
+
+<p style="margin-top: 1em"></li><li>The new glyph symbol
+&lsquo;tno&rsquo; is a textual variant of
+&lsquo;no&rsquo;.</p>
+
+<p style="margin-top: 1em"></li><li>The new glyph symbol
+&lsquo;+e&rsquo; represents U+03F5, GREEK LUNATE EPSILON
+SYMBOL. (Well, it is not really new since it has been
+previously supported by grolj4.) The mapping for both the
+dvi and lj4 symbol font has been changed accordingly so that
+Greek small letter epsilon, &lsquo;*e&rsquo;, has the same
+glyph shape as with other devices. </li></p></ul>
+
+<p>grops</p><ul>
+
+<p><li>The font &lsquo;freeeuro.pfa&rsquo; has been added
+to provide various default glyph shapes for &lsquo;eu&rsquo;
+and &lsquo;Eu&rsquo;.</p>
+
+<p style="margin-top: 1em"></li><li>It is now possible to
+access all glyphs in a Type&nbsp;1 font, not only 256
+(provided the font file created by afmtodit has proper
+entries). grops constructs additional encoding vectors on
+the fly if necessary.</p>
+
+<p style="margin-top: 1em"></li><li>The paper size is now
+emitted via the %%DocumentMedia and PageSize mechanisms so
+that it is no longer required to tell &lsquo;gv&rsquo; or
+&lsquo;ps2pdf&rsquo; about the paper size. The
+&lsquo;broken&rsquo; flag value&nbsp;16 omits this feature
+(the used PostScript command &lsquo;setpagedevice&rsquo; is
+a LanguageLevel&nbsp;2 extension). Patch by
+<a href="mailto:egil@kvaleberg.no">Egil Kvaleberg</a>.</p>
+
+<p style="margin-top: 1em"></li><li>Non-slanted PostScript
+metrics have been changed again; they no longer contain
+negative left italic correction values. This assures correct
+spacing with eqn. </li></p></ul>
+
+<p>grodvi</p><ul>
+
+<p><li>The font cmtex10 has been added as the special font
+&lsquo;SC&rsquo; to the DVI fonts. It is used as a
+font-specific special font for CW and CWI.</p>
+
+<p style="margin-top: 1em"></li><li>New options &minus;l
+and &minus;p to set landscape orientation and the paper
+size. grodvi now emits a &lsquo;papersize&rsquo; special
+which is understood by DVI drivers like dvips.</p>
+
+<p style="margin-top: 1em">Consequently, the DESC file
+should contain a &lsquo;papersize&rsquo; keyword.</p>
+
+<p style="margin-top: 1em"></li><li>The glyph shapes for
+\[*f] and \[*e] have been exchanged with \[+f] and \[+e],
+respectively, to be in sync with all other devices.</p>
+
+<p style="margin-top: 1em"></li><li>Glyphs \[HE] and \[DI]
+have been replaced with \[u2662] and \[u2661], respectively,
+since the former two glyphs have a black (filled) shape
+which grodvi doesn&rsquo;t provide by default (it never has
+actually). </li></p></ul>
+
+<p>grolj4</p><ul>
+
+<p><li>The glyphs \[*e] and \[+e] have been exchanged to be
+in sync with all other devices.</p>
+
+<p style="margin-top: 1em"></li><li>The glyph \[~=] is now
+called \[|=]. Similar to other devices, \[~=] is now another
+name for glyph \[~~]. </li></p></ul>
+
+<p>grotty</p><ul>
+
+<p><li>New option &lsquo;&minus;r&rsquo;. It is similar to
+the &minus;i option except it tells grotty to use the
+&lsquo;reverse video&rsquo; attribute to render italic
+fonts. </li></p></ul>
+
+<p>pic</p><ul>
+
+<p><li>New command &lsquo;figname&rsquo; to set the name of
+a picture&rsquo;s output box in TeX mode. </li></p></ul>
+
+<p>refer</p><ul>
+
+<p><li>The environment variable &lsquo;REFER&rsquo; to
+override the name of the default database isn&rsquo;t new
+but hasn&rsquo;t been documented before. </li></p></ul>
+
+<p>soelim</p><ul>
+
+<p><li>New option &lsquo;&minus;r&rsquo; to avoid emission
+of &lsquo;.lf&rsquo; lines.</p>
+
+<p style="margin-top: 1em"></li><li>New option
+&lsquo;&minus;t&rsquo; to emit TeX comment lines (giving
+current file and the line number) instead of
+&lsquo;.lf&rsquo; lines. </li></p></ul>
+
+<p>afmtodit</p><ul>
+
+<p><li>Unencoded glyphs in an AFM file are output also
+(since grops can now emit multiple encoding vectors for a
+single font).</p>
+
+<p style="margin-top: 1em"></li><li>New option
+&lsquo;&minus;m&rsquo; to prevent negative left italic
+correction values.</p>
+
+<p style="margin-top: 1em"></li><li>The mapping and
+encoding file together with file &lsquo;DESC&rsquo; are now
+searched in the default font directory also. Please refer to
+the man page of afmtodit for more details. </li></p></ul>
+
+<p>macro packages</p><ul>
+
+<p><li><a href="mailto:kollar@alltel.net">Larry Kollar</a>
+and others made the man macros more customizable.</p><ul>
+
+<p><li>New command line options &minus;rFT, &minus;rIN, and
+&minus;rSN to set the vertical location of the footer line,
+the body text indentation, and the sub-subheading
+indentation.</p>
+
+<p style="margin-top: 1em"></li><li>New command line option
+&minus;rHY (similar to the ms macros) to control
+hyphenation.</p>
+
+<p style="margin-top: 1em"></li><li>New macros
+&lsquo;.PT&rsquo; and &lsquo;.BT&rsquo; to print the header
+and footer strings. They can be replaced with a customized
+version in &lsquo;man.local&rsquo;.</p>
+
+<p style="margin-top: 1em"></li><li>The string
+&lsquo;HF&rsquo; now holds the typeface to print headings
+and subheadings.</p>
+
+<p style="margin-top: 1em"></li><li>Similar to the ms
+macros, the LT register now defaults to LL if not explicitly
+specified on the command line. </li></p></ul>
+
+<p style="margin-top: 1em"></li><li>troff&rsquo;s start-up
+file &lsquo;troffrc&rsquo; now includes
+&lsquo;papersize.tmac&rsquo; to set the paper size with the
+command line option &lsquo;-dpaper=&lt;size&gt;&rsquo;.</p>
+
+<p style="margin-top: 1em">Possible values for
+&lsquo;&lt;size&gt;&rsquo; are the same as the predefined
+&lsquo;papersize&rsquo; values in the DESC file (only
+lowercase; see the groff_font man page) except a7-d7. An
+appended &lsquo;l&rsquo; (ell) character denotes landscape
+orientation. Examples: &lsquo;a4&rsquo;, &lsquo;c3l&rsquo;,
+&lsquo;letterl&rsquo;.</p>
+
+<p style="margin-top: 1em">Most output drivers need
+additional command line switches &lsquo;&minus;p&rsquo; and
+&lsquo;&minus;l&rsquo; to override the default paper length
+and orientation as set in the driver specific DESC file.</p>
+
+<p style="margin-top: 1em">For example, use the following
+for PS output on A4 paper in landscape orientation:</p>
+
+<p style="margin-left:3%; margin-top: 1em"><tt>groff -Tps
+-dpaper=a4l -P-pa4 -P-l -ms foo.ms &gt; foo.ps</tt></p>
+ 
+<p></li></p></ul></td></tr></table><hr>
+[ <a href="webpage.html">top</a> ]

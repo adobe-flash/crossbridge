@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of groff, the GNU roff type-setting system.
+
+Copyright (C) 2004, 2005, 2006, 2009, 2010 Free Software Foundation, Inc.
+Written by Peter Schaffter.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being this comment section, with no Front-Cover
+Texts, and with no Back-Cover Texts.
+
+A copy of the Free Documentation License is included as a file called
+FDL in the main directory of the groff source package.
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+  <title>Using mom</title>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+</head>
+
+<body style="background-color: #f5faff;">
+
+<!-- ==================================================================== -->
+
+<div id="top" class="page">
+
+<!-- Navigation links -->
+<table style="width: 100%;">
+  <tr>
+    <td><a href="toc.html">Back to Table of Contents</a></td>
+    <td style="text-align: right;"><a href="typesetting.html#top">Next: The typesetting macros</a></td>
+  </tr>
+  </table>
+
+<h1 id="using" class="docs">Using mom</h1>
+
+<div style="text-align: center;">
+<ul class="no-enumerator" style="margin-left: -2.5em;">
+  <li ><a href="#using-intro">Introduction</a></li>
+  <li ><a href="#using-macros">How to input mom&#8217;s macros</a></li>
+  <li ><a href="#using-previewing">How to preview documents</a></li>
+  <li ><a href="#using-saving">Saving documents</a></li>
+  <li ><a href="#using-printing">Printing documents</a></li>
+</ul>
+</div>
+
+<div class="rule-short" style="margin-top: 18px;"><hr/></div>
+
+<h2 id="using-intro" class="docs">Introduction</h2>
+
+<p>
+As explained in the section
+<a href="intro.html#top">What is mom?</a>,
+mom can be used in two ways: for straight typesetting or
+for document processing.  The difference between the two
+is that in straight typesetting, every macro is a literal
+typesetting instruction that determines precisely how text
+following it will look.  Document processing, on the other
+hand, uses markup tags (e.g. <kbd>.PP</kbd> for
+paragraphs, <kbd>.HEAD</kbd> for heads,
+<kbd>.FOOTNOTE</kbd> for footnotes, etc.) that make a
+lot of typesetting decisions automatically.
+</p>
+
+<p>
+You tell mom that you want to use the document processing macros
+with the
+<a href="docprocessing.html#start"><kbd>START</kbd></a>
+macro, explained below.  After <kbd>START</kbd>,
+mom determines the appearance of text following the markup tags
+automatically, although you, the user, can easily change how mom
+interprets the tags.  This gives you nearly complete control
+over document design.  In addition, the typesetting macros, in
+combination with document processing, let you meet all sorts of
+typesetting needs that just can&#8217;t be covered by &#8220;one
+macro fits all&#8220; markup tags.
+</p>
+
+<h2 id="using-macros" class="docs">How to input mom&#8217;s macros</h2>
+
+<p>
+Regardless of which way you use mom, the following apply:
+</p>
+
+<ol style="margin-top: -.5em; margin-bottom: -.5em;">
+  <li>
+    You need a good text editor for inputting mom files.
+    <span style="display: block; margin-top: .25em; margin-bottom: .5em;">
+    I cannot recommend highly enough that you use an editor that
+    lets you write syntax highlighting rules for mom&#8217;s
+    macros and
+    <a href="definitions.html#inlines">inline escapes</a>.
+    Simply colourizing macros and inlines to half-intensity can be
+    enough to make text stand out clearly from formatting commands.
+    </span>
+  </li>
+  <li>
+    All mom&#8217;s macros begin with a period (dot) and must be
+    entered in upper case (capital) letters.
+  </li>
+  <li>
+    Macro
+    <a href="definitions.html#arguments">arguments</a>
+    are separated from the macro itself by spaces.  Multiple
+    arguments to the same macro are separated from each
+    other by spaces.  Any number of spaces may be used.  All
+    arguments to a macro must appear on the same line as the
+    macro.
+  </li>
+  <li>
+    Any argument (except a
+    <a href="definitions.html#stringargument">string argument</a>)
+    that is not a digit must be entered in upper case
+    (capital) letters.
+  </li>
+  <li>
+    Any argument that requires a plus or minus sign must
+    have the plus or minus sign prepended to the argument
+    with no intervening space (e.g. <kbd>+2</kbd>).
+  </li>
+  <li>
+    Any argument that requires a
+    <a href="definitions.html#unitofmeasure">unit of measure</a>
+    must have the unit appended directly to the argument, with no
+    intervening space (e.g. <kbd>.5i</kbd>).
+  </li>
+  <li>
+    <a href="definitions.html#stringargument">String arguments</a>,
+    in the sense that the term is used in this manual, must be
+    surrounded by double-quotes
+    (<kbd>"&lt;text of string&gt;"</kbd>).  Multiple
+    string arguments are separated from each other by spaces (each
+    argument surrounded by double-quotes, of course).
+  </li>
+  <li>
+    If a string argument, as entered in your text editor, becomes
+    uncomfortably long (i.e. runs longer than the visible portion of
+    your screen or window), you may break it into two or more lines
+    by placing the backslash character (<kbd>\</kbd>)
+    at the ends of lines to break them up, like this:
+    <span class="pre">
+  .SUBTITLE "An In-Depth Consideration of the \
+  Implications of Forty-Two as the Meaning of Life, \
+  The Universe, and Everything"
+    </span>
+  </li>
+</ol>
+
+<div class="box-tip">
+<p class="tip">
+<span class="tip">Tip:</span>
+It&#8217;s important that formatted documents be easy to
+read/interpret when you&#8217;re looking at them in a text editor.
+One way to achieve this is to group macros that serve a similar
+purpose together, and separate them from other groups of macros
+with a blank comment line.  In groff, that&#8217;s done with
+<kbd>\#</kbd> on a line by itself.  Consider the
+following, which is a template for starting the chapter of a book.
+<br/>
+<span class="pre-in-pp">
+  .TITLE   "My Pulitzer Novel"
+  .AUTHOR  "Joe Blow"
+  .CHAPTER  1
+  \#
+  .DOCTYPE    CHAPTER
+  .PRINTSTYLE TYPESET
+  \#
+  .FAM     P
+  .PT_SIZE 10
+  .LS      12
+  \#
+  .START
+</span>
+</p>
+</div>
+
+<h2 id="using-previewing" class="docs">How to preview documents</h2>
+
+<p>
+Other than printing out hard copy, there are two well-established
+methods for previewing your work.  Both assume you have a working
+X server.
+</p>
+
+<p>
+Groff itself comes with a quick and dirty previewer called
+gxditview. Invoke it with:
+<br/>
+<span class="pre-in-pp">
+  groff -X -mom &lt;filename&gt;
+</span>
+It&#8217;s not particularly pretty, doesn&#8217;t have many
+navigation options, requires a lot of work if you want to use
+other than the standard groff PostScript fonts, and occasionally has
+difficulty accurately reproducing some of mom&#8217;s macro effects
+(<a href="goodies.html#smartquotes">smartquotes</a>
+and
+<a href="goodies.html#leader">leaders</a>
+come to mind).  What it does have going for it is that it&#8217;s
+fast and doesn&#8217;t gobble up system resources.
+</p>
+
+<p>
+A surer way to preview documents is with gv (ghostview).  This
+involves processing documents with groff and directing the default
+PostScript output to a file, like this:
+<br/> 
+<span class="pre-in-pp">
+  groff -mom &lt;filename&gt; &gt; &lt;filename&gt;.ps
+</span>
+You can then then open the ps file in gv.
+</p>
+
+<div class="box-tip">
+<p class="tip">
+<span class="tip">Tip:</span>
+I&#8217;ve set up my editor (vi[m]) to do seamless, automatic
+previewing.  Whenever I&#8217;m working on a document that
+needs previewing/checking, I fire up gv with the &#8220;Watch
+File&#8220; option turned on.  The first time I want to look at
+the file, I tell vim (via a keymapping) to process it with groff
+and send it to a PostScript file:
+<br/>
+<span class="pre-in-pp">
+  groff -mom &lt;filename&gt; &gt; &lt;filename&gt;.ps
+</span>
+I then open the file inside gv.  Ever after, when I want to look at
+any changes I make, I simply tell vim to work its magic again.
+The Watch File option in gv registers that the PostScript file has
+changed, and automatically loads the new version.  <i>Voilà!</i>&mdash;instant
+previewing.
+</p>
+</div>
+
+<h2 id="using-saving" class="docs">Saving documents</h2>
+
+<p>
+By default, groff dumps its PostScript output to stdout (your
+terminal screen) so you have to say where you want it to go if you
+want to save it to a file.  The most straightforward way to do
+this is:
+<br/>
+<span class="pre-in-pp">
+  groff -mom &lt;filename&gt; &gt; &lt;filename&gt;.ps
+</span>
+which drops the output in a PostScript file.  Alternatively, you
+might prefer to save it as a pdf file, in which case you'd do:
+<br/>
+<span class="pre">
+  groff -mom &lt;filename&gt; | ps2pdf - &lt;filename&gt;.pdf
+</span>
+</p>
+
+<h2 id="using-printing" class="docs" style="margin-top: 1.5em;">Printing documents</h2>
+
+<p>
+You can process and print documents from the command line without
+saving them to .ps or .pdf files first.  Here are two common ways
+to do it:
+
+<span class="pre">
+  groff -mom -l &lt;filename&gt;
+  groff -mom &lt;filename&gt; | lpr
+</span>
+</p>
+
+<p style="margin-top: -1.5em;">
+In the first, the <kbd>-l</kbd> option tells groff
+to send the output to your printer.  In the second, you&#8217;re
+doing the same thing, except you&#8217;re telling groff to
+<i>pipe</i> the output to your printer spooler.  Basically,
+they&#8217;re the same thing.  The advantage to the second is that
+you can pass additional options to lpr, for example to send
+the output to a particular printer, like this:
+<br/>
+<span class="pre-in-pp">
+  groff -mom &lt;filename&gt; | lpr -P &lt;printer_name&gt;
+</span>
+</p>
+
+<div class="rule-long" style="margin-top: -.5em;"><hr/></div>
+
+<!-- Navigation links -->
+<table style="width: 100%; margin-top: 12px;">
+  <tr>
+    <td style="width: 33%;"><a href="toc.html">Back to Table of Contents</a></td>
+    <td style="width: 33%; text-align: center;"><a href="#top">Top</a></td>
+    <td style="width: 33%; text-align: right;"><a href="typesetting.html#top">Next: The typesetting macros</a></td>
+</tr>
+</table>
+
+</div>
+
+<div class="bottom-spacer"><br/></div>
+
+</body>
+</html>
+<!-- vim: fileencoding=utf-8: nomodified: -->

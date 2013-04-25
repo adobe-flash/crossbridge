@@ -1,0 +1,155 @@
+bzip2
+========================================================================
+bzip2 is a freely available, patent free (see below), high-quality data
+compressor. It typically compresses files to within 10% to 15% of the
+best available techniques (the PPM family of statistical compressors),
+whilst being around twice as fast at compression and six times faster
+at decompression. 
+
+Runtime requirements (these, or newer)
+  cygwin-1.7.9-1
+
+Build requirements (these, or newer)
+  cygwin-1.7.9-1
+  gcc4-core-4.3.4-4
+  binutils-2.20.51-2
+  texinfo-4.13-3
+  cygport-0.10.4-1
+
+Canonical homepage:
+  http://www.bzip2.org/
+
+Canonical download:
+  http://www.bzip2.org/1.0.6/
+
+License:
+  modified BSD (3-clause). 
+  (Actually, it's a four-clause old-style BSD, but the offensive 
+  advertising clause is turned into a "request")
+
+Language:
+  C
+ 
+========================================================================
+
+Build instructions:
+  unpack bzip2-1.0.6-X-src.tar.bz2
+    if you use setup to install this src package, it will be
+	 unpacked under /usr/src automatically
+  cd /usr/src
+  cygport ./bzip2-1.0.6-X.cygport all
+
+This will create:
+  /usr/src/bzip2-1.0.6-X.tar.bz2
+  /usr/src/bzip2-1.0.6-X-src.tar.bz2
+  /usr/src/libbz2_1-1.0.6-X.tar.bz2
+  /usr/src/libbz2-devel-1.0.6-X.tar.bz2
+
+Also, 'cygport ./bzip2-1.0.6-X.cygport check' will test the package
+
+========================================================================
+
+To link this library with your projects:
+  #1) include bzlib.h
+  #2) to link with the static library, use '-static' on the link line 
+  #3) to link with the dll compile and link as usual; no special flags
+      or -Ddefines are necessary
+
+========================================================================
+
+Files included in libbz2_1:
+
+  /usr/bin/cygbz2-1.dll
+
+Files included in bzip2:
+  see 'cygcheck -l bzip2' output or browse the listing 
+  for the appropriate version at http://cygwin.com/packages/.
+
+Files included in libbz2-devel:
+  see 'cygcheck -l libbz2-devel' output or browse the listing 
+  for the appropriate version at http://cygwin.com/packages/.
+
+========================================================================
+
+Port Notes:
+
+1) (internal:) the original, and rather dated and inflexible, build
+   system has been completely replaced by a new autoconf-based one,
+   contributed by Keith Marshall. This allows for (a) out-of-tree
+   builds, (b) cross-compiler builds, and (c) better handling for
+   win32/cygwin builds.
+
+----------  bzip2-1.0.6-2 -- 2011 May 21 -----------
+* Add --show-progress option to bzip2
+* Adopt mingw build system changes
+
+----------  bzip2-1.0.6-1 -- 2010 Jan 11 -----------
+* Update to latest upstream release
+  - fixes CVE-2010-0405
+* Compiled using gcc4
+
+----------  bzip2-1.0.5-10 -- 2009 Mar 01 -----------
+* fork for cygwin-1.7 development
+
+----------  bzip2-1.0.5-3 -- 2009 Mar 01 -----------
+* build with stock cygport 0.4.3
+* import fix from mingw-bzip2
+* update hint files
+
+----------  bzip2-1.0.5-2 -- 31 Mar 2008 -----------
+* removed unnecessary documentation files
+
+----------  bzip2-1.0.5-1 -- 18 Mar 2008 -----------
+* updated to latest release
+* fixes security issue: CERT-FI 20469
+
+----------  bzip2-1.0.3-2 -- 10 Nov 2006 -----------
+* switch to cygport build framework
+* incorporate Debian bugfixes
+
+1.0.3-1:
+------------------
+Routine version update
+- addresses security issues CAN-2005-1260, CAN-2005-0953
+
+1.0.2-6:
+  Don't use tempfile when it isn't available (Igor Pechtchanski)
+
+1.0.2-5:
+  Oops again.  cygwin-1.5.2 FLAG DAY release.
+
+1.0.2-4:
+  Oops.  cygwin-1.5.1 FLAG DAY release.  Move docs into /usr/share.
+
+1.0.2-3:
+  cygwin-1.5.0 FLAG DAY release.
+  Allow bzip2 to setmode() on stdout, stdin 
+
+1.0.2-2:
+  Converted to 'auto-import' build, and renamed the DLL.  The old
+  DLL is 'cygbz21.0.dll' and is in the libbz2_0 package.  The new
+  DLL is 'cygbz2-1.dll' and is in the libbz2_1 package.  New 
+  programs built with -lbz2 will get the new dll, but old programs
+  that depend on the old DLL will continue to work -- and both
+  libbz2_0 and libbz2_1 can be installed at the same time.
+
+1.0.2-1:
+  Split binary package into two: libbz2_0-VER-REL and bzip2-VER-REL.
+  This way, when the package is converted over to auto-import 
+  behavior and the DLL is renamed, the two DLLs can coexist.
+  --
+  Modified the package to enable automated building.
+
+As of 1.0.1-3, the dll is named "cygbz21.0.dll" NOT "libbz2.dll".  This 
+  helps to avoid dll naming conflicts between cygwin dll's and 
+  dlls from other platforms (native, pw, etc).  If you have an
+  executable that depends on "libbz2.dll" you may either recompile 
+  your app so that it links with libbz2.dll.a/cygbz21.0.dll, or install
+  *just* the dll from bzip-1.0.1-2.tar.gz into your /usr/bin 
+  directory.
+
+The executables installed are the *statically* linked versions, 
+regardless of the name (e.g. bzip2-stat.exe is installed as 
+<prefix>/bin/bzip2.exe).
+
+Cygwin port maintained by: Charles Wilson <cygwin@cygwin.com>

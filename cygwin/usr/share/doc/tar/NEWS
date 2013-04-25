@@ -1,0 +1,1348 @@
+GNU tar NEWS - User visible changes. 2010-11-07
+Please send GNU tar bug reports to <bug-tar@gnu.org>
+
+
+version 1.25 - Sergey Poznyakoff, 2010-11-07
+
+* Fix extraction of empty directories with the -C option in effect.
+* Fix extraction of device nodes.
+* Make sure name matching occurs before eventual name transformation.
+
+Tar 1.24 changed the ordering of name matching and name transformation
+so that the former saw already transformed file names.  This made it
+impossible to match file names in certain cases.  It is fixed now.
+
+* Fix the behavior of tar -x --overwrite on hosts lacking O_NOFOLLOW.
+
+* Improve the testsuite.
+
+* Alternative decompression programs.
+
+If extraction from a compressed archive fails because the corresponding
+compression program is not installed and the following two conditions
+are met, tar retries extraction using an alternative decompressor:
+
+ 1. Another compression program supported by tar is able to handle this
+ compression format.
+ 2. The compression program was not explicitly requested in the command
+ line by the use of such options as -z, -j, etc.
+
+For example, if `compress' is not available, tar will try `gzip'. 
+
+
+version 1.24 - Sergey Poznyakoff, 2010-10-24
+
+* The --full-time option.
+
+New command line option `--full-time' instructs tar to output file
+time stamps to the full resolution.
+
+* Bugfixes.
+
+** More reliable directory traversal when creating archives
+
+Tar now checks for inconsistencies caused when a file system is
+modified while tar is creating an archive.  In the new approach, tar
+maintains a cache of file descriptors to directories, so it uses more
+file descriptors than before, but it adjusts to system limits on
+the number of file descriptors.  Tar also takes more care when
+a file system is modified while tar is extracting from an archive.
+
+The new checks are implemented via the openat and related calls
+standardized by POSIX.1-2008.  On an older system where these calls do
+not exist or do not return useful results, tar emulates the calls at
+some cost in efficiency and reliability.
+
+** Symbolic link attributes
+
+When extracting symbolic links, tar now restores attributes such as
+last-modified time and link permissions, if the operating system
+supports this.  For example, recent versions of the Linux kernel
+support setting times on symlinks, and some BSD kernels also support
+symlink permissions.
+
+** --dereference consistency
+
+The --dereference (-h) option now applies to files that are copied
+into or out of archives, independently of other options.  For example,
+if F is a symbolic link and archive.tar contains a regular-file member
+also named F, "tar --overwrite -x -f archive.tar F" now overwrites F
+itself, rather than the file that F points to.  (To overwrite the file
+that F points to, add the --dereference (-h) option.)  Formerly,
+--dereference was intended to apply only when using the -c option, but
+the implementation was not consistent.
+
+Also, the --dereference option no longer affects accesses to other
+files, such as archives and time stamp files.  Symbolic links to these
+files are always followed.  Previously, the links were usually but not
+always followed.
+
+** Spurious error diagnostics on broken pipe.
+
+When receiving SIGPIPE, tar would exit with error status and
+"write error" diagnostics. In particular, this occurred if
+invoked as in the example below:
+
+   tar tf archive.tar | head -n 1
+
+** --remove-files
+
+`Tar --remove-files' failed to remove a directory which contained
+symlinks to another files within that directory.
+
+** --test-label behavior
+
+In case of a mismatch, `tar --test-label LABEL' exits with code 1,
+not 2 as it did in previous versions.
+
+The `--verbose' option used with `--test-label' provides additional
+diagnostics.
+
+Several volume labels may be specified in a command line, e.g.:
+
+   tar --test-label -f archive 'My volume' 'New volume' 'Test volume'
+
+In this case, tar exits with code 0 if any one of the arguments
+matches the actual volume label.
+
+** --label used with --update
+
+The `--label' option can be used with `--update' to prevent accidental
+update of an archive:
+
+  tar -rf archive --label 'My volume' .
+
+This did not work in previous versions, in spite of what the docs said.
+
+** --record-size and --tape-length (-L) options
+
+Usual size suffixes are allowed for these options.  For example,
+-L10k stands for a 10 kilobyte tape length.
+
+** Fix dead loop on extracting existing symlinks with the -k option.
+
+
+version 1.23 - Sergey Poznyakoff, 2010-03-10
+
+* Record size autodetection
+
+When listing or extracting archives, the actual record size is
+reported only if the archive is read from a device (as opposed
+to regular files and pipes).
+
+* Seekable archives
+
+When a read-only operation (e.g. --list or --extract) is requested
+on a regular file, tar attemtps to speed up accesses by using lseek.
+
+* New command line option `--warning'
+
+The `--warning' command line option allows to suppress or enable
+particular warning messages during `tar' run.  It takes a single
+argument (a `keyword'), identifying the class of warning messages
+to affect.  If the argument is prefixed with `no-', such warning
+messages are suppressed.  For example,
+
+  tar --warning=no-alone-zero-block -x -f archive
+
+suppresses the output of `A lone zero block' diagnostics, which is
+normally issued if `archive' ends with a single block of zeros.
+
+See Tar Manual, section 3.9 "Controlling Warning Messages", for a
+detailed discussion.
+
+* New command line option `--level'
+
+The `--level=N' option sets the incremental dump level N.  It
+is valid when used in conjunction with the -c and --listed-incremental
+options.  So far the only meaningful value for N is 0.  The
+`--level=0' option forces creating the level 0 dump, by truncating
+the snapshot file if it exists.
+
+* Files removed during incremental dumps
+
+If a file or directory is removed while incremental dump is
+in progress, tar exact actions depend on whether this file
+was explicitly listed in the command line, or was found
+during file system scan.
+
+If the file was explicitly listed in the command line, tar
+issues error message and exits with the code 2, meaning
+fatal error.
+
+Otherwise, if the file was found during the file system scan,
+tar issues a warning, saying "File removed before we read it",
+and sets exit code to 1, which means "some files differ".
+If the --warning=no-file-removed option is given, no warning
+is issued and exit code remains 0.
+
+* Modification times of PAX extended headers.
+
+Modification times in ustar header blocks of extended headers
+are set to mtimes of the corresponding archive members.  This
+can be overridden by the
+
+  --pax-opion='exthdr.mtime=STRING'
+
+command line option.  The STRING is either number of seconds since
+the Epoch or a `Time reference' (see below).
+
+Modification times in ustar header blocks of global extended
+headers are set to the time when tar was invoked.
+
+This can be overridden by the
+
+  --pax-opion='globexthdr.mtime=STRING'
+
+command line option.  The STRING is either number of seconds since
+the Epoch or a `Time reference' (see below).
+
+* Time references in --pax-option argument.
+
+Any value from the --pax-option argument that is enclosed in a pair
+of curly braces represents a time reference.  The string between the
+braces is understood either as a textual time representation, as described in
+chapter 7, "Date input formats", of the Tar manual, or as a name of
+an existing file, starting with `/' or `.'.  In the latter
+case, it is replaced with the modification time of that file.
+
+* Environment of --to-command script.
+
+The environment passed to the --to-command script is extended with
+the following variables:
+
+   TAR_VERSION          GNU tar version number
+   TAR_ARCHIVE          The name of the archive
+   TAR_VOLUME           Ordinal number of the volume
+   TAR_FORMAT           Format of the archive
+   TAR_BLOCKING_FACTOR  Current blocking factor
+
+* Bugfixes
+** Fix handling of hard link targets by -c --transform.
+** Fix hard links recognition with -c --remove-files.
+** Fix restoring files from backup (debian bug #508199).
+** Correctly restore modes and permissions on existing directories.
+** The --remove-files option removes files only if they were
+succesfully stored in the archive.
+** Fix storing and listing of the volume labels in POSIX format.
+** Improve algorithm for splitting long file names (ustar
+format).
+** Fix possible memory overflow in the rmt client code (CVE-2010-0624).
+
+
+version 1.22 - Sergey Poznyakoff, 2009-03-05
+
+* Support for xz compression
+
+Tar uses xz for compression if one of the following conditions is met:
+
+ 1. The option --xz or -J (see below) is used.
+ 2. The xz binary is set as compressor using --use-compress-program option.
+ 3. The file name of the archive being created ends in `.xz' and
+ auto-compress option (-a) is used.
+
+Xz is used for decompression if one of the following conditions is met:
+
+ 1. The option --xz or -J is used.
+ 2. The xz binary is set as compressor using --use-compress-program option.
+ 3. The file is recognized as xz compressed stream data.
+
+* Short option -J reassigned as a short equivalent of --xz
+
+* New option -I
+
+The -I option is assigned as a short equivalent for
+--use-compress-program.
+
+* The --no-recursive option works in incremental mode.
+
+
+version 1.21 - Sergey Poznyakoff, 2008-12-27
+
+* New short option -J
+
+A shortcut for --lzma.
+
+* New option --lzop
+
+* New option --no-auto-compress
+
+Cancels the effect of previous --auto-compress (-a) option.
+
+* New option --no-null
+
+Cancels the effect of previous --null option.
+
+* Compressed format recognition
+
+If tar is unable to determine archive compression format, it falls
+back to using archive suffix to determine it.
+
+* VCS support.
+
+Using --exclude-vcs handles also files used internally by Bazaar,
+Mercurial and Darcs.
+
+* Transformation scope flags
+
+Name transformation expressions understand additional flags that
+control type of archive members affected by them.  The flags are:
+
+ - r
+   Apply transformation to regular archive members.
+
+ - s
+   Apply transformation to symbolic link targets.
+
+ - h
+   Apply transformation to hard link targets.
+
+Corresponding upper-case letters negate the meaning, so that
+`H' means ``do not apply transformation to hard link targets.''
+
+The scope flags are listed in the third part of an `s' expression,
+e.g.:
+
+   tar --transform 's|^|/usr/local/|S'
+
+Default is `rsh', which means that transformations are applied to
+both regular archive members and to the targets of symbolic and hard
+links.  If several transform expressions are used, the default flags
+can be changed using `flags=' statement before the expressions, e.g.:
+
+   tar --transform 'flags=S;s|^|/usr/local/|S'
+
+* Bugfixes
+
+** The --null option disabled handling of tar options in list files.  This
+is fixed.
+** Fixed record size autodetection.  If the detected record size differs from
+the expected value (either default one, or the one set from the
+command line), tar always prints a warning if verbosity level is set
+to 1 or greater, i.e. if either -t or -v option is given.
+
+
+
+version 1.20 - Sergey Poznyakoff, 2008-04-14
+
+* New option --auto-compress (-a)
+
+With --create, selects compression algorithm basing on the suffix
+of the archive file name.
+
+* New option --lzma
+
+Selects LZMA compression algorithm
+
+* New option --hard-dereference
+
+During archive creation, dereferences hard links and stores the files
+they refer to, instead of creating usual hard link members (type '1').
+
+* New option --checkpoint-action
+
+This action allows to specify an action to be executed upon hitting a
+checkpoint.  Recognized actions are: dot, echo (the default),
+echo=string, ttyout=string, exec=cmdline, and sleep=value.  Any number
+of `--checkpoint-action' options can be specified, the actions will be
+executed in order of their appearance in the command line.  See
+chapter 3.8 "Checkpoints" for a complete description.
+
+* New options --no-check-device, --check-device.
+
+The `--no-check-device' option disables comparing device numbers during
+preparatory stage of an incremental dump.  This allows to avoid
+creating full dumps if the device numbers change (e.g. when using an
+LVM snapshot).
+
+The `--check-device' option enables comparing device numbers.  This is
+the default.  This option is provided to undo the effect of the previous
+`--no-check-device' option, e.g. if it was set in TAR_OPTIONS
+environment variable.
+
+* The --transform option.
+
+Any number of `--transform' options can be given in the command line.
+The specified transformations will be applied in turn.
+
+The argument to `--transform' option can be a list of replace
+expressions, separated by a semicolon (as in `sed').
+
+Filename transformations are applied to symbolic link targets
+during both creation and extraction.  Tar 1.19 used them only
+during extraction.
+
+For a detailed description, see chapter 6.7 "Modifying File and Member
+Names".
+
+* Info (end-of-volume) scripts
+
+The value of the blocking factor is made available to info and
+checkpoint scripts via environment variable TAR_BLOCKING_FACTOR.
+
+* Incremental archives
+
+Improved (sped up) extracting from incremental archives.
+
+* Bugfixes.
+** Fix bug introduced in version 1.19: tar refused to update non-existing
+archives.
+
+
+version 1.19 - Sergey Poznyakoff, 2007-10-10
+
+* New option --exclude-vcs
+
+Excludes directories and files, created by several widely used version
+control systems, e.g. "CVS/", ".svn/", etc.
+
+* --exclude-tag and --exclude-cache options
+
+The following options now work with incremental archives as well:
+
+  --exclude-caches
+  --exclude-caches-all
+  --exclude-tag
+  --exclude-tag-all
+  --exclude-tag-under
+
+* Fix handling of renamed files in listed incremental archives.
+
+Previous versions always stored absolute file names in rename
+records, even if -P was not used. This is fixed: rename records
+contain file names processed in accordance with the command line
+settings.
+
+* Fix --version output.
+
+* Recognition of broken archives.
+
+When supplied an archive smaller than 512 bytes in reading mode (-x,
+-t), the previous version of tar silently ignored it, exiting with
+code 0.  It is fixed.  Tar now issues the following diagnostic message:
+'This does not look like a tar archive', and exits with code 2.
+
+* Fix double-dot recognition in archive member names in case of duplicate '/.'.
+
+* Fix file padding in case of truncation of the input file to zero size.
+
+
+version 1.18 - Sergey Poznyakoff, 2007-06-29
+
+* Licensed under the GPLv3
+
+* Fixed several bugs in the testsuite
+
+
+version 1.17 - Sergey Poznyakoff, 2007-06-08
+
+* Fix archivation of sparse files in posix mode.  Previous versions padded
+  sparse members with spurious zero blocks.
+
+* Fix operation of --verify --listed-incremental.  Version 1.16.1 produced
+  a full dump when both options were given.
+
+* Fix --occurrence.  In previous versions it continued scanning the archive
+  even though all requested members has already been extracted.
+
+* Scope of --transform and --strip-components options.
+
+In addition to affecting regular archive members, the --transform
+option affects hard and soft link targets and the --strip-components
+option affects hard link targets as well.
+
+* End-of-volume script can send the new volume name to tar by writing
+  it to the file descriptor stored in the environment variable `TAR_FD'.
+
+
+version 1.16.1 - Sergey Poznyakoff, 2006-12-09
+
+* New option --exclude-tag allows to specify "exclusion tag files", i.e.
+  files whose presence in a directory means that the directory should not
+  be archived.
+
+* The --exclude-cache option excludes directories that contain the
+  CACHEDIR.TAG file from being archived.  Previous versions excluded
+  directory contents only, while the directories themselves were
+  still added to the archive.
+
+* Support for reading ustar type 'N' header logical records has been removed.
+  This GNU extension was generated only by very old versions of GNU 'tar'.
+  Unfortunately its implementation had security holes; see
+  <http://archives.neohapsis.com/archives/fulldisclosure/2006-11/0344.html>.
+  We don't expect that any tar archives in practical use have type 'N'
+  records, but if you have one and you trust its contents, you can
+  decode it with GNU tar 1.16 or earlier.
+
+* Race conditions have been fixed that in some cases briefly allowed
+  files extracted by 'tar -x --same-owner' (or plain 'tar -x', when
+  running as root) to be accessed by users that they shouldn't have been.
+
+
+version 1.16 - Sergey Poznyakoff, 2006-10-21
+
+* After creating an archive, tar exits with code 1 if some files were
+changed while being read.  Previous versions exited with code 2 (fatal
+error), and only if some files were truncated while being archived.
+
+* New option --mtime allows to set modification times for all archive
+members during creation.
+
+* Bug fixes
+** Avoid running off file descriptors when using multiple -C options.
+** tar --index-file=FILE --file=- sent the archive to FILE, and
+the listing to stderr.
+
+
+version 1.15.91 - Sergey Poznyakoff, 2006-06-16
+
+* Incompatible changes
+
+** Globbing
+
+Previous versions of GNU tar assumed shell-style globbing when
+extracting from or listing an archive.  For example:
+
+  tar xf foo.tar '*.c'
+
+would extract all files whose names end in '.c'.  This behavior
+was not documented and was incompatible with traditional tar
+implementations.  Therefore, starting from this version, GNU tar
+no longer uses globbing by default.  For example, the above invocation
+is now interpreted as a request to extract from the archive the file
+named '*.c'.
+
+To treat member names as globbing patterns, use --wildcards option.
+If you wish tar to mimic the behavior of versions up to 1.15.90,
+add --wildcards to the value of the environment variable TAR_OPTIONS.
+
+The exact way in which tar interprets member names is controlled by the
+following command line options:
+
+     --wildcards              use wildcards
+     --anchored               patterns match file name start
+     --ignore-case            ignore case
+     --wildcards-match-slash  wildcards match `/'
+
+Each of these options has a '--no-' counterpart that disables its
+effect (e.g. --no-wildcards).
+
+These options affect both the interpretation of member names from
+command line and that of the exclusion patterns (given with --exclude
+and --exclude-from options). The defaults are:
+
+ 1. For member names: --no-wildcards --anchored
+ 2. For exclusion patterns: --wildcards --no-anchored --wildcards-match-slash
+
+The options can appear multiple times in the command line, thereby
+changing the way command line arguments are interpreted.  For example,
+to use case-insensitive matching in exclude patterns and to revert to
+case-sensitive matching for the rest of command line, one could write:
+
+  tar xf foo.tar --ignore-case --exclude-from=FILE --no-ignore-case file.name
+
+** Short option -l is now an alias of --check-links option, which complies
+with UNIX98.  This ends the transition period started with version 1.14.
+
+* New features
+
+** New option --transform allows to transform file names before storing them
+in the archive or member names before extracting.  The option takes a
+sed replace expression as its argument.  For example,
+
+  tar cf foo.tar --transform 's,^,prefix/,'
+
+will add 'prefix/' to all file names stored in foo.tar.
+
+** --strip-components option works when deleting and comparing.  In previous
+versions it worked only with --extract.
+
+** New option --show-transformed-names enables display of transformed file
+or archive.   It generalizes --show-stored-names option, introduced in
+1.15.90.  In particular, when creating an archive in verbose mode, it lists
+member names as stored in the archive, i.e., with any eventual prefixes
+removed and file name transformations applied.  The option is useful,
+for example, while comparing `tar cv' and `tar tv' outputs.
+
+** New incremental snapshot file format keeps information about file names
+as well as that about directories.
+
+** The --checkpoint option takes an optional argument specifying the number
+of records between the two successive checkpoints.   Optional dot
+starting the argument intructs tar to print dots instead of textual
+checkpoints.
+
+** The --totals option can be used with any tar operation (previous versions
+understood it only with --create).  If an argument to this option is
+given, it specifies the signal upon delivery of which the statistics
+is to be printed.  Both forms of this option (with and without
+argument) can be given to in a single invocation of tar.
+
+* Bug fixes
+** Detect attempts to update compressed archives.
+
+
+version 1.15.90 - Sergey Poznyakoff, 2006-02-19
+
+* New features
+
+** Any number of -T (--files-from) options may be used in the command line.
+The file specified with -T may include any valid `tar' options,
+including another -T option.
+Compatibility note: older versions of tar would only recognize -C
+as an option name within the file list file.  Now any file whose name
+starts with - is handled as an option.  To insert file names starting with
+dash, use the --add-file option.
+
+** List files containing null-separated file names are detected and processed
+automatically.  It is no longer necessary to give the --null option.
+
+** New option --no-unquote disables the unquoting of input file names.
+This is useful for processing output from `find dir -print0'.
+An orthogonal option --unquote is provided as well.
+
+** New option --test-label tests the archive volume label.
+If an argument is specified, the label is compared against its value.
+Tar exits with code 0 if the two strings match, and with code 2 if
+they do not.
+
+If no argument is given, the --verbose option is implied.  In this case,
+tar prints the label name if present and exits with code 0.
+
+** New option --show-stored-names.  When creating an archive in verbose mode,
+it lists member names as stored in the archive, i.e., with any eventual
+prefixes removed.  The option is useful, for example, while comparing
+`tar cv' and `tar tv' outputs.
+
+** New option --to-command pipes the contents of archive members to the
+specified command.
+
+** New option --atime-preserve=system, which uses the O_NOATIME feature
+of recent Linux kernels to avoid some problems when preserving file
+access times.
+
+** New option --delay-directory-restore delays restoring modification times
+and permissions of extracted directories until the end of extraction.
+This is necessary for restoring from archives with unusual member
+ordering (in particular, those created with --no-recursion option).
+This option is implied when restoring from incremental archives.
+
+** New option --restrict prohibits use of some potentially harmful tar
+options.  Currently it disables '!' escape in multi-volume name menu.
+
+** New options --quoting-style and --quote-chars control the way tar
+quotes member names on output. The --quoting-style takes an argument
+specifying the quoting style to use (literal, shell, shell-always,
+c, escape, locale, clocale). The argument to --quote-chars is a string
+specifying characters to quote, even if the selected quoting style
+would not quote them otherwise. The option --no-quote-chars is
+provided to disable quoting certain characters.
+
+** The end-of-volume script (introduced with --info-script option) can
+get current archive name from the environment variable TAR_ARCHIVE and
+the volume number from the variable TAR_VOLUME.  It can alter the
+archive name by writing new name to the file descriptor 3.
+
+** Better support for full-resolution time stamps.  Tar cannot restore
+time stamps to full nanosecond resolution, though, until the kernel
+guys get their act together and give us a system call to set file time
+stamps to nanosecond resolution.
+
+** The -v option now prints time stamps only to 1-minute resolution,
+not full resolution, to avoid using up too many output columns.
+Nanosecond resolution is now supported, but that would be too much.
+
+* Bug fixes
+
+** Allow non-option arguments to be interspersed with options.
+** When extracting or listing archives in old GNU format, tar
+used to read an extra block of data after a long name header
+if length of the member name was divisible by block size (512).
+Consequently, the file pointer was set off and the next member
+was not processed correctly.
+** Previous version created invalid archives when files shrink
+during reading.
+** Compare mode (tar d) hung when trying to compare file contents.
+** Previous versions in certain cases failed to restore directory
+modification times.
+** When creating an archive, do not attempt to store files whose
+meta-data cannot be stored in the header due to format limitations
+(for ustar and v7 formats).
+** The --version option now also outputs information about copyright,
+license, and credits.  This reverts to the behavior of tar 1.14 and
+earlier, and conforms to the GNU coding standards.  The --license (-L)
+option introduced in tar 1.15 has been removed, since it's no longer
+needed.
+
+
+version 1.15.1 - Sergey Poznyakoff, 2004-12-21
+
+This version fixes a bug introduced in 1.15 which caused
+tar to refuse to extract files from standard input.
+
+
+version 1.15 - Sergey Poznyakoff, 2004-12-20
+
+* Compressed archives are recognised automatically, it is no longer
+necessary to specify -Z, -z, or -j options to read them.  Thus, you can
+now run `tar tf archive.tar.gz'.
+
+* When restoring incremental dumps, --one-file-system option
+prevents directory hierarchies residing on different devices
+from being purged.
+
+With the previous versions of tar it was dangerous to create
+incremental dumps with --one-file-system option, since they
+would recursively remove mount points when restoring from the
+back up.  This change fixes the bug.
+
+* Renamed --strip-path to --strip-components for consistency with
+the GNU convention.
+
+* Skipping archive members is sped up if the archive media supports
+seeks.
+
+* Restore script starts restoring only if it is given --all (-a) option,
+or some patterns.  This is to prevent accidental restores.
+
+* `tar --verify' prints a warning if during archive creation some of
+the file names had their prefixes stripped off.
+
+* New option --exclude-caches instructs tar to exclude cache directories
+automatically on archive creation.  Cache directories are those
+containing a standardized tag file, as specified at:
+
+	http://www.brynosaurus.com/cachedir/spec.html
+
+* New configure option --with-rmt allows to specify full path name to
+the `rmt' utility.  This supersedes DEFAULT_RMT_COMMAND variable
+introduced in version 1.14
+
+* New configure variable DEFAULT_RMT_DIR allows to specify the directory
+where to install `rmt' utility.  This is necessary since modifying
+--libexecdir as was suggested for version 1.14 produced a side effect: it
+also modified installation prefix for backup scripts (if
+--enable-backup-scripts was given).
+
+* Bug fixes:
+** Fixed flow in recognizing files to be included in incremental dumps.
+** Correctly recognize sparse archive members when used with -T option.
+** GNU multivolume headers cannot store filenames longer than 100 characters.
+Do not allow multivolume archives to begin with such filenames.
+** If a member with link count > 2 was stored in the archive twice,
+previous versions of tar were not able to extract it, since they
+were trying to link the file to itself, which always failed and
+lead to removing the already extracted copy.  Preserve the first
+extracted copy in such cases.
+** Restore script was passing improper argument to tar --listed option (which
+didn't affect the functionality, but was logically incorrect).
+** Fixed verification of created archives.
+** Fixed unquoting of file names containing backslash escapes (previous
+versions failed to recognize \a and \v).
+** When attempting to delete a non-existing member from the archive, previous
+versions of tar used to overwrite last archive block with zeroes.
+
+
+version 1.14 - Sergey Poznyakoff, 2004-05-11
+
+* Added support for POSIX.1-2001 and ustar archive formats.
+* New option --format allows to select the output archive format
+* The default output format can be selected at configuration time
+  by presetting the environment variable DEFAULT_ARCHIVE_FORMAT.
+  Allowed values are GNU, V7, OLDGNU and POSIX.
+* New option --strip-path allows to cut off a given number of
+  path elements from the name of the file being extracted.
+
+* New options --index-file, --no-overwrite-dir.  The --overwrite-dir
+  option is now the default; use --no-overwrite-dir if you prefer
+  the previous default behavior.
+
+* The semantics of -o option is changed.  When extracting, it
+  does the same as --no-same-owner GNU tar option.  This is compatible
+  with UNIX98 tar.  Otherwise, its effect is the same as that of
+  --old-archive option.  This latter is deprecated and will be removed
+  in future.
+
+* New option --check-links prints a message if not all links are dumped
+  for a file being archived.  This corresponds to the UNIX98 -l option.
+  The current semantics of the -l option is retained for compatibility
+  with previous releases, however such usage is strongly deprecated as
+  the option will change to its UNIX98 semantics in the future releases.
+
+* New option --occurrence[=N] can be used in conjunction with one of
+  the subcommands --delete, --diff, --extract or --list when a list of
+  files is given either on the command line or via -T option.  This
+  option instructs tar to process only the Nth occurrence of each named
+  file.  N defaults to 1, so `tar -x -f archive --occurrence filename'
+  extracts the first occurrence of `filename' from `archive'
+  and terminates without scanning to the end of the archive.
+
+* New option --pax-option allows to control the handling of POSIX
+  keywords in `pax' extended headers.  It is equivalent to `pax'
+  -o option.
+
+* --incremental and --listed-incremental options work correctly on
+  individual files, as well as on directories.
+
+* New scripts: backup (replaces old level-0 and level-1) and restore.
+The scripts are compiled and installed if --enable-backup-scripts
+option is given to configure.
+
+* By default tar searches "rmt" utility in "$prefix/libexec/rmt",
+which is consistent with the location where the version of "rmt"
+included in the package is installed.  Previous versions of tar
+used "/etc/rmt".  To install "rmt" to its traditional location,
+run configure with option --libexecdir=/etc.  Otherwise, if you
+already have rmt installed and wish to use it, instead of the
+shipped in version, set the variable DEFAULT_RMT_COMMAND to
+the full path name of the utility, e.g., ./configure
+DEFAULT_RMT_COMMAND=/etc/rmt.
+
+Notice also that the full path name of the "rmt" utility to
+use can be set at runtime, by giving option --rmt-command to
+tar.
+
+* Removed obsolete command line options:
+** --absolute-paths superseded by --absolute-names
+** --block-compress is not needed any longer
+** --block-size superseded by --blocking-factor
+** --modification-time superseded by --touch
+** --read-full-blocks superseded by --read-full-records
+** --record-number superseded by --block-number
+** --version-control superseded by --backup
+
+* New message translations fi (Finnish), gl (Galician), hr (Croatian),
+  hu (Hungarian), ms (Malaysian), nb (Norwegian), ro (Romanian), sk
+  (Slovak), zh_CN (Chinese simplified), zh_TW (Chinese traditional).
+  The code 'no' for Norwegian (Bokmål) has been withdrawn; use 'nb' instead.
+
+* Bug fixes.
+
+
+version 1.13.25 - Paul Eggert, 2001-09-26
+
+* Bug fixes.
+
+
+version 1.13.24 - Paul Eggert, 2001-09-22
+
+* New option --overwrite-dir.
+* Fixes for buffer overrun, porting, and copyright notice problems.
+* The message translations for Korean are available again.
+
+
+version 1.13.23 - Paul Eggert, 2001-09-13
+
+* Bug, porting, and copyright notice fixes.
+
+
+version 1.13.22 - Paul Eggert, 2001-08-29
+
+* Bug fixes.
+
+
+version 1.13.21 - Paul Eggert, 2001-08-28
+
+* Porting and copyright notice fixes.
+
+
+version 1.13.20 - Paul Eggert, 2001-08-27
+
+* Some bugs were fixed:
+  - security problems
+  - hard links to symbolic links
+
+* New option --recursion (the default) that is the inverse of --no-recursion.
+
+* New options --anchored, --ignore-case, --wildcards,
+  --wildcards-match-slash, and their negations (e.g., --no-anchored).
+  Along with --recursion and --no-recursion, these options control how
+  exclude patterns are interpreted.
+
+* The default interpretation of exclude patterns is now --no-anchored
+  --no-ignore-case --recursion --wildcards --wildcards-match-slash.
+  This is a quiet change to the semantics of --exclude.  The previous
+  semantics were a failed attempt at backward compatibility but it
+  became clear that the semantics were puzzling and did not satisfy
+  everybody.  Rather than continue to try to revive that dead horse we
+  thought it better to substitute cleaner semantics, with options so
+  that you can change the behavior more to your liking.
+
+* New message translations for Indonesian and Turkish.
+  The translation for Korean has been withdrawn due to encoding errors.
+  It will be reissued once those are fixed.
+
+
+version 1.13.19 - Paul Eggert, 2001-01-13
+
+* The -I option has been withdrawn, as it was buggy and confusing.
+  Eventually it is planned to be reintroduced, with the same meaning as -T.
+
+* With an option like -N DATE, if DATE starts with "/" or ".", it is taken
+  to be a file name; the last-modified time of that file is used as the date.
+
+
+version 1.13.18 - Paul Eggert, 2000-10-29
+
+* Some security problems have been fixed.  `tar -x' now modifies only
+  files under the working directory, unless you also specify an unsafe
+  option like --absolute-names or --overwrite.
+
+* The short name of the --bzip option has been changed to -j,
+  and -I is now an alias for -T, for compatibility with Solaris tar.
+
+* The manual is now distributed under the GNU Free Documentation License.
+
+* The new environment variable TAR_OPTIONS holds default command-line options.
+
+* The --no-recursion option now affects extraction too.
+
+* The wording in some diagnostics has been changed slightly.
+
+* Snapshot files now record whether each file was accessed via NFS.
+  The new file format is upward- and downward-compatible with the old.
+
+* New language supported: da.
+
+* Compilation by traditional (K&R) C compilers is no longer supported.
+  If you still use such a compiler, please use GCC instead.
+
+* This version of tar works best with GNU gzip test version 1.3 or later.
+  Please see <ftp://alpha.gnu.org/gnu/gzip/>.
+
+* `tar --delete -f -' now works again.
+
+
+version 1.13.17 - Paul Eggert, 2000-01-07.
+
+* `tar --delete -f -' is no longer allowed; it was too buggy.
+* Diagnostic messages have been made more regular and consistent.
+
+
+version 1.13.16 - Paul Eggert, 1999-12-13.
+
+* By default, tar now refuses to overwrite an existing file when
+  extracting files from an archive; instead, it removes the file
+  before extracting it.  If the existing file is a symbolic link, the
+  link is removed and not the pointed-to file.  There is one
+  exception: existing nonempty directories are not removed, nor are
+  their ownerships or permissions extracted.  This fixes some
+  longstanding security problems.
+
+  The new --overwrite option enables the old default behavior.
+
+  For regular files, tar implements this change by using the O_EXCL
+  option of `open' to ensure that it creates the file; if this fails, it
+  removes the file and tries again.  This is similar to the behavior of
+  the --unlink-first option, but it is faster in the common case of
+  extracting a new directory.
+
+* By default, tar now ignores file names containing a component of `..'
+  when extracting, and warns about such file names when creating an archive.
+  To enable the old behavior, use the -P or --absolute-names option.
+
+* Tar now handles file names with multibyte encodings (e.g., UTF-8, Shift-JIS)
+  correctly.  It relies on the mbrtowc function to handle multibyte characters.
+
+* The file generated by -g or --listed-incremental now uses a format
+  that is independent of locale, so that users need not worry about
+  locale when restoring a backup.  This is needed for proper support
+  of multibyte characters.  Old-format files can still be read, and
+  older versions of GNU tar can read new-format files, unless member
+  names have multibyte chars.
+
+* Many diagnostics have been changed slightly, so that file names are
+  now output unambiguously.  File names in diagnostics now are either
+  `quoted like this' (in the default C locale) or are followed by
+  colon, newline, or space, depending on context.  Unprintable
+  characters are escaped with a C-like backslash conventions.
+  Terminating characters (e.g., close-quote, colon, newline)
+  are also escaped as needed.
+
+* tar now ignores socket files when creating an archive.
+  Previously tar archived sockets as fifos, which caused problems.
+
+
+version 1.13.15 - Paul Eggert, 1999-12-03.
+
+* If a file's ctime changes when being archived, report an error.
+  Previously tar looked at mtime, which missed some errors.
+
+
+version 1.13.14 - Paul Eggert, 1999-11-07.
+
+* New translations ja, pt_BR.
+* New options --help and --version for rmt.
+* Ignore Solaris door files when creating an archive.
+
+
+version 1.13.13 - Paul Eggert, 1999-10-11.
+
+* Invalid headers in tar files now elicit errors, not just warnings.
+* `tar --version' output conforms to the latest GNU coding standards.
+* If you specify an invalid date, `tar' now substitutes (time_t) -1.
+* `configure --with-dmalloc' is no longer available.
+
+
+version 1.13.12 - Paul Eggert, 1999-09-24.
+
+* `tar' now supports hard links to symbolic links.
+
+* New options --no-same-owner, --no-same-permissions.
+
+* --total now also outputs a human-readable size, and a throughput value.
+
+* `tar' now uses two's-complement base-256 when outputting header
+  values that are out of the range of the standard unsigned base-8
+  format.  This affects archive members with negative or huge time
+  stamps or uids, and archive members 8 GB or larger.  The new tar
+  archives cannot be read by traditional tar, or by older versions of
+  GNU tar.  Use the --old-archive option to revert to the old
+  behavior, which uses unportable representations for negative values,
+  and which rejects large files.
+
+* On 32-bit hosts, `tar' now assumes that an incoming time stamp T in
+  the range 2**31 <= T < 2**32 represents the negative time (T -
+  2**32).  This behavior is nonstandard and is not portable to 64-bit
+  time_t hosts, so `tar' issues a warning.
+
+* `tar' no longer gives up extracting immediately upon discovering
+  that an archive contains garbage at the end.  It attempts to extract
+  as many files as possible from the good data before the garbage.
+
+* A read error now causes a nonzero exit status, not just a warning.
+
+* Some diagnostics have been reworded for consistency.
+
+
+version 1.13.11 - Paul Eggert, 1999-08-23.
+
+* The short name of the --bzip option has been changed to -I,
+  for compatibility with paxutils.
+
+* -T /dev/null now matches nothing; previously, it matched anything
+  if no explicit operands were given.
+
+* The `--' option now works the same as with other GNU utilities;
+  it causes later operands to be interpreted as file names, not options,
+  even if they begin with `-'.
+
+* For the --newer and --after-date options, the table of time zone
+  abbreviations like `EST' has been updated to match current practice.
+  Also, local time abbreviations are now recognized, even if they are
+  not in tar's hardwired table.  Remember, though, that you should use
+  numeric UTC offsets like `-0500' instead of abbreviations like
+  `EST', as abbreviations are not standardized and are ambiguous.
+
+
+version 1.13.10 - Paul Eggert, 1999-08-20.
+
+* `tar' now uses signed base-64 when outputting header values that are
+  out of the range of the standard unsigned base-8 format.  [This
+  change was superseded in 1.13.12, described above.]
+
+
+version 1.13.9 - Paul Eggert, 1999-08-18.
+
+* `tar' now writes two zero blocks at end-of-archive instead of just one.
+  POSIX.1 requires this, and some other `tar' implementations check for it.
+
+* `tar' no longer silently accepts a block containing nonzero checksum bytes
+  as a zero block.
+
+* `tar' now reads buggy tar files that have a null byte at the start of a
+  numeric header field.
+
+
+version 1.13.8 - Paul Eggert, 1999-08-16.
+
+* For compatibility with traditional `tar', intermediate directories
+  created automatically by root are no longer given the uid and gid of
+  the original file or directory.
+
+
+version 1.13.7 - Paul Eggert, 1999-08-14.
+
+* --listed-incremental and --newer are now incompatible options.
+
+* When creating an archive, leading `./' is no longer stripped,
+  to match traditional tar's behavior (and simplify the documentation).
+
+* --diff without --absolute-names no longer falls back on absolute names.
+
+
+version 1.13.6 - Paul Eggert, 1999-08-11.
+
+* An --exclude pattern containing / now excludes a file only if it matches an
+  initial prefix of the file name; a pattern without / continues to
+  exclude a file if it matches any file name component.
+
+* The protocol for talking to rmt has been extended slightly.
+  Open flags are now communicated in symbolic format as well as numeric.
+  The symbolic format (e.g., "O_WRONLY|O_CREAT|O_TRUNC") is for portability
+  when rmt is operating on a different operating system from tar.
+  The numeric format is retained, and rmt uses it if symbolic format is absent,
+  for backward compatibility with older versions of tar and rmt.
+
+* When writing GNU tar format headers, tar now uses signed base-64
+  for values that cannot be represented in unsigned octal.
+  This supports larger files (2**66 - 1 bytes instead of 2**33 - 1 bytes),
+  larger uids, negative time stamps, etc.
+
+* When extracting files with unknown ownership, tar now looks up the
+  uid and gid "nobody" on hosts whose headers do not define UID_NOBODY
+  and GID_NOBODY, and falls back on uid/gid -2 if there is no "nobody".
+
+* tar -t --numeric-owner now prints numeric uids and gids, not symbolic.
+
+* New option -y or --bzip2 for bzip2 compression, by popular request.
+
+
+version 1.13.5 - Paul Eggert, 1999-07-20.
+
+* Do the delayed updates of file metadata even after a fatal error.
+
+
+version 1.13.4 - Paul Eggert, 1999-07-20.
+
+* Do not chmod unless we are root or the -p option was given;
+  this matches historical practice.
+
+
+version 1.13.3 - Paul Eggert, 1999-07-16.
+
+* A path name is excluded if any of its file name components matches an
+  excluded pattern, even if the path name was specified on the command line.
+  Also see 1.13.6 for later changes in this area.
+
+
+version 1.13.2 - Paul Eggert, 1999-07-14.
+
+* Bug reporting address changed to <bug-tar@gnu.org>.
+
+
+version 1.13.1 - Paul Eggert, 1999-07-12.
+
+* Bug fixes only.
+
+version 1.13 - Paul Eggert, 1999-07-08.
+
+* Support for large files, e.g., files larger than 2 GB on many 32-bit hosts.
+  Also, support for larger uids, device ids, etc.
+* Many bug fixes and porting fixes.
+* This release is only for fixes.  A more ambitious test release,
+  with new features, is available as part of the paxutils.  Please see:
+    ftp://alpha.gnu.org/gnu/paxutils/
+  The fixes in this release are intended to be merged with paxutils
+  at some point, but they haven't been merged yet.
+* An interim GNU tar alpha had new --bzip2 and --ending-file options,
+  but they have been removed to maintain compatibility with paxutils.
+  Please try --use=bzip2 instead of --bzip2.
+
+Version 1.12 - François Pinard, 1997-04.
+
+Sensitive matters
+* Use shell globbing patterns for --label, instead of regular expressions.
+* Do not quote anymore internally over the quoting done by the shell.
+
+Output for humans
+* Offer internationalization capabilities of most recent GNU gettext.
+* Messages available in many more languages, thanks to all translators!
+* Usage of ISO 8601 dates in listings, instead of local American dates.
+* More normalization and cleanup in error messages.
+
+Creation
+* For helping using tar with find, offer a --no-recursion option.
+* Implement --numeric-owner for ignoring symbolic names at create time.
+* New --owner, --group --mode options, still preliminary.
+* Recognize creating an archive on /dev/null, so Amanda works faster.
+* Object to the creation of an empty archive (like in `tar cf FILE').
+* Barely start implementing --posix and POSIXLY_CORRECT.
+
+Extraction
+* Make a better job at restoring file and directory attributes.
+* Automatically attempt deleting existing files when in the way.
+* Option --unlink-first (-U) removes most files prior to extraction.
+* Option --recursive-unlink removes non-empty directories when in the way.
+* Option --numeric-owner ignores owner/group names, it uses UID/GID instead.
+* Use global umask when creating missing intermediate directories.
+* When symlinks are not available, extract symbolic links as hard links.
+* Diagnose extraction of contiguous files as regular files.
+* New --backup, --suffix and --version-control options.
+
+Various changes
+* Better support of huge archives with --tape-length and --totals.
+* Rename option --read-full-blocks (-B) to --read-full-records (-B).
+* Rename option --block-size (-b) to --blocking-factor (-b).
+* Rename option --record-number (-R) to --block-number (-R).
+* With --block-number (-R), report null blocks and end of file.
+* Implement --record-size for introducing a size in bytes.
+* Delete --block-compress option and rather decide it automatically.
+* Rename option --modification-time to --touch.
+
+Many bugs are squashed, while others still run free.
+
+Version 1.11.8 - François Pinard, 1995-06.
+
+* Messages available in French, German, Portuguese and Swedish.
+* The distribution provides a rudimentary Texinfo manual.
+* The device defaults to stdin/stdout, unless overridden by the installer.
+* Option --sparse (-S) should work on more systems.
+* Option --rsh-command may select an alternative remote shell program.
+
+Most changes are internal, and should yield better portability.
+
+Version 1.11.2 - Michael Bushnell, 1993-03.
+
+* Changes in backup scripts: cleaned up considerably; notices error
+conditions better over rsh; DUMP_REMIND_SCRIPT is now an option in
+backup-specs; new file dump-remind is an example of a
+DUMP_REMIND_SCRIPT.
+
+* Superfluous "Reading dirname" was a bug; fixed.
+
+* Incompatibility problems with a bug on Solaris are fixed.
+
+* New option --gzip (aliases are --ungzip and -z); calls gzip instead
+of compress.  Also, --use-compress-program lets you specify any
+compress program.  --compress-block is renamed --block-compress and
+now requires one of the three compression options to be specified.
+
+* Several error messages are cleaned up.
+
+* Directory owners are now set properly when running as root.
+
+* Provide DUMP_REMIND_SCRIPT in backup-specs as a possible option
+for --info-script.
+
+* Behave better with broken rmt servers.
+
+* Dump scripts no longer use --atime-preserve; this causes a nasty probem.
+
+* Several Makefile cleanups.
+
+Version 1.11.1 - Michael Bushnell, 1992-09.
+
+* Many bug fixes.
+
+Version 1.11 - Michael Bushnell, 1992-09.
+Version 1.10.16 - 1992-07.
+Version 1.10.15 - 1992-06.
+Version 1.10.14 - 1992-05.
+Version 1.10.13 - 1992-01.
+
+* Many bug fixes.
+
+* Now uses GNU standard configure, generated by Autoconf.
+
+* Long options now use `--'; use of `+' is deprecated and support
+for it will eventually be removed.
+
+* New option --null causes filenames read by -T to be
+null-terminated, and causes -C to be ignored.
+
+* New option --remove-files deletes files (but not directories)
+after they are added to the archive.
+
+* New option --ignore-failed-read prevents read-errors from affecting
+the exit status.
+
+* New option --checkpoint prints occasional messages as the tape
+is being read or written.
+
+* New option --show-omitted-dirs prints the names of directories
+omitted from the archive.
+
+* Some tape drives which use a non-standard method of indicating
+end-of-tape now work correctly with multi-tape archives.
+
+* --volno-file: Read the volume number used in prompting the user
+(but not in recording volume ID's on the archive) from a file.
+
+* When using --multi-volume, you can now give multiple -f arguments;
+the various tape drives will get used in sequence and then wrap
+around to the beginning.
+
+* Remote archive names no longer have to be in /dev: any file with a
+`:' is interpreted as remote.  If new option --force-local is given,
+then even archive files with a `:' are considered local.
+
+* New option --atime-preserve restores (if possible) atimes to
+their original values after dumping the file.
+
+* No longer does tar confusingly dump "." when you don't tell it
+what to dump.
+
+* When extracting directories, tar now correctly restores their
+modification and access times.
+
+* Longnames support is redone differently--long name info directly
+precedes the long-named file or link in the archive, so you no
+longer have to wait for the extract to hit the end of the tape for
+long names to work.
+
+Version 1.10 - Michael Bushnell, 1991-07.
+
+* Filename to -G is optional.  -C works right.  Names +newer and
++newer-mtime work right.
+
+* -g is now +incremental, -G is now +listed-incremental.
+
+* Sparse files now work correctly.
+
+* +volume is now called +label.
+
+* +exclude now takes a filename argument, and +exclude-from does
+what +exclude used to do.
+
+* Exit status is now correct.
+
+* +totals keeps track of total I/O and prints it when tar exits.
+
+* When using +label with +extract, the label is now a regexp.
+
+* New option +tape-length (-L) does multi-volume handling like BSD
+dump: you tell tar how big the tape is and it will prompt at that
+point instead of waiting for a write error.
+
+* New backup scripts level-0 and level-1 which might be useful
+to people.  They use a file "backup-specs" for information, and
+shouldn't need local modification.  These are what we use to do
+all our backups at the FSF.
+
+Version 1.09 - Jay Fenlason, 1990-10.
+Version 1.08 - Jay Fenlason, 1990-01.
+Versions 1.07 back to 1.00 by Jay Fenlason.
+
+* See ChangeLog for more details.
+
+
+
+Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2003,
+2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software Foundation, Inc.
+
+This file is part of GNU tar.
+
+GNU tar is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+GNU tar is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with tar; see the file COPYING.  If not, write to
+the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+Boston, MA 02110-1301, USA.
+
+Local variables:
+mode: outline
+paragraph-separate: "[	]*$"
+eval: (add-hook 'write-file-hooks 'time-stamp)
+time-stamp-start: "changes. "
+time-stamp-format: "%:y-%02m-%02d"
+time-stamp-end: "\n"
+end:
