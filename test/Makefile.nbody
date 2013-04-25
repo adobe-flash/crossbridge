@@ -1,0 +1,46 @@
+mSUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+
+all: nbody nbody.phi2mem nbody.reg2mem
+
+CC = gcc
+CFLAGS = -m32 -O3 -flto
+LDFLAGS = 
+CPU = i686
+
+OBJS = 
+
+nbody.linked.o : nbody.o $(OBJS)
+	$(LLVMPATH)/llvm-link -o=nbody.linked.o nbody.o $(OBJS)
+
+nbody.lto.o : nbody.linked.o
+	$(LLVMPATH)/opt -O3 nbody.linked.o -o nbody.lto.o
+
+nbody.s : nbody.lto.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o nbody.s nbody.lto.o
+
+nbody : nbody.s
+	$(CC) $(CFLAGS) $(LDFLAGS) nbody.s -o nbody
+
+nbody.phi2mem.o : nbody.lto.o
+	$(LLVMPATH)/opt -phi2mem nbody.lto.o -o nbody.phi2mem.o
+	
+nbody.phi2mem.s : nbody.phi2mem.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o nbody.phi2mem.s nbody.phi2mem.o
+
+nbody.phi2mem : nbody.phi2mem.s
+	$(CC) $(CFLAGS) $(LDFLAGS) nbody.phi2mem.s -o nbody.phi2mem
+
+nbody.reg2mem.o : nbody.lto.o
+	$(LLVMPATH)/opt -reg2mem nbody.lto.o -o nbody.reg2mem.o
+	
+nbody.reg2mem.s : nbody.reg2mem.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o nbody.reg2mem.s nbody.reg2mem.o
+
+nbody.reg2mem : nbody.reg2mem.s
+	$(CC) $(CFLAGS) $(LDFLAGS) nbody.reg2mem.s -o nbody.reg2mem
+
+clean:
+	rm *.o *.s nbody nbody.phi2mem nbody.reg2mem

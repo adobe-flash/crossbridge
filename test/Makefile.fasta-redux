@@ -1,0 +1,46 @@
+mSUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+
+all: fasta-redux fasta-redux.phi2mem fasta-redux.reg2mem
+
+CC = gcc
+CFLAGS = -m32 -O3 -flto
+LDFLAGS = 
+CPU = i686
+
+OBJS = 
+
+fasta-redux.linked.o : fasta-redux.o $(OBJS)
+	$(LLVMPATH)/llvm-link -o=fasta-redux.linked.o fasta-redux.o $(OBJS)
+
+fasta-redux.lto.o : fasta-redux.linked.o
+	$(LLVMPATH)/opt -O3 fasta-redux.linked.o -o fasta-redux.lto.o
+
+fasta-redux.s : fasta-redux.lto.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o fasta-redux.s fasta-redux.lto.o
+
+fasta-redux : fasta-redux.s
+	$(CC) $(CFLAGS) $(LDFLAGS) fasta-redux.s -o fasta-redux
+
+fasta-redux.phi2mem.o : fasta-redux.lto.o
+	$(LLVMPATH)/opt -phi2mem fasta-redux.lto.o -o fasta-redux.phi2mem.o
+	
+fasta-redux.phi2mem.s : fasta-redux.phi2mem.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o fasta-redux.phi2mem.s fasta-redux.phi2mem.o
+
+fasta-redux.phi2mem : fasta-redux.phi2mem.s
+	$(CC) $(CFLAGS) $(LDFLAGS) fasta-redux.phi2mem.s -o fasta-redux.phi2mem
+
+fasta-redux.reg2mem.o : fasta-redux.lto.o
+	$(LLVMPATH)/opt -reg2mem fasta-redux.lto.o -o fasta-redux.reg2mem.o
+	
+fasta-redux.reg2mem.s : fasta-redux.reg2mem.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o fasta-redux.reg2mem.s fasta-redux.reg2mem.o
+
+fasta-redux.reg2mem : fasta-redux.reg2mem.s
+	$(CC) $(CFLAGS) $(LDFLAGS) fasta-redux.reg2mem.s -o fasta-redux.reg2mem
+
+clean:
+	rm *.o *.s fasta-redux fasta-redux.phi2mem fasta-redux.reg2mem

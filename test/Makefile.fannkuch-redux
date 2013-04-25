@@ -1,0 +1,46 @@
+mSUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+
+all: fannkuch-redux fannkuch-redux.phi2mem fannkuch-redux.reg2mem
+
+CC = gcc
+CFLAGS = -m32 -O3 -flto
+LDFLAGS = 
+CPU = i686
+
+OBJS = 
+
+fannkuch-redux.linked.o : fannkuch-redux.o $(OBJS)
+	$(LLVMPATH)/llvm-link -o=fannkuch-redux.linked.o fannkuch-redux.o $(OBJS)
+
+fannkuch-redux.lto.o : fannkuch-redux.linked.o
+	$(LLVMPATH)/opt -O3 fannkuch-redux.linked.o -o fannkuch-redux.lto.o
+
+fannkuch-redux.s : fannkuch-redux.lto.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o fannkuch-redux.s fannkuch-redux.lto.o
+
+fannkuch-redux : fannkuch-redux.s
+	$(CC) $(CFLAGS) $(LDFLAGS) fannkuch-redux.s -o fannkuch-redux
+
+fannkuch-redux.phi2mem.o : fannkuch-redux.lto.o
+	$(LLVMPATH)/opt -phi2mem fannkuch-redux.lto.o -o fannkuch-redux.phi2mem.o
+	
+fannkuch-redux.phi2mem.s : fannkuch-redux.phi2mem.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o fannkuch-redux.phi2mem.s fannkuch-redux.phi2mem.o
+
+fannkuch-redux.phi2mem : fannkuch-redux.phi2mem.s
+	$(CC) $(CFLAGS) $(LDFLAGS) fannkuch-redux.phi2mem.s -o fannkuch-redux.phi2mem
+
+fannkuch-redux.reg2mem.o : fannkuch-redux.lto.o
+	$(LLVMPATH)/opt -reg2mem fannkuch-redux.lto.o -o fannkuch-redux.reg2mem.o
+	
+fannkuch-redux.reg2mem.s : fannkuch-redux.reg2mem.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o fannkuch-redux.reg2mem.s fannkuch-redux.reg2mem.o
+
+fannkuch-redux.reg2mem : fannkuch-redux.reg2mem.s
+	$(CC) $(CFLAGS) $(LDFLAGS) fannkuch-redux.reg2mem.s -o fannkuch-redux.reg2mem
+
+clean:
+	rm *.o *.s fannkuch-redux fannkuch-redux.phi2mem fannkuch-redux.reg2mem
