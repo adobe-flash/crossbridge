@@ -1,0 +1,89 @@
+
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Quake 1 FlasCC Demo</title>
+	<script type="text/javascript" src="swfobject.js"></script>
+	<script type="text/javascript">
+		swfobject.registerObject("example", "11.4.0", "expressInstall.swf");
+
+		function initDragTarget() {
+			var dropbox = document.getElementById("dragtarget")
+			dropbox.addEventListener("dragenter", dragNull, false);
+			dropbox.addEventListener("dragexit", dragNull, false);
+			dropbox.addEventListener("dragover", dragNull, false);
+			dropbox.addEventListener("drop", drop, false);
+		}
+
+		function dragNull(evt) {
+			evt.stopPropagation();
+			evt.preventDefault();
+		}
+
+		function drop(evt) {
+			evt.stopPropagation();
+			evt.preventDefault();
+
+			var files = evt.dataTransfer.files;
+			if (files.length == 1) {
+				var file = files[0];
+				var reader = new FileReader();
+				reader.onloadend = loadComplete;
+				reader.readAsDataURL(file);
+			}
+		}
+
+		function loadComplete(evt) {
+			var img = document.getElementById("dragtarget");
+			var data = evt.target.result.split(",")[1].split("=")[0]
+			img.innerHTML = "Loading file... "
+			swfobject.getObjectById("example").supplyData(data)
+		}
+
+	</script>
+	<style type="text/css">
+		html { text-align: center; }
+		body { font-family: Georgia,serif; background-color: #efefef; color: #333333; margin: auto;  }
+		a:link { color: #3366aa; }
+		a:visited { color: #aa3333; }
+		a:hover,a:active { color: #000000; }
+		#dragtarget {
+			background: #110000;
+			opacity: 0.5;
+			border: 4px dotted #FF0000;
+			-webkit-border-radius: 10px;
+			-moz-border-radius: 10px;
+			border-radius: 10px;
+			padding-bottom: 10px;
+		}
+	</style>
+</head>
+<body onload="initDragTarget()">
+	<div>
+		<p>First download the Quake 1 shareware data. (The original dos installer can be found here <a href="ftp://ftp.idsoftware.com/idstuff/quake/quake108.zip">ftp://ftp.idsoftware.com/idstuff/quake/quake108.zip</a>. And you can run it in <a href="http://www.dosbox.com/">dosbox</a> to extract the PAK file)</p>
+		<p id="dragtarget">Then drag the PAK0.PAK file contained in the zip file here...</p>
+		<object id="example" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="1024" height="768">
+			<param name="movie" value="Quake1Shim.swf" />
+			<param name="wmode" value="direct" />
+			<param name="FlashVars" value="waitForData=true" />
+			<param name="allowscriptaccess" value="always" />
+			
+			<!--[if !IE]>-->
+			<object type="application/x-shockwave-flash" data="Quake1Shim.swf" wmode="direct" width="1024" height="768">
+			<!--<![endif]-->
+			<param name="FlashVars" value="waitForData=true" />
+			<param name="allowscriptaccess" value="always" />
+			<div>
+				<h1>Quake 1 FlasCC demo</h1>
+				<p>Please download or upgrade <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player</a> to view this example.</p>
+			</div>
+			<!--[if !IE]>-->
+			</object>
+			<!--<![endif]-->
+		</object>
+		<p>Learn more about <a href="http://gaming.adobe.com/technologies/flascc">FlasCC</a></p>
+		<p>And for a more modern demo take a look at Unreal 3: <a href="http://www.unrealengine.com/flash">http://www.unrealengine.com/flash</a>, also compiled with FlasCC</p>
+	</div>
+</body>
+</html>

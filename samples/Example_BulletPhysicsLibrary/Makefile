@@ -1,4 +1,4 @@
-BULLETDIR:=bullet-2.80-rev2531
+BULLETDIR:=bullet-2.81-rev2613
 #EXTRA_CFLAGS:=-DUSE_PTHREADS
 #EXTRA_OPTS:=-pthread
 #EXTRA_LIBS:=-lBulletMultiThreaded
@@ -12,7 +12,7 @@ T09: check
 	mkdir -p build
 	cd build && PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" cmake \
 		-DCMAKE_CXX_FLAGS="-fno-exceptions -fno-rtti -O4" \
-		-DUSE_DOUBLE_PRECISION:BOOL=ON -DBUILD_EXTRAS:BOOL=OFF -DBUILD_DEMOS:BOOL=OFF  \
+		-DUSE_DOUBLE_PRECISION:BOOL=ON -DBUILD_EXTRAS:BOOL=OFF -DBUILD_DEMOS:BOOL=OFF  -DBUILD_MULTITHREADING:BOOL=OFF \
 		../$(BULLETDIR)/
 
 	make recompile
@@ -33,7 +33,7 @@ swc:
 	java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) build/Bullet.as
 
 	# Compile the SWIG C++ wrappers
-	cd build && PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" g++ $(BASE_CFLAGS) -DBT_USE_DOUBLE_PRECISION -I../$(BULLETDIR)/src \
+	cd build && PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" g++ $(EXTRA_OPTS) $(BASE_CFLAGS) -DBT_USE_DOUBLE_PRECISION -I../$(BULLETDIR)/src \
 	-Lsrc/BulletCollision -Lsrc/BulletDynamics -Lsrc/LinearMath -Lsrc/BulletMultiThreaded \
 	bullet_wrap.cxx -O4 -c
 
@@ -43,7 +43,7 @@ swc:
 	PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" nm build/bullet_wrap.o | grep " T " | awk '{print $$3}' | sed 's/__/_/' >> build/exports.txt
 
 	# Link the final library
-	cd build && PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" g++ $(BASE_CFLAGS) -DBT_USE_DOUBLE_PRECISION -I../$(BULLETDIR)/src ../main.cpp \
+	cd build && PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" g++ $(EXTRA_OPTS) $(BASE_CFLAGS) -DBT_USE_DOUBLE_PRECISION -I../$(BULLETDIR)/src ../main.cpp \
 	-Lsrc/BulletCollision -Lsrc/BulletDynamics -Lsrc/LinearMath -Lsrc/BulletMultiThreaded \
 	bullet_wrap.o Bullet.abc \
 	-Wl,--start-group \
@@ -69,7 +69,7 @@ away3dswf:
 		-compiler.omit-trace-statements=false \
 		-static-link-runtime-shared-libraries \
 		-library-path+=../build/Bullet.swc \
-		-library-path+=away3d-core-fp11_4_0_9_gold.swc \
+		-library-path+=away3d-core-fp11_4_1_0_Alpha.swc \
 		-swf-version=18 \
 		BulletPhysicsTest.as -o BulletPhysicsTest.swf
 

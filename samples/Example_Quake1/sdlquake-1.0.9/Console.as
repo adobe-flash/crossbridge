@@ -13,20 +13,24 @@ package com.adobe.flascc
   import flash.display.Bitmap
   import flash.display.BitmapData
   import flash.display.DisplayObjectContainer;
+  import flash.display.LoaderInfo;
   import flash.display.Sprite;
   import flash.display.StageScaleMode;
   import flash.events.Event;
   import flash.events.KeyboardEvent;
   import flash.events.MouseEvent;
   import flash.events.SampleDataEvent;
+  import flash.external.ExternalInterface;
   import flash.geom.Rectangle
   import flash.media.Sound;
   import flash.media.SoundChannel;
   import flash.net.LocalConnection;
   import flash.net.URLRequest;
+  import flash.system.Security;
   import flash.text.TextField;
   import flash.utils.ByteArray;
 
+  import com.adobe.flascc.vfs.InMemoryBackingStore;
   import com.adobe.flascc.vfs.ISpecialFile;
   import com.adobe.flascc.vfs.RootFSBackingStore;
 
@@ -55,6 +59,7 @@ package com.adobe.flascc
     private var keybytes:ByteArray = new ByteArray()
     private var last_mx:int = 0, last_my:int = 0
     private var snd:Sound = null
+    private var waitForData:Boolean = false
     private var sndChan:SoundChannel = null
     private var vbuffer:int, vgl_mx:int, vgl_my:int, kp:int
     private const emptyArgs:Vector.<int> = new Vector.<int>
@@ -73,12 +78,44 @@ package com.adobe.flascc
         return;
       }
 
+      // If this SWF is being hosted in a webpage and doesn't have an embedded
+      // VFS it will wait until the JS host supplies it with a PAK0.PAK file
+      try {
+        var paramObj:Object = CModule.rootSprite.loaderInfo.parameters.waitForData;
+        if(paramObj.toString() == "true") {
+          waitForData = true
+          if (ExternalInterface.available) {
+              ExternalInterface.addCallback("supplyData", supplyData);
+              Security.allowDomain("*") // Awwww yeah!
+          } else {
+            trace("External interface is not available for this container.");
+          }
+        }
+      } catch(e:*) {
+      }
+
+      if(!waitForData)
+        CModule.vfs.addBackingStore(new RootFSBackingStore(), null)
+
       if(container) {
         container.addChild(this)
         init(null)
       } else {
         addEventListener(Event.ADDED_TO_STAGE, init)
       }
+    }
+
+    private function supplyData(value:String):void
+    {
+      waitForData = false
+      ExternalInterface.addCallback("supplyData", null)
+
+      var bs:InMemoryBackingStore = new InMemoryBackingStore();
+      bs.addDirectory("/id1")
+      bs.addFile("/id1/pak0.pak", decodeBase64(value))
+      CModule.vfs.addBackingStore(bs, null)
+
+      init(null)
     }
 
     /**
@@ -88,6 +125,9 @@ package com.adobe.flascc
     */
     protected function init(e:Event):void
     {
+      if(waitForData)
+        return;
+
       inputContainer = new Sprite()
       addChild(inputContainer)
 
@@ -112,8 +152,7 @@ package com.adobe.flascc
         _tf.height = stage.stageHeight 
         inputContainer.addChild(_tf)
       }
-
-      CModule.vfs.addBackingStore(new RootFSBackingStore(), null)
+            
       try
       {
         // This will be true if the player supports workers
@@ -136,7 +175,7 @@ package com.adobe.flascc
       {
         // If main gives any exceptions make sure we get a full stack trace
         // in our console
-        consoleWrite(e.toString() + "\n" + e.getStackTrace().toString())
+        trace(e.toString() + "\n" + e.getStackTrace().toString())
         throw e
       }
       
@@ -315,6 +354,89 @@ package com.adobe.flascc
         }
         
         return txt;
+    }
+
+    /* 
+     * Copyright (C) 2012 Jean-Philippe Auclair 
+     * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php 
+     * Base64 library for ActionScript 3.0. 
+     * By: Jean-Philippe Auclair : http://jpauclair.net 
+     * Based on article: http://jpauclair.net/2010/01/09/base64-optimized-as3-lib/
+     */ 
+    private static const _decodeChars:Vector.<int> = new <int>[  
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,   
+            52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,   
+            -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,   
+            15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1,   
+            -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,   
+            41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1,   
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,   
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
+
+    public static function decodeBase64(str:String):ByteArray  
+    {  
+        var c1:int;  
+        var c2:int;  
+        var c3:int;  
+        var c4:int;  
+        var i:int = 0;  
+        var len:int = str.length;  
+          
+        var byteString:ByteArray = new ByteArray();  
+        byteString.writeUTFBytes(str);  
+        var outPos:int = 0;  
+        while (i < len)  
+        {  
+            //c1  
+            c1 = _decodeChars[int(byteString[i++])];  
+            if (c1 == -1)  
+                break;  
+              
+            //c2  
+            c2 = _decodeChars[int(byteString[i++])];  
+            if (c2 == -1)  
+                break;  
+              
+            byteString[int(outPos++)] = (c1 << 2) | ((c2 & 0x30) >> 4);  
+              
+            //c3  
+            c3 = byteString[int(i++)];  
+            if (c3 == 61)  
+            {  
+                byteString.length = outPos  
+                return byteString;  
+            }  
+              
+            c3 = _decodeChars[int(c3)];  
+            if (c3 == -1)  
+                break;  
+              
+            byteString[int(outPos++)] = ((c2 & 0x0f) << 4) | ((c3 & 0x3c) >> 2);  
+              
+            //c4  
+            c4 = byteString[int(i++)];  
+            if (c4 == 61)  
+            {  
+                byteString.length = outPos  
+                return byteString;  
+            }  
+              
+            c4 = _decodeChars[int(c4)];  
+            if (c4 == -1)  
+                break;  
+              
+            byteString[int(outPos++)] = ((c3 & 0x03) << 6) | c4;  
+        }  
+        byteString.length = outPos  
+        return byteString;  
     }
   }
 }
