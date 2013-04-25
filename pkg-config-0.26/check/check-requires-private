@@ -1,0 +1,35 @@
+#! /bin/sh
+
+# Make sure we're POSIX
+if [ "$PKG_CONFIG_SHELL_IS_POSIX" != "1" ]; then
+    PKG_CONFIG_SHELL_IS_POSIX=1 PATH=`getconf PATH` exec sh $0 "$@"
+fi
+set -e
+
+. ${srcdir}/common
+
+# expect cflags from requires-test and public-dep
+ARGS="--cflags requires-test"
+RESULT="-I/requires-test/include -I/private-dep/include -I/public-dep/include"
+run_test
+
+# still expect those cflags for static linking case
+ARGS="--static --cflags requires-test"
+RESULT="-I/requires-test/include -I/private-dep/include -I/public-dep/include"
+run_test
+
+# expect libs for just requires-test and public-dep
+ARGS="--libs requires-test"
+if [ "$list_indirect_deps" = "yes" ]; then
+    RESULT="-L/requires-test/lib -L/private-dep/lib -L/public-dep/lib -lrequires-test -lprivate-dep -lpublic-dep"
+else
+    RESULT="-L/requires-test/lib -L/public-dep/lib -lrequires-test -lpublic-dep"
+fi
+run_test
+
+# expect libs for requires-test, public-dep and private-dep in static case
+ARGS="--static --libs requires-test"
+RESULT="-L/requires-test/lib -L/private-dep/lib -L/public-dep/lib -lrequires-test -lprivate-dep -lpublic-dep"
+run_test
+
+

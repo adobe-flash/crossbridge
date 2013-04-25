@@ -1,0 +1,22 @@
+#! /bin/sh
+
+# Make sure we're POSIX
+if [ "$PKG_CONFIG_SHELL_IS_POSIX" != "1" ]; then
+    PKG_CONFIG_SHELL_IS_POSIX=1 PATH=`getconf PATH` exec sh $0 "$@"
+fi
+
+set -e
+
+. ${srcdir}/common
+
+ARGS="--libs simple"
+if [ "$list_indirect_deps" = "yes" ]; then
+    RESULT="-lsimple -lm"
+else
+    RESULT="-lsimple"
+fi
+run_test
+
+ARGS="--libs fields-blank"
+RESULT=""
+run_test

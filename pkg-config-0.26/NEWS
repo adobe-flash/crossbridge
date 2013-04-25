@@ -1,0 +1,158 @@
+pkg-config 0.26
+===
+
+ - Build system fixes
+ - More tests
+ - pkg.m4 fixups which makes autoconf 2.66 happier.
+ - Drop support for legacy -config scripts.  Those should already be
+   gone and cause problems in cross-compilation environments.
+ - Drop embedded glib
+ - Fix up pkg.m4 to handle the case of --exists working and --cflags
+   or --libs failing.
+ - Various documentation updates
+ - Allow $() through without escaping it.
+ - Add --with-system-include-path instead of hard-coding
+   /usr/include.
+
+pkg-config 0.25
+===
+
+ - 0.24 included a too strict whitespace/shell metacharacter filter
+   leading to some legal characters like = and : being escaped in the
+   output.  This has been fixed.
+ - when building with newer and external libpopt, it would be confused
+   over being asked to split an empty string, leading to errors with
+   packages that included empty fields in their .pc files.
+ - Make the COPYING file explicitly GPLv2.  The COPYING file in 0.24
+   was inadvertently GPLv3 rather than the correct GPLv2.
+ - Minor changes to documentation
+
+pkg-config 0.24
+===
+ - Fix up bug in PKG_CONFIG_SYSROOT handling which mangled non-I and
+   non-L arguments
+ - Put /usr/lib/pkgconfig and /usr/share/pkgconfig into the default
+   search path when no prefix is passed to configure.
+ - Portability fixes for Windows and NetBSD
+ - Various man page updates
+ - Add logging support to log how pkg-config is being called.
+ - Skip Requires.private unless we need them for Cflags
+ - Add a variable, pc_path to the compiled-in pkg-config package that
+   you can query for the compiled-in PKG_CONFIG_PC_PATH.
+ - Various updates to pkg.m4.
+ - Update rpmvercmp with bugfixes from upstream.
+ - Add introductory guide to pkg-config, thanks to Dan Nicholson for
+   the patch.
+ - Add listing of variables in a package
+ - Make it possible to use external popt.
+ - Add --print-provides and --print-requires(-private) options
+ - Add support for paths containing whitespace and shell metacharacters
+
+pkg-config 0.23
+===
+ - Add support for setting sysroot through PKG_CONFIG_SYSROOT_DIR in
+   the environment.
+ - Update included glib to 1.2.10.
+ - Other minor fixes, including a segfault.
+
+pkg-config 0.22
+===
+ - Make Requires.private a whole lot more useful by traversing the
+   whole tree, not just the top-level, for Cflags.
+ - Add support for using the system glib.
+ - Update URL to pkg-config website
+ - Fix some win32 problems.
+ - Other minor fixes.
+
+pkg-config 0.21
+===
+ - Fix some cosmetic output from pkg.m4
+ - Fix build problems with !gcc due to always passing -Wall
+ - Documentation fixes
+ - We now always add the Cflags from packages we depend on, whether
+   they are public or private dependencies.  The discussion surrouding
+   this change can be found in http://bugs.debian.org/340904 .
+ - Add internal pkg-config package which can be queried for version
+   number and other information.
+
+pkg-config 0.20
+===
+ - Fix test suite to work on Solaris.  Yay non-POSIX /bin/sh :-(
+ - Fix segfault on --help with gcc4.  Fix segfault on bigendian arches
+   in some cases.
+ - Win32 fixes
+ - Add --short-errors, now used by pkg.m4 if available.  This gives a
+   better error message if some libraries can't be found.
+
+pkg-config 0.19
+===
+ - Fix a segfault
+ - Fix default search path
+ - Fix cosmetic bug in pkg.m4 where AC_MSG_RESULT wasn't called in
+   some cases.
+
+pkg-config 0.18.1
+===
+ - Fix up pkg.m4 to not end up with pkg_failed=untried always.
+
+pkg-config 0.18
+===
+ - The inter-library dependencies check was too tight and caused
+ problems if one used the --no-undefined flag to libtool on Solaris
+ (since it there expands to -Wl,-z,defs which disallows undefined
+ symbols).  Add a new name to .pc files: Libs.private which will not
+ be listed in the output of --libs unless --static is also given.
+
+ Private libraries are libraries which are needed in the case of
+ static linking or on platforms not supporting inter-library
+ dependencies.  They are not supposed to be used for libraries which
+ are exposed through the library in question.  An example of an
+ exposed library is GTK+ exposing Glib.  A common example of a private
+ library is libm.
+
+ Generally, if include another library's headers in your own, it's a
+ public dependency and not a private one.
+
+ Thanks a lot to James Henstridge for both the bug and the following
+ discussion.
+
+pkg-config 0.17.2
+===
+ - Don't go into an infinite loop allocating more and more memory when
+   the same name is specified twice on the command line and we're in
+   "direct dependencies only"-mode.
+
+pkg-config 0.17.1
+===
+ - Now actually sets CFLAGS and LIBS instead of trying to set those in
+   a subshell.  (Only affects if you've autoreconfiscated with 0.17)
+ - Fix detection of inter-library dependencies.
+
+pkg-config 0.17
+===
+
+ - Evaluate second argument to PKG_CHECK_MODULES again
+ - Portability fixes (MacOS, BeOS, Cygwin)
+ - Handle inter-library dependencies and assume those are in place if
+   the platform supports them.  Disable with --enable-indirect-deps.
+ - Add initial test framework
+ - Build fixes (make distcheck now works)
+
+pkg-config 0.16
+===
+
+ - Use a search path, rather than a single default directory.
+ - Fix a bunch of bugs in glib by backporting
+ - More man page fixes
+ - Lots of small fixes and cleanups over the place.
+ - pkg-config now grabs _PKG_* and PKG_*, so don't use variables
+   starting with that in any configure scripts.
+
+pkg-config 0.15
+===
+
+ - add PKG_CONFIG_LIBDIR for cross-compiling (David Schleef)
+ - add --libs-only-other/--cflags-only-other (Zack Rusin)
+ - apply man page fixes (Pter Breitenlohner)
+ - C portability fix (David Robins)
+ - fix to win32 build (Tor Lillqvist)

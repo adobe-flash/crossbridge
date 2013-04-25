@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: idirafter test
+Description: Dummy pkgconfig test package for testing pkgconfig
+Version: 1.0.0
+Requires:
+Libs: -lsimple
+Libs.private: -lm
+Cflags: -I/foo -idirafter -I/after -I/bar
