@@ -51,6 +51,10 @@ DisableInline("disable-inlining", cl::init(false),
   cl::desc("Do not run the inliner pass"));
 
 static cl::opt<bool>
+StripDebug("strip-debug",
+           cl::desc("Strip debugger symbol info from translation unit"));
+
+static cl::opt<bool>
 DisableGVNLoadPRE("disable-gvn-loadpre", cl::init(false),
   cl::desc("Do not run the GVN load PRE pass"));
 
@@ -356,9 +360,12 @@ bool LTOCodeGenerator::generateObjectFile(raw_ostream &out,
   Module* mergedModule = _linker.getModule();
 
   // if options were requested, set them
+#if 0 
+  //TODO MCANNIZZ
   if (!_codegenOptions.empty())
     cl::ParseCommandLineOptions(_codegenOptions.size(),
                                 const_cast<char **>(&_codegenOptions[0]));
+#endif
 
   // mark which symbols can not be internalized
   this->applyScopeRestrictions();
@@ -369,6 +376,9 @@ bool LTOCodeGenerator::generateObjectFile(raw_ostream &out,
   // Start off with a verification pass.
   passes.add(createVerifierPass());
 
+  // If the -strip-debug command line option was specified, do it.
+  if (StripDebug)
+    passes.add(createStripSymbolsPass(true));
   // Add an appropriate DataLayout instance for this module...
   passes.add(new DataLayout(*_target->getDataLayout()));
   passes.add(new TargetTransformInfo(_target->getScalarTargetTransformInfo(),

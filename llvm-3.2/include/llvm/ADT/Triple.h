@@ -44,6 +44,7 @@ public:
     UnknownArch,
 
     arm,     // ARM; arm, armv.*, xscale
+    avm2,    // Actionscript VM 2
     cellspu, // CellSPU: spu, cellspu
     hexagon, // Hexagon: hexagon
     mips,    // MIPS: mips, mipsallegrex

@@ -24,6 +24,18 @@
 #include "llvm/Support/Errno.h"
 #include "llvm/Support/Path.h"
 #include "llvm/Support/Program.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MemoryBuffer.h"
+#include "llvm/Support/system_error.h"
+#include "llvm/ADT/OwningPtr.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+char *SetFlasccSDKLocation(const char *);
+#ifdef __cplusplus
+}
+#endif
 
 #include <cerrno>
 #include <cstdlib>
@@ -38,6 +50,74 @@
 # define lseek _lseek
 # define read _read
 #endif
+
+bool showcmd = false;
+
+std::string runcmd(std::string cmd, std::vector<std::string> &args)
+{
+    std::string appPath = llvm::sys::Program::FindProgramByName(cmd).c_str();
+    llvm::sys::Path *ioredirects[3] = {NULL, NULL, NULL};
+    ioredirects[0] = new llvm::sys::Path();
+    ioredirects[1] = new llvm::sys::Path(std::string(llvm::sys::Path::GetTemporaryDirectory().c_str()) + "alctmp");
+    ioredirects[2] = new llvm::sys::Path(std::string(llvm::sys::Path::GetTemporaryDirectory().c_str()) + "alctmp");
+
+    // redirect stdout/stderr somewhere
+    ioredirects[1]->createTemporaryFileOnDisk();
+    ioredirects[2]->createTemporaryFileOnDisk();
+
+    char **argptrs = new char*[args.size()+2];
+    argptrs[0] = (char*)appPath.c_str();
+    argptrs[args.size()+1] = NULL;
+    for(unsigned int i=0; i<args.size(); i++) {
+        argptrs[1+i] = (char*)args[i].c_str();
+    }
+    std::string ErrMsg;
+    int result = llvm::sys::Program::ExecuteAndWait(llvm::sys::Path(appPath), (const char**)argptrs, NULL, (const llvm::sys::Path**)&ioredirects[0], 0, 0, &ErrMsg);
+
+    llvm::OwningPtr<llvm::MemoryBuffer> stdoutbuffer,stderrbuffer;
+    llvm::MemoryBuffer::getFile(ioredirects[1]->c_str(), stdoutbuffer);
+    llvm::MemoryBuffer::getFile(ioredirects[2]->c_str(), stderrbuffer);
+    std::string stdoutstring = stdoutbuffer->getBuffer();
+    std::string stderrstring = stderrbuffer->getBuffer();
+    ioredirects[1]->eraseFromDisk();
+    ioredirects[2]->eraseFromDisk();
+
+    if(result != 0) {
+        std::string argstring = "";
+        for(unsigned int i=0; i<args.size(); i++)
+            argstring += args[i] + " ";
+
+        llvm::report_fatal_error("Failed to run " + appPath + " with args: " + argstring + "\nError: " + ErrMsg + "\n" + stdoutstring + stderrstring);
+    }
+    
+    size_t p = stdoutstring.find_last_not_of(" \t\f\v\n\r");
+    if (p != std::string::npos)
+        stdoutstring.erase(p+1);
+    else
+        stdoutstring.clear();
+    
+    return stdoutstring;
+}
+
+std::string javapath()
+{
+  std::vector<std::string> args;
+  args.push_back("java");
+  return runcmd("which", args);
+}
+
+inline std::string winfriendlypath(std::string str)
+{
+#if defined(__CYGWIN__) || defined(__MINGW32__)
+    std::vector<std::string> args;
+    args.push_back("-at");
+    args.push_back("windows");
+    args.push_back(str);
+    return runcmd("cygpath", args);
+#else
+    return str;
+#endif
+}
 
 using namespace llvm;
 
@@ -66,6 +146,7 @@ namespace {
 
   lto_codegen_model output_type = LTO_CODEGEN_PIC_MODEL_STATIC;
   std::string output_name = "";
+  std::vector<std::string> optArgs, llcArgs;
   std::list<claimed_file> Modules;
   std::vector<sys::Path> Cleanup;
   lto_code_gen_t code_gen = NULL;
@@ -86,6 +167,7 @@ namespace options {
   // For example, "generate-api-file" and "as"options are for the plugin
   // use only and will not be passed.
   static std::vector<std::string> extra;
+  static bool codegen_opt = false, llc_opt = false, asc_opt = false;
 
   static void process_plugin_option(const char* opt_)
   {
@@ -95,6 +177,8 @@ namespace options {
 
     if (opt == "generate-api-file") {
       generate_api_file = true;
+    } else if (opt == "verbose") {
+      showcmd = true;
     } else if (opt.startswith("mcpu=")) {
       mcpu = opt.substr(strlen("mcpu="));
     } else if (opt.startswith("extra-library-path=")) {
@@ -103,6 +187,24 @@ namespace options {
       triple = opt.substr(strlen("mtriple="));
     } else if (opt.startswith("obj-path=")) {
       obj_path = opt.substr(strlen("obj-path="));
+    } else if (opt.startswith("lto-as3-1=")) {
+        llcArgs.push_back("-as3tmp1");
+        llcArgs.push_back(opt.substr(strlen("lto-as3-1=")).str());
+    } else if (opt.startswith("lto-as3-2=")) {
+        llcArgs.push_back("-as3tmp2");
+        llcArgs.push_back(opt.substr(strlen("lto-as3-2=")).str());
+    } else if (opt.startswith("jvmopt=")) {
+        llcArgs.push_back("-jvmopt");
+        llcArgs.push_back(opt.substr(strlen("jvmopt=")).str());
+    } else if (opt.startswith("ascopt=")) {
+        llcArgs.push_back("-ascopt");
+        llcArgs.push_back(opt.substr(strlen("ascopt=")).str());
+    } else if (opt.startswith("ascopt")) {
+       asc_opt = true;
+    } else if (opt == "codegen-opt") {
+      codegen_opt = true;
+    } else if (opt == "llc-opt") {
+      llc_opt = true;
     } else if (opt == "emit-llvm") {
       generate_bc_file = BC_ONLY;
     } else if (opt == "also-emit-llvm") {
@@ -117,8 +219,17 @@ namespace options {
         bc_path = path;
       }
     } else {
-      // Save this option to pass to the code generator.
-      extra.push_back(opt);
+      if(codegen_opt) {
+        codegen_opt = false;
+        optArgs.push_back(opt.str());
+      } else if(llc_opt) {
+        llc_opt = false;
+        llcArgs.push_back(opt.str());
+      } else if(asc_opt) {
+        asc_opt = false;
+        llcArgs.push_back("-ascopt");
+        llcArgs.push_back(opt.str());
+      }
     }
   }
 }
@@ -409,26 +520,51 @@ static ld_plugin_status all_symbols_read_hook(void) {
     }
   }
 
-  if (options::generate_bc_file != options::BC_NO) {
-    std::string path;
-    if (options::generate_bc_file == options::BC_ONLY)
-      path = output_name;
-    else if (!options::bc_path.empty())
-      path = options::bc_path;
-    else
-      path = output_name + ".bc";
-    bool err = lto_codegen_write_merged_modules(code_gen, path.c_str());
-    if (err)
-      (*message)(LDPL_FATAL, "Failed to write the output file.");
-    if (options::generate_bc_file == options::BC_ONLY)
-      exit(0);
-  }
+  std::string ErrMsg;
+
   const char *objPath;
-  if (lto_codegen_compile_to_file(code_gen, &objPath)) {
-    (*message)(LDPL_ERROR, "Could not produce a combined object file\n");
+  sys::Path uniqueObjPath("/tmp/llvmgold.o");
+  if (!options::obj_path.empty()) {
+    objPath = options::obj_path.c_str();
+  } else {
+    if (uniqueObjPath.createTemporaryFileOnDisk(false, &ErrMsg)) {
+      (*message)(LDPL_ERROR, "%s", ErrMsg.c_str());
+      return LDPS_ERR;
+    }
+    objPath = uniqueObjPath.c_str();
   }
 
+  std::string bcpath;
+  if (options::generate_bc_file == options::BC_ONLY)
+      bcpath = output_name;
+  else if (!options::bc_path.empty())
+      bcpath = options::bc_path;
+  else
+      bcpath = std::string(objPath) + ".bc";
+
+  bool err = lto_codegen_write_merged_modules(code_gen, bcpath.c_str());
+  if (err)
+      (*message)(LDPL_FATAL, "Failed to write the output file.");
+  if (options::generate_bc_file == options::BC_ONLY)
+      exit(0);
+
+  std::string sdk = SetFlasccSDKLocation("/../../../../../../..");
+
+  optArgs.push_back("-O3");
+  optArgs.push_back(winfriendlypath(bcpath));
+  optArgs.push_back("-o");
+  optArgs.push_back(winfriendlypath(bcpath));
+  runcmd(sdk + "/usr/bin/opt", optArgs);
+    
+  llcArgs.push_back("-jvm=" + winfriendlypath(javapath()));
+  llcArgs.push_back("-filetype=obj");
+  llcArgs.push_back(winfriendlypath(bcpath));
+  llcArgs.push_back("-o");
+  llcArgs.push_back(winfriendlypath(objPath));
+  runcmd(sdk + "/usr/bin/llc", llcArgs);
+
   lto_codegen_dispose(code_gen);
+  code_gen = NULL;
   for (std::list<claimed_file>::iterator I = Modules.begin(),
          E = Modules.end(); I != E; ++I) {
     for (unsigned i = 0; i != I->syms.size(); ++i) {
@@ -437,11 +573,14 @@ static ld_plugin_status all_symbols_read_hook(void) {
     }
   }
 
+#if 0
+  // TODO MCANNZZ
   if ((*add_input_file)(objPath) != LDPS_OK) {
     (*message)(LDPL_ERROR, "Unable to add .o file to the link.");
     (*message)(LDPL_ERROR, "File left behind in: %s", objPath);
     return LDPS_ERR;
   }
+#endif
 
   if (!options::extra_library_path.empty() &&
       set_extra_library_path(options::extra_library_path.c_str()) != LDPS_OK) {

@@ -7,6 +7,7 @@ add_llvm_library(LLVMCodeGen
   CallingConvLower.cpp
   CodeGen.cpp
   CodePlacementOpt.cpp
+  ConflictGraph.cpp # SEP
   CriticalAntiDepBreaker.cpp
   DeadMachineInstructionElim.cpp
   DFAPacketizer.cpp
@@ -107,6 +108,7 @@ add_llvm_library(LLVMCodeGen
   TwoAddressInstructionPass.cpp
   UnreachableBlockElim.cpp
   VirtRegMap.cpp
+  VirtRegReduction.cpp # SEP
   )
 
 add_dependencies(LLVMCodeGen intrinsics_gen)

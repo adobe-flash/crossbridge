@@ -53,7 +53,7 @@ ${name} ignored.")
     add_library( ${name} ${libkind} ${ALL_FILES} )
     set_target_properties( ${name} PROPERTIES PREFIX "" )
 
-    llvm_config( ${name} ${LLVM_LINK_COMPONENTS} )
+    #llvm_config( ${name} ${LLVM_LINK_COMPONENTS} )
     link_system_libs( ${name} )
 
     if (APPLE)
@@ -61,6 +61,11 @@ ${name} ignored.")
       set_target_properties(${name} PROPERTIES
         LINK_FLAGS "-Wl,-flat_namespace -Wl,-undefined -Wl,suppress")
     endif()
+
+    if ( LLVM_CYGWINMAC )
+      set_target_properties(${name} PROPERTIES
+        LINK_FLAGS "-shared")
+    endif ()
 
     if( EXCLUDE_FROM_ALL )
       set_target_properties( ${name} PROPERTIES EXCLUDE_FROM_ALL ON)
@@ -90,6 +95,13 @@ macro(add_llvm_executable name)
   link_system_libs( ${name} )
 endmacro(add_llvm_executable name)
 
+macro(llvm_target_link_libraries name)
+  if( CYGWIN OR LLVM_CYGWINMAC )
+    target_link_libraries(${name} -Wl,--start-group ${ARGN} -Wl,--end-group )
+  else()
+    target_link_libraries(${name} ${ARGN} )
+  endif()
+endmacro(llvm_target_link_libraries name)
 
 macro(add_llvm_tool name)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${LLVM_TOOLS_BINARY_DIR})

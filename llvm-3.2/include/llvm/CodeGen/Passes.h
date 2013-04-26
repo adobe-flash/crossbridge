@@ -505,6 +505,8 @@ namespace llvm {
   /// UnpackMachineBundles - This pass unpack machine instruction bundles.
   extern char &UnpackMachineBundlesID;
 
+  // SEP virtual register reduction pass
+  FunctionPass *createVirtRegReductionPass();
   /// FinalizeMachineBundles - This pass finalize machine instruction
   /// bundles (created earlier, e.g. during pre-RA scheduling).
   extern char &FinalizeMachineBundlesID;

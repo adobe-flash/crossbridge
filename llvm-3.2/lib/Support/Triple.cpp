@@ -20,6 +20,7 @@ const char *Triple::getArchTypeName(ArchType Kind) {
   case UnknownArch: return "unknown";
 
   case arm:     return "arm";
+  case avm2:    return "avm2";
   case cellspu: return "cellspu";
   case hexagon: return "hexagon";
   case mips:    return "mips";
@@ -53,6 +54,8 @@ const char *Triple::getArchTypePrefix(ArchType Kind) {
   switch (Kind) {
   default:
     return 0;
+
+  case avm2:    return "avm2";
 
   case arm:
   case thumb:   return "arm";
@@ -155,6 +158,7 @@ const char *Triple::getEnvironmentTypeName(EnvironmentType Kind) {
 Triple::ArchType Triple::getArchTypeForLLVMName(StringRef Name) {
   return StringSwitch<Triple::ArchType>(Name)
     .Case("arm", arm)
+    .Case("avm2", avm2)
     .Case("cellspu", cellspu)
     .Case("mips", mips)
     .Case("mipsel", mipsel)
@@ -195,6 +199,7 @@ const char *Triple::getArchNameForAssembler() {
     .Case("powerpc64", "ppc64")
     .Cases("mblaze", "microblaze", "mblaze")
     .Case("arm", "arm")
+    .Case("avm2", "avm2")
     .Cases("armv4t", "thumbv4t", "armv4t")
     .Cases("armv5", "armv5e", "thumbv5", "thumbv5e", "armv5")
     .Cases("armv6", "thumbv6", "armv6")
@@ -218,6 +223,7 @@ static Triple::ArchType parseArch(StringRef ArchName) {
     .Case("powerpc", Triple::ppc)
     .Cases("powerpc64", "ppu", Triple::ppc64)
     .Case("mblaze", Triple::mblaze)
+    .Case("avm2", Triple::avm2)
     .Cases("arm", "xscale", Triple::arm)
     // FIXME: It would be good to replace these with explicit names for all the
     // various suffixes supported.
@@ -678,6 +684,7 @@ static unsigned getArchPointerBitWidth(llvm::Triple::ArchType Arch) {
   case llvm::Triple::x86:
   case llvm::Triple::xcore:
   case llvm::Triple::spir:
+  case llvm::Triple::avm2:
     return 32;
 
   case llvm::Triple::mips64:
@@ -729,6 +736,7 @@ Triple Triple::get32BitArchVariant() const {
   case Triple::thumb:
   case Triple::x86:
   case Triple::xcore:
+  case Triple::avm2:
     // Already 32-bit.
     break;
 
@@ -758,6 +766,7 @@ Triple Triple::get64BitArchVariant() const {
   case Triple::tce:
   case Triple::thumb:
   case Triple::xcore:
+  case Triple::avm2:
     T.setArch(UnknownArch);
     break;
 

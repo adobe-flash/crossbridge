@@ -875,8 +875,8 @@ bool LTOModule::parseSymbols(std::string &errMsg) {
   }
 
   // add asm globals
-  if (addAsmGlobalSymbols(errMsg))
-    return true;
+  //if (addAsmGlobalSymbols(errMsg))
+  //  return true;
 
   // add aliases
   for (Module::alias_iterator a = _module->alias_begin(),

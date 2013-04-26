@@ -288,7 +288,6 @@ protected: // Can only create subclasses.
                     StringRef CPU, StringRef FS, TargetOptions Options,
                     Reloc::Model RM, CodeModel::Model CM,
                     CodeGenOpt::Level OL);
-
 public:
   /// createPassConfig - Create a pass configuration object to be used by
   /// addPassToEmitX methods for generating a pipeline of CodeGen passes.

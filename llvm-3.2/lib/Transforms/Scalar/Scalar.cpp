@@ -50,6 +50,7 @@ void llvm::initializeScalarOpts(PassRegistry &Registry) {
   initializeLowerAtomicPass(Registry);
   initializeLowerExpectIntrinsicPass(Registry);
   initializeMemCpyOptPass(Registry);
+  initializePhiToMemPass(Registry);
   initializeObjCARCAliasAnalysisPass(Registry);
   initializeObjCARCAPElimPass(Registry);
   initializeObjCARCExpandPass(Registry);

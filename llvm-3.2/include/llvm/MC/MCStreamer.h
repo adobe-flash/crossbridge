@@ -540,6 +540,10 @@ namespace llvm {
     /// indicated by the hasRawTextSupport() predicate.  By default this aborts.
     virtual void EmitRawText(StringRef String);
     void EmitRawText(const Twine &String);
+    // AVM2 Specific
+    virtual void EmitRawTextAsm(StringRef String);
+    void EmitRawTextAsm(const Twine &String);
+    // AVM2 Specific
 
     /// ARM-related methods.
     /// FIXME: Eventually we should have some "target MC streamer" and move

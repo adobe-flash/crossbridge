@@ -1370,6 +1370,12 @@ void DwarfDebug::beginFunction(const MachineFunction *MF) {
                MOE = MI->operands_end(); MOI != MOE; ++MOI) {
           if (!MOI->isReg() || !MOI->isDef() || !MOI->getReg())
             continue;
+
+          // TODO: this is really hacky; need to figure out why the
+          // register number is sometimes invalid.
+          if (TRI->getNumRegs() < MOI->getReg())
+            continue;
+
           for (MCRegAliasIterator AI(MOI->getReg(), TRI, true);
                AI.isValid(); ++AI) {
             unsigned Reg = *AI;
