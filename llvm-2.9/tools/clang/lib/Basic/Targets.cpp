@@ -1395,6 +1395,16 @@ public:
 } // end anonymous namespace
 
 namespace {
+class AVM2TargetInfo : public X86_32TargetInfo {
+public:
+  AVM2TargetInfo(const std::string& triple) : X86_32TargetInfo(triple) {
+    DoubleAlign = LongDoubleAlign = 64;
+    LongDoubleWidth = 64;
+  }
+};
+} // end anonymous namespace
+
+namespace {
 class OpenBSDI386TargetInfo : public OpenBSDTargetInfo<X86_32TargetInfo> {
 public:
   OpenBSDI386TargetInfo(const std::string& triple) :
