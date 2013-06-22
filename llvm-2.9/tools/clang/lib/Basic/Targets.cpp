@@ -2588,6 +2588,8 @@ static TargetInfo *AllocateTarget(const std::string &T) {
   default:
     return NULL;
 
+  case llvm::Triple::avm2:
+    return new FreeBSDTargetInfo<AVM2TargetInfo>(T);
   case llvm::Triple::arm:
   case llvm::Triple::thumb:
     switch (os) {
