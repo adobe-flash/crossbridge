@@ -80,7 +80,7 @@ extern void kfree(void *ptr, ...);
 #define tvtohz ktvtohz
 #define thread_lock(X) /*thread_lock*/
 #define thread_unlock(X) /*thread_unlock*/
-#define copyin(A, B, C) (memcpy((A), (B), (C)), 0)
+#define copyin(A, B, C) (memcpy((B), (A), (C)), 0)
 #define fuword(A) (*(volatile u_long *)(A))
 #define fuword32(A) (*(volatile uint32_t *)(A))
 #define suword(A, B) (((*(volatile u_long *)(A)) = (B)), 0)

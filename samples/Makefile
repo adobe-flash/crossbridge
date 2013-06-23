@@ -14,7 +14,6 @@ clean:
 	@cd 08_GDB && make clean
 	@cd 09_Pthreads && make clean
 	@cd 10_MessageChannel && make clean
-	@cd 11_OpenMP && make clean
 	@cd 12_Stage3D && make clean
 	
 	@cd Example_Lua && make clean
@@ -43,8 +42,6 @@ T09:
 	cd 09_Pthreads && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 T10:
 	cd 10_MessageChannel && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-T11:
-	cd 11_OpenMP && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 T12:
 	cd 12_Stage3D && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 
@@ -60,7 +57,7 @@ Example_Box2D:
 	@cd Example_Box2D && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 
 
-allsamples: T01 T02 T03 T04 T05 T06 T07 T08 T09 T10 T11 T12
+allsamples: T01 T02 T03 T04 T05 T06 T07 T08 T09 T10 T12
 	echo "done!"
 
 examples: Example_Lua Example_BulletPhysicsLibrary Example_libqrencode Example_Quake1 Example_Box2D

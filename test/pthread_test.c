@@ -78,8 +78,10 @@ static void test_sync()
   int i;
   pthread_t threads[THREADS];
 
-  for(i = 0; i < THREADS; i++)
+  for(i = 0; i < THREADS; i++) {
+    printf("\tcreate: %d\n", i);
     AZR(pthread_create(threads + i, NULL, test_sync_tp, &counter));
+  }
   for(i = 0; i < THREADS; i++)
     AZR(pthread_join(threads[i], NULL));
   printf("\tcounter: %d\n", counter);
@@ -357,7 +359,7 @@ int main()
     return 1;
   }	
 
-  signal(SIGUSR1, sigusr1);
+  //signal(SIGUSR1, sigusr1);
   printf("testing __sync\n");
   test_sync(); // test __sync stuff
   printf("testing mutex\n");

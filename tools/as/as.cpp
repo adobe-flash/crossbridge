@@ -289,6 +289,9 @@ int main(int argc, char **argv)
   bool useLegacyAsc = false;
   FILE *input = NULL;
   FILE *output = NULL;
+  std::vector<std::string> jargs;
+
+  jargs.push_back("java");
 
   for(int i = 1; i < argc; i++)
   {
@@ -313,6 +316,12 @@ int main(int argc, char **argv)
       targetPlayer = true;
     else if(arg == "--use-legacy-asc")
       useLegacyAsc = true;
+    else if(arg == "--jvmopt")
+    {
+      if(i >= argc - 1)
+        error("--jvmopt with no parameter");
+      jargs.push_back(argv[++i]);
+    }
     else
     {
       if(input)
@@ -393,12 +402,12 @@ int main(int argc, char **argv)
   std::string libPath = SetFlasccSDKLocation("/../../");
   libPath = unipath(libPath + "/usr/lib");
 
-  std::vector<std::string> jargs;
-
-  jargs.push_back("java");
-  jargs.push_back("-Xms512M");
-  jargs.push_back("-Xmx2048M");
-  jargs.push_back("-ea");
+  if(jargs.size() == 1) // default is 1 arg (just "java")
+  {
+    jargs.push_back("-Xms512M");
+    jargs.push_back("-Xmx2048M");
+    jargs.push_back("-ea");
+  }
   if(useLegacyAsc)
   {
     jargs.push_back("-classpath");

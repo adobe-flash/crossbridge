@@ -146,9 +146,17 @@ static long start_time;
 
 static int flag_macro_alternate;
 
-flag_target_player = 0;
+int flag_target_player = 0;
 
-flag_use_legacy_asc = 0;
+int flag_use_legacy_asc = 0;
+
+static int jvmopt_count = 0;
+
+static struct JVMOptLink
+{
+  struct JVMOptLink *next;
+  const char *opt;
+} *jvmopt_head = NULL;
 
 #ifdef USE_EMULATIONS
 #define EMULATION_ENVIRON "AS_EMULATION"
@@ -477,7 +485,8 @@ parse_args (int * pargc, char *** pargv)
       OPTION_COMPRESS_DEBUG,
       OPTION_NOCOMPRESS_DEBUG,
       OPTION_AVM2_TARGET_PLAYER,
-      OPTION_AVM2_USE_LEGACY_ASC
+      OPTION_AVM2_USE_LEGACY_ASC,
+      OPTION_AVM2_JVMOPT
     /* When you add options here, check that they do
        not collide with OPTION_MD_BASE.  See as.h.  */
     };
@@ -548,6 +557,7 @@ parse_args (int * pargc, char *** pargv)
     ,{"warn", no_argument, NULL, OPTION_WARN}
     ,{"target-player", no_argument, NULL, OPTION_AVM2_TARGET_PLAYER}
     ,{"use-legacy-asc", no_argument, NULL, OPTION_AVM2_USE_LEGACY_ASC}
+    ,{"jvmopt", required_argument, NULL, OPTION_AVM2_JVMOPT}
   };
 
   /* Construct the option lists from the standard list and the target
@@ -832,6 +842,15 @@ This program has absolutely no warranty.\n"));
 	  flag_use_legacy_asc = 1;
 	  break;
 
+	case OPTION_AVM2_JVMOPT:
+	{
+	  struct JVMOptLink *optLink = (struct JVMOptLink *)malloc(sizeof(struct JVMOptLink));
+	  optLink->next = jvmopt_head;
+	  optLink->opt = xstrdup(optarg);
+	  jvmopt_head = optLink;
+	  jvmopt_count++;
+	  break;
+	}
 	case OPTION_WARN:
 	  flag_no_warnings = 0;
 	  flag_fatal_warnings = 0;
@@ -1232,17 +1251,26 @@ main (int argc, char ** argv)
 
   char asloc[PATH_MAX];
   sprintf(&asloc[0], "%s/usr/bin/avm2-as", sdkloc);
-  char* args[7];
+  int argCount = 7 + 2 * jvmopt_count;
+  char **args = malloc(sizeof(char *) * argCount);
   int argNo = 0;
+  int n;
 
   args[argNo++] = asloc;
+  for(n = jvmopt_count - 1; n >= 0; n--)
+  {
+    args[argNo + n * 2] = xstrdup("--jvmopt");
+    args[argNo + n * 2 + 1] = jvmopt_head->opt;
+    jvmopt_head = jvmopt_head->next;
+  }
+  argNo += 2 * jvmopt_count;
   args[argNo++] = 0; // replace with input file
-  args[argNo++] = strdup("-o");
+  args[argNo++] = xstrdup("-o");
   args[argNo++] = out_file_name;
   if(flag_target_player)
-    args[argNo++] = strdup("--target-player");
+    args[argNo++] = xstrdup("--target-player");
   if(flag_use_legacy_asc)
-    args[argNo++] = strdup("--use-legacy-asc");
+    args[argNo++] = xstrdup("--use-legacy-asc");
   args[argNo++] = NULL;
 
   /* Skip argv[0].  */
@@ -1259,6 +1287,7 @@ main (int argc, char ** argv)
   }
 
   runcmd(args);
+  free(args);
   xexit (EXIT_SUCCESS);
 // AVM2 specific
 

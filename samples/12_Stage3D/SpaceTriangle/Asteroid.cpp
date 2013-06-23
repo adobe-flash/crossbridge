@@ -33,7 +33,7 @@ namespace SpaceTriangle
 		pos = _pos;
 
 		i3dbuffer = ctx3d->createIndexBuffer(18);
-	    int indicies[] = {
+	    uint16_t indicies[] = {
 	    	0,2,1,
 	    	0,2,3,
 	    	0,3,4,

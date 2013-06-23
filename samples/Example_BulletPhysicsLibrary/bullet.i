@@ -22,6 +22,7 @@
 #include "btBulletDynamicsCommon.h"
 #include "btBulletCollisionCommon.h"
 #include "BulletCollision/CollisionDispatch/btSphereBoxCollisionAlgorithm.h"
+#include "BulletDynamics/ConstraintSolver/btConstraintSolver.h"
 #ifdef USE_PTHREADS
 #include "BulletMultiThreaded/PosixThreadSupport.h"
 #include "BulletMultiThreaded/btThreadSupportInterface.h"
@@ -74,6 +75,17 @@ void positionAndRotateMesh()
 	AS3_CopyScalarToVar(mesh.rotationX, eulerAngles.getX());
 	AS3_CopyScalarToVar(mesh.rotationY, eulerAngles.getY());
 	AS3_CopyScalarToVar(mesh.rotationZ, eulerAngles.getZ());
+}
+
+//btRigidBodyConstructionInfo.create(mass, ms.swigCPtr, shape.swigCPtr, inertia.swigCPtr)
+btRigidBody* createRigidBody(btScalar mass, btDefaultMotionState *ms, btCollisionShape *shape, 
+								btVector3 *inertia, btScalar restitution, btScalar friction)
+{
+	btRigidBody::btRigidBodyConstructionInfo rbci = btRigidBody::btRigidBodyConstructionInfo(mass, ms, shape, *inertia);
+	rbci.m_restitution = restitution;
+	rbci.m_friction = friction;
+
+	return new btRigidBody(rbci);
 }
 
 #ifdef USE_PTHREADS
@@ -172,61 +184,6 @@ btParallelConstraintSolver* createThreadedSolver(int numTasks)
 %include "BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h"
 %include "BulletDynamics/Dynamics/btRigidBody.h"
 
-%{
-typedef btRigidBody::btRigidBodyConstructionInfo btRigidBodyConstructionInfo;
-%}
-// This is necessary because swig can't handle the nested struct
-struct	btRigidBodyConstructionInfo
-{
-	btScalar			m_mass;
-
-	///When a motionState is provided, the rigid body will initialize its world transform from the motion state
-	///In this case, m_startWorldTransform is ignored.
-	btMotionState*		m_motionState;
-	btTransform	m_startWorldTransform;
-
-	btCollisionShape*	m_collisionShape;
-	btVector3			m_localInertia;
-	btScalar			m_linearDamping;
-	btScalar			m_angularDamping;
-
-	///best simulation results when friction is non-zero
-	btScalar			m_friction;
-	///best simulation results using zero restitution.
-	btScalar			m_restitution;
-
-	btScalar			m_linearSleepingThreshold;
-	btScalar			m_angularSleepingThreshold;
-
-	//Additional damping can help avoiding lowpass jitter motion, help stability for ragdolls etc.
-	//Such damping is undesirable, so once the overall simulation quality of the rigid body dynamics system has improved, this should become obsolete
-	bool				m_additionalDamping;
-	btScalar			m_additionalDampingFactor;
-	btScalar			m_additionalLinearDampingThresholdSqr;
-	btScalar			m_additionalAngularDampingThresholdSqr;
-	btScalar			m_additionalAngularDampingFactor;
-
-	btRigidBodyConstructionInfo(	btScalar mass, btMotionState* motionState, btCollisionShape* collisionShape, const btVector3& localInertia=btVector3(0,0,0)):
-	m_mass(mass),
-		m_motionState(motionState),
-		m_collisionShape(collisionShape),
-		m_localInertia(localInertia),
-		m_linearDamping(btScalar(0.)),
-		m_angularDamping(btScalar(0.)),
-		m_friction(btScalar(0.5)),
-		m_restitution(btScalar(0.)),
-		m_linearSleepingThreshold(btScalar(0.8)),
-		m_angularSleepingThreshold(btScalar(1.f)),
-		m_additionalDamping(false),
-		m_additionalDampingFactor(btScalar(0.005)),
-		m_additionalLinearDampingThresholdSqr(btScalar(0.01)),
-		m_additionalAngularDampingThresholdSqr(btScalar(0.01)),
-		m_additionalAngularDampingFactor(btScalar(0.01))
-	{
-		m_startWorldTransform.setIdentity();
-	}
-};
-
 // Threading!
 #ifdef USE_PTHREADS
 %include "BulletMultiThreaded/PosixThreadSupport.h"
@@ -235,37 +192,9 @@ struct	btRigidBodyConstructionInfo
 %include "BulletMultiThreaded/btParallelConstraintSolver.h"
 %include "BulletMultiThreaded/SpuNarrowPhaseCollisionTask/SpuGatheringCollisionTask.h"
 
-%{
-typedef PosixThreadSupport::ThreadConstructionInfo ThreadConstructionInfo;
-%}
-
-
-struct	ThreadConstructionInfo
-{
-	ThreadConstructionInfo(const char* uniqueName,
-								PosixThreadFunc userThreadFunc,
-								PosixlsMemorySetupFunc	lsMemoryFunc,
-								int numThreads=1,
-								int threadStackSize=65535
-								)
-								:m_uniqueName(uniqueName),
-								m_userThreadFunc(userThreadFunc),
-								m_lsMemoryFunc(lsMemoryFunc),
-								m_numThreads(numThreads),
-								m_threadStackSize(threadStackSize)
-	{
-
-	}
-
-	const char*					m_uniqueName;
-	PosixThreadFunc			m_userThreadFunc;
-	PosixlsMemorySetupFunc	m_lsMemoryFunc;
-	int						m_numThreads;
-	int						m_threadStackSize;
-
-};
-
-
 SpuGatheringCollisionDispatcher* createThreadedDispatcher(btDefaultCollisionConfiguration *collisionConfig, int numTasks);
 btParallelConstraintSolver* createThreadedSolver(int numTasks);
 #endif
+
+btRigidBody* createRigidBody(btScalar mass, btDefaultMotionState *ms, btCollisionShape *shape, 
+								btVector3 *inertia, btScalar restitution, btScalar friction);
