@@ -1,0 +1,1003 @@
+%%BeginResource: procset LoutFigPrependGraphic
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                    %
+%  PostScript @SysPrependGraphic file for @Fig  Jeffrey H. Kingston  %
+%  Version 2.0 (includes CIRCUM label)                 January 1992  %
+%                                                                    %
+%  To assist in avoiding name clashes, the names of all symbols      %
+%  defined here begin with "lfig".  However, this is not feasible    %
+%  with user-defined labels and some labels used by users.           %
+%                                                                    %
+%  <point>      is two numbers, a point.                             %
+%  <length>     is one number, a length                              %
+%  <angle>      is one number, an angle in degrees                   %
+%  <dashlength> is one number, the preferred length of a dash        %
+%                                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+errordict begin
+   /handleerror
+   {
+      {  /Times-Roman findfont 8 pt scalefont setfont
+	 0 setgray 4 pt 4 pt moveto
+	 $error /errorname get
+	 dup lfigdict exch known
+	 { lfigdict exch get }
+	 { 30 string cvs } ifelse
+	 show
+	 (  Command: ) show
+	 $error /command get 30 string cvs show
+      } stopped {} if
+      showpage stop
+   } def
+end
+
+% concat strings: <string> <string> lfigconcat <string>
+% must be defined outside lfigdict since used in lfigpromotelabels
+/lfigconcat
+{ 2 copy length exch length add string
+  dup 0 4 index putinterval
+  dup 3 index length 3 index putinterval
+  3 1 roll pop pop
+} def
+
+% <string> lfigdebugprint -
+% must be defined outside lfigdict since used in arbitrary places
+% /lfigdebugprint
+% { print
+%   (;  operand stack:\n) print
+%   count copy
+%   count 2 idiv
+%   { ==
+%     (\n) print
+%   } repeat
+%   (\n) print
+% } def
+
+/lfigdict 120 dict def
+lfigdict begin
+
+% error messages
+/dictfull (dictfull error:  too many labels?) def
+/dictstackoverflow (dictstackoverflow error:  labels nested too deeply?) def
+/execstackoverflow (execstackoverflow error:  figure nested too deeply?) def
+/limitcheck (limitcheck error:  figure nested too deeply or too large?) def
+/syntaxerror (syntaxerror error:  syntax error in text of figure?) def
+/typecheck (typecheck error:  syntax error in text of figure?) def
+/undefined (undefined error:  unknown or misspelt label?) def
+/VMError (VMError error:  run out of memory?) def
+
+% push pi onto stack:  - lfigpi <num>
+/lfigpi 3.14159 def
+
+% arc directions
+/clockwise     false def
+/anticlockwise true  def
+
+% maximum of two numbers:  <num> <num> lfigmax <num>
+/lfigmax { 2 copy gt { pop } { exch pop } ifelse } def
+
+% minimum of two numbers:  <num> <num> lfigmin <num>
+/lfigmin { 2 copy lt { pop } { exch pop } ifelse } def
+
+% add two points:  <point> <point> lfigpadd <point>
+/lfigpadd { exch 3 1 roll add 3 1 roll add exch } def
+
+% subtract first point from second:  <point> <point> lfigpsub <point>
+/lfigpsub { 3 2 roll sub 3 1 roll exch sub exch } def
+
+% max two points:  <point> <point> lfigpmax <point>
+/lfigpmax { exch 3 1 roll lfigmax 3 1 roll lfigmax exch } def
+
+% min two points:  <point> <point> lfigpmin <point>
+/lfigpmin { exch 3 1 roll lfigmin 3 1 roll lfigmin exch } def
+
+% scalar multiplication: <point> <num> lfigpmul <point>
+/lfigpmul { dup 3 1 roll mul 3 1 roll mul exch } def
+
+% point at angle and distance:  <point> <length> <angle> lfigatangle <point>
+/lfigatangle { 2 copy cos mul 3 1 roll sin mul lfigpadd } def
+
+% angle from one point to another:  <point> <point> lfigangle <angle>
+/lfigangle { lfigpsub 2 copy 0 eq exch 0 eq and {pop} {exch atan} ifelse } def
+
+% distance between two points:  <point> <point> lfigdistance <length>
+/lfigdistance { lfigpsub dup mul exch dup mul add sqrt } def
+
+% difference in x coords: <point> <point> lfigxdistance <length>
+/lfigxdistance { pop 3 1 roll pop sub } def
+
+%difference in y coords: <point> <point> lfigydistance <length>
+/lfigydistance { 3 1 roll pop sub exch pop } def
+
+% stroke a solid line:  <length> <dashlength> lfigsolid -
+/lfigsolid
+{  pop pop [] 0 setdash stroke
+} def
+
+% stroke a lfigdashed line:   <length> <dashlength> lfigdashed -
+/lfigdashed
+{  2 copy div 2 le 1 index 0 le or
+   {  exch pop 1 pt lfigmax [ exch dup ] 0 setdash }
+   {  dup [ exch 4 2 roll 2 copy div
+      1 sub 2 div ceiling dup 4 1 roll
+      1 add mul sub exch div ] 0 setdash
+   } ifelse stroke
+} def
+
+% stroke a lfigcdashed line:  <length> <dashlength> lfigcdashed -
+/lfigcdashed
+{  2 copy le 1 index 0 le or
+   { exch pop 1 pt lfigmax [ exch dup ] dup 0 get 2 div setdash }
+   { dup [ 4 2 roll exch 2 copy exch div
+     2 div ceiling div 1 index sub
+     ] exch 2 div setdash
+   } ifelse stroke
+} def
+
+% stroke a dotted line:  <length> <dashlength> lfigdotted -
+/lfigdotted
+{  2 copy le 1 index 0 le or
+   { exch pop 1 pt lfigmax [ exch 0 exch ] 0 setdash }
+   { 1 index exch div ceiling div
+     [ 0 3 2 roll ] 0 setdash
+   } ifelse stroke
+} def
+
+% stroke a noline line:  <length> <dashlength> lfignoline -
+/lfignoline
+{ pop pop
+} def
+
+% painting (i.e. filling): - lfigwhite - (etc.)
+/lfignopaint		{			       } def
+/lfignochange		{ 			  fill } def
+/lfigdarkblue		{ 0.0 0.0 0.5 setrgbcolor fill } def
+/lfigblue		{ 0.0 0.0 1.0 setrgbcolor fill } def
+/lfiglightblue		{ 0.5 0.5 1.0 setrgbcolor fill } def
+/lfigdarkgreen		{ 0.0 0.5 0.0 setrgbcolor fill } def
+/lfiggreen		{ 0.0 1.0 0.0 setrgbcolor fill } def
+/lfiglightgreen		{ 0.5 1.0 0.5 setrgbcolor fill } def
+/lfigdarkred		{ 0.5 0.0 0.0 setrgbcolor fill } def
+/lfigred		{ 1.0 0.0 0.0 setrgbcolor fill } def
+/lfiglightred		{ 1.0 0.5 0.5 setrgbcolor fill } def
+/lfigdarkcyan		{ 0.0 0.5 0.5 setrgbcolor fill } def
+/lfigcyan		{ 0.0 1.0 1.0 setrgbcolor fill } def
+/lfiglightcyan		{ 0.5 1.0 1.0 setrgbcolor fill } def
+/lfigdarkmagenta	{ 0.5 0.0 0.5 setrgbcolor fill } def
+/lfigmagenta		{ 1.0 0.0 1.0 setrgbcolor fill } def
+/lfiglightmagenta	{ 1.0 0.5 1.0 setrgbcolor fill } def
+/lfigdarkyellow		{ 0.5 0.5 0.0 setrgbcolor fill } def
+/lfigyellow		{ 1.0 1.0 0.0 setrgbcolor fill } def
+/lfiglightyellow	{ 1.0 1.0 0.5 setrgbcolor fill } def
+/lfigdarkgray		{ 0.2 0.2 0.2 setrgbcolor fill } def
+/lfiggray		{ 0.5 0.5 0.5 setrgbcolor fill } def
+/lfiglightgray		{ 0.8 0.8 0.8 setrgbcolor fill } def
+/lfigdarkgrey		{ 0.2 0.2 0.2 setrgbcolor fill } def
+/lfiggrey		{ 0.5 0.5 0.5 setrgbcolor fill } def
+/lfiglightgrey		{ 0.8 0.8 0.8 setrgbcolor fill } def
+/lfigblack		{ 0.0 0.0 0.0 setrgbcolor fill } def
+/lfigwhite		{ 1.0 1.0 1.0 setrgbcolor fill } def
+
+% line caps (and joins, not currently used)
+/lfigbutt       0 def
+/lfiground      1 def
+/lfigprojecting 2 def
+/lfigmiter      0 def
+/lfigbevel      2 def
+
+% shape and labels of the @Box symbol
+/lfigbox
+{
+   0     0     /SW  lfigpointdef
+   xsize 0     /SE  lfigpointdef
+   xsize ysize /NE  lfigpointdef
+   0     ysize /NW  lfigpointdef
+   SE 0.5 lfigpmul /S   lfigpointdef
+   NW 0.5 lfigpmul /W   lfigpointdef
+   W SE lfigpadd   /E   lfigpointdef
+   S NW lfigpadd   /N   lfigpointdef
+   NE 0.5 lfigpmul /CTR lfigpointdef
+   [ CTR NE lfigpsub /lfigboxcircum cvx ] lfigcircumdef
+   SW SE NE NW SW
+} def
+
+% shape and labels of the @CurveBox symbol
+/lfigcurvebox
+{
+
+   xsize 0.5 mul	ysize 0.5 mul	/CTR lfigpointdef
+   xsize 0.5 mul	0		/S   lfigpointdef
+   xsize		ysize 0.5 mul	/E   lfigpointdef
+   xsize 0.5 mul	ysize		/N   lfigpointdef
+   0			ysize 0.5 mul	/W   lfigpointdef
+
+   xmark 0.293 mul		xmark 0.293 mul		  /SW  lfigpointdef
+   xsize xmark 0.293 mul sub	xmark 0.293 mul		  /SE  lfigpointdef
+   xsize xmark 0.293 mul sub	ysize xmark 0.293 mul sub /NE  lfigpointdef
+   xmark 0.293 mul		ysize xmark 0.293 mul sub /NW  lfigpointdef
+
+   [ xsize ysize 0.5 lfigpmul xmark /lfigcurveboxcircum cvx ] lfigcircumdef
+
+   xmark		0
+   xsize xmark sub	0
+   [ xsize xmark sub	xmark		]
+   xsize		xmark
+   xsize		ysize xmark sub
+   [ xsize xmark sub	ysize xmark sub	]
+   xsize xmark sub	ysize
+   xmark		ysize
+   [ xmark		ysize xmark sub	]
+   0			ysize xmark sub
+   0			xmark
+   [ xmark		xmark		]
+   xmark		0
+} def
+
+% shadow of the @ShadowBox symbol
+% its shape and labels are done, somewhat inaccurately, with lfigbox
+/lfigshadow
+{ xmark 2 mul 0 moveto xsize 0 lineto
+  xsize ysize xmark 2 mul sub lineto
+  xsize xmark sub ysize xmark 2 mul sub lineto
+  xsize xmark sub xmark lineto
+  xmark 2 mul xmark lineto closepath fill
+} def
+
+% shape and labels of the @Square symbol
+/lfigsquare
+{
+   xsize ysize 0.5 lfigpmul /CTR lfigpointdef
+   CTR xsize xsize ysize ysize lfigpmax 0.5 lfigpmul lfigpadd /NE lfigpointdef
+   CTR 0 0 CTR NE lfigdistance 135 lfigatangle lfigpadd /NW lfigpointdef
+   CTR 0 0 CTR NE lfigdistance 225 lfigatangle lfigpadd /SW lfigpointdef
+   CTR 0 0 CTR NE lfigdistance 315 lfigatangle lfigpadd /SE lfigpointdef
+   SW 0.5 lfigpmul SE 0.5 lfigpmul lfigpadd /S lfigpointdef
+   NW 0.5 lfigpmul NE 0.5 lfigpmul lfigpadd /N lfigpointdef
+   SW 0.5 lfigpmul NW 0.5 lfigpmul lfigpadd /W lfigpointdef
+   SE 0.5 lfigpmul NE 0.5 lfigpmul lfigpadd /E lfigpointdef
+   [ CTR NE lfigpsub /lfigboxcircum cvx ] lfigcircumdef
+   SW SE NE NW SW
+} def
+
+% shape and labels of the @Diamond symbol
+/lfigdiamond
+{
+   xsize 0 0.5 lfigpmul /S   lfigpointdef
+   0 ysize 0.5 lfigpmul /W   lfigpointdef
+   S W         lfigpadd /CTR lfigpointdef
+   CTR W       lfigpadd /N   lfigpointdef
+   CTR S       lfigpadd /E   lfigpointdef
+   [ xsize ysize 0.5 lfigpmul /lfigdiamondcircum cvx ] lfigcircumdef
+   S E N W S
+} def
+
+% shape and labels of the @Ellipse symbol
+/lfigellipse
+{
+   xsize 0 0.5 lfigpmul /S   lfigpointdef
+   0 ysize 0.5 lfigpmul /W   lfigpointdef
+   S W         lfigpadd /CTR lfigpointdef
+   CTR W       lfigpadd /N   lfigpointdef
+   CTR S       lfigpadd /E   lfigpointdef
+   CTR xsize 0 0.3536 lfigpmul lfigpadd 0 ysize 0.3536 lfigpmul lfigpadd /NE lfigpointdef
+   0 ysize 0.3536 lfigpmul CTR xsize 0 0.3536 lfigpmul lfigpadd lfigpsub /SE lfigpointdef
+   xsize 0 0.3536 lfigpmul CTR lfigpsub 0 ysize 0.3536 lfigpmul lfigpadd /NW lfigpointdef
+   0 ysize 0.3536 lfigpmul xsize 0 0.3536 lfigpmul CTR lfigpsub lfigpsub /SW lfigpointdef
+   [ xsize ysize 0.5 lfigpmul /lfigellipsecircum cvx ] lfigcircumdef
+   S [ CTR ] E [ CTR ] N [ CTR ] W [ CTR ] S
+} def
+
+% shape and labels of the @Circle symbol
+/lfigcircle
+{
+   xsize ysize 0.5 lfigpmul /CTR lfigpointdef
+   CTR xsize 0 ysize 0 lfigpmax 0.5 lfigpmul lfigpadd /E lfigpointdef
+   CTR 0 0 CTR E lfigdistance 45 lfigatangle lfigpadd /NE lfigpointdef
+   CTR 0 0 CTR E lfigdistance 90 lfigatangle lfigpadd /N lfigpointdef
+   CTR 0 0 CTR E lfigdistance 135 lfigatangle lfigpadd /NW lfigpointdef
+   CTR 0 0 CTR E lfigdistance 180 lfigatangle lfigpadd /W lfigpointdef
+   CTR 0 0 CTR E lfigdistance 225 lfigatangle lfigpadd /SW lfigpointdef
+   CTR 0 0 CTR E lfigdistance 270 lfigatangle lfigpadd /S lfigpointdef
+   CTR 0 0 CTR E lfigdistance 315 lfigatangle lfigpadd /SE lfigpointdef
+   [ S E lfigpsub /lfigellipsecircum cvx ] lfigcircumdef
+   S [ CTR ] E [ CTR ] N [ CTR ] W [ CTR ] S
+} def
+
+% shape and labels of the @HLine and @HArrow symbols
+/lfighline
+{
+   0 ymark lfigprevious /FROM lfigpointdef
+   xsize ymark lfigprevious /TO lfigpointdef
+} def
+
+% shape and labels of the @VLine and @VArrow symbols
+/lfigvline
+{
+   xmark ysize lfigprevious /FROM lfigpointdef
+   xmark 0 lfigprevious /TO lfigpointdef
+} def
+
+% points of a polygon around base with given no of sides, vert init angle:
+% <sides> <angle> figpolygon <point> ... <point>
+/lfigpolygon
+{  xsize ysize 0.5 lfigpmul /CTR lfigpointdef
+   90 sub CTR 2 copy lfigmax 5 3 roll
+   [ 4 copy pop /lfigpolycircum cvx ] lfigcircumdef
+   exch dup 360 exch div exch
+   1 1  3 2 roll
+   {  4 string cvs (P) exch lfigconcat cvn
+      6 copy pop pop lfigatangle 2 copy 10 2 roll
+      3 2 roll lfigpointdef
+      dup 3 1 roll add exch
+   }  for
+   pop lfigatangle
+} def
+
+% next array element:  <array> <index> lfiggetnext <array> <index> <any> true
+%                                               or <array> <index> false
+/lfiggetnext
+{  2 copy exch length ge
+   { false }
+   { 2 copy get exch 1 add exch true } ifelse
+} def
+
+% check whether thing is number:  <any> lfigisnumbertype <any> <bool>
+/lfigisnumbertype
+{  dup type dup
+   /integertype eq exch /realtype eq or
+} def
+
+% check whether thing is an array:  <any> lfigisarraytype <any> <bool>
+/lfigisarraytype { dup type /arraytype eq } def
+
+% get next item:  <array> <index> lfiggetnextitem <array> <index> 0
+%                                              or <array> <index> <array> 1
+%                                              or <array> <index> <point> 2
+/lfiggetnextitem
+{   lfiggetnext
+    {	lfigisarraytype
+	{   1
+	}
+	{   lfigisnumbertype
+	    {	3 1 roll
+		lfiggetnext
+		{   lfigisnumbertype
+		    {	4 3 roll exch  2
+		    }
+		    {	pop 3 2 roll pop  0
+		    } ifelse
+		}
+		{   3 2 roll pop  0
+		} ifelse
+	    }
+	    {	pop 0
+	    } ifelse
+	} ifelse
+    }
+    {	0
+    } ifelse
+} def
+
+% set arc path:  bool x1 y1  x2 y2  x0 y0  lfigsetarc  <angle> <angle> <dist>
+% the path goes from x1 y1 to x2 y2 about centre x0 y0,
+% anticlockwise if bool is true else clockwise.
+% The orientations of backwards pointing and forwards pointing
+% arrowheads are returned in the two angles, and
+% the length of the arc is returned in <dist>.
+/lfigsetarc
+{
+  20 dict begin
+     matrix currentmatrix 8 1 roll
+     2 copy translate 2 copy 8 2 roll
+     4 2 roll lfigpsub 6 2 roll lfigpsub
+     dup /y1 exch def dup mul /y1s exch def
+     dup /x1 exch def dup mul /x1s exch def
+     dup /y2 exch def dup mul /y2s exch def
+     dup /x2 exch def dup mul /x2s exch def
+
+     y1s y2s eq
+     {	-1
+     }
+     {	y1s x2s mul y2s x1s mul sub y1s y2s sub div
+     } ifelse
+     /da exch def
+
+     x1s x2s eq
+     {	-1
+     }
+     {	x1s y2s mul x2s y1s mul sub x1s x2s sub div
+     } ifelse
+     /db exch def
+
+     da 0 gt db 0 gt and
+     {	/LMax da sqrt db sqrt lfigmax def
+	/scalex da sqrt LMax div def
+	/scaley db sqrt LMax div def
+	scalex scaley scale
+	0 0 LMax
+	0 0 x1 scalex mul y1 scaley mul lfigangle
+	0 0 x2 scalex mul y2 scaley mul lfigangle
+	2 copy eq { 360 add } if
+	2 copy 8 2 roll
+	5 index { arc } { arcn } ifelse
+	2 index 1 index
+	{ 90 sub } { 90 add } ifelse
+	dup sin scaley mul exch cos scalex mul atan
+	2 index 2 index
+	{ 90 add } { 90 sub } ifelse
+	dup sin scaley mul exch cos scalex mul atan
+	5 2 roll  % res1 res2 ang1 ang2 anticlockwise
+	{ exch sub } { sub } ifelse
+	dup 0 le { 360 add } if  lfigpi mul LMax mul 180 div
+     }
+     {	0 0 x1 y1 lfigdistance 0 0 x2 y2 lfigdistance eq
+	0 0 x1 y1 lfigdistance 0 gt and
+	{	0 0
+		0 0 x1 y1 lfigdistance
+		0 0 x1 y1 lfigangle
+		0 0 x2 y2 lfigangle
+		2 copy eq { 360 add } if
+		2 copy 8 2 roll
+		5 index { arc } { arcn } ifelse
+		2 index 1 index
+		{ 90 sub } { 90 add } ifelse
+		2 index 2 index
+		{ 90 add } { 90 sub } ifelse
+		5 2 roll % res1 res2 ang1 ang2 clockwise
+		{ exch sub } { sub } ifelse
+		dup 0 le { 360 add } if lfigpi mul 0 0 x1 y1 lfigdistance mul 180 div
+	}
+	{	x2 y2 lineto pop
+		x2 y2 x1 y1 lfigangle
+		x1 y1 x2 y2 lfigangle
+		x1 y1 x2 y2 lfigdistance
+	} ifelse
+     } ifelse
+     4 -1 roll setmatrix
+   end
+} def
+
+% lfigsetcurve: set up a Bezier curve from x0 y0 to x3 y3
+% and return arrowhead angles and length of curve (actually 0)
+% x0 y0 x1 y1 x2 y2 x3 y3 lfigsetcurve <angle> <angle> <length>
+/lfigsetcurve
+{ 8 copy curveto pop pop
+  lfigangle
+  5 1 roll
+  4 2 roll lfigangle
+  exch
+  0
+} def
+
+% lfigpaintpath: paint a path of the given shape
+% /paint [ shape ] lfigpaintpath -
+/lfigpaintpath
+{
+  10 dict begin
+    0 newpath
+    /prevseen false def
+    /curveseen false def
+    { lfiggetnextitem
+      dup 0 eq { pop exit }
+      { 1 eq
+        { /curveseen true def
+	  /curve exch def
+	  curve length 0 eq { /curveseen false def } if
+        }
+        { /ycurr exch def
+	  /xcurr exch def
+	  prevseen
+	  { curveseen
+	    { curve length 4 eq
+	      { xprev yprev
+		curve 0 get curve 1 get
+		curve 2 get curve 3 get
+		xcurr ycurr
+		lfigsetcurve pop pop pop
+	      }
+	      { xprev yprev xcurr ycurr
+	        curve length 1 ge { curve 0 get } { 0 } ifelse
+	        curve length 2 ge { curve 1 get } { 0 } ifelse
+	        curve length 3 ge { curve 2 get } { true } ifelse
+	        7 1 roll
+	        lfigsetarc pop pop pop
+	      } ifelse
+	    }
+	    { xcurr ycurr lineto
+	    } ifelse
+	  }
+	  { xcurr ycurr moveto
+	  } ifelse
+	  /xprev xcurr def
+	  /yprev ycurr def
+	  /prevseen true def
+	  /curveseen false def
+        } ifelse
+      } ifelse
+    } loop pop pop cvx exec
+  end
+} def
+
+% stroke a path of the given shape in the given linestyle and dash length.
+% Return the origin and angle of the backward and forward arrow heads.
+% dashlength /linestyle [shape] lfigdopath  [<point> <angle>] [<point> <angle>] 
+/lfigdopath
+{
+  10 dict begin
+    0
+    /prevseen  false def
+    /curveseen false def
+    /backarrow []    def
+    /fwdarrow  []    def
+    {
+	lfiggetnextitem
+	dup 0 eq { pop exit }
+	{
+	    1 eq
+	    {	/curveseen true def
+		/curve exch def
+		curve length 0 eq { /prevseen false def } if
+	    }
+	    {	/ycurr exch def
+		/xcurr exch def
+		prevseen
+		{   newpath xprev yprev moveto
+		    curveseen
+		    {	curve length 4 eq
+			{   xprev yprev
+			    curve 0 get curve 1 get
+			    curve 2 get curve 3 get
+			    xcurr ycurr lfigsetcurve
+			}
+			{   xprev yprev xcurr ycurr
+			    curve length 1 ge { curve 0 get } { 0 } ifelse
+			    curve length 2 ge { curve 1 get } { 0 } ifelse
+			    curve length 3 ge { curve 2 get } { true } ifelse
+			    7 1 roll
+			    lfigsetarc
+			} ifelse
+		    }
+		    {	xcurr ycurr lineto
+			xcurr ycurr xprev yprev lfigangle dup 180 sub
+			xprev yprev xcurr ycurr lfigdistance
+		    } ifelse
+		    6 index 6 index cvx exec
+		    [ xprev yprev 5 -1 roll ]
+		    backarrow length 0 eq
+		    { /backarrow exch def }
+		    { pop } ifelse
+		    [ xcurr ycurr 4 -1 roll ] /fwdarrow exch def
+		} if
+		/xprev xcurr def
+		/yprev ycurr def
+		/prevseen true def
+		/curveseen false def
+	    } ifelse
+	} ifelse
+    } loop
+    pop pop pop pop
+    backarrow length 0 eq { [ 0 0 0 ] } { backarrow } ifelse
+    fwdarrow  length 0 eq { [ 0 0 0 ] } { fwdarrow  } ifelse
+  end
+} def
+
+% lfigdoarrow: draw an arrow head of given form
+% dashlength /lstyle /pstyle hfrac height width [ <point> <angle> ] lfigdoarrow -
+/lfigdoarrow
+{  matrix currentmatrix 8 1 roll
+   dup 0 get 1 index 1 get translate
+   2 get rotate
+   [ 2 index neg 2 index 0 0
+     3 index 3 index neg
+     1 index 10 index mul 0
+     7 index 7 index ]
+   4 1 roll pop pop pop
+   dup 3 1 roll
+   gsave lfigpaintpath grestore lfigdopath pop pop
+   setmatrix
+} def
+
+% arrow head styles
+/lfigopen     0.0 def
+/lfighalfopen 0.5 def
+/lfigclosed   1.0 def
+
+% stroke no arrows, forward, back, and both
+/lfignoarrow { pop pop pop pop pop pop pop pop                        } def
+/lfigforward { 7 -1 roll lfigdoarrow pop                              } def
+/lfigback    { 8 -2 roll pop lfigdoarrow                              } def
+/lfigboth    { 8 -1 roll 7 copy lfigdoarrow pop 7 -1 roll lfigdoarrow } def
+
+% lfigprevious: return previous point on path
+/lfigprevious
+{ lfigisnumbertype
+  { 2 copy }
+  { lfigisarraytype
+    { 2 index 2 index }
+    { 0 0 }
+    ifelse
+  } ifelse
+} def
+
+% label a point in 2nd top dictionary:  <point> /name lfigpointdef -
+/lfigpointdef
+{
+  % (Entering lfigpointdef) lfigdebugprint
+  [ 4 2 roll transform
+    /itransform cvx ] cvx
+    currentdict end
+    3 1 roll
+    % currentdict length currentdict maxlength lt
+    % { def }
+    % { exec moveto (too many labels) show stop }
+    % ifelse
+    def
+    begin
+  % (Leaving lfigpointdef) lfigdebugprint
+} def
+
+% promote labels from second top to third top dictionary
+% <string> lfigpromotelabels -
+/lfigpromotelabels
+{
+  % (Entering lfigpromotelabels) lfigdebugprint
+  currentdict end exch currentdict end
+  { exch 20 string cvs 2 index
+    (@) lfigconcat exch lfigconcat cvn exch def
+  } forall pop begin
+  % (Leaving lfigpromotelabels) lfigdebugprint
+} def
+
+% show labels (except CIRCUM): - lfigshowlabels -
+/lfigshowlabels
+{
+  % (Entering lfigshowlabels) lfigdebugprint
+  currentdict end
+    currentdict
+    { 1 index 20 string cvs (CIRCUM) search % if CIRCUM in key
+      { pop pop pop pop pop }
+      { pop cvx exec 2 copy
+        newpath 1.5 pt 0 360 arc
+        0 setgray fill
+        /Times-Roman findfont 8 pt scalefont setfont
+        moveto 0.2 cm 0.1 cm rmoveto 20 string cvs show
+      }
+      ifelse
+    } forall
+  begin
+  % (Leaving lfigshowlabels) lfigdebugprint
+} def
+
+% fix an angle to 0 <= res < 360:  <angle> lfigfixangle <angle>
+/lfigfixangle
+{
+  % (Entering lfigfixangle) lfigdebugprint
+  { dup 0 ge { exit } if
+    360 add
+  } loop
+  { dup 360 lt { exit } if
+    360 sub
+  } loop
+  % (Leaving lfigfixangle) lfigdebugprint
+} def
+
+% find point on circumference of box:  alpha a b lfigboxcircum x y
+/lfigboxcircum
+{
+  % (Entering lfigboxcircum) lfigdebugprint
+  4 dict begin
+    /b exch def
+    /a exch def
+    lfigfixangle /alpha exch def
+    0 0 a b lfigangle /theta exch def
+
+    % if alpha <= theta, return (a, a*tan(alpha))
+    alpha theta le
+    { a  a alpha sin mul alpha cos div }
+    {
+      % else if alpha <= 180 - theta, return (b*cot(alpha), b)
+      alpha 180 theta sub le
+      { b alpha cos mul alpha sin div  b }
+      {
+        % else if alpha <= 180 + theta, return (-a, -a*tan(alpha))
+        alpha 180 theta add le
+        { a neg  a neg alpha sin mul alpha cos div }
+        {
+	  % else if alpha <= 360 - theta, return (-b*cot(alpha), -b)
+	  alpha 360 theta sub le
+          { b neg alpha cos mul alpha sin div  b neg }
+	  {
+	    % else 360 - theta <= alpha, return (a, a*tan(alpha))
+	    a  a alpha sin mul alpha cos div
+	  } ifelse
+        } ifelse
+      } ifelse
+    } ifelse
+  end
+  % (Leaving lfigboxcircum) lfigdebugprint
+} def
+
+% find quadratic roots (assume a != 0): a b c lfigqroots x1 x2 2
+%                                                     or    x2 1
+%                                                     or       0
+/lfigqroots
+{
+  4 dict begin
+    /c exch def
+    /b exch def
+    /a exch def
+    /disc b b mul 4 a c mul mul sub def
+    disc 0 lt
+    { 0
+    }
+    { disc 0 eq
+      { b neg 2 a mul div
+	1
+      }
+      { b neg disc sqrt add 2 a mul div
+        b neg disc sqrt sub 2 a mul div
+	2
+      }
+      ifelse
+    }
+    ifelse
+  end
+} def
+
+% work our which quadrant: <angle> lfigquadrant <0-3>
+/lfigquadrant
+{ dup 90 lt
+  { pop 0
+  }
+  { dup 180 lt
+    { pop 1
+    }
+    { 270 lt
+      { 2
+      }
+      { 3
+      } ifelse
+    } ifelse
+  } ifelse
+} def
+
+% find curvebox circum, assuming upper right quadrant: alpha a b xmk lfigcb x y
+/lfigcb
+{
+  6 dict begin
+    /xmk exch def
+    /b exch def
+    /a exch def
+    /alpha exch def
+    /theta1 0 0 a b xmk sub lfigangle def
+    /theta2 0 0 a xmk sub b lfigangle def
+    alpha theta1 le
+    { % if alpha <= theta1, return (a, a*tan(alpha))
+      a  a alpha sin mul alpha cos div
+    }
+    { alpha theta2 ge
+      { % else if alpha > theta2, return (b*cot(alpha), b)
+	b alpha cos mul alpha sin div  b
+      }
+      {
+	% else, return the intersection of line and circle
+	a xmk sub b xmk sub xmk  0 0 alpha lfigcircleintersect
+	dup 0 eq
+	{ % should never happen, just return any reasonable point
+	  pop
+	  a b 0.5 lfigpmul
+	}
+	{ 1 eq
+	  { % should never happen, just return the point on top of stack
+	  }
+	  { % the usual case, two points on stack, return the larger
+	    lfigpmax
+	  } ifelse
+	} ifelse
+      } ifelse
+    } ifelse
+  end
+} def
+
+% find point on circumference of curvebox: alpha a b xmk lfigcurveboxcircum x y
+/lfigcurveboxcircum
+{
+  % (Entering lfigcurveboxcircum) lfigdebugprint
+  5 dict begin
+    /xmk exch def
+    /b exch def
+    /a exch def
+    lfigfixangle /alpha exch def
+
+    % work out which quadrant we are in, and reflect accordingly
+    /quad alpha lfigquadrant def
+    quad 0 eq
+    { alpha a b xmk lfigcb
+    }
+    { quad 1 eq
+      { 180 alpha sub a b xmk lfigcb exch neg exch
+      }
+      { quad 2 eq
+	{ alpha 180 sub a b xmk lfigcb neg exch neg exch
+	}
+	{ 360 alpha sub a b xmk lfigcb neg
+	} ifelse
+      } ifelse
+    } ifelse
+  end
+  % (Leaving lfigcurveboxcircum) lfigdebugprint
+} def
+
+% find point on circumference of diamond:  alpha a b lfigdiamondcircum x y
+/lfigdiamondcircum
+{
+  % (Entering lfigdiamondcircum) lfigdebugprint
+  4 dict begin
+    /b exch def
+    /a exch def
+    lfigfixangle /alpha exch def
+    b alpha cos abs mul  a alpha sin abs mul  add  /denom exch def
+    a b mul alpha cos mul denom div
+    a b mul alpha sin mul denom div
+  end
+  % (Leaving lfigdiamondcircum) lfigdebugprint
+} def
+
+% find point on circumference of ellipse:  alpha a b lfigellipsecircum x y
+/lfigellipsecircum
+{
+  % (Entering lfigellipsecircum) lfigdebugprint
+  4 dict begin
+    /b exch def
+    /a exch def
+    lfigfixangle /alpha exch def
+    b alpha cos mul dup mul  a alpha sin mul dup mul  add sqrt /denom exch def
+    a b mul alpha cos mul denom div
+    a b mul alpha sin mul denom div
+  end
+  % (Leaving lfigellipsecircum) lfigdebugprint
+} def
+
+% find point of intersection of two lines each defined by two points
+% x1 y1 x2 y2  x3 y3 x4 y4  lfiglineintersect x y
+/lfiglineintersect
+{
+  % (Entering lfiglineintersect) lfigdebugprint
+  13 dict begin
+    /y4 exch def
+    /x4 exch def
+    /y3 exch def
+    /x3 exch def
+    /y2 exch def
+    /x2 exch def
+    /y1 exch def
+    /x1 exch def
+    x2 x1 sub /x21 exch def
+    x4 x3 sub /x43 exch def
+    y2 y1 sub /y21 exch def
+    y4 y3 sub /y43 exch def
+    y21 x43 mul y43 x21 mul sub /det exch def
+  
+    % calculate x 
+    y21 x43 mul x1 mul
+    y43 x21 mul x3 mul sub
+    y3 y1 sub x21 mul x43 mul add
+    det div
+
+    % calculate y
+    x21 y43 mul y1 mul
+    x43 y21 mul y3 mul sub
+    x3 x1 sub y21 mul y43 mul add
+    det neg div
+
+  end
+  % (Leaving lfiglineintersect) lfigdebugprint
+} def
+
+% find point on circumference of polygon
+% alpha radius num theta lfigpolycircum x y
+/lfigpolycircum
+{
+  % (Entering lfigpolycircum) lfigdebugprint
+  13 dict begin
+    /theta exch def
+    /num exch def
+    /radius exch def
+    /alpha exch def
+
+    % calculate delta, the angle from theta to alpha
+    alpha theta sub lfigfixangle
+
+    % calculate the angle which is the multiple of 360/num closest to delta
+    360 num div div truncate 360 num div mul theta add /anglea exch def
+
+    % calculate the next multiple of 360/num after anglea
+    anglea 360 num div add /angleb exch def
+
+    % intersect the line through these two points with the alpha line
+    anglea cos anglea sin  angleb cos angleb sin
+    0 0  alpha cos 2 mul alpha sin 2 mul
+    lfiglineintersect radius lfigpmul
+
+  end
+  % (Leaving lfigpolycircum) lfigdebugprint
+} def
+
+% find point of intersection of a point and a circle
+% x0 y0 r  x1 y1 theta  lfigcircleintersect xa ya xb yb 2
+%                                        or       xb yb 1
+%                                        or             0
+/lfigcircleintersect
+{
+  % (Entering lfigcircleintersect) lfigdebugprint
+  15 dict begin
+    /theta exch def
+    /y1    exch def
+    /x1    exch def
+    /r     exch def
+    /y0    exch def
+    /x0    exch def
+
+    % if sin(theta) = 0 then line is horizontal and y must be y1
+    theta sin abs 0.00001 lt
+    { 
+      /a 1 def
+      /b -2 x0 mul def
+      /c x0 dup mul y1 y0 sub dup mul add r dup mul sub def
+      a b c lfigqroots dup
+      0 eq
+      { pop
+	0
+      }
+      { 1 eq
+	{ y1 1
+	}
+	{ y1 exch y1 2
+	} ifelse
+      } ifelse
+    }
+    {
+      /ct theta cos theta sin div def
+      /a ct ct mul 1 add def
+      /b ct x1 x0 sub mul y1 add y0 sub 2 mul def
+      /c x1 x0 sub dup mul y1 y0 sub dup mul add r dup mul sub def
+      a b c lfigqroots dup
+      0 eq
+      { pop
+	0
+      }
+      { 1 eq
+	{ y1 add /yb exch def
+	  yb y1 sub ct mul x1 add /xb exch def
+	  xb yb 1
+	}
+	{ y1 add /ya exch def
+	  ya y1 sub ct mul x1 add /xa exch def
+	  y1 add /yb exch def
+	  yb y1 sub ct mul x1 add /xb exch def
+	  xa ya xb yb 2
+	} ifelse
+      } ifelse
+    } ifelse
+  end
+  % (Leaving lfigcircleintersect) lfigdebugprint
+} def
+
+% add CIRCUM operator with this body:  <array> lfigcircumdef -
+/lfigcircumdef
+{   % (Entering lfigcircumdef) lfigdebugprint
+    /CIRCUM exch cvx
+    currentdict end
+    3 1 roll
+    % currentdict length currentdict maxlength lt
+    % { def }
+    % { exec moveto (too many labels) show stop }
+    % ifelse
+    def
+    begin
+    % (Leaving lfigcircumdef) lfigdebugprint
+} def
+
+end
+%%EndResource

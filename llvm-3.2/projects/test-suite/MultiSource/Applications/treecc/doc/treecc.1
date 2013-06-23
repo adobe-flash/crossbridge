@@ -1,0 +1,113 @@
+.\" Copyright (c) 2001 Southern Storm Software, Pty Ltd.
+.\"
+.\" This program is free software; you can redistribute it and/or modify
+.\" it under the terms of the GNU General Public License as published by
+.\" the Free Software Foundation; either version 2 of the License, or
+.\" (at your option) any later version.
+.\"
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\"
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+.TH treecc 1 "19 June 2001" "Southern Storm Software" ""
+.SH NAME
+treecc \- tree compiler-compiler
+.SH SYNOPSIS
+.ll +8
+.B treecc
+[ options ]
+.I input
+\&...
+.SH DESCRIPTION
+.B Treecc
+converts input files in the treecc syntax into source
+code that permits creating and walking abstract syntax trees.
+It is intended for use in developing compilers, in concert with
+existing tools such as \fBlex\fR(1) and \fByacc\fR(1).
+The treecc syntax is described in the \fBtreecc\fR texinfo
+topic.
+.SH OPTIONS
+.TP
+.B \-o \fIfile\fB, \-\-output \fIfile\fR
+Set the name of the output file.  If this option is not supplied,
+then the name of the first input file will be used, with its
+extension changed to ".c".  If the input is stdin, the default
+output file is "yy_tree.c".
+
+This option may be overridden using the "%output" keyword in
+the input files.
+.TP
+.B \-h \fIfile\fB, \-\-header \fIfile\fR
+Set the name of the header output file.  This is only used for
+the C and C++ languages.  If this option is not supplied,
+then the name of the output file will be used, with its extension
+changed to ".h".  If the input is stdin, the default header output
+file is "yy_tree.h".
+
+This option may be overriden using the "%header" keyword in the
+input files.
+
+If this option is used with a language that does not require
+headers, it will be ignored.
+.TP
+.B \-d \fIdir\fB, \-\-output\-dir \fIdir\fR
+Set the name of the Java output directory.  This is only used for
+the Java language.  If this option is not supplied, then the directory
+corresponding to the first input file is used.  If the input is stdin,
+the default is the current directory.
+
+This option may be overriden using the "%outdir" keyword in the
+input files.
+
+If this option is used with a language other than Java, it will be ignored.
+.TP
+.B \-e \fIext\fB, \-\-extension \fIext\fR
+Change the default output file extension to \fIext\fR, instead of
+".c".  The value \fIext\fR can have a leading dot, but this is
+not required.
+.TP
+.B \-f, \-\-force\-create
+\fBTreecc\fR attempts to optimise the creation of output files
+so that they are only modified if a non-trivial change has
+occurred in the input.  This can reduce the number of source
+code recompiles when \fBtreecc\fR is used in combination
+with \fBmake\fR(1).
+
+This option forces the output files to be created, even if they
+are the same as existing files with the same name.
+
+The directive "%option force" can be used in the input files
+to achieve the same effect as this option.
+.TP
+.B \-O \fIopt\fB, \-\-option \fIopt\fR
+Set a treecc option value.  This is a command-line version of
+the "%option" keyword in the input files.
+.TP
+.B \-n, \-\-no\-output
+Suppress the generation of output files.  \fBTreecc\fR parses the
+input files, checks for errors, and then stops.
+.TP
+.B \-\-help
+Print a usage message for the \fBtreecc\fR program.
+.TP
+.B \-v, \-\-version
+Print the version of the \fBtreecc\fR program.
+.TP
+.B \-\-
+Marks the end of the command-line options, and the beginning of
+the input filenames.  You may need to use this if your filename
+begins with '-'.  e.g. "treecc -- -input.tc".  This is not needed
+if the input is stdin: "treecc -" is perfectly valid.
+.SH "AUTHOR"
+Written by Southern Storm Software, Pty Ltd.
+
+http://www.southern-storm.com.au/
+.SH "SEE ALSO"
+lex(1), yacc(1), make(1)
+.SH "DIAGNOSTICS"
+Exit status is 1 if an error occurred while processing the input.
+Otherwise the exit status is 0.

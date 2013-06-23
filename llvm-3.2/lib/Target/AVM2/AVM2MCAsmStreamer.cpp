@@ -17,6 +17,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+//===- lib/Target/AVM2/AVM2MCAsmStreamer.cpp - AVM2 Text Assembly Output -----===//
+
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
 
 #include "AVM2.h"
 #include "llvm/ADT/OwningPtr.h"
@@ -512,7 +515,8 @@ public:
     }
     
     virtual void FinishImpl() {
-        AVM2MCAsmStreamer::Finish();
+      //AVM2MCAsmStreamer::Finish();
+      AVM2MCAsmStreamer::FinishImpl();
         delete FOS1;
         delete FOS2;
 
@@ -596,7 +600,7 @@ public:
             jvmPath = StringRef(pathWithSuffix);
         }
 
-        runcmd(jvmPath.str(), args);
+        runcmd(nativepath(jvmPath.str()), args);
 
         OwningPtr<MemoryBuffer> mbuf;
         sys::Path output(tdir);

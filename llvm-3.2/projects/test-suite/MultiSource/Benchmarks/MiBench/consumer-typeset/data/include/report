@@ -1,0 +1,403 @@
+###############################################################################
+#                                                                             #
+#   Lout setup file for technical reports                                     #
+#                                                                             #
+#   Jeffrey H. Kingston                                                       #
+#   5 February 1999                                                           #
+#   17 September 1999                                                         #
+#                                                                             #
+#   Note: this version, released with Lout Version 3.13, is not upwardly      #
+#   compatible with previous versions:  the @Abstract symbol must now         #
+#   be placed before the //, not after.                                       #
+#                                                                             #
+###############################################################################
+
+
+###############################################################################
+#                                                                             #
+#  @SysInclude commands for standard packages.                                #
+#                                                                             #
+###############################################################################
+
+  @SysInclude { langdefs	} # language definitions
+  @SysInclude { bsf		} # BasicSetup package
+  @SysInclude { dsf		} # DocumentSetup package
+  @SysInclude { reportf		} # ReportSetup extension
+
+
+###############################################################################
+#                                                                             #
+#  @Include command for reading personal definitions from current directory.  #
+#                                                                             #
+###############################################################################
+
+  @Include { mydefs }
+
+
+###############################################################################
+#                                                                             #
+#  The @BasicSetup @Use clause - basics, lists, paragraphs, displays.         #
+#                                                                             #
+#  To change the default value of any option, delete the # at the start of    #
+#  its line and change the value between braces.                              #
+#                                                                             #
+###############################################################################
+ 
+@Use { @BasicSetup
+  # @InitialFont	{ Times Base 12p	} # initial font
+  # @InitialBreak	{{adjust 1.2fx hyphen} @OrIfPlain {ragged 1fx nohyphen}}
+  # @InitialSpace	{ lout			} # initial space style
+  # @InitialLanguage	{ English		} # initial language
+  # @InitialColour	{ black			} # initial colour
+  # @OptimizePages	{ No			} # optimize page breaks?
+  # @HeadingFont	{ Bold			} # font for @Heading
+  # @ParaGap		{ 1.3vx @OrIfPlain 1f	} # gap between paragraphs
+  # @ParaIndent		{ 2.00f	@OrIfPlain 5s	} # first-line indent for @PP
+  # @DisplayGap		{ 1.00v	@OrIfPlain 1f	} # gap above, below displays
+  # @DisplayIndent	{ 2.00f	@OrIfPlain 5s	} # @IndentedDisplay indent
+  # @DefaultIndent	{ 0.5rt			} # @Display indent
+  # @DisplayNumStyle	{ (num)			} # style of display numbers
+  # @WideIndent		{ 4.00f	@OrIfPlain 10s	} # @WideTaggedList indent
+  # @VeryWideIndent	{ 8.00f	@OrIfPlain 20s	} # @VeryWideTaggedList indent
+  # @ListOuterGap	{ 1.00v	@OrIfPlain 1f	} # gap before, after lists
+  # @ListGap		{ 1.00v	@OrIfPlain 1f	} # gap between list items
+  # @ListIndent		{ 0s			} # indent of list items
+  # @ListRightIndent	{ 0s			} # right indent of list items
+  # @ListLabelWidth	{ 2.00f	@OrIfPlain 5s	} # width allowed for list tags
+  # @NumberSeparator	{ .			} # separates nums like 2.3.7
+  # @CrossLinkFormat	{ @Body			} # format of cross links
+}
+
+
+###############################################################################
+#                                                                             #
+#  The @DocumentSetup @Use clause - page layout plus figures, tables, etc.    #
+#                                                                             #
+#  To change the default value of any option, delete the # at the start of    #
+#  its line and change the value between braces.                              #
+#                                                                             #
+###############################################################################
+
+@Use { @DocumentSetup
+  # @PageType		{ A4	@OrIfPlain Other} # page type (width, height)
+  # @PageWidth		{ 80s			} # page width if type Other
+  # @PageHeight		{ 66f			} # page height if type Other
+  # @PageOrientation	{ Portrait		} # Portrait, Landscape, etc.
+  # @PageBackground	{  			} # background of each page
+  # @TopMargin		{ 2.5c	@OrIfPlain 6f	} # top margin of all pages
+  # @FootMargin		{ 2.5c	@OrIfPlain 6f	} # bottom margin of all pages
+  # @OddLeftMargin	{ 2.5c	@OrIfPlain 10s	} # left margin of odd pages
+  # @OddRightMargin	{ 2.5c	@OrIfPlain 10s	} # right margin of odd pages
+  # @EvenLeftMargin	{ 2.5c	@OrIfPlain 10s	} # left margin of even pages
+  # @EvenRightMargin	{ 2.5c	@OrIfPlain 10s	} # right margin of even pages
+  # @OddLeftBodyMargin	{ 0c			} # extra margin for page body
+  # @OddRightBodyMargin	{ 0c			} # extra margin for page body
+  # @EvenLeftBodyMargin	{ 0c			} # extra margin for page body
+  # @EvenRightBodyMargin{ 0c			} # extra margin for page body
+  # @PageBoxType	{ None			} # None Box CurveBox ShadowBox
+  # @PageBoxMargin	{ 1.00c			} # page box margin
+  # @PageBoxLineWidth	{			} # page box line thickness
+  # @PageBoxPaint	{ none			} # page box paint
+  # @PageBoxShadow	{ 0.60c			} # shadow margin if ShadowBox
+  # @PageEnclose	{ @Body			} # enclose every page in this
+  # @ColumnNumber	{ 1			} # number of columns (1 to 10)
+  # @ColumnGap		{ 1.00c	@OrIfPlain 6s	} # column gap
+  # @FigureLocation	{ PageTop		} # default figure location
+  # @TableLocation	{ PageTop		} # default table location
+  # @FigureFormat	{ @CC @Body		} # default figure format
+  # @TableFormat	{ @CC @Body		} # default table format
+  # @FigureWord		{ figure		} # "Figure" word else anything
+  # @TableWord		{ table			} # "Table" word else anything
+  # @FigureNumbers	{ Arabic		} # method of numbering figures
+  # @TableNumbers	{ Arabic		} # method of numbering tables
+  # @FigureCaptionPos	{ Below 		} # Above or Below
+  # @TableCaptionPos	{ Below			} # Above or Below
+  # @FigureCaptionFont  { -2p                   } # figure caption font
+  # @FigureCaptionBreak { adjust hyphen 1.2fx   } # figure caption break
+  # @FigureCaptionFormat{ {@B { word @NumSep number. &2s }} @Insert caption }
+  # @TableCaptionFont   { -2p                   } # table caption font
+  # @TableCaptionBreak  { adjust hyphen 1.2fx   } # table caption break
+  # @TableCaptionFormat { {@B { word @NumSep number. &2s }} @Insert caption }
+  # @MakeFigureContents { No                    } # list of figures at start
+  # @MakeTableContents  { No                    } # list of tables at start
+  # @MakeContents	{ No			} # make contents? Yes or No
+  # @ContentsGap	{ 0.20v	@OrIfPlain 0f	} # extra gap above minor entry
+  # @ContentsGapAbove	{ 0.80v	@OrIfPlain 1f	} # extra gap above major entry
+  # @ContentsGapBelow	{ 0.00v	@OrIfPlain 0f	} # extra gap below major entry
+  # @ContentsFont       { Bold                  } # font for major entry
+  # @ContentsPartGapAbove { 1.00v @OrIfPlain 1f	} # extra gap above `part' entry
+  # @ContentsPartGapBelow { 0.00v @OrIfPlain 0f	} # extra gap below `part' entry
+  # @ContentsFormat	{ number @DotSep title	} # contents entry format
+  # @ContentsLeader	{ ..			} # leader symbol in contents
+  # @ContentsLeaderGap	{ 4s	@OrIfPlain 2s	} # gap between leaders
+  # @ContentsRightWidth	{ 3f	@OrIfPlain 6s	} # page numbers column width
+  # @MakeReferences	{ Yes			} # make references? Yes or No
+  # @RefCiteStyle	{ [cite]		} # citation style
+  # @RefCiteLabels	{ @RefNum		} # citation items
+  # @RefNumbers		{ Arabic		} # reference numbers
+  # @RefListFormat	{ Labels		} # NoLabels, Labels, etc.
+  # @RefListLabels	{ [@RefNum]		} # ref list label format
+  # @RefListTitle	{ references		} # title of reference list
+  # @ChapRefListTitle	{ references		} # title of chapter ref list
+  # @RefListIndent	{ 0s			} # indent to left of labels
+  # @RefListRightIndent	{ 0s			} # indent to right of items
+  # @RefListGap		{ @ListGap		} # gap between ref list items
+  # @RefListFont	{        		} # font used in reference list
+  # @RefListBreak	{        		} # break style of ref list
+  # @RefListLabelWidth 	{ @ListLabelWidth	} # Labels column width
+  # @RefListSortKey	{ @Tag			} # sorting key
+  # @MakeIndex		{ No			} # make index? Yes or No
+  # @IndexFont		{			} # index entries font
+  # @IndexBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
+  # @IndexColumnNumber	{ 2			} # index columns (1 to 10)
+  # @IndexColumnGap	{ 1.00c	@OrIfPlain 6s	} # index column gap
+  # @IndexCtd		{ Yes			} # include (ctd.) lines
+  # @IndexCtdWord	{ continued		} # "ctd." in current lang.
+  # @IndexCtdFormat	{ @Body @I (@CtdWord)	} # format of ctd.
+  # @MakeIndexA		{ No 			} # make index A? Yes or No
+  # @IndexAFont		{			} # index A entries font
+  # @IndexABreak	{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
+  # @IndexAColumnNumber	{ 2			} # index A columns (1 to 10)
+  # @IndexAColumnGap	{ 1.00c	@OrIfPlain 6s	} # index A column gap
+  # @IndexACtd		{ Yes			} # include (ctd.) lines
+  # @IndexACtdWord	{ continued		} # "ctd." in current lang.
+  # @IndexACtdFormat	{ @Body @I (@CtdWord)	} # format of ctd.
+  # @MakeIndexB		{ No 			} # make index B? Yes or No
+  # @IndexBFont		{			} # index B entries font
+  # @IndexBBreak	{ {oragged 1.2fx} @OrIfPlain {oragged 1fx} } # and break
+  # @IndexBColumnNumber	{ 2			} # index B columns (1 to 10)
+  # @IndexBColumnGap	{ 1.00c	@OrIfPlain 6s	} # index B column gap
+  # @IndexBCtd		{ Yes			} # include (ctd.) lines
+  # @IndexBCtdWord	{ continued		} # "ctd." in current lang.
+  # @IndexBCtdFormat	{ @Body @I (@CtdWord)	} # format of ctd.
+  # @TopGap		{ 0.75c	@OrIfPlain 2f	} # gap between figures
+  # @MidGap		{ 0.75c	@OrIfPlain 2f	} # gap above/below body text
+  # @FootNoteNumbers	{ Arabic		} # footnote numbers
+  # @FootNoteThrough	{ No			} # numbered through chapter?
+  # @FootNoteLocation	{ ColFoot		} # where the footnote appears
+  # @FootNoteFont	{ 0.80f			} # font for footnotes
+  # @FootNoteBreak	{ 1.2fx	@OrIfPlain 1fx	} # break for footnotes
+  # @FootNoteFormat     { { number &0.05f } @Insert body } # footnote format
+  # @FootLen		{ 2.00c	@OrIfPlain 10s	} # length of footnote line
+  # @FootAboveGap	{ @DisplayGap		} # gap above footnote line
+  # @FootGap		{ 0.20c	@OrIfPlain 1fx	} # gap between footnotes
+  # @MarginNoteFont	{ 0.80f			} # font of margin notes
+  # @MarginNoteBreak	{ ragged 1.10fx		} # break style of margin notes
+  # @MarginNoteHGap	{ 0.5c   		} # horizontal gap to notes
+  # @MarginNoteVGap	{ @DisplayGap  		} # min vertical gap between
+  # @MarginNoteWidth	{ 1.50c  		} # width of margin notes
+  # @EndNoteNumbers	{ Arabic		} # endnote numbers
+  # @EndNoteFont	{ 0.80f			} # font of endnotes
+  # @EndNoteBreak	{ 1.2fx	@OrIfPlain 1fx	} # break for endnotes
+  # @EndNoteFormat	{ { number &0.05f } @Insert body } # endnote format
+  # @EndNoteGap		{ 0.20c	@OrIfPlain 1f	} # gap between endnotes
+  # @TheoremWord	{ theorem		} # "Theorem" word, etc.
+  # @TheoremTitleFormat	{ (title)		} # only if title present
+  # @TheoremFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
+  # @DefinitionWord	{ definition		} # "Definition" word, etc.
+  # @DefinitionTitleFormat { (title)		} # only if title present
+  # @DefinitionFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
+  # @ClaimWord		{ claim			} # "Claim" word, etc.
+  # @ClaimTitleFormat	{ (title)		} # only if title present
+  # @ClaimFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
+  # @PropositionWord	{ proposition		} # "Proposition" word, etc.
+  # @PropositionTitleFormat { (title)		} # only if title present
+  # @PropositionFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
+  # @LemmaWord		{ lemma			} # "Lemma" word, etc.
+  # @LemmaTitleFormat	{ (title)		} # only if title present
+  # @LemmaFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
+  # @CorollaryWord	{ corollary		} # "Corollary" word, etc.
+  # @CorollaryTitleFormat { (title)		} # only if title present
+  # @CorollaryFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
+  # @ExampleWord	{ example		} # "Example" word, etc.
+  # @ExampleTitleFormat	{ (title)		} # only if title present
+  # @ExampleFormat	{ {@B { word @NumSep number title: } &2s} @Insert body }
+  # @ProofWord		{ proof			} # "Proof" word, etc.
+  # @PageHeaders	{ Simple		} # None Simple Titles NoTitles
+  # @PageNumbers	{ Arabic		} # page numbers
+  # @FirstPageNumber	{ 1			} # number of first page 
+  # @IntroPageNumbers	{ Roman			} # intro page numbers
+  # @IntroFirstPageNumber{ 1			} # number of first intro page 
+  # @StructPageNums	{ No			} # make structured page numbers
+
+  # @OddTop		{ @Centre{- @PageNum -}	} # Simple page headers
+  # @OddFoot		{ @Null			}
+  # @EvenTop		{ @Centre{- @PageNum -}	}
+  # @EvenFoot		{ @Null			}
+  # @StartOddTop	{ @Null			}
+  # @StartOddFoot	{ @Null			}
+  # @StartEvenTop	{ @Null			}
+  # @StartEvenFoot	{ @Null			}
+  # @IntroOddTop	{ @Null			}
+  # @IntroOddFoot	{ @Centre @PageNum	}
+  # @IntroEvenTop	{ @Null			}
+  # @IntroEvenFoot	{ @Centre @PageNum	}
+  # @IntroStartOddTop	{ @Null			}
+  # @IntroStartOddFoot	{ @Null			}
+  # @IntroStartEvenTop	{ @Null			}
+  # @IntroStartEvenFoot	{ @Null			}
+
+						  # Titles, NoTitles headers
+  # @RunningOddTop  { @I {@MinorNum @DotSep @MinorTitle} @Right @B @PageNum }
+  # @RunningOddFoot		{ @Null					}
+  # @RunningEvenTop { @B @PageNum @Right @I {@MajorNum @DotSep @MajorTitle} }
+  # @RunningEvenFoot		{ @Null					}
+  # @RunningStartOddTop 	{ @Null					}
+  # @RunningStartOddFoot	{ @Centre { Bold 0.8f } @Font @PageNum	}
+  # @RunningStartEvenTop	{ @Null					}
+  # @RunningStartEvenFoot	{ @Centre { Bold 0.8f } @Font @PageNum	}
+  # @RunningIntroOddTop		{ @Null					}
+  # @RunningIntroOddFoot	{ @Right @PageNum			}
+  # @RunningIntroEvenTop	{ @Null					}
+  # @RunningIntroEvenFoot	{ @PageNum				}
+  # @RunningIntroStartOddTop	{ @Null					}
+  # @RunningIntroStartOddFoot	{ @Null					}
+  # @RunningIntroStartEvenTop	{ @Null					}
+  # @RunningIntroStartEvenFoot	{ @Null					}
+}
+
+
+###############################################################################
+#                                                                             #
+#  The @ReportSetup @Use clause - options specific to technical reports.      #
+#                                                                             #
+###############################################################################
+
+@Use { @ReportSetup
+  # @CoverSheet			{ Yes		} # make cover sheet
+  # @ContentsSeparate		{ No		} # contents on separate pages
+  # @DateLine			{ No		} # Yes, No, or a date
+  # @AboveTitleGap		{ 1i		} # space above title
+  # @TitleFont			{ Bold		} # title font
+  # @TitleBreak			{ clines 1.4vx	} # title break
+  # @AuthorFont			{ Italic	} # author font
+  # @AuthorBreak		{ clines	} # author break
+  # @InstitutionFont		{		} # institution font
+  # @InstitutionBreak		{ clines	} # institution break
+  # @DateLineFont		{		} # dateline font
+  # @DateLineBreak		{		} # dateline break
+  # @AbstractDisplay		{ No		} # abstract full width display
+  # @AbstractFont		{ 		} # font of abstract
+  # @AbstractBreak		{ 		} # break style of abstract
+  # @AbstractFormat		{ @Centre @Title @DP @Body } # abstract format
+  # @AbstractTitle		{ dft		} # abstract title (dft is @AbstractWord)
+  # @ReferencesBeforeAppendices	{ No		} # references before appendices
+  # @AbstractWord		{ abstract	} # word for "Abstract"
+  # @ContentsWord		{ contents	} # word for "Contents"
+  # @AppendixWord		{ appendix	} # word for "Appendix"
+  # @IndexWord			{ index		} # word for "Index"
+  # @IndexAWord			{ index		} # word for "Index" (A)
+  # @IndexBWord			{ index		} # word for "Index" (B)
+  # @SectionNumbers		{ Arabic	} # kind of section numbers
+  # @FirstSectionNumber		{ 1		} # first section num (Arabic)
+  # @SubSectionNumbers		{ Arabic	} # kind of subsection numbers
+  # @FirstSubSectionNumber	{ 1		} # first subsect num (Arabic)
+  # @SubSubSectionNumbers	{ Arabic	} # kind of sub-subsect numbers
+  # @FirstSubSubSectionNumber	{ 1		} # first subsub. num (Arabic)
+  # @AppendixNumbers		{ UCAlpha	} # kind of appendix numbers
+  # @FirstAppendixNumber	{ 1		} # first appendix num (Arabic)
+  # @SubAppendixNumbers		{ Arabic	} # kind of subappendix numbers
+  # @FirstSubAppendixNumber	{ 1		} # first sub-app. num (Arabic)
+  # @SubSubAppendixNumbers	{ Arabic	} # kind of sub-subapp. numbers
+  # @FirstSubSubAppendixNumber	{ 1		} # first sub-sub. num (Arabic)
+  # @AbstractHeadingFont	{ Bold			} # abstract head font
+  # @AbstractHeadingBreak	{ ragged 1.2fx nohyphen	} # abstract head break
+  # @AbstractHeadingFormat	{ @Centre title		} # abstract head fmt
+  # @ContentsHeadingFont	{ Bold			} # contents head font
+  # @ContentsHeadingBreak	{ ragged 1.2fx nohyphen	} # contents head break
+  # @ContentsHeadingFormat	{ title			} # contents head fmt
+  # @SectionHeadingFont		{ Bold			} # section head font
+  # @SectionHeadingBreak	{ ragged 1.2fx nohyphen	} # section head break
+  # @SectionHeadingFormat	{ number @DotSep title	} # section head fmt
+  # @SubSectionHeadingFont	{ Bold			} # subsection head font
+  # @SubSectionHeadingBreak	{ ragged 1.2fx nohyphen	} # subsection head break
+  # @SubSectionHeadingFormat	{ number @DotSep title	} # subsection head fmt
+  # @SubSubSectionHeadingFont	{ Slope			} # sub-subs. head font
+  # @SubSubSectionHeadingBreak	{ ragged 1.2fx nohyphen	} # sub-subs. head break
+  # @SubSubSectionHeadingFormat	{ number @DotSep title	} # sub-subs. head fmt
+  # @AppendixHeadingFont	{ Bold			} # appendix head font
+  # @AppendixHeadingBreak	{ ragged 1.2fx nohyphen	} # appendix head break
+  # @AppendixHeadingFormat	{ number @DotSep title	} # appendix head fmt
+  # @SubAppendixHeadingFont	{ Bold			} # subapp. head font
+  # @SubAppendixHeadingBreak	{ ragged 1.2fx nohyphen	} # subapp. head break
+  # @SubAppendixHeadingFormat	{ number @DotSep title	} # subapp. head fmt
+  # @SubSubAppendixHeadingFont	{ Slope			} # sub-subapp. head font
+  # @SubSubAppendixHeadingBreak	{ ragged 1.2fx nohyphen	} # sub-subapp head break
+  # @SubSubAppendixHeadingFormat{ number @DotSep title	} # sub-subapp. head fmt
+  # @ReferencesHeadingFont	{ Bold			} # references head font
+  # @ReferencesHeadingBreak	{ ragged 1.2fx nohyphen	} # references head break
+  # @ReferencesHeadingFormat	{ title			} # references head fmt
+  # @IndexHeadingFont		{ Bold			} # index head font
+  # @IndexHeadingBreak		{ ragged 1.2fx nohyphen	} # index head break
+  # @IndexHeadingFormat		{ title			} # index head fmt
+  # @IndexAHeadingFont		{ Bold			} # index A head font
+  # @IndexAHeadingBreak		{ ragged 1.2fx nohyphen	} # index A head break
+  # @IndexAHeadingFormat	{ title			} # index A head fmt
+  # @IndexBHeadingFont		{ Bold			} # index B head font
+  # @IndexBHeadingBreak		{ ragged 1.2fx nohyphen	} # index B head break
+  # @IndexBHeadingFormat	{ title			} # index B head fmt
+  # @SectionGap			{ 2.0v	@OrIfPlain 3f	} # between sections
+  # @SubSectionGap		{ 1.5v	@OrIfPlain 2f	} # between subsects
+  # @SubSubSectionGap		{ 1.5v	@OrIfPlain 2f	} # between sub-subs.
+  # @AppendixGap		{ 2.0v	@OrIfPlain 3f	} # between appendices
+  # @SubAppendixGap		{ 1.5v	@OrIfPlain 2f	} # between subappendices
+  # @SubSubAppendixGap		{ 1.5v	@OrIfPlain 2f	} # between sub-subapps
+  # @SectionInContents		{ Yes		} # add sections to contents
+  # @SubSectionInContents	{ Yes		} # add subsections to contents
+  # @SubSubSectionInContents	{ No		} # add sub-subsects to contents
+  # @AppendixInContents		{ Yes		} # add appendices to contents
+  # @SubAppendixInContents	{ Yes		} # add subappendices to contents
+  # @SubSubAppendixInContents	{ No		} # add sub-subapps to contents
+  # @ReferencesInContents	{ Yes		} # add references to contents
+  # @IndexInContents		{ Yes		} # add index to contents
+  # @IndexAInContents		{ Yes		} # add index A to contents
+  # @IndexBInContents		{ Yes		} # add index B to contents
+  # @SectionNumInTheorems	{ No		} # theorem num has section num
+  # @SubSectionNumInTheorems	{ No		} # theorem num has subsect num
+  # @SubSubSectionNumInTheorems	{ No		} # theorem num has sub-ss. num
+  # @AppendixNumInTheorems	{ No		} # theorem num has appendix num
+  # @SubAppendixNumInTheorems	{ No		} # theorem num has sub-app num
+  # @SubSubAppendixNumInTheorems{ No		} # theorem num has sub-sa. num
+  # @SectionNumInDisplays	{ Yes		} # display num has section num
+  # @SubSectionNumInDisplays	{ No		} # display num has subsect num
+  # @SubSubSectionNumInDisplays	{ No		} # display num has sub-ss. num
+  # @AppendixNumInDisplays	{ Yes		} # display num has appendix num
+  # @SubAppendixNumInDisplays	{ No		} # display num has sub-app num
+  # @SubSubAppendixNumInDisplays{ No		} # display num has sub-sa. num
+  # @SectionNumInFigures	{ No		} # figure num has section num
+  # @SubSectionNumInFigures	{ No		} # figure num has subsect num
+  # @SubSubSectionNumInFigures	{ No		} # figure num has sub-ss. num
+  # @AppendixNumInFigures	{ No		} # figure num has appendix num
+  # @SubAppendixNumInFigures	{ No		} # figure num has sub-app num
+  # @SubSubAppendixNumInFigures	{ No		} # figure num has sub-sa. num
+  # @SectionNumInTables		{ No		} # table num has section num
+  # @SubSectionNumInTables	{ No		} # table num has subsect num
+  # @SubSubSectionNumInTables	{ No		} # table num has sub-ss. num
+  # @AppendixNumInTables	{ No		} # table num has appendix num
+  # @SubAppendixNumInTables	{ No		} # table num has sub-app num
+  # @SubSubAppendixNumInTables	{ No		} # table num has sub-sa. num
+  # @SectionNumInRunners 	{ Yes		} # runners have section num
+  # @SubSectionNumInRunners 	{ No		} # runners have subsect num
+  # @SubSubSectionNumInRunners 	{ No		} # runners have sub-ss. num
+  # @AppendixNumInRunners 	{ Yes		} # runners have appendix num
+  # @SubAppendixNumInRunners 	{ No		} # runners have sub-app num
+  # @SubSubAppendixNumInRunners { No		} # runners have sub-sa. num
+  # @FigureContentsPrefix	{		} # for structured page nums
+  # @TableContentsPrefix	{		} # for structured page nums
+  # @SectionPrefix		{		} # for structured page nums
+  # @AppendixPrefix		{		} # for structured page nums
+  # @ReferencesPrefix		{		} # for structured page nums
+  # @IndexPrefix		{		} # for structured page nums
+  # @IndexAPrefix		{		} # for structured page nums
+  # @IndexBPrefix		{		} # for structured page nums
+}
+
+
+###############################################################################
+#                                                                             #
+#  @Database (and @SysDatabase) clauses go here.                              #
+#                                                                             #
+###############################################################################
+
+@SysDatabase @FontDef  { fontdefs }		  # font definitions
+@SysDatabase @RefStyle { refstyle }		  # reference printing styles

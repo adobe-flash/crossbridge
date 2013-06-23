@@ -1,0 +1,78 @@
+##=== TEST.nightly.report - Report description for nightly -----*- perl -*-===##
+#
+# This file defines a report to be generated for the nightly tests.
+#
+##===----------------------------------------------------------------------===##
+
+# Sort by program name
+$SortCol = 0;
+$TrimRepeatedPrefix = 1;
+
+my $WallTimeRE = "Time: ([0-9.]+) seconds \\([0-9.]+ wall clock";
+
+# FormatTime - Convert a time from 1m23.45 into 83.45
+sub FormatTime {
+  my $Time = shift;
+  if ($Time =~ m/([0-9]+)[m:]([0-9.]+)/) {
+    return sprintf("%7.4f", $1*60.0+$2);
+  }
+
+  return sprintf("%7.4f", $Time);
+}
+
+sub GCCLLCRatio {
+  my ($Cols, $Col) = @_;
+  my $GCC = $Cols->[$Col-7];
+  my $LLC = $Cols->[$Col-5];
+  return "n/a" if ($GCC eq "*" or $LLC eq "*");
+  return sprintf("%3.2f", $GCC/$LLC) if ($GCC >= 0.1 and $LLC >= 0.1);
+  return "-";
+}
+
+sub GCCLLC_BETARatio {
+  my ($Cols, $Col) = @_;
+  my $GCC = $Cols->[$Col-8];
+  my $LLC_BETA = $Cols->[$Col-5];
+  return "n/a" if ($GCC eq "*" or $LLC_BETA eq "*");
+  return sprintf("%3.2f", $GCC/$LLC_BETA) if ($GCC >= 0.1 and $LLC_BETA >= 0.1);
+  return "-";
+}
+
+sub LLCLLC_BETARatio {   # LLC/LLC-BETA
+  my ($Cols, $Col) = @_;
+  my $LLC = $Cols->[$Col-7];
+  my $LLC_BETA = $Cols->[$Col-6];
+  return "n/a" if ($LLC eq "*" or $LLC_BETA eq "*");
+  return sprintf("%3.2f", $LLC/$LLC_BETA) if ($LLC >= 0.1 and $LLC_BETA >= 0.1);
+  return "-";
+}
+
+# highlight the RATIO columns with green/red.
+$HilightColumns{14} = 1;
+$HilightColumns{15} = 1;
+$HilightColumns{16} = 1;
+$HilightColumns{17} = 1;
+
+# These are the columns for the report.  The first entry is the header for the
+# column, the second is the regex to use to match the value.  Empty list create
+# separators, and closures may be put in for custom processing.
+(
+# Name
+ ["Program"  , '\'([^\']+)\' Program'],
+ [],
+# Times
+ ["GCCAS"    , "TEST-RESULT-compile: .*$WallTimeRE"],
+ ["Bytecode" , 'TEST-RESULT-compile: *([0-9]+)'],
+ ["LLC compile" , "TEST-RESULT-llc: .*$WallTimeRE"],
+ ["LLC-BETA compile" , "TEST-RESULT-llc-beta: .*$WallTimeRE"],
+ ["JIT codegen" , "TEST-RESULT-jit-comptime: .*$WallTimeRE"],
+ [],
+ ["GCC"      , 'TEST-RESULT-nat-time: user\s*([.0-9m:]+)', \&FormatTime],
+ ["LLC"      , 'TEST-RESULT-llc-time: user\s*([.0-9m:]+)', \&FormatTime],
+ ["LLC-BETA" , 'TEST-RESULT-llc-beta-time: user\s*([.0-9m:]+)',\&FormatTime],
+ ["JIT"      , 'TEST-RESULT-jit-time: user\s*([.0-9m:]+)', \&FormatTime],
+ [],
+ ["GCC/LLC"  , \&GCCLLCRatio],
+ ["GCC/LLC-BETA"  , \&GCCLLC_BETARatio],
+ ["LLC/LLC-BETA"  , \&LLCLLC_BETARatio]
+);

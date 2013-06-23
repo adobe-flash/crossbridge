@@ -5,7 +5,7 @@ tablegen(LLVM AVM2GenInstrInfo.inc -gen-instr-info)
 tablegen(LLVM AVM2GenAsmWriter.inc -gen-asm-writer)
 tablegen(LLVM AVM2GenDAGISel.inc -gen-dag-isel)
 tablegen(LLVM AVM2GenCallingConv.inc -gen-callingconv)
-tablegen(LLVM AVM2GenSubtarget.inc -gen-subtarget)
+tablegen(LLVM AVM2GenSubtargetInfo.inc -gen-subtarget)
 add_public_tablegen_target(AVM2CommonTableGen)
 
 add_llvm_target(AVM2CodeGen

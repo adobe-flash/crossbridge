@@ -1,0 +1,235 @@
+
+  SPhot - Monte Carlo Transport Code
+
+
+    Benchmark-specific Instructions and Constraints
+
+*Privacy & Legal Notice* <http://www.llnl.gov/disclaimer.html>
+------------------------------------------------------------------------
+
+
+    Contents
+
+    * Expected Results 
+    * Optimization and Improvement Challenges 
+    * Parallelism and Scalability Expectations 
+    * Benchmark Specific Instructions 
+    * Release and Modification Record 
+
+------------------------------------------------------------------------
+
+
+    Expected Results
+
+       Please see the Summary writeup and the Sphot Sequoia Specific Benchmark
+       tests for information about expected results and the reporting of data.
+
+
+------------------------------------------------------------------------
+
+
+    Optimization and Improvement Challenges
+
+Performance improvement and optimizations for this code fall into the
+following categories:
+
+   1. *MPI Related*
+
+      Very little data is actually transferred between MPI tasks, since
+      each task has its own copy of the mesh, most likely in memory or
+      even cache. Most of the inter-task data transfer is for the
+      purpose of collecting timing results and involves very little
+      data. Several MPI_Barrier calls are used for synchronization
+      purposes also.
+
+      Improving MPI related performance would involve minimizing or
+      removing all MPI_Barrier calls and finding a way to minimize the
+      exchange of inter-task timing statistics. In regards to the
+      exchange of timing statistics, task 0 is a definitive bottleneck
+      since it must act as the "master" task and communicate with all
+      other tasks. This bottleneck may pose a challenge as the problem
+      is scaled up to hundreds or thousands of MPI tasks.
+
+      A very important, platform dependent optimization consideration
+      for this code is determining the optimal number of MPI tasks to
+      use. For example, a cluster of 32-processor SMP machines may
+      demonstrate optimal performance when there are 4 MPI tasks
+      (running 8 OpenMP threads each) on each SMP machine. This
+      optimization will probably best be determined by experimentation
+      on a given platform.
+
+   2. *OpenMP Related*
+
+      The current implementation does not make use of THREADPRIVATE
+      common blocks. Instead, all threads access certain COMMON block
+      variables globally, and that access occurs within the
+      computational core routine (execute.f) of the code. For SMPs with
+      few processors, this does not seem to pose a performance problem.
+      However, it is anticipated that for many-processor SMP machines,
+      it may. Improving OpenMP performance would involve finding a means
+      to implement THREADPRIVATE common blocks. Currently, the code
+      produces "wrong" results if this is attempted.
+
+      As with MPI, determining the optimal number of OpenMP threads to
+      use is a very important platform dependent optimization
+      consideration.
+
+   3. *Computation Kernel Related*
+
+      Actual execution time for a "run" of SPhot requires very little
+      wallclock or CPU time--certainly much less than a minute for any
+      current platform. Also, due to the small problem size (grid size),
+      and the embarrassingly parallel nature of this code, performance
+      gains in this category would be minimal at best.
+
+      For those interested in improving the performance of the
+      computationally significant routines, the following might be
+      evaluated:
+
+          * execute.f
+
+            This routine is responsible for over 50% of the total
+            execution time. Profiling has shown that most of the cycles
+            are distributed over a fairly large number of lines that
+            perform simple arithmetic operations (multiplies, adds,
+            divides), variable assignments (load/store), and IF
+            condition testing.
+
+          * pranf.f
+
+            This routine comprises approximately 10% of the total
+            execution time. It is a very small routine where virtually
+            all of the execution time can be accounted for by a single
+            line of code, shown below:
+
+
+   RandNum = float( Seed( 4 ) ) / Divisor( 4 ) +
+
+1     float( Seed( 3 ) ) / Divisor( 3 ) +
+
+2     float( Seed( 2 ) ) / Divisor( 2 ) +
+
+3     float( Seed( 1 ) ) / Divisor( 1 ) 
+
+
+
+          * ranfmodmult.f
+
+            This routine comprises approximately 10% of the total
+            execution time. This is another rather trivial (in size)
+            routine. The execution time is more or less evenly
+            distributed over all lines of executable code (less than 20)
+            which mostly perform simple arithmetic and load/store
+            operations.
+
+          * sqrt intrinsic function
+
+            This will vary according to platform. On one platform tested
+            using the native Fortran compiler, approximately 10% of the
+            total execution time was attributed to this intrinsic function.
+
+------------------------------------------------------------------------
+
+
+    Parallelism and Scalability Expectations
+
+Because SPhot is trivially parallel, it might be expected that this code
+should scale "perfectly" to very large processor counts. Additionally,
+I/O operations have been replaced with MPI communications to eliminate
+scalability problems common to many I/O systems.
+
+
+When SPhot is executed in hybrid mode (MPI with OpenMP), both shared 
+memory and distributed memory communications hardware and software 
+performance will be demonstrated.  CPU time per "run" will remain 
+relatively constant since runs are intended to map to a processor's 
+CPUs. Increasing the number of "runs" which may be done in parallel 
+increases with the number of available CPUs. Perfect scalability is 
+evidenced by an efficiency calculation of 1.00. That is, there is no 
+additional time required to compute N runs on N CPUs.
+
+Realistically, the scalability of SPhot may be affected by the MPI and
+OpenMP related factors discussed under the Optimization and Improvement
+Challenges Optimization> section. As indicated
+there, the application's MPI communications include barriers and
+potential task 0 bottlenecks. Also, the OpenMP sharing of global COMMON
+block data within the computation loop may also degrade performance for
+many-processor SMP machines.
+
+------------------------------------------------------------------------
+
+
+    Benchmark Specific Instructions and Constraints
+
+   1. *Code Modifications*
+
+      For the purposes of the ASC benchmarks, modifications to this
+      application's source code are not permitted unless such
+      modifications are:
+          * Needed to modify certain default parameters as discussed in
+            the Building the Code section.
+          * Minor and not intended for optimization purposes. Permitted
+            modifications would include those required to overcome
+            platform specific obstacles to building or running the code.
+            These modifications should be documented and reported to the
+            ASCI benchmark point of contact. 
+
+   2. *Modifications to Input File Parameters*
+
+      As discussed in the Running the Code 
+      section previously, the *Nruns* parameter will almost invariably
+      need to be modified every time the number of MPI tasks / OpenMP
+      threads used in an execution changes. This input parameter and the
+      output print flag are the only two parameters which can be modified.
+
+      Note that this parameter must be at least equal to and evenly
+      divisible by the (Number of MPI tasks * Number of OpenMP threads)
+      used. It has a default maximum value of 10001. If this default
+      value is too small, consult the Building the Code
+      section for instructions on how to
+      increase the value of the Nruns parameter.
+
+   3. *Compiler Generated Optimizations*
+
+      Benchmarkers are welcomed and encouraged to employ the use of
+      compiler generated optimizations when building the code.
+      Specifying these optimizations should not require modification to
+      the source code, but instead should take the form of common
+      compiler "flags". These types of optimizations may be specified in
+      the two Makefiles used for that purpose. See Building the Code
+      for additional information.
+
+   4. *Maximum Number of MPI Tasks and OpenMP Threads*
+
+      For the purpose of array dimensioning, particularly for the
+      collection of timing statistics, maximum values for these two
+      parameters are defined in the file includes/times.inc. The
+      distribution software sets these as follows:
+
+      PARAMETER( maxMPItasks = 16384 )
+      PARAMETER( maxThreadsPerMPItask = 128 )
+
+      If these values need to be increased, see the Building the Code
+      section for instructions.
+
+   5. *Required Problems*
+
+     Please see the Sphot Sequoia Specific Problem set for the problems
+     to be run, the results to be reported, and the description of the
+     calculation of the Figure of Merit (FOM) for the runs.
+------------------------------------------------------------------------
+
+
+    Release and Modification Record
+
+Version 1.0, this version. No release required. Public domain software.
+------------------------------------------------------------------------
+
+For more information about this page, contact:
+Tom Spelce ,  spelce1@llnl.gov mailto:spelce1@llnl.gov>
+
+<http://www.llnl.gov/>
+
+*UCRL-MI-144211*
+September 19, 2001
+

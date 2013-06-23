@@ -1,0 +1,25 @@
+##=== TEST.dbg.report - Report description for dbg -------------*- perl -*-===##
+#
+# This file defines a report to be generated for TEST=dbg tests.
+#
+##===----------------------------------------------------------------------===##
+
+
+# These are the columns for the report.  The first entry is the header for the
+# column, the second is the regex to use to match the value.  Empty list create
+# separators, and closures may be put in for custom processing.
+(
+# Name
+ ["Program"  , '\'([^\']+)\' Program'],
+ [],
+# Times
+ ["GCC Total"    , 'GCC Total Arguments: *([0-9]+)'],
+ ["GCC Valid"    , 'GCC Matching Arguments: *([0-9]+)'],
+ ["GCC Invalid"    , 'GCC Not Matching Arguments: *([0-9]+)'],
+ ["GCC Missing"    , 'GCC Missing Arguments: *([0-9]+)'],
+ [],
+ ["LLVM Total"    , 'LLVM Total Arguments: *([0-9]+)'],
+ ["LLVM Valid"    , 'LLVM Matching Arguments: *([0-9]+)'],
+ ["LLVM Invalid"    , 'LLVM Not Matching Arguments: *([0-9]+)'],
+ ["LLVM Missing"    , 'LLVM Missing Arguments: *([0-9]+)'],
+);

@@ -1,0 +1,30 @@
+##===- Makefile.FORTRAN ------------------------------------*- Makefile -*-===##
+#
+#                     The LLVM Compiler Infrastructure
+#
+# This file is distributed under the University of Illinois Open Source
+# License. See LICENSE.TXT for details.
+# 
+#===------------------------------------------------------------------------===#
+#
+# Enable running FORTRAN programs with LLVM using any available FORTRAN support.
+#
+##===----------------------------------------------------------------------===##
+
+include $(LEVEL)/Makefile.config
+
+# Make sure the correct targets come first.
+ifdef TEST
+test::
+else
+all::
+endif
+
+# Include the correct Makefile given how FORTRAN is currently being supported.
+ifeq ($(USE_F95),1)
+include $(LEVEL)/Makefile.nagfortran
+else
+ifeq ($(USE_F2C),1)
+include $(LEVEL)/Makefile.f2c
+endif
+endif

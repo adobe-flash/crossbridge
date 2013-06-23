@@ -17,15 +17,26 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+//===- AVM2Subtarget.cpp - AVM2 Subtarget Information -------------------===//
+//
+// This file implements the AVM2 specific subclass of TargetSubtarget.
+//
+//===----------------------------------------------------------------------===//
+
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
 
 #include "AVM2Subtarget.h"
 #include "AVM2.h"
-#define GET_SUBTARGETINFO_TARGET_DESC
+
 #define GET_SUBTARGETINFO_ENUM
-#include "AVM2GenSubtarget.inc"
+#define GET_SUBTARGETINFO_MC_DESC
+#define GET_SUBTARGETINFO_TARGET_DESC
+#define GET_SUBTARGETINFO_CTOR
+#include "AVM2GenSubtargetInfo.inc"
+
 using namespace llvm;
 
-#include "llvm/Support/CommandLine.h"
+//#include "llvm/Support/CommandLine.h"
 
 static cl::opt<bool> UseAS3Asm(
   "use-legacy-as3-asm",
@@ -33,15 +44,17 @@ static cl::opt<bool> UseAS3Asm(
   cl::desc("Use AS3 Assembly instead of intrinsics"),
   cl::Hidden);
 
-AVM2Subtarget::AVM2Subtarget(const Target &T, const std::string &TT, const std::string &FS)
+AVM2Subtarget::AVM2Subtarget(const std::string &TT, const std::string &CPU,
+                             const std::string &FS)
+  :AVM2GenSubtargetInfo(TT, CPU, FS)
 {
     // Determine default and user specified characteristics
-    std::string CPU = "generic";
+    //std::string CPU = "generic";
     UseActivations = false;
     DisableDebugLines = true;
     ForceOrderedCompares = false;
     // Parse features string.
-    ParseSubtargetFeatures(FS, CPU);
+    ParseSubtargetFeatures(CPU, FS);
 }
 
 bool AVM2Subtarget::useInlineAsm() const { return UseAS3Asm; }

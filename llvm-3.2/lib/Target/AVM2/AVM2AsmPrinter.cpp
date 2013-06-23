@@ -19,6 +19,8 @@
 // THE SOFTWARE.
 
 //===-- AVM2AsmPrinter.cpp - AVM2 LLVM assembly writer ------------------===//
+ 
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
 
 #define DEBUG_TYPE "asm-printer"
 #include "AVM2.h"

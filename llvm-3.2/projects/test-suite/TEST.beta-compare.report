@@ -1,0 +1,32 @@
+##=== TEST.beta-compare.report - Compare llc vs llcbeta --------*- perl -*-===##
+#
+# This file defines a report to be generated for the beta-compare test.
+#
+##===----------------------------------------------------------------------===##
+
+# Sort by name
+$SortCol = 1;
+$TrimRepeatedPrefix = 1;
+
+sub SizeRatio {
+  my ($Cols, $Col) = @_;
+  my $LLC = $Cols->[$Col-2];
+  my $BETA = $Cols->[$Col-1];
+  return "n/a" if ($LLC eq "*" or $BETA eq "*");
+  return sprintf("%2.3f", $LLC/$BETA);
+}
+
+
+# These are the columns for the report.  The first entry is the header for the
+# column, the second is the regex to use to match the value.  Empty list create
+# seperators, and closures may be put in for custom processing.
+(
+# Name
+ ["Name:" , '\'([^\']+)\' Program'],
+ [],
+# Code Size
+ ["#Insts", 'LLC: *([0-9]+).*Number of machine instrs printed'],
+ ["Beta", 'LLCBETA: *([0-9]+).*Number of machine instrs printed'],
+ ["LLC/BETA"  , \&SizeRatio],
+ []
+ );

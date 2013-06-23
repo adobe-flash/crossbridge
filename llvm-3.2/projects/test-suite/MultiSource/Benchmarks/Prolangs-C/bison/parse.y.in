@@ -1,0 +1,763 @@
+%{
+#include <malloc.h>
+#include <string.h>
+#include "attr.h"
+int yylex();
+void yyerror(char* s);
+#include "symtab.h"
+/* Global variables */
+scopeEntry current = NULL;  /* Points to current scope */
+scopeEntry temp = NULL;     /* Used temporarily for adding and/or
+			       removing scopes */
+%}
+
+%union { int number;
+	 tokentype token;
+	 BaseType basetype;
+	 typeinfo totaltype;
+	 namelist names;
+	 expnode exps;
+	 explist elist;}
+
+%token PROG PERIOD PROC FUNC VAR ARRAY RANGE OF
+%token INT CHAR BOOL WRITELN THEN ELSE IF DO WHILE
+%token BEG END ASG NOT TRUE_TOK FALSE_TOK
+%token <token> ID CCONST ICONST
+
+%type <basetype> stype
+%type <totaltype> type exp constant lhs var
+%type <names> idlist vardcl vardcls parmlist parms parm variables
+%type <elist> explist optexplist
+
+%start program
+%nonassoc '=' NEQ LT LEQ GEQ GT
+%left '+' '-' OR
+%left '*' AND DIV
+%right NOT
+
+%%
+program : PROG ID
+        { enterblock(); }
+        ';' block PERIOD 
+        {leaveblock();};
+
+block : variables
+      {
+      /* Seen all the variables so declare them in the current scope */
+	 symTabEntry s;
+         namenode tmpnode;
+
+	 tmpnode = $1.firstname;
+	 while ( tmpnode != NULL )
+	 {
+            if ( lookup( tmpnode -> name , current ) == NULL )
+	    {
+ 	       s = declare(tmpnode -> name,tmpnode -> idtype.basetype,
+		       tmpnode -> idtype.gentype,tmpnode -> ptype,
+                       tmpnode -> idtype.number, tmpnode -> idtype.endnum);
+	    }
+            else
+	       printf("\n***Error: duplicate declaration of %s\n", tmpnode ->
+		      name);
+	    tmpnode = tmpnode -> next;
+	 }
+      }
+      procdcls cmpdstmt;
+
+procdcls : procdcls procdcl | /* empty */ ;
+
+procdcl : PROC ID 
+        {  
+	   symTabEntry find;
+
+	   if (lookup($2.str,current) == NULL)
+	      find = declare($2.str,VOIDTYPE,PROCTYPE,NOTPARM,-1,-1);
+	   /* Just make a spot in the outerscope to hold the name of the */
+	   /* procedure */
+	   else
+	      printf("\n***Error: duplicate declaration of %s\n",$2.str);
+	   enterblock();
+           procentry($2.str,PROCTYPE);
+	} 
+        parmlist
+        {           /* After we have seen the parmlist, install it and */
+           int n;   /* update the number field */
+	   
+	   n = installparms($4);
+	   current -> procedure -> number = n;
+        }
+        ';' block ';'
+        {
+	   symTabEntry find;
+	   
+	   find = lookup($2.str, current -> outerscope);  /* Before we leave the block */
+	   if ( find != NULL )                            /* We must transfer the link */
+	   {                                              /* to the outer scope        */
+	      find -> number = current -> procedure -> number;
+	      find -> formals = current -> procedure -> formals;
+	   }
+           leaveblock();
+	}
+	| FUNC ID
+        {   /* Same as above up until where 'stype' is */
+	   symTabEntry find;
+	   if (lookup($2.str,current) == NULL)
+	      find = declare($2.str,VOIDTYPE,FUNCTYPE,NOTPARM,-1,-1);
+	   else
+	      printf("\n***Error: duplicate declaration of %s\n",$2.str);
+	   enterblock();
+           procentry($2.str,FUNCTYPE);
+        } 
+        parmlist
+        {
+	   int n;
+	   
+	   n = installparms($4);
+	   current -> procedure -> number = n;
+	}
+        ':' stype ';'
+         { finishfunc($7);
+	   /* We NOW know what type it returns so record it */}  
+	block ';'
+        {
+	   symTabEntry find;
+	  
+	   find = lookup($2.str, current -> outerscope );
+	   if ( find != NULL )
+	   {   /* Before we leave the block, we must make the link in the outer scope */
+	      find -> number = current -> procedure -> number;
+	      find -> basetype = current -> procedure -> basetype;
+	      find -> formals = current -> procedure -> formals;
+	   }
+           leaveblock(); 
+	}
+	;
+parmlist : '(' parms ')'
+         { $$ = $2; }    /* Pass up the list of params */
+	 | /* empty */
+         { $$.firstname = NULL;   /* There are no params so the list is NULL */
+	   $$.lastname = NULL; };
+
+parms : parms ';' parm
+        {  /* Link the current list to the new parmlist and send it up */
+	   $1.lastname -> next = $3.firstname;
+	   $$.firstname = $1.firstname;
+	   $$.lastname = $3.lastname;
+	}
+	| parm   
+        { $$ = $1; }; /* Send up the base case */
+
+parm :  VAR vardcl	                  
+        {  /* We know that these are pass by reference so record
+	      it in all the nodes */
+	   namenode tmpnode;
+	   
+	   tmpnode = $2.firstname;
+	   while ( tmpnode != NULL )
+	   {
+	      tmpnode -> ptype = REFPARM;
+	      tmpnode = tmpnode -> next;
+	   }
+	   $$ = $2; /* Send up the new list */
+	}
+	| vardcl                          
+        {  /* We know that these are pass by value so record
+	      it in all the nodes */
+	   namenode tmpnode;
+	   
+	   tmpnode = $1.firstname;
+	   while ( tmpnode != NULL )
+	   {
+	      tmpnode -> ptype = VALPARM;
+	      tmpnode = tmpnode -> next;
+	   }
+	   $$ = $1; /* Send up the new list */
+	};
+
+variables: /* empty */ 
+        { $$.firstname = NULL;  /* No variables = no list */
+	  $$.lastname = NULL; }
+	| VAR vardcls           /* Pass up the list of variables */
+        { $$ = $2; };
+
+vardcls	: vardcls vardcl ';'
+        {  /* Concatenates the 2 namelists */
+           $1.lastname -> next = $2.firstname;
+	   $$.firstname = $1.firstname;
+	   $$.lastname = $2.lastname;
+        }
+	| vardcl ';'
+        { $$ = $1; };
+vardcl	: idlist ':' type
+        {  /* We have a list of IDs and we have their type so
+	      we can now record them to be all of the same type */
+	   namenode tmpnode;
+
+	   tmpnode = $1.firstname;
+	   while ( tmpnode != NULL )
+	   {
+	      tmpnode->idtype.basetype = $3.basetype;
+	      tmpnode->idtype.gentype = $3.gentype;
+	      tmpnode->idtype.number = $3.number;
+	      tmpnode->idtype.endnum = $3.endnum;
+	      tmpnode->ptype = NOTPARM;
+              tmpnode = tmpnode -> next;
+	   }
+           $$ = $1; /* Send up the new list */
+        };
+idlist	: idlist ',' ID
+        {  /* Hook the new ID to the current list of IDs */
+	   namenode tmpname1 = NULL;
+
+	   tmpname1 = (namenode) malloc(sizeof(struct _namenode));
+	   tmpname1 -> name = $3.str;
+	   tmpname1 -> next = NULL;
+           $1.lastname -> next = tmpname1;
+           $$.firstname = $1.firstname;
+	   $$.lastname = tmpname1;
+        }
+        | ID
+        {  /* Start the linked list with the first ID */
+	   namenode tmpname1 = NULL;
+	
+	   tmpname1 = (namenode) malloc(sizeof(struct _namenode));
+	   tmpname1 -> name = $1.str;
+	   tmpname1 -> next = NULL;
+	   $$.firstname = tmpname1;
+	   $$.lastname = tmpname1;
+        }
+	;
+type	: ARRAY '[' ICONST RANGE ICONST ']' OF stype
+        { if ($3.num > $5.num)
+	  {
+	     printf("\n***Error: lower bound exceeds upper bound\n");
+	     $$.basetype = $8;   /* Basetype is whatever 'stype' was */
+	     $$.gentype = ARRAYTYPE;
+	     $$.number = $5.num;
+	     $$.endnum = $3.num;
+	  }
+          else
+	  {
+             $$.basetype = $8;   /* Basetype is whatever 'stype' was */
+             $$.gentype = ARRAYTYPE;
+	     $$.number = $3.num;
+	     $$.endnum = $5.num;
+          }
+	}
+	| stype
+        {   
+           $$.basetype = $1;
+	   $$.gentype = NOTYPE;
+	   $$.number = -1;
+	   $$.endnum = -1;
+        };
+
+stype	: INT	                    { $$ = INTTYPE; /* Send up the basetypes */ }
+	| CHAR	                    { $$ = CHARTYPE;                            }
+	| BOOL	                    { $$ = BOOLTYPE;                            };
+
+stmtlist : stmtlist ';' stmt      {   }
+	| stmt                    {   };
+
+stmt	: ifstmt                  {   }
+	| wstmt                   {   }
+	| astmt                   {   }
+	| procstmt                {   }
+	| cmpdstmt                {   }
+	| writestmt               {   };
+
+writestmt: WRITELN '(' exp ')'
+        { if (( $3.basetype == INTTYPE ) || ( $3.basetype == STRINGTYPE ))
+	  {  /* Must be a string or int */
+	     if ( $3.gentype != NOTYPE )
+	        printf("\n***Error: illegal type for writeln\n"); /* No arrays or such */
+	  }
+	  else
+	     printf("\n***Error: illegal type for writeln\n"); /* Only ints and strings */
+	};
+
+procstmt: ID optexplist
+        {
+           symTabEntry s;
+	   
+	   s = lookupALL($1.str);
+	   if ( s == NULL )       /* ID not found */
+	      printf("\n***Error: undeclared identifier %s\n",$1.str);
+	   else
+	   {
+	      if ( s -> gentype != PROCTYPE ) /* Found, but not a procedure */
+	         printf("\n***Error: id %s is not a procedure\n",$1.str);
+	      else
+	      {  /* Found and it is a procedure so check the parameters */
+		 int check;
+		 check = checkparams( s -> formals , $2 );
+	      }
+	   }
+        }
+	;
+ifstmt	: ifhead THEN stmt ELSE stmt
+	| ifhead THEN stmt
+	;
+ifhead	: IF exp
+        {  /* only booleans */
+	   if ($2.basetype != BOOLTYPE)
+	      printf("\n***Error: exp in if stmt must be boolean\n");
+	}
+	;
+wstmt	: whead DO stmt
+	;
+whead	: WHILE exp
+        {  /* only booleans */
+	   if ($2.basetype != BOOLTYPE)
+	      printf("\n***Error: exp in while stmt must be boolean\n");
+	};
+
+cmpdstmt: BEG stmtlist END;
+
+astmt : lhs exp
+        {  /* Make sure the assignment types match */
+           if (!(match($1,$2)))
+	      printf("\n***Error: assignment types do not match\n");
+        };
+
+lhs	: var ASG
+        { $$ = $1; };
+
+optexplist: /* empty */
+        { $$.firstexp = NULL;   /* No optexplist = NULL list */
+	  $$.lastexp = NULL; }
+	| '(' explist ')'
+        { $$ = $2; };
+
+explist : explist ',' exp
+        {  /* Hook the new expression type to the current list */
+	   expnode tmpnode;
+	   
+	   tmpnode = makeexp($3);
+	   $1.lastexp -> next = tmpnode;
+	   $$.firstexp = $1.firstexp;
+	   $$.lastexp = tmpnode;
+        }
+	| exp
+        {  /* Start the list with the first expression */
+	   expnode tmpnode;
+	   
+	   tmpnode = makeexp($1);
+	   $$.firstexp = tmpnode;
+	   $$.lastexp = tmpnode;
+        };
+
+exp	: exp '+' exp
+        {  /* '+' requires integers */
+
+	   if (( $1.basetype != INTTYPE ) || ( $3.basetype != INTTYPE ) ||
+               ( $1.gentype != NOTYPE ) || ( $3.gentype != NOTYPE ))
+              printf("\n***Error: operands of '+' must be integers\n");
+           $$.basetype = INTTYPE;
+           $$.gentype = NOTYPE;
+           $$.number = -1;
+           $$.endnum = -1;
+        }
+	| exp '-' exp
+	{  /* '-' requires integers */
+
+	   if (( $1.basetype != INTTYPE ) || ( $3.basetype != INTTYPE ) ||
+               ( $1.gentype != NOTYPE ) || ( $3.gentype != NOTYPE ))
+              printf("\n***Error: operands of '-' must be integers\n");
+           $$.basetype = INTTYPE;
+           $$.gentype = NOTYPE;
+           $$.number = -1;
+           $$.endnum = -1;
+	}
+	| '-' exp %prec NOT
+        {  /* unary '-' requires an integer */
+
+           if (( $2.basetype != INTTYPE ) || ( $2.gentype != NOTYPE ))
+	      printf("\n***Error: right operand of '-' must be an integer\n");
+	   $$.basetype = INTTYPE;
+	   $$.gentype = NOTYPE;
+	   $$.number = -1;
+	   $$.endnum = -1;
+	}
+	| exp '*' exp
+        {  /* '*' requires integers */
+
+           if (( $1.basetype != INTTYPE ) || ( $3.basetype != INTTYPE ) ||
+               ( $1.gentype != NOTYPE ) || ( $3.gentype != NOTYPE ))
+              printf("\n***Error: operands of '*' must be integers\n");
+           $$.basetype = INTTYPE;
+           $$.gentype = NOTYPE;
+           $$.number = -1;
+           $$.endnum = -1;
+        }
+	| exp DIV exp
+        {  /* DIV requires integers */
+
+	   if (( $1.basetype != INTTYPE ) || ( $3.basetype != INTTYPE ) ||
+	       ( $1.gentype != NOTYPE ) || ( $3.gentype != NOTYPE ))
+	      printf("\n***Error: operands of div must be integers\n");
+	   $$.basetype = INTTYPE;
+	   $$.gentype = NOTYPE;
+	   $$.number = -1;
+	   $$.endnum = -1;
+        }
+	| exp NEQ exp
+        {  /* '<>' requires the same types AND only base types */
+
+	   if ( $1.basetype != $3.basetype )
+              printf("\n***Error: operands of '<>' have different types\n");
+           if (( $1.gentype != NOTYPE ) || ( $3.gentype != NOTYPE ))
+	      printf("\n***Error: operands of '<>' must be base types\n");
+           $$.basetype = BOOLTYPE;
+           $$.gentype = NOTYPE;
+           $$.number = -1;
+           $$.endnum = -1;
+        }
+	| exp '=' exp                    
+        {  /* '=' requires the same types AND only base types */
+
+           if (($1.basetype != $3.basetype ) || ( $1.gentype != NOTYPE ) ||
+               ( $3.gentype != NOTYPE ))
+	      printf("\n***Error: operands of '=' have different types\n");
+	   $$.basetype = BOOLTYPE;
+	   $$.gentype = NOTYPE;
+	   $$.number = -1;
+	   $$.endnum = -1;
+        }
+	| exp GEQ exp                    
+        {  /* '>=' requires integers */
+
+	   if (( $1.basetype != INTTYPE ) || ( $3.basetype != INTTYPE ) ||
+               ( $1.gentype != NOTYPE ) || ( $3.gentype != NOTYPE ))
+              printf("\n***Error: operands of '>=' must be integers\n");
+           $$.basetype = BOOLTYPE;
+           $$.gentype = NOTYPE;
+           $$.number = -1;
+           $$.endnum = -1;
+        }
+	| exp GT exp	                 
+        {  /* '>' requires integers */
+
+	   if (( $1.basetype != INTTYPE ) || ( $3.basetype != INTTYPE ) ||
+               ( $1.gentype != NOTYPE ) || ( $3.gentype != NOTYPE ))
+              printf("\n***Error: operands of '>' must be integers\n");
+           $$.basetype = BOOLTYPE;
+           $$.gentype = NOTYPE;
+           $$.number = -1;
+           $$.endnum = -1;
+        }
+	| exp LT exp
+        {  /* '<' requires integers */
+
+           if (( $1.basetype != INTTYPE ) || ( $3.basetype != INTTYPE ) ||
+               ( $1.gentype != NOTYPE ) || ( $3.gentype != NOTYPE ))
+              printf("\n***Error: operands of '<' must be integers\n");
+           $$.basetype = BOOLTYPE;
+           $$.gentype = NOTYPE;
+           $$.number = -1;
+           $$.endnum = -1;
+        }
+	| exp LEQ exp
+        {  /* '<=' requires integers */
+
+	   if (( $1.basetype != INTTYPE ) || ( $3.basetype != INTTYPE ) ||
+	       ( $1.gentype != NOTYPE ) || ( $3.gentype != NOTYPE ))
+	      printf("\n***Error: operands of '<=' must be integers\n");
+	   $$.basetype = BOOLTYPE;
+	   $$.gentype = NOTYPE;
+	   $$.number = -1;
+	   $$.endnum = -1;
+        }
+        | exp AND exp
+        {  /* AND requires booleans */
+
+	   if (( $1.basetype != BOOLTYPE ) || ( $3.basetype != BOOLTYPE ) ||
+	       ( $1.gentype != NOTYPE ) || ( $3.gentype != NOTYPE ))
+	      printf("\n***Error: operands of AND must be boolean\n");
+           $$.basetype = BOOLTYPE;
+	   $$.gentype = NOTYPE;
+	   $$.number = -1;
+	   $$.endnum = -1;
+        }
+	| exp OR exp
+        {  /* OR requires booleans */
+
+	   if (( $1.basetype != BOOLTYPE ) || ( $3.basetype != BOOLTYPE ) ||
+	       ( $1.gentype != NOTYPE ) || ( $3.gentype != NOTYPE ))
+	      printf("\n***Error: operands of OR must be boolean\n");
+	   $$.basetype = BOOLTYPE;
+	   $$.gentype = NOTYPE;
+	   $$.number = -1;
+	   $$.endnum = -1;
+	}
+        | NOT exp
+        {  /* NOT requires a boolean */
+
+	   if (( $2.basetype != BOOLTYPE ) || ( $2.gentype != NOTYPE ))
+	      printf("\n***Error: right operand of NOT must be boolean\n");
+	   $$.basetype = $2.basetype;
+	   $$.gentype = NOTYPE;
+	   $$.number = -1;
+	   $$.endnum = -1;
+        }
+	| '(' exp ')'                    
+        {  /* Simply pass up the type of the expression within the
+	      parentheses */
+
+           $$.basetype = $2.basetype;
+	   $$.gentype = $2.gentype;
+	   $$.number = $2.number;
+	   $$.endnum = $2.endnum;
+        }
+	| ID '(' explist ')'                    
+        {  /* This should be a function in an expression */
+
+           symTabEntry s;     
+ 
+           s = lookupALL($1.str);
+	   if ( s == NULL )
+	   {
+	      printf("\n***Error: undeclared identifier: %s\n",$1.str);
+	      $$.basetype = VOIDTYPE;
+	      $$.gentype = NOTYPE;
+	      $$.number = -1;
+	      $$.endnum = -1;
+	   }
+	   else
+	   {
+	      if ( s -> gentype == FUNCTYPE ) /* Make sure it is a function */
+	      {
+	         int check;
+		 
+		 check = checkparams( s -> formals , $3 );
+		 $$.basetype = s -> basetype;  /* Take the return type */
+		 $$.gentype = NOTYPE;          /* of the function      */
+		 $$.number = -1;
+		 $$.endnum = -1;
+	      }
+	      else
+	      {  /* Not a function : ERROR !!  */
+
+		 printf("\n***Error: id %s is not a function\n",$1.str);
+		 $$.basetype = VOIDTYPE;
+		 $$.gentype = NOTYPE;
+		 $$.number = -1;
+		 $$.endnum = -1;
+	      }
+	   }
+        }
+	| ID                    
+        {  /* This can be a variable or a function with no parameters */
+ 
+	   symTabEntry s;
+
+	   s = lookupALL($1.str);
+	   if ( s == NULL)
+	   {
+	      printf("\n***Error: undeclared identifier: %s\n",$1.str);
+	      $$.basetype = VOIDTYPE;
+	      $$.gentype = NOTYPE;
+	      $$.number = -1;
+	      $$.endnum = -1;
+	   }
+	   else
+	   {  /* No procedures allowed in expressions */
+
+	      if (s -> gentype == PROCTYPE )
+	      {
+	         printf("\n***Error: illegal type for expression\n");
+		 $$.basetype = VOIDTYPE;
+		 $$.gentype = NOTYPE;
+		 $$.number = -1;
+		 $$.endnum = 1;
+	      }
+	      if ( s -> gentype == ARRAYTYPE )
+	      {
+		 $$.basetype = s -> basetype;
+		 $$.gentype = ARRAYTYPE;
+		 $$.number = s -> number;
+		 $$.endnum = s -> endnum;
+	      }
+	      if ( s -> gentype == FUNCTYPE )
+	      {  /* Can be a function ONLY if there are no formal parameters */
+
+		 if ( s -> formals != NULL )
+		    printf("\n***Error: too few actual parameters\n");
+		 $$.basetype = s -> basetype;
+		 $$.gentype = NOTYPE;
+		 $$.number = -1;
+		 $$.endnum = -1;
+	      }
+	      if ( s -> gentype == NOTYPE )
+	      {
+		 $$.basetype = s -> basetype;
+		 $$.gentype = NOTYPE;
+		 $$.number = -1;
+		 $$.endnum = -1;
+	      }
+	   }
+	}
+	| ID '[' exp ']'                    
+        {  /* This should be an array only */
+  
+	   symTabEntry s;
+
+           s = lookupALL($1.str);
+	   if ( s == NULL)
+	   {
+	      printf("\n***Error: undeclared identifier: %s\n",$1.str);
+	      $$.basetype = VOIDTYPE;
+	      $$.gentype = NOTYPE;
+	      $$.number = -1;
+	      $$.endnum = -1;
+	   }
+	   else
+	   {  /* Check variable AND the subscript */
+
+              if ( s -> gentype != ARRAYTYPE )
+	         printf("\n***Error: id %s is not an array\n",$1.str);
+	      if (( $3.basetype != INTTYPE ) || ( $3.gentype != NOTYPE ))
+		 printf("\n***Error: subscript exp not type integer\n");
+	      $$.basetype = s -> basetype;
+	      $$.gentype = NOTYPE;
+	      $$.number = -1;
+	      $$.endnum = -1;
+	   }
+        }
+	| constant { $$ = $1; /* Simply send up the constant's type */ };
+
+var	: ID
+        {  /* Left hand side without '[' and ']' can ONLY be a variable OR
+	      the function from the CURRENT scope */
+
+	   symTabEntry s;
+	   
+	   s = lookupALL($1.str);
+	   if ( s == NULL)
+	   {
+	      printf("\n***Error: undeclared identifier: %s\n",$1.str);
+	      $$.basetype = VOIDTYPE;
+	      $$.gentype = NOTYPE;
+	      $$.number = -1;
+	      $$.endnum = -1;
+	   }
+	   else
+	   {  /* Function can only be on the left side if it is
+		 defining the current function */
+
+	      if ( s -> gentype == FUNCTYPE )
+	      {
+		 if ( s == current -> procedure )
+		 {
+		    $$.basetype = s -> basetype;
+		    $$.gentype = NOTYPE;
+		    $$.number = -1;
+		    $$.endnum = -1;
+		 }
+		 else
+		 {  /* Otherwise, it is an error */
+
+	            printf("\n***Error: function name on left side of :=\n");
+		    $$.basetype = VOIDTYPE;
+		    $$.gentype = NOTYPE;
+		    $$.number = -1;
+		    $$.number = -1;
+		 }
+	      }
+	      else
+	      {
+	         if ( s -> gentype == NOTYPE )
+	         {
+	            $$.basetype = s -> basetype;
+		    $$.gentype = NOTYPE;
+		    $$.number = s -> number;
+                    $$.endnum = s -> endnum;
+	         }
+	         else
+		 {  /* No arrays or procedures on the left side */
+
+		    printf("\n***Error: assignment to nonscalar\n");
+		    $$.basetype = VOIDTYPE;
+		    $$.gentype = NOTYPE;
+		    $$.number = -1;
+		    $$.endnum = -1;
+		 }
+	      }
+	   }
+	}
+	| ID '[' exp ']'
+        {  /* This should be an array AND an index */
+
+	   symTabEntry s;
+
+	   s = lookupALL($1.str);
+	   if ( s == NULL )
+	   {
+	      printf("\n***Error: undeclared identifier: %s\n",$1.str);
+	      $$.basetype = VOIDTYPE;
+	      $$.gentype = NOTYPE;
+	      $$.number = -1;
+	      $$.endnum = -1;
+	   }
+           else
+	   {  /* Check to make sure it IS an array and the index is
+		 an integer */
+
+	      if ( s -> gentype == ARRAYTYPE )
+	      {
+	         if (( $3.basetype != INTTYPE ) || ( $3.gentype != NOTYPE ))
+		    printf("\n***Error: subscript exp is not type integer\n");
+                 $$.basetype = s -> basetype;
+		 $$.gentype = NOTYPE;
+		 $$.number = -1;
+		 $$.endnum = -1;
+	      }
+	      else
+	      {  /* This is not an array */
+		 printf("\n***Error: id %s is not an array\n",$1.str);
+		 $$.basetype = VOIDTYPE;
+		 $$.gentype = NOTYPE;
+		 $$.number = -1;
+		 $$.endnum = -1;
+	      }
+	   }
+        };
+
+constant: ICONST
+        {  $$.basetype = INTTYPE; /* Basic integer */
+	   $$.gentype = NOTYPE;
+	   $$.number = -1;
+           $$.endnum = -1; }
+	| CCONST
+        {  
+	   if ( strlen($1.str) == 3 )  /* Single character */
+	      $$.basetype = CHARTYPE;
+	   else
+	      $$.basetype = STRINGTYPE; /* String */
+	   $$.gentype = NOTYPE;
+	   $$.number = -1;
+           $$.endnum = -1; }
+	| TRUE_TOK
+        { $$.basetype = BOOLTYPE;  /* TRUE and FALSE are both booleans */
+	   $$.gentype = NOTYPE;
+	   $$.number = -1;
+	   $$.endnum = -1; }
+	| FALSE_TOK
+        {  $$.basetype = BOOLTYPE;
+           $$.gentype = NOTYPE;
+           $$.number = -1;
+           $$.endnum = -1; };
+
+%%
+
+void
+yyerror(char* s) {
+    fprintf(stderr,"%s\n",s);
+    }
+
+int
+main() {
+    printf("1\t");
+    yyparse();
+    return 1;
+    }

@@ -17,6 +17,13 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+//===-- AVM2TargetAsmInfo.cpp - AVM2 asm properties -----------*- C++ -*-===//
+//
+// This file contains the declarations of the AVM2TargetAsmInfo properties.
+//
+//===----------------------------------------------------------------------===//
+
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
 
 #include "AVM2TargetAsmInfo.h"
 #include "AVM2Subtarget.h"

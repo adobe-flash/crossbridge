@@ -17,6 +17,13 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+//===- AVM2RegisterInfo.cpp - AVM2 Register Information -------*- C++ -*-===//
+//
+// This file contains the AVM2 implementation of the MRegisterInfo class.
+//
+//===----------------------------------------------------------------------===//
+
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
 
 #define GET_REGINFO_TARGET_DESC
 #define GET_REGINFO_MC_DESC

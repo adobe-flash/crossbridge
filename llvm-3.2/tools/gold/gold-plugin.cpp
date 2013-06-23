@@ -573,14 +573,11 @@ static ld_plugin_status all_symbols_read_hook(void) {
     }
   }
 
-#if 0
-  // TODO MCANNZZ
   if ((*add_input_file)(objPath) != LDPS_OK) {
     (*message)(LDPL_ERROR, "Unable to add .o file to the link.");
     (*message)(LDPL_ERROR, "File left behind in: %s", objPath);
     return LDPS_ERR;
   }
-#endif
 
   if (!options::extra_library_path.empty() &&
       set_extra_library_path(options::extra_library_path.c_str()) != LDPS_OK) {

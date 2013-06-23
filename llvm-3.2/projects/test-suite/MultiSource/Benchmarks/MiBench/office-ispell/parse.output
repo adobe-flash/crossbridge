@@ -1,0 +1,1225 @@
+
+Grammar
+rule 1    file -> headers tables
+rule 2    file -> tables
+rule 3    headers -> option_group charset_group
+rule 4    headers -> option_group charset_group altchar_group
+rule 5    headers -> charset_group
+rule 6    headers -> charset_group altchar_group
+rule 7    option_group -> option_stmt
+rule 8    option_group -> option_group option_stmt
+rule 9    charset_group -> deftype_stmt charset_stmt
+rule 10   charset_group -> charset_stmt
+rule 11   charset_group -> charset_group charset_stmt
+rule 12   deftype_stmt -> DEFSTRINGTYPE stringtype_info
+rule 13   altchar_group -> altchar_stmt
+rule 14   altchar_group -> altchar_group altchar_stmt
+rule 15   charset_stmt -> WORDCHARS char_set char_set
+rule 16   charset_stmt -> WORDCHARS char_set
+rule 17   charset_stmt -> BOUNDARYCHARS char_set char_set
+rule 18   charset_stmt -> BOUNDARYCHARS char_set
+rule 19   charset_stmt -> STRINGCHAR STRING
+rule 20   charset_stmt -> STRINGCHAR STRING STRING
+rule 21   altchar_stmt -> ALTSTRINGTYPE stringtype_info
+rule 22   altchar_stmt -> ALTSTRINGTYPE stringtype_info altchar_spec_group
+rule 23   stringtype_info -> STRING STRING filesuf_list
+rule 24   filesuf_list -> filesuf
+rule 25   filesuf_list -> filesuf_list filesuf
+rule 26   filesuf -> STRING
+rule 27   altchar_spec_group -> altchar_spec
+rule 28   altchar_spec_group -> altchar_spec_group altchar_spec
+rule 29   altchar_spec -> ALTSTRINGCHAR STRING STRING
+rule 30   option_stmt -> NROFFCHARS STRING
+rule 31   option_stmt -> TEXCHARS STRING
+rule 32   option_stmt -> COMPOUNDMIN STRING
+rule 33   option_stmt -> COMPOUNDWORDS on_or_off
+rule 34   option_stmt -> COMPOUNDWORDS CONTROLLED STRING
+rule 35   option_stmt -> ALLAFFIXES on_or_off
+rule 36   option_stmt -> FLAGMARKER STRING
+rule 37   char_set -> '.'
+rule 38   char_set -> STRING
+rule 39   char_set -> RANGE
+rule 40   on_or_off -> ON
+rule 41   on_or_off -> OFF
+rule 42   tables -> prefix_table suffix_table
+rule 43   tables -> suffix_table prefix_table
+rule 44   tables -> prefix_table
+rule 45   tables -> suffix_table
+rule 46   prefix_table -> PREFIXES table
+rule 47   suffix_table -> SUFFIXES table
+rule 48   table -> flagdef
+rule 49   table -> table flagdef
+rule 50   flagdef -> FLAG STRING ':' rules
+rule 51   flagdef -> FLAG flagoptions STRING ':' rules
+rule 52   flagdef -> error
+rule 53   flagoptions -> flagoption
+rule 54   flagoptions -> flagoptions flagoption
+rule 55   flagoption -> '*'
+rule 56   flagoption -> '~'
+rule 57   rules -> affix_rule
+rule 58   rules -> rules affix_rule
+rule 59   affix_rule -> cond_or_null '>' ichar_string
+rule 60   affix_rule -> cond_or_null '>' '-' ichar_string ',' ichar_string
+rule 61   affix_rule -> cond_or_null '>' '-' ichar_string ',' '-'
+rule 62   affix_rule -> cond_or_null '>' '-' ',' '-'
+rule 63   cond_or_null ->		/* empty */
+rule 64   cond_or_null -> conditions
+rule 65   conditions -> char_set
+rule 66   conditions -> conditions char_set
+rule 67   ichar_string -> STRING
+
+Terminals, with rules where they appear
+
+$ (-1)
+'*' (42) 55
+',' (44) 60 61 62
+'-' (45) 60 61 62
+'.' (46) 37
+':' (58) 50 51
+'>' (62) 59 60 61 62
+'~' (126) 56
+error (256) 52
+ALLAFFIXES (257) 35
+ALTSTRINGCHAR (258) 29
+ALTSTRINGTYPE (259) 21 22
+BOUNDARYCHARS (260) 17 18
+COMPOUNDMIN (261) 32
+COMPOUNDWORDS (262) 33 34
+CONTROLLED (263) 34
+DEFSTRINGTYPE (264) 12
+FLAG (265) 50 51
+FLAGMARKER (266) 36
+NROFFCHARS (267) 30
+OFF (268) 41
+ON (269) 40
+PREFIXES (270) 46
+RANGE (271) 39
+SUFFIXES (272) 47
+STRING (273) 19 20 23 26 29 30 31 32 34 36 38 50 51 67
+STRINGCHAR (274) 19 20
+TEXCHARS (275) 31
+WORDCHARS (276) 15 16
+
+Nonterminals, with rules where they appear
+
+file (30)
+    on left: 1 2
+headers (31)
+    on left: 3 4 5 6, on right: 1
+option_group (32)
+    on left: 7 8, on right: 3 4 8
+charset_group (33)
+    on left: 9 10 11, on right: 3 4 5 6 11
+deftype_stmt (34)
+    on left: 12, on right: 9
+altchar_group (35)
+    on left: 13 14, on right: 4 6 14
+charset_stmt (36)
+    on left: 15 16 17 18 19 20, on right: 9 10 11
+altchar_stmt (37)
+    on left: 21 22, on right: 13 14
+stringtype_info (38)
+    on left: 23, on right: 12 21 22
+filesuf_list (39)
+    on left: 24 25, on right: 23 25
+filesuf (40)
+    on left: 26, on right: 24 25
+altchar_spec_group (41)
+    on left: 27 28, on right: 22 28
+altchar_spec (42)
+    on left: 29, on right: 27 28
+option_stmt (43)
+    on left: 30 31 32 33 34 35 36, on right: 7 8
+char_set (44)
+    on left: 37 38 39, on right: 15 16 17 18 65 66
+on_or_off (45)
+    on left: 40 41, on right: 33 35
+tables (46)
+    on left: 42 43 44 45, on right: 1 2
+prefix_table (47)
+    on left: 46, on right: 42 43 44
+suffix_table (48)
+    on left: 47, on right: 42 43 45
+table (49)
+    on left: 48 49, on right: 46 47 49
+flagdef (50)
+    on left: 50 51 52, on right: 48 49
+flagoptions (51)
+    on left: 53 54, on right: 51 54
+flagoption (52)
+    on left: 55 56, on right: 53 54
+rules (53)
+    on left: 57 58, on right: 50 51 58
+affix_rule (54)
+    on left: 59 60 61 62, on right: 57 58
+cond_or_null (55)
+    on left: 63 64, on right: 59 60 61 62
+conditions (56)
+    on left: 65 66, on right: 64 66
+ichar_string (57)
+    on left: 67, on right: 59 60 61
+
+
+state 0
+
+    ALLAFFIXES	shift, and go to state 1
+    BOUNDARYCHARS	shift, and go to state 2
+    COMPOUNDMIN	shift, and go to state 3
+    COMPOUNDWORDS	shift, and go to state 4
+    DEFSTRINGTYPE	shift, and go to state 5
+    FLAGMARKER	shift, and go to state 6
+    NROFFCHARS	shift, and go to state 7
+    PREFIXES	shift, and go to state 8
+    SUFFIXES	shift, and go to state 9
+    STRINGCHAR	shift, and go to state 10
+    TEXCHARS	shift, and go to state 11
+    WORDCHARS	shift, and go to state 12
+
+    file	go to state 100
+    headers	go to state 13
+    option_group	go to state 14
+    charset_group	go to state 15
+    deftype_stmt	go to state 16
+    charset_stmt	go to state 17
+    option_stmt	go to state 18
+    tables	go to state 19
+    prefix_table	go to state 20
+    suffix_table	go to state 21
+
+
+
+state 1
+
+    option_stmt  ->  ALLAFFIXES . on_or_off   (rule 35)
+
+    OFF 	shift, and go to state 22
+    ON  	shift, and go to state 23
+
+    on_or_off	go to state 24
+
+
+
+state 2
+
+    charset_stmt  ->  BOUNDARYCHARS . char_set char_set   (rule 17)
+    charset_stmt  ->  BOUNDARYCHARS . char_set   (rule 18)
+
+    '.' 	shift, and go to state 25
+    RANGE	shift, and go to state 26
+    STRING	shift, and go to state 27
+
+    char_set	go to state 28
+
+
+
+state 3
+
+    option_stmt  ->  COMPOUNDMIN . STRING   (rule 32)
+
+    STRING	shift, and go to state 29
+
+
+
+state 4
+
+    option_stmt  ->  COMPOUNDWORDS . on_or_off   (rule 33)
+    option_stmt  ->  COMPOUNDWORDS . CONTROLLED STRING   (rule 34)
+
+    CONTROLLED	shift, and go to state 30
+    OFF 	shift, and go to state 22
+    ON  	shift, and go to state 23
+
+    on_or_off	go to state 31
+
+
+
+state 5
+
+    deftype_stmt  ->  DEFSTRINGTYPE . stringtype_info   (rule 12)
+
+    STRING	shift, and go to state 32
+
+    stringtype_info	go to state 33
+
+
+
+state 6
+
+    option_stmt  ->  FLAGMARKER . STRING   (rule 36)
+
+    STRING	shift, and go to state 34
+
+
+
+state 7
+
+    option_stmt  ->  NROFFCHARS . STRING   (rule 30)
+
+    STRING	shift, and go to state 35
+
+
+
+state 8
+
+    prefix_table  ->  PREFIXES . table   (rule 46)
+
+    error	shift, and go to state 36
+    FLAG	shift, and go to state 37
+
+    table	go to state 38
+    flagdef	go to state 39
+
+
+
+state 9
+
+    suffix_table  ->  SUFFIXES . table   (rule 47)
+
+    error	shift, and go to state 36
+    FLAG	shift, and go to state 37
+
+    table	go to state 40
+    flagdef	go to state 39
+
+
+
+state 10
+
+    charset_stmt  ->  STRINGCHAR . STRING   (rule 19)
+    charset_stmt  ->  STRINGCHAR . STRING STRING   (rule 20)
+
+    STRING	shift, and go to state 41
+
+
+
+state 11
+
+    option_stmt  ->  TEXCHARS . STRING   (rule 31)
+
+    STRING	shift, and go to state 42
+
+
+
+state 12
+
+    charset_stmt  ->  WORDCHARS . char_set char_set   (rule 15)
+    charset_stmt  ->  WORDCHARS . char_set   (rule 16)
+
+    '.' 	shift, and go to state 25
+    RANGE	shift, and go to state 26
+    STRING	shift, and go to state 27
+
+    char_set	go to state 43
+
+
+
+state 13
+
+    file  ->  headers . tables   (rule 1)
+
+    PREFIXES	shift, and go to state 8
+    SUFFIXES	shift, and go to state 9
+
+    tables	go to state 44
+    prefix_table	go to state 20
+    suffix_table	go to state 21
+
+
+
+state 14
+
+    headers  ->  option_group . charset_group   (rule 3)
+    headers  ->  option_group . charset_group altchar_group   (rule 4)
+    option_group  ->  option_group . option_stmt   (rule 8)
+
+    ALLAFFIXES	shift, and go to state 1
+    BOUNDARYCHARS	shift, and go to state 2
+    COMPOUNDMIN	shift, and go to state 3
+    COMPOUNDWORDS	shift, and go to state 4
+    DEFSTRINGTYPE	shift, and go to state 5
+    FLAGMARKER	shift, and go to state 6
+    NROFFCHARS	shift, and go to state 7
+    STRINGCHAR	shift, and go to state 10
+    TEXCHARS	shift, and go to state 11
+    WORDCHARS	shift, and go to state 12
+
+    charset_group	go to state 45
+    deftype_stmt	go to state 16
+    charset_stmt	go to state 17
+    option_stmt	go to state 46
+
+
+
+state 15
+
+    headers  ->  charset_group .   (rule 5)
+    headers  ->  charset_group . altchar_group   (rule 6)
+    charset_group  ->  charset_group . charset_stmt   (rule 11)
+
+    ALTSTRINGTYPE	shift, and go to state 47
+    BOUNDARYCHARS	shift, and go to state 2
+    STRINGCHAR	shift, and go to state 10
+    WORDCHARS	shift, and go to state 12
+
+    $default	reduce using rule 5 (headers)
+
+    altchar_group	go to state 48
+    charset_stmt	go to state 49
+    altchar_stmt	go to state 50
+
+
+
+state 16
+
+    charset_group  ->  deftype_stmt . charset_stmt   (rule 9)
+
+    BOUNDARYCHARS	shift, and go to state 2
+    STRINGCHAR	shift, and go to state 10
+    WORDCHARS	shift, and go to state 12
+
+    charset_stmt	go to state 51
+
+
+
+state 17
+
+    charset_group  ->  charset_stmt .   (rule 10)
+
+    $default	reduce using rule 10 (charset_group)
+
+
+
+state 18
+
+    option_group  ->  option_stmt .   (rule 7)
+
+    $default	reduce using rule 7 (option_group)
+
+
+
+state 19
+
+    file  ->  tables .   (rule 2)
+
+    $default	reduce using rule 2 (file)
+
+
+
+state 20
+
+    tables  ->  prefix_table . suffix_table   (rule 42)
+    tables  ->  prefix_table .   (rule 44)
+
+    SUFFIXES	shift, and go to state 9
+
+    $default	reduce using rule 44 (tables)
+
+    suffix_table	go to state 52
+
+
+
+state 21
+
+    tables  ->  suffix_table . prefix_table   (rule 43)
+    tables  ->  suffix_table .   (rule 45)
+
+    PREFIXES	shift, and go to state 8
+
+    $default	reduce using rule 45 (tables)
+
+    prefix_table	go to state 53
+
+
+
+state 22
+
+    on_or_off  ->  OFF .   (rule 41)
+
+    $default	reduce using rule 41 (on_or_off)
+
+
+
+state 23
+
+    on_or_off  ->  ON .   (rule 40)
+
+    $default	reduce using rule 40 (on_or_off)
+
+
+
+state 24
+
+    option_stmt  ->  ALLAFFIXES on_or_off .   (rule 35)
+
+    $default	reduce using rule 35 (option_stmt)
+
+
+
+state 25
+
+    char_set  ->  '.' .   (rule 37)
+
+    $default	reduce using rule 37 (char_set)
+
+
+
+state 26
+
+    char_set  ->  RANGE .   (rule 39)
+
+    $default	reduce using rule 39 (char_set)
+
+
+
+state 27
+
+    char_set  ->  STRING .   (rule 38)
+
+    $default	reduce using rule 38 (char_set)
+
+
+
+state 28
+
+    charset_stmt  ->  BOUNDARYCHARS char_set . char_set   (rule 17)
+    charset_stmt  ->  BOUNDARYCHARS char_set .   (rule 18)
+
+    '.' 	shift, and go to state 25
+    RANGE	shift, and go to state 26
+    STRING	shift, and go to state 27
+
+    $default	reduce using rule 18 (charset_stmt)
+
+    char_set	go to state 54
+
+
+
+state 29
+
+    option_stmt  ->  COMPOUNDMIN STRING .   (rule 32)
+
+    $default	reduce using rule 32 (option_stmt)
+
+
+
+state 30
+
+    option_stmt  ->  COMPOUNDWORDS CONTROLLED . STRING   (rule 34)
+
+    STRING	shift, and go to state 55
+
+
+
+state 31
+
+    option_stmt  ->  COMPOUNDWORDS on_or_off .   (rule 33)
+
+    $default	reduce using rule 33 (option_stmt)
+
+
+
+state 32
+
+    stringtype_info  ->  STRING . STRING filesuf_list   (rule 23)
+
+    STRING	shift, and go to state 56
+
+
+
+state 33
+
+    deftype_stmt  ->  DEFSTRINGTYPE stringtype_info .   (rule 12)
+
+    $default	reduce using rule 12 (deftype_stmt)
+
+
+
+state 34
+
+    option_stmt  ->  FLAGMARKER STRING .   (rule 36)
+
+    $default	reduce using rule 36 (option_stmt)
+
+
+
+state 35
+
+    option_stmt  ->  NROFFCHARS STRING .   (rule 30)
+
+    $default	reduce using rule 30 (option_stmt)
+
+
+
+state 36
+
+    flagdef  ->  error .   (rule 52)
+
+    $default	reduce using rule 52 (flagdef)
+
+
+
+state 37
+
+    flagdef  ->  FLAG . STRING ':' rules   (rule 50)
+    flagdef  ->  FLAG . flagoptions STRING ':' rules   (rule 51)
+
+    '*' 	shift, and go to state 57
+    '~' 	shift, and go to state 58
+    STRING	shift, and go to state 59
+
+    flagoptions	go to state 60
+    flagoption	go to state 61
+
+
+
+state 38
+
+    prefix_table  ->  PREFIXES table .   (rule 46)
+    table  ->  table . flagdef   (rule 49)
+
+    error	shift, and go to state 36
+    FLAG	shift, and go to state 37
+
+    $   	reduce using rule 46 (prefix_table)
+    SUFFIXES	reduce using rule 46 (prefix_table)
+
+    flagdef	go to state 62
+
+
+
+state 39
+
+    table  ->  flagdef .   (rule 48)
+
+    $default	reduce using rule 48 (table)
+
+
+
+state 40
+
+    suffix_table  ->  SUFFIXES table .   (rule 47)
+    table  ->  table . flagdef   (rule 49)
+
+    error	shift, and go to state 36
+    FLAG	shift, and go to state 37
+
+    $   	reduce using rule 47 (suffix_table)
+    PREFIXES	reduce using rule 47 (suffix_table)
+
+    flagdef	go to state 62
+
+
+
+state 41
+
+    charset_stmt  ->  STRINGCHAR STRING .   (rule 19)
+    charset_stmt  ->  STRINGCHAR STRING . STRING   (rule 20)
+
+    STRING	shift, and go to state 63
+
+    $default	reduce using rule 19 (charset_stmt)
+
+
+
+state 42
+
+    option_stmt  ->  TEXCHARS STRING .   (rule 31)
+
+    $default	reduce using rule 31 (option_stmt)
+
+
+
+state 43
+
+    charset_stmt  ->  WORDCHARS char_set . char_set   (rule 15)
+    charset_stmt  ->  WORDCHARS char_set .   (rule 16)
+
+    '.' 	shift, and go to state 25
+    RANGE	shift, and go to state 26
+    STRING	shift, and go to state 27
+
+    $default	reduce using rule 16 (charset_stmt)
+
+    char_set	go to state 64
+
+
+
+state 44
+
+    file  ->  headers tables .   (rule 1)
+
+    $default	reduce using rule 1 (file)
+
+
+
+state 45
+
+    headers  ->  option_group charset_group .   (rule 3)
+    headers  ->  option_group charset_group . altchar_group   (rule 4)
+    charset_group  ->  charset_group . charset_stmt   (rule 11)
+
+    ALTSTRINGTYPE	shift, and go to state 47
+    BOUNDARYCHARS	shift, and go to state 2
+    STRINGCHAR	shift, and go to state 10
+    WORDCHARS	shift, and go to state 12
+
+    $default	reduce using rule 3 (headers)
+
+    altchar_group	go to state 65
+    charset_stmt	go to state 49
+    altchar_stmt	go to state 50
+
+
+
+state 46
+
+    option_group  ->  option_group option_stmt .   (rule 8)
+
+    $default	reduce using rule 8 (option_group)
+
+
+
+state 47
+
+    altchar_stmt  ->  ALTSTRINGTYPE . stringtype_info   (rule 21)
+    altchar_stmt  ->  ALTSTRINGTYPE . stringtype_info altchar_spec_group   (rule 22)
+
+    STRING	shift, and go to state 32
+
+    stringtype_info	go to state 66
+
+
+
+state 48
+
+    headers  ->  charset_group altchar_group .   (rule 6)
+    altchar_group  ->  altchar_group . altchar_stmt   (rule 14)
+
+    ALTSTRINGTYPE	shift, and go to state 47
+
+    $default	reduce using rule 6 (headers)
+
+    altchar_stmt	go to state 67
+
+
+
+state 49
+
+    charset_group  ->  charset_group charset_stmt .   (rule 11)
+
+    $default	reduce using rule 11 (charset_group)
+
+
+
+state 50
+
+    altchar_group  ->  altchar_stmt .   (rule 13)
+
+    $default	reduce using rule 13 (altchar_group)
+
+
+
+state 51
+
+    charset_group  ->  deftype_stmt charset_stmt .   (rule 9)
+
+    $default	reduce using rule 9 (charset_group)
+
+
+
+state 52
+
+    tables  ->  prefix_table suffix_table .   (rule 42)
+
+    $default	reduce using rule 42 (tables)
+
+
+
+state 53
+
+    tables  ->  suffix_table prefix_table .   (rule 43)
+
+    $default	reduce using rule 43 (tables)
+
+
+
+state 54
+
+    charset_stmt  ->  BOUNDARYCHARS char_set char_set .   (rule 17)
+
+    $default	reduce using rule 17 (charset_stmt)
+
+
+
+state 55
+
+    option_stmt  ->  COMPOUNDWORDS CONTROLLED STRING .   (rule 34)
+
+    $default	reduce using rule 34 (option_stmt)
+
+
+
+state 56
+
+    stringtype_info  ->  STRING STRING . filesuf_list   (rule 23)
+
+    STRING	shift, and go to state 68
+
+    filesuf_list	go to state 69
+    filesuf	go to state 70
+
+
+
+state 57
+
+    flagoption  ->  '*' .   (rule 55)
+
+    $default	reduce using rule 55 (flagoption)
+
+
+
+state 58
+
+    flagoption  ->  '~' .   (rule 56)
+
+    $default	reduce using rule 56 (flagoption)
+
+
+
+state 59
+
+    flagdef  ->  FLAG STRING . ':' rules   (rule 50)
+
+    ':' 	shift, and go to state 71
+
+
+
+state 60
+
+    flagdef  ->  FLAG flagoptions . STRING ':' rules   (rule 51)
+    flagoptions  ->  flagoptions . flagoption   (rule 54)
+
+    '*' 	shift, and go to state 57
+    '~' 	shift, and go to state 58
+    STRING	shift, and go to state 72
+
+    flagoption	go to state 73
+
+
+
+state 61
+
+    flagoptions  ->  flagoption .   (rule 53)
+
+    $default	reduce using rule 53 (flagoptions)
+
+
+
+state 62
+
+    table  ->  table flagdef .   (rule 49)
+
+    $default	reduce using rule 49 (table)
+
+
+
+state 63
+
+    charset_stmt  ->  STRINGCHAR STRING STRING .   (rule 20)
+
+    $default	reduce using rule 20 (charset_stmt)
+
+
+
+state 64
+
+    charset_stmt  ->  WORDCHARS char_set char_set .   (rule 15)
+
+    $default	reduce using rule 15 (charset_stmt)
+
+
+
+state 65
+
+    headers  ->  option_group charset_group altchar_group .   (rule 4)
+    altchar_group  ->  altchar_group . altchar_stmt   (rule 14)
+
+    ALTSTRINGTYPE	shift, and go to state 47
+
+    $default	reduce using rule 4 (headers)
+
+    altchar_stmt	go to state 67
+
+
+
+state 66
+
+    altchar_stmt  ->  ALTSTRINGTYPE stringtype_info .   (rule 21)
+    altchar_stmt  ->  ALTSTRINGTYPE stringtype_info . altchar_spec_group   (rule 22)
+
+    ALTSTRINGCHAR	shift, and go to state 74
+
+    $default	reduce using rule 21 (altchar_stmt)
+
+    altchar_spec_group	go to state 75
+    altchar_spec	go to state 76
+
+
+
+state 67
+
+    altchar_group  ->  altchar_group altchar_stmt .   (rule 14)
+
+    $default	reduce using rule 14 (altchar_group)
+
+
+
+state 68
+
+    filesuf  ->  STRING .   (rule 26)
+
+    $default	reduce using rule 26 (filesuf)
+
+
+
+state 69
+
+    stringtype_info  ->  STRING STRING filesuf_list .   (rule 23)
+    filesuf_list  ->  filesuf_list . filesuf   (rule 25)
+
+    STRING	shift, and go to state 68
+
+    $default	reduce using rule 23 (stringtype_info)
+
+    filesuf	go to state 77
+
+
+
+state 70
+
+    filesuf_list  ->  filesuf .   (rule 24)
+
+    $default	reduce using rule 24 (filesuf_list)
+
+
+
+state 71
+
+    flagdef  ->  FLAG STRING ':' . rules   (rule 50)
+
+    '.' 	shift, and go to state 25
+    RANGE	shift, and go to state 26
+    STRING	shift, and go to state 27
+
+    $default	reduce using rule 63 (cond_or_null)
+
+    char_set	go to state 78
+    rules	go to state 79
+    affix_rule	go to state 80
+    cond_or_null	go to state 81
+    conditions	go to state 82
+
+
+
+state 72
+
+    flagdef  ->  FLAG flagoptions STRING . ':' rules   (rule 51)
+
+    ':' 	shift, and go to state 83
+
+
+
+state 73
+
+    flagoptions  ->  flagoptions flagoption .   (rule 54)
+
+    $default	reduce using rule 54 (flagoptions)
+
+
+
+state 74
+
+    altchar_spec  ->  ALTSTRINGCHAR . STRING STRING   (rule 29)
+
+    STRING	shift, and go to state 84
+
+
+
+state 75
+
+    altchar_stmt  ->  ALTSTRINGTYPE stringtype_info altchar_spec_group .   (rule 22)
+    altchar_spec_group  ->  altchar_spec_group . altchar_spec   (rule 28)
+
+    ALTSTRINGCHAR	shift, and go to state 74
+
+    $default	reduce using rule 22 (altchar_stmt)
+
+    altchar_spec	go to state 85
+
+
+
+state 76
+
+    altchar_spec_group  ->  altchar_spec .   (rule 27)
+
+    $default	reduce using rule 27 (altchar_spec_group)
+
+
+
+state 77
+
+    filesuf_list  ->  filesuf_list filesuf .   (rule 25)
+
+    $default	reduce using rule 25 (filesuf_list)
+
+
+
+state 78
+
+    conditions  ->  char_set .   (rule 65)
+
+    $default	reduce using rule 65 (conditions)
+
+
+
+state 79
+
+    flagdef  ->  FLAG STRING ':' rules .   (rule 50)
+    rules  ->  rules . affix_rule   (rule 58)
+
+    '.' 	shift, and go to state 25
+    RANGE	shift, and go to state 26
+    STRING	shift, and go to state 27
+
+    '>' 	reduce using rule 63 (cond_or_null)
+    $default	reduce using rule 50 (flagdef)
+
+    char_set	go to state 78
+    affix_rule	go to state 86
+    cond_or_null	go to state 81
+    conditions	go to state 82
+
+
+
+state 80
+
+    rules  ->  affix_rule .   (rule 57)
+
+    $default	reduce using rule 57 (rules)
+
+
+
+state 81
+
+    affix_rule  ->  cond_or_null . '>' ichar_string   (rule 59)
+    affix_rule  ->  cond_or_null . '>' '-' ichar_string ',' ichar_string   (rule 60)
+    affix_rule  ->  cond_or_null . '>' '-' ichar_string ',' '-'   (rule 61)
+    affix_rule  ->  cond_or_null . '>' '-' ',' '-'   (rule 62)
+
+    '>' 	shift, and go to state 87
+
+
+
+state 82
+
+    cond_or_null  ->  conditions .   (rule 64)
+    conditions  ->  conditions . char_set   (rule 66)
+
+    '.' 	shift, and go to state 25
+    RANGE	shift, and go to state 26
+    STRING	shift, and go to state 27
+
+    $default	reduce using rule 64 (cond_or_null)
+
+    char_set	go to state 88
+
+
+
+state 83
+
+    flagdef  ->  FLAG flagoptions STRING ':' . rules   (rule 51)
+
+    '.' 	shift, and go to state 25
+    RANGE	shift, and go to state 26
+    STRING	shift, and go to state 27
+
+    $default	reduce using rule 63 (cond_or_null)
+
+    char_set	go to state 78
+    rules	go to state 89
+    affix_rule	go to state 80
+    cond_or_null	go to state 81
+    conditions	go to state 82
+
+
+
+state 84
+
+    altchar_spec  ->  ALTSTRINGCHAR STRING . STRING   (rule 29)
+
+    STRING	shift, and go to state 90
+
+
+
+state 85
+
+    altchar_spec_group  ->  altchar_spec_group altchar_spec .   (rule 28)
+
+    $default	reduce using rule 28 (altchar_spec_group)
+
+
+
+state 86
+
+    rules  ->  rules affix_rule .   (rule 58)
+
+    $default	reduce using rule 58 (rules)
+
+
+
+state 87
+
+    affix_rule  ->  cond_or_null '>' . ichar_string   (rule 59)
+    affix_rule  ->  cond_or_null '>' . '-' ichar_string ',' ichar_string   (rule 60)
+    affix_rule  ->  cond_or_null '>' . '-' ichar_string ',' '-'   (rule 61)
+    affix_rule  ->  cond_or_null '>' . '-' ',' '-'   (rule 62)
+
+    '-' 	shift, and go to state 91
+    STRING	shift, and go to state 92
+
+    ichar_string	go to state 93
+
+
+
+state 88
+
+    conditions  ->  conditions char_set .   (rule 66)
+
+    $default	reduce using rule 66 (conditions)
+
+
+
+state 89
+
+    flagdef  ->  FLAG flagoptions STRING ':' rules .   (rule 51)
+    rules  ->  rules . affix_rule   (rule 58)
+
+    '.' 	shift, and go to state 25
+    RANGE	shift, and go to state 26
+    STRING	shift, and go to state 27
+
+    '>' 	reduce using rule 63 (cond_or_null)
+    $default	reduce using rule 51 (flagdef)
+
+    char_set	go to state 78
+    affix_rule	go to state 86
+    cond_or_null	go to state 81
+    conditions	go to state 82
+
+
+
+state 90
+
+    altchar_spec  ->  ALTSTRINGCHAR STRING STRING .   (rule 29)
+
+    $default	reduce using rule 29 (altchar_spec)
+
+
+
+state 91
+
+    affix_rule  ->  cond_or_null '>' '-' . ichar_string ',' ichar_string   (rule 60)
+    affix_rule  ->  cond_or_null '>' '-' . ichar_string ',' '-'   (rule 61)
+    affix_rule  ->  cond_or_null '>' '-' . ',' '-'   (rule 62)
+
+    ',' 	shift, and go to state 94
+    STRING	shift, and go to state 92
+
+    ichar_string	go to state 95
+
+
+
+state 92
+
+    ichar_string  ->  STRING .   (rule 67)
+
+    $default	reduce using rule 67 (ichar_string)
+
+
+
+state 93
+
+    affix_rule  ->  cond_or_null '>' ichar_string .   (rule 59)
+
+    $default	reduce using rule 59 (affix_rule)
+
+
+
+state 94
+
+    affix_rule  ->  cond_or_null '>' '-' ',' . '-'   (rule 62)
+
+    '-' 	shift, and go to state 96
+
+
+
+state 95
+
+    affix_rule  ->  cond_or_null '>' '-' ichar_string . ',' ichar_string   (rule 60)
+    affix_rule  ->  cond_or_null '>' '-' ichar_string . ',' '-'   (rule 61)
+
+    ',' 	shift, and go to state 97
+
+
+
+state 96
+
+    affix_rule  ->  cond_or_null '>' '-' ',' '-' .   (rule 62)
+
+    $default	reduce using rule 62 (affix_rule)
+
+
+
+state 97
+
+    affix_rule  ->  cond_or_null '>' '-' ichar_string ',' . ichar_string   (rule 60)
+    affix_rule  ->  cond_or_null '>' '-' ichar_string ',' . '-'   (rule 61)
+
+    '-' 	shift, and go to state 98
+    STRING	shift, and go to state 92
+
+    ichar_string	go to state 99
+
+
+
+state 98
+
+    affix_rule  ->  cond_or_null '>' '-' ichar_string ',' '-' .   (rule 61)
+
+    $default	reduce using rule 61 (affix_rule)
+
+
+
+state 99
+
+    affix_rule  ->  cond_or_null '>' '-' ichar_string ',' ichar_string .   (rule 60)
+
+    $default	reduce using rule 60 (affix_rule)
+
+
+
+state 100
+
+    $   	go to state 101
+
+
+
+state 101
+
+    $   	go to state 102
+
+
+
+state 102
+
+    $default	accept

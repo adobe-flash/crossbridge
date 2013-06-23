@@ -1,0 +1,100 @@
+##=== TEST.aa.report - Report description for AA tests ---------*- perl -*-===##
+#
+# This file defines a report to be generated for the alias analysis comparison
+# test.
+#
+##===----------------------------------------------------------------------===##
+
+# Helper function
+sub Ratio {
+  my ($Cols, $Col) = @_;
+  if ($Cols->[$Col-2] ne "*" and
+      $Cols->[$Col-2] != "0") {
+    return $Cols->[$Col-1]/$Cols->[$Col-2];
+  } else {
+    return "n/a";
+  }
+}
+
+sub OnlyMayInfo {
+  $_[0] =~ m|/([0-9]+)%/|;
+  return $1."\\%";
+}
+
+# Sort by ds time...
+$SortCol = 12;
+$SortNumeric = 1;
+
+# Sort in ascending order
+$SortReverse = 0;
+
+# For latex output, limit benchmarks and rename as appropriate
+@LatexRowMapOrder = (
+            'treeadd'    => 'Olden-treeadd',
+            'bisort'     => 'Olden-bisort',
+            'mst'        => 'Olden-mst',
+            'perimeter'  => 'Olden-perimeter',
+            'health'     => 'Olden-health',
+            'tsp'        => 'Olden-tsp',
+            'power'      => 'Olden-power',
+            'em3d'       => 'Olden-em3d',
+            'voronoi'    => 'Olden-voronoi',
+            'bh'         => 'Olden-bh',
+            '-' => '-',
+            'anagram'    => 'ptrdist-anagram',
+            'ks'         => 'ptrdist-ks',
+            'ft'         => 'ptrdist-ft',
+            'yacr2'      => 'ptrdist-yacr2',
+            'bc'         => 'ptrdist-bc',
+            '-' => '-',
+            '179.art'    => '179.art',
+            '183.equake' => '183.equake',
+            '181.mcf'    => '181.mcf',
+            '256.bzip2'  => '256.bzip2',
+            '164.gzip'   => '164.gzip',
+            '197.parser' => '197.parser',
+            '188.ammp'   => '188.ammp',
+            '175.vpr'    => '175.vpr',
+            '300.twolf'  => '300.twolf',
+            '186.crafty' => '186.crafty',
+            '255.vortex' => '255.vortex',
+            '254.gap'    => '254.gap',
+            '-' => '-',
+            'sgefa'      => 'sgefa',
+            'sim'        => 'sim',
+            'burg'       => 'burg'
+           );
+
+@LatexColumns = (2, 3, 4, 5, 6);
+
+# Specify how to reformat columns to be presentable...
+%LatexColumnFormat = (
+                      2 => \&OnlyMayInfo,
+                      3 => \&OnlyMayInfo,
+                      4 => \&OnlyMayInfo,
+                      5 => \&OnlyMayInfo,
+                      6 => \&OnlyMayInfo);
+
+# These are the columns for the report.  The first entry is the header for the
+# column, the second is the regex to use to match the value.  Empty list create
+# seperators, and closures may be put in for custom processing.
+(
+# Name
+            ["Name:",     '\'([^\']+)\' Program'],
+            [],
+# Precision
+            ["basic",     '.basic.txt: [^:]*Summary: (.*)'],
+            ["steens-fi", '.steens-fi.txt: [^:]*Summary: (.*)'],
+            ["steens",    '.steens.txt: [^:]*Summary: (.*)'],
+            ["ds-fi",     '.ds-fi.txt: [^:]*Summary: (.*)'],
+            ["ds",        '.ds.txt: [^:]*Summary: (.*)'],
+            [],
+# Times
+#Output/treeadd.aa.andersens.txt:   Total Execution Time: 0 seconds (0.00111997 wall clock)
+            ["basic",     '.basic.txt: [^(]*\(([-e0-9.]+) wall'],
+            ["steens-fi", '.steens-fi.txt: [^(]*\(([-e0-9.]+) wall'],
+            ["steens",    '.steens.txt: [^(]*\(([-e0-9.]+) wall'],
+            ["ds-fi",     '.ds-fi.txt: [^(]*\(([-e0-9.]+) wall'],
+            ["ds",        '.ds.txt: [^(]*\(([-e0-9.]+) wall'],
+            []
+);

@@ -1,0 +1,596 @@
+<html>
+<head>
+<title>Treecc: An Aspect-Oriented Approach to Writing Compilers</title>
+</head>
+<body bgcolor="#ffffff">
+<h1>Treecc: An Aspect-Oriented Approach to Writing Compilers</h1>
+
+Rhys Weatherley, <a href="mailto:rweather@southern-storm.com.au">rweather@southern-storm.com.au</a>.<p>
+
+Copyright &copy; 2001, 2002 Rhys Weatherley<br>
+Verbatim copying and distribution of this entire article is permitted
+in any medium, provided this copyright notice is preserved.<p>
+
+This is a copy of an article that was published in
+<a href="http://www.rons.net.cn/english/FSM/issue02">Issue 2</a>
+of Free Software Magazine.<p>
+
+<h2>1. Introduction</h2>
+
+The C# compiler in Portable.NET <a href="#pnetref">[1]</a> is built on top
+of the "Tree Compiler Compiler" (treecc) utility program.
+Treecc <a href="#treeccref">[2]</a> is distributed as Free Software
+under the terms of the GNU General Public License.<p>
+
+This article provides some background of why treecc came about.  It discusses
+two common compiler implementation techniques, and the reasons why they
+often fail to manage the complexity of large programming languages like C#.<p>
+
+We then discuss a new programming technique called "Aspect-Oriented
+Programming".  Treecc is an example of applying this technique to managing
+the complexity of compiler construction.<p>
+
+<h2>2. Patterns and Compiler Design</h2>
+
+Compiler writing is generally seen as a black art, but in reality it isn't
+all that hard.  The basic compilation steps are:<p>
+
+<ol>
+	<li>Convert the program into an abstract syntax tree.</li>
+	<li>Perform type-checking and semantic analysis on the tree.</li>
+	<li>Rearrange the tree to perform optimisations.</li>
+	<li>Convert the tree into the target code.</li>
+</ol>
+
+The difficulty in writing compilers is not the steps involved, but rather
+the sheer number of tiny little details to keep straight.  Modern languages
+contain large numbers of operators, which are all very similar, but slightly
+different:<p>
+
+<blockquote>
+Add, substract, multiply, divide, remainder, shift left, shift right,
+shift right unsigned, bitwise and, bitwise or, exclusive-or, negate,
+bitwise not, logical not, logical and, logical or, ...
+</blockquote>
+
+And that's just the operators.  Introduce statements, arrays, type coercion,
+method invocation, and class definition, and it becomes very easy to
+forget something amongst the forest of code.<p>
+
+In an attempt to control this complexity, two common pattern-based
+approaches have arisen over the years: Inheritance and Visitor.<p>
+
+The inheritance pattern can be characterised as follows:<p>
+
+<ol>
+	<li>Declare a node type for every syntactic element in the language.
+	    All types ultimately inherit from "<code>Node</code>".</li>
+	<li>Declare virtual methods in "<code>Node</code>" for
+	    operations on node types: semantic analysis, optimization,
+		code generation, etc.</li>
+	<li>Override the virtuals in sub-classes to provide the
+	    compiler implementation.</li>
+</ol><p>
+
+The visitor pattern can be characterised as follows:<p>
+
+<ol>
+	<li>Declare a node type for every syntactic element in the language.
+	    All types ultimately inherit from "<code>Node</code>".</li>
+	<li>Declare a "<code>Visitor</code>" class with abstract virtual
+		methods such as "<code>VisitAdd</code>", "<code>VisitSub</code>",
+		"<code>VisitIf</code>", "<code>VisitFunction</code>",
+		etc for all of the node types.</li>
+	<li>Define a "walking procedure" over "<code>Node</code>" objects for
+	    walking around a syntax tree, making callbacks on a supplied
+		visitor object.</li>
+	<li>Create multiple classes that inherit from "<code>Visitor</code>",
+	    one for each operation.  Implement the "<code>Visit*</code>"
+		functions for that type of operation.</li>
+</ol>
+
+In the following sections, we will explore why these two patterns often
+fail to manage compiler complexity, even when the programmer applies them
+rigorously.<p>
+
+<h2>3. The implementation language is your worst enemy</h2>
+
+We will start with the inheritance pattern.  Consider that we've written
+the following C# code during the "declare all the node types" phase of
+the project:<p>
+
+<blockquote>
+<pre>public class UnaryExpression : Expression
+{
+    protected Expression expr;
+
+    public UnaryExpression(Expression _expr) { expr = _expr; }
+}
+
+public class NegateExpression : UnaryExpression
+{
+    public NegateExpression(Expression _expr) : base(_expr) {}
+}
+
+public class UnaryPlusExpression : UnaryExpression
+{
+    public UnaryPlusExpression(Expression _expr) : base(_expr) {}
+}
+
+public class BitwiseNotExpression : UnaryExpression
+{
+    public BitwiseNotExpression(Expression _expr) : base(_expr) {}
+}</pre>
+</blockquote>
+
+We continue this process for several hundred other node types, gradually
+building up the entire syntax tree.  This will probably take several weeks
+to complete for a substantial language like C#, assuming that we are writing
+the parser alongside the node types.<p>
+
+We now want to go in and implement type-checking, so we modify the
+"<code>UnaryExpression</code>" class as follows:<p>
+
+<blockquote>
+<pre>public class UnaryExpression : Expression
+{
+    protected Expression expr;
+
+    public UnaryExpression(Expression _expr) { expr = _expr; }
+
+    public override LanguageType TypeCheck()
+    {
+        LanguageType type = expr.TypeCheck();
+        if(type.IsInteger() || type.IsFloat())
+        {
+            return type;
+        }
+        throw new TypeCheckException();
+    }
+}</pre>
+</blockquote>
+
+We've put the common unary expression type-checking code in a common base
+class.  This makes it easier to maintain because there is only one copy.
+We continue the process over the next few weeks and months for all the
+other operators, statements, and declarations in the language.  So far,
+so good.<p>
+
+Unfortunately, we've made a mistake.  The "<code>BitwiseNot</code>"
+operator is only legal on integer values; not floating-point.<p>
+
+But will we find this bug?  It was several weeks ago when we first wrote
+the "<code>BitwiseNotExpression</code>" class, and we have since forgotten
+all about it.  It may even have been written by another programmer on the
+team, who has also forgotten all about it.  When we build our compiler,
+we don't get any errors because the implemention language is perfectly
+happy with the above code.<p>
+
+Surely testing will find it?  We are building a test suite alongside
+the code, right?  Unfortunately, that doesn't help either.  The test
+suite for a major language will be at least as complex as the compiler
+itself, and so there is always the temptation to abstract common tests
+into common test classes.  We've just shifted the bug into the test suite
+and given ourselves a false sense of security.<p>
+
+So we keep coding for several more months, adding lots more code.  And then
+a really nasty bug pops up.  The "<code>BitwiseNot</code>" operator is acting
+strangely, and we have no idea why.  The system is now so complex, with
+so many common base classes implementing fallback defaults, that tracking
+this down becomes very hard.<p>
+
+The inheritance pattern has a fatal flaw.  Adding a new operation entails
+a very large maintainence burden, because hundreds of classes must be
+modified.  This is very error-prone, so we try to abstract details into
+common base classes.  But this introduces other errors.<p>
+
+The problem basically boils down to semantic analysis: the implementation
+language does not have enough knowledge about the application domain to
+spot the problem and warn us about it.  So it happily compiles the code
+and leaves us to hang ourselves on the system's complexity later.
+Programming languages are supposed to help us manage complexity, not
+make the problem worse!<p>
+
+I wrote a number of compilers using the inheritance approach, and every
+single time the complexity killed me.  I needed fallback defaults for
+code maintainence reasons, but using fallbacks introduced massive numbers
+of bugs.  I was stuck.<p>
+
+<h2>4. Design patterns aren't always what they are cracked up to be</h2>
+
+After much hair-pulling, I searched <em>Design Patterns</em>
+by Gamma, et al <a href="#gammaref">[3]</a>.  "<em>Is there a better
+way of doing this?</em>".  Visitor patterns are the answer:
+the book even gives a compiler example.<p>
+
+Visitors solve the "<em>I forgot to implement the <code>BitwiseNot</code></em>"
+problem.  Because every node type has its own "<code>Visit*</code>" method,
+we will get an error when we try to build the compiler without implementing
+the operation for a node type.  Of course, this assumes that we haven't
+been dumb and implemented fallback defaults in the "<code>Visitor</code>"
+base class.<p>
+
+Instead of using virtual methods, we can implement visitors using
+switch statements over node types.  e.g.<p>
+
+<blockquote>
+<pre>switch(node.type)
+{
+    case Negate: ...
+    case UnaryPlus: ...
+    case BinaryNot: ...
+    ...
+}</pre>
+</blockquote>
+
+However, switch statements have a similar flaw to inheritance: the
+implementation language will not warn us if we forget to put in
+a case for every node type.  It will happily fall out through the
+"<code>default</code>" case with no warning.  Tracking down these bugs
+can be just as hard as tracking down inheritance fallback bugs.
+Using virtual methods is "safer", if not quite as efficient.<p>
+
+Unfortunately, there is a catch with visitors, as explained in
+<em>Design Patterns</em>:<p>
+
+<blockquote>
+<em>Use the Visitor pattern when ... the classes defining the object
+structure rarely change, but you often want to define new operations
+over the structure.  Changing the object structure classes requires
+redefining the interface to all visitors, which is potentially
+costly.  If the object structure classes change often, then it's
+probably better to define the operations in those classes.</em>
+</blockquote>
+
+During the early stages of writing a compiler, the node types change very
+frequently.  This activates the Achilles heel of the Visitor pattern,
+and creates a maintainence nightmare.  The book suggests that we should
+use the inheritance approach to solve this problem.<p>
+
+<h2>5. So which one do we use?  Inheritance or Visitor?</h2>
+
+The inheritance pattern becomes a problem when new operations are needed.
+The solution is visitors.  Visitors become a problem when new node types
+are needed.  The solution is inheritance.<p>
+
+What we have is a situation that the design patterns gurus didn't
+consider: if the set of nodes and operations are both changing rapidly,
+then we will have problems no matter what we do.<p>
+
+We need a solution that combines the strengths of both patterns without
+the drawbacks of either.  We want the implementation language to catch
+us when we forget something, but we also want it to handle large numbers
+of nodes and operations smoothly.  We want to split different operations
+into different modules, but also keep them closely associated with the
+node type.<p>
+
+None of the standard patterns provide this combination of functionality,
+because none of the existing implementation languages support both styles
+of program design at the same time.<p>
+
+<h2>6. Aspect-Oriented Programming</h2>
+
+A new field in language design has emerged in recent years called
+"Aspect-Oriented Programming" (AOP).  A good review of the field
+can be found in the October 2001 issue of the "<em>Communications of
+the ACM</em>" <a href="#aopref">[4]</a>, and on the AspectJ Web site
+<a href="#aspectjref">[5]</a>.<p>
+
+The following excerpt from the introduction to the AOP section in the
+CACM issue describes the essential aspects of AOP, and the difference
+between OOP and AOP:<p>
+
+<blockquote>
+<em>AOP is based on the idea that computer systems are better programmed
+by separately specifying the various concerns (properties or areas
+of interest) of a system and some description of their relationships,
+and then relying on mechanisms in the underlying AOP environment to
+weave or compose them together into a coherent program. ...
+While the tendancy in OOP's is to find commonality among classes
+and push it up the inheritance tree, AOP attempts to realize
+scattered concerns as first-class elements, and eject them
+horizontally from the object structure.</em>
+</blockquote>
+
+Aspect-orientation gives us some hope of solving our compiler
+complexity problems.  When we moved from the inheritance pattern
+to the visitor pattern, we were attempting to eject the operations
+horizontally.  But it didn't quite work as well as we had hoped: the
+intrinsic complexity of the set of nodes kept interfering.  AOP
+allows us to take the idea further, without re-introducing the problems
+that visitors have.<p>
+
+We can view each operation on node types (semantic analysis,
+optimization, code generation, etc) as an "aspect" of the compiler's
+construction.  The AOP language weaves these aspects with the node
+types to create the final compiler.<p>
+
+However, we don't really want to invent a completely new programming
+language for compiler construction.  We would have to implement this
+new language using all of the flawed techniques that makes writing
+compilers hard.  It's a classic chicken and egg problem: we don't
+want to replace a buggy compiler with a buggy compiler implementation
+language.<p>
+
+We can strike a compromise, similar to that used by lex and yacc.
+Those tools use a custom syntax for the difficult parts, and a
+pre-existing underlying language (usually C) to implement everything
+else.  The code is expanded by the tool and then compiled with the
+underlying language's compiler.<p>
+
+Treecc uses a domain-specific aspect-oriented programming language for
+declaring and managing nodes and operations, and uses an underlying language
+to implement the body of the operations.  C, C++, C#, or Java can be used
+as the underlying language, depending upon your personal preference.<p>
+
+Treecc is about 13,000 lines of code in size, which is relatively
+easy to debug by hand.<p>
+
+<em>Aside:</em> treecc does not support all of the AOP features that are
+described in the literature.  Treecc weaves together classes from multiple
+method definitions.  Other AOP languages can also weave together methods
+from fragments in multiple aspects.  We concentrated on those AOP features
+that were useful for compiler construction.  Other features could be
+incorporated at a later date.<p>
+
+<h2>7. Using Treecc to Beat Inheritance Bugs</h2>
+
+Now that we've identified the problems of inheritance and visitor patterns
+for compiler implementation, we will show how treecc helps the programmer
+avoid these traps.<p>
+
+The following is the treecc definition of our example node types:
+
+<blockquote>
+<pre>%option lang = "C#"
+
+%node Expression %abstract %typedef
+
+%node UnaryExpression Expression %abstract =
+{
+    Expression expr;
+}
+
+%node NegateExpression UnaryExpression
+%node UnaryPlusExpression UnaryExpression
+%node BitwiseNotExpression UnaryExpression</pre>
+</blockquote>
+
+Treecc converts this into a number of C# classes, one for each
+node type.  It also inserts helper methods for testing the type
+of a node and for tracking source line numbers.  If the output language
+is C or C++, treecc will also insert code for allocating large numbers
+of nodes efficiently.<p>
+
+The type-checking operation (or "aspect") is declared as follows:<p>
+
+<blockquote>
+<pre>%operation %virtual LanguageType TypeCheck(Expression e)
+
+TypeCheck(NegateExpression),
+TypeCheck(UnaryPlusExpression)
+{
+    LanguageType type = e.expr.TypeCheck();
+    if(type.IsInteger() || type.IsFloat())
+    {
+        return type;
+    }
+    throw new TypeCheckException();
+}
+
+TypeCheck(BitwiseNotExpression)
+{
+    LanguageType type = e.expr.TypeCheck();
+    if(type.IsInteger())
+    {
+        return type;
+    }
+    throw new TypeCheckException();
+}</pre>
+</blockquote>
+
+We have not declared the operation to cover "<code>Expression</code>" or
+"<code>UnaryExpression</code>".  Instead, we list all of the applicable
+subtypes explicitly.  When treecc is run on the above file, it will check
+that every non-abstract node type is handled by an operation case.  If it finds
+a missing type, it will report an error.  Let's demonstrate that by adding a
+new unary expression type:<p>
+
+<blockquote><code>
+%node LogicalNotExpression UnaryExpression<br>
+<br>
+eg.tc:17: node type `LogicalNotExpression' is not handled in operation `TypeCheck'<br>
+</code></blockquote>
+
+This is at the heart of treecc's power: it performs a large amount of
+semantic analysis over the node types to determine if the programmer has
+forgotten something.  The programmer is notified of this early in
+development process, when it is easier to fix the problem.<p>
+
+As we discussed earlier, we want to implement common code in common
+base classes to improve code sharing.  However, this introduces
+hard to find bugs.  Treecc avoids the need to do this by allowing
+the programmer to attach multiple cases to the same code block,
+as in the case of "<code>NegateExpression</code>" and
+"<code>UnaryPlusExpression</code>" above.<p>
+
+An important feature of aspect-oriented languages is aspect modularity:
+it should be possible to implement separate aspects in different parts
+of the code.  Treecc supports this by separating node and operation
+definitions.  Operations do not need to be implemented in the same
+file as the nodes to which they apply, and multiple operations on
+the same node types can be scattered through-out the code.<p>
+
+Portable.NET takes this even further by separating individual operations
+across multiple files for expressions, statements, declarations, etc.
+This introduces a clearer structure to the code that makes it easier
+to navigate the source during compiler construction.  The semantic analysis
+routines in treecc ensure that nothing is missed when all of the
+separate modules are recombined.<p>
+
+<h2>8. Painless Visitors</h2>
+
+The previous example used a "<code>%virtual</code>" operation, which
+is defined over all node types.  Treecc inserts the virtual method
+body wherever it is required.<p>
+
+Sometimes we don't want to define an operation as a virtual method.
+We would prefer to use the visitor approach.  The following is what
+a visitor version of "<code>TypeCheck</code>" would look like:
+
+<blockquote>
+<pre>%operation LanguageType TypeChecker::TypeCheck(Expression e) = {null}
+
+TypeCheck(NegateExpression),
+TypeCheck(UnaryPlusExpression)
+{
+    LanguageType type = TypeCheck(e.expr);
+    if(type.IsInteger() || type.IsFloat())
+    {
+        return type;
+    }
+    throw new TypeCheckException();
+}
+
+TypeCheck(BitwiseNotExpression)
+{
+    LanguageType type = TypeCheck(e.expr);
+    if(type.IsInteger())
+    {
+        return type;
+    }
+    throw new TypeCheckException();
+}</pre>
+</blockquote>
+
+This is almost identical to the previous version, except for the
+definition of the operation, and the calling conventions for
+"<code>TypeCheck</code>".  Behind the scenes, treecc creates
+a class called "<code>TypeChecker</code>" that contains a static
+method called "<code>TypeCheck</code>".  This is the visitor.<p>
+
+Interestingly, if we had used C as the underlying language, then no
+changes are necessary to the bodies of the operation cases.  Only
+the "<code>%virtual</code>" keyword changes.  The C macro pre-processor
+is used to smooth out the differences.<p>
+
+This illustrates another useful property of treecc: it is very simple
+to flip operations between inhertance-based virtuals and visitor-based
+non-virtuals.  This allows the programmer to start developing the compiler
+one way, change their mind, and quickly flip to the other way.<p>
+
+Normally, changing inheritance-based code into visitor-based code
+would entail a complete system rewrite.  Changing patterns with
+treecc is trivial.<p>
+
+This is a common property of aspect-oriented programming languages:
+because the language takes care of the inserting the aspects into
+the main classes, it is easier to change the style of insertion
+without a major system overhaul.<p>
+
+Non-virtual operations can be applied to multiple arguments, which
+can be very useful when implementing coercions:
+
+<blockquote>
+<pre>%enum SimpleType =
+{
+    Integer,
+    Long,
+    Float,
+    Error
+}
+
+%operation %inline SimpleType Binary::Coerce
+        ([SimpleType type1], [SimpleType type2]) = {Error}
+
+Coerce(Integer, Integer)
+{
+    return Integer;
+}
+
+Coerce(Integer, Long),
+Coerce(Long, Integer),
+Coerce(Long, Long)
+{
+    return Long;
+}
+
+Coerce(Integer, Float),
+Coerce(Float, Integer),
+Coerce(Long, Float),
+Coerce(Float, Float)
+{
+    return Float;
+}
+
+Coerce(Integer, Error),
+Coerce(Error, Integer),
+Coerce(Long, Error),
+Coerce(Error, Long),
+Coerce(Float, Error),
+Coerce(Error, Float),
+Coerce(Error, Error)
+{
+    return Error;
+}</pre>
+</blockquote>
+
+Treecc turns this into a highly efficient nested switch statement,
+which would be extremely difficult to debug by hand.  We actually
+left out one of the cases above, so we get an error:
+
+<blockquote><code>eg.tc:48: case `Float, Long' is missing from operation `Coerce'</code></blockquote>
+
+Casts and coercions on primitive types can now be implemented as
+simple table lookups, with treecc checking the completeness of the
+table for us.<p>
+
+<h2>9. Conclusion and Future Directions</h2>
+
+Treecc provides a new way to attack the complexity of compiler implementation
+by automating error-prone tasks.  It performs a large amount of semantic
+analysis on the program to ensure that common problems are caught early
+in the development cycle.<p>
+
+Because treecc is based on an aspect-oriented foundation, it allows the
+programmer to separate out concerns and deal with them individually.
+Treecc puts the whole system back together in the most efficient manner
+possible.<p>
+
+The system is not necessarily complete.  We'd like to experiment with
+rule-based code generation techniques.  At present, optimizers and
+code generators must be written by hand, as operations on node types.<p>
+
+A rule-based system would make it easier to build clever optimizers
+as a set of pattern matching directives.  Operations are already a
+special class of pattern matcher, but they don't have any back-tracking
+and retry capabilities.<p>
+
+Another area that treecc can be applied to is the construction of
+"Just In Time" compilers.  The first phase of the JIT process is the
+reconstruction of the intermediate code form of the program.  This
+intermediate code typically takes the form of abstract syntax trees or
+three-address statements.<p>
+
+Treecc is well-suited to the management of JIT intermediate forms.
+Register allocation, dynamic flow analysis, and machine-dependent
+code generation can be added as JIT aspects.  We are currently
+exploring the use of treecc to assist in the construction of a
+JIT for Portable.NET<p>
+
+<h2>References</h2>
+
+<a name="pnetref">[1] Portable.NET Web Site, <a href="http://www.southern-storm.com.au/portable_net.html">http://www.southern-storm.com.au/portable_net.html</a>.<p>
+
+<a name="treeccref">[2] Treecc Web Site, <a href="http://www.southern-storm.com.au/treecc.html">http://www.southern-storm.com.au/treecc.html</a>.<p>
+
+<a name="gammaref">[3] Gamma, et al., <em>Design Patterns: Elements of
+Reusable Object-Oriented Software</em>, Addison-Wesley, 1995.<p>
+
+<a name="aopref">[4] Aspect-Oriented Programming, <em>Communications of
+the ACM</em>, October 2001.<p>
+
+<a name="aspectjref">[5] AspectJ Web Site, <a href="http://www.aspectj.org/">http://www.aspectj.org/</a>.<p>
+
+</body>
+</html>

@@ -17,6 +17,13 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+//===-- AVM2SelectionDAGInfo.cpp - AVM2 SelectionDAG Info ---------------===//
+//
+// This file implements the AVM2SelectionDAGInfo class.
+//
+//===----------------------------------------------------------------------===//
+
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
 
 #define DEBUG_TYPE "AVM2-selectiondag-info"
 #include "AVM2TargetMachine.h"

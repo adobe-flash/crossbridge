@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+//===-- AVM2.h - Top-level interface for AVM2 representation --*- C++ -*-===//
+
 #ifndef TARGET_AVM2_H
 #define TARGET_AVM2_H
 

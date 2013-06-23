@@ -1,0 +1,35 @@
+
+###############################################################################
+#                                                                             #
+#  init                                                                       #
+#                                                                             #
+#  Lout file for initializing run.                                            #
+#                                                                             #
+#  Jeffrey H. Kingston                                                        #
+#  21 September 1994                                                          #
+#                                                                             #
+###############################################################################
+
+
+@SysInclude { langdefs }			  # language definitions
+@SysInclude { bsf }				  # BasicSetup package
+@SysInclude { dsf }				  # DocumentSetup package
+						  #   including standard.ld
+def @TeX
+{
+    @OneCol { T &0.4fo {-0.2f @VShift E} &0.45fo X }
+}
+
+def @LaTeX
+{
+    @OneCol { L &0.3fo { +0.1f @VShift 0.8f @Font A } &0.4fo @TeX }
+}
+
+@Use { @BasicSetup }
+@Use { @DocumentSetup }
+
+@SysDatabase @Reference { loutrefs }		  # references about Lout
+@SysDatabase @Reference { oldrefs }		  # old references about Lout
+@SysDatabase @RefStyle { refstyle }		  # reference printing styles
+@SysDatabase @FontDef  { fontdefs }		  # font definitions
+@SysDatabase @FontDef  { latin2 }		  # more font definitions

@@ -1,0 +1,48 @@
+Searching for programs with 1 operations.
+Found 0 solutions.
+Counters = 104, total = 104
+Searching for programs with 2 operations.
+Found 0 solutions.
+Counters = 448, 11305, total = 11753
+Searching for programs with 3 operations.
+Found 0 solutions.
+Counters = 21914, 53141, 1752237, total = 1827292
+Searching for programs with 4 operations.
+
+Found a 4-operation program:
+   add   r1,rx,3
+   and   r2,r1,2
+   shr   r3,3,r2
+   xor   r4,r3,rx
+   Expr: ((3 >>u ((x + 3) & 2)) ^ x)
+
+Found a 4-operation program:
+   add   r1,rx,3
+   and   r2,r1,2
+   shrs  r3,3,r2
+   xor   r4,r3,rx
+   Expr: ((3 >>s ((x + 3) & 2)) ^ x)
+
+Found a 4-operation program:
+   sub   r1,rx,1
+   and   r2,r1,2
+   shr   r3,3,r2
+   xor   r4,r3,rx
+   Expr: ((3 >>u ((x - 1) & 2)) ^ x)
+
+Found a 4-operation program:
+   sub   r1,rx,1
+   and   r2,r1,2
+   shrs  r3,3,r2
+   xor   r4,r3,rx
+   Expr: ((3 >>s ((x - 1) & 2)) ^ x)
+
+Found a 4-operation program:
+   sub   r1,-2,rx
+   and   r2,r1,2
+   shr   r3,3,r2
+   xor   r4,r3,rx
+   Expr: ((3 >>u ((-2 - x) & 2)) ^ x)
+Found 5 solutions.
+Counters = 971685, 1006173, 3822690, 85224621, total = 91025169
+exit 0

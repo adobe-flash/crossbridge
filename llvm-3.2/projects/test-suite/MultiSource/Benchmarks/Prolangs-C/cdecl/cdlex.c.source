@@ -1,0 +1,1643 @@
+#include <stdio.h>
+# define U(x) x
+# define NLSTATE yyprevious=YYNEWLINE
+# define BEGIN yybgin = yysvec + 1 +
+# define INITIAL 0
+# define YYLERR yysvec
+# define YYSTATE (yyestate-yysvec-1)
+# define YYOPTIM 1
+# define YYLMAX BUFSIZ
+#ifndef __cplusplus
+# define output(c) (void)putc(c,yyout)
+#else
+# define lex_output(c) (void)putc(c,yyout)
+#endif
+
+#if defined(__cplusplus) || defined(__STDC__)
+
+#if defined(__cplusplus) && defined(__EXTERN_C__)
+extern "C" {
+#endif
+	int yyback(int *, int);
+	int yyinput(void);
+	int yylook(void);
+	void yyoutput(int);
+	int yyracc(int);
+	int yyreject(void);
+	void yyunput(int);
+	int yylex(void);
+#ifdef YYLEX_E
+	void yywoutput(wchar_t);
+	wchar_t yywinput(void);
+#endif
+#ifndef yyless
+	int yyless(int);
+#endif
+#ifndef yywrap
+	int yywrap_nasko(void);
+#endif
+#ifdef LEXDEBUG
+	void allprint(char);
+	void sprint(char *);
+#endif
+#if defined(__cplusplus) && defined(__EXTERN_C__)
+}
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+	void exit(int);
+#ifdef __cplusplus
+}
+#endif
+
+#endif
+# define unput(c) {yytchar= (c);if(yytchar=='\n')yylineno--;*yysptr++=yytchar;}
+# define yymore() (yymorfg=1)
+#ifndef __cplusplus
+# define input() (((yytchar=yysptr>yysbuf?U(*--yysptr):getc(yyin))==10?(yylineno++,yytchar):yytchar)==EOF?0:yytchar)
+#else
+# define lex_input() (((yytchar=yysptr>yysbuf?U(*--yysptr):getc(yyin))==10?(yylineno++,yytchar):yytchar)==EOF?0:yytchar)
+#endif
+#define ECHO fprintf(yyout, "%s",yytext)
+# define REJECT { nstr = yyreject(); goto yyfussy;}
+int yyleng;
+char yytext[YYLMAX];
+int yymorfg;
+extern char *yysptr, yysbuf[];
+int yytchar;
+FILE *yyin = 0, *yyout = 0;
+extern int yylineno;
+struct yysvf { 
+	struct yywork *yystoff;
+	struct yysvf *yyother;
+	int *yystops;};
+struct yysvf *yyestate;
+extern struct yysvf yysvec[], *yybgin;
+
+/* Lexical analyzer description for ANSI and C++ cdecl. */
+
+/* The output of this file is included */
+
+/* into the C file cdecl.c. */
+char cdlexsccsid[] = "@(#)cdlex.l	2.2 3/30/88";
+# define YYNEWLINE 10
+yylex(){
+  if (yyin == 0) { yyin = stdin; yyin = stdout; }
+int nstr; extern int yyprevious;
+#ifdef __cplusplus
+/* to avoid CC and lint complaining yyfussy not being used ...*/
+static int __lex_hack = 0;
+if (__lex_hack) goto yyfussy;
+#endif
+while((nstr = yylook()) >= 0)
+yyfussy: switch(nstr){
+case 0:
+if(yywrap_nasko()) return(0); break;
+case 1:
+
+	return ARRAY;
+break;
+case 2:
+
+	return AS;
+break;
+case 3:
+
+	return CAST;
+break;
+case 4:
+
+	return DECLARE;
+break;
+case 5:
+
+	return 0;
+break;
+case 6:
+
+	return EXPLAIN;
+break;
+case 7:
+
+return FUNCTION;
+break;
+case 8:
+
+	return FUNCTION;
+break;
+case 9:
+
+	return HELP;
+break;
+case 10:
+
+	return INTO;
+break;
+case 11:
+
+	return MEMBER;
+break;
+case 12:
+
+	return OF;
+break;
+case 13:
+
+	return POINTER;
+break;
+case 14:
+
+	return POINTER;
+break;
+case 15:
+
+	return 0;
+break;
+case 16:
+
+return REFERENCE;
+break;
+case 17:
+
+	return REFERENCE;
+break;
+case 18:
+
+return RETURNING;
+break;
+case 19:
+
+	return RETURNING;
+break;
+case 20:
+
+	return SET;
+break;
+case 21:
+
+	return TO;
+break;
+case 22:
+
+	return ARRAY;
+break;
+case 23:
+
+	return DOUBLECOLON;
+break;
+case 24:
+
+	return HELP;
+break;
+case 25:
+
+	return COMMA;
+break;
+case 26:
+
+	{ yylval.dynstr = ds(yytext);	return AUTO; }
+break;
+case 27:
+
+{ yylval.dynstr = ds("char");	return CHAR; }
+break;
+case 28:
+
+	{ yylval.dynstr = ds(yytext);	return CHAR; }
+break;
+case 29:
+
+	{ yylval.dynstr = ds(yytext);	return CLASS; }
+break;
+case 30:
+
+{ yylval.dynstr = ds("const");	return CONSTVOLATILE; }
+break;
+case 31:
+
+	{ yylval.dynstr = ds(yytext);	return CONSTVOLATILE; }
+break;
+case 32:
+
+	{ yylval.dynstr = ds(yytext);	return DOUBLE; }
+break;
+case 33:
+
+{ yylval.dynstr = ds("enum");	return ENUM; }
+break;
+case 34:
+
+	{ yylval.dynstr = ds(yytext);	return ENUM; }
+break;
+case 35:
+
+	{ yylval.dynstr = ds(yytext);	return EXTERN; }
+break;
+case 36:
+
+	{ yylval.dynstr = ds(yytext);	return FLOAT; }
+break;
+case 37:
+
+	{ yylval.dynstr = ds("int");	return INT; }
+break;
+case 38:
+
+	{ yylval.dynstr = ds(yytext);	return INT; }
+break;
+case 39:
+
+	{ yylval.dynstr = ds(yytext);	return LONG; }
+break;
+case 40:
+
+	{ yylval.dynstr = ds(yytext);	return CONSTVOLATILE; }
+break;
+case 41:
+
+{ yylval.dynstr = ds(yytext);	return REGISTER; }
+break;
+case 42:
+
+	{ yylval.dynstr = ds(yytext);	return SHORT; }
+break;
+case 43:
+
+	{ yylval.dynstr = ds(yytext);	return SIGNED; }
+break;
+case 44:
+
+	{ yylval.dynstr = ds(yytext);	return STATIC; }
+break;
+case 45:
+
+{ yylval.dynstr = ds("struct");	return STRUCT; }
+break;
+case 46:
+
+	{ yylval.dynstr = ds(yytext);	return STRUCT; }
+break;
+case 47:
+
+	{ yylval.dynstr = ds(yytext);	return UNION; }
+break;
+case 48:
+
+{ yylval.dynstr = ds(yytext);	return UNSIGNED; }
+break;
+case 49:
+
+	{ yylval.dynstr = ds(yytext);	return VOID; }
+break;
+case 50:
+
+{ yylval.dynstr = ds(yytext);	return CONSTVOLATILE; }
+break;
+case 51:
+
+{ yylval.dynstr = ds(yytext);	return NAME; }
+break;
+case 52:
+
+	{ yylval.dynstr = ds(yytext);	return NUMBER; }
+break;
+case 53:
+
+	;
+break;
+case 54:
+
+	;
+break;
+case 55:
+
+return *yytext;
+break;
+case 56:
+
+	{
+			(void) printf("bad character '%s'\n",visible(*yytext));
+			return *yytext;
+		}
+break;
+case -1:
+break;
+default:
+(void)fprintf(yyout,"bad switch yylook %d",nstr);
+} return(0); }
+/* end of yylex */
+int yyvstop[] = {
+0,
+
+56,
+0,
+
+54,
+56,
+0,
+
+55,
+0,
+
+53,
+56,
+0,
+
+55,
+56,
+0,
+
+25,
+56,
+0,
+
+52,
+56,
+0,
+
+56,
+0,
+
+24,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+51,
+56,
+0,
+
+53,
+0,
+
+52,
+0,
+
+23,
+0,
+
+51,
+0,
+
+51,
+0,
+
+2,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+12,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+21,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+38,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+14,
+51,
+0,
+
+51,
+0,
+
+17,
+51,
+0,
+
+51,
+0,
+
+19,
+51,
+0,
+
+20,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+26,
+51,
+0,
+
+3,
+51,
+0,
+
+28,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+34,
+51,
+0,
+
+5,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+8,
+51,
+0,
+
+9,
+51,
+0,
+
+51,
+0,
+
+10,
+51,
+0,
+
+39,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+15,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+49,
+51,
+0,
+
+51,
+0,
+
+1,
+51,
+0,
+
+51,
+0,
+
+29,
+51,
+0,
+
+31,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+36,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+42,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+47,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+32,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+35,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+11,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+43,
+51,
+0,
+
+44,
+51,
+0,
+
+46,
+51,
+0,
+
+51,
+0,
+
+22,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+4,
+51,
+0,
+
+51,
+0,
+
+6,
+51,
+0,
+
+51,
+0,
+
+37,
+51,
+0,
+
+40,
+51,
+0,
+
+13,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+30,
+51,
+0,
+
+51,
+0,
+
+7,
+51,
+0,
+
+51,
+0,
+
+41,
+51,
+0,
+
+51,
+0,
+
+51,
+0,
+
+48,
+51,
+0,
+
+50,
+51,
+0,
+
+27,
+51,
+0,
+
+51,
+0,
+
+16,
+51,
+0,
+
+18,
+51,
+0,
+
+45,
+51,
+0,
+
+51,
+0,
+
+33,
+51,
+0,
+0};
+# define YYTYPE unsigned char
+struct yywork { YYTYPE verify, advance; } yycrank[] = {
+0,0,	0,0,	1,3,	0,0,	
+0,0,	0,0,	0,0,	6,31,	
+0,0,	0,0,	1,4,	1,5,	
+31,0,	0,0,	0,0,	6,31,	
+6,0,	0,0,	0,0,	0,0,	
+0,0,	0,0,	0,0,	0,0,	
+0,0,	0,0,	0,0,	0,0,	
+0,0,	0,0,	0,0,	0,0,	
+0,0,	0,0,	0,0,	0,0,	
+1,6,	0,0,	0,0,	1,7,	
+0,0,	6,31,	0,0,	0,0,	
+6,31,	1,8,	0,0,	0,0,	
+0,0,	1,9,	6,31,	0,0,	
+0,0,	0,0,	6,31,	0,0,	
+0,0,	0,0,	0,0,	1,10,	
+10,33,	0,0,	0,0,	0,0,	
+1,11,	0,0,	1,12,	0,0,	
+0,0,	6,31,	0,0,	6,31,	
+0,0,	0,0,	0,0,	0,0,	
+0,0,	0,0,	0,0,	0,0,	
+0,0,	2,10,	9,32,	9,32,	
+9,32,	9,32,	9,32,	9,32,	
+9,32,	9,32,	9,32,	9,32,	
+0,0,	0,0,	0,0,	0,0,	
+0,0,	0,0,	1,13,	39,69,	
+1,14,	1,15,	1,16,	1,17,	
+18,48,	1,18,	1,19,	21,51,	
+23,53,	1,20,	1,21,	1,22,	
+1,23,	1,24,	1,25,	1,26,	
+1,27,	1,28,	1,29,	1,30,	
+2,13,	17,46,	2,14,	2,15,	
+2,16,	2,17,	19,49,	2,18,	
+2,19,	20,50,	17,47,	2,20,	
+2,21,	2,22,	2,23,	2,24,	
+2,25,	2,26,	2,27,	2,28,	
+2,29,	2,30,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+13,35,	13,36,	22,52,	13,37,	
+25,56,	26,57,	28,62,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	24,54,	29,63,	35,66,	
+37,67,	12,34,	24,55,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	12,34,	12,34,	12,34,	
+12,34,	14,38,	27,58,	15,42,	
+16,44,	27,59,	27,60,	38,68,	
+14,39,	30,64,	40,70,	41,71,	
+14,40,	15,43,	16,45,	14,41,	
+42,72,	27,61,	43,73,	30,65,	
+44,74,	45,75,	46,78,	47,79,	
+48,80,	49,81,	50,82,	51,83,	
+45,76,	52,84,	54,85,	55,86,	
+45,77,	56,87,	57,88,	57,89,	
+58,91,	59,92,	60,93,	61,94,	
+63,96,	64,98,	65,99,	66,101,	
+67,102,	65,100,	68,103,	69,104,	
+57,90,	70,105,	63,97,	71,106,	
+72,107,	73,108,	74,109,	75,110,	
+61,95,	76,111,	77,112,	78,113,	
+79,114,	80,115,	81,116,	82,118,	
+83,119,	84,120,	85,121,	87,122,	
+88,123,	89,124,	90,125,	92,126,	
+81,117,	93,127,	94,128,	95,129,	
+96,130,	97,131,	98,132,	99,133,	
+100,134,	101,135,	104,136,	105,137,	
+106,138,	107,139,	108,140,	109,141,	
+111,142,	112,143,	113,144,	114,145,	
+116,146,	119,147,	120,148,	121,149,	
+123,150,	124,151,	125,152,	126,153,	
+127,154,	128,155,	129,156,	130,157,	
+131,158,	132,159,	134,160,	136,161,	
+138,162,	139,163,	140,164,	141,165,	
+142,166,	143,167,	145,168,	146,169,	
+147,170,	148,171,	149,172,	150,173,	
+151,174,	152,175,	154,176,	155,177,	
+156,178,	158,179,	159,180,	160,181,	
+161,182,	162,183,	163,184,	165,185,	
+166,186,	168,187,	169,188,	171,189,	
+172,190,	173,191,	174,192,	175,193,	
+178,194,	179,195,	181,196,	182,197,	
+183,198,	185,199,	187,200,	191,201,	
+192,202,	193,203,	194,204,	195,205,	
+196,206,	197,207,	199,208,	201,209,	
+203,210,	204,211,	208,212,	212,213,	
+0,0};
+struct yysvf yysvec[] = {
+0,	0,	0,
+yycrank+-1,	0,		0,	
+yycrank+-23,	yysvec+1,	0,	
+yycrank+0,	0,		yyvstop+1,
+yycrank+0,	0,		yyvstop+3,
+yycrank+0,	0,		yyvstop+6,
+yycrank+-6,	0,		yyvstop+8,
+yycrank+0,	0,		yyvstop+11,
+yycrank+0,	0,		yyvstop+14,
+yycrank+34,	0,		yyvstop+17,
+yycrank+2,	0,		yyvstop+20,
+yycrank+0,	0,		yyvstop+22,
+yycrank+94,	0,		yyvstop+25,
+yycrank+38,	yysvec+12,	yyvstop+28,
+yycrank+120,	yysvec+12,	yyvstop+31,
+yycrank+118,	yysvec+12,	yyvstop+34,
+yycrank+110,	yysvec+12,	yyvstop+37,
+yycrank+13,	yysvec+12,	yyvstop+40,
+yycrank+3,	yysvec+12,	yyvstop+43,
+yycrank+16,	yysvec+12,	yyvstop+46,
+yycrank+18,	yysvec+12,	yyvstop+49,
+yycrank+6,	yysvec+12,	yyvstop+52,
+yycrank+43,	yysvec+12,	yyvstop+55,
+yycrank+6,	yysvec+12,	yyvstop+58,
+yycrank+74,	yysvec+12,	yyvstop+61,
+yycrank+39,	yysvec+12,	yyvstop+64,
+yycrank+56,	yysvec+12,	yyvstop+67,
+yycrank+117,	yysvec+12,	yyvstop+70,
+yycrank+47,	yysvec+12,	yyvstop+73,
+yycrank+76,	yysvec+12,	yyvstop+76,
+yycrank+124,	yysvec+12,	yyvstop+79,
+yycrank+-2,	yysvec+6,	yyvstop+82,
+yycrank+0,	yysvec+9,	yyvstop+84,
+yycrank+0,	0,		yyvstop+86,
+yycrank+0,	yysvec+12,	yyvstop+88,
+yycrank+73,	yysvec+12,	yyvstop+90,
+yycrank+0,	yysvec+12,	yyvstop+92,
+yycrank+72,	yysvec+12,	yyvstop+95,
+yycrank+108,	yysvec+12,	yyvstop+97,
+yycrank+2,	yysvec+12,	yyvstop+99,
+yycrank+129,	yysvec+12,	yyvstop+101,
+yycrank+117,	yysvec+12,	yyvstop+103,
+yycrank+133,	yysvec+12,	yyvstop+105,
+yycrank+117,	yysvec+12,	yyvstop+107,
+yycrank+119,	yysvec+12,	yyvstop+109,
+yycrank+132,	yysvec+12,	yyvstop+111,
+yycrank+127,	yysvec+12,	yyvstop+113,
+yycrank+129,	yysvec+12,	yyvstop+115,
+yycrank+132,	yysvec+12,	yyvstop+117,
+yycrank+125,	yysvec+12,	yyvstop+119,
+yycrank+132,	yysvec+12,	yyvstop+121,
+yycrank+134,	yysvec+12,	yyvstop+123,
+yycrank+148,	yysvec+12,	yyvstop+125,
+yycrank+0,	yysvec+12,	yyvstop+127,
+yycrank+141,	yysvec+12,	yyvstop+130,
+yycrank+133,	yysvec+12,	yyvstop+132,
+yycrank+144,	yysvec+12,	yyvstop+134,
+yycrank+148,	yysvec+12,	yyvstop+136,
+yycrank+136,	yysvec+12,	yyvstop+138,
+yycrank+142,	yysvec+12,	yyvstop+140,
+yycrank+151,	yysvec+12,	yyvstop+142,
+yycrank+158,	yysvec+12,	yyvstop+144,
+yycrank+0,	yysvec+12,	yyvstop+146,
+yycrank+151,	yysvec+12,	yyvstop+149,
+yycrank+158,	yysvec+12,	yyvstop+151,
+yycrank+153,	yysvec+12,	yyvstop+153,
+yycrank+162,	yysvec+12,	yyvstop+155,
+yycrank+149,	yysvec+12,	yyvstop+157,
+yycrank+146,	yysvec+12,	yyvstop+159,
+yycrank+149,	yysvec+12,	yyvstop+161,
+yycrank+150,	yysvec+12,	yyvstop+163,
+yycrank+152,	yysvec+12,	yyvstop+165,
+yycrank+160,	yysvec+12,	yyvstop+167,
+yycrank+171,	yysvec+12,	yyvstop+169,
+yycrank+161,	yysvec+12,	yyvstop+171,
+yycrank+155,	yysvec+12,	yyvstop+173,
+yycrank+165,	yysvec+12,	yyvstop+175,
+yycrank+173,	yysvec+12,	yyvstop+177,
+yycrank+178,	yysvec+12,	yyvstop+179,
+yycrank+177,	yysvec+12,	yyvstop+181,
+yycrank+165,	yysvec+12,	yyvstop+183,
+yycrank+177,	yysvec+12,	yyvstop+185,
+yycrank+176,	yysvec+12,	yyvstop+188,
+yycrank+182,	yysvec+12,	yyvstop+190,
+yycrank+173,	yysvec+12,	yyvstop+192,
+yycrank+172,	yysvec+12,	yyvstop+194,
+yycrank+0,	yysvec+12,	yyvstop+196,
+yycrank+167,	yysvec+12,	yyvstop+199,
+yycrank+183,	yysvec+12,	yyvstop+201,
+yycrank+180,	yysvec+12,	yyvstop+204,
+yycrank+169,	yysvec+12,	yyvstop+206,
+yycrank+0,	yysvec+12,	yyvstop+209,
+yycrank+173,	yysvec+12,	yyvstop+212,
+yycrank+179,	yysvec+12,	yyvstop+214,
+yycrank+174,	yysvec+12,	yyvstop+216,
+yycrank+174,	yysvec+12,	yyvstop+218,
+yycrank+181,	yysvec+12,	yyvstop+220,
+yycrank+188,	yysvec+12,	yyvstop+222,
+yycrank+178,	yysvec+12,	yyvstop+224,
+yycrank+195,	yysvec+12,	yyvstop+226,
+yycrank+199,	yysvec+12,	yyvstop+228,
+yycrank+176,	yysvec+12,	yyvstop+230,
+yycrank+0,	yysvec+12,	yyvstop+232,
+yycrank+0,	yysvec+12,	yyvstop+235,
+yycrank+201,	yysvec+12,	yyvstop+238,
+yycrank+184,	yysvec+12,	yyvstop+241,
+yycrank+184,	yysvec+12,	yyvstop+243,
+yycrank+204,	yysvec+12,	yyvstop+245,
+yycrank+194,	yysvec+12,	yyvstop+247,
+yycrank+202,	yysvec+12,	yyvstop+249,
+yycrank+0,	yysvec+12,	yyvstop+252,
+yycrank+207,	yysvec+12,	yyvstop+255,
+yycrank+191,	yysvec+12,	yyvstop+257,
+yycrank+190,	yysvec+12,	yyvstop+259,
+yycrank+191,	yysvec+12,	yyvstop+261,
+yycrank+0,	yysvec+12,	yyvstop+264,
+yycrank+205,	yysvec+12,	yyvstop+267,
+yycrank+0,	yysvec+12,	yyvstop+269,
+yycrank+0,	yysvec+12,	yyvstop+272,
+yycrank+208,	yysvec+12,	yyvstop+275,
+yycrank+205,	yysvec+12,	yyvstop+277,
+yycrank+195,	yysvec+12,	yyvstop+279,
+yycrank+0,	yysvec+12,	yyvstop+281,
+yycrank+198,	yysvec+12,	yyvstop+284,
+yycrank+198,	yysvec+12,	yyvstop+286,
+yycrank+200,	yysvec+12,	yyvstop+288,
+yycrank+199,	yysvec+12,	yyvstop+290,
+yycrank+215,	yysvec+12,	yyvstop+292,
+yycrank+212,	yysvec+12,	yyvstop+294,
+yycrank+219,	yysvec+12,	yyvstop+296,
+yycrank+209,	yysvec+12,	yyvstop+298,
+yycrank+217,	yysvec+12,	yyvstop+300,
+yycrank+210,	yysvec+12,	yyvstop+302,
+yycrank+0,	yysvec+12,	yyvstop+304,
+yycrank+206,	yysvec+12,	yyvstop+307,
+yycrank+0,	yysvec+12,	yyvstop+309,
+yycrank+224,	yysvec+12,	yyvstop+312,
+yycrank+0,	yysvec+12,	yyvstop+314,
+yycrank+227,	yysvec+12,	yyvstop+317,
+yycrank+211,	yysvec+12,	yyvstop+320,
+yycrank+225,	yysvec+12,	yyvstop+322,
+yycrank+213,	yysvec+12,	yyvstop+324,
+yycrank+223,	yysvec+12,	yyvstop+326,
+yycrank+219,	yysvec+12,	yyvstop+328,
+yycrank+0,	yysvec+12,	yyvstop+330,
+yycrank+225,	yysvec+12,	yyvstop+333,
+yycrank+230,	yysvec+12,	yyvstop+335,
+yycrank+218,	yysvec+12,	yyvstop+337,
+yycrank+236,	yysvec+12,	yyvstop+339,
+yycrank+233,	yysvec+12,	yyvstop+341,
+yycrank+234,	yysvec+12,	yyvstop+343,
+yycrank+220,	yysvec+12,	yyvstop+345,
+yycrank+227,	yysvec+12,	yyvstop+347,
+yycrank+0,	yysvec+12,	yyvstop+349,
+yycrank+238,	yysvec+12,	yyvstop+352,
+yycrank+240,	yysvec+12,	yyvstop+354,
+yycrank+224,	yysvec+12,	yyvstop+356,
+yycrank+0,	yysvec+12,	yyvstop+358,
+yycrank+231,	yysvec+12,	yyvstop+361,
+yycrank+228,	yysvec+12,	yyvstop+363,
+yycrank+238,	yysvec+12,	yyvstop+365,
+yycrank+228,	yysvec+12,	yyvstop+367,
+yycrank+235,	yysvec+12,	yyvstop+369,
+yycrank+245,	yysvec+12,	yyvstop+371,
+yycrank+0,	yysvec+12,	yyvstop+373,
+yycrank+250,	yysvec+12,	yyvstop+376,
+yycrank+238,	yysvec+12,	yyvstop+378,
+yycrank+0,	yysvec+12,	yyvstop+380,
+yycrank+238,	yysvec+12,	yyvstop+383,
+yycrank+236,	yysvec+12,	yyvstop+385,
+yycrank+0,	yysvec+12,	yyvstop+387,
+yycrank+236,	yysvec+12,	yyvstop+390,
+yycrank+238,	yysvec+12,	yyvstop+392,
+yycrank+243,	yysvec+12,	yyvstop+394,
+yycrank+253,	yysvec+12,	yyvstop+396,
+yycrank+250,	yysvec+12,	yyvstop+398,
+yycrank+0,	yysvec+12,	yyvstop+400,
+yycrank+0,	yysvec+12,	yyvstop+403,
+yycrank+239,	yysvec+12,	yyvstop+406,
+yycrank+256,	yysvec+12,	yyvstop+409,
+yycrank+0,	yysvec+12,	yyvstop+411,
+yycrank+250,	yysvec+12,	yyvstop+414,
+yycrank+258,	yysvec+12,	yyvstop+416,
+yycrank+244,	yysvec+12,	yyvstop+418,
+yycrank+0,	yysvec+12,	yyvstop+420,
+yycrank+245,	yysvec+12,	yyvstop+423,
+yycrank+0,	yysvec+12,	yyvstop+425,
+yycrank+252,	yysvec+12,	yyvstop+428,
+yycrank+0,	yysvec+12,	yyvstop+430,
+yycrank+0,	yysvec+12,	yyvstop+433,
+yycrank+0,	yysvec+12,	yyvstop+436,
+yycrank+264,	yysvec+12,	yyvstop+439,
+yycrank+250,	yysvec+12,	yyvstop+441,
+yycrank+255,	yysvec+12,	yyvstop+443,
+yycrank+252,	yysvec+12,	yyvstop+445,
+yycrank+267,	yysvec+12,	yyvstop+447,
+yycrank+267,	yysvec+12,	yyvstop+449,
+yycrank+255,	yysvec+12,	yyvstop+451,
+yycrank+0,	yysvec+12,	yyvstop+453,
+yycrank+265,	yysvec+12,	yyvstop+456,
+yycrank+0,	yysvec+12,	yyvstop+458,
+yycrank+270,	yysvec+12,	yyvstop+461,
+yycrank+0,	yysvec+12,	yyvstop+463,
+yycrank+269,	yysvec+12,	yyvstop+466,
+yycrank+272,	yysvec+12,	yyvstop+468,
+yycrank+0,	yysvec+12,	yyvstop+470,
+yycrank+0,	yysvec+12,	yyvstop+473,
+yycrank+0,	yysvec+12,	yyvstop+476,
+yycrank+263,	yysvec+12,	yyvstop+479,
+yycrank+0,	yysvec+12,	yyvstop+481,
+yycrank+0,	yysvec+12,	yyvstop+484,
+yycrank+0,	yysvec+12,	yyvstop+487,
+yycrank+265,	yysvec+12,	yyvstop+490,
+yycrank+0,	yysvec+12,	yyvstop+492,
+0,	0,	0};
+struct yywork *yytop = yycrank+375;
+struct yysvf *yybgin = yysvec+1;
+char yymatch[] = {
+  0,   1,   1,   1,   1,   1,   1,   1, 
+  1,   9,  10,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  9,   1,   1,  35,   1,   1,  38,   1, 
+ 38,  38,  38,   1,  44,   1,   1,   1, 
+ 48,  48,  48,  48,  48,  48,  48,  48, 
+ 48,  48,   1,  38,   1,   1,   1,  63, 
+  1,  65,  65,  65,  65,  65,  65,  65, 
+ 65,  65,  65,  65,  65,  65,  65,  65, 
+ 65,  65,  65,  65,  65,  65,  65,  65, 
+ 65,  65,  65,  38,   1,  38,   1,  65, 
+  1,  65,  65,  65,  65,  65,  65,  65, 
+ 65,  65,  65,  65,  65,  65,  65,  65, 
+ 65,  65,  65,  65,  65,  65,  65,  65, 
+ 65,  65,  65,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+  1,   1,   1,   1,   1,   1,   1,   1, 
+0};
+char yyextra[] = {
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,
+0};
+/*	Copyright (c) 1989 AT&T	*/
+/*	  All Rights Reserved  	*/
+
+/*	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T	*/
+/*	The copyright notice above does not evidence any   	*/
+/*	actual or intended publication of such source code.	*/
+
+#pragma ident	"@(#)ncform	6.8	95/02/11 SMI"
+
+int yylineno =1;
+# define YYU(x) x
+# define NLSTATE yyprevious=YYNEWLINE
+struct yysvf *yylstate [YYLMAX], **yylsp, **yyolsp;
+char yysbuf[YYLMAX];
+char *yysptr = yysbuf;
+int *yyfnd;
+extern struct yysvf *yyestate;
+int yyprevious = YYNEWLINE;
+#if defined(__cplusplus) || defined(__STDC__)
+int yylook(void)
+#else
+yylook()
+#endif
+{
+	register struct yysvf *yystate, **lsp;
+	register struct yywork *yyt;
+	struct yysvf *yyz;
+	int yych, yyfirst;
+	struct yywork *yyr;
+# ifdef LEXDEBUG
+	int debug;
+# endif
+	char *yylastch;
+	/* start off machines */
+# ifdef LEXDEBUG
+	debug = 0;
+# endif
+	yyfirst=1;
+	if (!yymorfg)
+		yylastch = yytext;
+	else {
+		yymorfg=0;
+		yylastch = yytext+yyleng;
+		}
+	for(;;){
+		lsp = yylstate;
+		yyestate = yystate = yybgin;
+		if (yyprevious==YYNEWLINE) yystate++;
+		for (;;){
+# ifdef LEXDEBUG
+			if(debug)fprintf(yyout,"state %d\n",yystate-yysvec-1);
+# endif
+			yyt = yystate->yystoff;
+			if(yyt == yycrank && !yyfirst){  /* may not be any transitions */
+				yyz = yystate->yyother;
+				if(yyz == 0)break;
+				if(yyz->yystoff == yycrank)break;
+				}
+#ifndef __cplusplus
+			*yylastch++ = yych = input();
+#else
+			*yylastch++ = yych = lex_input();
+#endif
+			if(yylastch > &yytext[YYLMAX]) {
+				fprintf(yyout,"Input string too long, limit %d\n",YYLMAX);
+				exit(1);
+			}
+			yyfirst=0;
+		tryagain:
+# ifdef LEXDEBUG
+			if(debug){
+				fprintf(yyout,"char ");
+				allprint(yych);
+				putchar('\n');
+				}
+# endif
+			yyr = yyt;
+			if ( (int)yyt > (int)yycrank){
+				yyt = yyr + yych;
+				if (yyt <= yytop && yyt->verify+yysvec == yystate){
+					if(yyt->advance+yysvec == YYLERR)	/* error transitions */
+						{unput(*--yylastch);break;}
+					*lsp++ = yystate = yyt->advance+yysvec;
+					if(lsp > &yylstate[YYLMAX]) {
+						fprintf(yyout,"Input string too long, limit %d\n",YYLMAX);
+						exit(1);
+					}
+					goto contin;
+					}
+				}
+# ifdef YYOPTIM
+			else if((int)yyt < (int)yycrank) {		/* r < yycrank */
+				yyt = yyr = yycrank+(yycrank-yyt);
+# ifdef LEXDEBUG
+				if(debug)fprintf(yyout,"compressed state\n");
+# endif
+				yyt = yyt + yych;
+				if(yyt <= yytop && yyt->verify+yysvec == yystate){
+					if(yyt->advance+yysvec == YYLERR)	/* error transitions */
+						{unput(*--yylastch);break;}
+					*lsp++ = yystate = yyt->advance+yysvec;
+					if(lsp > &yylstate[YYLMAX]) {
+						fprintf(yyout,"Input string too long, limit %d\n",YYLMAX);
+						exit(1);
+					}
+					goto contin;
+					}
+				yyt = yyr + YYU(yymatch[yych]);
+# ifdef LEXDEBUG
+				if(debug){
+					fprintf(yyout,"try fall back character ");
+					allprint(YYU(yymatch[yych]));
+					putchar('\n');
+					}
+# endif
+				if(yyt <= yytop && yyt->verify+yysvec == yystate){
+					if(yyt->advance+yysvec == YYLERR)	/* error transition */
+						{unput(*--yylastch);break;}
+					*lsp++ = yystate = yyt->advance+yysvec;
+					if(lsp > &yylstate[YYLMAX]) {
+						fprintf(yyout,"Input string too long, limit %d\n",YYLMAX);
+						exit(1);
+					}
+					goto contin;
+					}
+				}
+			if ((yystate = yystate->yyother) && (yyt= yystate->yystoff) != yycrank){
+# ifdef LEXDEBUG
+				if(debug)fprintf(yyout,"fall back to state %d\n",yystate-yysvec-1);
+# endif
+				goto tryagain;
+				}
+# endif
+			else
+				{unput(*--yylastch);break;}
+		contin:
+# ifdef LEXDEBUG
+			if(debug){
+				fprintf(yyout,"state %d char ",yystate-yysvec-1);
+				allprint(yych);
+				putchar('\n');
+				}
+# endif
+			;
+			}
+# ifdef LEXDEBUG
+		if(debug){
+			fprintf(yyout,"stopped at %d with ",*(lsp-1)-yysvec-1);
+			allprint(yych);
+			putchar('\n');
+			}
+# endif
+		while (lsp-- > yylstate){
+			*yylastch-- = 0;
+			if (*lsp != 0 && (yyfnd= (*lsp)->yystops) && *yyfnd > 0){
+				yyolsp = lsp;
+				if(yyextra[*yyfnd]){		/* must backup */
+					while(yyback((*lsp)->yystops,-*yyfnd) != 1 && lsp > yylstate){
+						lsp--;
+						unput(*yylastch--);
+						}
+					}
+				yyprevious = YYU(*yylastch);
+				yylsp = lsp;
+				yyleng = yylastch-yytext+1;
+				yytext[yyleng] = 0;
+# ifdef LEXDEBUG
+				if(debug){
+					fprintf(yyout,"\nmatch ");
+					sprint(yytext);
+					fprintf(yyout," action %d\n",*yyfnd);
+					}
+# endif
+				return(*yyfnd++);
+				}
+			unput(*yylastch);
+			}
+		if (yytext[0] == 0  /* && feof(yyin) */)
+			{
+			yysptr=yysbuf;
+			return(0);
+			}
+#ifndef __cplusplus
+		yyprevious = yytext[0] = input();
+		if (yyprevious>0)
+			output(yyprevious);
+#else
+		yyprevious = yytext[0] = lex_input();
+		if (yyprevious>0)
+			lex_output(yyprevious);
+#endif
+		yylastch=yytext;
+# ifdef LEXDEBUG
+		if(debug)putchar('\n');
+# endif
+		}
+	}
+#if defined(__cplusplus) || defined(__STDC__)
+int yyback(int *p, int m)
+#else
+yyback(p, m)
+	int *p;
+#endif
+{
+	if (p==0) return(0);
+	while (*p) {
+		if (*p++ == m)
+			return(1);
+	}
+	return(0);
+}
+	/* the following are only used in the lex library */
+#if defined(__cplusplus) || defined(__STDC__)
+int yyinput(void)
+#else
+yyinput()
+#endif
+{
+#ifndef __cplusplus
+	return(input());
+#else
+	return(lex_input());
+#endif
+	}
+#if defined(__cplusplus) || defined(__STDC__)
+void yyoutput(int c)
+#else
+yyoutput(c)
+  int c; 
+#endif
+{
+#ifndef __cplusplus
+	output(c);
+#else
+	lex_output(c);
+#endif
+	}
+#if defined(__cplusplus) || defined(__STDC__)
+void yyunput(int c)
+#else
+yyunput(c)
+   int c; 
+#endif
+{
+	unput(c);
+	}

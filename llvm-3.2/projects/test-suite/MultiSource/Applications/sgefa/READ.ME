@@ -1,0 +1,51 @@
+**********************************************************************
+**********************************************************************
+**********************************************************************
+********************	<<< DISCLAIMER >>>	**********************
+**********************************************************************
+**********************************************************************
+**********************************************************************
+This  document was prepared   as an account  of  work sponsored  by an
+agency of the  United States  Government.   Neither  the United States
+Government  nor the University     of  California nor   any   of their
+employees, makes any warranty,  express  or implied,  or assumes   any
+legal liability or responsibility for  the accuracy, completeness,  or
+usefulness  of   any  information,  apparatus,    product,  or process
+disclosed, or represents  that  its use would not   infringe privately
+owned  rights.  Reference herein to  any specific commercial products,
+process, or    service  by trade   name, trademark,  manufacturer,  or
+otherwise, does not  necessarily constitute or  imply its endorsement,
+recommendation, or  favoring by  the United States  Government or  the
+University of California.  The views and opinions of authors expressed
+herein do not necessarily state or reflect those of  the United States
+Government  thereof, and shall not be  used for advertising or product
+endorsement purposes.
+**********************************************************************
+**********************************************************************
+**********************************************************************
+
+	   This is the READ.ME for the SGEFA/SGESL package.
+
+	SGEFA is a   gaussian  elimination (with  partial    pivoting)
+package written in C (single precision).  It is a translation from the
+FORTRAN LINPACK routines of the same names.  The matrix data structure
+was modified  to account for   the conventions of   C.  That  is,  all
+elements of the  matrix are referenced  from 0 instead  of  1 and  the
+matrix is stored as a series of vectors (which  are the columns).  The
+matrix data  structure is defined in ge.h.   The user must supply  the
+storage for the columns  of the matrix by  calls to the  standard UNIX
+memory allocation routine MALLOC.  See  the matgen routine in driver.c
+for  an example.  The necessary BLAS  routines are included in blas.c.
+Easy access to the matrix elements can  be had by looking  at the elem
+and pelem macros defined in ge.h.
+
+	A sample  output (from a  Sun-3/160   workstation with FPA) is
+included in the file sgefat.out
+
+	Send comments, suggestions and bug-reports to:
+		Dr. Mark K. Seager
+		Lawrence Livermore Nat. Lab.
+		PO Box 808, L-316
+		Livermore, CA 94550
+		(415) 423-3141
+		seager@lll-crg.Arpa

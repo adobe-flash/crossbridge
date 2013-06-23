@@ -18,6 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+//===-- AVM2/AVM2MCCodeEmitter.cpp - Convert AVM2 code to ABC -------===//
+
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
+
 #define DEBUG_TYPE "mccodeemitter"
 #include "AVM2TargetAsmInfo.h"
 #include "AVM2TargetMachine.h"

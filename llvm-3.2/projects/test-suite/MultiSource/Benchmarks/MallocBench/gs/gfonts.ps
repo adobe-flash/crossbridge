@@ -1,0 +1,183 @@
+%    Copyright (C) 1990 Aladdin Enterprises.  All rights reserved.
+%    Distributed by Free Software Foundation, Inc.
+%
+% This file is part of Ghostscript.
+%
+% Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+% to anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer
+% to the Ghostscript General Public License for full details.
+%
+% Everyone is granted permission to copy, modify and redistribute
+% Ghostscript, but only under the conditions described in the Ghostscript
+% General Public License.  A copy of this license is supposed to have been
+% given to you along with Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+
+% Font initialization for Ghostscript.  Despite anything claimed below,
+% Ghostscript fonts are actually in the same format as Adobe Type 1 fonts,
+% except that the external form customarily does not use eexec encryption.
+% Someday there will be GNU documentation that describes this format.
+% Until then, you'll have to either get a copy of Adobe's book, or read
+% the Ghostscript code.  The interpreter for Type 1 fonts, which reveals
+% most of their structure, is in the file gstype1.c.
+
+% Define the default font.
+/defaultfontname /Ugly def
+
+% Internal procedure to load the font name -> font file name map
+% if it isn't loaded already, and push it on the stack.
+/Fontmap
+ { /FontFileMap where
+    { /FontFileMap get }
+    { (Fontmap) findlibfile not
+       { (Can't find ) print print (!\n) print stop }
+      if
+
+      FontDirectory maxlength dict exch
+      2 dict begin
+        mark exch 2 index exch
+	/;
+	 { % The stack contains a mark, the dictionary, the font name,
+	   % the file name, and additional information about the font.
+	   counttomark 3 sub { pop } repeat put
+	   1 index
+	 } bind def
+	run
+      end
+      pop pop		% pop the mark and the copy of the dictionary
+      userdict exch /FontFileMap exch put
+      FontFileMap
+     }
+   ifelse
+ } bind def
+
+% Define findfont so it tries to load a font if it's not found.
+/findfont
+ {
+	% If the key is a string, convert it to a name for lookup.
+	dup type /stringtype eq { cvn } if
+
+	% If the font isn't in FontDirectory already, load it.
+	dup FontDirectory exch known not
+	 { dup		% save the font name on the stack
+
+	   % Push the font name -> font file name map on the stack,
+	   % loading it if necessary.
+	   Fontmap
+
+	   % Read the file name from the map.
+	   % (The stack contains the font name and the font file map.)
+	   1 index known not
+	    { (Substituting ) print defaultfontname cvx =only
+	      ( for ) print == flush
+	      pop defaultfontname
+	    }
+	    { FontFileMap exch get
+
+	      % If we can't find the file, substitute for the font.
+	      dup findlibfile
+	       { (Loading font file ) print exch print (... ) print flush
+	         mark exch run cleartomark		% run can take a file
+		 (done.\n) print flush
+	       }
+	       { pop 1 index defaultfontname eq
+		  { (Can't find default font!\n) print
+		    pop pop /NullFont
+		  }
+		  { (Can't find font file ) print print
+		    (, substituting ) print defaultfontname cvx =only
+		    (.\n) print flush
+		    pop defaultfontname
+		  }
+		 ifelse
+	       }
+	      ifelse
+	    }
+	   ifelse
+
+	 } if
+
+	% Get the font from the augmented FontDirectory.
+	% Check for the possibility that we haven't loaded
+	% the default font yet.
+	dup FontDirectory exch known not
+	 { findfont }
+	 { FontDirectory exch get }
+	ifelse
+
+ } bind def
+
+% Here is a reference implementation of addcharpath for "type 7" paths
+% (the type formerly used by Ghostscript).  We include this for backward
+% compatibility because Ghostscript's format has changed.
+/addcharpath		% <string> <pathtype> ->
+ { pop		% don't bother to check the pathtype
+    { moveto 3 -1 roll pop { rlineto } 3 1 roll } exch
+   % In the loop, the top element of the stack is the remaining part
+   % of the string, and the next element is the moveto/rlineto procedure.
+    { dup length 0 eq { exit } if
+      dup 0 get
+      dup 16#88 eq
+      { pop exch pop
+         { moveto 3 -1 roll pop { rlineto } 3 1 roll } exch
+	1
+      }
+      { dup 16 ge
+        { dup 15 and 0 ne
+	   { % xx
+	     dup -4 bitshift 8 sub   exch 15 and 8 sub   1
+	   }
+	   { % x0
+	     -4 bitshift 8 sub   1 index 1 get 128 sub   2
+	   }
+	  ifelse
+	}
+	{ dup 15 and 0 ne
+	   { % 0x
+	     8 sub   1 index 1 get 128 sub exch   2
+	   }
+	   { % 00
+	     pop   dup 1 get 128 sub   1 index 2 get 128 sub   3
+	   }
+	  ifelse
+	}
+	ifelse
+	3 1 roll		% now: proc string nbytes dx dy
+	0.25 mul exch 0.25 mul exch
+	4 index exec
+      }
+      ifelse
+      dup 2 index length exch sub getinterval
+    } loop
+   pop pop
+ }
+bind def
+
+
+% The CharStrings for a Ghostscript font are a dictionary in which
+% the key is the character name, and the value is a compressed
+% representation of a path, as produced by type1imagepath.
+% For detailed information, see the book
+% "Adobe Type 1 Font Format", published by Adobe Systems Inc.
+
+% Here is the BuildChar implementation
+% for Type 1 (Ghostscript standard) fonts.
+% The name Type1BuildChar is known to the interpreter.
+
+/Type1BuildChar
+ { exch begin
+    Encoding exch get
+    dup CharStrings exch known not
+     { (Substituting .notdef for ) print = flush /.notdef } if
+    CharStrings exch get
+    PaintType 0 ne
+     { 1 setmiterlimit 1 setlinejoin 1 setlinecap
+       StrokeWidth setlinewidth }
+    if
+    type1addpath	% does a fill or stroke
+   end
+ } bind def

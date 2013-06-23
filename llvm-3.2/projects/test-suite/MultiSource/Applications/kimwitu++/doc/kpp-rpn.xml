@@ -1,0 +1,332 @@
+<appendix id="app:rpn">
+  <title>Complete code of RPN example</title>
+  <sect1><title>main.k</title>
+    <programlisting>
+      <![CDATA[
+  %{
+  #include <iostream>
+  #include "k.h"
+  #include "rk.h"
+  #include "unpk.h"
+  #include "csgiok.h"
+
+  int yyparse( );
+  aritherm root_term;
+  %}
+
+  %{ KC_TYPES_HEADER
+  extern aritherm root_term;
+  %}
+
+  %option yystype
+
+  void
+  printer( const char *s, uview v ) {
+    std::cout << s;
+  }
+
+  int
+  main( int argc, char** argv ) {
+    std::cout << "rpn calculator" << std::endl;
+    yyparse( );
+    aritherm canon_term = root_term -> rewrite( canonify );
+    aritherm simpl_term = canon_term -> rewrite( simplify );
+    std::cout << "simplified term in infix notation" << endl;
+    simpl_term -> unparse( printer, infix );
+    std::cout << std::endl;
+  }
+      ]]>
+    </programlisting>
+  </sect1>
+  <sect1><title>abstr.k</title>
+    <programlisting>
+      <![CDATA[
+  aritherm:   SimpleTerm  ( simpleterm )
+	    | Plus	  ( aritherm aritherm )
+	    | Minus	  ( aritherm aritherm )
+	    | Mul	  ( aritherm aritherm )
+	    | Div	  ( aritherm aritherm );
+
+  simpleterm:   Number	  ( integer )
+	      | Ident	  ( casestring );
+      ]]>
+    </programlisting>
+  </sect1>
+  <sect1><title>rpn.k</title>
+    <programlisting>
+      <![CDATA[
+  %rview simplify, canonify;
+
+  // 1 + 2 -> 3
+  Plus(SimpleTerm(Number(a)),SimpleTerm(Number(b)))->
+    <simplify:SimpleTerm(Number(plus(a,b)))>;
+  // 1 + 3 + b -> 4 + b
+  Plus(SimpleTerm(Number(a)),Plus(SimpleTerm(Number(b)),rem))->
+    <simplify:Plus(SimpleTerm(Number(plus(a,b))),rem)>;
+  // 1 + 3 - b -> 4 - b
+  Plus(SimpleTerm(Number(a)),Minus(SimpleTerm(Number(b)),rem))->
+    <simplify:Minus(SimpleTerm(Number(plus(a,b))),rem)>;
+  // 6 - 2 -> 4
+  Minus(SimpleTerm(Number(a)),SimpleTerm(Number(b)))->
+    <simplify:SimpleTerm(Number(minus(a,b)))>;
+  // 6 - 4 - b -> 2 - b
+  Minus(SimpleTerm(Number(a)),Minus(SimpleTerm(Number(b)),rem))->
+    <simplify:Minus(SimpleTerm(Number(minus(a,b))),rem)>;
+  // 6 - 4 + b -> 2 + b
+  Minus(SimpleTerm(Number(a)),Plus(SimpleTerm(Number(b)),rem))->
+    <simplify:Plus(SimpleTerm(Number(minus(a,b))),rem)>;
+  // 3 * 2 * b -> 6 * b
+  Mul(SimpleTerm(Number(a)),Mul(SimpleTerm(Number(b)),rem))->
+    <simplify:Mul(SimpleTerm(Number(mul(a,b))),rem)>;
+  // 3 * 2 / b -> 6 / b
+  Mul(SimpleTerm(Number(a)),Div(SimpleTerm(Number(b)),rem))->
+    <simplify:Div(SimpleTerm(Number(mul(a,b))),rem)>;
+  // 3 * 2 -> 6
+  Mul(SimpleTerm(Number(a)),SimpleTerm(Number(b)))->
+    <simplify:SimpleTerm(Number(mul(a,b)))>;
+  // 6 / 2 -> 3
+  Div(SimpleTerm(Number(a)),SimpleTerm(Number(b)))->
+    <simplify:SimpleTerm(Number(div(a,b)))>;
+  // 6 / 2 / b -> 3 / b
+  Div(SimpleTerm(Number(a)),Div(SimpleTerm(Number(b)),rem))->
+    <simplify:Div(SimpleTerm(Number(div(a,b))),rem)>;
+  // 6 / 2 * b -> 3 * b
+  Div(SimpleTerm(Number(a)),Mul(SimpleTerm(Number(b)),rem))->
+    <simplify:Mul(SimpleTerm(Number(div(a,b))),rem)>;
+
+  // a + a -> 2 * a
+  Plus(b=SimpleTerm(Ident(a)),SimpleTerm(Ident(a)))->
+    <simplify:Mul(SimpleTerm(Number(mkinteger(2))),b)>;
+  // a - a -> 0
+  Minus(SimpleTerm(Ident(a)),SimpleTerm(Ident(a)))->
+    <simplify: SimpleTerm(Number(mkinteger(0)))>;
+  // a / a -> 1
+  Div(SimpleTerm(Ident(a)),SimpleTerm(Ident(a)))->
+    <simplify: SimpleTerm(Number(mkinteger(1)))>;
+  // 6 * a + a -> 7 * a
+  Plus(Mul(SimpleTerm(Number(a)),SimpleTerm(Ident(b))),c=SimpleTerm(Ident(b)))->
+    <simplify: Mul(SimpleTerm(Number(plus(a,mkinteger(1)))),c)>;
+  // 6 * a -a -> 5 * a
+  Minus(Mul(SimpleTerm(Number(a)),SimpleTerm(Ident(b))),c=SimpleTerm(Ident(b)))->
+    <simplify: Mul(SimpleTerm(Number(minus(a,mkinteger(1)))),c)>;
+  // 6 * a + 3 * a -> 9 * a
+  Plus(Mul(SimpleTerm(Number(a)),SimpleTerm(Ident(b))),
+       Mul(SimpleTerm(Number(d)),c=SimpleTerm(Ident(b))))->
+    <simplify: Mul(SimpleTerm(Number(plus(a,d))),c)>;
+  // 6 * a - 2 * a -> 4 * a
+  Minus(Mul(SimpleTerm(Number(a)),SimpleTerm(Ident(b))),
+	Mul(SimpleTerm(Number(d)),c=SimpleTerm(Ident(b))))->
+    <simplify: Mul(SimpleTerm(Number(minus(a,d))),c)>;
+  // a + (a + 2 * b) -> 2 * a + 2 * b
+  Plus(b=SimpleTerm(Ident(a)),Plus(SimpleTerm(Ident(a)),rem))->
+    <simplify: Plus(Mul(SimpleTerm(Number(mkinteger(2))),b),rem)>;
+      // a - (a +- 2 * b) -> 2 * b
+  Minus(SimpleTerm(Ident(a)),Plus(SimpleTerm(Ident(a)),rem)),
+  Minus(SimpleTerm(Ident(a)),Minus(SimpleTerm(Ident(a)),rem))->
+    <simplify: rem>;
+  // a + (a - 2 * b) -> 2 * a - 2 * b
+  Plus(b=SimpleTerm(Ident(a)),Minus(SimpleTerm(Ident(a)),rem))->
+    <simplify: Minus(Mul(SimpleTerm(Number(mkinteger(2))),b),rem)>;
+
+  // (a + b) + c -> a + (b + c)
+  Plus( Plus(a, b), c)
+	  -> < canonify: Plus(a, Plus(b, c))>;
+  // (a - b) + c -> c + (a - b)
+  Plus( Minus(a, b), c)
+	  -> < canonify: Plus(c, Minus(a, b))>;
+  // (a + b) - c -> a + (b - c)
+  Minus( Plus(a, b), c)
+	  -> < canonify: Plus(a, Minus(b, c))>;
+  // (a * b) * c -> a * (b * c)
+  Mul( Mul(a, b), c)
+	  -> < canonify: Mul(a, Mul(b, c))>;
+  // a + 5 -> 5 + a
+  Plus( a=SimpleTerm(Ident(*)), b=SimpleTerm(Number(*)) )
+	  -> < canonify: Plus(b, a)>;
+  // a * 5 -> 5 * a
+  Mul( a=SimpleTerm(Ident(*)), b=SimpleTerm(Number(*)) )
+	  -> < canonify: Mul(b, a)>;
+  // a + (6 + b) -> 6 + (a + b)
+  Plus( a=SimpleTerm(Ident(*)), Plus(b=SimpleTerm(Number(*)), rest) )
+	  -> < canonify: Plus(b, Plus(a,rest))>;
+  // a * (6 * b) -> 6 * (a * b)
+  Mul( a=SimpleTerm(Ident(*)), Mul(b=SimpleTerm(Number(*)), rest) )
+	  -> < canonify: Mul(b, Mul(a,rest))>;
+
+  %{ KC_REWRITE
+  inline integer plus(integer a, integer b){
+    return mkinteger(a->value+b->value);
+  }
+  inline integer minus(integer a, integer b){
+    return mkinteger(a->value-b->value);
+  }
+  inline integer mul(integer a, integer b){
+    return mkinteger(a->value*b->value);
+  }
+  inline integer div(integer a, integer b){
+    return mkinteger(b->value==0 ? 0 : a->value / b->value);
+  }
+  %}
+
+  %uview infix,postfix;
+
+  Plus(a,b)->[infix: "(" a "+" b ")"];
+  Minus(a,b)->[infix: "(" a "-" b ")"];
+  Mul(a,b)->[infix: "(" a "*" b ")"];
+  Div(a,b)->[infix: "(" a "/" b ")"];
+      ]]>
+    </programlisting>
+  </sect1>
+  <sect1><title>lexic.l</title>
+    <programlisting>
+      <![CDATA[
+  %{
+  #include <iostream>
+  #include "k.h"
+  #include "yystype.h"
+  #include "syntax.h"
+  #include "rpn.h"
+  %}
+
+  %option noyywrap
+
+  %%
+
+  -?[0-9]+    { yylval.yt_integer = mkinteger(atoi(yytext)); return NUMBER;}
+  [a-z]+      { yylval.yt_casestring = mkcasestring(yytext); return IDENT; }
+  [+*-/]      { return yytext[0]; }
+  [\t ]+      { /*empty*/ }
+  \n          { return EOF; }
+  .           { std::cerr << "Unkown character: " << yytext[0] << std::endl; }
+
+  %%
+
+  extern void yyerror(const char *s) {
+    std::cerr << "Syntax error: " << s << std::endl;
+  }
+
+      ]]>
+    </programlisting>
+  </sect1>
+  <sect1><title>syntax.y</title>
+    <programlisting>
+      <![CDATA[
+  %{
+  #include "k.h"
+  #include "yystype.h"
+
+  extern void yyerror(const char*);
+  extern int yylex();
+  %}
+
+  %token <yt_integer> NUMBER
+  %token <yt_casestring> IDENT
+  %token NEWLINE
+
+  %type <yt_aritherm> aritherm
+  %type <yt_simpleterm> simpleterm
+
+  %%
+
+
+  aritherm:
+	  simpleterm
+	  { root_term = $$ = SimpleTerm($1); }
+	  | aritherm aritherm '+'
+	  { root_term = $$ = Plus($1,$2); }
+	  | aritherm aritherm '*'
+	  { root_term = $$ = Mul($1,$2); }
+	  | aritherm aritherm '-'
+	  { root_term = $$ = Minus($1,$2); }
+	  | aritherm aritherm '/'
+	  { root_term = $$ = Div($1,$2); }
+  ;
+
+  simpleterm:
+	  NUMBER
+	  { $$ = Number($1); }
+	  | IDENT
+	  { $$ = Ident($1); }
+  ;
+      ]]>
+    </programlisting>
+  </sect1>
+  <sect1 id="app:make"><title>Makefile</title>
+    <programlisting>
+      <![CDATA[
+# Reverse Polish Notation, Makefile
+# c 2001, Michael Piefel <piefel@informatik.hu-berlin.de>
+ 
+.PRECIOUS: lexic.c y.output
+
+# Tools
+SHELL    = /bin/sh
+YACC     = bison
+LEX      = flex
+CC       = ${CXX}
+KC       = kc++
+
+#Flages
+YFLAGS   = -d -y
+LFLAGS   = -t
+CXXFLAGS = -g -Wall -Wno-unused -DYYDEBUG -DYYERROR_VERBOSE
+CFLAGS   = ${CXXFLAGS}
+
+# Sources
+KFILES   = rpn.k main.k abstr.k
+YFILES   = syntax.y
+LFILES   = lexic.l
+
+
+# Goals
+PARSER  = rpn-parser  
+
+# Help files
+
+KC_TIME = .kc_time_stamp
+
+KC_OGEN = k.o csgiok.o unpk.o rk.o
+KC_OSRC = $(KFILES:.k=.o)
+OBJS    = $(KC_OGEN) $(KC_OSRC) $(YFILES:.y=.o) $(LFILES:.l=.o) $(CFILES:.cc=.o)
+
+
+# default rule
+$(PARSER)::
+
+# include or make autodependencies
+ifeq (.depend,$(wildcard .depend))
+include .depend
+else
+$(PARSER):: depend
+endif
+
+# Rules
+$(KC_TIME): $(KFILES)
+	$(KC) $(KFILES)
+	touch $(KC_TIME)
+
+$(PARSER):: $(KC_TIME) $(OBJS)
+	$(CXX) $(CFLAGS) $(OBJS) ${LIBS} -o $@
+
+
+syntax.h : y.tab.h
+	-cmp -s syntax.h y.tab.h || cp y.tab.h syntax.h
+
+y.tab.h : syntax.c
+
+depend dep:
+	@echo Make dependencies first
+	$(MAKE) $(KC_TIME)
+	$(MAKE) $(YFILES:.y=.c)
+	$(MAKE) $(LFILES:.l=.c)
+	$(MAKE) syntax.h
+	$(CC) -M *.cc > .depend
+  
+clean:
+	-rm -f $(OBJS) core *~ *.bak  $(KFILES:.k=.cc)  $(KC_OGEN:.o=.cc) $(KC_TIME) .kc* \
+        $(YFILES:.y=.c) $(LFILES:.l=.c) $(KC_OGEN:.o=.h) $(KFILES:.k=.h) out.* \
+        y.tab.h syntax.h syntax.output syntax.tab.c yystype.h
+      ]]>
+    </programlisting>
+  </sect1>
+</appendix>

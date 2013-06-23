@@ -1,0 +1,41 @@
+
+Modern computer use multiple kinds of memory.
+
+There is CPU registers, CPU cash , intern memory and extern memory.
+
+If the CPU wants to read/write to memory.
+It have to do it whit different speed to different kinds of memory.
+
+CPU registers are fast.
+and extern memory is slowest.
+
+Data moves between this kinds of memory as blocks of data.
+
+Between CPU registers and CPU cash in 16,32 or 64 bit blocks.
+
+Between CPU cash and intern memory in 16,32 or 64 bit blocks.
+
+Between intern memory and extern memory in memory pages (4096 bytes) blocks.
+
+Given this a strategy for optimisation could be that we try to minimise 
+the number of times a block get moved from one kind of memory to another.
+
+To demonstrate and to test optimisers I have made the following 3 programs.
+
+The all solve the same problem but are using memory on 3 different ways.
+So a good optimiser should make them all run equal fast.
+
+The problem is to take a big array of numbers and then accumulate 4 numbers
+min, max, sum and product.
+
+testA is the fast version.
+It accumulate all values in one parse.
+
+testB is slower
+It accumulate all values in 4 parses.
+
+testC is slowest.
+It also accumulate the values in 4 parses.
+But it don't start at element 0 and go to element n-1 but it jumps around 
+in the array.
+

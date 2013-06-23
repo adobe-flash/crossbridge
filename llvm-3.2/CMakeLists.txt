@@ -481,7 +481,7 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/include/
 set(CPACK_PACKAGE_VENDOR "LLVM")
 set(CPACK_PACKAGE_VERSION_MAJOR ${LLVM_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${LLVM_VERSION_MINOR})
-add_version_info_from_vcs(CPACK_PACKAGE_VERSION_PATCH)
+#add_version_info_from_vcs(CPACK_PACKAGE_VERSION_PATCH)
 include(CPack)
 
 # Workaround for MSVS10 to avoid the Dialog Hell

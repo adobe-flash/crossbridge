@@ -1,0 +1,34 @@
+def 0 ^m.^n.n
+def true ^p.^q.p
+def def false ^p.^q.q
+def suc ^p.^m.^n.m(p m n)
+def pred ^$k.$k(^p.(mpair(suc(p true))(p true)))(mpair 0 0)false
+def mpair ^a.^b.^u.u a b
+def def iszero ^n. n (true false) true
+def ADD ^m.^n.^x.^y.m x(n x y)
+def MUL ^m.^n.^f.m(n f)
+def EXP ^m.^n.n m
+def GT ^m.^n.not(iszero (n pred m))
+def EQ ^m.^n.and (iszero (m pred n)) (iszero (n pred n))
+def LT ^m.^n.not(iszero(m pred n))
+def GE ^m.^n.not(LT m n)
+iszero 0
+iszero 5
+suc 0
+suc 1
+suc 2
+pred 3
+pred 2
+pred 1
+pred 0
+ADD 1 2
+MUL 2 3
+EXP 2 3
+EXP 3 2
+GT 2 3
+GT 3 2
+EQ 4 (ADD 2 2)
+EQ 5 (ADD 3 3)
+(EQ (ADD (MUL 2 (DIV 6 (MUL 3 (SUB 8 2))))) (ADD (MUL 2 (DIV 6 (MUL 3 (SUB 8 2))))))
+quit
+

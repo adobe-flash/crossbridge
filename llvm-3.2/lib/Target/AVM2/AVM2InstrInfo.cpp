@@ -18,6 +18,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+//===- AVM2InstrInfo.cpp - AVM2 Instruction Information -------*- C++ -*-===//
+//
+// This file contains the AVM2 implementation of the TargetInstrInfo class.
+//
+//===----------------------------------------------------------------------===//
+
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
+
 #define GET_INSTRINFO_ENUM
 #define GET_INSTRINFO_MC_DESC
 #include "AVM2InstrInfo.h"

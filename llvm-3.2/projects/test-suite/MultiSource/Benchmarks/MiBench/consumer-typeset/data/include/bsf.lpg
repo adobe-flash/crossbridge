@@ -1,0 +1,139 @@
+%%BeginResource: procset LoutBasicSetup
+
+% width height linethickness louteuro -
+% draw a Euro symbol of this width and height with this line thickness
+/louteuro {
+  20 dict begin
+    /eurothick exch def
+    /euroheight exch def
+    /eurowidth exch def
+    /eurostrokewidth euroheight 0.8 mul def
+    /eurostep eurothick 60 cos mul 60 sin div def
+    /eurotheta 40 def
+
+    % llx lly width thickness louteurobox -
+    % draw angled box starting at (llx, lly) with given width and thickness
+    /louteurobox
+    {
+      /euroboxthick exch def
+      /euroboxwidth exch def
+      newpath moveto euroboxwidth 0 rlineto
+      eurostep euroboxthick rlineto
+      euroboxwidth neg 0 rlineto closepath fill
+    } def
+
+    % lower cross stroke
+    0 euroheight 2 div eurothick 1.5 mul sub
+    eurostrokewidth eurothick louteurobox
+
+    % upper cross stroke
+    0 euroheight 2 div eurothick 0.5 mul add
+    eurostrokewidth eurostep 2 mul add eurothick louteurobox
+
+    % circular part
+    /eurohctr eurowidth euroheight 2 div eurotheta cos mul sub def
+    /eurovctr euroheight 2 div def
+    newpath
+    eurohctr eurovctr eurovctr eurotheta 350 eurotheta sub arc
+    eurohctr eurovctr eurovctr eurothick sub 365 eurotheta sub eurotheta arcn
+    closepath fill
+  end
+} def
+
+% path for @FullWidthRule symbol
+/LoutRule
+{ 0 0 moveto xsize 0 lineto
+} def
+
+% path for @Box symbol
+/LoutBox
+{ 0 0 moveto xsize 0 lineto
+  xsize ysize lineto 0 ysize lineto
+  closepath
+} def
+
+% path for @CurveBox symbol
+/LoutCurveBox
+{ xmark 0 moveto
+  xsize xmark sub xmark xmark 270 360 arc
+  xsize xmark sub ysize xmark sub xmark 0 90 arc
+  xmark ysize xmark sub xmark 90 180 arc
+  xmark xmark xmark 180 270 arc
+  closepath
+} def
+
+% path for @ShadowBox symbol
+/LoutShadowBox
+{ xmark 2 mul 0 moveto xsize 0 lineto
+  xsize ysize xmark 2 mul sub lineto
+  xsize xmark sub ysize xmark 2 mul sub lineto
+  xsize xmark sub xmark lineto
+  xmark 2 mul xmark lineto
+  closepath
+} def
+
+% set up dictionary containing margin note data: parity LoutMargSet -
+/LoutMargSet
+{ /LoutMargDict 12 dict def
+  LoutMargDict begin
+    /parity exch def
+    /matr matrix currentmatrix def
+    /rightx xsize def
+    /lefty ysize def   % highest allowable point for top of next left note
+    /righty ysize def  % highest allowable point for top of next right note
+    /max { 2 copy gt { pop } { exch pop } ifelse } def
+    /min { 2 copy lt { pop } { exch pop } ifelse } def
+  end
+} def
+
+%translate coordinate system for marginal notes:  type LoutMargShift -
+% where type 0 is left margin, 1 is right margin, 2 is outer, 3 is inner
+/LoutMargShift
+{ LoutMargDict begin
+
+    % y coordinate of top of note, in margin coords, before vertical adjust
+    0 ysize transform matr itransform exch pop
+
+    % decide whether left or right margin based on type and parity
+    exch [ 0 1 parity 1 parity sub ] exch get 0 eq
+    {
+      % left margin: adjust top of note downwards if overlaps previous note
+      lefty min
+
+      % bottom of note is new lefty position and also translate position
+      ysize sub dup /lefty exch def
+
+      % want right edge of note at coordinate zero
+      xsize neg exch
+    }
+    {
+      % right margin: adjust top of note downwards if overlaps previous note
+      righty min
+
+      % bottom of note is new righty position and also translate position
+      ysize sub dup /righty exch def
+
+      % want left edge of note at coordinate rightx
+      rightx exch
+    } ifelse
+
+    % stack now contains coord of bottom left corner in margin coordinates
+    matr setmatrix translate
+  end
+} def
+
+% create LoutPageDict with left, right, foot, top for @Place symbol users
+/LoutPageSet
+{
+  /LoutPageDict 5 dict def
+  LoutPageDict begin
+    /matr matrix currentmatrix def
+    /left 0 def
+    /right xsize def
+    /foot 0 def
+    /top ysize def
+  end
+
+} def
+
+%%EndResource

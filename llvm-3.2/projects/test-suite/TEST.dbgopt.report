@@ -1,0 +1,16 @@
+##=== TEST.dbgopt.report - Report description for dbgopt -------*- perl -*-===##
+#
+# This file defines a report to be generated for TEST=dbgopt tests.
+#
+##===----------------------------------------------------------------------===##
+
+
+# These are the columns for the report.  The first entry is the header for the
+# column, the second is the regex to use to match the value.  Empty list create
+# separators, and closures may be put in for custom processing.
+(
+# Name
+ ["Program"  , '\'([^\']+)\' Program'],
+ [],
+ ["Result"  , 'TEST: (PASS|FAIL)']
+);

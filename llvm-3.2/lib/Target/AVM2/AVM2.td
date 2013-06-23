@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+//===- AVM2.td - Describe the AVM2 Target Machine -------------*- C++ -*-===//
+
 //===----------------------------------------------------------------------===//
 // Target-independent interfaces which we are implementing
 //===----------------------------------------------------------------------===//
@@ -57,7 +59,7 @@ def AVM2InstrInfo : InstrInfo {
 // AVM2 processors supported.
 //===----------------------------------------------------------------------===//
 
-def : Processor<"generic", NoItineraries, []>;
+def : Processor<"avm2", NoItineraries, []>;
 
 //===----------------------------------------------------------------------===//
 // Declare the target which we are implementing

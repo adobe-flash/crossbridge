@@ -18,6 +18,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+//===-- AVM2ISelLowering.cpp - AVM2 DAG Lowering Implementation ---------===//
+//
+// This file implements the interfaces that AVM2 uses to lower LLVM code into a
+// selection DAG.
+//
+//===----------------------------------------------------------------------===//
+
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
+
 #include "AVM2.h"
 #include "AVM2TargetMachine.h"
 #include "AVM2MachineFunctionInfo.h"
@@ -181,6 +190,9 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
     setOperationAction(ISD::ROTR , MVT::i32, Expand);
     setOperationAction(ISD::BSWAP, MVT::i32, Expand); //YYY
 
+    setOperationAction(ISD::CTTZ_ZERO_UNDEF, MVT::i32, Expand);
+    setOperationAction(ISD::CTLZ_ZERO_UNDEF, MVT::i32, Expand);
+ 
     setOperationAction(ISD::CTPOP, MVT::i64, Expand);
     setOperationAction(ISD::CTTZ , MVT::i64, Expand);
     setOperationAction(ISD::CTLZ , MVT::i64, Expand);

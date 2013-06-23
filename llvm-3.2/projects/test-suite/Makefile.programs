@@ -1,0 +1,958 @@
+##===- llvm-test/Makefile.programs -------------------------*- Makefile -*-===##
+#
+# This makefile contains all of the makefile machinery that is common to
+# building stuff in this directory.  This script can be used in two
+# different ways.  The main job of this is to take executables for the following
+# targets:
+#
+#   1. The native platform compiler
+#   2. LLVM Bytecode Compiler + LLI interpreter (if ENABLE_LLI is enabled)
+#   3. LLVM Bytecode Compiler + LLC static compiler
+#   4. LLVM Bytecode Compiler + C Backend + Native Sun Compiler
+#   5. LLVM Bytecode Compiler + LLI Just-In-Time Compiler
+#
+# Running them, and then diffing the output.  If there are any failures, they
+# are flagged.  The other mode is used in conjunction with the TEST=<testname>
+# argument on the make command line.  In this case, a Makefile.TEST.<testname>
+# makefile is used to run tests on the program (see below).
+#
+# Input to this makefile should be the PROGRAMS_TO_TEST variable, which contains
+# a list of programs that should be run.  The makefile can also optionally
+# specify a STDIN_FILENAME variable, which contains a filename that is piped
+# into the program as it is being executed.
+#
+#  FIXME: There should be a way to specify the command line for a program
+#
+##===----------------------------------------------------------------------===##
+#
+#                            Running Custom Tests
+#
+# This makefile provides facilities for defining custom tests that are to be run
+# on all of the programs in the test suite.  In order to define one of these
+# tests, create a llvm-test/TEST.<testname>.Makefile file.  This file
+# should define a rule 'test.<testname>.%' which is run once for each program in
+# the suite (the % passed in is the program name).  For a simple example, see
+# Makefile.TEST.example.
+#
+##===----------------------------------------------------------------------===##
+
+# Dependencies on header files need to be determined explicitly because
+# we do not automatically compute dependencies
+INCLUDES := $(ExtraHeaders) $(wildcard $(SourceDir)/*.h)
+
+include $(LEVEL)/Makefile.tests
+
+.PRECIOUS: Output/%.llvm Output/%.native Output/%.simple Output/%.llc Output/%.llc.s
+.PRECIOUS: Output/%.cbe Output/%.cbe.c Output/%.llvm.bc Output/%.linked.bc
+.PRECIOUS: Output/%.linked.optbeta.bc Output/%.llvm.optbeta.bc
+
+PROGDIR = $(PROJ_SRC_ROOT)
+
+#
+# Scripts in the this directory...
+#
+
+TOLERANCEOPT :=
+ifdef FP_TOLERANCE
+TOLERANCEOPT += -r $(FP_TOLERANCE)
+endif
+ifdef FP_ABSTOLERANCE
+TOLERANCEOPT += -a $(FP_ABSTOLERANCE)
+endif
+
+# DIFFPROG - The program used to diff the output
+DIFFPROG := $(PROGDIR)/DiffOutput.sh "$(FPCMP) $(TOLERANCEOPT)"
+
+# RUNTIMELIMIT - The number of seconds we should wait before certain events
+# timeout.  This is overridable on the commandline or in tests makefiles.
+#
+ifndef RUNTIMELIMIT
+  RUNTIMELIMIT := 500
+endif
+
+# If the program specified a REFERENCE_OUTPUT_FILE, they obviously want to
+# USE_REFERENCE_OUTPUT.
+ifdef REFERENCE_OUTPUT_FILE
+USE_REFERENCE_OUTPUT := 1
+endif
+
+# Figure out what kind of configuration specific reference output file to look
+# for.
+ifdef SMALL_PROBLEM_SIZE
+REFERENCE_OUTPUT_KEY := small
+else
+ifdef LARGE_PROBLEM_SIZE
+REFERENCE_OUTPUT_KEY := large
+else
+REFERENCE_OUTPUT_KEY :=
+endif
+endif
+
+RUNSAFELY := $(PROGDIR)/RunSafely.sh
+RUNSAFELYLOCAL := $(PROGDIR)/RunSafely.sh
+
+ifdef REMOTE_HOST
+RUNSAFELY := $(RUNSAFELY) -r $(REMOTE_HOST)
+ifndef REMOTE_CLIENT
+REMOTE_CLIENT := rsh
+endif
+endif
+
+ifdef REMOTE_USER
+RUNSAFELY := $(RUNSAFELY) -l $(REMOTE_USER)
+endif
+
+ifdef REMOTE_CLIENT
+RUNSAFELY := $(RUNSAFELY) -rc $(REMOTE_CLIENT)
+endif
+
+ifdef REMOTE_PORT
+RUNSAFELY := $(RUNSAFELY) -rp "$(REMOTE_PORT)"
+endif
+
+ifdef RUNUNDER
+RUNSAFELY := $(RUNSAFELY) -u $(RUNUNDER)
+endif
+
+RUNSAFELY := $(RUNSAFELY) -t "$(TIMEIT_TARGET)"
+RUNSAFELYLOCAL := $(RUNSAFELYLOCAL) --show-errors -t "$(TIMEIT)"
+
+ifdef NO_WATCHDOG
+$(warning "NO_WATCHDOG make variable is no longer needed, please remove!")
+endif
+
+RUNSAFELY := $(RUNSAFELY) $(RUNTIMELIMIT)
+RUNSAFELYLOCAL := $(RUNSAFELYLOCAL) $(RUNTIMELIMIT)
+
+ifdef EXECUTION_ENVIRONMENT_OVERRIDES
+RUNSAFELY := $(RUNSAFELY) -u 'env $(EXECUTION_ENVIRONMENT_OVERRIDES)' $(RUNSAFELY)
+endif
+
+ifndef STDIN_FILENAME
+STDIN_FILENAME := /dev/null
+endif
+
+#
+# Targets to build for the default target...
+#
+
+# We will be working in the Output directory...
+PREFIXED_PROGRAMS_TO_TEST := $(addprefix Output/,$(PROGRAMS_TO_TEST))
+
+# Completed bytecode for a program
+BYTECODE   := $(addsuffix .llvm.bc, $(PREFIXED_PROGRAMS_TO_TEST))
+
+LLCCODEGEN := $(addsuffix .llc.s,   $(PREFIXED_PROGRAMS_TO_TEST))
+LLCBETACODEGEN := $(addsuffix .llc-beta.s,   $(PREFIXED_PROGRAMS_TO_TEST))
+
+# Output produced by programs run
+GCCOUTPUT := $(addsuffix .ll,       $(addprefix Output/,$basename $(Source)))
+NATOUTPUT := $(addsuffix .out-nat,  $(PREFIXED_PROGRAMS_TO_TEST))
+LLIOUTPUT := $(addsuffix .out-lli,  $(PREFIXED_PROGRAMS_TO_TEST))
+JITOUTPUT := $(addsuffix .out-jit,  $(PREFIXED_PROGRAMS_TO_TEST))
+JITBETAOUTPUT := $(addsuffix .out-jit-beta,  $(PREFIXED_PROGRAMS_TO_TEST))
+LLCOUTPUT := $(addsuffix .out-llc,  $(PREFIXED_PROGRAMS_TO_TEST))
+LLCBETAOUTPUT := $(addsuffix .out-llc-beta,  $(PREFIXED_PROGRAMS_TO_TEST))
+
+# Diffs of program runs vs the native program
+LLIDIFFS  := $(addsuffix .diff-lli, $(PREFIXED_PROGRAMS_TO_TEST))
+JITDIFFS  := $(addsuffix .diff-jit, $(PREFIXED_PROGRAMS_TO_TEST))
+JITBETADIFFS  := $(addsuffix .diff-jit-beta, $(PREFIXED_PROGRAMS_TO_TEST))
+LLCDIFFS  := $(addsuffix .diff-llc, $(PREFIXED_PROGRAMS_TO_TEST))
+LLCBETADIFFS  := $(addsuffix .diff-llc-beta, $(PREFIXED_PROGRAMS_TO_TEST))
+OPTBETADIFFS  := $(addsuffix .diff-opt-beta, $(PREFIXED_PROGRAMS_TO_TEST))
+
+# Profiles for the program.
+PROFOUTPUT := $(addsuffix .prof, $(PREFIXED_PROGRAMS_TO_TEST))
+PRINTPROFOUTPUT := $(addsuffix .printprof, $(PREFIXED_PROGRAMS_TO_TEST))
+
+# Build Program outputs:
+.PRECIOUS: Output/%.out-simple
+.PRECIOUS: Output/%.out-lli Output/%.out-jit Output/%.out-llc Output/%.out-llc-beta
+.PRECIOUS: Output/%.out-nat Output/%.out-cbe Output/%.out-opt-beta
+
+# Build diffs from the output...
+.PRECIOUS: Output/%.diff-simple
+.PRECIOUS: Output/%.diff-lli Output/%.diff-jit Output/%.diff-opt-beta
+.PRECIOUS: Output/%.diff-llc Output/%.diff-llc-beta Output/%.diff-cbe
+
+
+# Regardless of what other options are specified, build the program's bytecode
+# representation.
+all:: $(BYTECODE)
+profile:: $(PROFOUTPUT)
+print-profile:: $(PRINTPROFOUTPUT)
+
+ifdef RUN_GCC_ONLY
+DISABLE_DIFFS = 1
+all:: $(GCCOUTPUT)
+endif
+
+ifdef DISABLE_FOR_LLVM_PROGRAMS
+  DISABLE_DIFFS := 1
+endif
+
+ifdef DISABLE_LLC
+DISABLE_LLC_DIFFS = 1
+endif
+
+ifndef DISABLE_DIFFS
+ifndef DISABLE_LLC_DIFFS
+all:: $(LLCDIFFS)
+ifdef ENABLE_LLCBETA
+all:: $(LLCBETADIFFS)
+endif
+endif#DISABLE_LLC_DIFFS
+
+ifdef TARGET_HAS_JIT
+ifndef DISABLE_JIT
+all:: $(JITDIFFS)
+ifdef ENABLE_LLCBETA
+all:: $(JITBETADIFFS)
+endif
+endif#DISABLE_JIT
+endif#TARGET_HAS_JIT
+
+ifdef ENABLE_LLI
+all:: $(LLIDIFFS)
+endif
+endif#DISABLE_DIFFS
+
+ifeq ($(ARCH),PowerPC)
+LLCBETAOPTION := -regalloc=local -O0
+#--enable-ppc-preinc
+#--enable-tail-merge
+endif
+ifeq ($(ARCH),Alpha)
+LLCBETAOPTION := -sched=list-td
+# -enable-alpha-FTOI -enable-alpha-intfpdiv
+endif
+ifeq ($(ARCH),IA64)
+LLCBETAOPTION := -sched=simple
+endif
+ifeq ($(ARCH),x86_64)
+LLCBETAOPTION := -combiner-alias-analysis
+endif
+ifeq ($(ARCH),x86)
+LLCBETAOPTION := -combiner-alias-analysis
+endif
+ifeq ($(ARCH),Sparc)
+LLCBETAOPTION := -enable-sparc-v9-insts
+endif
+ifeq ($(ARCH),ARM)
+LLCBETAOPTION :=
+endif
+ifeq ($(ARCH),THUMB)
+LLCBETAOPTION :=
+endif
+
+print-llcbeta-option:
+	@echo $(LLCBETAOPTION)
+
+# Given an unoptimized bytecode file that is a simple linkage of all
+# the program's bytecode files, optimize the program using the
+# standard compilation optimizations.
+$(PROGRAMS_TO_TEST:%=Output/%.linked.bc): \
+Output/%.linked.bc: Output/%.linked.rbc $(LOPT)
+	$(VERB) $(RM) -f $(CURDIR)/$@.info
+	$(RUNSAFELYLOCAL) /dev/null $@.opt \
+	  $(LOPT) -std-compile-opts -info-output-file=$(CURDIR)/$@.info $(STATS) $(EXTRA_LOPT_OPTIONS) $< -o $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.llvm.stripped.bc): \
+Output/%.llvm.stripped.bc: Output/%.llvm.bc $(LOPT)
+	$(RUNSAFELYLOCAL) /dev/null $@.opt \
+	  $(LOPT) -mstrip $< -o $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.linked.optbeta.bc): \
+Output/%.linked.optbeta.bc: Output/%.linked.rbc $(LOPT)
+	$(VERB) $(RM) -f $(CURDIR)/$@.info
+	$(RUNSAFELYLOCAL) /dev/null $@.opt \
+	  $(LOPT) $(OPTBETAOPTIONS) -info-output-file=$(CURDIR)/$@.info $(STATS)  $< -o $@
+
+
+ifndef DISABLE_FOR_LLVM_PROGRAMS
+# Rule to produce final program bytecode file from linked, optimized, bytecode.
+# Link the program to the libraries it uses, then perform postlink
+# optimization...
+
+$(PROGRAMS_TO_TEST:%=Output/%.llvm.bc): \
+Output/%.llvm.bc: Output/%.linked.bc $(LOPT)
+	$(RUNSAFELYLOCAL) /dev/null $@.opt \
+	  $(LOPT) -std-link-opts $(OPTPASSES) \
+		-info-output-file=$(CURDIR)/$@.info \
+			$(STATS) $< $(EXTRA_LINKTIME_OPT_FLAGS) -o $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.llvm.optbeta.bc): \
+Output/%.llvm.optbeta.bc: Output/%.linked.optbeta.bc $(LOPT)
+	$(RUNSAFELYLOCAL) /dev/null $@.opt \
+	  $(LOPT) -std-link-opts \
+		-info-output-file=$(CURDIR)/$@.info \
+			$(STATS) $< $(EXTRA_LINKTIME_OPT_FLAGS) -o $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.noopt-llvm.bc): \
+Output/%.noopt-llvm.bc: Output/%.linked.rbc $(LOPT)
+	$(RUNSAFELYLOCAL) /dev/null $@.opt \
+	  $(LOPT) \
+		-info-output-file=$(CURDIR)/$@.info \
+			$(STATS) $< -o $@
+
+endif   # ifndef DISABLE_FOR_LLVM_PROGRAMS
+
+# Disable asm-verbose.  This can slow down compilation and is not what the
+# compilers default to using.
+LLCFLAGS += -asm-verbose=false
+
+# If the program requires exception handling support, enable (potentially
+# expensive) support for it.
+ifdef REQUIRES_EH_SUPPORT
+# PPC and X86 support DWARF exceptions, for everything else, default to SJLJ
+# -enable-eh is no longer required to get DWARF exceptions.
+ifneq ($(ARCH),PowerPC)
+ifneq ($(ARCH),x86)
+ifneq ($(ARCH),x86_64)
+LLCFLAGS += -enable-correct-eh-support
+EXTRA_LINKTIME_OPT_FLAGS += -disable-inlining
+endif
+endif
+endif
+endif
+
+# llc optimization level
+ifdef LLC_OPTFLAGS
+LLCFLAGS += $(LLC_OPTFLAGS)
+endif
+
+# Pass target specific llc flags
+ifdef TARGET_LLCFLAGS
+LLCFLAGS += $(TARGET_LLCFLAGS)
+endif
+ifdef EXTRA_LLCFLAGS
+LLCFLAGS += $(EXTRA_LLCFLAGS)
+endif
+
+# It is important to link C++ programs with G++ so look for -lstdc++ in LDFLAGS
+# and set the PROGRAMLD variable to the correct compiler interface to use.
+# Note that LDFLAGS must already be defined at the time this file is included,
+# or this will not work.
+ifneq ($(filter -lstdc++,$(LDFLAGS)),)
+PROGRAMLD := $(CXX)
+else
+PROGRAMLD := $(CC)
+endif
+
+#
+# Rules to compile the program for the C Back End
+#
+$(PROGRAMS_TO_TEST:%=Output/%.cbe.c): \
+Output/%.cbe.c: Output/%.llvm.bc $(LLC)
+	$(VERB) $(RM) -f $(CURDIR)/$@.info
+	$(RUNSAFELYLOCAL) /dev/null $@.llc \
+	  $(LLC) $(LLCFLAGS) -march=c $< -o $@ -info-output-file=$(CURDIR)/$@.info $(STATS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.cbe): \
+Output/%.cbe: Output/%.cbe.c
+	$(RUNSAFELYLOCAL) /dev/null $@.cc \
+	  $(CC) $< -o $@ $(LDFLAGS) $(CFLAGS) $(OPTFLAGS) -fno-strict-aliasing -fno-inline $(X_TARGET_FLAGS) $(LIBS)
+
+#
+# Compile a linked program to machine code with LLC.
+#
+$(PROGRAMS_TO_TEST:%=Output/%.llc.s): \
+Output/%.llc.s: Output/%.llvm.bc $(LLC)
+	$(VERB) $(RM) -f $(CURDIR)/$@.info
+	$(RUNSAFELYLOCAL) /dev/null $@.llc \
+	  $(LLC) $(LLCFLAGS) $(LLCOPTION) $< -o $@ -info-output-file=$(CURDIR)/$@.info $(STATS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.llc-beta.s): \
+Output/%.llc-beta.s: Output/%.llvm.bc $(LLC)
+	$(VERB) $(RM) -f $(CURDIR)/$@.info
+	$(RUNSAFELYLOCAL) /dev/null $@.llc \
+	  $(LLC) $(LLCFLAGS) $(LLCBETAOPTION) $< -o $@ -info-output-file=$(CURDIR)/$@.info $(STATS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.opt-beta.s): \
+Output/%.opt-beta.s: Output/%.llvm.optbeta.bc $(LLC)
+	$(VERB) $(RM) -f $(CURDIR)/$@.info
+	$(RUNSAFELYLOCAL) /dev/null $@.llc \
+	  $(LLC) $(LLCFLAGS) $< -o $@ -info-output-file=$(CURDIR)/$@.info $(STATS)
+
+# On darwin, pass -force_cpusubtype_ALL to allow all ppc instructions.
+ifeq ($(ARCH),PowerPC)
+LLCASSEMBLERFLAGS = -force_cpusubtype_ALL
+endif
+# On sparc, pass -mcpu=v9 to allow all V9 instructions, even in 32-bit mode.
+ifeq ($(ARCH),Sparc)
+LLCASSEMBLERFLAGS = -mcpu=v9
+endif
+
+# Generate a .o file from the llvm.bc file with the integrated assembler.
+$(PROGRAMS_TO_TEST:%=Output/%.llc.o): \
+Output/%.llc.o: Output/%.llvm.bc $(LLC)
+	$(VERB) $(RM) -f $(CURDIR)/$@.info
+	$(RUNSAFELYLOCAL) /dev/null $@.llc \
+	  $(LLC) $(LLCFLAGS) -filetype=obj $< -o $@ -info-output-file=$(CURDIR)/$@.info $(STATS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.llc-beta.o): \
+Output/%.llc-beta.o: Output/%.llvm.bc $(LLC)
+	$(VERB) $(RM) -f $(CURDIR)/$@.info
+	$(RUNSAFELYLOCAL) /dev/null $@.llc \
+	  $(LLC) $(LLCFLAGS) $(LLCBETAOPTION) -filetype=obj $< -o $@ -info-output-file=$(CURDIR)/$@.info $(STATS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.opt-beta.o): \
+Output/%.opt-beta.o: Output/%.llvm.optbeta.bc $(LLC)
+	$(VERB) $(RM) -f $(CURDIR)/$@.info
+	$(RUNSAFELYLOCAL) /dev/null $@.llc \
+	  $(LLC) $(LLCFLAGS) -filetype=obj  $< -o $@ -info-output-file=$(CURDIR)/$@.info $(STATS)
+
+
+ifdef TEST_INTEGRATED_ASSEMBLER
+
+# Link an LLVM-linked program using the system linker.
+$(PROGRAMS_TO_TEST:%=Output/%.llc): \
+Output/%.llc: Output/%.llc.o
+	-$(PROGRAMLD) $< -o $@ $(LLCLIBS) $(LLCASSEMBLERFLAGS) $(X_TARGET_FLAGS) $(LDFLAGS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.llc-beta): \
+Output/%.llc-beta: Output/%.llc-beta.o
+	-$(PROGRAMLD) $< -o $@ $(LLCLIBS) $(LLCASSEMBLERFLAGS) $(X_TARGET_FLAGS) $(LDFLAGS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.opt-beta): \
+Output/%.opt-beta: Output/%.opt-beta.o
+	-$(PROGRAMLD) $< -o $@ $(LLCLIBS) $(LLCASSEMBLERFLAGS) $(X_TARGET_FLAGS) $(LDFLAGS)
+
+else
+
+# Assemble/Link an LLVM-linked program using the system assembler and linker.
+#
+$(PROGRAMS_TO_TEST:%=Output/%.llc): \
+Output/%.llc: Output/%.llc.s
+	-$(PROGRAMLD) $< -o $@ $(LLCLIBS) $(LLCASSEMBLERFLAGS) $(X_TARGET_FLAGS) $(LDFLAGS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.llc-beta): \
+Output/%.llc-beta: Output/%.llc-beta.s
+	-$(PROGRAMLD) $< -o $@ $(LLCLIBS) $(LLCASSEMBLERFLAGS) $(X_TARGET_FLAGS) $(LDFLAGS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.opt-beta): \
+Output/%.opt-beta: Output/%.opt-beta.s
+	-$(PROGRAMLD) $< -o $@ $(LLCLIBS) $(LLCASSEMBLERFLAGS) $(X_TARGET_FLAGS) $(LDFLAGS)
+
+endif
+
+#
+# Rules to execute the program
+#
+
+# Note, these must be lazily expanded by make (for EXTRA_LLIFLAGS to work, it is
+# redefined in other Makefiles).
+LLI_OPTS = -force-interpreter=true --disable-core-files
+JIT_OPTS = -force-interpreter=false --disable-core-files
+
+# lli optimization level
+ifdef LLI_OPTFLAGS
+LLI_OPTFLAGS += $(LLI_OPTFLAGS)
+JIT_OPTFLAGS += $(LLI_OPTFLAGS)
+endif
+
+# Pass target specific lli flags
+ifdef TARGET_LLIFLAGS
+LLI_OPTS += $(TARGET_LLIFLAGS)
+JIT_OPTS += $(TARGET_LLIFLAGS)
+endif
+
+# EXTRA_LLIFLAGS is used by the nighly tester to add arugments to invocations of
+# the JIT and LLI in order to get timing info and statistics.
+ifndef EXTRA_LLIFLAGS
+EXTRA_LLIFLAGS =
+endif
+LLI_OPTS += $(EXTRA_LLIFLAGS)
+JIT_OPTS += $(EXTRA_LLIFLAGS)
+
+# If the program requires exception handling support, enable (potentially
+# expensive) support for it.
+ifdef REQUIRES_EH_SUPPORT
+JIT_OPTS += -enable-correct-eh-support
+endif
+
+# If the program wants its output hashed, add an output filter.
+ifdef ENABLE_HASHED_PROGRAM_OUTPUT
+ifdef HASH_PROGRAM_OUTPUT
+PROGRAM_OUTPUT_FILTER := $(PROGDIR)/HashProgramOutput.sh
+endif
+endif
+
+native:: $(PROGRAMS_TO_TEST:%=Output/%.native)
+stripped-bytecode:: $(PROGRAMS_TO_TEST:%=Output/%.llvm.stripped.bc)
+
+ifndef PROGRAMS_HAVE_CUSTOM_RUN_RULES
+
+# Rules to build the test output...
+ifndef USE_PRECOMPILED_BYTECODE
+ifndef USE_REFERENCE_OUTPUT
+
+$(PROGRAMS_TO_TEST:%=Output/%.out-nat): \
+Output/%.out-nat: Output/%.native
+	$(RUNSAFELY) $(STDIN_FILENAME) $@ $< $(RUN_OPTIONS)
+ifdef PROGRAM_OUTPUT_FILTER
+	$(PROGRAM_OUTPUT_FILTER) $@
+endif
+ifdef UPDATE_REFERENCE_OUTPUT
+ifeq ($(REFERENCE_OUTPUT_KEY),)
+	cp $@ $(PROJ_SRC_DIR)/$*.reference_output
+else
+	if [ ! -f $(PROJ_SRC_DIR)/$*.reference_output ]; then \
+	  echo "error: no normal reference output!"; \
+	  exit 1; \
+	elif (! diff -q $@ $(PROJ_SRC_DIR)/$*.reference_output); then \
+	  cp $@ $(PROJ_SRC_DIR)/$*.reference_output.$(REFERENCE_OUTPUT_KEY); \
+	else \
+	  echo "no need to update $(REFERENCE_OUTPUT_KEY) reference," \
+	       "matches normal reference!"; \
+	fi
+endif
+endif
+
+endif
+endif
+
+$(PROGRAMS_TO_TEST:%=Output/%.out-simple): \
+Output/%.out-simple: Output/%.simple
+	$(RUNSAFELY) $(STDIN_FILENAME) $@ $< $(RUN_OPTIONS)
+ifdef PROGRAM_OUTPUT_FILTER
+	$(PROGRAM_OUTPUT_FILTER) $@
+endif
+
+$(PROGRAMS_TO_TEST:%=Output/%.out-lli): \
+Output/%.out-lli: Output/%.llvm.bc $(LLI)
+	$(RUNSAFELY) $(STDIN_FILENAME) $@ $(LLI) -info-output-file=$(CURDIR)/$@.info $(STATS) $(LLI_OPTS) $< $(RUN_OPTIONS)
+ifdef PROGRAM_OUTPUT_FILTER
+	$(PROGRAM_OUTPUT_FILTER) $@
+endif
+
+$(PROGRAMS_TO_TEST:%=Output/%.out-jit): \
+Output/%.out-jit: Output/%.llvm.bc $(LLI)
+	$(RUNSAFELY) $(STDIN_FILENAME) $@ $(LLI) -info-output-file=$(CURDIR)/$@.info $(STATS) $(JIT_OPTS) $< $(RUN_OPTIONS)
+ifdef PROGRAM_OUTPUT_FILTER
+	$(PROGRAM_OUTPUT_FILTER) $@
+endif
+
+$(PROGRAMS_TO_TEST:%=Output/%.out-jit-beta): \
+Output/%.out-jit-beta: Output/%.llvm.bc $(LLI)
+	$(RUNSAFELY) $(STDIN_FILENAME) $@ $(LLI) -info-output-file=$(CURDIR)/$@.info $(STATS) $(LLCBETAOPTION) $(JIT_OPTS) $< $(RUN_OPTIONS)
+ifdef PROGRAM_OUTPUT_FILTER
+	$(PROGRAM_OUTPUT_FILTER) $@
+endif
+
+$(PROGRAMS_TO_TEST:%=Output/%.out-llc): \
+Output/%.out-llc: Output/%.llc
+	$(RUNSAFELY) $(STDIN_FILENAME) $@ $< $(RUN_OPTIONS)
+ifdef PROGRAM_OUTPUT_FILTER
+	$(PROGRAM_OUTPUT_FILTER) $@
+endif
+
+$(PROGRAMS_TO_TEST:%=Output/%.out-llc-beta): \
+Output/%.out-llc-beta: Output/%.llc-beta
+	$(RUNSAFELY) $(STDIN_FILENAME) $@ $< $(RUN_OPTIONS)
+ifdef PROGRAM_OUTPUT_FILTER
+	$(PROGRAM_OUTPUT_FILTER) $@
+endif
+
+$(PROGRAMS_TO_TEST:%=Output/%.out-opt-beta): \
+Output/%.out-opt-beta: Output/%.opt-beta
+	$(RUNSAFELY) $(STDIN_FILENAME) $@ $< $(RUN_OPTIONS)
+ifdef PROGRAM_OUTPUT_FILTER
+	$(PROGRAM_OUTPUT_FILTER) $@
+endif
+
+$(PROGRAMS_TO_TEST:%=Output/%.out-cbe): \
+Output/%.out-cbe: Output/%.cbe
+	$(RUNSAFELY) $(STDIN_FILENAME) $@ $< $(RUN_OPTIONS)
+ifdef PROGRAM_OUTPUT_FILTER
+	$(PROGRAM_OUTPUT_FILTER) $@
+endif
+
+# The RunSafely.sh script puts an "exit <retval>" line at the end of
+# the program's output. We have to make bugpoint do the same thing
+# or else it will get false positives when it diff's the reference
+# output with the program's output.
+BUGPOINT_OPTIONS += -append-exit-code
+
+# Support remote execution
+ifdef REMOTE_HOST
+BUGPOINT_OPTIONS += -remote-host=$(REMOTE_HOST)
+ifdef REMOTE_PORT
+BUGPOINT_OPTIONS += -remote-port=$(REMOTE_PORT)
+endif
+ifdef REMOTE_USER
+BUGPOINT_OPTIONS += -remote-user=$(REMOTE_USER)
+endif
+ifdef REMOTE_CLIENT
+BUGPOINT_OPTIONS += -remote-client=$(REMOTE_CLIENT)
+endif
+endif
+
+# If a tolerance is set, pass it off to bugpoint
+ifdef FP_TOLERANCE
+BUGPOINT_OPTIONS += -rel-tolerance $(FP_TOLERANCE)
+endif
+ifdef FP_ABSTOLERANCE
+BUGPOINT_OPTIONS += -abs-tolerance $(FP_ABSTOLERANCE)
+endif
+
+ifdef DISABLE_LOOP_EXTRACT
+BUGPOINT_OPTIONS += -disable-loop-extraction
+endif
+
+ifdef DISABLE_BLOCK_EXTRACT
+BUGPOINT_OPTIONS += -disable-block-extraction
+endif
+
+# Give bugpoint information about LDFLAGS to pass down to the actual link stage
+# of the program.
+BUGPOINT_OPTIONS += $(LDFLAGS:%=-Xlinker=%) $(EXTRA_OPTIONS:%=-Xlinker=%)
+
+# Specify stdin, reference output, and command line options for the program...
+BUGPOINT_OPTIONS += -input=$(STDIN_FILENAME) -output=Output/$*.out-nat
+BUGPOINT_OPTIONS += -timeout=$(RUNTIMELIMIT)
+BUGPOINT_OPTIONS += --tool-args $(LLCFLAGS)
+ifeq ($(ARCH),x86)
+BUGPOINT_TOOL_OPTIONS = -gcc-tool-args -m32
+endif
+ifeq ($(ARCH),x86_64)
+BUGPOINT_TOOL_OPTIONS += -gcc-tool-args -m64
+endif
+BUGPOINT_ARGS += --args -- $(RUN_OPTIONS)
+
+# Rules to bugpoint the opt, llc, or lli commands...
+$(PROGRAMS_TO_TEST:%=Output/%.bugpoint-opt): \
+Output/%.bugpoint-opt: Output/%.noopt-llvm.bc $(LBUGPOINT) \
+                         Output/%.out-nat
+	PWD=$(CURDIR) $(LBUGPOINT) -llc-safe $< -std-compile-opts \
+          $(BUGPOINT_OPTIONS) $(BUGPOINT_TOOL_OPTIONS) $(BUGPOINT_ARGS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.bugpoint-llc): \
+Output/%.bugpoint-llc: Output/%.llvm.bc $(LBUGPOINT) Output/%.out-nat
+	PWD=$(CURDIR) $(LBUGPOINT) $< -run-llc \
+	  $(BUGPOINT_OPTIONS) $(BUGPOINT_TOOL_OPTIONS) $(BUGPOINT_ARGS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.bugpoint-llc-beta): \
+Output/%.bugpoint-llc-beta: Output/%.llvm.bc $(LBUGPOINT) Output/%.out-nat
+	PWD=$(CURDIR) $(LBUGPOINT) $< -llc-safe \
+          $(BUGPOINT_OPTIONS) $(LLCBETAOPTION) $(BUGPOINT_TOOL_OPTIONS) $(BUGPOINT_ARGS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.bugpoint-opt-beta): \
+Output/%.bugpoint-opt-beta: Output/%.linked.rbc $(LBUGPOINT) Output/%.out-nat
+	PWD=$(CURDIR) $(LBUGPOINT) -llc-safe $< \
+          $(BUGPOINT_OPTIONS) $(BUGPOINT_TOOL_OPTIONS) $(OPTBETAOPTIONS) $(BUGPOINT_ARGS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.bugpoint-jit): \
+Output/%.bugpoint-jit: Output/%.llvm.bc $(LBUGPOINT) Output/%.out-nat
+	PWD=$(CURDIR) $(LBUGPOINT) $< -run-jit -safe-run-llc \
+          $(BUGPOINT_OPTIONS) $(BUGPOINT_TOOL_OPTIONS) $(BUGPOINT_ARGS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.bugpoint-cbe): \
+Output/%.bugpoint-cbe: Output/%.llvm.bc $(LBUGPOINT) Output/%.out-nat
+	PWD=$(CURDIR) $(LBUGPOINT) $< -cbe-bug \
+          $(BUGPOINT_OPTIONS) $(BUGPOINT_TOOL_OPTIONS) $(BUGPOINT_ARGS)
+
+$(PROGRAMS_TO_TEST:%=Output/%.misopt.out): \
+Output/%.misopt.out: Output/%.linked.rbc $(LFINDMISOPT)
+	$(LFINDMISOPT) $< Output/$*.misopt "$(RUN_OPTIONS)" \
+	  "$(STDIN_FILENAME)" > Output/$*.misopt.out 2>&1
+
+clean::
+	rm -f bugpoint-*
+	rm -f bugpoint.*
+	rm -rf Output/misopt-*
+
+LIBPROFILESO = $(LLVMLIBCURRENTSOURCE)/libprofile_rt.so
+
+$(PROGRAMS_TO_TEST:%=Output/%.prof): \
+Output/%.prof: Output/%.llvm-prof.bc Output/%.out-nat $(LIBPROFILESO)
+	@rm -f $@
+	$(RUNSAFELY) $(STDIN_FILENAME) Output/$*.out-prof $(LLI) $(JIT_OPTS) \
+            -fake-argv0 'Output/$*.llvm.bc' -load $(LIBPROFILESO) $< -llvmprof-output $@ $(RUN_OPTIONS)
+	@cmp -s Output/$*.out-prof Output/$*.out-nat || \
+		printf "***\n***\n*** WARNING: Output of profiled program (Output/$*.out-prof)\n*** doesn't match the output of the native program (Output/$*.out-nat)!\n***\n***\n";
+
+endif
+
+
+#
+# Rules to generate profiling information
+#
+$(PROGRAMS_TO_TEST:%=Output/%.llvm-prof.bc): \
+Output/%.llvm-prof.bc: Output/%.llvm.bc
+	$(RUNSAFELYLOCAL) /dev/null $@.opt \
+	  $(LOPT) -insert-edge-profiling $< -o $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.printprof): \
+Output/%.printprof: Output/%.llvm.bc Output/%.prof $(LPROF)
+	$(RUNSAFELYLOCAL) /dev/null $@.prof \
+	  $(LPROF) $< Output/$*.prof
+
+
+#
+# Rules to diff test output...
+#
+ifdef PROGRAM_IS_NONDETERMINISTIC
+# If the program is non-deterministic, just touch $@
+DIFFPROG = touch $@ \#
+endif
+
+$(PROGRAMS_TO_TEST:%=Output/%.diff-simple): \
+Output/%.diff-simple: Output/%.out-nat Output/%.out-simple
+	-$(DIFFPROG) simple $* $(HIDEDIFF)
+
+$(PROGRAMS_TO_TEST:%=Output/%.diff-lli): \
+Output/%.diff-lli: Output/%.out-nat Output/%.out-lli
+	-$(DIFFPROG) lli $* $(HIDEDIFF)
+
+$(PROGRAMS_TO_TEST:%=Output/%.diff-jit): \
+Output/%.diff-jit: Output/%.out-nat Output/%.out-jit
+	-$(DIFFPROG) jit $* $(HIDEDIFF)
+
+$(PROGRAMS_TO_TEST:%=Output/%.diff-jit-beta): \
+Output/%.diff-jit-beta: Output/%.out-nat Output/%.out-jit-beta
+	-$(DIFFPROG) jit-beta $* $(HIDEDIFF)
+
+$(PROGRAMS_TO_TEST:%=Output/%.diff-llc): \
+Output/%.diff-llc: Output/%.out-nat Output/%.out-llc
+	-$(DIFFPROG) llc $* $(HIDEDIFF)
+
+$(PROGRAMS_TO_TEST:%=Output/%.diff-llc-beta): \
+Output/%.diff-llc-beta: Output/%.out-nat Output/%.out-llc-beta
+	-$(DIFFPROG) llc-beta $* $(HIDEDIFF)
+
+$(PROGRAMS_TO_TEST:%=Output/%.diff-opt-beta): \
+Output/%.diff-opt-beta: Output/%.out-nat Output/%.out-opt-beta
+	-$(DIFFPROG) opt-beta $* $(HIDEDIFF)
+
+$(PROGRAMS_TO_TEST:%=Output/%.diff-cbe): \
+Output/%.diff-cbe: Output/%.out-nat Output/%.out-cbe
+	-$(DIFFPROG) cbe $* $(HIDEDIFF)
+
+ifndef DISABLE_DIFFS
+$(PROGRAMS_TO_TEST:%=Output/%.exe-simple): \
+Output/%.exe-simple: Output/%.diff-simple
+	-rm -f $@
+	-cp $< $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.exe-lli): \
+Output/%.exe-lli: Output/%.diff-lli
+	-rm -f $@
+	-cp $< $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.exe-jit): \
+Output/%.exe-jit: Output/%.diff-jit
+	-rm -f $@
+	-cp $< $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.exe-jit-beta): \
+Output/%.exe-jit-beta: Output/%.diff-jit-beta
+	-rm -f $@
+	-cp $< $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.exe-llc): \
+Output/%.exe-llc: Output/%.diff-llc
+	-rm -f $@
+	-cp $< $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.exe-llc-beta): \
+Output/%.exe-llc-beta: Output/%.diff-llc-beta
+	-rm -f $@
+	-cp $< $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.exe-opt-beta): \
+Output/%.exe-opt-beta: Output/%.diff-opt-beta
+	-rm -f $@
+	-cp $< $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.exe-cbe): \
+Output/%.exe-cbe: Output/%.diff-cbe
+	-rm -f $@
+	-cp $< $@
+
+# Pseudo target to build just the bytecode file.
+bytecode:: $(PROGRAMS_TO_TEST:%=Output/%.llvm.bc)
+
+endif
+
+# Rules to support the USE_PRECOMPILED_BYTECODE setting If set, submakefiles
+# will not know how to make output bytecode files for the programs in this
+# directory.  Instead, this makefile just copies them out of the bytecode
+# repository.
+ifdef USE_PRECOMPILED_BYTECODE
+
+# Calculate the directory we should copy the bytecode file into.  This is
+# relative to BYTECODE_REPOSITORY and the current directory this program is in.
+#
+CURDIR  := $(shell cd .; pwd)
+PROGDIR := $(shell cd $(LEVEL); pwd)
+SRCDIR  := $(BYTECODE_REPOSITORY)/$(subst $(PROGDIR),,$(CURDIR))
+
+# Because we don't have source code, we cannot build a native version of the
+# executable.  Copy over pregenerated reference output.
+$(PROGRAMS_TO_TEST:%=Output/%.out-nat): \
+Output/%.out-nat: $(SRCDIR)/%.reference_output Output/.dir $(PROJ_SRC_ROOT)/instant.txt
+	cp $< $@
+	# Pretend that the reference output was produced instantaneously.
+	cp $(PROJ_SRC_ROOT)/instant.txt $@.time
+
+$(PROGRAMS_TO_TEST:%=Output/%.LOC.txt): \
+Output/%.LOC.txt: $(SRCDIR)/%.LOC.txt Output/.dir
+	cp $< $@
+else
+
+# Rules to support USE_REFERENCE_OUTPUT.
+ifdef USE_REFERENCE_OUTPUT
+
+# If a reference output file is specified, use that.
+ifdef REFERENCE_OUTPUT_FILE
+
+Output/%.out-nat: $(REFERENCE_OUTPUT_FILE) Output/.dir $(PROJ_SRC_ROOT)/instant.txt
+	cp $< $@
+	# Pretend that the reference output was produced instantaneously.
+	cp $(PROJ_SRC_ROOT)/instant.txt $@.time
+
+else
+
+# Otherwise, pick the best reference output based on
+# 'progamname.reference_output'.
+#
+# Note that this rule needs to be in both Makefile.programs and Makefile.spec.
+Output/%.out-nat: Output/.dir $(PROJ_SRC_ROOT)/instant.txt
+	-if [ -f "$(PROJ_SRC_DIR)/$*.reference_output.$(REFERENCE_OUTPUT_KEY)" ]; then \
+	  cp $(PROJ_SRC_DIR)/$*.reference_output.$(REFERENCE_OUTPUT_KEY) $@; \
+	elif [ -f "$(PROJ_SRC_DIR)/$*.reference_output" ]; then \
+	  cp $(PROJ_SRC_DIR)/$*.reference_output $@; \
+	else \
+	  printf "WARNING: %s: %s\n" "NO REFERENCE OUTPUT (using default)" "$(PROJ_SRC_DIR)/$*.reference_output" > $@; \
+	  cp $(PROJ_SRC_ROOT)/default.reference_output $@; \
+	  cat $@; \
+	fi
+	# Pretend that the reference output was produced instantaneously.
+	cp $(PROJ_SRC_ROOT)/instant.txt $@.time
+
+endif
+
+endif
+endif
+
+# Support for the TEST= option... when TEST= is specified on the command line,
+# the default target is the test target.  Here we dispatch to a specific set of
+# tests.
+#
+test:: $(PROGRAMS_TO_TEST:%=test.$(TEST).%)
+
+# Support building with the TEST= option without executing tests.
+# Allows parallel builds to complete before running serial benchmarks.
+build:: $(PROGRAMS_TO_TEST:%=build.$(TEST).%)
+
+# AVAILABLE_TESTS - Compute the set of tests available for user help
+#
+TEST_FILES = $(wildcard $(PROGDIR)/TEST.*.Makefile) \
+             $(wildcard $(LLVM_SRC_ROOT)/projects/*/test/TEST.*.Makefile)
+AVAILABLE_TESTS = $(patsubst TEST.%.Makefile,%,$(notdir $(TEST_FILES)))
+
+# If they just say 'make test' then we print out an error telling the user to
+# specify a TEST= option.
+$(PROGRAMS_TO_TEST:%=test..%): \
+test..%:
+	@echo
+	@echo "***************************************************************"
+	@echo "  ERROR: you cannot type '$(MAKE) test' directly."
+	@echo "  Instead, use '$(MAKE) TEST=X' where X is the name of a test."
+	@echo "  Tests available: $(AVAILABLE_TESTS)"
+	@echo "  Alternatively, just use '$(MAKE)' to run comparisons."
+	@echo "***************************************************************"
+	@echo
+	@exit 1
+
+# Include all makefiles which define tests... These makefiles must define
+# test.<testname>.%  given input from Output/%.llvm.bc
+#
+ifdef TEST
+TestMakefile := $(wildcard $(PROGDIR)/TEST.$(TEST).Makefile) \
+                $(wildcard $(LLVM_SRC_ROOT)/projects/*/test/TEST.$(TEST).Makefile)
+TestReport   := $(wildcard $(PROGDIR)/TEST.$(TEST).report) \
+                $(wildcard $(LLVM_SRC_ROOT)/projects/*/test/TEST.$(TEST).report)
+TestGnuPlot  := $(wildcard $(PROGDIR)/TEST.$(TEST).gnuplot) \
+                $(wildcard $(LLVM_SRC_ROOT)/projects/*/test/TEST.$(TEST).gnuplot)
+ifneq ($(strip $(TestMakefile)),)
+-include $(TestMakefile)
+else
+$(PROGRAMS_TO_TEST:%=test.$(TEST).%): \
+test.$(TEST).%:
+	@echo
+	@echo "***************************************************************"
+	@echo "  ERROR: Test '$(TEST)' is not a known test!"
+	@echo "  Tests Available: $(AVAILABLE_TESTS)"
+	@echo "  Test Program: $*"
+	@echo "  Test Makefile: $(TestMakefile)"
+	@echo "  Test Report: $(TestReport)"
+	@echo "***************************************************************"
+	@echo
+	@exit 1
+endif
+endif
+
+#
+# Rules for building a report from 'make report TEST=<x>'
+#
+GENERATEREPORT := $(PROJ_SRC_ROOT)/GenerateReport.pl
+
+ifndef ENABLE_PARALLEL_REPORT
+FORCE_SERIAL_ARG := -j1
+endif
+
+report.$(TEST).raw.out:: $(REPORT_DEPENDENCIES) $(TestMakefile)
+	$(MAKE) $(FORCE_SERIAL_ARG) TEST=$(TEST)
+	find . -name \*.$(TEST).report.txt -exec cat {} \; | tee $@
+
+ifneq ($(TestReport),)
+report.$(TEST).txt: report.$(TEST).raw.out $(TestReport) $(GENERATEREPORT)
+	$(GENERATEREPORT) $(TestReport) < $< > $@
+
+report.$(TEST).html: report.$(TEST).raw.out $(TestReport) $(GENERATEREPORT)
+	$(GENERATEREPORT) -html $(TestReport) < $< > $@
+
+report.$(TEST).tex: report.$(TEST).raw.out $(TestReport) $(GENERATEREPORT)
+	$(GENERATEREPORT) -latex $(TestReport) < $< > $@
+
+report.$(TEST).csv: report.$(TEST).raw.out $(TestReport) $(GENERATEREPORT)
+	$(GENERATEREPORT) -csv $(TestReport) < $< > $@
+
+report.graphs: report.$(TEST).raw.out $(TestReport) $(TestGnuPlot) $(GENERATEREPORT)
+	$(GENERATEREPORT) -graphs $(TestReport) < $<
+	gnuplot $(TestGnuPlot)
+
+report: report.$(TEST).txt
+	@cat $<
+
+report.html: report.$(TEST).html
+
+report.csv: report.$(TEST).csv
+
+report.tex: report.$(TEST).tex
+	@cat $<
+
+report.$(TEST).txtonly: report.$(TEST).raw.out $(TestReport)
+	@cat report.$(TEST).raw.out
+
+report.dbgopt.header:
+	@echo "***************************************************************"
+	@echo " Test failures in this report indicates that code generation"
+	@echo " for the test case is influenced by presense of debugging"
+	@echo " information."
+	@echo " "
+	@echo " Run following commands to investigate failures."
+	@echo " prompt> clang -g -fdebug-disable-debug-info-print -Os -S foo.c -o foo.first.s"
+	@echo " prompt> clang -Os -S foo.c -o foo.second.s"
+	@echo " prompt> diff foo.first.s foo.second.s"
+	@echo "***************************************************************"
+
+report.dbgopt: report.dbgopt.header report.$(TEST).txtonly
+
+endif
+
+clean::
+	rm -f report.*.raw.out report.*.txt report.*.html report.*.tex report.*.csv

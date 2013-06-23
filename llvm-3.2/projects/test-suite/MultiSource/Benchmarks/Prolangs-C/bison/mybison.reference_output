@@ -1,0 +1,3068 @@
+#include <stdio.h>
+
+#ifndef __STDC__
+#define const
+#endif
+
+
+
+#define	YYFINAL		152
+#define	YYFLAG		-32768
+#define	YYNTBASE	48
+
+#define YYTRANSLATE(x) ((unsigned)(x) <= 291 ? yytranslate[x] : 84)
+
+static const char yytranslate[] = {     0,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,    43,
+    44,    38,    35,    45,    36,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,    42,    41,     2,
+    29,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+    46,     2,    47,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+     2,     2,     2,     2,     2,     1,     2,     3,     4,     5,
+     6,     7,     8,     9,    10,    11,    12,    13,    14,    15,
+    16,    17,    18,    19,    20,    21,    22,    23,    24,    25,
+    26,    27,    28,    30,    31,    32,    33,    34,    37,    39,
+    40
+};
+
+static const short yyrline[] = {     0,
+    39,    41,    44,    65,    67,    67,    69,    83,    89,   101,
+   112,   118,   121,   135,   137,   141,   147,   150,   163,   177,
+   180,   183,   189,   191,   208,   219,   230,   247,   255,   256,
+   257,   259,   260,   262,   263,   264,   265,   266,   267,   269,
+   279,   298,   299,   301,   307,   309,   315,   317,   323,   326,
+   329,   332,   341,   350,   361,   372,   382,   393,   404,   416,
+   427,   438,   449,   460,   471,   482,   493,   503,   512,   549,
+   600,   627,   629,   688,   726,   731,   740,   745
+};
+
+static const char * const yytname[] = {     0,
+"error","$illegal.","PROG","PERIOD","PROC","FUNC","VAR","ARRAY","RANGE","OF",
+"INT","CHAR","BOOL","WRITELN","THEN","ELSE","IF","DO","WHILE","BEG",
+"END","ASG","NOT","TRUE_TOK","FALSE_TOK","ID","CCONST","ICONST","'='","NEQ",
+"LT","LEQ","GEQ","GT","'+'","'-'","OR","'*'","AND","DIV",
+"';'","':'","'('","')'","','","'['","']'","program"
+};
+
+static const short yyr1[] = {     0,
+    49,    48,    51,    50,    52,    52,    54,    55,    53,    56,
+    57,    58,    53,    59,    59,    60,    60,    61,    61,    62,
+    62,    63,    63,    64,    65,    65,    66,    66,    67,    67,
+    67,    68,    68,    69,    69,    69,    69,    69,    69,    70,
+    71,    72,    72,    73,    74,    75,    76,    77,    78,    79,
+    79,    80,    80,    81,    81,    81,    81,    81,    81,    81,
+    81,    81,    81,    81,    81,    81,    81,    81,    81,    81,
+    81,    81,    82,    82,    83,    83,    83,    83
+};
+
+static const short yyr2[] = {     0,
+     0,     6,     0,     4,     2,     0,     0,     0,     8,     0,
+     0,     0,    11,     3,     0,     3,     1,     2,     1,     0,
+     2,     3,     2,     3,     3,     1,     8,     1,     1,     1,
+     1,     3,     1,     1,     1,     1,     1,     1,     1,     4,
+     2,     5,     3,     2,     3,     2,     3,     2,     2,     0,
+     3,     3,     1,     3,     3,     2,     3,     3,     3,     3,
+     3,     3,     3,     3,     3,     3,     2,     3,     4,     1,
+     4,     1,     1,     4,     1,     1,     1,     1
+};
+
+static const short yydefact[] = {     0,
+     0,     1,     0,    20,     0,     0,     3,    26,    21,     0,
+     0,     2,     6,     0,    23,     0,     0,     0,    22,     0,
+    29,    30,    31,    24,    28,    25,     0,     0,     0,     5,
+     4,     0,     7,    10,     0,     0,     0,    50,     0,    33,
+    39,    37,    34,     0,    35,     0,    38,    36,     0,     0,
+     0,    15,    15,     0,     0,    77,    78,    70,    76,    75,
+     0,     0,    44,    72,    46,     0,     0,    41,    47,     0,
+     0,     0,    48,    49,     0,     0,     8,    11,     0,    67,
+     0,     0,    56,     0,     0,     0,     0,     0,     0,     0,
+     0,     0,     0,     0,     0,     0,     0,    53,     0,    32,
+    43,    45,     0,     0,     0,    17,    19,     0,     0,    40,
+     0,     0,    68,    60,    59,    63,    64,    61,    62,    54,
+    55,    66,    57,    65,    58,    51,     0,    74,     0,     0,
+    18,     0,    14,    20,     0,    69,    71,    52,    42,     0,
+    16,     0,     0,    27,     9,    12,    20,     0,    13,     0,
+     0,     0
+};
+
+static const short yydefgoto[] = {   150,
+     3,     6,    13,    18,    30,    52,   108,    53,   109,   147,
+    77,   105,   106,     7,     9,   107,    11,    24,    25,    39,
+    40,    41,    42,    43,    44,    45,    46,    47,    48,    49,
+    68,    97,    98,    50,    64
+};
+
+static const short yypact[] = {     8,
+    -2,-32768,     7,    21,    20,    69,-32768,-32768,    20,    45,
+   -30,-32768,-32768,    55,-32768,    76,    56,    11,-32768,    51,
+-32768,-32768,-32768,-32768,-32768,-32768,    72,    86,    57,-32768,
+-32768,    85,-32768,-32768,    73,    42,    42,   -13,   -18,-32768,
+-32768,-32768,-32768,    99,-32768,    97,-32768,-32768,    42,    95,
+   122,    89,    89,    42,    42,-32768,-32768,   -21,-32768,-32768,
+    42,    42,   125,-32768,   125,    42,    42,-32768,-32768,    57,
+    57,    57,   125,-32768,   105,     3,-32768,-32768,     5,-32768,
+    42,    42,-32768,   109,    42,    42,    42,    42,    42,    42,
+    42,    42,    42,    42,    42,    42,    18,   125,    71,-32768,
+   118,-32768,    88,    20,    31,-32768,-32768,   110,    94,-32768,
+    46,    90,-32768,   137,   137,   137,   137,   137,   137,    41,
+    41,    41,-32768,-32768,-32768,-32768,    42,-32768,    57,   140,
+-32768,     3,-32768,    21,    82,-32768,-32768,   125,-32768,    82,
+-32768,   111,   138,-32768,-32768,-32768,    21,   139,-32768,   178,
+   181,-32768
+};
+
+static const short yypgoto[] = {-32768,
+-32768,  -126,-32768,-32768,-32768,-32768,-32768,-32768,-32768,-32768,
+   129,-32768,    52,-32768,-32768,    -5,-32768,-32768,  -122,-32768,
+   -65,-32768,-32768,-32768,-32768,-32768,-32768,   165,-32768,-32768,
+-32768,   104,   -35,-32768,-32768
+};
+
+
+#define	YYLAST		185
+
+
+static const short yytable[] = {    10,
+    63,    65,    69,    14,   100,   101,   102,   142,   -73,   104,
+     1,    16,   143,    73,    17,    27,    28,   144,    79,    80,
+   148,    81,    70,     2,    82,    83,    84,     5,     8,    66,
+    29,    99,    67,    85,    86,    87,    88,    89,    90,    91,
+    92,    93,    94,    95,    96,     8,   112,     4,   110,   114,
+   115,   116,   117,   118,   119,   120,   121,   122,   123,   124,
+   125,   126,   127,   139,    55,    56,    57,    58,    59,    60,
+    35,   132,    12,    36,   133,    37,    29,    61,    94,    95,
+    96,    26,    38,    20,    62,    15,    21,    22,    23,   136,
+   127,   138,    21,    22,    23,    19,    32,    33,   131,    85,
+    86,    87,    88,    89,    90,    91,    92,    93,    94,    95,
+    96,    34,    51,    71,    72,    54,    74,   128,    85,    86,
+    87,    88,    89,    90,    91,    92,    93,    94,    95,    96,
+    75,    76,   103,   129,   130,   135,   137,    85,    86,    87,
+    88,    89,    90,    91,    92,    93,    94,    95,    96,   140,
+   134,   145,   113,    85,    86,    87,    88,    89,    90,    91,
+    92,    93,    94,    95,    96,-32768,-32768,-32768,-32768,-32768,
+-32768,    91,    92,    93,    94,    95,    96,   151,   146,   149,
+   152,    78,    31,   141,   111
+};
+
+static const short yycheck[] = {     5,
+    36,    37,    21,     9,    70,    71,    72,   134,    22,     7,
+     3,    42,   135,    49,    45,     5,     6,   140,    54,    55,
+   147,    43,    41,    26,    46,    61,    62,     7,    26,    43,
+    20,    67,    46,    29,    30,    31,    32,    33,    34,    35,
+    36,    37,    38,    39,    40,    26,    82,    41,    44,    85,
+    86,    87,    88,    89,    90,    91,    92,    93,    94,    95,
+    96,    44,    45,   129,    23,    24,    25,    26,    27,    28,
+    14,    41,     4,    17,    44,    19,    20,    36,    38,    39,
+    40,    26,    26,     8,    43,    41,    11,    12,    13,    44,
+    45,   127,    11,    12,    13,    41,    46,    26,   104,    29,
+    30,    31,    32,    33,    34,    35,    36,    37,    38,    39,
+    40,    26,    28,    15,    18,    43,    22,    47,    29,    30,
+    31,    32,    33,    34,    35,    36,    37,    38,    39,    40,
+     9,    43,    28,    16,    47,    42,    47,    29,    30,    31,
+    32,    33,    34,    35,    36,    37,    38,    39,    40,    10,
+    41,    41,    44,    29,    30,    31,    32,    33,    34,    35,
+    36,    37,    38,    39,    40,    29,    30,    31,    32,    33,
+    34,    35,    36,    37,    38,    39,    40,     0,    41,    41,
+     0,    53,    18,   132,    81
+};
+#define YYPURE 1
+
+#line 751 "parse.y.in"
+
+
+void
+yyerror(char* s) {
+    fprintf(stderr,"%s\n",s);
+    }
+
+int
+main() {
+    printf("1\t");
+    yyparse();
+    return 1;
+    }
+ck the parameters */
+		 int check;
+		 check = checkparams( s -> formals , yyp->yyvsp[0].elist );
+	      }
+	   }
+        ;
+    break;}
+case 44:
+#line 302 "parse.y.in"
+{  /* only booleans */
+	   if (yyp->yyvsp[0].totaltype.basetype != BOOLTYPE)
+	      printf("\n***Error: exp in if stmt must be boolean\n");
+	;
+    break;}
+case 46:
+#line 310 "parse.y.in"
+{  /* only booleans */
+	   if (yyp->yyvsp[0].totaltype.basetype != BOOLTYPE)
+	      printf("\n***Error: exp in while stmt must be boolean\n");
+	;
+    break;}
+case 48:
+#line 318 "parse.y.in"
+{  /* Make sure the assignment types match */
+           if (!(match(yyp->yyvsp[-1].totaltype,yyp->yyvsp[0].totaltype)))
+	      printf("\n***Error: assignment types do not match\n");
+        ;
+    break;}
+case 49:
+#line 324 "parse.y.in"
+{ yyval.totaltype = yyp->yyvsp[-1].totaltype; ;
+    break;}
+case 50:
+#line 327 "parse.y.in"
+{ yyval.elist.firstexp = NULL;   /* No optexplist = NULL list */
+	  yyval.elist.lastexp = NULL; ;
+    break;}
+case 51:
+#line 330 "parse.y.in"
+{ yyval.elist = yyp->yyvsp[-1].elist; ;
+    break;}
+case 52:
+#line 333 "parse.y.in"
+{  /* Hook the new expression type to the current list */
+	   expnode tmpnode;
+	   
+	   tmpnode = makeexp(yyp->yyvsp[0].totaltype);
+	   yyp->yyvsp[-2].elist.lastexp -> next = tmpnode;
+	   yyval.elist.firstexp = yyp->yyvsp[-2].elist.firstexp;
+	   yyval.elist.lastexp = tmpnode;
+        ;
+    break;}
+case 53:
+#line 342 "parse.y.in"
+{  /* Start the list with the first expression */
+	   expnode tmpnode;
+	   
+	   tmpnode = makeexp(yyp->yyvsp[0].totaltype);
+	   yyval.elist.firstexp = tmpnode;
+	   yyval.elist.lastexp = tmpnode;
+        ;
+    break;}
+case 54:
+#line 351 "parse.y.in"
+{  /* '+' requires integers */
+
+	   if (( yyp->yyvsp[-2].totaltype.basetype != INTTYPE ) || ( yyp->yyvsp[0].totaltype.basetype != INTTYPE ) ||
+               ( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+              printf("\n***Error: operands of '+' must be integers\n");
+           yyval.totaltype.basetype = INTTYPE;
+           yyval.totaltype.gentype = NOTYPE;
+           yyval.totaltype.number = -1;
+           yyval.totaltype.endnum = -1;
+        ;
+    break;}
+case 55:
+#line 362 "parse.y.in"
+{  /* '-' requires integers */
+
+	   if (( yyp->yyvsp[-2].totaltype.basetype != INTTYPE ) || ( yyp->yyvsp[0].totaltype.basetype != INTTYPE ) ||
+               ( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+              printf("\n***Error: operands of '-' must be integers\n");
+           yyval.totaltype.basetype = INTTYPE;
+           yyval.totaltype.gentype = NOTYPE;
+           yyval.totaltype.number = -1;
+           yyval.totaltype.endnum = -1;
+	;
+    break;}
+case 56:
+#line 373 "parse.y.in"
+{  /* unary '-' requires an integer */
+
+           if (( yyp->yyvsp[0].totaltype.basetype != INTTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+	      printf("\n***Error: right operand of '-' must be an integer\n");
+	   yyval.totaltype.basetype = INTTYPE;
+	   yyval.totaltype.gentype = NOTYPE;
+	   yyval.totaltype.number = -1;
+	   yyval.totaltype.endnum = -1;
+	;
+    break;}
+case 57:
+#line 383 "parse.y.in"
+{  /* '*' requires integers */
+
+           if (( yyp->yyvsp[-2].totaltype.basetype != INTTYPE ) || ( yyp->yyvsp[0].totaltype.basetype != INTTYPE ) ||
+               ( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+              printf("\n***Error: operands of '*' must be integers\n");
+           yyval.totaltype.basetype = INTTYPE;
+           yyval.totaltype.gentype = NOTYPE;
+           yyval.totaltype.number = -1;
+           yyval.totaltype.endnum = -1;
+        ;
+    break;}
+case 58:
+#line 394 "parse.y.in"
+{  /* DIV requires integers */
+
+	   if (( yyp->yyvsp[-2].totaltype.basetype != INTTYPE ) || ( yyp->yyvsp[0].totaltype.basetype != INTTYPE ) ||
+	       ( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+	      printf("\n***Error: operands of div must be integers\n");
+	   yyval.totaltype.basetype = INTTYPE;
+	   yyval.totaltype.gentype = NOTYPE;
+	   yyval.totaltype.number = -1;
+	   yyval.totaltype.endnum = -1;
+        ;
+    break;}
+case 59:
+#line 405 "parse.y.in"
+{  /* '<>' requires the same types AND only base types */
+
+	   if ( yyp->yyvsp[-2].totaltype.basetype != yyp->yyvsp[0].totaltype.basetype )
+              printf("\n***Error: operands of '<>' have different types\n");
+           if (( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+	      printf("\n***Error: operands of '<>' must be base types\n");
+           yyval.totaltype.basetype = BOOLTYPE;
+           yyval.totaltype.gentype = NOTYPE;
+           yyval.totaltype.number = -1;
+           yyval.totaltype.endnum = -1;
+        ;
+    break;}
+case 60:
+#line 417 "parse.y.in"
+{  /* '=' requires the same types AND only base types */
+
+           if ((yyp->yyvsp[-2].totaltype.basetype != yyp->yyvsp[0].totaltype.basetype ) || ( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) ||
+               ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+	      printf("\n***Error: operands of '=' have different types\n");
+	   yyval.totaltype.basetype = BOOLTYPE;
+	   yyval.totaltype.gentype = NOTYPE;
+	   yyval.totaltype.number = -1;
+	   yyval.totaltype.endnum = -1;
+        ;
+    break;}
+case 61:
+#line 428 "parse.y.in"
+{  /* '>=' requires integers */
+
+	   if (( yyp->yyvsp[-2].totaltype.basetype != INTTYPE ) || ( yyp->yyvsp[0].totaltype.basetype != INTTYPE ) ||
+               ( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+              printf("\n***Error: operands of '>=' must be integers\n");
+           yyval.totaltype.basetype = BOOLTYPE;
+           yyval.totaltype.gentype = NOTYPE;
+           yyval.totaltype.number = -1;
+           yyval.totaltype.endnum = -1;
+        ;
+    break;}
+case 62:
+#line 439 "parse.y.in"
+{  /* '>' requires integers */
+
+	   if (( yyp->yyvsp[-2].totaltype.basetype != INTTYPE ) || ( yyp->yyvsp[0].totaltype.basetype != INTTYPE ) ||
+               ( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+              printf("\n***Error: operands of '>' must be integers\n");
+           yyval.totaltype.basetype = BOOLTYPE;
+           yyval.totaltype.gentype = NOTYPE;
+           yyval.totaltype.number = -1;
+           yyval.totaltype.endnum = -1;
+        ;
+    break;}
+case 63:
+#line 450 "parse.y.in"
+{  /* '<' requires integers */
+
+           if (( yyp->yyvsp[-2].totaltype.basetype != INTTYPE ) || ( yyp->yyvsp[0].totaltype.basetype != INTTYPE ) ||
+               ( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+              printf("\n***Error: operands of '<' must be integers\n");
+           yyval.totaltype.basetype = BOOLTYPE;
+           yyval.totaltype.gentype = NOTYPE;
+           yyval.totaltype.number = -1;
+           yyval.totaltype.endnum = -1;
+        ;
+    break;}
+case 64:
+#line 461 "parse.y.in"
+{  /* '<=' requires integers */
+
+	   if (( yyp->yyvsp[-2].totaltype.basetype != INTTYPE ) || ( yyp->yyvsp[0].totaltype.basetype != INTTYPE ) ||
+	       ( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+	      printf("\n***Error: operands of '<=' must be integers\n");
+	   yyval.totaltype.basetype = BOOLTYPE;
+	   yyval.totaltype.gentype = NOTYPE;
+	   yyval.totaltype.number = -1;
+	   yyval.totaltype.endnum = -1;
+        ;
+    break;}
+case 65:
+#line 472 "parse.y.in"
+{  /* AND requires booleans */
+
+	   if (( yyp->yyvsp[-2].totaltype.basetype != BOOLTYPE ) || ( yyp->yyvsp[0].totaltype.basetype != BOOLTYPE ) ||
+	       ( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+	      printf("\n***Error: operands of AND must be boolean\n");
+           yyval.totaltype.basetype = BOOLTYPE;
+	   yyval.totaltype.gentype = NOTYPE;
+	   yyval.totaltype.number = -1;
+	   yyval.totaltype.endnum = -1;
+        ;
+    break;}
+case 66:
+#line 483 "parse.y.in"
+{  /* OR requires booleans */
+
+	   if (( yyp->yyvsp[-2].totaltype.basetype != BOOLTYPE ) || ( yyp->yyvsp[0].totaltype.basetype != BOOLTYPE ) ||
+	       ( yyp->yyvsp[-2].totaltype.gentype != NOTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+	      printf("\n***Error: operands of OR must be boolean\n");
+	   yyval.totaltype.basetype = BOOLTYPE;
+	   yyval.totaltype.gentype = NOTYPE;
+	   yyval.totaltype.number = -1;
+	   yyval.totaltype.endnum = -1;
+	;
+    break;}
+case 67:
+#line 494 "parse.y.in"
+{  /* NOT requires a boolean */
+
+	   if (( yyp->yyvsp[0].totaltype.basetype != BOOLTYPE ) || ( yyp->yyvsp[0].totaltype.gentype != NOTYPE ))
+	      printf("\n***Error: right operand of NOT must be boolean\n");
+	   yyval.totaltype.basetype = yyp->yyvsp[0].totaltype.basetype;
+	   yyval.totaltype.gentype = NOTYPE;
+	   yyval.totaltype.number = -1;
+	   yyval.totaltype.endnum = -1;
+        ;
+    break;}
+case 68:
+#line 504 "parse.y.in"
+{  /* Simply pass up the type of the expression within the
+	      parentheses */
+
+           yyval.totaltype.basetype = yyp->yyvsp[-1].totaltype.basetype;
+	   yyval.totaltype.gentype = yyp->yyvsp[-1].totaltype.gentype;
+	   yyval.totaltype.number = yyp->yyvsp[-1].totaltype.number;
+	   yyval.totaltype.endnum = yyp->yyvsp[-1].totaltype.endnum;
+        ;
+    break;}
+case 69:
+#line 513 "parse.y.in"
+{  /* This should be a function in an expression */
+
+           symTabEntry s;     
+ 
+           s = lookupALL(yyp->yyvsp[-3].token.str);
+	   if ( s == NULL )
+	   {
+	      printf("\n***Error: undeclared identifier: %s\n",yyp->yyvsp[-3].token.str);
+	      yyval.totaltype.basetype = VOIDTYPE;
+	      yyval.totaltype.gentype = NOTYPE;
+	      yyval.totaltype.number = -1;
+	      yyval.totaltype.endnum = -1;
+	   }
+	   else
+	   {
+	      if ( s -> gentype == FUNCTYPE ) /* Make sure it is a function */
+	      {
+	         int check;
+		 
+		 check = checkparams( s -> formals , yyp->yyvsp[-1].elist );
+		 yyval.totaltype.basetype = s -> basetype;  /* Take the return type */
+		 yyval.totaltype.gentype = NOTYPE;          /* of the function      */
+		 yyval.totaltype.number = -1;
+		 yyval.totaltype.endnum = -1;
+	      }
+	      else
+	      {  /* Not a function : ERROR !!  */
+
+		 printf("\n***Error: id %s is not a function\n",yyp->yyvsp[-3].token.str);
+		 yyval.totaltype.basetype = VOIDTYPE;
+		 yyval.totaltype.gentype = NOTYPE;
+		 yyval.totaltype.number = -1;
+		 yyval.totaltype.endnum = -1;
+	      }
+	   }
+        ;
+    break;}
+case 70:
+#line 550 "parse.y.in"
+{  /* This can be a variable or a function with no parameters */
+ 
+	   symTabEntry s;
+
+	   s = lookupALL(yyp->yyvsp[0].token.str);
+	   if ( s == NULL)
+	   {
+	      printf("\n***Error: undeclared identifier: %s\n",yyp->yyvsp[0].token.str);
+	      yyval.totaltype.basetype = VOIDTYPE;
+	      yyval.totaltype.gentype = NOTYPE;
+	      yyval.totaltype.number = -1;
+	      yyval.totaltype.endnum = -1;
+	   }
+	   else
+	   {  /* No procedures allowed in expressions */
+
+	      if (s -> gentype == PROCTYPE )
+	      {
+	         printf("\n***Error: illegal type for expression\n");
+		 yyval.totaltype.basetype = VOIDTYPE;
+		 yyval.totaltype.gentype = NOTYPE;
+		 yyval.totaltype.number = -1;
+		 yyval.totaltype.endnum = 1;
+	      }
+	      if ( s -> gentype == ARRAYTYPE )
+	      {
+		 yyval.totaltype.basetype = s -> basetype;
+		 yyval.totaltype.gentype = ARRAYTYPE;
+		 yyval.totaltype.number = s -> number;
+		 yyval.totaltype.endnum = s -> endnum;
+	      }
+	      if ( s -> gentype == FUNCTYPE )
+	      {  /* Can be a function ONLY if there are no formal parameters */
+
+		 if ( s -> formals != NULL )
+		    printf("\n***Error: too few actual parameters\n");
+		 yyval.totaltype.basetype = s -> basetype;
+		 yyval.totaltype.gentype = NOTYPE;
+		 yyval.totaltype.number = -1;
+		 yyval.totaltype.endnum = -1;
+	      }
+	      if ( s -> gentype == NOTYPE )
+	      {
+		 yyval.totaltype.basetype = s -> basetype;
+		 yyval.totaltype.gentype = NOTYPE;
+		 yyval.totaltype.number = -1;
+		 yyval.totaltype.endnum = -1;
+	      }
+	   }
+	;
+    break;}
+case 71:
+#line 601 "parse.y.in"
+{  /* This should be an array only */
+  
+	   symTabEntry s;
+
+           s = lookupALL(yyp->yyvsp[-3].token.str);
+	   if ( s == NULL)
+	   {
+	      printf("\n***Error: undeclared identifier: %s\n",yyp->yyvsp[-3].token.str);
+	      yyval.totaltype.basetype = VOIDTYPE;
+	      yyval.totaltype.gentype = NOTYPE;
+	      yyval.totaltype.number = -1;
+	      yyval.totaltype.endnum = -1;
+	   }
+	   else
+	   {  /* Check variable AND the subscript */
+
+              if ( s -> gentype != ARRAYTYPE )
+	         printf("\n***Error: id %s is not an array\n",yyp->yyvsp[-3].token.str);
+	      if (( yyp->yyvsp[-1].totaltype.basetype != INTTYPE ) || ( yyp->yyvsp[-1].totaltype.gentype != NOTYPE ))
+		 printf("\n***Error: subscript exp not type integer\n");
+	      yyval.totaltype.basetype = s -> basetype;
+	      yyval.totaltype.gentype = NOTYPE;
+	      yyval.totaltype.number = -1;
+	      yyval.totaltype.endnum = -1;
+	   }
+        ;
+    break;}
+case 72:
+#line 627 "parse.y.in"
+{ yyval.totaltype = yyp->yyvsp[0].totaltype; /* Simply send up the constant's type */ ;
+    break;}
+case 73:
+#line 630 "parse.y.in"
+{  /* Left hand side without '[' and ']' can ONLY be a variable OR
+	      the function from the CURRENT scope */
+
+	   symTabEntry s;
+	   
+	   s = lookupALL(yyp->yyvsp[0].token.str);
+	   if ( s == NULL)
+	   {
+	      printf("\n***Error: undeclared identifier: %s\n",yyp->yyvsp[0].token.str);
+	      yyval.totaltype.basetype = VOIDTYPE;
+	      yyval.totaltype.gentype = NOTYPE;
+	      yyval.totaltype.number = -1;
+	      yyval.totaltype.endnum = -1;
+	   }
+	   else
+	   {  /* Function can only be on the left side if it is
+		 defining the current function */
+
+	      if ( s -> gentype == FUNCTYPE )
+	      {
+		 if ( s == current -> procedure )
+		 {
+		    yyval.totaltype.basetype = s -> basetype;
+		    yyval.totaltype.gentype = NOTYPE;
+		    yyval.totaltype.number = -1;
+		    yyval.totaltype.endnum = -1;
+		 }
+		 else
+		 {  /* Otherwise, it is an error */
+
+	            printf("\n***Error: function name on left side of :=\n");
+		    yyval.totaltype.basetype = VOIDTYPE;
+		    yyval.totaltype.gentype = NOTYPE;
+		    yyval.totaltype.number = -1;
+		    yyval.totaltype.number = -1;
+		 }
+	      }
+	      else
+	      {
+	         if ( s -> gentype == NOTYPE )
+	         {
+	            yyval.totaltype.basetype = s -> basetype;
+		    yyval.totaltype.gentype = NOTYPE;
+		    yyval.totaltype.number = s -> number;
+                    yyval.totaltype.endnum = s -> endnum;
+	         }
+	         else
+		 {  /* No arrays or procedures on the left side */
+
+		    printf("\n***Error: assignment to nonscalar\n");
+		    yyval.totaltype.basetype = VOIDTYPE;
+		    yyval.totaltype.gentype = NOTYPE;
+		    yyval.totaltype.number = -1;
+		    yyval.totaltype.endnum = -1;
+		 }
+	      }
+	   }
+	;
+    break;}
+case 74:
+#line 689 "parse.y.in"
+{  /* This should be an array AND an index */
+
+	   symTabEntry s;
+
+	   s = lookupALL(yyp->yyvsp[-3].token.str);
+	   if ( s == NULL )
+	   {
+	      printf("\n***Error: undeclared identifier: %s\n",yyp->yyvsp[-3].token.str);
+	      yyval.totaltype.basetype = VOIDTYPE;
+	      yyval.totaltype.gentype = NOTYPE;
+	      yyval.totaltype.number = -1;
+	      yyval.totaltype.endnum = -1;
+	   }
+           else
+	   {  /* Check to make sure it IS an array and the index is
+		 an integer */
+
+	      if ( s -> gentype == ARRAYTYPE )
+	      {
+	         if (( yyp->yyvsp[-1].totaltype.basetype != INTTYPE ) || ( yyp->yyvsp[-1].totaltype.gentype != NOTYPE ))
+		    printf("\n***Error: subscript exp is not type integer\n");
+                 yyval.totaltype.basetype = s -> basetype;
+		 yyval.totaltype.gentype = NOTYPE;
+		 yyval.totaltype.number = -1;
+		 yyval.totaltype.endnum = -1;
+	      }
+	      else
+	      {  /* This is not an array */
+		 printf("\n***Error: id %s is not an array\n",yyp->yyvsp[-3].token.str);
+		 yyval.totaltype.basetype = VOIDTYPE;
+		 yyval.totaltype.gentype = NOTYPE;
+		 yyval.totaltype.number = -1;
+		 yyval.totaltype.endnum = -1;
+	      }
+	   }
+        ;
+    break;}
+case 75:
+#line 727 "parse.y.in"
+{  yyval.totaltype.basetype = INTTYPE; /* Basic integer */
+	   yyval.totaltype.gentype = NOTYPE;
+	   yyval.totaltype.number = -1;
+           yyval.totaltype.endnum = -1; ;
+    break;}
+case 76:
+#line 732 "parse.y.in"
+{  
+	   if ( strlen(yyp->yyvsp[0].token.str) == 3 )  /* Single character */
+	      yyval.totaltype.basetype = CHARTYPE;
+	   else
+	      yyval.totaltype.basetype = STRINGTYPE; /* String */
+	   yyval.totaltype.gentype = NOTYPE;
+	   yyval.totaltype.number = -1;
+           yyval.totaltype.endnum = -1; ;
+    break;}
+case 77:
+#line 741 "parse.y.in"
+{ yyval.totaltype.basetype = BOOLTYPE;  /* TRUE and FALSE are both booleans */
+	   yyval.totaltype.gentype = NOTYPE;
+	   yyval.totaltype.number = -1;
+	   yyval.totaltype.endnum = -1; ;
+    break;}
+case 78:
+#line 746 "parse.y.in"
+{  yyval.totaltype.basetype = BOOLTYPE;
+           yyval.totaltype.gentype = NOTYPE;
+           yyval.totaltype.number = -1;
+           yyval.totaltype.endnum = -1; ;
+    break;}
+}
+#define	PROG	258
+#define	PERIOD	259
+#define	PROC	260
+#define	FUNC	261
+#define	VAR	262
+#define	ARRAY	263
+#define	RANGE	264
+#define	OF	265
+#define	INT	266
+#define	CHAR	267
+#define	BOOL	268
+#define	WRITELN	269
+#define	THEN	270
+#define	ELSE	271
+#define	IF	272
+#define	DO	273
+#define	WHILE	274
+#define	BEG	275
+#define	END	276
+#define	ASG	277
+#define	NOT	278
+#define	TRUE_TOK	279
+#define	FALSE_TOK	280
+#define	ID	281
+#define	CCONST	282
+#define	ICONST	283
+#define	NEQ	284
+#define	LT	285
+#define	LEQ	286
+#define	GEQ	287
+#define	GT	288
+#define	OR	289
+#define	AND	290
+#define	DIV	291
+
+Conflict in state 80 between rule 67 and token '=' resolved as reduce.
+Conflict in state 80 between rule 67 and token NEQ resolved as reduce.
+Conflict in state 80 between rule 67 and token LT resolved as reduce.
+Conflict in state 80 between rule 67 and token LEQ resolved as reduce.
+Conflict in state 80 between rule 67 and token GEQ resolved as reduce.
+Conflict in state 80 between rule 67 and token GT resolved as reduce.
+Conflict in state 80 between rule 67 and token '+' resolved as reduce.
+Conflict in state 80 between rule 67 and token '-' resolved as reduce.
+Conflict in state 80 between rule 67 and token OR resolved as reduce.
+Conflict in state 80 between rule 67 and token '*' resolved as reduce.
+Conflict in state 80 between rule 67 and token AND resolved as reduce.
+Conflict in state 80 between rule 67 and token DIV resolved as reduce.
+Conflict in state 83 between rule 56 and token '=' resolved as reduce.
+Conflict in state 83 between rule 56 and token NEQ resolved as reduce.
+Conflict in state 83 between rule 56 and token LT resolved as reduce.
+Conflict in state 83 between rule 56 and token LEQ resolved as reduce.
+Conflict in state 83 between rule 56 and token GEQ resolved as reduce.
+Conflict in state 83 between rule 56 and token GT resolved as reduce.
+Conflict in state 83 between rule 56 and token '+' resolved as reduce.
+Conflict in state 83 between rule 56 and token '-' resolved as reduce.
+Conflict in state 83 between rule 56 and token OR resolved as reduce.
+Conflict in state 83 between rule 56 and token '*' resolved as reduce.
+Conflict in state 83 between rule 56 and token AND resolved as reduce.
+Conflict in state 83 between rule 56 and token DIV resolved as reduce.
+Conflict in state 114 between rule 60 and token '=' resolved as an error.
+Conflict in state 114 between rule 60 and token NEQ resolved as an error.
+Conflict in state 114 between rule 60 and token LT resolved as an error.
+Conflict in state 114 between rule 60 and token LEQ resolved as an error.
+Conflict in state 114 between rule 60 and token GEQ resolved as an error.
+Conflict in state 114 between rule 60 and token GT resolved as an error.
+Conflict in state 114 between rule 60 and token '+' resolved as shift.
+Conflict in state 114 between rule 60 and token '-' resolved as shift.
+Conflict in state 114 between rule 60 and token OR resolved as shift.
+Conflict in state 114 between rule 60 and token '*' resolved as shift.
+Conflict in state 114 between rule 60 and token AND resolved as shift.
+Conflict in state 114 between rule 60 and token DIV resolved as shift.
+Conflict in state 115 between rule 59 and token '=' resolved as an error.
+Conflict in state 115 between rule 59 and token NEQ resolved as an error.
+Conflict in state 115 between rule 59 and token LT resolved as an error.
+Conflict in state 115 between rule 59 and token LEQ resolved as an error.
+Conflict in state 115 between rule 59 and token GEQ resolved as an error.
+Conflict in state 115 between rule 59 and token GT resolved as an error.
+Conflict in state 115 between rule 59 and token '+' resolved as shift.
+Conflict in state 115 between rule 59 and token '-' resolved as shift.
+Conflict in state 115 between rule 59 and token OR resolved as shift.
+Conflict in state 115 between rule 59 and token '*' resolved as shift.
+Conflict in state 115 between rule 59 and token AND resolved as shift.
+Conflict in state 115 between rule 59 and token DIV resolved as shift.
+Conflict in state 116 between rule 63 and token '=' resolved as an error.
+Conflict in state 116 between rule 63 and token NEQ resolved as an error.
+Conflict in state 116 between rule 63 and token LT resolved as an error.
+Conflict in state 116 between rule 63 and token LEQ resolved as an error.
+Conflict in state 116 between rule 63 and token GEQ resolved as an error.
+Conflict in state 116 between rule 63 and token GT resolved as an error.
+Conflict in state 116 between rule 63 and token '+' resolved as shift.
+Conflict in state 116 between rule 63 and token '-' resolved as shift.
+Conflict in state 116 between rule 63 and token OR resolved as shift.
+Conflict in state 116 between rule 63 and token '*' resolved as shift.
+Conflict in state 116 between rule 63 and token AND resolved as shift.
+Conflict in state 116 between rule 63 and token DIV resolved as shift.
+Conflict in state 117 between rule 64 and token '=' resolved as an error.
+Conflict in state 117 between rule 64 and token NEQ resolved as an error.
+Conflict in state 117 between rule 64 and token LT resolved as an error.
+Conflict in state 117 between rule 64 and token LEQ resolved as an error.
+Conflict in state 117 between rule 64 and token GEQ resolved as an error.
+Conflict in state 117 between rule 64 and token GT resolved as an error.
+Conflict in state 117 between rule 64 and token '+' resolved as shift.
+Conflict in state 117 between rule 64 and token '-' resolved as shift.
+Conflict in state 117 between rule 64 and token OR resolved as shift.
+Conflict in state 117 between rule 64 and token '*' resolved as shift.
+Conflict in state 117 between rule 64 and token AND resolved as shift.
+Conflict in state 117 between rule 64 and token DIV resolved as shift.
+Conflict in state 118 between rule 61 and token '=' resolved as an error.
+Conflict in state 118 between rule 61 and token NEQ resolved as an error.
+Conflict in state 118 between rule 61 and token LT resolved as an error.
+Conflict in state 118 between rule 61 and token LEQ resolved as an error.
+Conflict in state 118 between rule 61 and token GEQ resolved as an error.
+Conflict in state 118 between rule 61 and token GT resolved as an error.
+Conflict in state 118 between rule 61 and token '+' resolved as shift.
+Conflict in state 118 between rule 61 and token '-' resolved as shift.
+Conflict in state 118 between rule 61 and token OR resolved as shift.
+Conflict in state 118 between rule 61 and token '*' resolved as shift.
+Conflict in state 118 between rule 61 and token AND resolved as shift.
+Conflict in state 118 between rule 61 and token DIV resolved as shift.
+Conflict in state 119 between rule 62 and token '=' resolved as an error.
+Conflict in state 119 between rule 62 and token NEQ resolved as an error.
+Conflict in state 119 between rule 62 and token LT resolved as an error.
+Conflict in state 119 between rule 62 and token LEQ resolved as an error.
+Conflict in state 119 between rule 62 and token GEQ resolved as an error.
+Conflict in state 119 between rule 62 and token GT resolved as an error.
+Conflict in state 119 between rule 62 and token '+' resolved as shift.
+Conflict in state 119 between rule 62 and token '-' resolved as shift.
+Conflict in state 119 between rule 62 and token OR resolved as shift.
+Conflict in state 119 between rule 62 and token '*' resolved as shift.
+Conflict in state 119 between rule 62 and token AND resolved as shift.
+Conflict in state 119 between rule 62 and token DIV resolved as shift.
+Conflict in state 120 between rule 54 and token '=' resolved as reduce.
+Conflict in state 120 between rule 54 and token NEQ resolved as reduce.
+Conflict in state 120 between rule 54 and token LT resolved as reduce.
+Conflict in state 120 between rule 54 and token LEQ resolved as reduce.
+Conflict in state 120 between rule 54 and token GEQ resolved as reduce.
+Conflict in state 120 between rule 54 and token GT resolved as reduce.
+Conflict in state 120 between rule 54 and token '+' resolved as reduce.
+Conflict in state 120 between rule 54 and token '-' resolved as reduce.
+Conflict in state 120 between rule 54 and token OR resolved as reduce.
+Conflict in state 120 between rule 54 and token '*' resolved as shift.
+Conflict in state 120 between rule 54 and token AND resolved as shift.
+Conflict in state 120 between rule 54 and token DIV resolved as shift.
+Conflict in state 121 between rule 55 and token '=' resolved as reduce.
+Conflict in state 121 between rule 55 and token NEQ resolved as reduce.
+Conflict in state 121 between rule 55 and token LT resolved as reduce.
+Conflict in state 121 between rule 55 and token LEQ resolved as reduce.
+Conflict in state 121 between rule 55 and token GEQ resolved as reduce.
+Conflict in state 121 between rule 55 and token GT resolved as reduce.
+Conflict in state 121 between rule 55 and token '+' resolved as reduce.
+Conflict in state 121 between rule 55 and token '-' resolved as reduce.
+Conflict in state 121 between rule 55 and token OR resolved as reduce.
+Conflict in state 121 between rule 55 and token '*' resolved as shift.
+Conflict in state 121 between rule 55 and token AND resolved as shift.
+Conflict in state 121 between rule 55 and token DIV resolved as shift.
+Conflict in state 122 between rule 66 and token '=' resolved as reduce.
+Conflict in state 122 between rule 66 and token NEQ resolved as reduce.
+Conflict in state 122 between rule 66 and token LT resolved as reduce.
+Conflict in state 122 between rule 66 and token LEQ resolved as reduce.
+Conflict in state 122 between rule 66 and token GEQ resolved as reduce.
+Conflict in state 122 between rule 66 and token GT resolved as reduce.
+Conflict in state 122 between rule 66 and token '+' resolved as reduce.
+Conflict in state 122 between rule 66 and token '-' resolved as reduce.
+Conflict in state 122 between rule 66 and token OR resolved as reduce.
+Conflict in state 122 between rule 66 and token '*' resolved as shift.
+Conflict in state 122 between rule 66 and token AND resolved as shift.
+Conflict in state 122 between rule 66 and token DIV resolved as shift.
+Conflict in state 123 between rule 57 and token '=' resolved as reduce.
+Conflict in state 123 between rule 57 and token NEQ resolved as reduce.
+Conflict in state 123 between rule 57 and token LT resolved as reduce.
+Conflict in state 123 between rule 57 and token LEQ resolved as reduce.
+Conflict in state 123 between rule 57 and token GEQ resolved as reduce.
+Conflict in state 123 between rule 57 and token GT resolved as reduce.
+Conflict in state 123 between rule 57 and token '+' resolved as reduce.
+Conflict in state 123 between rule 57 and token '-' resolved as reduce.
+Conflict in state 123 between rule 57 and token OR resolved as reduce.
+Conflict in state 123 between rule 57 and token '*' resolved as reduce.
+Conflict in state 123 between rule 57 and token AND resolved as reduce.
+Conflict in state 123 between rule 57 and token DIV resolved as reduce.
+Conflict in state 124 between rule 65 and token '=' resolved as reduce.
+Conflict in state 124 between rule 65 and token NEQ resolved as reduce.
+Conflict in state 124 between rule 65 and token LT resolved as reduce.
+Conflict in state 124 between rule 65 and token LEQ resolved as reduce.
+Conflict in state 124 between rule 65 and token GEQ resolved as reduce.
+Conflict in state 124 between rule 65 and token GT resolved as reduce.
+Conflict in state 124 between rule 65 and token '+' resolved as reduce.
+Conflict in state 124 between rule 65 and token '-' resolved as reduce.
+Conflict in state 124 between rule 65 and token OR resolved as reduce.
+Conflict in state 124 between rule 65 and token '*' resolved as reduce.
+Conflict in state 124 between rule 65 and token AND resolved as reduce.
+Conflict in state 124 between rule 65 and token DIV resolved as reduce.
+Conflict in state 125 between rule 58 and token '=' resolved as reduce.
+Conflict in state 125 between rule 58 and token NEQ resolved as reduce.
+Conflict in state 125 between rule 58 and token LT resolved as reduce.
+Conflict in state 125 between rule 58 and token LEQ resolved as reduce.
+Conflict in state 125 between rule 58 and token GEQ resolved as reduce.
+Conflict in state 125 between rule 58 and token GT resolved as reduce.
+Conflict in state 125 between rule 58 and token '+' resolved as reduce.
+Conflict in state 125 between rule 58 and token '-' resolved as reduce.
+Conflict in state 125 between rule 58 and token OR resolved as reduce.
+Conflict in state 125 between rule 58 and token '*' resolved as reduce.
+Conflict in state 125 between rule 58 and token AND resolved as reduce.
+Conflict in state 125 between rule 58 and token DIV resolved as reduce.
+State 101 contains 1 shift/reduce conflict.
+parse.y.in contains 1 shift/reduce conflict.
+
+
+token types:
+ type -1 is $
+ type 40 is '('
+ type 41 is ')'
+ type 42 is '*'
+ type 43 is '+'
+ type 44 is ','
+ type 45 is '-'
+ type 58 is ':'
+ type 59 is ';'
+ type 61 is '='
+ type 91 is '['
+ type 93 is ']'
+ type 256 is error
+ type 258 is PROG
+ type 259 is PERIOD
+ type 260 is PROC
+ type 261 is FUNC
+ type 262 is VAR
+ type 263 is ARRAY
+ type 264 is RANGE
+ type 265 is OF
+ type 266 is INT
+ type 267 is CHAR
+ type 268 is BOOL
+ type 269 is WRITELN
+ type 270 is THEN
+ type 271 is ELSE
+ type 272 is IF
+ type 273 is DO
+ type 274 is WHILE
+ type 275 is BEG
+ type 276 is END
+ type 277 is ASG
+ type 278 is NOT
+ type 279 is TRUE_TOK
+ type 280 is FALSE_TOK
+ type 281 is ID
+ type 282 is CCONST
+ type 283 is ICONST
+ type 284 is NEQ
+ type 285 is LT
+ type 286 is LEQ
+ type 287 is GEQ
+ type 288 is GT
+ type 289 is OR
+ type 290 is AND
+ type 291 is DIV
+
+
+state 0
+
+    PROG	shift  1
+    program	shift  150
+
+
+
+state 1
+
+    program  ->  PROG . ID @1 ';' block PERIOD   (2)
+
+    ID  	shift  2
+
+
+
+state 2
+
+    program  ->  PROG ID . @1 ';' block PERIOD   (2)
+
+    @1  	shift  3
+
+    $default	reduce  1  (@1)
+
+
+
+state 3
+
+    program  ->  PROG ID @1 . ';' block PERIOD   (2)
+
+    ';' 	shift  4
+
+
+
+state 4
+
+    program  ->  PROG ID @1 ';' . block PERIOD   (2)
+
+    VAR 	shift  5
+    block	shift  6
+    variables	shift  7
+
+    $default	reduce  20  (variables)
+
+
+
+state 5
+
+    variables  ->  VAR . vardcls   (21)
+
+    ID  	shift  8
+    vardcls	shift  9
+    vardcl	shift  10
+    idlist	shift  11
+
+
+
+state 6
+
+    program  ->  PROG ID @1 ';' block . PERIOD   (2)
+
+    PERIOD	shift  12
+
+
+
+state 7
+
+    block  ->  variables . @2 procdcls cmpdstmt   (4)
+
+    @2  	shift  13
+
+    $default	reduce  3  (@2)
+
+
+
+state 8
+
+    idlist  ->  ID .   (26)
+
+    $default	reduce  26  (idlist)
+
+
+
+state 9
+
+    variables  ->  VAR vardcls .   (21)
+    vardcls  ->  vardcls . vardcl ';'   (22)
+
+    ID  	shift  8
+    vardcl	shift  14
+    idlist	shift  11
+
+    $default	reduce  21  (variables)
+
+
+
+state 10
+
+    vardcls  ->  vardcl . ';'   (23)
+
+    ';' 	shift  15
+
+
+
+state 11
+
+    vardcl  ->  idlist . ':' type   (24)
+    idlist  ->  idlist . ',' ID   (25)
+
+    ':' 	shift  16
+    ',' 	shift  17
+
+
+
+state 12
+
+    program  ->  PROG ID @1 ';' block PERIOD .   (2)
+
+    $default	reduce  2  (program)
+
+
+
+state 13
+
+    block  ->  variables @2 . procdcls cmpdstmt   (4)
+
+    procdcls	shift  18
+
+    $default	reduce  6  (procdcls)
+
+
+
+state 14
+
+    vardcls  ->  vardcls vardcl . ';'   (22)
+
+    ';' 	shift  19
+
+
+
+state 15
+
+    vardcls  ->  vardcl ';' .   (23)
+
+    $default	reduce  23  (vardcls)
+
+
+
+state 16
+
+    vardcl  ->  idlist ':' . type   (24)
+
+    ARRAY	shift  20
+    INT 	shift  21
+    CHAR	shift  22
+    BOOL	shift  23
+    type	shift  24
+    stype	shift  25
+
+
+
+state 17
+
+    idlist  ->  idlist ',' . ID   (25)
+
+    ID  	shift  26
+
+
+
+state 18
+
+    block  ->  variables @2 procdcls . cmpdstmt   (4)
+    procdcls  ->  procdcls . procdcl   (5)
+
+    PROC	shift  27
+    FUNC	shift  28
+    BEG 	shift  29
+    procdcl	shift  30
+    cmpdstmt	shift  31
+
+
+
+state 19
+
+    vardcls  ->  vardcls vardcl ';' .   (22)
+
+    $default	reduce  22  (vardcls)
+
+
+
+state 20
+
+    type  ->  ARRAY . '[' ICONST RANGE ICONST ']' OF stype   (27)
+
+    '[' 	shift  32
+
+
+
+state 21
+
+    stype  ->  INT .   (29)
+
+    $default	reduce  29  (stype)
+
+
+
+state 22
+
+    stype  ->  CHAR .   (30)
+
+    $default	reduce  30  (stype)
+
+
+
+state 23
+
+    stype  ->  BOOL .   (31)
+
+    $default	reduce  31  (stype)
+
+
+
+state 24
+
+    vardcl  ->  idlist ':' type .   (24)
+
+    $default	reduce  24  (vardcl)
+
+
+
+state 25
+
+    type  ->  stype .   (28)
+
+    $default	reduce  28  (type)
+
+
+
+state 26
+
+    idlist  ->  idlist ',' ID .   (25)
+
+    $default	reduce  25  (idlist)
+
+
+
+state 27
+
+    procdcl  ->  PROC . ID @3 parmlist @4 ';' block ';'   (9)
+
+    ID  	shift  33
+
+
+
+state 28
+
+    procdcl  ->  FUNC . ID @5 parmlist @6 ':' stype ';' @7 block ';'   (13)
+
+    ID  	shift  34
+
+
+
+state 29
+
+    cmpdstmt  ->  BEG . stmtlist END   (47)
+
+    WRITELN	shift  35
+    IF  	shift  36
+    WHILE	shift  37
+    BEG 	shift  29
+    ID  	shift  38
+    stmtlist	shift  39
+    stmt	shift  40
+    writestmt	shift  41
+    procstmt	shift  42
+    ifstmt	shift  43
+    ifhead	shift  44
+    wstmt	shift  45
+    whead	shift  46
+    cmpdstmt	shift  47
+    astmt	shift  48
+    lhs 	shift  49
+    var 	shift  50
+
+
+
+state 30
+
+    procdcls  ->  procdcls procdcl .   (5)
+
+    $default	reduce  5  (procdcls)
+
+
+
+state 31
+
+    block  ->  variables @2 procdcls cmpdstmt .   (4)
+
+    $default	reduce  4  (block)
+
+
+
+state 32
+
+    type  ->  ARRAY '[' . ICONST RANGE ICONST ']' OF stype   (27)
+
+    ICONST	shift  51
+
+
+
+state 33
+
+    procdcl  ->  PROC ID . @3 parmlist @4 ';' block ';'   (9)
+
+    @3  	shift  52
+
+    $default	reduce  7  (@3)
+
+
+
+state 34
+
+    procdcl  ->  FUNC ID . @5 parmlist @6 ':' stype ';' @7 block ';'   (13)
+
+    @5  	shift  53
+
+    $default	reduce  10  (@5)
+
+
+
+state 35
+
+    writestmt  ->  WRITELN . '(' exp ')'   (40)
+
+    '(' 	shift  54
+
+
+
+state 36
+
+    ifhead  ->  IF . exp   (44)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  63
+    constant	shift  64
+
+
+
+state 37
+
+    whead  ->  WHILE . exp   (46)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  65
+    constant	shift  64
+
+
+
+state 38
+
+    procstmt  ->  ID . optexplist   (41)
+    var  ->  ID .   (73)
+    var  ->  ID . '[' exp ']'   (74)
+
+    '(' 	shift  66
+    '[' 	shift  67
+    optexplist	shift  68
+
+    ASG 	reduce  73  (var)
+    $default	reduce  50  (optexplist)
+
+
+
+state 39
+
+    stmtlist  ->  stmtlist . ';' stmt   (32)
+    cmpdstmt  ->  BEG stmtlist . END   (47)
+
+    END 	shift  69
+    ';' 	shift  70
+
+
+
+state 40
+
+    stmtlist  ->  stmt .   (33)
+
+    $default	reduce  33  (stmtlist)
+
+
+
+state 41
+
+    stmt  ->  writestmt .   (39)
+
+    $default	reduce  39  (stmt)
+
+
+
+state 42
+
+    stmt  ->  procstmt .   (37)
+
+    $default	reduce  37  (stmt)
+
+
+
+state 43
+
+    stmt  ->  ifstmt .   (34)
+
+    $default	reduce  34  (stmt)
+
+
+
+state 44
+
+    ifstmt  ->  ifhead . THEN stmt ELSE stmt   (42)
+    ifstmt  ->  ifhead . THEN stmt   (43)
+
+    THEN	shift  71
+
+
+
+state 45
+
+    stmt  ->  wstmt .   (35)
+
+    $default	reduce  35  (stmt)
+
+
+
+state 46
+
+    wstmt  ->  whead . DO stmt   (45)
+
+    DO  	shift  72
+
+
+
+state 47
+
+    stmt  ->  cmpdstmt .   (38)
+
+    $default	reduce  38  (stmt)
+
+
+
+state 48
+
+    stmt  ->  astmt .   (36)
+
+    $default	reduce  36  (stmt)
+
+
+
+state 49
+
+    astmt  ->  lhs . exp   (48)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  73
+    constant	shift  64
+
+
+
+state 50
+
+    lhs  ->  var . ASG   (49)
+
+    ASG 	shift  74
+
+
+
+state 51
+
+    type  ->  ARRAY '[' ICONST . RANGE ICONST ']' OF stype   (27)
+
+    RANGE	shift  75
+
+
+
+state 52
+
+    procdcl  ->  PROC ID @3 . parmlist @4 ';' block ';'   (9)
+
+    '(' 	shift  76
+    parmlist	shift  77
+
+    $default	reduce  15  (parmlist)
+
+
+
+state 53
+
+    procdcl  ->  FUNC ID @5 . parmlist @6 ':' stype ';' @7 block ';'   (13)
+
+    '(' 	shift  76
+    parmlist	shift  78
+
+    $default	reduce  15  (parmlist)
+
+
+
+state 54
+
+    writestmt  ->  WRITELN '(' . exp ')'   (40)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  79
+    constant	shift  64
+
+
+
+state 55
+
+    exp  ->  NOT . exp   (67)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  80
+    constant	shift  64
+
+
+
+state 56
+
+    constant  ->  TRUE_TOK .   (77)
+
+    $default	reduce  77  (constant)
+
+
+
+state 57
+
+    constant  ->  FALSE_TOK .   (78)
+
+    $default	reduce  78  (constant)
+
+
+
+state 58
+
+    exp  ->  ID . '(' explist ')'   (69)
+    exp  ->  ID .   (70)
+    exp  ->  ID . '[' exp ']'   (71)
+
+    '(' 	shift  81
+    '[' 	shift  82
+
+    $default	reduce  70  (exp)
+
+
+
+state 59
+
+    constant  ->  CCONST .   (76)
+
+    $default	reduce  76  (constant)
+
+
+
+state 60
+
+    constant  ->  ICONST .   (75)
+
+    $default	reduce  75  (constant)
+
+
+
+state 61
+
+    exp  ->  '-' . exp   (56)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  83
+    constant	shift  64
+
+
+
+state 62
+
+    exp  ->  '(' . exp ')'   (68)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  84
+    constant	shift  64
+
+
+
+state 63
+
+    ifhead  ->  IF exp .   (44)
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '=' 	shift  85
+    NEQ 	shift  86
+    LT  	shift  87
+    LEQ 	shift  88
+    GEQ 	shift  89
+    GT  	shift  90
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    $default	reduce  44  (ifhead)
+
+
+
+state 64
+
+    exp  ->  constant .   (72)
+
+    $default	reduce  72  (exp)
+
+
+
+state 65
+
+    whead  ->  WHILE exp .   (46)
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '=' 	shift  85
+    NEQ 	shift  86
+    LT  	shift  87
+    LEQ 	shift  88
+    GEQ 	shift  89
+    GT  	shift  90
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    $default	reduce  46  (whead)
+
+
+
+state 66
+
+    optexplist  ->  '(' . explist ')'   (51)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    explist	shift  97
+    exp 	shift  98
+    constant	shift  64
+
+
+
+state 67
+
+    var  ->  ID '[' . exp ']'   (74)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  99
+    constant	shift  64
+
+
+
+state 68
+
+    procstmt  ->  ID optexplist .   (41)
+
+    $default	reduce  41  (procstmt)
+
+
+
+state 69
+
+    cmpdstmt  ->  BEG stmtlist END .   (47)
+
+    $default	reduce  47  (cmpdstmt)
+
+
+
+state 70
+
+    stmtlist  ->  stmtlist ';' . stmt   (32)
+
+    WRITELN	shift  35
+    IF  	shift  36
+    WHILE	shift  37
+    BEG 	shift  29
+    ID  	shift  38
+    stmt	shift  100
+    writestmt	shift  41
+    procstmt	shift  42
+    ifstmt	shift  43
+    ifhead	shift  44
+    wstmt	shift  45
+    whead	shift  46
+    cmpdstmt	shift  47
+    astmt	shift  48
+    lhs 	shift  49
+    var 	shift  50
+
+
+
+state 71
+
+    ifstmt  ->  ifhead THEN . stmt ELSE stmt   (42)
+    ifstmt  ->  ifhead THEN . stmt   (43)
+
+    WRITELN	shift  35
+    IF  	shift  36
+    WHILE	shift  37
+    BEG 	shift  29
+    ID  	shift  38
+    stmt	shift  101
+    writestmt	shift  41
+    procstmt	shift  42
+    ifstmt	shift  43
+    ifhead	shift  44
+    wstmt	shift  45
+    whead	shift  46
+    cmpdstmt	shift  47
+    astmt	shift  48
+    lhs 	shift  49
+    var 	shift  50
+
+
+
+state 72
+
+    wstmt  ->  whead DO . stmt   (45)
+
+    WRITELN	shift  35
+    IF  	shift  36
+    WHILE	shift  37
+    BEG 	shift  29
+    ID  	shift  38
+    stmt	shift  102
+    writestmt	shift  41
+    procstmt	shift  42
+    ifstmt	shift  43
+    ifhead	shift  44
+    wstmt	shift  45
+    whead	shift  46
+    cmpdstmt	shift  47
+    astmt	shift  48
+    lhs 	shift  49
+    var 	shift  50
+
+
+
+state 73
+
+    astmt  ->  lhs exp .   (48)
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '=' 	shift  85
+    NEQ 	shift  86
+    LT  	shift  87
+    LEQ 	shift  88
+    GEQ 	shift  89
+    GT  	shift  90
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    $default	reduce  48  (astmt)
+
+
+
+state 74
+
+    lhs  ->  var ASG .   (49)
+
+    $default	reduce  49  (lhs)
+
+
+
+state 75
+
+    type  ->  ARRAY '[' ICONST RANGE . ICONST ']' OF stype   (27)
+
+    ICONST	shift  103
+
+
+
+state 76
+
+    parmlist  ->  '(' . parms ')'   (14)
+
+    VAR 	shift  104
+    ID  	shift  8
+    parms	shift  105
+    parm	shift  106
+    vardcl	shift  107
+    idlist	shift  11
+
+
+
+state 77
+
+    procdcl  ->  PROC ID @3 parmlist . @4 ';' block ';'   (9)
+
+    @4  	shift  108
+
+    $default	reduce  8  (@4)
+
+
+
+state 78
+
+    procdcl  ->  FUNC ID @5 parmlist . @6 ':' stype ';' @7 block ';'   (13)
+
+    @6  	shift  109
+
+    $default	reduce  11  (@6)
+
+
+
+state 79
+
+    writestmt  ->  WRITELN '(' exp . ')'   (40)
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '=' 	shift  85
+    NEQ 	shift  86
+    LT  	shift  87
+    LEQ 	shift  88
+    GEQ 	shift  89
+    GT  	shift  90
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+    ')' 	shift  110
+
+
+
+state 80
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+    exp  ->  NOT exp .   (67)
+
+
+    $default	reduce  67  (exp)
+
+
+
+state 81
+
+    exp  ->  ID '(' . explist ')'   (69)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    explist	shift  111
+    exp 	shift  98
+    constant	shift  64
+
+
+
+state 82
+
+    exp  ->  ID '[' . exp ']'   (71)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  112
+    constant	shift  64
+
+
+
+state 83
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  '-' exp .   (56)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+
+    $default	reduce  56  (exp)
+
+
+
+state 84
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+    exp  ->  '(' exp . ')'   (68)
+
+    '=' 	shift  85
+    NEQ 	shift  86
+    LT  	shift  87
+    LEQ 	shift  88
+    GEQ 	shift  89
+    GT  	shift  90
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+    ')' 	shift  113
+
+
+
+state 85
+
+    exp  ->  exp '=' . exp   (60)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  114
+    constant	shift  64
+
+
+
+state 86
+
+    exp  ->  exp NEQ . exp   (59)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  115
+    constant	shift  64
+
+
+
+state 87
+
+    exp  ->  exp LT . exp   (63)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  116
+    constant	shift  64
+
+
+
+state 88
+
+    exp  ->  exp LEQ . exp   (64)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  117
+    constant	shift  64
+
+
+
+state 89
+
+    exp  ->  exp GEQ . exp   (61)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  118
+    constant	shift  64
+
+
+
+state 90
+
+    exp  ->  exp GT . exp   (62)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  119
+    constant	shift  64
+
+
+
+state 91
+
+    exp  ->  exp '+' . exp   (54)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  120
+    constant	shift  64
+
+
+
+state 92
+
+    exp  ->  exp '-' . exp   (55)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  121
+    constant	shift  64
+
+
+
+state 93
+
+    exp  ->  exp OR . exp   (66)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  122
+    constant	shift  64
+
+
+
+state 94
+
+    exp  ->  exp '*' . exp   (57)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  123
+    constant	shift  64
+
+
+
+state 95
+
+    exp  ->  exp AND . exp   (65)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  124
+    constant	shift  64
+
+
+
+state 96
+
+    exp  ->  exp DIV . exp   (58)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  125
+    constant	shift  64
+
+
+
+state 97
+
+    optexplist  ->  '(' explist . ')'   (51)
+    explist  ->  explist . ',' exp   (52)
+
+    ')' 	shift  126
+    ',' 	shift  127
+
+
+
+state 98
+
+    explist  ->  exp .   (53)
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '=' 	shift  85
+    NEQ 	shift  86
+    LT  	shift  87
+    LEQ 	shift  88
+    GEQ 	shift  89
+    GT  	shift  90
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    $default	reduce  53  (explist)
+
+
+
+state 99
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+    var  ->  ID '[' exp . ']'   (74)
+
+    '=' 	shift  85
+    NEQ 	shift  86
+    LT  	shift  87
+    LEQ 	shift  88
+    GEQ 	shift  89
+    GT  	shift  90
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+    ']' 	shift  128
+
+
+
+state 100
+
+    stmtlist  ->  stmtlist ';' stmt .   (32)
+
+    $default	reduce  32  (stmtlist)
+
+
+
+state 101
+
+    ifstmt  ->  ifhead THEN stmt . ELSE stmt   (42)
+    ifstmt  ->  ifhead THEN stmt .   (43)
+
+    ELSE	shift  129
+
+    ELSE	[reduce  43  (ifstmt)]
+    $default	reduce  43  (ifstmt)
+
+
+
+state 102
+
+    wstmt  ->  whead DO stmt .   (45)
+
+    $default	reduce  45  (wstmt)
+
+
+
+state 103
+
+    type  ->  ARRAY '[' ICONST RANGE ICONST . ']' OF stype   (27)
+
+    ']' 	shift  130
+
+
+
+state 104
+
+    parm  ->  VAR . vardcl   (18)
+
+    ID  	shift  8
+    vardcl	shift  131
+    idlist	shift  11
+
+
+
+state 105
+
+    parmlist  ->  '(' parms . ')'   (14)
+    parms  ->  parms . ';' parm   (16)
+
+    ';' 	shift  132
+    ')' 	shift  133
+
+
+
+state 106
+
+    parms  ->  parm .   (17)
+
+    $default	reduce  17  (parms)
+
+
+
+state 107
+
+    parm  ->  vardcl .   (19)
+
+    $default	reduce  19  (parm)
+
+
+
+state 108
+
+    procdcl  ->  PROC ID @3 parmlist @4 . ';' block ';'   (9)
+
+    ';' 	shift  134
+
+
+
+state 109
+
+    procdcl  ->  FUNC ID @5 parmlist @6 . ':' stype ';' @7 block ';'   (13)
+
+    ':' 	shift  135
+
+
+
+state 110
+
+    writestmt  ->  WRITELN '(' exp ')' .   (40)
+
+    $default	reduce  40  (writestmt)
+
+
+
+state 111
+
+    explist  ->  explist . ',' exp   (52)
+    exp  ->  ID '(' explist . ')'   (69)
+
+    ')' 	shift  136
+    ',' 	shift  127
+
+
+
+state 112
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+    exp  ->  ID '[' exp . ']'   (71)
+
+    '=' 	shift  85
+    NEQ 	shift  86
+    LT  	shift  87
+    LEQ 	shift  88
+    GEQ 	shift  89
+    GT  	shift  90
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+    ']' 	shift  137
+
+
+
+state 113
+
+    exp  ->  '(' exp ')' .   (68)
+
+    $default	reduce  68  (exp)
+
+
+
+state 114
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp '=' exp .   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    '=' 	error (nonassociative)
+    NEQ 	error (nonassociative)
+    LT  	error (nonassociative)
+    LEQ 	error (nonassociative)
+    GEQ 	error (nonassociative)
+    GT  	error (nonassociative)
+
+    $default	reduce  60  (exp)
+
+
+
+state 115
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp NEQ exp .   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    '=' 	error (nonassociative)
+    NEQ 	error (nonassociative)
+    LT  	error (nonassociative)
+    LEQ 	error (nonassociative)
+    GEQ 	error (nonassociative)
+    GT  	error (nonassociative)
+
+    $default	reduce  59  (exp)
+
+
+
+state 116
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp LT exp .   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    '=' 	error (nonassociative)
+    NEQ 	error (nonassociative)
+    LT  	error (nonassociative)
+    LEQ 	error (nonassociative)
+    GEQ 	error (nonassociative)
+    GT  	error (nonassociative)
+
+    $default	reduce  63  (exp)
+
+
+
+state 117
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp LEQ exp .   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    '=' 	error (nonassociative)
+    NEQ 	error (nonassociative)
+    LT  	error (nonassociative)
+    LEQ 	error (nonassociative)
+    GEQ 	error (nonassociative)
+    GT  	error (nonassociative)
+
+    $default	reduce  64  (exp)
+
+
+
+state 118
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp GEQ exp .   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    '=' 	error (nonassociative)
+    NEQ 	error (nonassociative)
+    LT  	error (nonassociative)
+    LEQ 	error (nonassociative)
+    GEQ 	error (nonassociative)
+    GT  	error (nonassociative)
+
+    $default	reduce  61  (exp)
+
+
+
+state 119
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp GT exp .   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    '=' 	error (nonassociative)
+    NEQ 	error (nonassociative)
+    LT  	error (nonassociative)
+    LEQ 	error (nonassociative)
+    GEQ 	error (nonassociative)
+    GT  	error (nonassociative)
+
+    $default	reduce  62  (exp)
+
+
+
+state 120
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp '+' exp .   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    $default	reduce  54  (exp)
+
+
+
+state 121
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp '-' exp .   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    $default	reduce  55  (exp)
+
+
+
+state 122
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+    exp  ->  exp OR exp .   (66)
+
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    $default	reduce  66  (exp)
+
+
+
+state 123
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp '*' exp .   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+
+    $default	reduce  57  (exp)
+
+
+
+state 124
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp AND exp .   (65)
+    exp  ->  exp . OR exp   (66)
+
+
+    $default	reduce  65  (exp)
+
+
+
+state 125
+
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp DIV exp .   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+
+    $default	reduce  58  (exp)
+
+
+
+state 126
+
+    optexplist  ->  '(' explist ')' .   (51)
+
+    $default	reduce  51  (optexplist)
+
+
+
+state 127
+
+    explist  ->  explist ',' . exp   (52)
+
+    NOT 	shift  55
+    TRUE_TOK	shift  56
+    FALSE_TOK	shift  57
+    ID  	shift  58
+    CCONST	shift  59
+    ICONST	shift  60
+    '-' 	shift  61
+    '(' 	shift  62
+    exp 	shift  138
+    constant	shift  64
+
+
+
+state 128
+
+    var  ->  ID '[' exp ']' .   (74)
+
+    $default	reduce  74  (var)
+
+
+
+state 129
+
+    ifstmt  ->  ifhead THEN stmt ELSE . stmt   (42)
+
+    WRITELN	shift  35
+    IF  	shift  36
+    WHILE	shift  37
+    BEG 	shift  29
+    ID  	shift  38
+    stmt	shift  139
+    writestmt	shift  41
+    procstmt	shift  42
+    ifstmt	shift  43
+    ifhead	shift  44
+    wstmt	shift  45
+    whead	shift  46
+    cmpdstmt	shift  47
+    astmt	shift  48
+    lhs 	shift  49
+    var 	shift  50
+
+
+
+state 130
+
+    type  ->  ARRAY '[' ICONST RANGE ICONST ']' . OF stype   (27)
+
+    OF  	shift  140
+
+
+
+state 131
+
+    parm  ->  VAR vardcl .   (18)
+
+    $default	reduce  18  (parm)
+
+
+
+state 132
+
+    parms  ->  parms ';' . parm   (16)
+
+    VAR 	shift  104
+    ID  	shift  8
+    parm	shift  141
+    vardcl	shift  107
+    idlist	shift  11
+
+
+
+state 133
+
+    parmlist  ->  '(' parms ')' .   (14)
+
+    $default	reduce  14  (parmlist)
+
+
+
+state 134
+
+    procdcl  ->  PROC ID @3 parmlist @4 ';' . block ';'   (9)
+
+    VAR 	shift  5
+    block	shift  142
+    variables	shift  7
+
+    $default	reduce  20  (variables)
+
+
+
+state 135
+
+    procdcl  ->  FUNC ID @5 parmlist @6 ':' . stype ';' @7 block ';'   (13)
+
+    INT 	shift  21
+    CHAR	shift  22
+    BOOL	shift  23
+    stype	shift  143
+
+
+
+state 136
+
+    exp  ->  ID '(' explist ')' .   (69)
+
+    $default	reduce  69  (exp)
+
+
+
+state 137
+
+    exp  ->  ID '[' exp ']' .   (71)
+
+    $default	reduce  71  (exp)
+
+
+
+state 138
+
+    explist  ->  explist ',' exp .   (52)
+    exp  ->  exp . '+' exp   (54)
+    exp  ->  exp . '-' exp   (55)
+    exp  ->  exp . '*' exp   (57)
+    exp  ->  exp . DIV exp   (58)
+    exp  ->  exp . NEQ exp   (59)
+    exp  ->  exp . '=' exp   (60)
+    exp  ->  exp . GEQ exp   (61)
+    exp  ->  exp . GT exp   (62)
+    exp  ->  exp . LT exp   (63)
+    exp  ->  exp . LEQ exp   (64)
+    exp  ->  exp . AND exp   (65)
+    exp  ->  exp . OR exp   (66)
+
+    '=' 	shift  85
+    NEQ 	shift  86
+    LT  	shift  87
+    LEQ 	shift  88
+    GEQ 	shift  89
+    GT  	shift  90
+    '+' 	shift  91
+    '-' 	shift  92
+    OR  	shift  93
+    '*' 	shift  94
+    AND 	shift  95
+    DIV 	shift  96
+
+    $default	reduce  52  (explist)
+
+
+
+state 139
+
+    ifstmt  ->  ifhead THEN stmt ELSE stmt .   (42)
+
+    $default	reduce  42  (ifstmt)
+
+
+
+state 140
+
+    type  ->  ARRAY '[' ICONST RANGE ICONST ']' OF . stype   (27)
+
+    INT 	shift  21
+    CHAR	shift  22
+    BOOL	shift  23
+    stype	shift  144
+
+
+
+state 141
+
+    parms  ->  parms ';' parm .   (16)
+
+    $default	reduce  16  (parms)
+
+
+
+state 142
+
+    procdcl  ->  PROC ID @3 parmlist @4 ';' block . ';'   (9)
+
+    ';' 	shift  145
+
+
+
+state 143
+
+    procdcl  ->  FUNC ID @5 parmlist @6 ':' stype . ';' @7 block ';'   (13)
+
+    ';' 	shift  146
+
+
+
+state 144
+
+    type  ->  ARRAY '[' ICONST RANGE ICONST ']' OF stype .   (27)
+
+    $default	reduce  27  (type)
+
+
+
+state 145
+
+    procdcl  ->  PROC ID @3 parmlist @4 ';' block ';' .   (9)
+
+    $default	reduce  9  (procdcl)
+
+
+
+state 146
+
+    procdcl  ->  FUNC ID @5 parmlist @6 ':' stype ';' . @7 block ';'   (13)
+
+    @7  	shift  147
+
+    $default	reduce  12  (@7)
+
+
+
+state 147
+
+    procdcl  ->  FUNC ID @5 parmlist @6 ':' stype ';' @7 . block ';'   (13)
+
+    VAR 	shift  5
+    block	shift  148
+    variables	shift  7
+
+    $default	reduce  20  (variables)
+
+
+
+state 148
+
+    procdcl  ->  FUNC ID @5 parmlist @6 ':' stype ';' @7 block . ';'   (13)
+
+    ';' 	shift  149
+
+
+
+state 149
+
+    procdcl  ->  FUNC ID @5 parmlist @6 ':' stype ';' @7 block ';' .   (13)
+
+    $default	reduce  13  (procdcl)
+
+
+
+state 150
+
+    $   	shift  151
+
+
+
+state 151
+
+    $   	shift  152
+
+
+
+state 152
+
+    NO ACTIONS
+exit 0

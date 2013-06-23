@@ -1,0 +1,79 @@
+
+###############################################################################
+#                                                                             #
+#   Lout setup file for table printing                                        #
+#                                                                             #
+#   Jeffrey H. Kingston                                                       #
+#   5 February 1999                                                           #
+#                                                                             #
+###############################################################################
+
+###############################################################################
+#                                                                             #
+#  The @SysInclude { tblf } line                                              #
+#                                                                             #
+#  This line causes Lout to read the definitions for diagrams, and should     #
+#  not be touched.                                                            #
+#                                                                             #
+###############################################################################
+ 
+@SysInclude { tblf }
+
+
+###############################################################################
+#                                                                             #
+#  The @TbleSetup @Use clause                                                 #
+#                                                                             #
+#  To change the default value of any option, delete the # at the start of    #
+#  its line and change the value between braces.                              #
+#                                                                             #
+###############################################################################
+
+@Use { @TblSetup
+    # paint                { nopaint            } # colour of background
+    # background           {                    } # object in background
+    # font                 {                    } # font
+    # break                {                    } # paragraph breaking style
+    # width                {                    } # fixed width or "expand"
+    # height               {                    } # fixed height
+    # indent               {                    } # horizontal indent
+    # indentvertical       {                    } # vertical indent
+    # strut                { yes                } # vertical strut
+    # struthorizontal      { no                 } # horizontal strut
+    # margin               {                    } # margin all round
+    # marginhorizontal     { 0.6f @OrIfPlain 2s } # margin left, right of entry
+    # marginleft           {                    } # margin left of entry
+    # marginright          {                    } # margin right of entry
+    # marginvertical       { 0.3f @OrIfPlain 2f } # margin above, below entry
+    # marginabove          {                    } # margin above entry
+    # marginbelow          {                    } # margin below entry
+    # rule                 { no                 } # rule all round cell
+    # rulehorizontal       {                    } # rule above and below cell
+    # ruleabove            {                    } # rule above cell
+    # rulebelow            {                    } # rule below cell
+    # rulevertical         {                    } # rule left and right of cell
+    # ruleleft             {                    } # rule left of cell
+    # ruleright            {                    } # rule right of cell
+    # rulewidth            { 0.05f              } # width (thickness) of rule
+    # rulehorizontalwidth  { {} @OrIfPlain 1f   } # width of above, below rules
+    # ruleabovewidth       {                    } # width of above rule
+    # rulebelowwidth       {                    } # width of below rule
+    # ruleverticalwidth    { {} @OrIfPlain 1s   } # width of left, right rules
+    # ruleleftwidth        {                    } # width of left rule
+    # rulerightwidth       {                    } # width of right rule
+    # rulegap              { 0.15f              } # gap between double rules
+    # rulehorizontalgap    { {} @OrIfPlain 0f   } # gap between dbl a&b rules
+    # ruleabovegap         {                    } # gap between dbl above rules
+    # rulebelowgap         {                    } # gap between dbl below rules
+    # ruleverticalgap      { {} @OrIfPlain 0s   } # gap between dbl l&r rules
+    # ruleleftgap          {                    } # gap between dbl left rules
+    # rulerightgap         {                    } # gap between dbl right rules
+    # rulecolour           { black              } # color of rules
+    # rulehorizontalcolour {                    } # color of above, below rules
+    # ruleabovecolour      {                    } # color of above rules
+    # rulebelowcolour      {                    } # color of below rules
+    # ruleverticalcolour   {                    } # color of left, right rules
+    # ruleleftcolour       {                    } # color of left rules
+    # rulerightcolour      {                    } # color of right rules
+    # ruleplainchar        { .                  } # plain text rule characters
+}

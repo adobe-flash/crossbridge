@@ -1,0 +1,37 @@
+##===- Makefile.spec2006 -----------------------------------*- Makefile -*-===##
+#
+# This makefile contains information for building SPEC2006 as an external test.
+#
+##===----------------------------------------------------------------------===##
+
+include $(LEVEL)/Makefile.config
+
+SPEC_ROOT := $(SPEC2006_ROOT)
+CPPFLAGS += -DSPEC_CPU2006
+
+ifdef ARCH_LP64
+  CPPFLAGS += -DSPEC_CPU_LP64
+endif
+
+# RUN_TYPE - Either ref, test, or train. May be specified on the command line.
+# Individual tests may override this to provide better input sizes.
+ifndef RUN_TYPE
+ifdef SMALL_PROBLEM_SIZE
+  RUN_TYPE := test
+else
+  ifdef LARGE_PROBLEM_SIZE
+    RUN_TYPE := train
+  else
+    RUN_TYPE := test
+  endif
+endif
+endif
+
+# Don't use CINT2006/CFP2006, always use CPU2006.
+SPEC_SUITEDIR := CPU2006
+
+include $(PROJ_SRC_ROOT)/External/SPEC/Makefile.spec.config
+include $(LEVEL)/External/SPEC/Makefile.spec
+
+CPPFLAGS += -DSPEC_CPU
+FPPFLAGS += -DSPEC_CPU

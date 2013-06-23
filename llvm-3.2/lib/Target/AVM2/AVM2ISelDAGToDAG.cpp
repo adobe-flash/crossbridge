@@ -18,6 +18,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+//===-- AVM2ISelDAGToDAG.cpp - A dag to dag inst selector for AVM2 ------===//
+//
+// This file defines an instruction selector for the AVM2 target.
+//
+//===----------------------------------------------------------------------===//
+
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
+
 #include "AVM2.h"
 #include "AVM2TargetMachine.h"
 #include "AVM2ISelLowering.h"

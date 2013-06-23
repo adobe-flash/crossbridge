@@ -1,0 +1,31 @@
+##===- Makefile.spec2000 -----------------------------------*- Makefile -*-===##
+#
+# This makefile contains information for building SPEC2000 as an external test.
+#
+##===----------------------------------------------------------------------===##
+
+include $(LEVEL)/Makefile.config
+
+SPEC_ROOT := $(SPEC2000_ROOT)
+CPPFLAGS += -DSPEC_CPU2000
+
+ifdef ARCH_LP64
+  CPPFLAGS += -DSPEC_CPU2000_LP64
+endif
+
+# RUN_TYPE - Either ref, test, or train.  May be specified on the command line.
+# individual tests may override this to provide better input sizes
+ifndef RUN_TYPE
+ifdef SMALL_PROBLEM_SIZE
+RUN_TYPE := test
+else
+ifdef LARGE_PROBLEM_SIZE
+RUN_TYPE := ref
+else
+RUN_TYPE := train
+endif
+endif
+endif
+
+include $(PROJ_SRC_ROOT)/External/SPEC/Makefile.spec.config
+include $(LEVEL)/External/SPEC/Makefile.spec

@@ -1,0 +1,23 @@
+##===- Makefile.dummylib -----------------------------------*- Makefile -*-===##
+#
+# This makefile fragment is to be used by program tests which require the
+# program to be linked with libdummy.  The output program is named:
+#   Output/$(PROG).lib.bc
+#
+##===----------------------------------------------------------------------===##
+
+# DUMMYLIB - The path to the library of stub functions which is used to resolve
+# external functions for dsanalysis.
+#
+DUMMYLIB := $(LLVMLIBDEBUGSOURCE)/libdummy.bca
+DUMMYSRC := $(LLVM_SRC_ROOT)/runtime/libdummy
+
+# Rebuild dummylib if necessary...
+$(DUMMYLIB) : $(wildcard $(DUMMYSRC)/*.c)
+	cd $(DUMMYSRC); $(MAKE)
+
+# LINKED_PROGS - All of the programs linked to libdummy
+LINKED_PROGS := $(PROGRAMS_TO_TEST:%=Output/%.lib.bc)
+
+$(LINKED_PROGS): Output/%.lib.bc: Output/%.llvm.bc $(DUMMYLIB)
+	$(LLINK) $< $(DUMMYLIB) -o $@

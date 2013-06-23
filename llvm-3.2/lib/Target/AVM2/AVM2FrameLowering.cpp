@@ -20,6 +20,8 @@
 
 //====- AVM2FrameLowering.cpp - AVM2 Frame Information -------*- C++ -*-====//
 
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
+
 #include "AVM2FrameLowering.h"
 #include "AVM2InstrInfo.h"
 #include "AVM2MachineFunctionInfo.h"

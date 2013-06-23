@@ -1,0 +1,110 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @Pas package for formatting Pascal programs (Version 2.0)             #
+#                                                                             #
+#  Version 1.0 by Jeffrey H. Kingston, June 1991.                             #
+#  Version 2.0 by Jeffrey H. Kingston, 22 December 1992.                      #
+#                                                                             #
+#  See "Eq - a Lout package for typesetting mathematics" for user             #
+#  information.                                                               #
+#                                                                             #
+#  Reference:   Jensen, K. and Wirth, N.  Pascal User Manual and Report.      #
+#               Second Edition, Springer-Verlag, 1975.                        #
+#                                                                             #
+###############################################################################
+
+export	"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+	"." "," ":" ";" "'" "`" "+" "-" "*" "/" "(" ")"
+	"[" "]" "^" ".." "=" "<" ">" "<>" "<=" ">=" ":="
+
+	and array begin case const div do downto else end
+	file for forward function goto if in label mod nil not
+	of or otherwise packed procedure program record repeat
+	set then to type until var while with @Com
+
+def @Pas
+   body @Body
+@Begin
+
+    def @R right x { Base @Font x }
+    def @B right x { Bold @Font x }
+    def @S right x { { Symbol Base } @Font x }
+
+    def "0"	{ @R "0"			}
+    def "1"	{ @R "1"			}
+    def "2"	{ @R "2"			}
+    def "3"	{ @R "3"			}
+    def "4"	{ @R "4"			}
+    def "5"	{ @R "5"			}
+    def "6"	{ @R "6"			}
+    def "7"	{ @R "7"			}
+    def "8"	{ @R "8"			}
+    def "9"	{ @R "9"			}
+    def "."	{ @R "."			}
+    def ","	{ @R ","			}
+    def ":"	{ @R ":"			}
+    def ";"	{ @R ";"			}
+    def "'"	{ @R "'"			}
+    def "`"	{ @R "`"			}
+    def "+"	{ @S "+"			}
+    def "-"	{ @S "-"			}
+    def "*"	{ @S @Char "asteriskmath"	}
+    def "/"	{ @R @Char "fraction"		}
+    def "("	{ @R "("			}
+    def ")"	{ @R ")"			}
+    def "["	{ @R "["			}
+    def "]"	{ @R "]"			}
+    def "^"	{ @S 0.8f @Font @Char "arrowup"	}
+    def ".."	{ @R ".." &0.1f			}
+    def "="	{ @S @Char "equal"		}
+    def "<"	{ @S @Char "less"		}
+    def ">"	{ @S @Char "greater"		}
+    def "<>"	{ @S @Char "notequal"		}
+    def "<="	{ @S @Char "lessequal"		}
+    def ">="	{ @S @Char "greaterequal"	}
+    def ":="	{ :{//0.03fo &0.1f =}		}
+
+    def and		{ @B "and"		}
+    def array		{ @B "array"		}
+    def begin		{ @B "begin"		}
+    def case		{ @B "case"		}
+    def const		{ @B "const"		}
+    def div		{ @B "div"		}
+    def do		{ @B "do"		}
+    def downto		{ @B "downto"		}
+    def else		{ @B "else"		}
+    def end		{ @B "end"		}
+    def file		{ @B "file"		}
+    def for		{ @B "for"		}
+    def forward		{ @B "forward"		}
+    def function	{ @B "function"		}
+    def goto		{ @B "goto"		}
+    def if		{ @B "if"		}
+    def in		{ @B "in"		}
+    def label		{ @B "label"		}
+    def mod		{ @B "mod"		}
+    def nil		{ @B "nil"		}
+    def not		{ @B "not"		}
+    def of		{ @B "of"		}
+    def or		{ @B "or"		}
+    def otherwise	{ @B "otherwise"	}
+    def packed		{ @B "packed"		}
+    def procedure	{ @B "procedure"	}
+    def program		{ @B "program"		}
+    def record		{ @B "record"		}
+    def repeat		{ @B "repeat"		}
+    def set		{ @B "set"		}
+    def then		{ @B "then"		}
+    def to		{ @B "to"		}
+    def type		{ @B "type"		}
+    def until		{ @B "until"		}
+    def var		{ @B "var"		}
+    def while		{ @B "while"		}
+    def with		{ @B "with"		}
+
+    def @Com right x	{ @R "{" x @R "}"	}
+
+   Slope @Font lines @Break @Body
+
+@End @Pas

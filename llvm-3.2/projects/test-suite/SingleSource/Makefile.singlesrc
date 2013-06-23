@@ -1,0 +1,138 @@
+##===- SingleSource/Makefile.singlesrc --------------------*- Makefile -*-===##
+#
+# This makefile builds all of the C programs in this directory in three
+# different configurations:
+#   1. By the native GCC compiler
+#   2. To LLVM bytecode
+#   3. To Sparc machine code, from bytecode, using LLC
+#
+# After building all of these different forms, the programs are run and the
+# output is diff'd
+#
+#  FIXME: There should be a way to specify libraries to link programs against
+#  FIXME: There should be a way to specify the command line for a program
+#
+#  IDEA: This could be specified in the start of the .c file, in a comment block
+#
+##===----------------------------------------------------------------------===##
+
+# Force lazy substitution.
+ALL_PROGRAMS_TO_SKIP = $(PROGRAMS_TO_SKIP)
+
+# If DISABLE_CXX is given, add any C++ programs to the list to skip.
+ifdef DISABLE_CXX
+  CXX_SOURCES = $(filter %.cpp %.cc %.mm, $(Source))
+  ALL_PROGRAMS_TO_SKIP += $(patsubst $(SourceDir)%,%,$(basename $(CXX_SOURCES)))
+endif
+
+PROGRAMS_TO_TEST = $(filter-out $(ALL_PROGRAMS_TO_SKIP), \
+	$(patsubst $(SourceDir)%,%,$(basename $(Source))))
+
+include $(LEVEL)/Makefile.programs
+.PRECIOUS: Output/%.linked.rll
+
+ifndef USE_PRECOMPILED_BYTECODE
+Output/%.linked.rbc: Output/%.bc
+	-cp -f $< $@
+
+Output/%.LOC.txt: $(SourceDir)/%.c
+	cat $< | wc -l > $@
+
+Output/%.LOC.txt: $(SourceDir)/%.cpp
+	cat $< | wc -l > $@
+
+Output/%.LOC.txt: $(SourceDir)/%.m
+	cat $< | wc -l > $@
+
+Output/%.LOC.txt: $(SourceDir)/%.mm
+	cat $< | wc -l > $@
+endif
+
+Output/%.llvm.o: %.c Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCC) $(CPPFLAGS) $(CFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+Output/%.llvm.o: %.m Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCC) $(CPPFLAGS) $(CFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+Output/%.llvm.o: %.C Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+Output/%.llvm.o: %.cpp Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+Output/%.llvm.o: %.cc Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+Output/%.llvm.o: %.mm Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+.PRECIOUS: Output/%.llvm.o
+
+Output/%.simple: Output/%.llvm.o Output/.dir
+	-$(CP) $<.compile.time $@.compile.time
+	-$(LD_ENV_OVERRIDES) $(LCXX) -o $@ $< $(LDFLAGS) $(CFLAGS) $(TARGET_FLAGS)
+
+# FIXME: LIBS should be specified, not hardcoded to -lm
+Output/%.native: $(SourceDir)/%.c Output/.dir
+	-$(CC) $(CPPFLAGS) $(CFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.native: $(SourceDir)/%.cpp Output/.dir
+	-$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.native: $(SourceDir)/%.m Output/.dir
+	-$(CC) $(CPPFLAGS) $(CFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.native: $(SourceDir)/%.mm Output/.dir
+	-$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.native.dbg: $(SourceDir)/%.c Output/.dir
+	-$(CC) -g $(CPPFLAGS) $(CFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.native.dbg: $(SourceDir)/%.cpp Output/.dir
+	-$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.native.dbg: $(SourceDir)/%.m Output/.dir
+	-$(CC) -g $(CPPFLAGS) $(CFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.native.dbg: $(SourceDir)/%.mm Output/.dir
+	-$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.native.dbg.opt: $(SourceDir)/%.c Output/.dir
+	-$(CC) -g $(CPPFLAGS) $(CFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.native.dbg.opt: $(SourceDir)/%.cpp Output/.dir
+	-$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.native.dbg.opt: $(SourceDir)/%.m Output/.dir
+	-$(CC) -g $(CPPFLAGS) $(CFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.native.dbg.opt: $(SourceDir)/%.mm Output/.dir
+	-$(CXX) -g $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.dbg: $(SourceDir)/%.c Output/.dir
+	-$(LCC) -g $(CPPFLAGS) $(CFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.dbg: $(SourceDir)/%.cpp Output/.dir
+	-$(LCXX) -g $(CPPFLAGS) $(CXXFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.dbg: $(SourceDir)/%.m Output/.dir
+	-$(LCC) -g $(CPPFLAGS) $(CFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.dbg: $(SourceDir)/%.mm Output/.dir
+	-$(LCXX) -g $(CPPFLAGS) $(CXXFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.dbg.opt: $(SourceDir)/%.c Output/.dir
+	-$(LCC) -g $(CPPFLAGS) $(CFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.dbg.opt: $(SourceDir)/%.cpp Output/.dir
+	-$(LCXX) -g $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.dbg.opt: $(SourceDir)/%.m Output/.dir
+	-$(LCC) -g $(CPPFLAGS) $(CFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+Output/%.dbg.opt: $(SourceDir)/%.mm Output/.dir
+	-$(LCXX) -g $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) $< -lm -o $@ $(LDFLAGS)
+
+bugpoint-gccas bugpoint-opt bugpoint-jit bugpoint-llc bugpoint-llc-beta:
+	@echo "The $@ target doesn't work in SingleSource.  Try:"
+	@echo "  'make Output/[programname].$@' instead."

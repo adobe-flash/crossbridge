@@ -20,6 +20,8 @@
 
 //===-- AVM2AsmBackend.cpp - AVM2 Assembler Backend -------------------------===//
 
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
+
 #include "AVM2TargetAsmInfo.h"
 #include "AVM2TargetMachine.h"
 #include "AVM2.h"

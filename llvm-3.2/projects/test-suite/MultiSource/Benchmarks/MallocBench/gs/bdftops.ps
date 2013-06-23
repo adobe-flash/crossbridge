@@ -1,0 +1,466 @@
+%    Copyright (C) 1990 Aladdin Enterprises.  All rights reserved.
+%    Distributed by Free Software Foundation, Inc.
+%
+% This file is part of Ghostscript.
+%
+% Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+% to anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer
+% to the Ghostscript General Public License for full details.
+%
+% Everyone is granted permission to copy, modify and redistribute
+% Ghostscript, but only under the conditions described in the Ghostscript
+% General Public License.  A copy of this license is supposed to have been
+% given to you along with Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+
+% bdftops.ps
+% Convert a BDF file to a Ghostscript font.
+
+% Ghostscript fonts are in the same format as Adobe Type 1 fonts,
+% except that they do not use eexec encryption.
+% See gfonts.ps for more information.
+
+/envBDF 75 dict def
+envBDF begin
+
+% Define whether to write out the CharStrings in binary or in hex.
+% Binary takes less space on the file, but isn't guaranteed portable.
+   /binary false def
+
+% Define lenIV (the number of initial random bytes in the encoded outlines).
+% This should be zero, but we set it to 4 for compatibility with PostScript.
+   /lenIV 4 def
+
+% Define the character sequences used to fill in some undefined entries
+% in the standard encoding.
+   mark
+     (fraction) [/slash]
+     (quotesingle) [/quoteright]
+     (quotedblleft) [/quotedbl]
+     (guillemotleft) [/less /less]
+     (guilsinglleft) [/less]
+     (guilsinglright) [/greater]
+     (fi) [/f /i]
+     (fl) [/f /l]
+     (endash) [/hyphen /hyphen]
+     (periodcentered) [/asterisk]
+     (bullet) [/asterisk]
+     (quotesinglbase) [/quoteright]
+     (quotedblbase) [/quotedbl]
+     (quotedblright) [/quotedbl]
+     (guillemotright) [/greater /greater]
+     (ellipsis) [/period /period /period]
+     (emdash) [/hyphen /hyphen /hyphen]
+     (AE) [/A /E]
+     (OE) [/O /E]
+     (ae) [/a /e]
+     (oe) [/o /e]
+     (germandbls) [/s /s]
+   counttomark 2 idiv dup dict begin
+   { def } repeat
+   pop currentdict end /composites exch def
+% Note the characters that must be defined as subroutines.
+   96 dict begin
+     0 composites
+      { exch pop
+         { dup currentdict exch known
+	    { pop }
+	    { 1 index def 1 add }
+	   ifelse
+	 }
+	forall
+      }
+     forall
+     currentdict
+   end /subrchars exch def
+
+% Load the utility procedures.
+   (fcutils.ps) run
+
+% Define the Type 1 opcodes we care about.
+   /c_callsubr 10 def
+   /c_return 11 def
+   /c_escape 12 def
+     /ce_sbw 7 def
+     /ce_setcurrentpoint 33 def
+   /c_hsbw 13 def
+   /c_endchar 14 def
+
+% Define a buffer for reading the BDF file.
+   /buffer 400 string def
+
+% Read a line from the BDF file into the buffer.
+% Define /keyword as the first word on the line.
+% Define /args as the remainder of the line.
+% If the keyword is equal to commentword, skip the line.
+% (If commentword is equal to a space, never skip.)
+   /commentword ( ) def
+   /nextline
+    { bdfile buffer readline not
+       { (Premature EOF\n) print stop } if
+      ( ) search
+       { /keyword exch def pop }
+       { /keyword exch def () }
+      ifelse
+      /args exch def
+      keyword commentword eq { nextline } if
+    } bind def
+
+% Get an integer argument from args.
+   /iarg		% iarg -> int
+    { args ( ) search
+       { cvi exch pop exch }
+       { cvi () }
+      ifelse  /args exch def
+    } bind def
+
+% Convert the remainder of args into a string.
+   /remarg		% remarg -> string
+    { args copystring
+    } bind def
+
+% Get a string argument that occupies the remainder of args.
+   /sarg		% sarg -> string
+    { args (") anchorsearch
+       { pop /args exch def } { pop } ifelse
+      args args length 1 sub get (") 0 get eq
+       { args 0 args length 1 sub getinterval /args exch def } if
+      args copystring
+    } bind def
+
+% Check that the keyword is the expected one.
+   /checkline		% (EXPECTED-KEYWORD) checkline ->
+    { dup keyword ne
+       { (Expected ) print =
+         (Line=) print keyword print ( ) print args print (\n) print stop
+       } if
+      pop
+    } bind def
+
+% Read a line and check its keyword.
+   /getline		% (EXPECTED-KEYWORD) getline ->
+    { nextline checkline
+    } bind def
+
+% Define some utilities for writing the output file.
+   /wtstring 100 string def
+   /ws {psfile exch writestring} bind def
+   /wl {ws (\n) ws} bind def
+   /wt {wtstring cvs ws ( ) ws} bind def
+   /wo {psfile exch write==only ( ) ws} bind def
+
+% Encrypt and write a hex string for Subrs or CharStrings.
+% Note that this smashes the string being written.
+   /wx
+    { 4330 exch dup type1encrypt exch pop
+      binary
+       { dup length wo (_R ) ws ws
+       }
+       { (<) ws
+         % Some systems choke on very long lines, so
+	 % we break up the hexstring into chunks of 50 characters.
+	  { dup length 25 le {exit} if
+	    dup 0 25 getinterval psfile exch writehexstring (\n) ws
+	    dup length 25 sub 25 exch getinterval
+	  } loop
+	 psfile exch writehexstring (>) ws
+       } ifelse
+    } bind def
+% Write a character definition.
+   /wcdef
+    { (/) ws exch ws ( ) ws wx ( _D) wl
+    } bind def
+
+% The main program.
+   /bdftops		% infilename outfilename mapfilename bdftops ->
+    { /mapname exch def
+      /psname exch def
+      /bdfname exch def
+      gsave		% so we can set the CTM to the font matrix
+
+%  Open the input files.  We don't open the output file until
+%  we've done a minimal validity check on the input.
+      bdfname (r) file /bdfile exch def
+      mapname findlibfile not
+        { (bdftops: Can't find map file ) print print (!\n) print stop }
+      if
+      /mapfile exch def
+
+%  Check for the STARTFONT.
+      (STARTFONT) getline
+      args (2.1) ne { (Not version 2.1\n) print stop } if
+
+%  Look up the output file name in the font map.
+      mapfile psname fontmapfind
+      /uniqueID exch def
+      /encoding exch def
+      /fontname exch def
+
+%  Now open the output file.
+      psname (w) file /psfile exch def
+
+%  Put out a header compatible with the Adobe "standard".
+      (%!FontType1-1.0: ) ws fontname wt (000.000) wl
+
+%  Copy the leading comments, up to FONT.
+      (% This is a font description converted from ) ws
+        bdfname ws (.) wl
+      true
+      { nextline
+        keyword (COMMENT) ne {exit} if
+	{ (% Here are the leading comments from the BDF file:\n%) wl
+	} if false
+	(%) ws remarg wl
+      } loop pop
+      /commentword (COMMENT) def	% do skip comments from now on
+
+%  Read and process the FONT, SIZE, and FONTBOUNDINGBOX.
+      % If we cared about FONT, we'd use it here.  If the BDF files
+      % from MIT had PostScript names rather than X names, we would
+      % care; but what's there is unusable, so we discard FONT.
+      (FONT) checkline
+      (SIZE) getline
+        /pointsize iarg def   /xres iarg def   /yres iarg def
+      (FONTBOUNDINGBOX) getline
+        /fbbw iarg def   /fbbh iarg def   /fbbxo iarg def   /fbbyo iarg def
+	/fraster fbbw 7 add 8 idiv def
+      nextline
+
+% Allocate the buffers for the bitmap and the outline,
+% according to the font bounding box.
+      /bits fraster fbbh mul 200 max 65535 min string def
+      /outline bits length 6 mul 65535 min string def
+
+%  The Type 1 font machinery really only work with a 1000 unit
+%  character coordinate system.  Set this up here.
+	% Compute the factor to make the X entry in the FontMatrix
+	% come out at exactly 0.001.
+	/fontscale   72 pointsize div xres div 1000 mul   def
+
+%  Read and process the properties.  We only care about a few of them.
+      /pcount 0 def
+      keyword (STARTPROPERTIES) eq
+       { iarg
+          { nextline
+	    keyword (COPYRIGHT) eq
+	    keyword (FULL_NAME) eq or
+	    keyword (FAMILY_NAME) eq or
+	    keyword (WEIGHT_NAME) eq or
+	     { keyword cvn sarg def
+	       /pcount pcount 1 add def
+	     } if
+	  } repeat
+         (ENDPROPERTIES) getline
+	 nextline
+       } if
+
+%  Compute and set the eventual FontMatrix.
+      [ 0.001 0 0 0.001 xres mul yres div 0 0 ] setmatrix
+
+%  Read and process the header for the bitmaps.
+      (CHARS) checkline
+        /ccount iarg def
+
+%  Initialize the character subroutine table.
+      /subrs subrchars length array def
+      /subrcount 0 def
+      /charstrings ccount composites length add dict def
+
+%  Read and process the bitmap data.  This reads the remainder of the file.
+      ccount -1 1
+       { (STARTCHAR) getline
+           /charname remarg def
+	 (/) print charname bits cvs print
+	   10 mod 1 eq { (\n) print flush } if
+	 (ENCODING) getline		% Ignore, assume StandardEncoding
+	 (SWIDTH) getline
+	   /swx iarg pointsize mul 1000 div xres mul 72 div def
+	   /swy iarg pointsize mul 1000 div xres mul 72 div def
+	 (DWIDTH) getline		% Ignore, use SWIDTH instead
+	 (BBX) getline
+	   /bbw iarg def  /bbh iarg def  /bbox iarg def  /bboy iarg def
+	 nextline
+	 keyword (ATTRIBUTES) eq
+	  { nextline
+	  } if
+	 (BITMAP) checkline
+
+%  Read the bits for this character.
+	 bbw 7 add 8 idiv /raster exch def
+% The bitmap handed to type1imagepath must have the correct height,
+% because type1imagepath uses this to compute the scale factor,
+% so we have to clear the unused parts of it.
+	 bits dup 0 1 raster fbbh mul 1 sub
+	  { 0 put dup } for
+	 pop pop
+	 raster fbbh bbh sub mul   raster   raster fbbh 1 sub mul
+	  { bits exch raster getinterval
+	    bdfile buffer readline not
+	     { (EOF in bitmap\n) print stop } if
+	    exch readhexstring pop pop pop
+	  } for
+	 (ENDCHAR) getline
+
+%  Compute the font entry, converting the bitmap to an outline.
+	 bits 0 raster fbbh mul getinterval	% the bitmap image
+	 bbw   fbbh				% bitmap width & height
+	 swx   swy				% width x & y
+	 bbox neg   bboy neg			% origin x & y
+	 	% Account for lenIV when converting the outline.
+	 outline  lenIV  outline length lenIV sub  getinterval
+	 type1imagepath
+	 length lenIV add
+	 outline exch 0 exch getinterval
+% Check whether this character must be a subroutine.
+% If so, strip off the initial [h]sbw, replace the endchar by a return,
+% and put the charstring in the Subrs array.
+	 subrchars charname known
+	  { /charstr exch def lenIV
+	     { dup charstr exch get
+	       dup c_hsbw eq { pop exit } if
+	       dup c_escape eq
+	        { pop 1 add dup charstr exch get
+		  ce_sbw eq { exit } if
+		  (Invalid CharString!\n) print stop
+		} if
+	       dup 247 lt
+	        { pop 1 }
+		{ 255 eq { 5 } { 2 } ifelse }
+	       ifelse add
+	     } loop
+	    1 add /charend exch def
+	    charstr charstr length 1 sub c_return put
+	    subrs   subrchars charname get
+	      charstr   charend lenIV sub   dup charstr length exch sub
+	        getinterval copystring
+	    put
+	    charstr charend subrchars charname get 139 add put
+	    charstr charend 1 add c_callsubr put
+	    charstr charend 2 add c_endchar put
+	    /subrcount subrcount 1 add def
+	    charstr 0 charend 3 add getinterval
+	  }
+	 if
+	 copystring
+	 charname exch charstrings 3 1 roll put
+       } for
+      (ENDFONT) getline
+
+%  Synthesize missing characters out of available ones.
+%  For fixed-width fonts, only do this in the 1-for-1 case.
+      composites
+       { 1 index charstrings exch known
+          { pop pop }
+	  { dup true		%%%%%% fixedwidth
+	     { dup length 1 eq }
+	     { true }
+	    ifelse
+	    exch { charstrings exch known and } forall
+	     { (/) print 1 index bits cvs print
+	       0 get charstrings exch get copystring
+	       charstrings 3 1 roll put
+	     }
+	     { pop pop }
+	    ifelse
+	  }
+	 ifelse
+       }
+      forall flush
+
+%  Write out the creation of the font dictionary and FontInfo.
+      pcount 0 gt
+       { (11 dict begin) wl
+	 (/FontInfo ) ws pcount wo (dict dup begin) wl
+	 currentdict /COPYRIGHT known
+	  { (/Notice ) ws COPYRIGHT wo (readonly def) wl } if
+	 currentdict /FULL_NAME known
+	  { (/FullName ) ws FULL_NAME wo (readonly def) wl } if
+	 currentdict /FAMILY_NAME known
+	  { (/FamilyName ) ws FAMILY_NAME wo (readonly def) wl } if
+	 currentdict /WEIGHT_NAME known
+	  { (/Weight ) ws WEIGHT_NAME wo (readonly def) wl } if
+	 (end readonly def) wl
+       }
+       { (10 dict begin) wl
+       }
+      ifelse
+
+%  Write out the other fixed entries in the font dictionary.
+      (/FontName ) ws fontname wo (def) wl
+      (/PaintType 0 def) wl
+      (/FontType 1 def) wl
+      (/FontMatrix [ ) ws
+        matrix currentmatrix {wt} forall
+	(] readonly def) wl
+      (/Encoding ) ws encoding wt (def) wl
+      fontscale
+      (/FontBBox { ) ws
+	dup fbbxo mul wt   dup fbbyo mul wt
+	dup fbbxo fbbw add mul wt   dup fbbyo fbbh add mul wt
+	(} readonly def) wl
+      pop
+      (/UniqueID ) ws uniqueID wo (def) wl	% uniqueID is an integer
+      (currentdict end) wl
+
+%  The rest of the file could be in eexec form, but we don't see any point
+%  in doing this, because we aren't attempting to conceal it from anyone.
+
+%  Create and initialize the Private dictionary.
+      (dup /Private 9 dict dup begin) wl
+      (/_D {readonly def} readonly def) wl
+      (/_P {readonly put} readonly def) wl
+      (/_R {string currentfile exch readstring pop} readonly def) wl
+      (/BlueValues [] def) wl
+      (/lenIV ) ws lenIV wo (def) wl
+      (/MinFeature {16 16} def) wl
+      (/password 5839 def) wl
+      (/UniqueID ) ws uniqueID wo (def) wl
+
+%  Write the Subrs entries, if any.
+      subrcount 0 gt
+       { (/Subrs ) ws subrs length wo (array) wl
+         0 1 subrs length 1 sub
+	  { dup subrs exch get dup null ne
+	     { (dup ) ws exch wo wx ( _P) wl }
+	     { pop pop }
+	    ifelse
+	  } for
+         (_D) wl
+       }
+      if
+
+%  Write all the CharStrings entries.
+      (2 index /CharStrings ) ws charstrings length 1 add wo
+        (dict dup begin) wl
+      charstrings { wcdef } forall
+
+%  Write the CharStrings entry for .notdef.
+      outline lenIV <8b8b0d0e> putinterval	% 0 0 hsbw endchar
+      (.notdef) outline 0 lenIV 4 add getinterval wcdef
+
+%  Wrap up the private part of the font.
+      (end) wl		% CharStrings
+      (end) wl		% Private
+      (readonly put) wl		% CharStrings
+      (readonly put) wl		% Private
+
+%  Write the other standard entries in the font dictionary.
+      (dup begin) wl
+      (end) wl
+
+%  Terminate the output, and close the files.
+      (dup /FontName get exch definefont pop) wl
+      bdfile closefile
+      psfile closefile
+      grestore
+    } bind def
+end
+
+% Enter the main program in the current dictionary.
+/bdftops
+ { envBDF begin   (Fontmap) bdftops end
+ } bind def

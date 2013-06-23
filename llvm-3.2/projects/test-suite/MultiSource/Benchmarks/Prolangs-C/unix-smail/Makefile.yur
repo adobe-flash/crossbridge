@@ -1,0 +1,55 @@
+# Makefile for smail (not a installation makefile)
+
+# @(#)Makefile	2.5 (smail) 9/15/87
+
+CFLAGS	=	-O
+#
+# System V Release 2.0 sites can use -lmalloc for a faster malloc
+#
+#LIBS	=	-lmalloc
+
+OBJECTS =	main.o map.o resolve.o deliver.o misc.o alias.o pw.o headers.o getpath.o str.o getopt.o
+
+all: smail svbinmail lcasep pathproc mkfnames nptx
+
+smail:		$(OBJECTS)
+		cc $(CFLAGS) $(OBJECTS) -o smail $(LIBS)
+
+adf:
+	../ptt -aX $(OBJECTS:.o=.c) ../pttlibfile.c
+
+test_adf:
+	@exec doall smail "-aX -D_NO_LONGLONG $(OBJECTS:.o=.c) ../pttlibfile.c" 0 0
+
+
+$(OBJECTS):	defs.h
+		cc $(CFLAGS) -c $<
+
+svbinmail:	svbinmail.c defs.h
+		cc $(CFLAGS) svbinmail.c -o svbinmail
+
+lcasep:		lcasep.c
+		cc $(CFLAGS) lcasep.c -o lcasep
+
+pathproc:	pathproc.sh
+		cp pathproc.sh pathproc
+		chmod 755 pathproc
+
+mkfnames:	mkfnames.sh
+		cp mkfnames.sh mkfnames
+		chmod 755 mkfnames
+
+nptx:		nptx.o pw.o str.o
+		cc $(CFLAGS) nptx.o pw.o str.o -o nptx $(LIBS)
+
+nptx.o:		nptx.c
+		cc $(CFLAGS) -c nptx.c
+
+install:	all
+		@echo read doc/Install
+
+clean:
+		rm -f *.o *.ln a.out core
+
+clobber:	clean
+		rm -f smail rmail lcasep pathproc mkfnames svbinmail nptx

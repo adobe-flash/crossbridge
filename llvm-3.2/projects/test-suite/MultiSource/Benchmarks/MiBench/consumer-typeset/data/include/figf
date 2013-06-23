@@ -1,0 +1,909 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @Fig package for drawing figures (Version 2.0)                        #
+#                                                                             #
+#  Version 1.0 by Jeffrey H. Kingston, October 1991.                          #
+#  Version 2.0 by Jeffrey H. Kingston, 22 December 1992.                      #
+#  Symbol names changed by JHK 5 March 1993 to avoid clashes with EPS files.  #
+#  @CurveBox and @ShadowBox added by JHK April 1995.                          #
+#                                                                             #
+#  See "Fig - a Lout package for drawing figures" for user information.       #
+#                                                                             #
+#  This package is now obsolete, having been replaced by @Diag.               #
+#                                                                             #
+###############################################################################
+
+@SysPrependGraphic { "figf.lpg" }
+
+export in cm pt em sp vs ft dg
+       "<<" "**" "++" "--" @Max @Min
+       @Distance @XDistance @YDistance @Angle
+       @Prev "::" @Label @BaseOf @MarkOf @ShowLabels @Figure
+       @Frame @Box @CurveBox @ShadowBox @Square @Diamond @Polygon @Ellipse
+       @Circle @HLine @VLine @Line @HArrow @VArrow @Arrow @Arc
+
+def @Fig                  
+    named maxlabels  { 200     }
+    named linestyle  { solid   }
+    named linewidth  { 0.5 pt  }
+    named linecap    { round   }
+    named dashlength { 0.15 cm }
+    named paint      { nopaint }
+    named margin     { 0.4c    }
+    named arrow      { noarrow }
+    named headstyle  { open    }
+    named headwidth  { 0.05 cm }
+    named headlength { 0.15 cm }
+    body @Body
+@Begin
+
+    # Like @Graphic, but affects the graphics state of right parameter
+    def @InnerGraphic
+	left ps
+	right x
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield { { ps gsave // grestore } @Graphic x }
+	    	PDF        @Yield { }
+	    }
+    }
+
+    def in precedence 39 left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x "in" }
+	    	PDF        @Yield { "__mul(__in, "x")" }
+	    }
+	}
+
+    def cm precedence 39 left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x "cm" }
+	    	PDF        @Yield { "__mul(__cm, "x")" }
+	    }
+	}
+
+    def pt precedence 39 left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x "pt" }
+	    	PDF        @Yield { "__mul(__pt, "x")" }
+	    }
+	}
+
+    def em precedence 39 left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x "em" }
+	    	PDF        @Yield { "__mul(__em, "x")" }
+	    }
+	}
+
+    def sp precedence 39 left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x "sp" }
+	    	PDF        @Yield { "__mul(__louts, "x")" }
+	    }
+	}
+
+    def vs precedence 39 left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x "vs" }
+	    	PDF        @Yield { "__mul(__loutv, "x")" }
+	    }
+	}
+
+    def ft precedence 39 left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x "ft" }
+	    	PDF        @Yield { "__mul(__loutf, "x")" }
+	    }
+	}
+
+    def dg precedence 39 left x {
+	    @BackEnd @Case {
+	    	PostScript @Yield { x "dg" }
+	    	PDF        @Yield { }
+	    }
+	}
+
+    def "<<"
+	precedence 38
+	left length
+	right angle
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				0 0 length angle "lfigatangle"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def "**"
+	precedence 37
+	left point
+	right length
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				point length "lfigpmul"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def "++"
+	precedence 36
+	associativity left
+	left x
+	right y
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				x y "lfigpadd"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def "--"
+	precedence 36
+	associativity left
+	left x
+	right y
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				y x "lfigpsub"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @Max
+	precedence 36
+	left x
+	right y
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				x y "lfigpmax"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @Min
+	precedence 36
+	left x
+	right y
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				x y "lfigpmin"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @Distance
+	precedence 35
+	left x
+	right y
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				x y "lfigdistance"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @XDistance
+	precedence 35
+	left x
+	right y
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				x y "lfigxdistance"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @YDistance
+	precedence 35
+	left x
+	right y
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				x y "lfigydistance"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @Angle
+	precedence 35
+	left x
+	right y
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				x y "lfigangle"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @Prev
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				"lfigprevious"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def "::"
+	precedence 33
+	left name
+	right x
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				{ "currentdict end" maxlabels "dict begin begin"
+				  // "("name") lfigpromotelabels" } @Graphic x
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @Label
+	right name
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				"/"name "lfigpointdef"
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @MarkOf
+	precedence 32
+	left point
+	right x
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				{ point "translate" } @InnerGraphic
+				{
+				    /0io |0io @OneCol @OneRow x |0io /0io
+				}
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @BaseOf
+	precedence 32
+	left point
+	right x
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				{ point "translate" } @InnerGraphic
+				{
+				    /0io |0io @OneRow @OneCol {
+				    | @OneCol @OneRow x ^/
+				    } |0io /0io
+				}
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @ShowLabels
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				"lfigshowlabels" @Graphic
+			}
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @Figure
+	named shape      {            }
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named arrow      { arrow      }
+	named headstyle  { headstyle  }
+	named headwidth  { headwidth  }
+	named headlength { headlength }
+	named paint      { paint      }
+	named margin     { 0c         }
+	right x
+    {
+	    @BackEnd @Case {
+	    	PostScript @Yield {
+				@HContract @VContract
+				{
+				    #fill the shape
+				    paint @Case
+				    {
+					nopaint @Yield {}
+			
+					{ nochange darkblue blue lightblue darkgreen green lightgreen
+					  darkred red lightred darkcyan cyan lightcyan darkmagenta
+					  magenta lightmagenta darkyellow yellow lightyellow darkgray
+					  gray lightgray darkgrey grey lightgrey black white }
+					@Yield
+					{ "/lfig"paint "[" shape "] gsave lfigpaintpath grestore" }
+				    }
+			
+				    # stroke the path and add any arrowheads
+				    linestyle @Case
+				    {
+					{ solid dashed cdashed dotted noline } @Yield
+					{
+					    linewidth "setlinewidth" "lfig"linecap "setlinecap"
+					    dashlength "/lfig"linestyle "[" shape "] lfigdopath"
+					    arrow @Case
+					    {
+						noarrow @Yield { pop pop }
+						{ forward back both } @Yield
+						{  dashlength "/lfig"linestyle "/"lfigblack
+						   headstyle @Case
+						   { { open halfopen closed } @Yield "lfig"headstyle }
+						   headlength headwidth "lfig"arrow
+						}
+					    }
+					}
+				    }
+				}
+				@Graphic
+				{
+				    ^/margin ^|margin @OneCol @OneRow x |margin
+				     /margin
+				}
+			}
+
+			PDF @Yield {
+			}
+		}
+    }
+
+    def @Frame
+	right x
+    {
+	@Figure
+	    shape {xsize 0 @Label X 0 ysize @Label Y}
+	{ x }
+    }
+
+    def @Box
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { margin     }
+	right x
+    {
+	@Figure
+	    shape {
+		# 0     0      @Label SW
+		# xsize 0      @Label SE
+		# xsize ysize  @Label NE
+		# 0     ysize  @Label NW
+		# SE ** 0.5    @Label S
+		# NW ** 0.5    @Label W
+		# W ++ SE      @Label E
+		# S ++ NW      @Label N
+		# NE ** 0.5    @Label CTR
+		# SW SE NE NW SW
+		lfigbox
+	    }
+	    linestyle  { linestyle }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	x
+    }
+
+
+    def @CurveBox
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { margin     }
+	right x
+    {
+	@Figure
+	    shape {
+		lfigcurvebox
+	    }
+	    linestyle  { linestyle }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	{ 0c @HShift x }
+    }
+
+    def @ShadowBox
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { margin     }
+	named shadow     { 0.2f       }
+	right x
+    {
+		@BackEnd @Case {
+			PostScript @Yield {
+				@VContract @HContract 0c @HShift "lfigshadow" @Graphic
+				{
+				  ^/shadow ^|shadow 0c @HShift
+				  @Figure
+				    shape {
+					lfigbox
+				    }
+				    linestyle  { linestyle }
+				    linewidth  { linewidth  }
+				    linecap    { linecap    }
+				    dashlength { dashlength }
+				    paint      { paint      }
+				    margin     { margin     }
+				  0c @HShift x
+				  |shadow /shadow
+				}
+			}
+			PDF @Yield {
+				@VContract @HContract 0c @HShift
+
+#				"lfigshadow" @Graphic is this:
+				{ "__mul(__xmark, 2) 0 m __xsize 0 l"			#  xmark 2 mul 0 moveto xsize 0 lineto
+				  "__xsize __sub(__ysize, __mul(__xmark, 2)) l"	#  xsize ysize xmark 2 mul sub lineto
+				  "__sub(__xsize, __xmark) __sub(ysize, __mul(__xmark, 2)) l"	#  xsize xmark sub ysize xmark 2 mul sub lineto
+				  "__sub(__xsize, __xmark) __xmark l"			#  xsize xmark sub xmark lineto
+				  "__mul(__xmark, 2) __xmark l h f"				#  xmark 2 mul xmark lineto closepath fill
+				} @Graphic
+
+				{
+				  ^/shadow ^|shadow 0c @HShift
+				  @Figure
+				    shape {
+					lfigbox
+				    }
+				    linestyle  { linestyle }
+				    linewidth  { linewidth  }
+				    linecap    { linecap    }
+				    dashlength { dashlength }
+				    paint      { paint      }
+				    margin     { margin     }
+				  0c @HShift x
+				  |shadow /shadow
+				}
+			}
+		}
+    }
+
+    def @Square
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { margin     }
+	right x
+    {
+	@Figure
+	    shape {
+		# {xsize ysize} ** 0.5                           @Label CTR
+		# CTR ++ {{xsize xsize} @Max {ysize ysize}}**0.5 @Label NE
+		# CTR ++ { {CTR @Distance NE} << 135 }           @Label NW
+		# CTR ++ { {CTR @Distance NE} << 225 }           @Label SW
+		# CTR ++ { {CTR @Distance NE} << 315 }           @Label SE
+		# SW ** 0.5 ++ SE ** 0.5                         @Label S
+		# NW ** 0.5 ++ NE ** 0.5                         @Label N
+		# SW ** 0.5 ++ NW ** 0.5                         @Label W
+		# SE ** 0.5 ++ NE ** 0.5                         @Label E
+		# SW SE NE NW SW
+		lfigsquare
+	    }
+	    linestyle  { linestyle  }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	x
+    }
+
+    def @Diamond
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { margin     }
+	right x
+    {
+	@Figure
+	    shape {
+		# {xsize 0} ** 0.5  @Label S
+		# {0 ysize} ** 0.5  @Label W
+		# S ++ W            @Label CTR
+		# CTR ++ W          @Label N
+		# CTR ++ S          @Label E
+		# S E N W S
+		lfigdiamond
+	    }
+	    linestyle  { linestyle  }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	x
+    }
+
+    def @Polygon
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { margin     }
+	named sides      { 3          }
+	named angle      { "dup 180 exch div" }
+	right x
+    {
+	@Figure
+	    shape      { sides angle lfigpolygon }
+	    linestyle  { linestyle  }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	x
+    }
+
+    def @Ellipse
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { margin     }
+	right x
+    {
+	@Figure
+	    shape {
+		# {xsize 0} ** 0.5  @Label S
+		# {0 ysize} ** 0.5  @Label W
+		# S ++ W            @Label CTR
+		# CTR ++ W          @Label N
+		# CTR ++ S          @Label E
+		# CTR ++ {xsize 0} ** 0.3536 ++ {0 ysize} ** 0.3536  @Label NE
+		# CTR ++ {xsize 0} ** 0.3536 -- {0 ysize} ** 0.3536  @Label SE
+		# CTR -- {xsize 0} ** 0.3536 ++ {0 ysize} ** 0.3536  @Label NW
+		# CTR -- {xsize 0} ** 0.3536 -- {0 ysize} ** 0.3536  @Label SW
+		# S [ CTR ] E [ CTR ] N [ CTR ] W [ CTR ] S
+		lfigellipse
+	    }
+	    linestyle  { linestyle  }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	x
+    }
+
+    def @Circle
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { margin     }
+	right x
+    {
+	@Figure
+	    shape {
+		# {xsize ysize} **0.5                    @Label CTR
+		# CTR ++ {{xsize 0} @Max {ysize 0}}**0.5 @Label E
+		# CTR ++ { {CTR @Distance E} << 45  }    @Label NE
+		# CTR ++ { {CTR @Distance E} << 90  }    @Label N
+		# CTR ++ { {CTR @Distance E} << 135 }    @Label NW
+		# CTR ++ { {CTR @Distance E} << 180 }    @Label W
+		# CTR ++ { {CTR @Distance E} << 225 }    @Label SW
+		# CTR ++ { {CTR @Distance E} << 270 }    @Label S
+		# CTR ++ { {CTR @Distance E} << 315 }    @Label SE
+		# S [ CTR ] E [ CTR ] N [ CTR ] W [ CTR ] S
+		lfigcircle
+	    }
+	    linestyle  { linestyle  }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	x
+    }
+
+    def @HLine
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { 0c         }
+	named arrow      { arrow      }
+	named headstyle  { headstyle  }
+	named headwidth  { headwidth  }
+	named headlength { headlength }
+	right x
+    {
+	@Figure
+	    shape {
+		# 0     ymark @Prev @Label FROM
+		# xsize ymark @Prev @Label TO
+		lfighline
+	    }
+	    linestyle  { linestyle  }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	    arrow      { arrow      }
+	    headstyle  { headstyle  }
+	    headwidth  { headwidth  }
+	    headlength { headlength }
+	x
+    }
+
+    def @VLine
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { 0c         }
+	named arrow      { arrow      }
+	named headstyle  { headstyle  }
+	named headwidth  { headwidth  }
+	named headlength { headlength }
+	right x
+    {
+	@Figure
+	    shape {
+		# xmark ysize @Prev @Label FROM
+		# xmark 0     @Prev @Label TO
+		lfigvline
+	    }
+	    linestyle  { linestyle }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	    arrow      { arrow      }
+	    headstyle  { headstyle  }
+	    headwidth  { headwidth  }
+	    headlength { headlength }
+	x
+    }
+
+    def @HArrow
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { 0c         }
+	named arrow      { forward    }
+	named headstyle  { headstyle  }
+	named headwidth  { headwidth  }
+	named headlength { headlength }
+	right x
+    {
+	@Figure
+	    shape {
+		# 0     ymark @Prev @Label FROM
+		# xsize ymark @Prev @Label TO
+		lfighline
+	    }
+	    linestyle  { linestyle  }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	    arrow      { arrow      }
+	    headstyle  { headstyle  }
+	    headwidth  { headwidth  }
+	    headlength { headlength }
+	x
+    }
+
+    def @VArrow
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { 0c         }
+	named arrow      { forward    }
+	named headstyle  { headstyle  }
+	named headwidth  { headwidth  }
+	named headlength { headlength }
+	right x
+    {
+	@Figure
+	    shape {
+		# xmark ysize @Prev @Label FROM
+		# xmark 0     @Prev @Label TO
+		lfigvline
+	    }
+	    linestyle  { linestyle  }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	    arrow      { arrow      }
+	    headstyle  { headstyle  }
+	    headwidth  { headwidth  }
+	    headlength { headlength }
+	x
+    }
+
+    def @Line
+	named from       { 0 ysize    }
+	named to         { xsize 0    }
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { 0c         }
+	named arrow      { arrow      }
+	named headstyle  { headstyle  }
+	named headwidth  { headwidth  }
+	named headlength { headlength }
+	right x
+    {
+	@Figure
+	    shape {
+		from @Prev @Label FROM
+		to   @Prev @Label TO
+	    }
+	    linestyle  { linestyle  }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	    arrow      { arrow      }
+	    headstyle  { headstyle  }
+	    headwidth  { headwidth  }
+	    headlength { headlength }
+	x
+    }
+
+    def @Arrow
+	named from       { 0 ysize    }
+	named to         { xsize 0    }
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { 0c         }
+	named arrow      { forward    }
+	named headstyle  { headstyle  }
+	named headwidth  { headwidth  }
+	named headlength { headlength }
+	right x
+    {
+	@Figure
+	    shape {
+		from @Prev @Label FROM
+		to   @Prev @Label TO
+	    }
+	    linestyle  { linestyle  }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	    arrow      { arrow      }
+	    headstyle  { headstyle  }
+	    headwidth  { headwidth  }
+	    headlength { headlength }
+	x
+    }
+
+    def @Arc
+	named from       { 0 ysize    }
+	named to         { xsize 0    }
+	named ctr        { 0 0        }
+	named direction  { clockwise  }
+	named linestyle  { linestyle  }
+	named linewidth  { linewidth  }
+	named linecap    { linecap    }
+	named dashlength { dashlength }
+	named paint      { paint      }
+	named margin     { 0c         }
+	named arrow      { noarrow    }
+	named headstyle  { headstyle  }
+	named headwidth  { headwidth  }
+	named headlength { headlength }
+	right x
+    {
+	@Figure
+	    shape {
+		from @Label FROM
+		to   @Label TO
+		ctr  @Label CTR
+		FROM [ CTR
+		direction @Case { {clockwise anticlockwise} @Yield direction }
+		] TO
+	    }
+	    linestyle  { linestyle  }
+	    linewidth  { linewidth  }
+	    linecap    { linecap    }
+	    dashlength { dashlength }
+	    paint      { paint      }
+	    margin     { margin     }
+	    arrow      { arrow      }
+	    headstyle  { headstyle  }
+	    headwidth  { headwidth  }
+	    headlength { headlength }
+	x
+    }
+
+    @BackEnd @Case {
+        PostScript @Yield {
+            { "grestore save gsave" maxlabels "dict begin lfigdict begin"
+              // "end end restore"
+            } @Graphic @Body
+        }
+        PDF @Yield {
+        }
+    }
+
+@End @Fig                  

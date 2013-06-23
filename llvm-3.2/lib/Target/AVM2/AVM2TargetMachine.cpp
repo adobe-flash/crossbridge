@@ -17,6 +17,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
+//===-- AVM2TargetMachine.cpp - Define TargetMachine for AVM2 -----------===//
+
+static const char AdobeInternalCode[] __attribute__((used)) = "This File contains Adobe internal code.";
 
 #include "AVM2TargetAsmInfo.h"
 #include "AVM2TargetMachine.h"
@@ -80,8 +83,8 @@ AVM2TargetMachine::AVM2TargetMachine(const llvm::Target& T, StringRef TT,
                       const TargetOptions &Options, Reloc::Model RM,
                       CodeModel::Model CM, CodeGenOpt::Level OL)
     : LLVMTargetMachine( T, TT, CPU, FS, Options, RM, CM, OL),
-      DL("e-p:32:32-f64:32:64-i64:32:64"),		// original 2.1 data layout string.
-      Subtarget(T, TT, FS),
+      DL("e-p:32:32-f64:32:64-i64:32:64-i32:32:32"),		// original 2.1 data layout string.
+      Subtarget(TT, CPU, FS),
       InstrInfo(Subtarget),
       TLInfo(*this),
       TSInfo(*this),

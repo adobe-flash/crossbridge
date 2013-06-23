@@ -1,0 +1,211 @@
+PROJECT_NAME = @PACKAGE_NAME@
+PROJ_VERSION = @PACKAGE_VERSION@
+#
+# Set this variable to the top of the LLVM source tree.
+#
+LLVM_SRC_ROOT = @LLVM_SRC@
+
+#
+# Set this variable to the top level directory where LLVM was built
+# (this is *not* the same as OBJ_ROOT as defined in LLVM's Makefile.config).
+#
+LLVM_OBJ_ROOT = @LLVM_OBJ@
+
+# Set this variable based on whether or not we have access to LLVM source and
+# object trees.
+ifeq ($(LLVM_SRC_ROOT),no)
+HAS_LLVM := 0
+else
+ifeq ($(LLVM_OBJ_ROOT),no)
+HAS_LLVM := 0
+else
+HAS_LLVM := 1
+endif
+endif
+
+# Set the directory root of this project's source files
+PROJ_SRC_ROOT := $(subst //,/,@abs_top_srcdir@)
+
+# Set the root directory of this project's object files
+PROJ_OBJ_ROOT := $(subst //,/,@abs_top_builddir@)
+
+# Set the root directory of this project's install prefix
+PROJ_INSTALL_ROOT := @prefix@
+program_prefix  := @program_prefix@
+
+# Include LLVM's configuration Makefile, if available.
+ifeq ($(HAS_LLVM),1)
+include $(LLVM_OBJ_ROOT)/Makefile.config
+else
+
+# Otherwise, define specific things we know we need.
+realpath = $(shell cd $(1); $(PWD))
+PROJ_OBJ_DIR  := $(call realpath, .)
+PROJ_OBJ_ROOT := $(call realpath, $(PROJ_OBJ_DIR)/$(LEVEL))
+PROJ_SRC_DIR := $(call realpath, $(PROJ_SRC_ROOT)/$(patsubst $(PROJ_OBJ_ROOT)%,%,$(PROJ_OBJ_DIR)))
+
+CP := cp
+DATE := date
+DOT := dot
+ECHO := echo
+INSTALL := install
+LIBS :=
+MKDIR := mkdir
+MV := mv
+PWD := pwd
+RM := rm
+SED := sed
+
+# Configure parameters.
+TARGET_OS := @TARGET_OS@
+ARCH := @ARCH@
+ENDIAN := @ENDIAN@
+
+# Include the target config specific flags.
+-include $(PROJ_OBJ_ROOT)/tools/TargetConfig.mk
+
+endif
+
+# Define TCLSH here if LLVM's configuration Makefile is unavailable
+# or it does not define TCLSH.
+ifndef TCLSH
+TCLSH := tclsh
+endif
+
+# Ignore the LIBS set by $(LLVM_OBJ_ROOT)/Makefile.config
+LIBS :=
+
+# Set SourceDir for backwards compatibility.
+ifndef SourceDir
+SourceDir=$(PROJ_SRC_DIR)
+endif
+
+ORIGINAL_CC := "$(CC)"
+ORIGINAL_CXX := "$(CC)"
+
+ifdef TARGET_ARCH
+ARCH := $(TARGET_ARCH)
+endif
+
+ifdef TARGET_CC
+CC := $(TARGET_CC)
+endif
+
+ifdef TARGET_CXX
+CXX := $(TARGET_CXX)
+endif
+
+# Path to location for LLVM C/C++ front-end. You can modify this if you
+# want to override the value set by configure.
+LLVMGCCDIR := @LLVMGCCDIR@
+
+# Full pathnames of LLVM C/C++ front-end 'cc1' and 'cc1plus' binaries:
+LLVMGCC  := @LLVMGCC@
+LLVMGXX  := @LLVMGXX@
+LLVMCC1  := @LLVMCC1@
+LLVMCC1PLUS := @LLVMCC1PLUS@
+LLVMGCC_LANGS := @LLVMGCC_LANGS@
+LLVMGCC_DRAGONEGG := @LLVMGCC_DRAGONEGG@
+
+# Information on Clang, if configured.
+CLANGPATH := @CLANGPATH@
+CLANGXXPATH := @CLANGXXPATH@
+ENABLE_BUILT_CLANG := @ENABLE_BUILT_CLANG@
+
+# The LLVM capable compiler to use.
+LLVMCC_OPTION := @LLVMCC_OPTION@
+
+# The flag used to emit LLVM IR.
+LLVMCC_EMITIR_FLAG = @LLVMCC_EMITIR_FLAG@
+LLVMCC_DISABLEOPT_FLAGS := @LLVMCC_DISABLEOPT_FLAGS@
+
+ifdef TARGET_LLVMGCC
+LLVMGCC := $(TARGET_LLVMGCC)
+LLVMCC := $(TARGET_LLVMGCC)
+LLVMCC_OPTION := llvm-gcc
+endif
+
+ifdef TARGET_LLVMGXX
+LLVMGXX := $(TARGET_LLVMGXX)
+LLVMCXX := $(TARGET_LLVMGXX)
+LLVMCC_OPTION := llvm-gcc
+endif
+
+ifdef TARGET_LLVMGCCARCH
+LLVMGCCARCH := $(TARGET_LLVMGCCARCH)
+endif
+
+ifeq ($(ARCH),THUMB)
+TEST_TARGET_FLAGS += -mthumb
+endif
+
+#
+# Provide variables specific to llvm-test
+#
+
+# SPEC benchmarks:
+#     If these are set then run the SPEC benchmarks.
+#     You must provide the SPEC benchmarks on your own.
+@USE_SPEC2006@
+@USE_SPEC2000@
+@USE_SPEC95@
+
+# Path to the SPEC benchmarks.
+SPEC2006_ROOT := @SPEC2006_ROOT@
+SPEC2000_ROOT := @SPEC2000_ROOT@
+SPEC95_ROOT := @SPEC95_ROOT@
+
+# F2C: Enable LLVM to run Fortran benchmarks without a Fortran front-end
+@USE_F2C@
+F2C_DIR := @F2C_DIR@
+F2C     := @F2C@
+F2C_INC := @F2C_INC@
+F2C_LIB := @F2C_LIB@
+
+# F95: Enable LLVM to run Fortran benchmarks without a Fortran front-end
+@USE_F95@
+F95_DIR := @F95_DIR@
+F95     := @F95@
+F95_INC := @F95_INC@
+F95_LIB := @F95_LIB@
+
+# Path to the Povray source code.
+@USE_POVRAY@
+POVRAY_ROOT := @POVRAY_ROOT@
+
+# Path to the Namd source code
+@USE_NAMD@
+NAMD_ROOT := @NAMD_ROOT@
+
+# Path to the Sweep3d source code
+@USE_SWEEP3D@
+SWEEP3D_ROOT := @SWEEP3D_ROOT@
+
+# Path to the fpgrowth source code
+@USE_FPGROWTH@
+FPGROWTH_ROOT := @FPGROWTH_ROOT@
+
+# Path to the ALP source code
+@USE_ALP@
+ALP_ROOT := @ALP_ROOT@
+
+# Path to the NURBS source code
+@USE_NURBS@
+NURBS_ROOT := @NURBS_ROOT@
+
+# Path to the HMMER source code
+@USE_HMMER@
+HMMER_ROOT := @HMMER_ROOT@
+
+# Path to the Skidmarks source code
+@USE_SKIDMARKS10@
+SKIDMARKS10_ROOT := @SKIDMARKS10_ROOT@
+
+# Disable LLC diffs for testing.
+@DISABLE_LLC_DIFFS@
+
+# Define HAVE_RE_COMP to 1 if re_comp is found, don't define it otherwise
+@HAVE_RE_COMP@
+
+# Get the shared library (dll) extension
+SHLIBEXT = @SHLIBEXT@

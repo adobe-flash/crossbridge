@@ -1,0 +1,99 @@
+       Quick and Dirty Guide to Extending and Testing Treecc
+
+1. Adding a new output language - Scaffolding
+
+The following is the bare scaffolding to link a new language into treecc:
+
+    - Add a new identifier to the TREECC_LANG_* list in "info.h".
+    - Recognise the language name for the "lang" option in "options.c",
+      function "LangOption".
+    - Add a new case to the switch statement in "TreeCCGenerate" function
+      in the file "gen.c" for the language identifier, which calls a
+      function called "TreeCCGenerateLang", which you should prototype
+      in "gen.h".
+    - Add a new "gen_lang.c" file to the project (don't forget to
+      update Makefile.am), which implements the output routines.
+
+2. Adding a new output language - Details
+
+The "gen_lang.c" file needs to export a single function called
+"TreeCCGenerateLang", which iterates over all the nodes and operations
+to output the final code.
+
+The "TreeCCGenerateLang" function must perform the following tasks,
+roughly in this order:
+
+    - Output any source header information that is required.
+    - Output node kinds, which are used to uniquely identify each
+      node type (e.g. "#define expression_kind 1" in C).  In an OO
+      language, you can output these kind values 
+    - Perform forward declaration of the node classes and operations,
+      if required by the output language (C# and Java don't need this,
+      but C does).
+    - Output the node allocation skeleton (normally not needed if
+      your language is garbage-collected).
+    - Define the node classes, and any factory create methods that
+      are required.  You may also need to define a "state type" which
+      holds common allocation information.
+    - Output non-virtual operations, by calling "TreeCCGenerateNonVirtuals",
+      and passing it a function block ("TreeCCNonVirtual" type) to
+      assist with the output process.
+    - Output any source footer information that is required, including
+      helper functions for node allocation, kind testing, etc.
+
+It is usually easiest to start with one of the existing output languages
+and then cut-and-paste yourself a new one.  If you are using a non garbage
+collected language such as C or C++, then start with either "gen_c.c" or
+"gen_cpp.c" as a base.  If you are using a garbage collected language
+like C# or Java, then start with either "gen_cs.c" or "gen_java.c".
+
+The function "TreeCCNodeVisitAll" can be very useful for iterating over
+all node types in the system: pass it a callback that provides your
+language-specific node handling code.  See "info.h" and "gen.h" for
+other helper functions.
+
+Nodes and operations can be written to multiple output files, and you
+must handle this properly.  The functions in "stream.h" can assist with
+this.  The "header" and "source" fields in "TreeCCNode" and "TreeCCOperation"
+describe where to output node and operation implementations.
+
+The actual API to nodes and operations is language-specific, but try
+to follow the existing styles where possible.  See "doc/treecc.texi"
+for documentation on the existing API styles.
+
+2. Testing all possible variants.
+
+There are lots of different output modes (re-entrant vs non re-entrant,
+line tracking vs no line tracking, abstract factories, virtual vs non-virtual
+operations, inline vs non-inline, etc).
+
+Your test cases in the "tests" directory should attempt to cover the
+major areas.  See the "output*.tst" files for the existing tests.  You
+shouldn't need to create "input" or "parse" tests, as they are generic.
+
+Once you have written a new "outputN.tst" file, generate test output
+using "./test_output outputN.tst >outputN.out".  Then hand-inspect the
+"outputN.out" file for problems.  Once you are satisfied that your
+"gen_lang.c" code is generating the right output, add the following
+line to "tests/test_list":
+
+    test_output outputN
+
+After you have done this, you can run "make check" to verify that you
+haven't broken anything as you made changes to the system.
+
+3. Add an example.
+
+Go into the "examples" directory and add a new version of the expression
+example for your language, to demonstrate how to use treecc with the
+language.  The examples doesn't necessarily need to compile - just give
+a guide as to how to use the tool.
+
+4. Write documentation.
+
+Add a new section to "doc/treecc.texi" describing the API for your
+language, using the existing sections as to a guide to the text.
+
+5. It's not as hard as your think!
+
+The above may look daunting, but it's mostly a cut-and-paste exercise.

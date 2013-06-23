@@ -1,0 +1,45 @@
+##=== TEST.llc.report - Report description for llc tests -------*- perl -*-===##
+#
+# This file defines a report to be generated for the llc test.
+#
+##===----------------------------------------------------------------------===##
+
+# Sort by name
+$SortCol = 1;
+$TrimRepeatedPrefix = 1;
+
+# These are the columns for the report.  The first entry is the header for the
+# column, the second is the regex to use to match the value.  Empty list create
+# seperators, and closures may be put in for custom processing.
+(
+# Name
+ ["Name:" , '\'([^\']+)\' Program'],
+ [],
+# Times
+ ["LiveVar", '([0-9.]+) \([^)]+\)[ 0-9A-Za-z]+Live Variable'],
+ ["LiveInt", '([0-9.]+) \([^)]+\)[ 0-9A-Za-z]+Live Interval'],
+ ["RASetup", sub { return AddColumns(@_,-1,-2); }],
+ ["RA"     , '([0-9.]+) \([^)]+\)[ 0-9A-Za-z]+Register Allocator'],
+ ["RATotal", sub { return AddColumns(@_,-1,-2); }],
+ ["Total"  , 'real ([0-9.]+)'],
+ [],
+# Sizes
+ ["#MCInsts", '([0-9]+).*Number of machine instrs printed'],
+ ["#IntOrig", '([0-9]+).*Number of original intervals'],
+ ["#IntCoal", '([0-9]+).*Number of intervals after coalescing'],
+ ["Eff     ", '(\d+\.\d+).*Ratio of intervals processed over total intervals'],
+ [],
+# Number of transformations
+ ["#store" , '([0-9]+).*Number of stores added'],
+ ["#load"  , '([0-9]+).*Number of loads added'],
+ ["#ld/st" , sub { return AddColumns(@_,-1,-2); }],
+ ["#fold"  , '([0-9]+).*Number of loads/stores folded into instructions'],
+ ["#memref", sub { return AddColumns(@_,-1,-3,-4); }],
+ ["#spill" , '([0-9]+).*Number of register spills'],
+ ["#i-mov" , '([0-9]+).*Number of identity moves eliminated'],
+ ["#tot-el", sub { return AddColumns(@_,-1,-2); }],
+ ["#pre", '([0-9]+).*Number of pre-indexed nodes created'],
+ ["#post", '([0-9]+).*Number of post-indexed nodes created'],
+ ["#indexed", sub { return AddColumns(@_,-1,-2); }],
+ []
+ );

@@ -43,7 +43,7 @@ namespace {
         AVM2AsmParser(MCSubtargetInfo &sti, MCAsmParser &parser)
             : MCTargetAsmParser()
         {
-            printf("AVM2AsmParser!\n");
+            //printf("AVM2AsmParser!\n");
         }
         
         virtual bool ParseRegister(unsigned int&, llvm::SMLoc&, llvm::SMLoc&)

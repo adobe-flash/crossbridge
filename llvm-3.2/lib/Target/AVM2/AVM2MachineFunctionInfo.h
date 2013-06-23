@@ -17,7 +17,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 //===- AVM2MachineFunctionInfo.h - AVM2 Machine Function Info -*- C++ -*-===//
 //
 // This file declares  AVM2 specific per-machine-function information.

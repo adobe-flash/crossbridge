@@ -274,12 +274,9 @@ static void EmitGCCInlineAsmStr(const char *AsmStr, const MachineInstr *MI,
           OS << '$';
         ++LastEmitted;  // Consume second '$' character.
         break;
-      case '(':             // $( -> same as GCC's { character.
+      case '(':             // $( -> same as GCC's { character. In as3, do not process { charachter here, let asc process.
         ++LastEmitted;      // Consume '(' character.
-        if (CurVariant != -1)
-          report_fatal_error("Nested variants found in inline asm string: '" +
-                             Twine(AsmStr) + "'");
-        CurVariant = 0;     // We're in the first variant now.
+        OS << '{';
         break;
       case '|':
         ++LastEmitted;  // consume '|' character.
@@ -288,12 +285,9 @@ static void EmitGCCInlineAsmStr(const char *AsmStr, const MachineInstr *MI,
         else
           ++CurVariant;   // We're in the next variant.
         break;
-      case ')':         // $) -> same as GCC's } char.
+      case ')':         // $) -> same as GCC's } char. In as3, do not process } char here, let asc process.
         ++LastEmitted;  // consume ')' character.
-        if (CurVariant == -1)
-          OS << '}';     // this is gcc's behavior for } outside a variant
-        else
-          CurVariant = -1;
+        OS << '}';     // this is gcc's behavior for } outside a variant
         break;
       }
       if (Done) break;
