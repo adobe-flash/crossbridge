@@ -27,13 +27,53 @@ import com.adobe.flascc.kernel.*;
 import com.adobe.flascc.vfs.*;
 import C_Run.*;
 
+class ThunkMaker
+{
+  private var modPkgName:String;
+  private var thunkSet:Dictionary;
+  private var start:int;
+  private var end:int;
+  private var index:int;
+
+  public function ThunkMaker(modPkgName:String, thunkSet:Dictionary, start:int, end:int, index:int):void
+  {
+	this.modPkgName = modPkgName;
+	this.thunkSet = thunkSet;
+	this.start = start;
+	this.end = end;
+	this.index = index;
+  }
+  public function thunk():void
+  {
+    delete CModule.modThunks[modPkgName];
+  //trace("thunking for " + modPkgName + " (" + index + ")");
+
+    var m:CModule = CModule.getModuleByPackage(modPkgName);
+  //      var removed:int = 0;
+
+    m.getScript(); // init!
+    // remove all remaining thunks for this range
+    for(var j:int = start; j < end; j++)
+      if(thunkSet[ptr2fun[j]])
+      {
+        delete thunkSet[ptr2fun[j]];
+        ptr2fun[j] = null;
+  //          removed++;
+      }
+  //trace("removed " + removed + " thunks");
+
+    if(index >= 0)
+      ptr2fun[index]();
+  };
+}
+
 /**
 * Contains convenience functions for reading and writting to domainMemory; also manages any flascc-specific global state (for example, the VFS and Posix interface implementations.)
 */
 public class CModule
 {
   /**
-  * Returns the ByteArray object using as RAM 
+  * Returns the ByteArray object using as RAM
   */
   public static function get ram():ByteArray
   {
@@ -132,7 +172,7 @@ public class CModule
     namespace ns = "C_Run";
     return ns::["_"+name];
   }
-  
+
   /**
   * relies on metadata -- won't return info in stripped builds
   * returns an Array of sym descriptors
@@ -220,26 +260,7 @@ public class CModule
   */
   static function makeThunk(modPkgName:String, thunkSet:Dictionary, start:int, end:int, index:int):Function
   {
-    return function():void {
-//trace("thunking for " + modPkgName + " (" + index + ")");
-      delete modThunks[modPkgName];
-
-      var m:CModule = getModuleByPackage(modPkgName);
-//      var removed:int = 0;
-
-      m.getScript(); // init!
-      // remove all remaining thunks for this range
-      for(var j:int = start; j < end; j++)
-        if(thunkSet[ptr2fun[j]])
-        {
-          ptr2fun[j] = null;
-//          removed++;
-        }
-//trace("removed " + removed + " thunks");
-
-      if(index >= 0)
-        ptr2fun[index]();
-    };
+    return new ThunkMaker(modPkgName, thunkSet, start, end, index).thunk;
   }
 
   /**
@@ -279,7 +300,7 @@ public class CModule
     }
     return result;
   }
-  
+
   /**
   * @private
   */
@@ -317,12 +338,12 @@ public class CModule
     {
       if(align < 1)
         align = 1;
-  
+
       result = sbrk(size, align);
     }
     return result;
   }
- 
+
   /**
   * @private
   */
@@ -407,7 +428,7 @@ public class CModule
   }
 
   /**
-  * Read an 8 bit value from domainMemory with zero padding to extend it to a 32 bit signed integer. This will always result in positive integers. 
+  * Read an 8 bit value from domainMemory with zero padding to extend it to a 32 bit signed integer. This will always result in positive integers.
   * @param ptr The address of the location in domainMemory to read from
   * @return An 8 bit integer zero padded to 32 bit.
   */
@@ -418,7 +439,7 @@ public class CModule
   }
 
   /**
-  * Read a 16 bit value from domainMemory with zero padding to extend it to a 32 bit signed integer. This will always result in positive integers. 
+  * Read a 16 bit value from domainMemory with zero padding to extend it to a 32 bit signed integer. This will always result in positive integers.
   * @param ptr The address of the location in domainMemory to read from
   * @return A 16 bit integer zero padded to 32 bit.
   */
@@ -429,7 +450,7 @@ public class CModule
   }
 
   /**
-  * Read a 32 bit value from domainMemory. 
+  * Read a 32 bit value from domainMemory.
   * @param ptr The address of the location in domainMemory to read from
   * @return A 32 bit integer.
   */
@@ -501,7 +522,7 @@ public class CModule
   {
     var args:Vector.<int> = new Vector.<int>;
     args.push(size);
-    return callI(_malloc, args); 
+    return callI(_malloc, args);
   }
 
   /**
@@ -513,7 +534,7 @@ public class CModule
   {
     var args:Vector.<int> = new Vector.<int>;
     args.push(ptr);
-    callI(_free, args); 
+    callI(_free, args);
   }
 
   /**
@@ -717,7 +738,7 @@ public class CModule
 
       for(var i:int = args.length-1; i >= 0; i--)
         push32(args[i]);
-    
+
       (ptr2fun_init[functionPtr])();
     }
     finally
@@ -954,7 +975,7 @@ public class CModule
           namespace C_RunNS = "C_Run";
           value = script.C_RunNS::[_name]; // value of the constant
         }
-        // ".text/12" => 5456/*explicit value*/ + 1234/*section offset*/ 
+        // ".text/12" => 5456/*explicit value*/ + 1234/*section offset*/
         map[_sect + "/" + value] = uint(_off + sections[_sect][0]);
       }
     } else {
@@ -981,7 +1002,7 @@ public class CModule
         ns = new Namespace(String(parent.@uri));
         value = script.ns::[cname]; // value of the constant
 
-        // ".text/12" => 5456/*explicit value*/ + 1234/*section offset*/ 
+        // ".text/12" => 5456/*explicit value*/ + 1234/*section offset*/
         map[args[2] + "/" + value] = uint(uint(args[3]) + sections[args[2]][0]);
       }
     }
@@ -995,7 +1016,7 @@ public class CModule
     var newToBeMapped:Vector.<CModule> = new Vector.<CModule>;
     for each (module in toBeMapped) {
       if (module.script) {
-        module.mapCsymsWithExplicitValues(cachedCSyms); 
+        module.mapCsymsWithExplicitValues(cachedCSyms);
       } else {
         newToBeMapped.push(module);
       }
@@ -1030,7 +1051,7 @@ public class CModule
     if(modSyms) {
       for(var i:int=0; i<modSyms.length; i++) {
         var arr:Array = modSyms[i];
-        
+
         var _type:String = arr[0]
         var _name:String = arr[1]
 
@@ -1139,7 +1160,7 @@ public class CModule
 
     return script.C_RunNS::["_"+s];
   }
-  
+
   /**
   * @private
   */
@@ -1150,7 +1171,7 @@ public class CModule
     {
       var size:int = ctorsSect[1];
       var args:Vector.<int> = new Vector.<int>;
-      
+
       if(size)
         getScript(); // ensure module is initialized
       for(var p:int = ctorsSect[0]; size >= 4; size -=4, p += 4)
@@ -1174,7 +1195,7 @@ public class CModule
       var size:int = dtorsSect[1];
       var p:int = dtorsSect[0];
       var args:Vector.<int> = new Vector.<int>;
-      
+
       if(size)
         getScript(); // ensure module is initialized
       for(; size >= 4; size -=4, p += 4)
@@ -1247,9 +1268,9 @@ public class CModule
   */
   public static var activeConsole:Object;
 
-  
+
   private static var _vfs:Object = null;
-  
+
   /**
   * The current VFS implementation
   * @return An object that implements the IVFS interface
@@ -1422,10 +1443,10 @@ public class CModule
 
     if(!args)
       args = new Vector.<String>
-    
+
     if(!env)
       env = new Vector.<String>
-      
+
     // try to set us as the ui thread
     try {
       C_Run.workerClass["current"].setSharedProperty("flascc.uiThread.threadId", realThreadId);
@@ -1457,10 +1478,10 @@ public class CModule
 
     if(afterStackSize < 8192 || afterStackSize % pageSize)
       throw new Error("invalid stack size");
-    
+
     if(!args)
       args = new Vector.<String>
-    
+
     if(!env)
       env = new Vector.<String>
 
@@ -1515,7 +1536,7 @@ public class CModule
 
   // set up worker init stuff
   workerInits.push(function(worker:*):void
-  { 
+  {
     //trace("workerInit: " + threadId);
     prepForThreadedExec();
 
