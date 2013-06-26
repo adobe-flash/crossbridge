@@ -1,0 +1,550 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @PodSetup package for formatting Pod programs                         #
+#                                                                             #
+#  Jeffrey H. Kingston                                                        #
+#  25 March 2000                                                              #
+#                                                                             #
+#  This package uses a filtered body parameter to convert Pod source          #
+#  code into Lout source.  The filter program is prg2lout, which is           #
+#  distributed with Lout and should be compiled and installed wherever        #
+#  Lout itself is.                                                            #
+#                                                                             #
+###############################################################################
+
+export @Pod
+def @PodSetup
+    named pipe               {           }  # pipe through this first
+    named style
+	named @OrIfPlain left x right y
+	{ @BackEnd @Case { PlainText @Yield y else @Yield x } }
+			     { varying @OrIfPlain fixed }  # print style
+
+
+    # the following options apply when style is "fixed"
+
+    named fixedtextfont			{ Courier Base -1p	} # text font
+    named fixedtextbreak		{ adjust 1.0vx hyphen	} # text para breaking
+    named fixedverbatimfont		{ Courier Base		} # verbatim font
+    named fixedtabin			{ 8			} # tab interval
+    named fixedtabout			{ 8s			} # tab width
+    named fixedlinenumbersfont		{			} # line numbers font
+    named fixedlinenumbersformat right @Body{ @Body		} # line numbers format
+
+    named fixedparagap			{ 1.0v			} # gap between paras
+    named fixedlistgap			{ 1.0v			} # gap within lists
+    named fixedlistindent		{ 0s			} # list label indent
+    named fixedlistrightindent		{ 0s			} # list right indent
+    named fixedlistlabelwidth		{ 2.0f			} # default label space
+    named fixedlistlabelfont 		{ 			} # list label font
+    named fixedlistlabelformat right @Body { @Body		} # list label format
+
+    named fixedaheadfont		{ Bold +4p		} # =head1 font
+    named fixedaheadbreak		{ lines 1.1vx		} # =head1 para break
+    named fixedaheadformat right @Body	{ //1v @Body		} # =head1 format
+    named fixedbheadfont		{ Bold +2p		} # =head2 font
+    named fixedbheadbreak		{ lines 1.1vx		} # =head2 para break
+    named fixedbheadformat right @Body	{ @Body			} # =head2 format
+    named fixedcheadfont		{ Bold			} # =head3 font
+    named fixedcheadbreak		{ lines 1.1vx		} # =head3 para break
+    named fixedcheadformat right @Body	{ @Body			} # =head3 format
+
+    named fixeditalicfont		{ Slope			} # font of I<>
+    named fixeditalicformat right @Body	{ @Body			} # format of I<>
+    named fixedboldfont			{ Bold			} # font of B<>
+    named fixedboldformat right @Body	{ @Body			} # format of B<>
+    named fixedcodefont			{ Base			} # font of C<>
+    named fixedcodeformat right @Body	{ @Body			} # format of C<>
+    named fixedfilefont			{ Slope			} # font of F<>
+    named fixedfileformat right @Body	{ @Body			} # format of F<>
+    named fixedlinkfont			{ Slope			} # font of L<>
+    named fixedlinkformat right @Body	{ @Underline @Body	} # format of L<>
+    named fixedindexfont		{ Slope			} # font of X<>
+    named fixedindexformat right @Body	{ @Body			} # format of X<>
+
+
+    # the following options apply when style is "varying"
+
+    named varyingtextfont		{ Times Base		} # text font
+    named varyingtextbreak		{ adjust 1.0vx hyphen	} # text para breaking
+    named varyingverbatimfont		{ Courier Base -1p	} # verbatim font
+    named varyingtabin			{ 8			} # tab interval
+    named varyingtabout			{ 8s			} # tab width
+    named varyinglinenumbersfont	{			} # line numbers font
+    named varyinglinenumbersformat right @Body{ @Body		} # line numbers format
+
+    named varyingparagap		{ 1.0v			} # gap between paras
+    named varyinglistgap		{ 1.0v			} # gap within lists
+    named varyinglistindent		{ 0s			} # list label indent
+    named varyinglistrightindent	{ 0s			} # list right indent
+    named varyinglistlabelwidth		{ 2.0f			} # default label space
+    named varyinglistlabelfont 		{ 			} # list label font
+    named varyinglistlabelformat right @Body { @Body		} # list label format
+
+    named varyingaheadfont		{ Bold +4p		} # =head1 font
+    named varyingaheadbreak		{ lines 1.1vx		} # =head1 para break
+    named varyingaheadformat right @Body{ //1v @Body		} # =head1 format
+    named varyingbheadfont		{ Bold +2p		} # =head2 font
+    named varyingbheadbreak		{ lines 1.1vx		} # =head2 para break
+    named varyingbheadformat right @Body{ @Body			} # =head2 format
+    named varyingcheadfont		{ Bold			} # =head3 font
+    named varyingcheadbreak		{ lines 1.1vx		} # =head3 para break
+    named varyingcheadformat right @Body{ @Body			} # =head3 format
+
+    named varyingitalicfont		{ Slope			} # font of I<>
+    named varyingitalicformat right @Body	{ @Body			} # format of I<>
+    named varyingboldfont		{ Bold			} # font of B<>
+    named varyingboldformat right @Body	{ @Body			} # format of B<>
+    named varyingcodefont		{ Courier Base -1p	} # font of C<>
+    named varyingcodeformat right @Body	{ @Body			} # format of C<>
+    named varyingfilefont		{ Slope			} # font of F<>
+    named varyingfileformat right @Body	{ @Body			} # format of F<>
+    named varyinglinkfont		{ Slope			} # font of L<>
+    named varyinglinkformat right @Body	{ @Underline @Body	} # format of L<>
+    named varyingindexfont		{ Slope			} # font of X<>
+    named varyingindexformat right @Body{ @Body			} # format of X<>
+
+    # the following options apply when style is "symbol"
+
+    named symboltextfont		{ Times Base		} # text font
+    named symboltextbreak		{ adjust 1.0vx hyphen	} # text para breaking
+    named symbolverbatimfont		{ Courier Base -1p	} # verbatim font
+    named symboltabin			{ 8			} # tab interval
+    named symboltabout			{ 8s			} # tab width
+    named symbollinenumbersfont		{			} # line numbers font
+    named symbollinenumbersformat right @Body	{ @Body		} # line numbers format
+
+    named symbolparagap			{ 1.0v			} # gap between paras
+    named symbollistgap			{ 1.0v			} # gap within lists
+    named symbollistindent		{ 0s			} # list label indent
+    named symbollistrightindent		{ 0s			} # list right indent
+    named symbollistlabelwidth		{ 2.0f			} # default label space
+    named symbollistlabelfont 		{ 			} # list label font
+    named symbollistlabelformat right @Body { @Body		} # list label format
+
+    named symbolaheadfont		{ Bold +4p		} # =head1 font
+    named symbolaheadbreak		{ lines 1.1vx		} # =head1 para break
+    named symbolaheadformat right @Body	{ //1v @Body		} # =head1 format
+    named symbolbheadfont		{ Bold +2p		} # =head2 font
+    named symbolbheadbreak		{ lines 1.1vx		} # =head2 para break
+    named symbolbheadformat right @Body	{ @Body			} # =head2 format
+    named symbolcheadfont		{ Bold			} # =head3 font
+    named symbolcheadbreak		{ lines 1.1vx		} # =head3 para break
+    named symbolcheadformat right @Body	{ @Body			} # =head3 format
+
+    named symbolitalicfont		{ Slope			} # font of I<>
+    named symbolitalicformat right @Body{ @Body			} # format of I<>
+    named symbolboldfont		{ Bold			} # font of B<>
+    named symbolboldformat right @Body	{ @Body			} # format of B<>
+    named symbolcodefont		{ Courier Base -1p	} # font of C<>
+    named symbolcodeformat right @Body	{ @Body			} # format of C<>
+    named symbolfilefont		{ Slope			} # font of F<>
+    named symbolfileformat right @Body	{ @Body			} # format of F<>
+    named symbollinkfont		{ Slope			} # font of L<>
+    named symbollinkformat right @Body	{ @Underline @Body	} # format of L<>
+    named symbolindexfont		{ Slope			} # font of X<>
+    named symbolindexformat right @Body	{ @Body			} # format of X<>
+
+@Begin
+
+
+    export
+    
+	@PV @PPG @PLG @PLI @PLRI @PLLW @PLL @PHA @PHB @PHC
+	@PFI @PFB @PFC @PFF @PFL @PFX @A "$>" @PL
+
+    def @Pod
+	named style		{ style			} # style
+	named pipe		{ pipe			} # pipe through this
+	named textfont		{ dft			} # text font
+	named textbreak		{ dft			} # text para breaking
+	named verbatimfont	{ dft			} # verbatim font
+	named tabin		{ dft			} # tab interval
+	named tabout		{ dft			} # tab width
+	named linenumbersfont	{ dft			} # line numbers font
+	named paragap		{ dft			} # gap between paras
+	named listgap		{ dft			} # gap within lists
+	named listindent	{ dft			} # list label indent
+	named listrightindent	{ dft			} # list right indent
+	named listlabelwidth	{ dft			} # default label space
+	named listlabelfont 	{ dft			} # list label font
+	named aheadfont		{ dft			} # =head1 font
+	named aheadbreak	{ dft			} # =head1 para break
+	named bheadfont		{ dft			} # =head2 font
+	named bheadbreak	{ dft			} # =head2 para break
+	named cheadfont		{ dft			} # =head3 font
+	named cheadbreak	{ dft			} # =head3 para break
+	named italicfont	{ dft			} # font of I<>
+	named boldfont		{ dft			} # font of B<>
+	named codefont		{ dft			} # font of C<>
+	named filefont		{ dft			} # font of F<>
+	named linkfont		{ dft			} # font of L<>
+	named indexfont		{ dft			} # font of X<>
+	body @Body			      		  # filtered, see below
+    @Begin
+
+	def @Test	# returns x unless x is dft
+	    left x
+	    named iffixed {}
+	    named ifvarying {}
+	    named ifsymbol {}
+	{
+	    x @Case {
+		dft @Yield {
+		    style @Case {
+			fixed   @Yield { iffixed   }
+			varying @Yield { ifvarying }
+			symbol  @Yield { ifsymbol  }
+		    }
+		}
+		else @Yield x
+	    }
+	}
+
+
+	def @Else	# returns x, or y if x is dft
+	    left x
+	    right y
+	{
+	    x @Case {
+		dft  @Yield y
+		else @Yield x
+	    }
+	}
+
+
+	def @InitTab
+	{
+	  tabin @Test
+	      iffixed   { fixedtabin   }
+	      ifvarying { varyingtabin }
+	      ifsymbol  { symboltabin  }
+	}
+
+
+	def @InitTabWidth
+	{
+	  tabout @Test
+	      iffixed   { fixedtabout   }
+	      ifvarying { varyingtabout }
+	      ifsymbol  { symboltabout  }
+	}
+
+
+	def @Filter
+	{
+	    pipe @Case {
+		"" @Yield {
+	    	    "prg2lout -r -lPod" -i{@FilterIn} -o{@FilterOut} -e{@FilterErr}
+			-t{@InitTab} -T{@InitTabWidth}
+		}
+		else @Yield {
+	    	    "cat" @FilterIn "|" pipe "|"
+		    "prg2lout -r -lPod" -o{@FilterOut}
+		    -e{@FilterErr} -t{@InitTab} -T{@InitTabWidth}
+		}
+	    }
+	}
+
+
+	def @InitFont
+	{
+	  textfont @Test
+	      iffixed   { fixedtextfont   }
+	      ifvarying { varyingtextfont }
+	      ifsymbol  { symboltextfont  }
+	}
+
+
+
+	def @InitBreak
+	{
+	  textbreak @Test
+	      iffixed   { fixedtextbreak   }
+	      ifvarying { varyingtextbreak }
+	      ifsymbol  { symboltextbreak  }
+	}
+
+
+	def printverbatim
+		right x
+	{
+	    def verbfont
+	    {
+		verbatimfont @Test
+		    iffixed   { fixedverbatimfont   }
+		    ifvarying { varyingverbatimfont }
+		    ifsymbol  { symbolverbatimfont  }
+	    }
+
+	    def verbatimstrut { @VContract { 0.5v @High ^/ / 0.5v @High } }
+
+	    @OneCol verbfont @Font x |0io verbatimstrut
+	}
+
+
+	macro @PV { // printverbatim }
+
+
+	def paragraphgap
+	{
+	    paragap @Test
+		iffixed   { fixedparagap   }
+		ifvarying { varyingparagap }
+		ifsymbol  { symbolparagap  }
+	}
+
+
+	macro @PPG { //paragraphgap }
+
+
+	def @PLG
+	{
+	    listgap @Test
+		iffixed   { fixedlistgap   }
+		ifvarying { varyinglistgap }
+		ifsymbol  { symbollistgap  }
+	}
+
+
+	def @PLI
+	{
+	    listindent @Test
+		iffixed   { fixedlistindent   }
+		ifvarying { varyinglistindent }
+		ifsymbol  { symbollistindent  }
+	}
+
+
+	def @PLRI
+	{
+	    listrightindent @Test
+		iffixed   { fixedlistrightindent   }
+		ifvarying { varyinglistrightindent }
+		ifsymbol  { symbollistrightindent  }
+	}
+
+
+	def @PLLW right x
+	{
+	    def defaultwidth
+	    {
+	    	listlabelwidth @Test
+		    iffixed   { fixedlistlabelwidth   }
+		    ifvarying { varyinglistlabelwidth }
+		    ifsymbol  { symbollistlabelwidth  }
+	    }
+
+	    def givenwidth
+	    {
+		style @Case {
+		    fixed   @Yield { x"s" }
+		    varying @Yield { x"f" }
+		    symbol  @Yield { x"f" }
+		}
+	    }
+
+	    x @Case {
+		"" @Yield defaultwidth
+		else @Yield givenwidth
+	    }
+	}
+
+
+	def @PLL right x
+	{
+	    def bullet
+	    {
+		@BackEnd @Case {
+		    PlainText @Yield "*"
+		    else      @Yield @Char "bullet"
+		}
+	    }
+
+	    def value
+	    {
+		x @Case {
+		    "*" @Yield bullet
+		    else @Yield x
+		}
+	    }
+
+	    style @Case {
+		fixed @Yield fixedlistlabelformat {
+		    { listlabelfont @Else fixedlistlabelfont } @Font value }
+		varying @Yield varyinglistlabelformat {
+		    { listlabelfont @Else varyinglistlabelfont } @Font value }
+		symbol @Yield symbollistlabelformat {
+		    { listlabelfont @Else symbollistlabelfont } @Font value }
+	    }
+	}
+
+
+	def @PHA right x
+	{
+	    style @Case {
+		fixed @Yield fixedaheadformat {
+		    { aheadfont @Else fixedaheadfont } @Font
+		    { aheadbreak @Else fixedaheadbreak } @Break x }
+		varying @Yield varyingaheadformat {
+		    { aheadfont @Else varyingaheadfont } @Font
+		    { aheadbreak @Else varyingaheadbreak } @Break x }
+		symbol @Yield symbolaheadformat {
+		    { aheadfont @Else symbolaheadfont } @Font
+		    { aheadbreak @Else varyingaheadbreak } @Break x }
+	    }
+	}
+
+
+	def @PHB right x
+	{
+	    style @Case {
+		fixed @Yield fixedbheadformat {
+		    { bheadfont @Else fixedbheadfont } @Font
+		    { bheadbreak @Else fixedbheadbreak } @Break x }
+		varying @Yield varyingbheadformat {
+		    { bheadfont @Else varyingbheadfont } @Font
+		    { bheadbreak @Else varyingbheadbreak } @Break x }
+		symbol @Yield symbolbheadformat {
+		    { bheadfont @Else symbolbheadfont } @Font
+		    { bheadbreak @Else varyingbheadbreak } @Break x }
+	    }
+	}
+
+
+	def @PHC right x
+	{
+	    style @Case {
+		fixed @Yield fixedcheadformat {
+		    { cheadfont @Else fixedcheadfont } @Font
+		    { cheadbreak @Else fixedcheadbreak } @Break x }
+		varying @Yield varyingcheadformat {
+		    { cheadfont @Else varyingcheadfont } @Font
+		    { cheadbreak @Else varyingcheadbreak } @Break x }
+		symbol @Yield symbolcheadformat {
+		    { cheadfont @Else symbolcheadfont } @Font
+		    { cheadbreak @Else varyingcheadbreak } @Break x }
+	    }
+	}
+
+
+	def @PFI right x
+	{
+	    style @Case {
+		fixed @Yield fixeditalicformat {
+		    { italicfont @Else fixeditalicfont } @Font x }
+		varying @Yield varyingitalicformat {
+		    { italicfont @Else varyingitalicfont } @Font x }
+		symbol @Yield symbolitalicformat {
+		    { italicfont @Else symbolitalicfont } @Font x }
+	    }
+	}
+
+
+	def @PFB right x
+	{
+	    style @Case {
+		fixed @Yield fixedboldformat {
+		    { boldfont @Else fixedboldfont } @Font x }
+		varying @Yield varyingboldformat {
+		    { boldfont @Else varyingboldfont } @Font x }
+		symbol @Yield symbolboldformat {
+		    { boldfont @Else symbolboldfont } @Font x }
+	    }
+	}
+
+
+	def @PFC right x
+	{
+	    style @Case {
+		fixed @Yield fixedcodeformat {
+		    { codefont @Else fixedcodefont } @Font x }
+		varying @Yield varyingcodeformat {
+		    { codefont @Else varyingcodefont } @Font x }
+		symbol @Yield symbolcodeformat {
+		    { codefont @Else symbolcodefont } @Font x }
+	    }
+	}
+
+
+	def @PFF right x
+	{
+	    style @Case {
+		fixed @Yield fixedfileformat {
+		    { filefont @Else fixedfilefont } @Font x }
+		varying @Yield varyingfileformat {
+		    { filefont @Else varyingfilefont } @Font x }
+		symbol @Yield symbolfileformat {
+		    { filefont @Else symbolfilefont } @Font x }
+	    }
+	}
+
+
+	def @PFL right x
+	{
+	    style @Case {
+		fixed @Yield fixedlinkformat {
+		    { linkfont @Else fixedlinkfont } @Font x }
+		varying @Yield varyinglinkformat {
+		    { linkfont @Else varyinglinkfont } @Font x }
+		symbol @Yield symbollinkformat {
+		    { linkfont @Else symbollinkfont } @Font x }
+	    }
+	}
+
+
+	def @PFX right x
+	{
+	    style @Case {
+		fixed @Yield fixedindexformat {
+		    { indexfont @Else fixedindexfont } @Font x }
+		varying @Yield varyingindexformat {
+		    { indexfont @Else varyingindexfont } @Font x }
+		symbol @Yield symbolindexformat {
+		    { indexfont @Else symbolindexfont } @Font x }
+	    }
+	}
+
+
+	def @A		# get characters from the Adobe Symbol font
+	    left sym
+	    right x
+	{
+	    style @Case {
+		symbol	@Yield { { Symbol Base } @Font @Char sym }
+		else	@Yield { x			}
+	    }
+	}
+
+
+	macro "$>" { {} & }
+
+
+	def pl		# for formatting line numbers
+	    right x
+	{
+	    def strut { @VContract { 0.5v @High ^/ / 0.5v @High } }
+
+	    strut & style @Case {
+		fixed @Yield fixedlinenumbersformat {
+		    { linenumbersfont @Else fixedlinenumbersfont } @Font x
+		}
+		varying @Yield varyinglinenumbersformat {
+		    { linenumbersfont @Else varyinglinenumbersfont } @Font x
+		}
+		symbol @Yield symbollinenumbersformat {
+		    { linenumbersfont @Else symbollinenumbersfont } @Font x
+		}
+	    }
+	}
+
+
+	macro @PL { // pl }
+
+
+	@InitFont @Font @InitBreak @Break @Body
+
+    @End @Pod
+
+@End @PodSetup

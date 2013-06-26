@@ -1,0 +1,10 @@
+[P0 conformsTo: P1]: no
+[P1 conformsTo: P0]: no
+[P1 conformsTo: P2]: no
+[P2 conformsTo: P1]: no
+[P3 conformsTo: P1]: yes
+[P1 conformsTo: P3]: no
+[A getClass] != 0: yes
+class_conformsToProtocol([A getClass], @protocol(P0)): yes
+class_conformsToProtocol([A getClass], @protocol(P1)): no
+exit 0

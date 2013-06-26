@@ -1,0 +1,75 @@
+%    Copyright (C) 1990 Aladdin Enterprises.  All rights reserved.
+%    Distributed by Free Software Foundation, Inc.
+%
+% This file is part of Ghostscript.
+%
+% Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+% to anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer
+% to the Ghostscript General Public License for full details.
+%
+% Everyone is granted permission to copy, modify and redistribute
+% Ghostscript, but only under the conditions described in the Ghostscript
+% General Public License.  A copy of this license is supposed to have been
+% given to you along with Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+
+% Print the CharStrings and Subrs from a Type 1 font in symbolic form.
+
+30 dict dup begin
+  1 (hstem) def   3 (vstem) def   4 (vmoveto) def
+  5 (rlineto) def   6 (hlineto) def   7 (vlineto) def
+  8 (rrcurveto) def   9 (closepath) def   10 (callsubr) def
+  11 (return) def   13 (hsbw) def   14 (endchar) def
+  21 (rmoveto) def   22 (hmoveto) def   30 (vhcurveto) def
+  31 (hvcurveto) def
+  32 (dotsection) def   33 (vstem3) def   34 (hstem3) def
+  38 (seac) def   39 (sbw) def   44 (div) def
+  48 (callothersubr) def   49 (pop) def   65 (setcurrentpoint) def
+end /csdict exch def
+
+/printcs
+ { 4330 exch dup length string type1decrypt exch pop
+   dup /s exch def length /n exch def
+   lenIV 1 sub
+    { 1 add dup n ge { exit } if
+      ( ) print dup s exch get
+      dup 31 le
+       { dup 12 eq { pop 1 add dup s exch get 32 add } if
+         dup csdict exch known
+	  { csdict exch get print }
+	  { =only (?) print }
+	 ifelse
+       }
+       { dup 247 lt
+       	  { 139 sub }
+	  { dup 255 eq
+	     { pop 4 add (****)
+	     }
+	     { 247 sub {108 364 620 876 -108 -364 -620 -876} exch get
+	       exch 1 add exch s 2 index get add
+	     }
+	    ifelse
+	  }
+	 ifelse =only
+       }
+      ifelse
+    } loop
+   pop (\n) print
+ } bind def
+
+/printfont
+ { currentfont begin Private begin 10 dict begin
+   CharStrings { exch ==only printcs } forall
+   0 1 Subrs length 1 sub
+    { dup =only
+      Subrs exch get printcs
+    } for
+   end end end
+ } bind def
+
+/Times-Roman findfont setfont
+printfont

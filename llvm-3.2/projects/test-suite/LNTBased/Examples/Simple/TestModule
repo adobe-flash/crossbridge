@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+# -*- Python -*-
+
+# We import test functionity from LNT.
+from lnt.tests import nt
+from lnt.testing import TestSamples, PASS, FAIL, XFAIL
+
+# Test module classes are currently required to subclass 'nt.TestModule'.
+class Simple(nt.TestModule):
+    def execute_test(self, options):
+        # The options dictionary defines the user command line parameters that
+        # are supposed to apply to the test. Some important variables which are
+        # guaranteed to be present are:
+        # ... FIXME
+
+        # We are expected to return a list of test samples, which will be merged
+        # with all the other reports.
+        #
+        # There are no constraints on the test names (i.e., they do not need to
+        # match the directory structure as the SingleSource or MultiSource tests
+        # would), but must be unique.
+        #
+        # The tests should follow the current LNT test schema for reporting test
+        # status (success and failure).  The current schema is that status is
+        # reported as an additional test with the '.status' suffix and
+        # appropriate test codes (defined by the 'lnt.testing' module, see
+        # below). If no '.status' result is reported, the test is assumed to
+        # have passed.
+        return [
+            TestSamples('nts.LNT/Examples/Simple.compile', [1.0]),
+            TestSamples('nts.LNT/Examples/Simple.exec', [1.0]),
+            TestSamples('nts.LNT/Examples/Simple.exec.status', [FAIL])]
+
+# This is the only required entry point to the module.
+test_class = Simple
+
+# This is not required, but allows users with LNT in the environment (required
+# for initial imports to work) to execute this test directly.
+if __name__ == '__main__':
+    test_class().main()

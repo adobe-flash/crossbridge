@@ -1,0 +1,389 @@
+%==========================================================================
+%==========================================================================
+
+Code Description
+
+A. General description:
+
+SMG2000 is a parallel semicoarsening multigrid solver for the linear
+systems arising from finite difference, finite volume, or finite
+element discretizations of the diffusion equation,
+
+  \grad \cdot ( D \grad u ) + \sigma u = f
+
+on logically rectangular grids.  The code solves both 2D and 3D
+problems with discretization stencils of up to 9-point in 2D and up to
+27-point in 3D.  See the following paper for details on the algorithm
+and its parallel implementation/performance:
+
+  P. N. Brown, R. D. Falgout, and J. E. Jones,
+    "Semicoarsening multigrid on distributed memory machines",
+    SIAM Journal on Scientific Computing, 21 (2000), pp. 1823-1834.
+    Also available as LLNL technical report UCRL-JC-130720.
+
+The driver provided with SMG2000 builds linear systems for the special
+case of the above equation,
+
+  - cx u_xx - cy u_yy - cz u_zz = (1/h)^2 ,         (in 3D)
+  - cx u_xx - cy u_yy           = (1/h)^2 ,         (in 2D)
+
+with Dirichlet boundary conditions of u = 0, where h is the mesh
+spacing in each direction.  Standard finite differences are used to
+discretize the equations, yielding 5-pt. and 7-pt. stencils in 2D and
+3D, respectively.
+
+To determine when the solver has converged, the driver currently uses
+the relative-residual stopping criteria,
+
+  ||r_k||_2 / ||b||_2 < tol
+
+with tol = 10^-6.
+
+This solver can serve as a key component for achieving scalability in
+radiation diffusion simulations.
+
+B. Coding:
+
+SMG2000 is written in ISO-C.  It is an SPMD code which uses MPI.
+Parallelism is achieved by data decomposition.  The driver provided
+with SMG2000 achieves this decomposition by simply subdividing the
+grid into logical P x Q x R (in 3D) chunks of equal size.
+
+C. Parallelism:
+
+SMG2000 is a highly synchronous code.  The communications and
+computations patterns exhibit the surface-to-volume relationship
+common to many parallel scientific codes.  Hence, parallel efficiency
+is largely determined by the size of the data "chunks" mentioned
+above, and the speed of communications and computations on the
+machine.  SMG2000 is also memory-access bound, doing only about 1-2
+computations per memory access, so memory-access speeds will also have
+a large impact on performance.
+
+%==========================================================================
+%==========================================================================
+
+Files in this Distribution
+
+NOTE: The SMG2000 code is derived directly from the hypre library, a large
+linear solver library that is being developed in the Center for Applied 
+Scientific Computing (CASC) at LLNL.
+
+In the smg2000 directory the following files are included:
+
+COPYRIGHT_and_DISCLAIMER
+HYPRE_config.h
+Makefile
+Makefile.include
+
+The following subdirectories are also included:
+
+docs
+krylov
+struct_ls
+struct_mv
+test
+utilities
+
+In the 'docs' directory the following files are included:
+
+smg2000.readme
+
+In the 'krylov' directory the following files are included:
+
+HYPRE_pcg.c
+Makefile
+krylov.h
+pcg.c
+
+In the 'struct_ls' directory the following files are included:
+
+HYPRE_struct_ls.h
+HYPRE_struct_pcg.c
+HYPRE_struct_smg.c
+Makefile
+coarsen.c
+cyclic_reduction.c
+general.c
+headers.h
+pcg_struct.c
+point_relax.c
+semi_interp.c
+semi_restrict.c
+smg.c
+smg.h
+smg2_setup_rap.c
+smg3_setup_rap.c
+smg_axpy.c
+smg_relax.c
+smg_residual.c
+smg_setup.c
+smg_setup_interp.c
+smg_setup_rap.c
+smg_setup_restrict.c
+smg_solve.c
+struct_ls.h
+
+In the 'struct_mv' directory the following files are included:
+
+HYPRE_struct_grid.c
+HYPRE_struct_matrix.c
+HYPRE_struct_mv.h
+HYPRE_struct_stencil.c
+HYPRE_struct_vector.c
+Makefile
+box.c
+box_algebra.c
+box_alloc.c
+box_neighbors.c
+communication.c
+communication_info.c
+computation.c
+grow.c
+headers.h
+hypre_box_smp_forloop.h
+project.c
+struct_axpy.c
+struct_copy.c
+struct_grid.c
+struct_innerprod.c
+struct_io.c
+struct_matrix.c
+struct_matrix_mask.c
+struct_matvec.c
+struct_mv.h
+struct_scale.c
+struct_stencil.c
+struct_vector.c
+
+In the 'test' directory the following files are included:
+
+Makefile
+smg2000.c
+
+In the 'utilities' directory the following files are included:
+
+HYPRE_utilities.h
+Makefile
+general.h
+hypre_smp_forloop.h
+memory.c
+memory.h
+mpistubs.c
+mpistubs.h
+random.c
+threading.c
+threading.h
+timer.c
+timing.c
+timing.h
+utilities.h
+version
+
+%==========================================================================
+%==========================================================================
+
+Building the Code
+
+SMG2000 uses a simple Makefile system for building the code.  All
+compiler and link options are set by modifying the file
+'smg2000/Makefile.include' appropriately.  This file is then included
+in each of the following makefiles:
+
+  krylov/Makefile
+  struct_ls/Makefile
+  struct_mv/Makefile
+  test/Makefile
+  utilities/Makefile
+
+To build the code, first modify the 'Makefile.include' file
+appropriately, then type (in the smg2000 directory)
+
+  make
+
+Other available targets are
+
+  make clean        (deletes .o files)
+  make veryclean    (deletes .o files, libraries, and executables)
+
+To configure the code to run with:
+1 - OpenMP only, add '-DHYPRE_USING_OPENMP -DHYPRE_SEQUENTIAL' to 
+    the 'INCLUDE_CFLAGS' line in the 'Makefile.include' file and 
+    use a valid OpenMP compiler. 
+2 - Open MP with MPI, add '-DHYPRE_USING_OPENMP -DTIMER_USE_MPI'  
+    to the 'INCLUDE_CFLAGS' line in the 'Makefile.include' file 
+    and use a valid OpenMP compiler and MPI library.
+3 - MPI only , add '-DTIMER_USE_MPI' to the 'INCLUDE_CFLAGS' line 
+    in the 'Makefile.include' file and use a valid MPI.
+
+%==========================================================================
+%==========================================================================
+
+Optimization and Improvement Challenges
+
+This code is memory-access bound.  We believe it would be very
+difficult to obtain "good" cache reuse with an optimized version of
+the code.
+
+%==========================================================================
+%==========================================================================
+
+Parallelism and Scalability Expectations
+
+SMG2000 has been run on the following platforms:
+
+ Blue-Pacific         - up to 1000 procs
+ Red                  - up to 3150 procs
+ Compaq cluster       - up to 64 procs
+ Sun Sparc Ultra 10's - up to 4 machines
+
+Consider increasing both problem size and number of processors in tandem.
+On scalable architectures, time-to-solution for SMG2000 will initially
+increase, then it will level off at a modest numbers of processors,
+remaining roughly constant for larger numbers of processors.  Iteration
+counts will also increase slightly for small to modest sized problems,
+then level off at a roughly constant number for larger problem sizes.
+
+For example, we get the following results for a 3D problem with
+cx = 0.1, cy = 1.0, and cz = 10.0, for a problem distributed on
+a logical P x Q x R processor topology, with fixed local problem
+size per processor given as 35x35x35:
+
+ "P x Q x R"      P  "iters"     "setup time"    "solve time"    
+  1x1x1           1     6          1.681680        23.255241 
+  2x2x2           8     6          3.738600        32.262907
+  3x3x3          27     6          6.601194        41.341892 
+  6x6x6         216     7         12.310776        46.672215
+  8x8x8         512     7         18.968893        50.051737 
+  10x10x10     1000     7         18.890876        54.094806 
+  14x15x15     3150     8         30.635085        62.725305 
+
+These results were obtained on ASCI Red.
+
+%==========================================================================
+%==========================================================================
+
+Running the Code
+
+The driver for SMG2000 is called `smg2000', and is located in the
+smg2000/test subdirectory.  Type
+
+   mpirun -np 1 smg2000 -help
+
+to get usage information.  This prints out the following:
+
+Usage: .../smg2000/test/smg2000 [<options>]
+
+  -n <nx> <ny> <nz>    : problem size per block
+  -P <Px> <Py> <Pz>    : processor topology
+  -b <bx> <by> <bz>    : blocking per processor
+  -c <cx> <cy> <cz>    : diffusion coefficients
+  -v <n_pre> <n_post>  : number of pre and post relaxations
+  -d <dim>             : problem dimension (2 or 3)
+  -solver <ID>         : solver ID (default = 0)
+                         0 - SMG
+                         1 - CG with SMG precond
+                         2 - CG with diagonal scaling
+                         3 - CG
+
+All of the arguments are optional.  The most important options for the
+SMG2000 compact application are the `-n' and `-P' options.  The `-n'
+option allows one to specify the local problem size per MPI process,
+the the `-P' option specifies the process topology on which to run.
+The global problem size will be <Px>*<nx> by <Py>*<ny> by <Pz>*<nz>.
+
+When running with OpenMP, the number of threads used per MPI process
+is controlled via the OMP_NUM_THREADS environment variable.
+
+%==========================================================================
+%==========================================================================
+
+Timing Issues
+
+If using MPI, the whole code is timed using the MPI timers.  If not using 
+MPI, standard system timers are used.  Timing results are printed to 
+standard out, and are divided into "Setup Phase" times and "Solve Phase" 
+times. Timings for a few individual routines are also printed out.
+
+%==========================================================================
+%==========================================================================
+
+Memory Needed
+
+SMG2000 is a memory intensive code, and its memory needs are somewhat
+complicated to describe.  For the 3D problems discussed in this
+document, memory requirements are roughly 54 times the local problem
+size times the size of a double plus some overhead for storing ghost
+points, etc. in the code.  The overhead required by this version of
+the SMG code grows essentially like the logarithm of the problem size.
+
+%==========================================================================
+%==========================================================================
+
+About the Data
+
+SMG2000 does not read in any data. All control is on the execute line.
+
+%==========================================================================
+%==========================================================================
+
+Expected Results
+
+Consider the following run:
+
+  mpirun -np 1 smg2000 -n 12 12 12 -c 2.0 3.0 40
+
+This is what SMG2000 prints out:
+
+   Running with these driver parameters:
+     (nx, ny, nz)    = (12, 12, 12)
+     (Px, Py, Pz)    = (1, 1, 1)
+     (bx, by, bz)    = (1, 1, 1)
+     (cx, cy, cz)    = (2.000000, 3.000000, 40.000000)
+     (n_pre, n_post) = (1, 1)
+     dim             = 3
+     solver ID       = 0
+   =============================================
+   Struct Interface:
+   =============================================
+   Struct Interface:
+     wall clock time = 0.005627 seconds
+     cpu clock time  = 0.010000 seconds
+   
+   =============================================
+   Setup phase times:
+   =============================================
+   SMG Setup:
+     wall clock time = 0.330096 seconds
+     cpu clock time  = 0.330000 seconds
+   
+   =============================================
+   Solve phase times:
+   =============================================
+   SMG Solve:
+     wall clock time = 0.686244 seconds
+     cpu clock time  = 0.480000 seconds
+   
+   
+   Iterations = 4
+   Final Relative Residual Norm = 8.972097e-07
+
+The relative residual norm may differ slightly from machine to machine
+or compiler to compiler, but should only differ very slightly (say,
+the 6th or 7th decimal place).  Also, the code should generate nearly
+identical results for a given problem, independent of the data
+distribution.  The only part of the code that does not guarantee
+bitwise identical results is the inner product used to compute norms.
+In practice, the above residual norm has remained the same.
+
+%==========================================================================
+%==========================================================================
+
+Release and Modification Record
+
+LLNL code release number: UCRL-CODE-2000-022
+
+(c) 2000   The Regents of the University of California
+
+See the file COPYRIGHT_and_DISCLAIMER for a complete copyright notice,
+contact person, and disclaimer.

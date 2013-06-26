@@ -1,0 +1,32 @@
+##=== TEST.nightly.report - Report description for nightly -----*- perl -*-===##
+#
+# This file defines a report to be generated for the nightly tests.
+#
+##===----------------------------------------------------------------------===##
+
+# Sort by program name
+$SortCol = 0;
+$TrimRepeatedPrefix = 1;
+
+my $WallTimeRE = "Time: ([0-9.]+) seconds \\([0-9.]+ wall clock";
+
+# FormatTime - Convert a time from 1m23.45 into 83.45
+sub FormatTime {
+  my $Time = shift;
+  if ($Time =~ m/([0-9]+)[m:]([0-9.]+)/) {
+    return sprintf("%7.4f", $1*60.0+$2);
+  }
+
+  return sprintf("%7.4f", $Time);
+}
+
+(
+ ["Program"  , '\'([^\']+)\' Program'],
+ [],
+ ["CC"       , 'TEST-RESULT-compile-success: (pass|fail|xfail)'],
+ ["CC_Time"  , 'TEST-RESULT-compile-time: user\s*([.0-9m:]+)', \&FormatTime],
+ ["CC_Real_Time", 'TEST-RESULT-compile-real-time: real\s*([.0-9m:]+)', \&FormatTime],
+ ["Exec"     , 'TEST-RESULT-exec-success: (pass|fail|xfail)'],
+ ["Exec_Time", 'TEST-RESULT-exec-time: user\s*([.0-9m:]+)', \&FormatTime],
+ ["Exec_Real_Time", 'TEST-RESULT-exec-real-time: real\s*([.0-9m:]+)', \&FormatTime],
+);

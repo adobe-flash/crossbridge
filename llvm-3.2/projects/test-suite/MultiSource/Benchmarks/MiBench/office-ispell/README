@@ -1,0 +1,394 @@
+    This is ispell version 3.1, an interactive spelling checker.
+
+Contents of this README file:
+
+    What Is Ispell and Why Do I Want It?
+    What's New in This Version?
+    Where Can I Get Ispell?
+    OK, How Do I Install It?
+    Who Wrote Ispell?
+    Where Do I Send Bug Reports?
+    How Do I Reference Ispell in Scholarly Papers?
+    Where Do I Get Dictionaries?
+    How Long Does It Take to Make Dictionaries?
+    Special Installation Notes for Certain Machines:
+    What About Ispell for MS-DOS?
+
+------------------------------------------------------------------------
+
+What Is Ispell and Why Do I Want It?
+
+    Ispell is a fast screen-oriented spelling checker that shows you
+    your errors in the context of the original file, and suggests possible
+    corrections when it can figure them out.  Compared to UNIX spell, it
+    is faster and much easier to use.  Ispell can also handle languages
+    other than English.
+    
+What's New in This Version?
+
+    Compared to ispell versions 2 and 4.0 (the latter was the
+    short-lived Gnu version), ispell 3.1 contains many new features,
+    notably TeX support, international language support, and handling
+    of prefixes as well as suffixes.  Compared to ispell version 3.0,
+    ispell 3.1 has many bug fixes, a number of minor improvements, and
+    vastly improved support for multiple languages.
+
+    The only truly important difference between 3.0 and 3.1 is in the
+    format of the "defstringtype" and "altstringtype" statements,
+    which now require a deformatter argument.  Existing affix files
+    will have to be converted.  See ispell.4 for documentation, or
+    deutsch.aff for an extended example.  The conversion is very easy
+    to do.  All affix files distributed with ispell have already been
+    converted.
+
+    The complete list of bug fixes and improvements is too long to
+    include here (and besides, I'm too overworked to create it).
+    However, users of ispell 2.0 and ispell 4.0 should note that the
+    "x" and "q" commands have been interchanged.
+
+Where Can I Get Ispell?
+
+    If you have a Web browser, visit the ispell home page:
+
+	http://www.cs.ucla.edu/ficus-members/geoff/ispell.html
+
+    The current version of ispell is available for anonymous ftp from
+    ftp.cs.ucla.edu (131.179.240.10) or ftp.math.orst.edu
+    (128.193.80.161), in the pub/ispell-3.1 directory.  The latest
+    version is always named "ispell-3.1.xx.tar.gz", where "xx" is
+    the patch level.  There are also sometimes files named
+    "README-patchxx" which contain notes specific to a given version.
+    Announcements of patches to ispell will be posted to comp.text.tex,
+    gnu.announce, and gnu.emacs.help.
+
+    A number of ftp mirror sites also store ispell.  Check Archie for
+    "ispell-3.1" to find a site near you.
+    
+    Ispell comes with English dictionaries.  For other languages,
+    check the "Where" and "README" files in the "languages"
+    subdirectory for hints on where to find dictionaries and how to
+    install them.
+
+OK, How Do I Install It?
+
+## For Mibench install, just type "make ispell" and use the ispell program
+## that is compiled for the benchmarking.
+
+    Ispell is quite portable (thanks to many people).  If you speak
+    American English and have a BSD-like system, you may be able to
+    get away with simply typing "make all" to finish unpacking
+    the kit and make ispell and a dictionary, all configured to be
+    installed in /usr/local/*.  If you have a USG (System V) system,
+    you will at least have to copy "local.h.samp" to "local.h", then
+    add "#define USG" to local.h before compiling.  Be sure you have
+    at least 10 MB of free space in /tmp, or set your TMPDIR
+    environment variable to point somewhere with that much space.
+
+    For more complex installations, you will have to create a fancier
+    local.h file.  All customization of ispell 3.1, even for the
+    Makefile, is done by creating or editing the file "local.h" to
+    override the default definitions of certain variables.  The most
+    common changes will be to the LANGUAGES variable (to set the
+    languages; see also the Makefiles in the various language
+    subdirectories), CC (to choose gcc), and BINDIR through MAN4DIR
+    (to control where ispell is installed).  There are many other
+    configuration parameters; see config.X for the complete list and
+    further instructions.  *DO NOT* make changes to config.X or to any
+    of the Makefiles.  Anything you define in "local.h" will override
+    definitions in those files.
+
+    The English-language dictionary comes in four sizes: small,
+    medium, large, and extra-large.  I recommend using the medium
+    dictionary unless you are very short on space.  The small and
+    medium dictionaries have been hand-checked against a paper
+    dictionary to improve their accuracy.  This is not true of the two
+    larger ones.  The large and extra-large dictionaries contain
+    less-frequently-used words, and most sites will not want to pay
+    the price of storing them, especially because they may contain
+    errors.  Also, a large dictionary can hide misspellings of short
+    words because there is some similar word that nobody uses.  (For
+    example, the crossword-puzzle favorite "ort" can hide misspellings
+    of "or".)
+
+    For each dictionary size, you can also choose to make a "plus"
+    version, named by adding a plus sign to the size indication.
+    These versions are created by incorporating a dictionary file of
+    your own, usually /usr/dict/words.  (I can't distribute a
+    dictionary based on that file because it's copyrighted.)  Making a
+    plus version requires extra time and disk space, but will give you
+    some computer and technical terms that aren't in the basic ispell
+    word list.  That's why the default dictionary is
+    "americanmed+.hash".
+
+    After all edits, you are ready to compile ispell.  Make sure you
+    have set your TMPDIR environment variable, and then type
+    "make all".  This will compile all the programs, put the
+    dictionaries together, and build the hash file.  If you get errors
+    while compiling term.c, change the setting of "#define USG" in
+    your local.h file and try again.
+
+    If you chose a "+" version of the dictionary (the LANGUAGES macro
+    in config.X), expect this first make to run for quite a while
+    (usually about half an hour, but as much as 24 hours on a very
+    limited machine) because of the munchlist step.  If you chose a
+    non-plus version, the make will not take long.  The munchlist step
+    will also take a *lot* of disk space (see the table below for more
+    information), so be sure to set TMPDIR in your environment to
+    point to someplace with lots of room.
+
+    After your first make completes, you are ready to install ispell.
+    The standard "make install" will install ispell, the auxiliary
+    programs and scripts, the manual page, and the dictionary hash
+    file, all in the directories you have chosen for them.  This
+    usually has to be done as root, and on some systems you will not
+    be able to redirect the output to a file.  (If you're the careful
+    sort, you'll check the output of "make -n install" first to be
+    sure there are no hidden surprises.)  If you don't want to install
+    the dictionary-building tools, you can type "make partial-install"
+    to install just the files needed to use ispell itself.
+
+    If you have emacs, note that the installation process does not
+    modify the top-level Info menu to include ispell; you must do this
+    by hand if you want ispell to appear in the top-level menu.  The
+    installation process may clobber emacs-related files from ispell
+    4.0.  If you don't consider this a feature, you should preserve
+    them first.  Also, if you have emacs you can ignore the warnings
+    issued when ispell.el is byte-compiled.  Finally, ispell.el
+    contains some platform-dependent stuff, such as path names and
+    egrep switches.  This is a bug that will be cleaned up someday.
+
+    As well as the standard "make clean" and "make realclean" targets,
+    there is also a "make dictclean" target which will get rid of
+    constructed dictionary files such as "english.med+".  This is a
+    separate target because of the time it takes to build
+    dictionaries.
+
+    Finally, there is a directory named "addons", which contains shar
+    kits for ispell helper programs that were generously written by
+    other people.  These are not copyrighted or supported by the
+    ispell maintainer.  Contact the original authors (listed in README
+    files in the kits) for more information.
+
+Who Wrote Ispell?
+
+    Ispell is a very old program.  The original was written in PDP-10
+    assembly in 1971, by R. E. Gorin.  The C version was written by
+    Pace Willisson of MIT.  Walt Buehring of Texas Instruments added
+    the emacs interface and posted it to the net.  Geoff Kuenning
+    added the international support and created the current release.
+    Many, many other people contributed to the current version; a
+    complete list (with a much more detailed history) can be found in
+    the file "Contributors".
+
+Where Do I Send Bug Reports?
+
+    Most ispell bug reports, except bugs related to the emacs-lisp
+    interface, should be sent to "ispell-bugs@itcorp.com".  Bugs in
+    the emacs interface (ispell.el) should be sent to
+    "ispell-el-bugs@itcorp.com".  If you're not sure which address to
+    use, send your report to "ispell-bugs@itcorp.com" and I'll sort it
+    out from there.
+
+    Bugs in add-on packages (found in the "addons" subdirectory)
+    should not be sent to itcorp.com.  Instead, send reports to the
+    developers of those packages (see the README file for the package
+    you are using).
+
+How Do I Reference Ispell in Scholarly Papers?
+
+    There is no published paper on ispell, so if you make use of
+    ispell in a fashion that requires a reference (e.g., using the
+    dictionary as a word list in a research project), you are limited
+    to an Internet reference.  The full proper title is printed by
+    "ispell -v": "International Ispell Version x.y.z".  Please include
+    the full version number in your reference so that people can
+    discover the exact variant that you used; sometimes it's
+    important.  If you're feeling really nice, you can also credit me,
+    Geoffrey H. Kuenning, as the author.  Usually, you should also
+    include a mention of the master ftp site, ftp.cs.ucla.edu, so that
+    readers of your paper can locate a copy if they wish.
+
+Where Do I Get Dictionaries?
+
+    Ispell comes with American and British dictionaries. American-style
+    spellings are the default.  To get British spellings, copy the
+    LANGUAGES and MASTERHASH definitions from config.X into your
+    local.h, and then globally replace "american" with "british".
+
+    For other languages, consult the file "languages/Where", which
+    lists everything I know about.  You can also check the ispell home
+    page:
+
+	http://www.cs.ucla.edu/ficus-members/geoff/ispell.html
+
+    which contains pointers to all known dictionaries.
+
+    If you create a dictionary of your own and make it available for
+    ftp, please send a notification to ispell-bugs@itcorp.com so that
+    I can add your dictionary to the ftp list.
+
+How Long Does It Take to Make Dictionaries?
+
+    The following tables give approximate timings and peak disk usage
+    for making each of the three augmented English dictionaries (the
+    so-called "plus" versions).  The timings were collected on an
+    unloaded 68040.  Your mileage may vary.
+
+    Using EXTRADICT=/usr/dict/words:
+
+			Time to build	Peak temp space	Final size
+
+	english.sml+	30 minutes	7.1M		306K
+	english.med+	35 minutes	8.8M		359K
+	english.lrg+	60 minutes	10.7M		680K
+
+    Using EXTRADICT=/usr/dict/words and /usr/dict/web2:
+
+			Time to build	Peak temp space	Final size
+
+	english.sml+	2-1/2 hours	19.5M		2243K
+	english.med+	2-1/2 hours	19.6M		2265K
+	english.lrg+	3 hours		20.7M		2347K
+
+    The peak disk usage occurs fairly early in the munching process.
+    When creating english.lrg+ with /usr/dict/web2, the peak was
+    reached within 30 minutes.  When web2 was omitted, the peak was
+    always reached within 1/4 of the total running time of munchlist.
+    Again, remember that these times will vary depending on your load
+    and your machine's power.
+
+Special Installation Notes for Certain Machines:
+
+    Although I have tried to avoid putting in specific machine
+    dependencies as a general rule, some machine-specific #defines
+    will be found at the end of config.X.
+
+    If you get lots of warnings when compiling term.c, check to be
+    sure that you have correctly defined SIGNAL_TYPE in your local.h.
+
+    Some versions of ISC Unix have TIOCGWINSZ defined even though it's
+    not supported and the necessary structures are not present.  The
+    solution is to add "#undef TIOCGWINSZ" in your local.h.
+
+    Under ISC (Solaris) Unix System V.3, you may have to add includes
+    of <sys/stream.h> and <sys/ptem.h> to your local.h to get around
+    compilation problems in term.c.
+
+    Some versions of SCO Unix define "struct winsize" conditionally.
+    The solution is to add "#define _IBCS2" in your local.h.
+
+    Some versions of SCO Unix define "struct winsize" in a weird
+    place.  Add #includes of <sys/stream.h> and <sys/ptem.h> to your
+    local.h to get around this.
+
+    Suns running 4.1.1 also have a bug in sort which causes core dumps
+    when running munchlist.  Sun users who have the System 5 option
+    can work around this bug by making sure that /usr/5bin precedes
+    /usr/bin in their path, so that /usr/5bin/sort is used by
+    munchlist.
+
+    It is reported that some older versions of gnu sort do not
+    recognize the -T option.  (However, as of textutils 1.9 it does.)
+    Define SORTTMP and MAKE_SORTTMP as the null string ("") if you use
+    gnu sort, or change your path to use the manufacturer's sort
+    command (but watch out for Sun's sort bug, above!).
+
+    Some versions of gcc for the Sparc have an optimizer bug that
+    causes problems for languages that use 8-bit characters.  The
+    solution is to turn off optimization when compiling at least
+    makedent.c, or for all of ispell.  The bug is known to exist in
+    gcc 2.4.5, and is known to have been fixed in gcc 2.5.8.
+
+    There is a report that on Solaris 2.3 for the sparc, buildhash may
+    core dump.  The cure is to use "bison -y" instead of yacc.
+
+    On SunOS 4.1.3 using Sun's SPARCompiler C2.0.1, you may have to
+    select static linking (-Bstatic option in CFLAGS).
+
+    The AIX RS6000 should use -lcurses for TERMLIB, rather than -ltermcap.
+
+    Amiga users will need to #define fork vfork.  Other than this,
+    ispell should compile using gcc on the Amiga.
+
+    There have been reports that some BSD releases don't properly
+    declare "extern int errno" in errno.h.  If you suffer from this
+    problem, you'll have to add your own declaration in your local.h.
+
+    There are known problems on Ultrix with the interaction between
+    ispell and some versions of elm on Ultrix.  You may be able to fix
+    this by making sure USG is undefined, or you may have to make more
+    extensive changes to term.c to cause it to use the "termios"
+    interface instead of the "termio" one.
+
+    The DEC Alpha and Cray have 64-bit longs.  Make sure you define
+    MASKTYPE_WIDTH as 64 for these machines.
+
+    Some versions of the DEC Alpha compiler may compile ispell
+    incorrectly.  The cure is to turn optimization off and compile
+    with the -g switch.  The symptoms are segmentation faults and
+    garbage characters in the ~/.ispell_english file.  If you get this
+    symptom, be sure to clean out the garbage before you rerun ispell
+    or recompiling won't help.
+
+    Some versions of "uniq" on the DEC Alpha, OSF/1 2.x, generate
+    garbage output if given null input, causing munchlist to loop
+    forever.  This can by checked by running "uniq < /dev/null | wc
+    -c", which ought print zero.  If it does not, you'll have to use
+    GNU uniq (from textutils/1.11) instead, or upgrade to OSF/1 3.0
+    which does not have the bug.
+
+    DEC OSF/1 keeps the extra dictionary in a wierd place.  Set
+    EXTRADICT to /usr/share/dict/words.
+
+    HP systems will need C compiler patch PHSS_3015 to compile ispell
+    correctly, bringing the revision to A.09.34 or higher.  The
+    symptom of the wrong compiler is incorrect highlighting of
+    misspelled words.  Gcc will also compile ispell correctly on HP
+    systems.
+    
+    I have a report that on HP systems 300-400, you must use either
+    gcc or the non-ansi CCFLAG ("cc +o2"), at least for the ispell.c
+    source.  However, it is possible that this problem has been
+    corrected by a bug fix to term.c.  I'd be interested in hearing
+    whether the report is still true.
+
+    Some "internationalized" Unixes (HP, for instance) vary the
+    behavior of sort(1) based on an environment variable such as LANG
+    or LOCALE.  The symptom is that munchlist does not produce an
+    optimal dictionary.  Munchlist tries to protect against this by
+    setting LANG and LOCALE to "C", but if your system uses different
+    environment variables, you may have to do this by hand.
+
+    If you get core dumps from the sort command (reported on HP
+    systems building large German dictionaries), try adding the "-y"
+    flag to the appropriate invocation of sort in the Makefile or in
+    munchlist.  This flag is only available on some systems.
+
+    SGI Irix systems store /usr/dict/words in /usr/lib/dict or
+    /usr/share/lib/dict.  You may have to install the normal "spell"
+    and associated files from cd-rom before it will exist.  If you get
+    errors compiling with Irix 4.0.5 or others, try defining __STDC__
+    in local.h, to get around problems caused by the fact that the
+    compiler accepts prototypes but doesn't define __STDC__.
+
+    Some BSDI systems have a screwy sort command that uses
+    -T to specify the record (as opposed to field) delimiter.  You'll
+    have to disable SORTTMP and enable MAKE_SORTTMP.  You'll also have
+    to be sure that /usr/tmp has lots and lots of free space.
+
+What About Ispell for MS-DOS?
+
+    Although ispell is not officially supported on MS-DOS, there are a
+    couple of #defines that you might find useful if you want to do
+    such a thing.  Check the end of config.X.  Several people have
+    reported success building DOS versions using emx/gcc.  Others have
+    used the djgpp package, with bison replacing yacc.  Some places to
+    look for a DOS ispell if you have an x86:
+
+	ftp.cdrom.com:pub/os2/unix/isp3009b.zip.
+	or
+	ftp-os2.cdrom.com:pub/os2/2_x/unix/
+
+    There is also a program named jspell, which is an ispell
+    lookalike.  Look on ftp.tex.ac.uk, in the directory
+    pub/archive/support/jspell.

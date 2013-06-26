@@ -1,0 +1,25 @@
+Directory lout/font - font metrics files
+
+This directory contains Adobe Systems font metrics (formerly .AFM)
+files for all the fonts mentioned in file lout/include/fontdefs.  These
+files are the source of Lout's information about the height and width
+of all characters.  The files are exactly as distributed publicly by
+Adobe Systems except that erroneous ligature information has been
+removed from the four Courier font files.
+
+In addition, for every Adobe Systems font file, (call it FF) there is
+a companion file FF+ containing supplementary character definitions and
+composite character definitions sufficient to support Latin2 without any
+need to obtain Latin2 fonts.  These files follow a format established
+by Version 3.21 of Lout, and were supplied by Jaroslav Serdula.
+
+Lout is informed of the existence of these files by means of a database
+of @FontDef symbols.  Two such are supplied with Lout, in directory
+$(LOUTLIB)/data:  fontdefs.ld and latin2.ld.
+
+All file names were previously reduced to a maximum of 8 characters,
+for portability to the DOS operating system.  Now some of the FF+
+files have nine characters again.  Let me know if this is a problem.
+
+Jeffrey H. Kingston
+10 May 2000

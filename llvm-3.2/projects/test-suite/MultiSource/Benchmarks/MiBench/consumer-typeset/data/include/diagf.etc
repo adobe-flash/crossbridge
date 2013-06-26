@@ -1,0 +1,627 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @Geometry package for algebra and geometry in PostScript              #
+#  Version 1.0 (June 1996)                                                    #
+#  Jeffrey H. Kingston                                                        #
+#                                                                             #
+###############################################################################
+
+export
+
+    i c p m s v f d "-0" "-1" "-2" "-3" "-4" "-5" "-6" "-7" "-8" "-9" "-."
+    pi e sqrt abs ceiling floor truncate round cos sin atan
+    exp log rand max min "*" "/" idiv mod "+" "-"
+    xcoord ycoord distance angleto ":=" ":==" "::" ":<" prev "??" "?!?"
+    boundaryatangle atangle
+    "**" "++" "--" anglefix anydebug ","
+    "=" "!=" "==" "!==" "<" "<=" ">" ">=" not and xor or
+    if quadcase signcase xloop yloop zloop
+    cabout aabout
+
+def @Geometry
+{
+    def i
+	precedence 100
+	left x
+    {
+	x "in"
+    }
+
+    def c
+	precedence 100
+	left x
+    {
+	x "cm"
+    }
+
+    def p
+	precedence 100
+	left x
+    {
+	x "pt"
+    }
+
+    def m
+	precedence 100
+	left x
+    {
+	x "em"
+    }
+
+    def s
+	precedence 100
+	left x
+    {
+	x "sp"
+    }
+
+    def v
+	precedence 100
+	left x
+    {
+	x "vs"
+    }
+
+    def f
+	precedence 100
+	left x
+    {
+	x "ft"
+    }
+
+    def d
+	precedence 100
+	left x
+    {
+	x "dg"
+    }
+
+    def pi
+    {
+	"ldiagpi"
+    }
+
+    def e
+    {
+	"ldiage"
+    }
+
+    def sqrt
+	precedence 99
+	right y
+    {
+	y "sqrt"
+    }
+
+    def abs
+	precedence 99
+	right y
+    {
+	y "abs"
+    }
+
+    def anglefix
+	precedence 99
+	right y
+    {
+	y "ldiagfixangle"
+    }
+
+    def ceiling
+	precedence 99
+	right y
+    {
+	y "ceiling"
+    }
+
+    def floor
+	precedence 99
+	right y
+    {
+	y "floor"
+    }
+
+    def truncate
+	precedence 99
+	right y
+    {
+	y "truncate"
+    }
+
+    def round
+	precedence 99
+	right y
+    {
+	y "round"
+    }
+
+    def cos
+	precedence 99
+	right y
+    {
+	y "cos"
+    }
+
+    def sin
+	precedence 99
+	right y
+    {
+	y "sin"
+    }
+
+    def xcoord
+	precedence 99
+	right y
+    {
+	y "pop"
+    }
+
+    def ycoord
+	precedence 99
+	right y
+    {
+	y "exch pop"
+    }
+
+    def distance
+	precedence 98
+	left x
+	right y
+    {
+	x y "ldiagdistance"
+    }
+
+    def angleto
+	precedence 98
+	left x
+	right y
+    {
+	x y "ldiagangleto"
+    }
+
+    def atan
+	precedence 98
+	left x
+	right y
+    {
+	x y "atan"
+    }
+
+    def exp
+	precedence 98
+	left x
+	right y
+    {
+	x y "exp"
+    }
+
+    def log
+	precedence 98
+	left x
+	right y
+    {
+	x y "ldiaglog"
+    }
+
+    def rand
+	precedence 98
+	left x
+	right y
+    {
+	x y "dorand"
+    }
+
+    def max
+	precedence 98
+	left x
+	right y
+    {
+	x y "ldiagmax"
+    }
+
+    def min
+	precedence 98
+	left x
+	right y
+    {
+	x y "ldiagmin"
+    }
+
+    def "*"
+	precedence 97
+	left x
+	right y
+    {
+	x y "mul"
+    }
+
+    def "/"
+	precedence 96
+	associativity left
+	left x
+	right y
+    {
+	x y "div"
+    }
+
+    def idiv
+	precedence 96
+	associativity left
+	left x
+	right y
+    {
+	x y "idiv"
+    }
+
+    def mod
+	precedence 96
+	left x
+	right y
+    {
+	x "cvi" y "cvi mod"
+    }
+
+    def "+"
+	precedence 95
+	associativity left
+	left x
+	right y
+    {
+	x @Case {
+	    ""   @Yield y
+	    else @Yield { x y "add" }
+	}
+    }
+
+    def "-"
+	precedence 95
+	associativity left
+	left x
+	right y
+    {
+	x @Case {
+	    ""   @Yield { y "neg" }
+	    else @Yield { x y "sub" }
+	}
+    }
+
+    def "-0" { "-0" }
+    def "-1" { "-1" }
+    def "-2" { "-2" }
+    def "-3" { "-3" }
+    def "-4" { "-4" }
+    def "-5" { "-5" }
+    def "-6" { "-6" }
+    def "-7" { "-7" }
+    def "-8" { "-8" }
+    def "-9" { "-9" }
+    def "-." { "-." }
+
+    def prev
+    {
+	"ldiagprevious"
+    }
+
+    def "??"
+	precedence 99
+	left x
+	right y
+    {
+	"{" x "} ("y") ldiagdolabel"
+    }
+
+    def "?!?"
+	precedence 99
+	left x
+	right y
+    {
+	"{" x "} "y" ldiagdolabel"
+    }
+
+    def boundaryatangle
+	precedence 89
+	left x
+	right y
+    {
+	x??"CTR" y x??"CIRCUM" "ldiagpadd"
+    }
+
+    def atangle
+	precedence 89
+	left x
+	right y
+    {
+	0 0 x y "ldiagatangle"
+    }
+
+    def "**"
+	precedence 88
+	left x
+	right y
+    {
+	x y "ldiagpmul"
+    }
+
+    def "++"
+	precedence 87
+	associativity left
+	left x
+	right y
+    {
+	x y "ldiagpadd"
+    }
+
+    def "--"
+	precedence 87
+	associativity left
+	left x
+	right y
+    {
+	y x "ldiagpsub"
+    }
+
+    def "="
+	precedence 79
+	left x
+	right y
+    {
+	x y "eq"
+    }
+
+    def "!="
+	precedence 79
+	left x
+	right y
+    {
+	x y "ne"
+    }
+
+    def "=="
+	precedence 79
+	left x
+	right y
+    {
+	x y "ldiagangleeq"
+    }
+
+    def "!=="
+	precedence 79
+	left x
+	right y
+    {
+	x y "ldiaganglene"
+    }
+
+    def "<"
+	precedence 79
+	left x
+	right y
+    {
+	x y "lt"
+    }
+
+    def "<="
+	precedence 79
+	left x
+	right y
+    {
+	x y "le"
+    }
+
+    def ">"
+	precedence 79
+	left x
+	right y
+    {
+	x y "gt"
+    }
+
+    def ">="
+	precedence 79
+	left x
+	right y
+    {
+	x y "ge"
+    }
+
+    def not
+	precedence 78
+	right y
+    {
+	y "not"
+    }
+
+    def and
+	precedence 77
+	left x
+	right y
+    {
+	x y "and"
+    }
+
+    def xor
+	precedence 76
+	left x
+	right y
+    {
+	x y "xor"
+    }
+
+    def or
+	precedence 76
+	left x
+	right y
+    {
+	x y "or"
+    }
+
+    def ","
+	precedence 70
+	left x
+	right y
+    {
+	OOO ++ { OOX -- OOO }**x ++ { OOY -- OOO }**y
+    }
+
+    def ":="
+	precedence 20
+	left x
+	right y
+    {
+	"/"x "[" y "] cvx def"
+    }
+
+    def ":=="
+	precedence 20
+	left x
+	right y
+    {
+	"/"x "[" y "counttomark 2 add (assigning) exch ldiagdebugprint ] cvx def"
+    }
+
+    def "::"
+	precedence 20
+	left x
+	right y
+    {
+	y "/"x "ldiagpointdef"
+    }
+
+    def ":<"
+	precedence 20
+	left x
+	right y
+    {
+	y "/"x"@ANGLE ldiagangledef"
+    }
+
+    def if
+	named cond {}
+	named then {}
+	named else {}
+    {
+	cond "{" then "} {" else "} ifelse"
+    }
+
+    def quadcase
+	precedence 10
+	left angle
+	named "0"	{}
+	named "0-90"	{}
+	named "90"	{}
+	named "90-180"	{}
+	named "180"	{}
+	named "180-270"	{}
+	named "270"	{}
+	named "270-360"	{}
+    {
+	"{" 0-90 "} {" 270 "} {" 180 "} {" 90 "}"
+	"{" 0 "} {" 270-360 "} {" 180-270 "} {" 90-180 "}" angle "ldiagquadcase"
+    }
+
+    def signcase
+	precedence 10
+	left number
+	named neg {}
+	named zero {}
+	named pos {}
+    {
+	"{" neg "} {" zero "} {" pos "}" number "ldiagsigncase"
+    }
+
+    def xloop
+	named from { 0 }
+	named to { 0 }
+	named by { 1 }
+	named do named x { "xval" } {}
+    {
+	from by to "{ /xval exch def" do "} for"
+    }
+
+    def yloop
+	named from { 0 }
+	named to { 0 }
+	named by { 1 }
+	named do named y { "yval" } {}
+    {
+	from by to "{ /yval exch def" do "} for"
+    }
+
+    def zloop
+	named from { 0 }
+	named to { 0 }
+	named by { 1 }
+	named do named z { "zval" } {}
+    {
+	from by to "{ /zval exch def" do "} for"
+    }
+
+    def anydebug
+	right tag
+    {
+	"[" tag "counttomark ("tag") exch ldiagdebugprint cleartomark"
+    }
+
+    def aabout
+	named circum {}
+	named extra {}
+	named centre {}
+    {
+	"{" circum "} cvlit" extra "[" centre "] cvx ldiagaabout"
+	# ZXCTR	:= centre
+	# ZFCTR	:= circum??CTR
+	# ZAREF	:= ZFCTR angleto ZXCTR
+	# ZAMIN	:= 0d
+	# ZPMIN	:= circum boundaryatangle { ZAREF - ZAMIN }
+	# 		 ++ extra atangle { ZAREF - ZAMIN }
+	# ZAMAX	:= 90d
+	# ZPMAX	:= circum boundaryatangle { ZAREF - ZAMAX }
+	# 		 ++ extra atangle { ZAREF - ZAMAX }
+	# xloop from { 1 } to { 12 } by { 1 } do {
+	#   ZAMID	:= { ZAMIN + ZAMAX } * 0.5
+	#   ZPMID	:= circum boundaryatangle { ZAREF - ZAMID }
+	# 		 ++ extra atangle { ZAREF - ZAMID }
+	#   if cond { {ZPMID distance ZXCTR} > {ZFCTR distance ZXCTR} } then {
+	#     ZAMAX := ZAMID
+	#     ZPMAX := ZPMID
+	#   }
+	#   else {
+	#     ZAMIN := ZAMID
+	#     ZPMIN := ZPMID
+	#   }
+	# }
+	# ZPMID
+    }
+
+    def cabout
+	named circum {}
+	named extra {}
+	named centre {}
+    {
+       "{" circum "} cvlit" extra "[" centre "] cvx ldiagcabout"
+       # ZXCTR	:= centre
+       # ZFCTR	:= circum??CTR
+       # ZAREF	:= ZFCTR angleto ZXCTR
+       # ZAMIN	:= 0d
+       # ZPMIN	:= circum boundaryatangle { ZAREF + ZAMIN }
+       # 		 ++ extra atangle { ZAREF + ZAMIN }
+       # ZAMAX	:= 90d
+       # ZPMAX	:= circum boundaryatangle { ZAREF + ZAMAX }
+       # 		 ++ extra atangle { ZAREF + ZAMAX }
+       # xloop from { 1 } to { 12 } by { 1 } do {
+       #   ZAMID	:= { ZAMIN + ZAMAX } * 0.5
+       #   ZPMID	:= circum boundaryatangle { ZAREF + ZAMID }
+       # 		 ++ extra atangle { ZAREF + ZAMID }
+       #   if cond { {ZPMID distance ZXCTR} > {ZFCTR distance ZXCTR} } then {
+       #     ZAMAX := ZAMID
+       #     ZPMAX := ZPMID
+       #   }
+       #   else {
+       #     ZAMIN := ZAMID
+       #     ZPMIN := ZPMID
+       #   }
+       # }
+       # ZPMID
+    }
+}

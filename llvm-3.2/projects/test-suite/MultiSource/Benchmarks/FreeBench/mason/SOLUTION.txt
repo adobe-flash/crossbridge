@@ -1,0 +1,242 @@
+Solving the Binary Arts(tm) Tripple Cross puzzle, by T.
+
+
+There are two possible ways to move in the puzzle:
+   The horizontal shuttle with 3 possible positions (from left to right: 0,1,2)
+   The flip with 2 positions (left-up och left-down)
+First move the shuttle to 1 and flip to left-down so that the shape of
+the puzzle looks like this:
+
+               X  X
+   X  X  X  X  X  X  X
+   X  X  X  X  X  X  X
+      X  X
+
+There are 9 squares that are marked, we will call them:
+   A - top left part of what should become a ball
+   B - top right part of ball
+   C - bottom left part of ball
+   D - bottom right part of ball
+   bi - the text "binary"
+   ar - the text "arts(tm)"
+   y - there are 3 yellow blobs, all the same. I just call them blobs.
+
+The correct solution to the puzzle looks like:
+
+               -  -
+   y  y  y  -  -  A  B
+   -  -  -  -  -  C  D 
+      bi ar
+
+We will number the positions in the puzzle (with left-down flip) :
+
+                   16  17
+    0   1   2   3   4   5   6
+    7   8   9  10  11  12  13
+       14  15
+
+How to move:
+Move sequences are written in compact form.
+Starting position is assumed to be with flip left-down.
+Each single digit means position the shuttle:
+   0: leftmost, 1: middle, 2: rightmost
+After each positioning of the shuttle, a toggle of the flip is assumed.
+
+We will solve the puzzle by doing a sequence of moves to for each of the
+named squares to put it into the correct position. We will start with A.
+Locate A and find the corresponding number of where it is in the
+above chart. Then look up that number in the table below to
+find a sequence. NOTE: move sequences are written backwards. Read them
+right to left.
+If A is already at the correct position (5) no moves are needed.
+If A is at 3 you should do the move sequence 1202 (It's backwards, remember?)
+
+A
+0 2021 0102 
+1 20 2102 
+2 20 2101 
+3 2021 
+4 2010 
+5 No moves needed
+6 2101 
+7 20 2010 1020 
+8 2020 1020 
+9 2021 0120 
+10 2020 
+11 0201 
+12 02 
+13 0210 
+14 2020 1010 
+15 20 2010 
+16 20 
+17 21
+
+"A" should now be at 5 (which also means B can't be at 5).
+Continue with position of B, same way...
+
+B
+0 20 1021 0102 
+1 1021 2102 
+2 10 2121 0210 
+3 12 1010 2012 
+4 10 1010 
+5 -
+6 No moves needed
+7 1021 2010 1020 
+8 20 1020 1020 
+9 1210 2121 0120 
+10 21 2010 2121 
+11 01 0101 
+12 0101 
+13 01 
+14 20 1020 1021 
+15 21 2010 2120 
+16 1010 
+17 10 
+
+
+C
+0 21 2021 0102 
+1 2120 2010 2010 
+2 2101 2021 0210 
+3 20 1012 0212 
+4 02 0121 2101 
+5 -
+6 -
+7 1212 0120 2121 
+8 02 1021 0120 
+9 2012 0210 1210 
+10 1021 2020 1020 
+11 1201 2120 
+12 No moves needed
+13 2102 1012 
+14 02 1012 0120 
+15 0212 0210 1020 
+16 1210 1201 2101 
+17 2121 0210 
+
+
+D
+0 01 0201 2020 2012 
+1 0102 0120 2101 2010 
+2 1201 2020 2101 0121 
+3 2121 2020 1202 0212 
+4 20 1212 1202 0202 
+5 -
+6 -
+7 0210 2102 0210 1020 
+8 1201 0201 0201 
+9 2121 2020 1020 1012 
+10 2020 1210 2020 
+11 12 0120 1010 1201 
+12 -
+13 No moves needed
+14 1020 1020 1021 
+15 2102 0101 2010 
+16 2101 0120 1012 1010 
+17 12 0121 0202 0201 
+
+
+bi
+0 0210 1010 2020 1020 
+1 2101 2010 1212 1010 
+2 0201 0202 0101 0120 
+3 2020 2020 1020 2020 2010 
+4 0101 2020 1210 2020 1010 
+5 -
+6 -
+7 12 0101 0120 2021 
+8 21 2021 0201 2102 0120 
+9 2010 1210 2020 2012 1010 
+10 0101 2121 0102 1012 
+11 12 0202 1010 1021 
+12 -
+13 -
+14 No moves needed
+15 20 2012 0101 2012 0201 
+16 21 2101 0102 0201 0212 
+17 1201 0202 0101 0121 
+
+
+ar
+0 2010 1212 1010 2101 
+1 1012 1020 1202 1202 1021 
+2 10 2010 2021 0202 0201 
+3 0121 2102 1021 0210 1210 
+4 12 1021 0210 2101 
+5 -
+6 -
+7 12 1010 1202 1010 1201 
+8 0210 1020 2020 2021 0120 
+9 0121 0121 0121 0121 
+10 2102 1021 0210 
+11 1210 1210 1210 1210 
+12 -
+13 -
+14 -
+15 No moves needed
+16 12 1021 0201 2121 0102 
+17 1012 0101 2121 0102 
+
+
+1st blob (you may chose the blob that gives the shortest sequence here)
+0 No moves needed
+1 01 2021 2101 2101 2101 2102 0210 
+2 01 0201 2021 0202 1010 2010 
+3 02 0201 2020 1202 0120 2010 
+4 01 2010 2101 0120 2101 0121 0210 
+5 -
+6 -
+7 20 1010 1202 0202 0101 0120 2020 
+8 21 0201 0201 0202 1020 2102 1201 
+9 1201 0101 2021 0202 0101 0121 
+10 01 0201 0120 2012 0210 2010 
+11 01 2012 1010 1202 1010 1201 0210 
+12 -
+13 -
+14 -
+15 -
+16 2121 2102 1010 2012 0210 1202 
+17 10 1020 1210 2121 0121 2012 1020 
+
+
+2nd blob
+0 -
+1 No moves needed
+2 10 1210 2102 1021 0101 
+3 20 1201 2121 0121 0121 0101 
+4 2121 0210 2102 1012 
+5 -
+6 -
+7 21 0202 1210 1212 1021 2020 2101 
+8 20 2101 0202 0202 0210 1202 
+9 1010 1210 1210 1210 1201 
+10 21 2102 1021 0101 2101 2101 
+11 1212 1021 0201 0212 0210 1010 2120 
+12 -
+13 -
+14 -
+15 -
+16 2012 0120 1201 
+17 21 2101 2101 2101 2102 
+
+
+Last blob
+0 -
+1 -
+2 No moves needed
+3 02 0201 2020 1202 0120 2010 
+4 2012 0121 2101 0120 1201 2121 0101 
+5 -
+6 -
+7 2101 2120 1212 1012 1020 2020 1020 
+8 2102 1210 1201 0202 0202 1201 2120 
+9 1012 1012 1012 1012 
+10 10 2102 1012 1012 1012 1010 1201 
+11 0102 1020 2012 0120 1201 0201 2010 
+12 -
+13 -
+14 -
+15 -
+16 2101 2101 2101 2101 
+17 21 2101 2101 2101 2102 

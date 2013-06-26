@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1.2//EN"
+		      "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY app-fdl SYSTEM "fdl.xml">
+]>
+<!-- "file:/usr/share/sgml/docbook/dtd/xml/4.1.2/docbookx.dtd" [ -->
+
+<!-- This is the developers documentation for the term processor Kimwitu++ -->
+
+<book lang="en" xml:lang="en">
+<bookinfo>
+  <title>Kimwitu++ developers reference</title>
+  <author>
+    <firstname>Michael</firstname>
+    <surname>Piefel</surname>
+    <affiliation>
+      <orgname>Humboldt-University Berlin</orgname>
+      <orgdiv>Institute for Informatics</orgdiv>
+    </affiliation>
+  </author>
+  <edition>This document is $Id: developers-reference.xml 12720 2004-04-06 20:25:22Z criswell $.</edition>
+</bookinfo>
+
+<toc/>
+
+<!-- - - - - - - - - - - - - - - -  Smart Pointers - - - - - - - - - - - - -->
+<chapter><title>Smart Pointers</title>
+  <para>Smart pointers were implemented by Gerd Kurzbach. Their usage is not
+    straightforward, because that is made impossible by a few challenges.</para>
+  <sect1><title>Usage</title>
+    <qandaset>
+      <qandaentry>
+	<question>
+	  <para>
+	    What are the pointer types called?
+	  </para>
+	</question>
+	<answer>
+	  <para>
+	    For a phylum called <replaceable>phylum</replaceable> there'll be the following
+	    pointer types:<itemizedlist>
+	      <listitem><para><replaceable>phylum</replaceable>, a simple C
+		  pointer,</para></listitem>
+	      <listitem><para>c_<replaceable>phylum</replaceable>, a simple constant C
+		  pointer,</para></listitem>
+	      <listitem><para><replaceable>phylum</replaceable>_ptr, the normal smart
+		  pointer,</para></listitem>
+	      <listitem><para>weak_<replaceable>phylum</replaceable>_ptr, the weak smart
+		  pointer (does increment reference count),</para></listitem>
+	    </itemizedlist>
+	  </para>
+	</answer>
+      </qandaentry>
+    </qandaset>
+  </sect1>
+  <sect1><title>Implementation</title>
+    <para>TODO</para>
+  </sect1>
+</chapter>
+
+<!-- - - - - - - - - - - - - -  Kimwitu++ Source Management - - - - - - - - - - - - -->
+<chapter><title>Kimwitu++ Source Management</title>
+  <sect1><title>Formatting the Kimwitu++ source code</title>
+    <sect2><title>The input (<abbrev>ie.</abbrev> Kimwitu++ text)</title>
+      <para>Tabs have a width of 8, in words eight, which means they are exactly 8 characters
+	wide, not two (2), not 4 (four), but 2<superscript>3</superscript> characters.</para>
+      <para>The indentation however should be four characters, <abbrev>ie.</abbrev>
+	2<superscript>2</superscript>.</para>
+      <para>If you don't want to use tabs, but expand them to spaces, fine. However, recall it's
+	shorter. In a proper editor, it should be easy to get the desired behaviour,
+	<abbrev>eg.</abbrev> in Vim you can set <userinput>set tabstop=8 softtabstop=4
+	  shiftwidth=4</userinput>.</para>
+    </sect2>
+    <sect2><title>The output (<abbrev>ie.</abbrev> generated text)</title>
+      <para>In general care should be taken to make the generated source code human readable.
+	It should always look according to the guidelines above.</para>
+      <para>Kimwitu++ features a smart printer. This means you don't have to worry about
+	spaces, tabs and alignment, the printer will do it automatically. It will even ignore
+	your spaces and tabs, so don't bother except for making the input more readable.
+	Occasionally the printer will fail (it's simple, and not a complete parser like
+	entity), so you have to use the following hints in the output strings:
+	<variablelist>
+	  <varlistentry><term><userinput>\b</userinput></term>
+	    <listitem><para>The printer likes to elide superfluous spaces. Sometimes spaces
+		are important (most notably to avoid nested template specifications with
+		<userinput>&gt; &gt;</userinput> being interpreted as the
+		<userinput>&gt;&gt;</userinput> operator. The space following
+		<userinput>\b</userinput> will <emphasis>not</emphasis> be ignored.
+	    </para></listitem>
+	  </varlistentry>
+	  <varlistentry><term><userinput>\v</userinput></term>
+	    <listitem><para>This causes the following text to be indented one additional level.
+		Mnemonic for <wordasword lang="de">vorwärts</wordasword>, which is German for
+		<wordasword>forward</wordasword>.
+	    </para></listitem>
+	  </varlistentry>
+	  <varlistentry><term><userinput>\r</userinput></term>
+	    <listitem><para>This causes the following text to one level of indenting less.
+		Mnemonic for <wordasword lang="de">rückwärts</wordasword>, which is German for
+		<wordasword>backward</wordasword>.
+	    </para></listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+    </sect2>
+  </sect1>
+  <sect1><title>CVS</title>
+    <para>All changes which have an influence on the user should be marked with a
+      <literal>USER:</literal> prefix in the CSV change log message. This allows to collect
+      all user visible changes in the <filename>CHANGELOG</filename> file on release.</para>
+  </sect1>
+</chapter>
+
+<!-- - - - - - - - - - - - - -  Uniq Phyla - - - - - - - - - - - - -->
+<chapter><title>Uniq Phyla</title>
+  <sect1><title>Hash Sets</title>
+    <qandaset>
+      <qandaentry><question>
+	  <para>Why are hash sets used?</para>
+	  </question><answer>
+	  <para>Performance. Red-Black trees are known to be always good, hash tables can have
+	    poor performance. But usually they are fast. As very many casestrings are created
+	    in common programs, we optimize for this.</para>
+      </answer></qandaentry>
+      <qandaentry><question>
+	  <para>Why another level of indirection?</para>
+	  </question><answer>
+	  <para>Performance (compute hash only once).</para>
+      </answer></qandaentry>
+      <qandaentry><question>
+	  <para>What are the preprocessor decisions for?</para>
+	  </question><answer>
+	  <para>Hash sets are not standardized yet.</para>
+	  <para>There are different implementations. The three compilers I looked at (gcc and
+	    Intel's compiler) use three different ways to implement it. (The two gccs only
+	    differ in the location of the header file.)</para>
+	  <para>The GNU compiler expects two functors: One doing a hash, one doing a test for
+	    equality. Predefined tests are not suitable, of course.</para>
+	  <para>The Intel compiler expects a single functor both unary and binary: A unary
+	    function doing a hash, a binary function doing a test for lessness. Predefined
+	    tests are not suitable, of course.</para>
+	  <para>There is no knowing how other compilers might implement this. If a known
+	    compiler is used, hash sets are employed by default, but can be deactivated by
+	    defining DONT_USE_HASHSET. If an unknown compiler is used, hash sets are not
+	    employed by default, but can be activated by defining USE_HASHSET (but then keep
+	    fingers crossed we guess the right way to use them).</para>
+      </answer></qandaentry>
+    </qandaset>
+  </sect1>
+</chapter>
+
+<!-- - - - - - - - - - - - - -  Patterns - - - - - - - - - - - - -->
+<chapter><title>Patterns</title>
+  <sect1><title>Allowed patterns</title>
+    <para>Patterns over phyla are not allowed. Patterns over predefined operators (e. g. _Str)
+      are not allowed.</para>
+    <sect2><title>Patterns over predefined operators</title>
+      <para>It is not desirable to define new unparse and rewrite rules for the predefined phyla.
+	Predefined phyla are primitive, rewriting should not need to change them.
+	Different unparse behaviour can easily be implemented in the unparse function, should
+	it really be needed.</para>
+      <para>A pattern over a predefined operator might be useful in a with-statement.
+	However, this is not necessary or possible: All operators in a with-statement must
+	be of the same phylum, as patterns over phyla are (not yet) allowed.</para>
+      <para>Primitive phyla only have one operator, so a with-statement would have only one
+	alternative and is superfluous.</para>
+    </sect2>
+    <sect2><title>Patterns over phyla</title>
+      <para>Patterns over phyla are not allowed. This should be changed, considering the
+	following.</para>
+      <para>In a pattern over a phylum, there cannot be any references to subphyla.
+	Therefore, they are a bit limited. One possible exception could be lists and
+	abstract_list, as they always have two children.</para>
+      <para>Patterns over phyla are useless in with-statements. They can equally well be
+	implemented with a switch-statement over prod_sel().</para>
+    </sect2>
+  </sect1>
+  <sect1><title>Pattern sorting</title>
+    <para>The sorting of patterns is a difficult area. There are some obvious cases, and
+      some which are more twisted.</para>
+    <para>If, at a certain point, two patterns may match the current phylum, which one will
+      be chosen? Let us consider the following cases:</para>
+    <itemizedlist>
+      <listitem><para>A pattern that is truly more specific than another, i. e. all
+	  terms that match it would also match the other, but not vice versa, should be
+	  tested for before the other.</para></listitem>
+      <listitem><para>For two patterns that are disjunct, i. e. there cannot exist any
+	  terms that match both, ordering does not matter.</para></listitem>
+      <listitem><para>Two patterns which cover the same terms should be considered an
+	  error. Otherwise one would always be preferred over the other, probably not
+	  what the user intended. This is not so when there is a guard condition on the
+	  pattern (<userinput>provided</userinput>); it is difficult to decide for us what
+	  the semantics of these are (except when there are two identical conditions,
+	  verbatim).</para></listitem>
+      <listitem><para>For overlapping patterns, the situation is complex. There must
+	  exist a pattern (or multiple patterns) that covers exactly the intersection.
+	  In general, for each term, there must always be a most specific
+	  pattern.</para>
+	<para>This condition is difficult to implement, and it is hoped to be rare. We
+	  might focus on easy special cases (as <emphasis>one</emphasis> pattern
+	  covering the intersection of <emphasis>two</emphasis> others) and give
+	  warnings whenever we are not sure.</para></listitem>
+    </itemizedlist>
+    <para>In all other cases, the patterns have to be sorted, and a warning might be issued
+      to the user if that ordering is not obvious. Currently, pattern sorting in Kimwitu is
+      through an algorithm that is unintuitive. It frequently leads to an unexpected order.
+      A pattern is considered more specific if it is more specific further to the left; when
+      in doubt, the order of appearance in the input is taken.</para>
+    <para>To this end, Gerd proposed two different algorithms, both intuitive but already
+      fairly complex, which both resulted in different orderings. I believe this problem
+      cannot be solved.</para>
+    <para>Unfortunately, for some projects, Kimwitu++ issues many warnings, when order
+      doesn't matter or is indeed obvious. A way to silence this warnings selectively is on
+      the wishlist</para>
+  </sect1>
+</chapter>
+
+</book>
+<!-- vim:set sw=2 ts=8: -->

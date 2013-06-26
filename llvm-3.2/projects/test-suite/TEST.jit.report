@@ -1,0 +1,41 @@
+##=== TEST.jit.report - Report description for jit tests -------*- perl -*-===##
+#
+# This file defines a report to be generated for the jit test.
+#
+##===----------------------------------------------------------------------===##
+
+# Sort by total execution time
+$SortCol = 2;
+$TrimRepeatedPrefix = 1;
+
+# Sort in descending order
+$SortReverse = 1;
+
+# These are the columns for the report.  The first entry is the header for the
+# column, the second is the regex to use to match the value.  Empty list create
+# seperators, and closures may be put in for custom processing.
+(
+# Name
+ ["Name:" , '\'([^\']+)\' Program'],
+ [],
+# Times
+ ["Total"  , 'real ([0-9.]+)'],
+ ["CodeGen", 'Total Execution Time: ([0-9.]+)'],
+ ["InstSel", '([0-9.]+) \([^)]+\)[ 0-9A-Za-z]+Instruction Selection'],
+ ["LiveVar", '([0-9.]+) \([^)]+\)[ 0-9A-Za-z]+Live Variable'],
+ ["RA"     , '([0-9.]+) \([^)]+\)[ 0-9A-Za-z]+Register Allocator'],
+ ["FPStack", '([0-9.]+) \([^)]+\)[ 0-9]+X86 FP Stackifier'],
+ ["Peep"   , '([0-9.]+) \([^)]+\)[- 0-9]+X86 Peephole Optimizer'],
+ [],
+# Sizes
+ ["MCSize"  , '([0-9]+).*Number of bytes of machine code compiled'],
+ ["#MCInsts", '([0-9]+).*Number of machine instructions emitted'],
+ ["#Glob"   , '([0-9]+).*Number of bytes of global vars'],
+ [],
+# Number of transformations
+ ["#store" , '([0-9]+).*Number of stores added'],
+ ["#load"  , '([0-9]+).*Number of loads added'],
+ ["#fp"    , '([0-9]+).*Number of floating point instructions'],
+ ["#fxch"  , '([0-9]+).*Number of fxch instructions inserted'],
+ []
+);

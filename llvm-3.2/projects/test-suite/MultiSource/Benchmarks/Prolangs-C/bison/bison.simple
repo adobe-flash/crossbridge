@@ -1,0 +1,1371 @@
+#line 2 "bison.simple"
+/* Skeleton output parser for bison,
+   copyright (C) 1984 Bob Corbett and Richard Stallman
+
+		       NO WARRANTY
+
+  BECAUSE THIS PROGRAM IS LICENSED FREE OF CHARGE, WE PROVIDE ABSOLUTELY
+NO WARRANTY, TO THE EXTENT PERMITTED BY APPLICABLE STATE LAW.  EXCEPT
+WHEN OTHERWISE STATED IN WRITING, FREE SOFTWARE FOUNDATION, INC,
+RICHARD M. STALLMAN AND/OR OTHER PARTIES PROVIDE THIS PROGRAM "AS IS"
+WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING,
+BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY
+AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE PROGRAM PROVE
+DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+ IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW WILL RICHARD M.
+STALLMAN, THE FREE SOFTWARE FOUNDATION, INC., AND/OR ANY OTHER PARTY
+WHO MAY MODIFY AND REDISTRIBUTE THIS PROGRAM AS PERMITTED BELOW, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY LOST PROFITS, LOST MONIES, OR
+OTHER SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OR INABILITY TO USE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR
+DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY THIRD PARTIES OR
+A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS) THIS
+PROGRAM, EVEN IF YOU HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES, OR FOR ANY CLAIM BY ANY OTHER PARTY.
+
+		GENERAL PUBLIC LICENSE TO COPY
+
+  1. You may copy and distribute verbatim copies of this source file
+as you receive it, in any medium, provided that you conspicuously and
+appropriately publish on each copy a valid copyright notice "Copyright
+(C) 1985 Free Software Foundation, Inc."; and include following the
+copyright notice a verbatim copy of the above disclaimer of warranty
+and of this License.  You may charge a distribution fee for the
+physical act of transferring a copy.
+
+  2. You may modify your copy or copies of this source file or
+any portion of it, and copy and distribute such modifications under
+the terms of Paragraph 1 above, provided that you also do the following:
+
+    a) cause the modified files to carry prominent notices stating
+    that you changed the files and the date of any change; and
+
+    b) cause the whole of any work that you distribute or publish,
+    that in whole or in part contains or is a derivative of this
+    program or any part thereof, to be licensed at no charge to all
+    third parties on terms identical to those contained in this
+    License Agreement (except that you may choose to grant more extensive
+    warranty protection to some or all third parties, at your option).
+
+    c) You may charge a distribution fee for the physical act of
+    transferring a copy, and you may at your option offer warranty
+    protection in exchange for a fee.
+
+Mere aggregation of another unrelated program with this program (or its
+derivative) on a volume of a storage or distribution medium does not bring
+the other program under the scope of these terms.
+
+  3. You may copy and distribute this program (or a portion or derivative
+of it, under Paragraph 2) in object code or executable form under the terms
+of Paragraphs 1 and 2 above provided that you also do one of the following:
+
+    a) accompany it with the complete corresponding machine-readable
+    source code, which must be distributed under the terms of
+    Paragraphs 1 and 2 above; or,
+
+    b) accompany it with a written offer, valid for at least three
+    years, to give any third party free (except for a nominal
+    shipping charge) a complete machine-readable copy of the
+    corresponding source code, to be distributed under the terms of
+    Paragraphs 1 and 2 above; or,
+
+    c) accompany it with the information you received as to where the
+    corresponding source code may be obtained.  (This alternative is
+    allowed only for noncommercial distribution and only if you
+    received the program in object code or executable form alone.)
+
+For an executable file, complete source code means all the source code for
+all modules it contains; but, as a special exception, it need not include
+source code for modules which are standard libraries that accompany the
+operating system on which the executable file runs.
+
+  4. You may not copy, sublicense, distribute or transfer this program
+except as expressly provided under this License Agreement.  Any attempt
+otherwise to copy, sublicense, distribute or transfer this program is void and
+your rights to use the program under this License agreement shall be
+automatically terminated.  However, parties who have received computer
+software programs from you with this License Agreement will not have
+their licenses terminated so long as such parties remain in full compliance.
+
+  5. If you wish to incorporate parts of this program into other free
+programs whose distribution conditions are different, write to the Free
+Software Foundation at 675 Mass Ave, Cambridge, MA 02139.  We have not yet
+worked out a simple rule that can be stated here, but we will often permit
+this.  We will be guided by the two goals of preserving the free status of
+all derivatives of our free software and of promoting the sharing and reuse of
+software.
+
+
+In other words, you are welcome to use, share and improve this program.
+You are forbidden to forbid anyone else to use, share and improve
+what you give them.   Help stamp out software-hoarding!  */
+
+/* This is the parser code that is written into each bison parser
+  when the %semantic_parser declaration is not specified in the grammar.
+  It was written by Richard Stallman by simplifying the hairy parser
+  used when %semantic_parser is specified.  */
+
+/* Note: there must be only one dollar sign in this file.
+   It is replaced by the list of actions, each action
+   as one case of the switch.  */
+
+#define yyerrok		(yyp->yyerrstatus = 0)
+#define yyclearin	(yychar = YYEMPTY)
+#define YYEMPTY		-2
+#define YYEOF		0
+#define YYFAIL		goto yyerrlab;
+#define YYACCEPT	goto yyaccept
+#define YYABORT		goto yyabort
+
+#define YYTERROR	1
+
+#ifndef YYIMPURE
+#define YYLEX		yylex(currentfile)
+#endif
+
+static char *dummy = NULL;
+char **_yytext = &dummy;
+static YYSTYPE dummys;
+YYSTYPE *_yylval = &dummys;
+static YYLTYPE dummyl;
+YYLTYPE *_yylloc = &dummyl;
+static int dummyp;
+int *_yyppval = &dummyp;
+
+#ifdef YYDEBUG
+int yydebug = 0;		/*  nonzero means print parse debug info */
+int yytrace = 0;		/*  nonzero means print high-level parse
+				    trace */
+#endif
+
+#ifndef YYPURE
+#define YYLEX		yylex(currentfile, &yylval, &yylloc)
+#endif
+
+/* If nonreentrant, generate the variables here */
+
+#ifndef YYIMPURE
+
+int	yyn;
+
+#endif  /* YYIMPURE */
+
+
+/*  YYMAXDEPTH indicates the initial size of the parser's stacks	*/
+
+#ifndef	YYMAXDEPTH
+#define YYMAXDEPTH 200
+#endif
+
+/*  YYMAXLIMIT is the maximum size the stacks can grow to
+    (effective only if the built-in stack extension method is used).  */
+
+#ifndef YYMAXLIMIT
+#define YYMAXLIMIT 10000
+#endif
+
+#define YYMAXFORKDEPTH 20
+
+typedef struct parsestate {
+	struct parsestate *flink, *blink;
+	char *text;
+  	YYSTYPE lval;
+	YYLTYPE lloc;
+	int cur_token_number;
+	int yychar;
+	int blocked;
+	int lineno;		/* line number containing PP token */
+	int yystate;
+	int yyerrstatus;
+	int yynerr;		/* number of parse errors so far */
+	short *yyss, *yyssp;	/* state stack and state tos */
+	YYSTYPE *yyvs, *yyvsp, *last_reduction;	/* val stack and val tos */
+	YYSTYPE *tos_stack[YYMAXFORKDEPTH], **tos_tos;
+#ifdef YYLSP_NEEDED
+	YYLTYPE *yyls, *yylsp;	/* line stack and line tos */
+#endif
+	unsigned short flags_stack[YYMAXFORKDEPTH], *flags; /* control flags */
+	int  data_stack[YYMAXFORKDEPTH], *data; /* client specific data */
+	/* The following manage the correspondence between the
+	   two parses for an #ifdef. "pending_join" is the
+	   partner that will be next joined to. "pending_endif"
+	   is the partner that will be awoken on the next ifdef. */
+	struct parsestate *pending_join_stack[YYMAXFORKDEPTH], **pending_join;
+	struct parsestate *pending_endif_stack[YYMAXFORKDEPTH], **pending_endif;
+	short yymaxdepth;	/* max depth of current stack */
+#ifdef YYDEBUG
+	char *branch_stack[YYMAXFORKDEPTH], **branch; 
+#endif
+} *parse;
+
+#define SEEN_ENDIF_BIT 		0x01
+#define SEEN_PP_TOKEN_BIT	0x02
+#define JOIN_PENDING_BIT 	0x04
+#define IFDEF_FORK_BIT 		0x08
+#define JUST_SHIFTED_BIT	0x10
+#define ACCEPTED_BIT		0x20
+#define ABORTED_BIT		0x40
+#define ACTIVE_BIT		0x80
+#define DONE_SOMETHING_BIT	0x100
+#define SEEN_ENDIF(p) 		(*(p)->flags & SEEN_ENDIF_BIT)
+#define SEEN_PP_TOKEN(p)	(*(p)->flags & SEEN_PP_TOKEN_BIT)
+#define JOIN_PENDING(p) 	(*(p)->flags & JOIN_PENDING_BIT)
+#define IFDEF_FORK(p) 		(*(p)->flags & IFDEF_FORK_BIT)
+#define JUST_SHIFTED(p)		(*(p)->flags & JUST_SHIFTED_BIT)
+#define ACCEPTED(p) 		(*(p)->flags & ACCEPTED_BIT)
+#define ABORTED(p) 		(*(p)->flags & ABORTED_BIT)
+#define ACTIVE(p) 		(*(p)->flags & ACTIVE_BIT)
+#define DONE_SOMETHING(p) 	(*(p)->flags & DONE_SOMETHING_BIT)
+#define SET_SEEN_ENDIF(p) 	(*(p)->flags |= SEEN_ENDIF_BIT)
+#define SET_SEEN_PP_TOKEN(p) 	(*(p)->flags |= SEEN_PP_TOKEN_BIT)
+#define SET_JOIN_PENDING(p) 	(*(p)->flags |= JOIN_PENDING_BIT)
+#define SET_IFDEF_FORK(p) 	(*(p)->flags |= IFDEF_FORK_BIT)
+#define SET_JUST_SHIFTED(p) 	(*(p)->flags |= JUST_SHIFTED_BIT)
+#define SET_ACCEPTED(p) 	(*(p)->flags |= ACCEPTED_BIT)
+#define SET_ABORTED(p) 		(*(p)->flags |= ABORTED_BIT)
+#define SET_ACTIVE(p) 		(*(p)->flags |= ACTIVE_BIT)
+#define SET_DONE_SOMETHING(p) 	(*(p)->flags |= DONE_SOMETHING_BIT)
+#define UNSET_SEEN_ENDIF(p) 	(*(p)->flags &= ~SEEN_ENDIF_BIT)
+#define UNSET_SEEN_PP_TOKEN(p) 	(*(p)->flags &= ~SEEN_PP_TOKEN_BIT)
+#define UNSET_JOIN_PENDING(p) 	(*(p)->flags &= ~JOIN_PENDING_BIT)
+#define UNSET_IFDEF_FORK(p) 	(*(p)->flags &= ~IFDEF_FORK_BIT)
+#define UNSET_JUST_SHIFTED(p) 	(*(p)->flags &= ~JUST_SHIFTED_BIT)
+#define UNSET_ACCEPTED(p) 	(*(p)->flags &= ~ACCEPTED_BIT)
+#define UNSET_ABORTED(p) 	(*(p)->flags &= ~ABORTED_BIT)
+#define UNSET_ACTIVE(p) 	(*(p)->flags &= ~ACTIVE_BIT)
+#define UNSET_DONE_SOMETHING(p) (*(p)->flags &= ~DONE_SOMETHING_BIT)
+#define UNSET_ALL(p)		(*(p)->flags = 0)
+
+#ifdef YYDEBUG
+void
+dumpparse(p)
+parse p;
+{
+    short *ss;
+
+    printf("parse %x, flink=%x, blink=%x, token=%d, yychar=%d\n",
+	   p, p->flink, p->blink, p->cur_token_number, p->yychar);
+    printf("\tblocked=%d, lineno=%d, yystate=%d, yyerrstatus=%d, yynerr=%d\n",
+	   p->blocked, p->lineno, p->yystate, p->yyerrstatus, p->yynerr);
+    printf("\tstate-stack: ");
+    for (ss = p->yyss; ss <= p->yyssp; ss++) {
+	printf(" %d", *ss);
+	if (ss - p->yyss == *p->tos_tos - p->yyvs)
+	    printf(" t");
+    }
+    printf("\n\n");
+}
+
+#endif
+
+#if 0
+extern int yylineno();		/* current line number per the scanner */
+#endif
+
+int id;
+
+YYSTYPE (*yyfork)();
+YYSTYPE (*yyjoin)();
+void	(*yyelse)();
+void	(*yyendif)();
+void    (*yyfinish)();
+void	(*yyswitch)();
+int	(*yyskip)();
+
+#include "preprocessor.h"
+#include "alloc.h"
+
+extern FILE *errfile;
+
+parse
+start_parse()
+{
+    register parse p;
+#ifdef YYDEBUG
+    if (yydebug)
+	fprintf(errfile, "Starting parse\n");
+#endif
+    p = (parse)Malloc(sizeof *p);
+
+    p->yystate = 0;
+    p->yyerrstatus = 0;
+    p->yynerr = 0;
+    p->blocked = 0;
+    p->cur_token_number = -1;
+    p->yychar = YYEMPTY;
+    p->last_reduction = 0;
+
+    /* Initialize stack pointers.  Waste one element of value and
+     * location stack so that they stay on the same level as the state
+     * stack.
+     */
+    p->yyss = (short *)Malloc(sizeof(short) * YYMAXDEPTH);
+    p->yyssp = p->yyss - 1;
+    p->yyvsp = p->yyvs = (YYSTYPE *)Malloc(sizeof(YYSTYPE) * YYMAXDEPTH);
+    p->tos_tos = &p->tos_stack[0];
+    *p->tos_tos = p->yyvsp;
+    p->flags = &p->flags_stack[0];
+    *p->flags = 0;
+    p->data = &p->data_stack[0];
+    *p->data = 0;
+    p->pending_join = &p->pending_join_stack[0];
+    p->pending_endif = &p->pending_endif_stack[0];
+    *p->pending_join = *p->pending_endif = 0;
+#ifdef YYLSP_NEEDED
+    p->yylsp = p->yyls = (YYLTYPE *)Malloc(sizeof(YYLTYPE) * YYMAXDEPTH);
+#endif
+    p->yymaxdepth = YYMAXDEPTH;
+    /* make it a circular linked list */
+    p->flink = p->blink = p;
+#ifdef YYDEBUG
+    p->branch = &p->branch_stack[0];
+    *p->branch = "TRUE branch";
+#endif
+    return p;
+}
+
+kill_parse(p)
+register parse p;
+{
+    Free(p->yyss);
+    Free(p->yyvs);
+#ifdef YYLSP_NEEDED
+    Free(p->yyls);
+#endif
+    Free(p);
+}
+
+unify_parses(p1, p2)
+parse p1, p2;
+{
+    register short *s1 = p1->yyssp;
+    register short *s2 = p2->yyssp;
+
+    if (*p1->pending_join != p2 || *p2->pending_join != p1)
+	return 0;
+
+    if (JUST_SHIFTED(p1) || JUST_SHIFTED(p2)) 
+	return 0;
+
+    if (!ACTIVE(p1) || !ACTIVE(p2)) 
+	return 0;
+
+    if ((!DONE_SOMETHING(p1) && !DONE_SOMETHING(p2)) ||
+	(ACCEPTED(p1) && ACCEPTED(p2))) {
+#ifdef YYDEBUG	       
+	if (yydebug)
+	    fprintf(errfile, "Joining parse %x to parse %x\n", p1, p2);
+#endif
+	return 1;
+    }
+    
+    if ((p1->yyvsp > *p1->tos_tos+1) || (p2->yyvsp > *p2->tos_tos+1))
+	return 0;
+    
+    while (s1 != p1->yyss && s2 != p2->yyss) {
+	if (*s1 != *s2)
+	    break;
+	s1--; s2--;
+    }
+
+    if (s1 == p1->yyss && s2 == p2->yyss) {
+#ifdef YYDEBUG	       
+	if (yydebug) {
+	    fprintf(errfile, "Joining parse %x to parse %x\n", p1, p2);
+	}
+#endif
+	return 1;
+    }
+    return 0;
+}
+
+void realloc_stack(as, p)
+    ScanPtr as;
+    register parse p;
+{
+    /* Give user a chance to reallocate the stack. */
+
+
+    /* Get the current used size of the three stacks, in elements.  */
+    int size = p->yyssp - p->yyss + 1;
+
+    if (p->yymaxdepth >= YYMAXLIMIT)
+	yyerror(as, "parser stack overflow");
+
+    p->yymaxdepth *= 2;
+    if (p->yymaxdepth > YYMAXLIMIT)
+	p->yymaxdepth = YYMAXLIMIT;
+
+    p->yyss = (short *) Realloc(p->yyss,
+				p->yymaxdepth * (sizeof (*p->yyssp)));
+    p->yyvs = (YYSTYPE *) Realloc(p->yyvs, 
+				  p->yymaxdepth * (sizeof (*p->yyvsp)));
+#ifdef YYLSP_NEEDED
+    p->yyls = (YYLTYPE *) Realloc(p->yyls, 
+				  p->yymaxdepth * (sizeof (*p->yylsp)));
+#endif
+
+    p->yyssp = p->yyss + size - 1;
+    p->yyvsp = p->yyvs + size - 1;
+#ifdef YYLSP_NEEDED
+    p->yylsp = p->yyls + size - 1;
+#endif
+
+#ifdef YYDEBUG
+    if (yydebug)
+	fprintf(errfile, "Stack size increased to %d\n", p->yymaxdepth);
+#endif
+
+#if 0
+    if (p->yyssp >= p->yyss + p->yymaxdepth - 1)
+	return
+#endif
+}
+
+#define REDUCTION 1
+
+#if 0
+static parse
+next_applicable_parse(p, parselist)
+register parse p, parselist;
+{
+    register parse l = parselist->flink;
+
+    while (l != p) {
+	if (l->cur_token_number == p->cur_token_number)
+	    break;
+	l = l->flink;
+    }
+    return l == p ? NULL : l;
+}
+#endif
+
+static void
+notify_of_endif(p, limit, activelist, cur_token_number)
+    parse p;
+    parse limit;
+    parse *activelist;
+{
+    parse *pending;
+
+    --p->pending_endif;
+    p->cur_token_number = cur_token_number;
+    p->yychar = YYEMPTY;
+    SET_SEEN_ENDIF(p);
+    SET_SEEN_PP_TOKEN(p);
+    /* if p isn't active, make it so and put it on the activelist */
+    if (!ACTIVE(p)) {
+	SET_ACTIVE(p);
+	if (*activelist == NULL) {
+	    *activelist = p;
+	    (*activelist)->flink = (*activelist)->blink = *activelist;
+	} else {
+	    (*activelist)->blink->flink = p;
+	    p->flink = *activelist;
+	    p->blink = (*activelist)->blink;
+	    (*activelist)->blink = p;
+	}
+    }
+
+    for (pending = p->pending_join; *pending != limit; pending--) {
+	notify_of_endif(*pending, p, activelist, cur_token_number);
+    }
+
+}
+
+static parse
+find_next_parse(parselist, cur_token_number)
+register parse parselist;
+{
+    register parse l, best_parse;
+    int parse_val, best_parse_val;
+
+    if (parselist->flink == parselist)
+    	if (ACCEPTED(parselist) || ABORTED(parselist))
+	    return NULL;
+	else
+    	    return parselist;
+
+    l = parselist;
+    best_parse_val = -2;
+    best_parse = NULL;
+    do {
+	if (ACCEPTED(l) || ABORTED(l)) {
+	    l = l->flink;
+	    continue;
+	}
+	else if (l->cur_token_number < cur_token_number) 
+	    parse_val = 100000;
+	else 
+	    parse_val = 0;
+
+	parse_val += l->yyssp - l->yyss;
+	if (parse_val > best_parse_val) {
+	    best_parse_val = parse_val;
+	    best_parse = l;
+	} else if (parse_val == best_parse_val &&
+		   *l->yyssp > *best_parse->yyssp) {
+	    best_parse_val = parse_val;
+	    best_parse = l;
+	}
+	    
+	l = l->flink;
+    } while (l != parselist);
+    return best_parse;
+}
+
+#define FALSE 0
+#define TRUE 1
+
+all_blocked(parselist, cur_token_number)
+parse parselist;
+{
+    register parse l = parselist;
+    do {
+	if (l->cur_token_number != cur_token_number)
+	    return FALSE;
+	l = l->flink;
+    } while (l != parselist);
+    return TRUE;
+}
+
+static parse merge_parses(yyp, ap, activelist, currentfile)
+    parse yyp, ap;
+    parse *activelist;
+    FilePtr currentfile;
+{
+    parse tmp;
+    
+    if (!IFDEF_FORK(yyp)) {
+	/* swap ap and yyp so that the result of the join
+	   (yyp) is the true branch of the fork */
+	tmp = ap;
+	ap = yyp;
+	yyp = tmp;
+    }
+#ifdef YYDEBUG
+    if (yydebug)
+	fprintf(errfile, "Joining parse 0x%x and 0x%x.\n", 
+		yyp, ap);
+#endif		
+    if (yyjoin) {
+	if (!yyp->last_reduction) 
+	    yyp->last_reduction = yyp->yyvsp;
+	if (!ap->last_reduction) 
+	    ap->last_reduction = ap->yyvsp;
+	*yyp->yyvsp = (*yyjoin)(yyp->last_reduction,
+				ap->last_reduction,
+				yyp->data, ap->data,
+				&currentfile->cpp_skipping);
+    }
+    --yyp->pending_join;
+    --yyp->data;
+    --yyp->flags;
+    --yyp->tos_tos;
+#ifdef YYDEBUG
+    --yyp->branch;
+#endif			
+    
+    /* get rid of the duplicate parse */
+    ap->blink->flink = ap->flink;
+    ap->flink->blink = ap->blink;
+    if (ap == *activelist)
+	*activelist = ap->flink;
+    kill_parse(ap);
+    return yyp;
+}
+
+static void merge_active(activelist, currentfile)
+    parse *activelist;
+    FilePtr currentfile;
+{
+    parse yyp, ap;
+    int parses_merged;
+    
+    /*
+     * See if there are any parses that we can join.
+     */
+    parses_merged = 1;
+    while (parses_merged && (*activelist)->flink != *activelist) {
+	parses_merged = 0;
+	yyp = *activelist;
+	do {
+	    ap = *yyp->pending_join;
+	    if (unify_parses(yyp, ap)) {
+		yyp = merge_parses(yyp, ap, activelist, currentfile);
+		parses_merged = 1;
+	    }
+	    yyp = yyp->flink;
+	} while (yyp != *activelist);
+    }
+}
+
+#line 607 "bison.simple"
+int yyparse(currentfile)
+    FilePtr currentfile;
+{
+    int yychar1; /*  lookahead token as an internal (translated) token number */
+
+#ifndef YYPURE
+    int yyn;
+#endif
+
+#ifdef YYDEBUG
+    extern int yydebug;
+#endif
+
+    YYSTYPE yyval;    	/* the variable used to return */
+    			/* semantic values from the action */
+    			/* routines */
+    int yylen;
+    register parse yyp;
+    parse ap, activelist;
+    int curtoken, retval;
+    char *curtext, **oldtext;
+    YYSTYPE curlval, *oldlval;
+    YYLTYPE curlloc, *oldlloc;
+    int cur_token_number = 0;
+
+
+    oldtext = _yytext;
+    oldlval = _yylval;
+    oldlloc = _yylloc;
+    
+    activelist = start_parse();
+    SET_ACTIVE(activelist);
+     
+    /* Go through parses in round-robin fashion. Activelist is a circular */
+    /* doubly linked list. */ 
+    while (yyp = find_next_parse(activelist, cur_token_number)) {
+	_yytext = &(yyp->text);
+	_yylval = &(yyp->lval);
+	_yylloc = &(yyp->lloc);
+#ifdef YYDEBUG
+	if (yydebug)
+	    fprintf(errfile, "Resuming parser %x %s\n", yyp, *yyp->branch);
+#endif
+	if (yyswitch) 
+	    (*yyswitch)(yyp->data, &currentfile->cpp_skipping);
+
+	/*
+	 * Figure out where to resume.  If this parse has never
+	 * seen a token, we start below the test statements, otherwise
+	 * we start where we left off.
+	 */
+#if 1
+	if (yyp->blocked == REDUCTION) {
+#ifdef YYDEBUG
+	    if (yydebug) 
+		fprintf(errfile, "yyp->blocked == REDUCTION, yyp->token = %d, %d\n", yyp->cur_token_number, cur_token_number);
+#endif
+	    goto yyresume;
+	}
+	else 
+#endif
+	    if (SEEN_PP_TOKEN(yyp)) {
+#ifdef YYDEBUG
+		if (yydebug) 
+		    fprintf(errfile, "SEEN_PP_TOKEN");
+#endif
+		goto yyresume;
+	}
+	else if (yyp->cur_token_number < 0) {
+	    /*
+	     * This is the start-up case for the parser.  We have
+	     * to set the token counter so that we will read the first
+	     * token and then fall through to push the initial state.
+	     */
+	    yyp->cur_token_number = cur_token_number;
+	} else 
+	    goto yyresume;
+
+        /*
+	 * Push a new state, which is found in yystate .  In all
+	 * cases, when you get here, the value and location stacks
+	 * have just been pushed.  so pushing a state here evens the
+	 * stacks.
+  	 */
+    yynewstate:
+#ifdef YYDEBUG
+	    if (yydebug) 
+		fprintf(errfile, "yynewstate: ");
+#endif
+	*++yyp->yyssp = yyp->yystate;
+	SET_DONE_SOMETHING(yyp);
+
+	if (yyp->yyssp >= yyp->yyss + yyp->yymaxdepth - 1)
+	    realloc_stack(currentfile->as, yyp);
+#ifdef YYDEBUG
+	if (yydebug) {
+	    short *ssp1 = yyp->yyss - 1;
+	    fprintf(errfile, "Entering state %d ", yyp->yystate);
+	    fprintf (errfile, "state stack now");
+	    while (ssp1 != yyp->yyssp)
+		fprintf (errfile, " %d", *++ssp1);
+	    fprintf (errfile, "\n");
+	}
+#endif
+
+	/*
+	 * We've already done the reduction.  Now see if we can join this
+	 * parse with its partner.
+	 */
+	if (SEEN_ENDIF(yyp) && (ap = *yyp->pending_join)) {
+	    /* we should really make sure that both parses can be
+	       reduced here */
+	    if (unify_parses(yyp, ap))
+		yyp = merge_parses(yyp, ap, &activelist, currentfile);
+	}
+
+#if 2	
+	/*
+	 * If we are here and blocked == REDUCTION, then we just
+	 * did a reduction so we should block to see if there is a better 
+	 * candidate parse for reduction.
+	 */
+	if (yyp->blocked == REDUCTION)
+	   continue; 
+#endif
+
+	/* Do appropriate processing given the current state.  Read
+	 * a lookahead token if we need one and don't already have
+	 * one.
+	 */
+    yyresume:
+#ifdef YYDEBUG
+	if (yydebug) 
+	    fprintf(errfile, "yyresume: ");
+#endif
+
+	/* First try to decide what to do without reference to
+	 * lookahead token.
+	 */
+
+	yyn = yypact[yyp->yystate];
+	if (yyn == YYFLAG)
+	    goto yydefault;
+
+	/* Not known => get a lookahead token if don't already have
+	 * one.
+	 */
+
+	/* yychar is either YYEMPTY or YYEOF or a valid token in
+	 * external form.
+	 */
+
+	if (yyp->yychar == YYEMPTY) {
+	    register parse newp;
+	    int need_new_token;
+
+	    /*
+	     * Synchronize on input.  Suspend this parse if other
+	     * parses haven't read the current token.
+	     */
+	    if (!(need_new_token = all_blocked(activelist, cur_token_number)) &&
+		yyp->cur_token_number == cur_token_number)
+		continue;
+
+	    if (need_new_token) {
+#ifdef YYDEBUG
+		if (yydebug)
+		    fprintf(errfile, "Reading a token: ");
+#endif
+		yyp->yychar = curtoken = YYLEX;
+		curtext = yytext;
+		curlval = yylval;
+		curlloc = yylloc;
+		yyp->cur_token_number = ++cur_token_number;
+	    } else {
+		yyp->yychar = curtoken;
+		yyp->text = curtext;
+		yyp->lval = curlval;
+		yyp->lloc = curlloc;
+		yyp->cur_token_number = cur_token_number;
+	    }
+
+	    switch (yyp->yychar) {
+		parse tail;
+		int token_val;
+
+	    case PPELSE:
+	    case PPELIF:
+#ifdef YYDEBUG
+		if (yydebug)
+		    fprintf(errfile, "Next token is ELSE\n");
+#endif
+		token_val = yyp->yychar;
+
+		/*
+		 * Swap role of active and sleeping parses
+		 * by putting all currently active parses to sleep
+		 * and waking all their partners.
+		 */
+		ap = activelist;        /* save old activelist */
+		activelist = NULL;	/* nothing currently active */
+		tail = ap;
+		
+		/*
+		 * Now put the relevant sleeping parses back on
+		 * activelist.
+		 */
+	    	{
+		    parse nextap = 0, partner;
+		    
+		    for (; ap && nextap != tail; ap = nextap) {
+			nextap = ap->flink;
+			partner = *ap->pending_endif;
+			UNSET_ACTIVE(ap);
+			if (!ACTIVE(partner)) {
+			    if (activelist == NULL) {
+				activelist = partner;
+				activelist->flink = activelist->blink =
+				    activelist;
+			    } else {
+				/* Put parse on end. Is this necessary? */
+				activelist->blink->flink = partner;
+				partner->flink = activelist;
+				partner->blink = activelist->blink;
+				activelist->blink = partner;
+			    }
+			    /* force this parse to read new token */
+			    partner->cur_token_number = cur_token_number;
+			    /* mark this parse as having just seen a
+			       preprocessor token */
+			    UNSET_ALL(partner);
+			    SET_SEEN_PP_TOKEN(partner);
+			    SET_ACTIVE(partner);
+			}
+		    }		/* for loop */
+		}		/* compound stmt */
+
+		if (yyelse) 
+		    if (IFDEF_FORK(yyp))
+			(*yyelse)(yyp->data, (*yyp->pending_endif)->data);
+		    else
+			(*yyelse)((*yyp->pending_endif)->data, yyp->data);
+
+
+		yyp->yychar = YYEMPTY;
+		yyp = activelist->blink;
+		if (token_val == PPELSE) {
+		    continue;
+		} else {
+		    /* fall through to do IF part of PPELIF case */ ;
+		    yyp->yychar = PPELIF;
+#ifdef YYDEBUG
+		    if (yydebug)
+			fprintf(errfile, "Next token was really ELSIF\n");
+#endif
+		}
+	    case PPIFDEF:
+	    case PPIF:
+	    case PPIFNDEF:
+
+#ifdef YYDEBUG
+		if (yydebug)	
+		    fprintf(errfile, "Next token is IFDEF, IFNDEF, or IF. ");
+#endif
+		/* save current tos for yyvs */
+		*(++yyp->tos_tos) = yyp->yyvsp;
+		++yyp->flags;
+		SET_JOIN_PENDING(yyp);
+		UNSET_SEEN_ENDIF(yyp);
+		SET_SEEN_PP_TOKEN(yyp);
+		SET_IFDEF_FORK(yyp);
+		SET_ACTIVE(yyp);
+		UNSET_DONE_SOMETHING(yyp);
+		++yyp->pending_join;
+		++yyp->pending_endif;
+		++yyp->data;
+		
+		/*
+		 * fork an alternate parse for this active parse.
+		 */
+		newp = start_parse();
+#ifdef YYDEBUG
+		if (yydebug)
+		    fprintf(errfile, 
+			    "Splitting parse 0x%x. New parse is 0x%x.\n", 
+			    yyp, newp);
+#endif		
+
+#ifdef YYDEBUG
+		++yyp->branch;
+		*yyp->branch = "TRUE branch";
+		bcopy(yyp->branch_stack, newp->branch_stack, sizeof
+		      newp->branch_stack);
+		newp->branch = newp->branch_stack + (yyp->branch -
+						     yyp->branch_stack);
+		*newp->branch = "FALSE branch";
+#endif
+		bcopy(yyp->yyss, newp->yyss,
+		      (yyp->yyssp - yyp->yyss + 1) * (sizeof *yyp->yyss));
+		newp->yyssp = newp->yyss + (yyp->yyssp - yyp->yyss);
+		bcopy(yyp->yyvs, newp->yyvs,
+		      (yyp->yyvsp - yyp->yyvs + 1) * (sizeof *yyp->yyvs));
+		newp->yyvsp = newp->yyvs + (yyp->yyvsp - yyp->yyvs);
+#ifdef YYLSP_NEEDED
+		bcopy(yyp->yyls, newp->yyls,
+		      (yyp->yylsp - yyp->yyls + 1) * (sizeof *yyp->yyls));
+		newp->yylsp = newp->yyls + (yyp->yylsp - yyp->yyls);
+#endif
+
+		{
+		    int i;
+		    for (i = 0; &yyp->tos_stack[i] <= yyp->tos_tos; i++)
+			newp->tos_stack[i] = newp->yyvs
+			    + (yyp->tos_stack[i] - yyp->yyvs);
+		}
+		newp->tos_tos = newp->tos_stack
+		    + (yyp->tos_tos - yyp->tos_stack);
+
+		newp->lineno = yyp->lineno = yylineno(currentfile->as);
+		newp->yystate = yyp->yystate;
+		newp->yyerrstatus = yyp->yyerrstatus;
+		newp->yynerr = yyp->yynerr;
+		newp->yymaxdepth = yyp->yymaxdepth;
+		
+		bcopy(yyp->flags_stack, newp->flags_stack,  
+		      sizeof newp->flags_stack);
+		newp->flags =
+		    newp->flags_stack + (yyp->flags - yyp->flags_stack);
+		UNSET_ALL(newp);
+		SET_JOIN_PENDING(newp);
+
+		bcopy(yyp->pending_join_stack, newp->pending_join_stack, 
+		      sizeof newp->pending_join_stack);
+		newp->pending_join =
+		    newp->pending_join_stack + (yyp->pending_join - 
+						yyp->pending_join_stack);
+		*newp->pending_join = yyp;
+		*yyp->pending_join = newp;
+
+		bcopy(yyp->pending_endif_stack, newp->pending_endif_stack, 
+		      sizeof newp->pending_endif_stack);
+		newp->pending_endif =
+		    newp->pending_endif_stack + (yyp->pending_endif - 
+						 yyp->pending_endif_stack);
+		*newp->pending_endif = yyp;
+		*yyp->pending_endif = newp;
+
+		bcopy(yyp->data_stack, newp->data_stack, sizeof
+		      newp->data_stack);
+		newp->data = newp->data_stack + (yyp->data - yyp->data_stack);
+
+		if (yyfork)
+		    if (yyp->last_reduction)
+		    	*yyp->last_reduction =
+			   (*yyfork)(yyp->last_reduction,
+				     yyp->yychar, yytext, yyppval, 
+				     yyp->data, newp->data,
+				     currentfile->cpp_skipping);
+		    else
+			(void)(*yyfork)(yyp->last_reduction,
+					yyp->yychar, yytext, yyppval,
+					yyp->data, newp->data,
+					currentfile->cpp_skipping);
+
+		yyp->cur_token_number = cur_token_number;
+		yyp->yychar = YYEMPTY;
+
+		continue;	/* do the next parse */
+
+	    case PPENDIF:
+#ifdef YYDEBUG
+		if (yydebug)
+		    fprintf(errfile, "Next token is ENDIF\n");
+#endif
+		ap = *yyp->pending_endif;
+
+		if (yyendif) 
+		    if (IFDEF_FORK(yyp))
+			(*yyendif)(yyp->data, ap->data);
+		    else
+			(*yyendif)(ap->data, yyp->data);
+
+		notify_of_endif(yyp, ap, &activelist, cur_token_number);
+		notify_of_endif(ap, *ap->pending_endif,
+		                &activelist, cur_token_number);
+
+		/* all partners are now active and have been notified of
+		   the #endif. See if there's anything we can join. */
+		merge_active(&activelist, currentfile);
+
+		continue;
+		
+	    case PPDEFINE:
+	    case PPINCLUDE:
+	    case PPLINE:
+		yyp->yychar = YYEMPTY;
+		break;
+	    }
+	}
+	/* This is a real token. Mark this parse has having seen one. */
+#ifdef YYDEBUG
+	if (yydebug && SEEN_PP_TOKEN(yyp))
+	    fprintf(errfile, "Unsetting SEEN_PP_TOKEN for %x, (%s).\n", yyp,
+		    *yyp->branch);
+#endif
+	UNSET_SEEN_PP_TOKEN(yyp);
+
+	/* Convert token to internal form (in yychar1) for indexing
+	 * tables with
+	 */
+
+	if (yyp->yychar <= 0) { /* This means end of input. */
+	    yychar1 = 0;
+	    yyp->yychar = YYEOF;	/* Don't call YYLEX any more */
+
+#ifdef YYDEBUG
+	    if (yydebug)
+		fprintf(errfile, "Now at end of input.\n");
+#endif
+	} else {
+	    yychar1 = YYTRANSLATE(yyp->yychar);
+
+#ifdef YYDEBUG
+	    if (yydebug)
+		fprintf(errfile, "Next token is %d (%s, %s)\n", yyp->yychar, yytname[yychar1], yytext);
+#endif
+	}
+
+	yyn += yychar1;
+	if (yyn < 0 || yyn > YYLAST || yycheck[yyn] != yychar1)
+	    goto yydefault;
+
+	yyn = yytable[yyn];
+
+	/* yyn is what to do for this token type in this state.
+	 * Negative => reduce, -yyn is rule number.  	 Positive =>
+	 * shift, yyn is new state.  	 New state is final state =>
+	 * don't bother to shift, 	 just return success.  	 0, or
+	 * most negative number => error.
+	 */
+
+	if (yyn < 0) {
+	    if (yyn == YYFLAG)
+		goto yyerrlab;
+	    yyn = -yyn;
+	    goto yyreduce;
+	} else if (yyn == 0)
+	    goto yyerrlab;
+
+	if (yyn == YYFINAL) {
+	    _yytext = oldtext;
+	    _yylval = oldlval;
+	    _yylloc = oldlloc;
+	    YYACCEPT;
+	}
+
+	/* Shift the lookahead token.  */
+
+#ifdef YYDEBUG
+	if (yydebug)
+	    fprintf(errfile, "Shifting token %d (%s, %s), ", yyp->yychar, yytname[yychar1], yytext);
+#endif
+
+	/* Discard the token being shifted unless it is eof.  */
+	if (yyp->yychar != YYEOF) {
+	    yyp->yychar = YYEMPTY;
+	    *++yyp->yyvsp = yylval;
+#ifdef YYLSP_NEEDED
+	    ++yyp->yylsp;
+	    *yyp->yylsp = yylloc;
+#endif
+	    SET_JUST_SHIFTED(yyp);
+	}
+
+	/* count tokens shifted since error; after three, turn off
+	 * error status.
+	 */
+ 	if (yyp->yyerrstatus) yyp->yyerrstatus--;
+
+	yyp->yystate = yyn;
+	goto yynewstate;
+
+	/* Do the default action for the current state.  */
+    yydefault:
+#ifdef YYDEBUG
+	if (yydebug) 
+	    fprintf(errfile, "yydefault: ");
+#endif
+	yyn = yydefact[yyp->yystate];
+	if (yyn == 0)
+	    goto yyerrlab;
+
+	/* Do a reduction.  yyn is the number of a rule to reduce
+	 * with.
+	 */
+    yyreduce:
+#ifdef YYDEBUG
+	if (yydebug) 
+	    fprintf(errfile, "yyreduce: ");
+#endif
+ 	yylen = yyr2[yyn];
+	yyval = (yyp->yyvsp)[1-yylen];
+	/* implement default value of the action */
+
+#ifdef YYDEBUG
+	if (yydebug) {
+	    if (yylen == 1)
+		fprintf (errfile, "Reducing 1 value via line %d, ",
+			 yyrline[yyn]);
+	    else
+		fprintf (errfile, "Reducing %d values via line %d, ",
+			 yylen, yyrline[yyn]);
+	}
+#endif
+
+
+$	/* the action file gets copied in in place of this dollarsign */
+#line 1120 "bison.simple"
+
+    	yyp->yyvsp -= yylen;
+	if (JOIN_PENDING(yyp) && yyp->yyvsp < *yyp->tos_tos)
+	    *yyp->tos_tos = yyp->yyvsp;
+	*++yyp->yyvsp = yyval;
+	if (yylen > 0) {
+	    yyp->last_reduction = yyp->yyvsp;
+	    UNSET_JUST_SHIFTED(yyp);
+	}
+
+	yyp->yyssp -= yylen;
+#ifdef YYLSP_NEEDED
+	yyp->yylsp -= yylen;
+#endif
+
+#ifdef YYDEBUG
+	if (yydebug) {
+	    short *ssp1 = yyp->yyss - 1;
+	    fprintf (errfile, "state stack now");
+	    while (ssp1 != yyp->yyssp)
+		fprintf (errfile, " %d", *++ssp1);
+	    fprintf (errfile, "\n");
+
+	}
+#endif
+
+#ifdef YYLSP_NEEDED
+	yyp->yylsp++;
+	if (yylen == 0)	{
+	    yyp->yylsp->first_line = yylloc.first_line;
+	    yyp->yylsp->first_column = yylloc.first_column;
+	    yyp->yylsp->last_line = (yyp->yylsp-1)->last_line;
+	    yyp->yylsp->last_column = (yyp->yylsp-1)->last_column;
+	} else {
+	    yyp->yylsp->last_line = (yyp->yylsp+yylen-1)->last_line;
+	    yyp->yylsp->last_column = (yyp->yylsp+yylen-1)->last_column;
+	}
+#endif
+
+
+	/* Now "shift" the result of the reduction. Determine
+	 * what state that goes to, based on the state we popped
+	 * back to and the rule number reduced by.
+	 */
+
+	yyn = yyr1[yyn];
+
+	yyp->yystate = yypgoto[yyn - YYNTBASE] + *yyp->yyssp;
+	if (yyp->yystate >= 0 && yyp->yystate <= YYLAST && yycheck[yyp->yystate] == *yyp->yyssp)
+	    yyp->yystate = yytable[yyp->yystate];
+	else
+	    yyp->yystate = yydefgoto[yyn - YYNTBASE];
+
+	yyp->blocked = REDUCTION;
+	goto yynewstate;
+
+    yyerrlab:			/* here on detecting error */
+
+	if (! yyp->yyerrstatus) {
+	    if (yyp->flink == yyp || !(*yyskip)(yyp->data)) {
+		/* If not already recovering from an error,  report this
+		   error. */ 
+		++yyp->yynerr;
+		yyerror(currentfile->as, "parse error");
+		if ((yyn = yypact[yyp->yystate]) > YYFLAG && yyn < YYLAST)
+		{
+		    int x, count;
+		    count = 0;
+		    for (x = 3; x < (sizeof(yytname) / sizeof(char *)); x++)
+		    {
+			if (yycheck[x + yyn] == x)
+			{
+			    fprintf (errfile, "%s %s", 
+				     count == 0 ? "expecting:" : " or", 
+				     yytname[x]);
+			    count++;
+			}
+		    }
+		    fprintf (errfile, "%s", count > 0 ? "\n" : "");
+		}
+	    }
+	    else {
+		YYABORT;
+	    }
+	}
+
+	if (yyp->yyerrstatus == 3) {
+
+	    /* if just tried and failed to reuse lookahead token after
+	     * an error, discard it.
+	     */
+
+	    /* return failure if at end of input */
+	    if (yyp->yychar == YYEOF) {
+		_yytext = oldtext;
+		_yylval = oldlval;
+		_yylloc = oldlloc;
+		YYABORT;
+	    }
+
+#ifdef YYDEBUG
+	    if (yydebug)
+		fprintf(errfile, "Discarding token %d (%s).\n", yyp->yychar, yytname[yychar1]);
+#endif
+
+	    yyp->yychar = YYEMPTY;
+	}
+
+	/* Else will try to reuse lookahead token
+	   after shifting the error token.  */
+
+	yyp->yyerrstatus = 3;   /* Each real token shifted decrements this */
+
+	goto yyerrhandle;
+
+    yyerrdefault: 	 
+
+	/* current state does not do anything special for the error
+	* token.
+	*/
+
+#if 0
+	/* This is wrong; only states that explicitly want error
+	 * tokens should shift them.
+	 */
+	yyn = yydefact[yyp->yystate];
+
+	/* If its default is to accept any token, ok.  Otherwise pop
+	 * it.
+	 */
+	if (yyn) goto yydefault;
+#endif
+
+    yyerrpop: 	 
+
+	/* pop the current state because it cannot handle the error token */
+
+	if (yyp->yyssp == yyp->yyss)  {
+	    _yytext = oldtext;
+	    _yylval = oldlval;
+	    _yylloc = oldlloc;
+	    YYABORT;
+	}
+	yyp->yyvsp--;
+	yyp->yystate = *--yyp->yyssp;
+#ifdef YYLSP_NEEDED
+	yyp->yylsp--;
+#endif
+
+#ifdef YYDEBUG
+	if (yydebug) {
+	    short *ssp1 = yyp->yyss - 1;
+	    fprintf (errfile, "Error: state stack now");
+	    while (ssp1 != yyp->yyssp)
+		fprintf (errfile, " %d", *++ssp1);
+	    fprintf (errfile, "\n");
+	}
+#endif
+
+    yyerrhandle:
+
+	yyn = yypact[yyp->yystate];
+	if (yyn == YYFLAG)
+	    goto yyerrdefault;
+
+	yyn += YYTERROR;
+	if (yyn < 0 || yyn > YYLAST || yycheck[yyn] != YYTERROR)
+	    goto yyerrdefault;
+
+	yyn = yytable[yyn];
+	if (yyn < 0) {
+	    if (yyn == YYFLAG)
+		goto yyerrpop;
+	    yyn = -yyn;
+	    goto yyreduce;
+	} else if (yyn == 0)
+	    goto yyerrpop;
+
+	if (yyn == YYFINAL) {
+	    _yytext = oldtext;
+	    _yylval = oldlval;
+	    _yylloc = oldlloc;
+	    YYACCEPT;
+	}
+
+#ifdef YYDEBUG
+	if (yydebug)
+	    fprintf(errfile, "Shifting error token, ");
+#endif
+
+	*++yyp->yyvsp = yylval;
+#ifdef YYLSP_NEEDED
+	*++yyp->yylsp = yylloc;
+#endif
+
+	yyp->yystate = yyn;
+	goto yynewstate;
+    yyabort:
+	SET_ABORTED(yyp);
+#ifdef YYDEBUG
+	if (yydebug)
+	    fprintf(errfile, "yyabort for parse %x\n", yyp);
+#endif
+	continue;
+    yyaccept: {
+	unsigned short *flags;
+	
+	UNSET_JUST_SHIFTED(yyp); /* Don't care that we just shifted the EOF
+				    token. */
+	for (flags = yyp->flags; flags >= yyp->flags_stack; flags--) 
+	    *flags |= ACCEPTED_BIT;
+
+#ifdef YYDEBUG
+	if (yydebug) {
+	    short *ssp1 = yyp->yyss - 1;
+	    fprintf(errfile, "yyaccept for parse %x\n", yyp);
+	    fprintf (errfile, " state stack now");
+	    while (ssp1 != yyp->yyssp)
+		fprintf (errfile, " %d", *++ssp1);
+	    fprintf (errfile, "\n");
+
+	}
+#endif
+	continue;
+    }
+	
+    } /* end for loop */
+
+    merge_active(&activelist, currentfile);
+
+    _yytext = oldtext;
+    _yylval = oldlval;
+    _yylloc = oldlloc;
+    
+    if (yyfinish) 
+	yyfinish(activelist->yyvsp, &currentfile->tree_root);
+    yyp = activelist;
+    retval = ABORTED(activelist) || activelist != activelist->flink;
+    do {
+	ap = yyp->flink;
+	kill_parse(yyp);
+	yyp = ap;
+    } while (yyp != activelist);
+    
+    return retval;
+    
+}

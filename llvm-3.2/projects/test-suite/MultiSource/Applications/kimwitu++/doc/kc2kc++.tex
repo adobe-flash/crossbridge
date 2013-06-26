@@ -1,0 +1,88 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{url,a4wide,newcent}
+\usepackage[latin1]{inputenc}
+
+\newcommand{\programtext}[1]{\texttt{\textbf{#1}}}
+
+\begin{document}
+\begin{center}\Huge From Kimwitu to Kimwitu++\end{center}
+
+This document is meant as a short guide for converting projects that employ
+Kimwitu to use Kimwitu++ instead. It is probably not complete. Please mail
+any comments to \url{piefel@informatik.hu-berlin.de}. % @
+
+\begin{itemize}
+    \item Generally Kimwitu++ works together with C++, while Kimwitu worked with C.
+    This will possibly cause some of the usual C to C++ hassle.
+
+    \item Kernighan \& Ritchie style for C functions is not allowed in *.k files.
+    Use proper ISO~C instead.
+
+    \item There is no longer a predefined phylum called `\programtext{int}'. There
+    is, however, a phylum providing the same functionality called
+    `\programtext{integer}'. When converting, please note that `\programtext{integer
+    i; i=5;}' will be caught by the compiler, while `\programtext{i=0;}' will not.
+    This is nasty, I'm sorry.
+
+    The right way to use them is `\programtext{integer i; i=mkinteger(5);} and
+    `\programtext{if (i->value==5) \dots}'.
+
+    \item Similar things apply to `\programtext{float}' et.\,al., there is now a
+    phylum `\programtext{real}'.
+
+    \item \programtext{Bool}, \programtext{True} and \programtext{False} disappeared and are
+    supplanted by their respective C++ counterparts.
+
+    \item Phyla are classes or objects, respectively. Instead of
+    `\programtext{unparse\_completeSyntaxTree( synTree, printer, view );}' you can
+    use the more natural `\programtext{synTree->unparse( printer, view );}'.
+
+    \item The keyword and typename `\programtext{\%view}' and `\programtext{view}'
+    are no longer available (they were deprecated anyway). Use
+    `\programtext{\%uview}' and `\programtext{uview}'.
+
+    \item Printers are now by default not functions taking \programtext{(char*,
+    uview)}, but rather objects of a class with \programtext{operator()(const char*,
+    uview)} defined. This allows a printer to have its own state. You can also still
+    use functions if you want, they will be wrapped when calling
+    \programtext{unparse}.
+
+    \item Everthing is in the namespace \programtext{kc}. If you put
+    \programtext{using namespace kc;} in your program, everthing else will continue
+    to work as it did.
+
+    \item If you want to interface with flex and bison, not that the union
+    \programtext{YYSTYPE} is not generated automatically anymore. Instead, use the
+    command line option --yystype, which will create a seperate yystype.h containing
+    the type definition.
+
+    \item CSGIO works a little different in two respects.\begin{itemize}
+	\item The old functions returned a string which indicated success or failure.
+	The new functions instead return \programtext{void}. Errors will be reported
+	by throwing exceptions of type \programtext{IO\_exception}; there is a
+	function \programtext{IO\_exception2char} turning that into a string.
+	\item While \programtext{CSGIOwrite} is a member function,
+	\programtext{CSGIOread} cannot be. The latter takes just the phylum type, not
+	a pointer to it---just write \programtext{CSGIOread(f, p)}.
+	\end{itemize}
+\end{itemize}
+\clearpage
+\begin{center}\large New Features\end{center}
+This is just a very brief list of some of the nicest new features, it is not
+exhaustive.
+\begin{itemize}
+    \item Everything can be unparsed. As long as the (somewhat limited) parser can
+    read it, it will be handed to a global unparse function (in namespace kc); define
+    your own function if it is needed.
+    \item All patterns (eg. for unparse rules) can have a guard condition; the
+    condition comes in parentheses after the pattern following the new keyword
+    \programtext{provided}.
+    \item New functions for phylum types can be defined, just write something like
+    \programtext{void foo::bar() \{ \dots~\}}.
+    \item There is a new (additional) syntax for defining attributes of phyla such as
+    \programtext{\%member int foo::baz}; when using \programtext{\%attr} instead, the
+    attribute will be written out and read in with CSGIO functions.
+    \item Likewise you can define additional constructors and destructors with
+    \programtext{\%ctor} and \programtext{\%dtor}.
+\end{itemize}
+\end{document}

@@ -70,11 +70,9 @@ package
 
       var groundMotionState:btDefaultMotionState =
         btDefaultMotionState.create(trans.swigCPtr, btTransform.getIdentity())
-      var groundRigidBodyCI:btRigidBodyConstructionInfo =
-        btRigidBodyConstructionInfo.create(0, groundMotionState.swigCPtr,
-          groundShape.swigCPtr, vector(0, 0, 0))
-      var groundRigidBody:btRigidBody =
-        btRigidBody.create(groundRigidBodyCI.swigCPtr)
+      var groundRigidBody:btRigidBody = new btRigidBody()
+      groundRigidBody.swigCPtr = Bullet.createRigidBody(1, groundMotionState.swigCPtr,
+          groundShape.swigCPtr, vector(0, 0, 0), 0.1, 1.0)
       world.addRigidBody(groundRigidBody.swigCPtr)
 
       trans = btTransform.create()
@@ -84,11 +82,9 @@ package
       var fallMotionState:btDefaultMotionState =
         btDefaultMotionState.create(trans.swigCPtr, btTransform.getIdentity())
       fallShape.calculateLocalInertia(1, vector(0, 0, 0))
-      var fallRigidBodyCI:btRigidBodyConstructionInfo =
-        btRigidBodyConstructionInfo.create(1, fallMotionState.swigCPtr,
-          fallShape.swigCPtr, vector(0, 0, 0))
-      var fallRigidBody:btRigidBody =
-        btRigidBody.create(fallRigidBodyCI.swigCPtr)
+      var fallRigidBody:btRigidBody = new btRigidBody()
+      fallRigidBody.swigCPtr = Bullet.createRigidBody(1, fallMotionState.swigCPtr,
+          fallShape.swigCPtr, vector(0, 0, 0), 0.1, 1.0)
       world.addRigidBody(fallRigidBody.swigCPtr)
       
       for (var i:int = 0; i < 5; i++) {

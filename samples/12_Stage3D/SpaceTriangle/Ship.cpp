@@ -34,7 +34,7 @@ namespace SpaceTriangle
 		ts(0.0)
 	{
 		i3dbuffer = ctx3d->createIndexBuffer(3);
-	    int indicies[] = {
+	    uint16_t indicies[] = {
 	    	2,1,0
 	    };
 	    i3dbuffer->uploadFromByteArray(internal::get_ram(), (int)&indicies[0], 0, 3, (void*)&indicies[0]);

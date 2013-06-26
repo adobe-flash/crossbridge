@@ -1,0 +1,37 @@
+
+###########################################################################
+#                                                                         #
+#  @IllustrationSetup extension to @DocumentSetup.                        #
+#                                                                         #
+#  Jeffrey H. Kingston                                                    #
+#  August 1994                                                            #
+#                                                                         #
+#  This package extends DocumentSetup for illustrations.                  #
+#                                                                         #
+###########################################################################
+
+extend @BasicSetup @DocumentSetup
+export @Illustration
+def @IllustrationSetup
+@Begin
+
+    #######################################################################
+    #                                                                     #
+    #  @Illustration                                                      #
+    #                                                                     #
+    #######################################################################
+
+    def @Illustration
+	named @InitialFont { @InitialFont }
+	named @InitialBreak { @InitialBreak }
+	named @InitialSpace { @InitialSpace }
+	named @InitialLanguage { @InitialLanguage }
+	named @InitialColour { @InitialColour }
+	right x
+    {
+        @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
+	@InitialSpace @Space { @ColourCommand @InitialColour } @SetColour
+	@OneCol @OneRow x
+    }
+
+@End @IllustrationSetup

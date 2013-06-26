@@ -1,0 +1,4566 @@
+###############################################################################
+#                                                                             #
+#  Lout @DocumentSetup package                                                #
+#                                                                             #
+#  Version 1.0 by Jeffrey H. Kingston, 17 July 1991.                          #
+#  Version 2.0 by Jeffrey H. Kingston, 22 December 1992.                      #
+#  Version 3.0 by Jeffrey H. Kingston, 19 April 1994.                         #
+#  Version 3.03 by Jeffrey H. Kingston, 6 May 1995.                           #
+#  Versions 3.04 and 3.05 by Jeffrey H. Kingston, 11 June 1995.               #
+#  Version 3.05 by Jeffrey H. Kingston, 25 July 1995.                         #
+#  Version 3.07 by Jeffrey H. Kingston, February 1996.                        #
+#  Version 3.10 by Jeffrey H. Kingston, September 1996.                       #
+#  Version 3.11 by Jeffrey H. Kingston, December 1996.                        #
+#  Version 3.13 by Jeffrey H. Kingston, October 1998.                         #
+#  Version 3.16 by Jeffrey H. Kingston, May 1999.                             #
+#  Version 3.17 by Jeffrey H. Kingston, September 1999.                       #
+#  Version 3.21 by Jeffrey H. Kingston, May 2000.                             #
+#                                                                             #
+#  This Lout package contains the general definitions used by all types of    #
+#  documents.  It needs to be extended (see docf, reportf, bookf, slidesf,    #
+#  etc.) with definitions for particular document types.  Consult "A User's   #
+#  Guide to the Lout Document Formatting System" for user information.        #
+#                                                                             #
+###############################################################################
+
+extend @BasicSetup
+
+export
+
+    @Runner
+	
+    @Figure @Table
+    @FootNote @AnotherFootNote @EndNote
+    @LeftNote @RightNote @OuterNote @InnerNote @Place
+    @Theorem @Proof @EndProof
+    @Definition @Claim @Proposition @Lemma @Corollary @Example
+    @Reference @RefStyle @RefPrint
+    @Ref @NoRef @ChapRef @NoChapRef
+    @Cite @NoCite @ChapCite @NoChapCite
+
+    @IndexA @SubIndexA @SubSubIndexA @RawIndexA
+    @RawSubIndexA @RawSubSubIndexA @IndexABlanks
+
+    @IndexB @SubIndexB @SubSubIndexB @RawIndexB
+    @RawSubIndexB @RawSubSubIndexB @IndexBBlanks
+
+    @Index @SubIndex @SubSubIndex @RawIndex
+    @RawSubIndex @RawSubSubIndex @IndexBlanks
+
+    @BypassContentsEntry @BypassMajorContentsEntry
+    @BypassFigureContentsEntry @BypassTableContentsEntry
+    @BypassReference @BypassChapReference
+    @BypassBeginIndex @BypassRawIndex @BypassEndIndex
+    @BypassBeginIndexA @BypassRawIndexA @BypassEndIndexA
+    @BypassBeginIndexB @BypassRawIndexB @BypassEndIndexB
+
+
+def @DocumentSetup
+    named @PageType		{ A4    @OrIfPlain Other} # page type (width, height)
+    named @PageWidth		{ 80s			} # page width if type Other
+    named @PageHeight		{ 66f			} # page height if type Other
+    named @PageOrientation	{ Portrait		} # Portrait, Landscape, etc.
+    named @PageBackground	{			} # background of each page
+    named @TopMargin		{ 2.50c  @OrIfPlain 6f	} # top margin of all pages
+    named @FootMargin		{ 2.50c  @OrIfPlain 6f	} # bottom margin of all pages
+    named @OddLeftMargin	{ 2.50c  @OrIfPlain 10s	} # left margin of odd pages
+    named @OddRightMargin	{ 2.50c  @OrIfPlain 10s	} # right margin of odd pages
+    named @EvenLeftMargin	{ 2.50c  @OrIfPlain 10s	} # left margin of even pages
+    named @EvenRightMargin	{ 2.50c  @OrIfPlain 10s	} # right margin of even pages
+    named @OddLeftBodyMargin	{ 0c			} # extra margin for page body
+    named @OddRightBodyMargin	{ 0c			} # extra margin for page body
+    named @EvenLeftBodyMargin	{ 0c			} # extra margin for page body
+    named @EvenRightBodyMargin	{ 0c			} # extra margin for page body
+    named @PageBoxType		{ None			} # None Box CurveBox ShadowBox
+    named @PageBoxMargin	{ 1.00c			} # page box margin
+    import @LengthUnits named @PageBoxLineWidth
+				{			} # page box line thickness
+    named @PageBoxPaint		{  none			} # page box paint
+    named @PageBoxShadow	{  0.60c		} # shadow margin if ShadowBox
+    named @PageEnclose right @Body { @Body		} # page enclose
+    named @ColumnNumber		{  1			} # number of columns (1 to 10)
+    named @ColumnGap		{  1.00c @OrIfPlain 6s	} # column gap
+    named @FigureLocation	{  PageTop		} # default figure location
+    named @TableLocation	{  PageTop		} # default table location
+    named @FigureFormat
+    	named @II right x { |@DisplayIndent x |      }
+    	named @QQ right x { |@DisplayIndent x |@DisplayIndent }
+    	named @CC right x { |0.5rt x |      }
+    	named @RR right x { |1.0rt x |      }
+	right @Body
+				{  @CC @Body		} # default figure format
+    named @TableFormat
+    	named @II right x { |@DisplayIndent x |      }
+    	named @QQ right x { |@DisplayIndent x |@DisplayIndent }
+    	named @CC right x { |0.5rt x |      }
+    	named @RR right x { |1.0rt x |      }
+	right @Body
+				{  @CC @Body		} # default table format
+    named @FigureWord		{  figure		} # "Figure" word else anything
+    named @TableWord		{  table		} # "Table" word else anything
+    named @FigureNumbers	{  Arabic		} # method of numbering figures
+    named @TableNumbers		{  Arabic		} # method of numbering tables
+    named @FigureCaptionPos	{  Below		} # Above or Below
+    named @TableCaptionPos	{  Below		} # Above or Below
+    named @FigureCaptionFont    {  -2p 			} # figure caption font
+    named @FigureCaptionBreak   {  adjust hyphen 1.2fx	} # figure caption break
+    named @FigureCaptionFormat named word {} named number {} named caption {}
+				{  {@B { word @NumSep number. &2s }} @Insert caption }
+    named @TableCaptionFont     {  -2p			} # figure caption font
+    named @TableCaptionBreak    {  adjust hyphen 1.2fx	} # figure caption break
+    named @TableCaptionFormat named word {} named number {} named caption {}
+				{  {@B { word @NumSep number. &2s }} @Insert caption }
+    named @MakeFigureContents   {  No			} # list of figures at start
+    named @MakeTableContents    {  No			} # list of tables at start
+    named @MakeContents		{  No			} # make contents? Yes or No
+    named @ContentsGap		{  0.20v @OrIfPlain 0f	} # extra gap above minor entry
+    named @ContentsGapAbove	{  0.80v @OrIfPlain 1f	} # extra gap above major entry
+    named @ContentsGapBelow	{  0.00v @OrIfPlain 0f	} # extra gap below major entry
+    named @ContentsFont    	{  Bold                 } # font for major entry
+    named @ContentsPartGapAbove	{  1.00v @OrIfPlain 1f  } # extra gap above part entry
+    named @ContentsPartGapBelow	{  0.00v @OrIfPlain 0f  } # extra gap below part entry
+    named @ContentsFormat
+	left number
+	right title
+				{  number @Sep title } # contents format
+    named @ContentsLeader	{  ..			} # leader symbol in contents
+    named @ContentsLeaderGap	{  4s    @OrIfPlain 2s	} # gap between leaders
+    named @ContentsRightWidth	{  3f    @OrIfPlain 6s	} # page numbers column width
+
+    named @MakeReferences	{  Yes			} # make references? Yes or No
+    named @RefCiteStyle right cite {  [cite]		} # citation style
+    named @RefCiteLabels
+	named @RefNum       {}
+	named @Tag          {}
+	named @Type         {}
+	named @Abstract     {}
+	named @Address      {}
+	named @Annote       {}
+	named @Author       {}
+	named @Day          {}
+	named @Edition      {}
+	named @HowPublished {}
+	named @InAuthor     {}
+	named @InTitle      {}
+	named @Institution  {}
+	named @Journal      {}
+	named @Keywords     {}
+	named @Label        {}
+	named @Month        {}
+	named @Note         {}
+	named @Number       {}
+	named @Organization {}
+	named @Page         {}
+	named @Pages        {}
+	named @Pinpoint     {}
+	named @Publisher    {}
+	named @Title        {}
+	named @TitleNote    {}
+	named @TRType       {}
+	named @Volume       {}
+	named @Year         {}
+				{  @RefNum		} # citation items
+    named @RefNumbers		{  Arabic		} # reference numbers
+
+    named @RefListFormat	{  Labels		} # NoLabels, Labels,
+						  	# DropLabels, IntegrateLabels
+    named @RefListLabels
+	named @RefNum       {}
+	named @Tag          {}
+	named @Type         {}
+	named @Abstract     {}
+	named @Address      {}
+	named @Annote       {}
+	named @Author       {}
+	named @Day          {}
+	named @Edition      {}
+	named @HowPublished {}
+	named @InAuthor     {}
+	named @InTitle      {}
+	named @Institution  {}
+	named @Journal      {}
+	named @Keywords     {}
+	named @Label        {}
+	named @Month        {}
+	named @Note         {}
+	named @Number       {}
+	named @Organization {}
+	named @Page         {}
+	named @Pages        {}
+	named @Pinpoint     {}
+	named @Publisher    {}
+	named @Title        {}
+	named @TitleNote    {}
+	named @TRType       {}
+	named @Volume       {}
+	named @Year         {}
+				{  [@RefNum]		} # ref list label format
+    named @RefListTitle		{  references		} # title of reference list
+    named @ChapRefListTitle	{  references		} # title of chapter ref list
+    named @RefListIndent	{  0s			} # indent to left of labels
+    named @RefListRightIndent	{  0s			} # indent to right of items
+    named @RefListGap		{  @ListGap		} # gap between ref list items
+    named @RefListFont		{			} # font used in reference list
+    named @RefListBreak		{			} # break style of ref list
+    named @RefListLabelWidth 	{  @ListLabelWidth	} # numeric labels column width
+    named @RefListSortKey
+	named @Tag          {}
+	named @Type         {}
+	named @Abstract     {}
+	named @Address      {}
+	named @Annote       {}
+	named @Author       {}
+	named @Day          {}
+	named @Edition      {}
+	named @HowPublished {}
+	named @InAuthor     {}
+	named @InTitle      {}
+	named @Institution  {}
+	named @Journal      {}
+	named @Keywords     {}
+	named @Label        {}
+	named @Month        {}
+	named @Note         {}
+	named @Number       {}
+	named @Organization {}
+	named @Page         {}
+	named @Pages        {}
+	named @Pinpoint     {}
+	named @Publisher    {}
+	named @Title        {}
+	named @TitleNote    {}
+	named @TRType       {}
+	named @Volume       {}
+	named @Year         {}
+	named ":"	    { "\037" }
+				{  @Tag			} # sorting key
+
+    named @MakeIndex		{  No			} # make index? Yes or No
+    named @IndexFont		{			} # index entries font
+    named @IndexBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index entries break
+    named @IndexColumnNumber	{  2			} # index columns (1 to 10)
+    named @IndexColumnGap	{  1.00c @OrIfPlain 6s	} # index column gap
+    named @IndexCtd		{  Yes			} # include (ctd.) lines
+    named @IndexCtdWord		{  continued		} # "ctd." in current lang
+    named @IndexCtdFormat
+	left @Body
+	right @CtdWord
+				{  @Body @I (@CtdWord)	} # (ctd.) format
+    named @MakeIndexA		{  No			} # make index A? Yes or No
+    named @IndexAFont		{			} # index A entries font
+    named @IndexABreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index A entries break
+    named @IndexAColumnNumber	{  2			} # index A columns (1 to 10)
+    named @IndexAColumnGap	{  1.00c @OrIfPlain 6s	} # index A column gap
+    named @IndexACtd		{  Yes			} # include (ctd.) lines
+    named @IndexACtdWord	{  continued		} # "ctd." in current lang
+    named @IndexACtdFormat
+	left @Body
+	right @CtdWord
+				{  @Body @I (@CtdWord)	} # (ctd.) format
+    named @MakeIndexB		{  No			} # make index B? Yes or No
+    named @IndexBFont		{			} # index B entries font
+    named @IndexBBreak		{ {oragged 1.2fx} @OrIfPlain {oragged 1fx}	} # index B entries break
+    named @IndexBColumnNumber	{  2			} # index B columns (1 to 10)
+    named @IndexBColumnGap	{  1.00c @OrIfPlain 6s	} # index B column gap
+    named @IndexBCtd		{  Yes			} # include (ctd.) lines
+    named @IndexBCtdWord	{  continued		} # "ctd." in current lang
+    named @IndexBCtdFormat
+	left @Body
+	right @CtdWord
+				{  @Body @I (@CtdWord)	} # (ctd.) format
+    named @TopGap		{  0.75c @OrIfPlain 2f	} # gap between figures
+    named @MidGap		{  0.75c @OrIfPlain 2f	} # gap above/below body text
+
+    named @FootNoteNumbers	{  Arabic		} # footnote numbers
+    named @FootNoteThrough	{  No			} # numbered through chapter?
+    named @FootNoteLocation	{  ColFoot		} # where the footnote appears
+    named @FootNoteFont		{  0.80f		} # font for footnotes
+    named @FootNoteBreak	{  1.2fx @OrIfPlain 1fx	} # break for footnotes
+    named @FootNoteFormat left number right body
+				{  { number &0.05f } @Insert body } # break for footnotes
+    named @FootLen		{  2.00c @OrIfPlain 10s	} # length of footnote line
+    named @FootAboveGap		{  @DisplayGap		} # gap above footnote line
+    named @FootGap		{  0.20c @OrIfPlain 1fx	} # gap between footnotes
+
+    named @MarginNoteFont	{  0.80f		} # font of margin notes
+    named @MarginNoteBreak	{  ragged 1.10fx	} # break style of margin notes
+    named @MarginNoteHGap	{  0.5c			} # horizontal gap to notes
+    named @MarginNoteVGap	{  @DisplayGap		} # min vertical gap between
+    named @MarginNoteWidth	{  1.50c		} # width of margin notes
+
+    named @EndNoteNumbers	{  Arabic		} # endnote numbers
+    named @EndNoteFont		{  0.80f		} # font of endnotes
+    named @EndNoteBreak		{  1.2fx @OrIfPlain 1fx	} # break for endnotes
+    named @EndNoteFormat left number right body
+				{  { number &0.05f } @Insert body } # break for endnotes
+    named @EndNoteGap		{  0.20c @OrIfPlain 1f	} # gap between endnotes
+
+    named @TheoremWord		{  theorem		} # "Theorem" word, etc.
+    named @TheoremTitleFormat right title
+				{  (title)              } # Theorem title format if present
+    named @TheoremFormat named word {} named number {} named title {} named body {} # theorem format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
+    named @DefinitionWord	{  definition		} # "Definition" word, etc.
+    named @DefinitionTitleFormat{  (title)              } # Definition title format if present
+    named @DefinitionFormat named word {} named number {} named title {} named body {} # definition format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
+    named @ClaimWord		{  claim		} # "Claim" word, etc.
+    named @ClaimTitleFormat	{  (title)              } # Claim title format if present
+    named @ClaimFormat named word {} named number {} named title {} named body {} # claim format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
+    named @PropositionWord	{  proposition		} # "Proposition" word, etc.
+    named @PropositionTitleFormat{  (title)             } # Proposition title format if present
+    named @PropositionFormat named word {} named number {} named title {} named body {} # proposition format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
+    named @LemmaWord		{  lemma		} # "Lemma" word, etc.
+    named @LemmaTitleFormat	{  (title)              } # Lemma title format if present
+    named @LemmaFormat named word {} named number {} named title {} named body {} # lemma format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
+    named @CorollaryWord	{  corollary		} # "Corollary" word, etc.
+    named @CorollaryTitleFormat	{  (title)              } # Corollary title format if present
+    named @CorollaryFormat named word {} named number {} named title {} named body {} # corollary format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
+    named @ExampleWord		{  example		} # "Example" word, etc.
+    named @ExampleTitleFormat	{  (title)              } # Example title format if present
+    named @ExampleFormat named word {} named number {} named title {} named body {} # example format
+				{  { @B { word @NumSep number title: } &2s } @Insert body }
+    named @ProofWord		{  proof		} # "Proof" word, etc.
+
+    named @PageHeaders		{  Simple		} # None Simple Titles NoTitles
+    named @PageNumbers		{  Arabic		} # page numbers
+    named @FirstPageNumber	{  1			} # number of first page 
+    named @IntroPageNumbers	{  Roman		} # intro page numbers
+    named @IntroFirstPageNumber	{  1			} # number of first intro page 
+    named @StructPageNums	{  No			} # structured page numbers
+
+    named @OddTop	      right @PageNum { @Centre { - @PageNum - }	}
+    named @OddFoot	      right @PageNum { @Null                    }
+    named @EvenTop	      right @PageNum { @Centre { - @PageNum - }	}
+    named @EvenFoot	      right @PageNum { @Null                    }
+    named @StartOddTop	      right @PageNum { @Null                    }
+    named @StartOddFoot	      right @PageNum { @Null                    }
+    named @StartEvenTop	      right @PageNum { @Null                    }
+    named @StartEvenFoot      right @PageNum { @Null                    }
+
+    named @IntroOddTop	      right @PageNum { @Null                    }
+    named @IntroOddFoot	      right @PageNum { @Centre @PageNum         }
+    named @IntroEvenTop	      right @PageNum { @Null                    }
+    named @IntroEvenFoot      right @PageNum { @Centre @PageNum         }
+    named @IntroStartOddTop   right @PageNum { @Null                    }
+    named @IntroStartOddFoot  right @PageNum { @Null                    }
+    named @IntroStartEvenTop  right @PageNum { @Null                    }
+    named @IntroStartEvenFoot right @PageNum { @Null                    }
+
+    named @RunningOddTop
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @I { @MinorNum @Sep @MinorTitle } @Right @B @PageNum }
+
+    named @RunningOddFoot
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Null }
+
+    named @RunningEvenTop
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @B @PageNum @Right @I { @MajorNum @Sep @MajorTitle } }
+
+    named @RunningEvenFoot
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Null }
+
+    named @RunningStartOddTop
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Null }
+
+    named @RunningStartOddFoot
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Centre { Bold 0.8f } @Font @PageNum }
+
+    named @RunningStartEvenTop
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Null }
+
+    named @RunningStartEvenFoot
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Centre { Bold 0.8f } @Font @PageNum }
+
+
+    named @RunningIntroOddTop
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Null }
+
+    named @RunningIntroOddFoot
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Right @PageNum  }
+
+    named @RunningIntroEvenTop
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Null }
+
+    named @RunningIntroEvenFoot
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @PageNum }
+
+    named @RunningIntroStartOddTop
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Null }
+
+    named @RunningIntroStartOddFoot
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Null }
+
+    named @RunningIntroStartEvenTop
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Null }
+
+    named @RunningIntroStartEvenFoot
+	named @MajorNum {} named @MajorTitle {}
+	named @MinorNum {} named @MinorTitle {} right @PageNum
+    { @Null }
+
+
+@Begin
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @Protect x                                                             #
+    #                                                                         #
+    #  Like @CNP, this reserves space on the current page or else makes sure  #
+    #  x appears on the following page.  Lookahead is proportional to font    #
+    #  size.                                                                  #
+    #                                                                         #
+    ###########################################################################
+
+    def @Protect right x { 3.0f @High //0io // x }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @HLine                                                                #
+    #                                                                         #
+    #   Draws a horizontal line to fill available space.                      #
+    #                                                                         #
+    ###########################################################################
+
+    def @HLine
+    {
+	@BackEnd @Case {
+	   PlainText @Yield { "-" @PlainGraphic 1f @High }
+	   PostScript @Yield { {0 0 moveto xsize 0 lineto stroke} @Graphic {} }
+	   PDF @Yield { {0 0 m __xsize 0 l S} @Graphic {} }
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  x @WordVal y                                                           #
+    #                                                                         #
+    #  Returns @Word&&x if x == y, otherwise y.                               #
+    #                                                                         #
+    ###########################################################################
+
+    def @WordVal
+	left x
+	right y
+    {
+	y @Case {
+	    x    @Yield @Word&&x
+	    else @Yield y
+	}
+    }
+
+    ###########################################################################
+    #                                                                         #
+    #  x @Dft y                                                               #
+    #                                                                         #
+    #  This returns x unless its value is "dft", in which case it returns y.  #
+    #  Useful for defaulting the value of one parameter to another.           #
+    #                                                                         #
+    ###########################################################################
+
+    def @Dft
+	left x
+	right y
+    {
+	x @Case {
+	    dft  @Yield y
+	    else @Yield x
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  x @Do y                                                                #
+    #                                                                         #
+    #  This returns @Null if x is No or None, otherwise y.                    #
+    #                                                                         #
+    ###########################################################################
+
+    def @Do
+	left x
+	right y
+    {
+	x @Case {
+	    { No None } @Yield @Null
+	    else        @Yield y
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  x @NoDo y                                                              #
+    #                                                                         #
+    #  Negation of @Do: This returns y if x is No or None, otherwise @Null.   #
+    #                                                                         #
+    ###########################################################################
+
+    def @NoDo
+	left x
+	right y
+    {
+	x @Case {
+	    { No None } @Yield y
+	    else        @Yield @Null
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  x @Then y                                                              #
+    #                                                                         #
+    #  This returns the empty object if x is No or None, otherwise y.         #
+    #                                                                         #
+    ###########################################################################
+
+    def @Then
+	left x
+	right y
+    {
+	x @Case {
+	    { No None } @Yield {}
+	    else        @Yield y
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  x @NoThen y                                                            #
+    #                                                                         #
+    #  Negation of @Then: returns y if x is No or None, otherwise empty.      #
+    #                                                                         #
+    ###########################################################################
+
+    def @NoThen
+	left x
+	right y
+    {
+	x @Case {
+	    { No None } @Yield y
+	    else        @Yield {}
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Number markers.                                                        #
+    #                                                                         #
+    ###########################################################################
+
+    def @Num
+	left numtype
+	right num
+    {
+	numtype @Case {
+	    None    @Yield {}
+	    Arabic  @Yield num
+	    Roman   @Yield @Roman&&num
+	    UCRoman @Yield @UCRoman&&num
+	    Alpha   @Yield @Alpha&&num
+	    UCAlpha @Yield @UCAlpha&&num
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @MakePageNum                                                          #
+    #                                                                         #
+    #   Make a page number.                                                   #
+    #                                                                         #
+    ###########################################################################
+
+    def @MakePageNum
+	named numbers {}
+	named rawnum {}
+	named prefix {}
+	named owner {}
+    {
+	def @OwnerNum { @PageMarker&&owner @Open { rawnum } }
+
+	def @StructNum { @FirstPageNumber @Plus rawnum @Minus @OwnerNum }
+
+	@PageHeaders.@StructPageNums @Case {
+	    { Titles.Yes NoTitles.Yes } @Yield {
+		prefix @Join { numbers @Num @StructNum } }
+	    else @Yield { numbers @Num rawnum }
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Page size, margins, and boxes.  This code culminates in @OddPage x     #
+    #  and @EvenPage x, which produce one odd or even page containing x.      #
+    #                                                                         #
+    ###########################################################################
+
+    def @Width
+    {
+	@PageType @Case {
+	    Letter      @Yield  612p
+	    Tabloid     @Yield  792p
+	    Ledger      @Yield 1224p
+	    Legal       @Yield  612p
+	    Statement   @Yield  396p
+	    Executive   @Yield  540p
+	    A3          @Yield  842p
+	    A4          @Yield  595p
+	    A5          @Yield  420p
+	    B4          @Yield  729p
+	    B5          @Yield  516p
+	    Folio       @Yield  612p
+	    Quarto      @Yield  610p
+	    10x14       @Yield  720p
+	    Other	@Yield @PageWidth
+	}
+    }
+
+    def @Height
+    {
+	@PageType @Case {
+	    Letter      @Yield  792p
+	    Tabloid     @Yield 1224p
+	    Ledger      @Yield  792p
+	    Legal       @Yield 1008p
+	    Statement   @Yield  612p
+	    Executive   @Yield  720p
+	    A3          @Yield 1190p
+	    A4          @Yield  842p
+	    A5          @Yield  595p
+	    B4          @Yield 1032p
+	    B5          @Yield  729p
+	    Folio       @Yield  936p
+	    Quarto      @Yield  780p
+	    10x14       @Yield 1008p
+	    Other       @Yield @PageHeight
+	}
+    }
+
+    def @OrientedWidth right @Orient
+    {
+	@Orient @Case {
+	    { Portrait ReversePortrait }   @Yield @Width
+	    { Landscape ReverseLandscape } @Yield @Height
+	}
+    }
+
+    def @OrientedHeight right @Orient
+    {
+	@Orient @Case {
+	    { Portrait ReversePortrait }   @Yield @Height
+	    { Landscape ReverseLandscape } @Yield @Width
+	}
+    }
+
+    def @OrientationAngle right @Orient
+    {
+	@Orient @Case {
+	    Portrait         @Yield 0d
+	    Landscape        @Yield 90d
+	    ReversePortrait  @Yield 180d
+	    ReverseLandscape @Yield 270d
+	}
+    }
+
+    def @PageBox right x
+    {
+	@PageBoxType @Case {
+	    None      @Yield x
+	    Box       @Yield @Box
+			margin { @PageBoxMargin }
+			paint { @PageBoxPaint }
+			linewidth { @PageBoxLineWidth } x
+	    CurveBox  @Yield @CurveBox
+			margin { @PageBoxMargin }
+			paint { @PageBoxPaint }
+			linewidth { @PageBoxLineWidth } x
+	    ShadowBox @Yield @ShadowBox
+			margin { @PageBoxMargin }
+			paint { @PageBoxPaint }
+			linewidth { @PageBoxLineWidth }
+			shadow { @PageBoxShadow } x
+	}
+    }
+
+    def @PageSet right x
+    {	
+#     "LoutPageSet" @Graphic	# VT: case PDF produces nothing
+      { @BackEnd @Case {
+          PostScript @Yield "LoutPageSet"
+          else @Yield "% @DoBackground/LoutPageSet UNIMPLEMENTED"
+        }
+      } @Graphic x
+    }
+
+    def @MargSet
+	left parity
+	right x
+    {
+#	{ parity "LoutMargSet" } @Graphic x	# VT: case PDF produces nothing
+	{ @BackEnd @Case {
+	    PostScript @Yield { parity "LoutMargSet" }
+	    else @Yield "% @MargSet/LoutMargSet UNIMPLEMENTED"
+	  }
+	} @Graphic x
+    }
+
+    def @OddPage
+	left extra
+	named @Orient {}
+	right x
+    {
+	@PageSet
+	{ @OrientationAngle @Orient } @Rotate
+	{ @OrientedWidth @Orient } @Wide { @OrientedHeight @Orient } @High
+	{   //@TopMargin ||@OddLeftMargin
+		{ // || @PageBackground } @Background
+	        # 1 @MargSet
+		@PageEnclose @PageBox @HExpand { extra // @VExpand x }
+	    ||@OddRightMargin //@FootMargin
+	}
+    }
+
+    def @EvenPage
+	left extra
+	named @Orient {}
+	right x
+    {
+	@PageSet
+	{ @OrientationAngle @Orient } @Rotate
+	{ @OrientedWidth @Orient } @Wide { @OrientedHeight @Orient } @High
+	{   //@TopMargin ||@EvenLeftMargin
+		{ // || @PageBackground } @Background
+	        # 0 @MargSet
+		@PageEnclose @PageBox @HExpand { extra // @VExpand x }
+	    ||@EvenRightMargin //@FootMargin
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Definitions for page headers and footers.  There are 16 symbols here,  #
+    #  in the following pattern:                                              #
+    #                                                                         #
+    #     @(- | Running)(- | Intro)(Odd | Even)(Top | Foot)Header             #
+    #                                                                         #
+    #  Running means that running headers are to be used.                     #
+    #  Intro means that the header is destined for an introductory page.      #
+    #  Odd or Even means whether the page number will be odd or even.         #
+    #  Top or Foot means whether the header is for the top or foot of page.   #
+    #                                                                         #
+    ###########################################################################
+
+    export @Start @MajorNum @MajorTitle @MinorNum @MinorTitle @Owner @Prefix
+    def @Runner
+	left  @Start
+	named @MajorNum   {}
+	named @MajorTitle {}
+	named @MinorNum   {}
+	named @MinorTitle {}
+	named @Owner      {}
+	named @Prefix     {}
+	named @Tag        {}
+    { @Null
+    }
+
+    def @DupRunner # duplicate previous runner
+    {
+	@Runner&&preceding @Open {
+	    NonStart @Runner
+		@MajorNum { @MajorNum }
+		@MajorTitle { @MajorTitle }
+		@MinorNum { @MinorNum }
+		@MinorTitle { @MinorTitle }
+		@Owner { @Owner }
+		@Prefix { @Prefix }
+	}
+    }
+
+    def @OddTopHeader
+	left @PageHeadersAndStart
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    None.Start      @Yield @Null
+	    None.NonStart   @Yield @Null
+	    None.None       @Yield @Null
+	    Simple.Start    @Yield @StartOddTop @PageNum
+	    Simple.NonStart @Yield @OddTop @PageNum
+	    Simple.None     @Yield @Null
+	}
+    }
+
+    def @OddFootHeader
+	left @PageHeadersAndStart
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    None.Start      @Yield @Null
+	    None.NonStart   @Yield @Null
+	    None.None       @Yield @Null
+	    Simple.Start    @Yield @StartOddFoot @PageNum
+	    Simple.NonStart @Yield @OddFoot @PageNum
+	    Simple.None     @Yield @Null
+	}
+    }
+
+    def @EvenTopHeader
+	left @PageHeadersAndStart
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    None.Start      @Yield @Null
+	    None.NonStart   @Yield @Null
+	    None.None       @Yield @Null
+	    Simple.Start    @Yield @StartEvenTop @PageNum
+	    Simple.NonStart @Yield @EvenTop @PageNum
+	    Simple.None     @Yield @Null
+	}
+    }
+
+    def @EvenFootHeader
+	left @PageHeadersAndStart
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    None.Start      @Yield @Null
+	    None.NonStart   @Yield @Null
+	    None.None       @Yield @Null
+	    Simple.Start    @Yield @StartEvenFoot @PageNum
+	    Simple.NonStart @Yield @EvenFoot @PageNum
+	    Simple.None     @Yield @Null
+	}
+    }
+
+    def @IntroOddTopHeader
+	left @PageHeadersAndStart
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    None.Start      @Yield @Null
+	    None.NonStart   @Yield @Null
+	    None.None       @Yield @Null
+	    Simple.Start    @Yield @IntroStartOddTop @PageNum
+	    Simple.NonStart @Yield @IntroOddTop @PageNum
+	    Simple.None     @Yield @Null
+	}
+    }
+
+    def @IntroOddFootHeader
+	left @PageHeadersAndStart
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    None.Start      @Yield @Null
+	    None.NonStart   @Yield @Null
+	    None.None       @Yield @Null
+	    Simple.Start    @Yield @IntroStartOddFoot @PageNum
+	    Simple.NonStart @Yield @IntroOddFoot @PageNum
+	    Simple.None     @Yield @Null
+	}
+    }
+
+    def @IntroEvenTopHeader
+	left @PageHeadersAndStart
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    None.Start      @Yield @Null
+	    None.NonStart   @Yield @Null
+	    None.None       @Yield @Null
+	    Simple.Start    @Yield @IntroStartEvenTop @PageNum
+	    Simple.NonStart @Yield @IntroEvenTop @PageNum
+	    Simple.None     @Yield @Null
+	}
+    }
+
+    def @IntroEvenFootHeader
+	left @PageHeadersAndStart
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    None.Start      @Yield @Null
+	    None.NonStart   @Yield @Null
+	    None.None       @Yield @Null
+	    Simple.Start    @Yield @IntroStartEvenFoot @PageNum
+	    Simple.NonStart @Yield @IntroEvenFoot @PageNum
+	    Simple.None     @Yield @Null
+	}
+    }
+
+
+    def @RunningOddTopHeader
+	left @PageHeadersAndStart
+	named @MajorNum   {}
+	named @MajorTitle {}
+	named @MinorNum   {}
+	named @MinorTitle {}
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    NoTitles.??       @Yield ??
+	    NoTitles.Start    @Yield @RunningStartOddTop @PageNum
+	    NoTitles.NonStart @Yield @RunningOddTop @PageNum
+	    NoTitles.None     @Yield @Null
+	    Titles.??         @Yield ??
+	    Titles.Start      @Yield @RunningStartOddTop
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.NonStart   @Yield @RunningOddTop
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.None	      @Yield @Null
+	}
+    }
+
+    def @RunningOddFootHeader
+	left @PageHeadersAndStart
+	named @MajorNum   {}
+	named @MajorTitle {}
+	named @MinorNum   {}
+	named @MinorTitle {}
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    NoTitles.??       @Yield @Null
+	    NoTitles.Start    @Yield @RunningStartOddFoot @PageNum
+	    NoTitles.NonStart @Yield @RunningOddFoot @PageNum
+	    NoTitles.None     @Yield @Null
+	    Titles.??         @Yield @Null
+	    Titles.Start      @Yield @RunningStartOddFoot
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.NonStart   @Yield @RunningOddFoot
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.None	      @Yield @Null
+	}
+    }
+
+    def @RunningEvenTopHeader
+	left @PageHeadersAndStart
+	named @MajorNum   {}
+	named @MajorTitle {}
+	named @MinorNum   {}
+	named @MinorTitle {}
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    NoTitles.??       @Yield ??
+	    NoTitles.Start    @Yield @RunningStartEvenTop @PageNum
+	    NoTitles.NonStart @Yield @RunningEvenTop @PageNum
+	    NoTitles.None     @Yield @Null
+	    Titles.??         @Yield ??
+	    Titles.Start      @Yield @RunningStartEvenTop
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.NonStart   @Yield @RunningEvenTop
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.None	      @Yield @Null
+	}
+    }
+
+    def @RunningEvenFootHeader
+	left @PageHeadersAndStart
+	named @MajorNum   {}
+	named @MajorTitle {}
+	named @MinorNum   {}
+	named @MinorTitle {}
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    NoTitles.??       @Yield @Null
+	    NoTitles.Start    @Yield @RunningStartEvenFoot @PageNum
+	    NoTitles.NonStart @Yield @RunningEvenFoot @PageNum
+	    NoTitles.None     @Yield @Null
+	    Titles.??         @Yield @Null
+	    Titles.Start      @Yield @RunningStartEvenFoot
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.NonStart   @Yield @RunningEvenFoot
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.None	      @Yield @Null
+	}
+    }
+
+    def @RunningIntroOddTopHeader
+	left @PageHeadersAndStart
+	named @MajorNum   {}
+	named @MajorTitle {}
+	named @MinorNum   {}
+	named @MinorTitle {}
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    NoTitles.??       @Yield ??
+	    NoTitles.Start    @Yield @RunningIntroStartOddTop @PageNum
+	    NoTitles.NonStart @Yield @RunningIntroOddTop @PageNum
+	    NoTitles.None     @Yield @Null
+	    Titles.??         @Yield ??
+	    Titles.Start      @Yield @RunningIntroStartOddTop
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.NonStart   @Yield @RunningIntroOddTop
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.None	      @Yield @Null
+	}
+    }
+
+    def @RunningIntroOddFootHeader
+	left @PageHeadersAndStart
+	named @MajorNum   {}
+	named @MajorTitle {}
+	named @MinorNum   {}
+	named @MinorTitle {}
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    NoTitles.??       @Yield @Null
+	    NoTitles.Start    @Yield @RunningIntroStartOddFoot @PageNum
+	    NoTitles.NonStart @Yield @RunningIntroOddFoot @PageNum
+	    NoTitles.None     @Yield @Null
+	    Titles.??         @Yield @Null
+	    Titles.Start      @Yield @RunningIntroStartOddFoot
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.NonStart   @Yield @RunningIntroOddFoot
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.None	      @Yield @Null
+	}
+    }
+
+    def @RunningIntroEvenTopHeader
+	left @PageHeadersAndStart
+	named @MajorNum   {}
+	named @MajorTitle {}
+	named @MinorNum   {}
+	named @MinorTitle {}
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    NoTitles.??       @Yield ??
+	    NoTitles.Start    @Yield @RunningIntroStartEvenTop @PageNum
+	    NoTitles.NonStart @Yield @RunningIntroEvenTop @PageNum
+	    NoTitles.None     @Yield @Null
+	    Titles.??         @Yield ??
+	    Titles.Start      @Yield @RunningIntroStartEvenTop
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.NonStart   @Yield @RunningIntroEvenTop
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.None	      @Yield @Null
+	}
+    }
+
+    def @RunningIntroEvenFootHeader
+	left @PageHeadersAndStart
+	named @MajorNum   {}
+	named @MajorTitle {}
+	named @MinorNum   {}
+	named @MinorTitle {}
+	right @PageNum
+    {
+	@PageHeadersAndStart @Case {
+	    NoTitles.??       @Yield @Null
+	    NoTitles.Start    @Yield @RunningIntroStartEvenFoot @PageNum
+	    NoTitles.NonStart @Yield @RunningIntroEvenFoot @PageNum
+	    NoTitles.None     @Yield @Null
+	    Titles.??         @Yield @Null
+	    Titles.Start      @Yield @RunningIntroStartEvenFoot
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.NonStart   @Yield @RunningIntroEvenFoot
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    @PageNum
+	    Titles.None	      @Yield @Null
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Helper definitions for laying out pages.                               #
+    #                                                                         #
+    ###########################################################################
+
+    def @PageTopPlace		{ @Galley }
+    def @PageFootAndTopPlace	{ @Galley }
+    def @PageFootNotePlace	{ @Galley }
+    def @FullPlace		{ @Galley }
+    def @OddFullPlace		{ @Galley }
+    def @EvenFullPlace		{ @Galley }
+    def @FullPagePlace		{ @Galley }
+    def @EvenFullPagePlace	{ @Galley }
+    def @EvenPagePlace		{ @Galley }
+    def @OddFullPagePlace	{ @Galley }
+    def @ColTopPlace		{ @Galley }
+    def @ColFootAndTopPlace	{ @Galley }
+    def @ColPlace		{ @Galley }
+    def @ColFootNotePlace	{ @Galley }
+    def @IntroFullPlace		{ @Galley }
+    def @IntroOddFullPlace	{ @Galley }
+    def @IntroEvenFullPlace	{ @Galley }
+    def @IntroColPlace		{ @Galley }
+    def @IndexPlace		{ @Galley }
+    def @IndexAPlace		{ @Galley }
+    def @IndexBPlace		{ @Galley }
+    def @AfterLinePlace		{ @ForceGalley }
+
+    def @TryAfterLinePlace right x
+    {
+	x @Case {
+	    noforce @Yield @Galley
+	    force   @Yield @ForceGalley
+	}
+    }
+
+    def @EvenFullPageSection
+    {
+		  @OneRow @EvenFullPagePlace
+	//	  @FullPagePlace
+	//@MidGap @EvenFullPageSection
+    }
+
+    def @OddFullPageSection
+    {
+		  @OneRow @OddFullPagePlace
+	//	  @FullPagePlace
+	//@MidGap @OddFullPageSection
+    }
+
+    def @EvenPageTopSect
+    {
+		  @OneRow @EvenPagePlace
+	//	  @PageTopPlace
+	//@MidGap @PageFootAndTopPlace
+	//@MidGap @EvenPageTopSect
+    }
+
+    def @OddPageTopSect
+    {
+		  @PageTopPlace
+	//@MidGap @PageFootAndTopPlace
+	//@MidGap @OddPageTopSect
+    }
+
+    def @PageOddTopSection right @Orient
+    {
+	@OddPageTopSect ||{@OrientedWidth @Orient} @FullPlace
+			||{@OrientedWidth @Orient} @OddFullPlace
+    }
+
+    def @PageEvenTopSection right @Orient
+    {
+	@EvenPageTopSect ||{@OrientedWidth @Orient} @FullPlace
+			 ||{@OrientedWidth @Orient} @EvenFullPlace
+    }
+
+    def @PageIntroOddTopSection right @Orient
+    {
+	@OddPageTopSect ||{@OrientedWidth @Orient} @IntroFullPlace
+			||{@OrientedWidth @Orient} @IntroOddFullPlace
+    }
+
+    def @PageIntroEvenTopSection right @Orient
+    {
+	@EvenPageTopSect
+	||{@OrientedWidth @Orient} @IntroFullPlace
+	||{@OrientedWidth @Orient} @IntroEvenFullPlace
+    }
+
+    def @PageFootNoteList
+    {
+		    @PageFootNotePlace
+	//@FootGap  @PageFootNoteList
+    }
+
+    def @PageFootNoteSection
+    {
+	            @FootLen @Wide @HLine
+	//@FootGap  @PageFootNoteList
+    }
+
+    def @PageFootAndTopSect
+    {
+		  @PageFootAndTopPlace
+	//@MidGap @PageFootAndTopSect
+    }
+
+    def @PageFootSection
+    {
+	//@MidGap       @PageFootAndTopSect
+	//@FootAboveGap @PageFootNoteSection
+    }
+
+    def @ColTopSection
+    {
+		  @ColTopPlace
+	//@MidGap @ColFootAndTopPlace
+	//@MidGap @TryAfterLinePlace noforce
+	//@MidGap @ColTopSection
+    }
+
+    def @RestOfColSection
+    {
+	          @AfterLinePlace
+	//@MidGap @TryAfterLinePlace force
+	//@MidGap @ColPlace @NotRevealed
+	//@MidGap @RestOfColSection
+    }
+
+    def @IntroRestOfColSection
+    {
+	          @AfterLinePlace
+	//@MidGap @TryAfterLinePlace force
+	//@MidGap @IntroColPlace @NotRevealed
+	//@MidGap @IntroRestOfColSection
+    }
+
+    def @ColFootAndTopList { @ColFootAndTopPlace //@TopGap @ColFootAndTopList }
+
+    def @ColFootNoteList
+    {
+		    @ColFootNotePlace
+	//@FootGap  @ColFootNoteList
+    }
+
+    def @ColFootNoteSection
+    {
+	           @FootLen @Wide @HLine
+	//@FootGap @ColFootNoteList
+    }
+
+    def @ColFootSection
+    {
+	//@TopGap       @ColFootAndTopList
+	//@FootAboveGap @ColFootNoteSection
+    }
+
+    def @ColsOf
+	left num
+	named gap { @ColumnGap }
+	right x
+    {
+	def @Two { x ||gap x }
+	def @Four { @Two ||gap @Two }
+	def @Eight { @Four ||gap @Four }
+
+	num @Case {
+	    1  @Yield { x				}
+	    2  @Yield { @Two				}
+	    3  @Yield { @Two  ||gap x			}
+	    4  @Yield { @Four				}
+	    5  @Yield { @Four ||gap x			}
+	    6  @Yield { @Four ||gap @Two		}
+	    7  @Yield { @Four ||gap @Two  ||gap x	}
+	    8  @Yield { @Four ||gap @Four		}
+	    9  @Yield { @Four ||gap @Four ||gap x	}
+	   10  @Yield { @Four ||gap @Four ||gap @Two	}
+	}
+    }
+
+    def @EqualWidth right x { 50c @Wide x }	# believe it or not
+
+    def @ColList right num
+    {
+	@HExpand num @ColsOf @EqualWidth @VExpand
+	{
+	    @ColTopSection //@TopGap
+	    @ColPlace //@MidGap @RestOfColSection // //1rt
+	    @OneRow { @ColFootSection }
+
+	}
+    }
+    
+    def @IntroColList right num
+    {
+	@HExpand num @ColsOf @EqualWidth @VExpand
+	{
+	    @ColTopSection //@TopGap
+	    @IntroColPlace //@MidGap @IntroRestOfColSection // //1rt
+	    @OneRow { @ColFootSection }
+	}
+    }
+    
+    def @ZeroColList right num
+    {
+	@HExpand num @ColsOf @EqualWidth 0c @High @ColPlace
+    }
+    
+    def @ZeroIntroColList right num
+    {
+	@HExpand num @ColsOf @EqualWidth 0c @High @IntroColPlace
+    }
+    
+    def @IndexColList right num
+    {
+	@HExpand num @ColsOf gap { @IndexColumnGap } @EqualWidth @VExpand @IndexPlace
+    }
+    
+    def @IndexAColList right num
+    {
+	@HExpand num @ColsOf gap { @IndexAColumnGap } @EqualWidth @VExpand @IndexAPlace
+    }
+    
+    def @IndexBColList right num
+    {
+	@HExpand num @ColsOf gap { @IndexBColumnGap } @EqualWidth @VExpand @IndexBPlace
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Footnotes.                                                             #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag count
+    def @FootNoteCounterMarker
+	named @Tag {}
+	named count {}
+    {
+	@Null
+    }
+
+    def @FootNoteNum right tag
+    {
+	@FootNoteCounterMarker&&tag @Open { @Next count }
+    }
+
+    def @FootNoteCounterIncrement
+	right tag
+    {
+	   @FootNoteCounterMarker&&preceding @Tagged tag
+	// @FootNoteCounterMarker count { @FootNoteNum tag }
+	// @NumberMarker @Tag { tag }
+		@Value { @FootNoteNumbers @Num @FootNoteNum tag }
+    }
+
+    def @BeginFootNoteCounter
+    {
+	@FootNoteCounterMarker count { 0 }
+    }
+
+    def @FootNote
+	named @Tag {}
+	named @Location { @FootNoteLocation }
+	named @Another { No }
+	named @Label { Numbered }
+	right x
+    {
+
+	def @FootLabelFmt
+	    right x
+	{
+	    @FootNoteFont @Font @FootNoteBreak @Break
+	    +0.3v @VShift { Base 0.8f } @Font x
+	}
+
+	def @FootExtra
+	{
+            @BackEnd @Case {
+	        PlainText @Yield ","
+	        else @Yield @FootLabelFmt ","
+            }
+	}
+
+	def @FootLabel
+	{
+	    @Label @Case {
+		"Numbered" @Yield { @BackEnd @Case {
+		    PlainText @Yield { ({@NumberOf @Tag}) }
+		    else @Yield @FootLabelFmt @NumberOf @Tag
+		} }
+		else @Yield { @BackEnd @Case {
+		    PlainText @Yield @Label
+		    else @Yield @FootLabelFmt @Label
+		} }
+            }
+	}
+
+	def @LongFootLabel
+	{
+	    @Another @Case {
+		No  @Yield {                 @FootLabel }
+		Yes @Yield { @FootExtra &0iu @FootLabel }
+	    }
+	}
+
+	def @FootVal
+	{
+	    @FootNoteFont @Font @FootNoteBreak @Break @Label @Case {
+		"Numbered" @Yield {
+		    { @FootNoteCounterIncrement @Tag & @FootLabel }
+		      @FootNoteFormat x
+		}
+		else @Yield { @FootLabel @FootNoteFormat x }
+	    }
+	}
+
+	def @PageFootNote into { @PageFootNotePlace&&following } { @FootVal }
+	def @ColFootNote  into { @ColFootNotePlace&&following  } { @FootVal }
+
+	@Location @Case {
+	    ColFoot  @Yield { @Null &0iu @LongFootLabel & @ColFootNote  }
+	    PageFoot @Yield { @Null &0iu @LongFootLabel & @PageFootNote }
+	}
+    }
+
+    macro @AnotherFootNote { @FootNote @Another { Yes } }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Definitions for page lists.  There are four symbols here, in the       #
+    #  following pattern:                                                     #
+    #                                                                         #
+    #    @(Simple | Running)(- | Intro)PageList                               #
+    #                                                                         #
+    #  Running means that the page list is to support running headers.        #
+    #  Intro means that the page list is an introductory page list.           #
+    #  These are then packaged into @PageList and @IntroPageList.             #
+    #                                                                         #
+    ###########################################################################
+
+    def @SStart right @PageNum
+    {
+	@PageNum @Case {
+	    { 1 0 } @Yield Start
+	    else    @Yield NonStart
+	}
+    }
+
+    def @ChooseColList right colnum
+    {
+	@OneOf
+	{
+	    @ColList colnum
+	    @IndexAColList @IndexAColumnNumber
+	    @IndexBColList @IndexBColumnNumber
+	    @IndexColList  @IndexColumnNumber
+	}
+    }
+
+    def @ChooseIntroColList right colnum
+    {
+	@OneOf
+	{
+	    @IntroColList colnum
+	    @IndexAColList @IndexAColumnNumber
+	    @IndexBColList @IndexBColumnNumber
+	    @IndexColList  @IndexColumnNumber
+	}
+    }
+
+    def @OddBodyMargins right x
+    {
+	@OddLeftBodyMargin @Wide {} || 1 @MargSet x || @OddRightBodyMargin @Wide {}
+    }
+
+    def @EvenBodyMargins right x
+    {
+	@EvenLeftBodyMargin @Wide {} || 0 @MargSet x || @EvenRightBodyMargin @Wide {}
+    }
+
+    def @SimplePageList
+	named @ColumnNumber {}
+	named @PageHeaders {}
+	named extra { No }
+	named @Orient {}
+	named @AtTop { @Null }
+	right @PageNum
+    {
+
+	def @OrdinaryOddPage
+	{
+		{@PageHeaders.{@SStart @PageNum}} @OddTopHeader
+		    { @PageNumbers @Num @PageNum }
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @PageOddTopSection @Orient
+			//@MidGap @ChooseColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //         @OddBodyMargins @PageFootSection
+		   //@MidGap {@PageHeaders.{@SStart @PageNum}} @OddFootHeader
+				 { @PageNumbers @Num @PageNum }
+		}
+	}
+
+	def @FullPageOddPage
+	{
+		{@PageHeaders.{@SStart @PageNum}} @OddTopHeader
+		    { @PageNumbers @Num @PageNum }
+		//@MidGap @OddBodyMargins @OddFullPageSection
+		//1rt @OneRow
+		{ //@MidGap {@PageHeaders.{@SStart @PageNum}} @OddFootHeader
+				 { @PageNumbers @Num @PageNum }
+		}
+	}
+
+        def @SimpleEvenPageList
+	    named @ColumnNumber {}
+	    named @PageHeaders {}
+	    named extra { No }
+	    right @PageNum
+        {
+
+	    def @OrdinaryEvenPage
+	    {
+		@PageHeaders.NonStart @EvenTopHeader
+		    { @PageNumbers @Num @PageNum }
+		//@MidGap
+		@EvenBodyMargins {
+			@PageEvenTopSection @Orient
+			//@MidGap @ChooseColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @EvenBodyMargins @PageFootSection
+		   //@MidGap @PageHeaders.NonStart @EvenFootHeader
+			     { @PageNumbers @Num @PageNum }
+		}
+	    }
+
+	    def @FullPageEvenPage
+	    {
+		@PageHeaders.NonStart @EvenTopHeader
+		    { @PageNumbers @Num @PageNum }
+		//@MidGap @EvenBodyMargins @EvenFullPageSection
+		//1rt @OneRow
+		{ //@MidGap @PageHeaders.NonStart @EvenFootHeader
+			     { @PageNumbers @Num @PageNum }
+		}
+	    }
+
+	        @PageMarker
+		    rawnum { @PageNum }
+		    num { @PageNumbers @Num @PageNum }
+	    //  @FootNoteThrough @NoDo @BeginFootNoteCounter
+	    //  {} @EvenPage @Orient { @Orient }
+	        {
+		    @OrdinaryEvenPage ||{@OrientedWidth @Orient} @FullPageEvenPage
+	        }
+	    //  @SimplePageList
+		    @ColumnNumber { @ColumnNumber }
+		    @PageHeaders { @PageHeaders }
+		    @Orient { @Orient }
+		@Next @PageNum
+        }
+
+	    @PageMarker
+		rawnum { @PageNum }
+		num { @PageNumbers @Num @PageNum }
+	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
+	//  { extra @Then @OddBodyMargins @ZeroColList @ColumnNumber } @OddPage @Orient { @Orient }
+	    {
+		@OrdinaryOddPage ||{@OrientedWidth @Orient} @FullPageOddPage
+	    }
+	//  @SimpleEvenPageList
+		@ColumnNumber { @ColumnNumber }
+		@PageHeaders { @PageHeaders }
+	    @Next @PageNum
+    }
+
+    def @SimpleIntroPageList
+	named @ColumnNumber {}
+	named @PageHeaders {}
+	named @Orient {}
+	named extra { No }
+	named @AtTop { @Null }
+	right @PageNum
+    {
+	    @PageMarker
+		num { @IntroPageNumbers @Num @PageNum }
+		rawnum { @PageNum }
+	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
+	//  { extra @Then @OddBodyMargins @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
+	    {
+		{@PageHeaders.{@SStart @PageNum}} @IntroOddTopHeader
+		    { @IntroPageNumbers @Num @PageNum }
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @PageIntroOddTopSection @Orient
+			//@MidGap @ChooseIntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @OddBodyMargins @PageFootSection
+		   //@MidGap
+		       {@PageHeaders.{@SStart @PageNum}} @IntroOddFootHeader
+			   { @IntroPageNumbers @Num @PageNum }
+		}
+	    }
+	//  @PageMarker
+		num { @IntroPageNumbers @Num @Next @PageNum }
+		rawnum { @Next @PageNum }
+	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
+	//  {} @EvenPage @Orient { @Orient }
+	    @Runner&&following @Open
+	    {
+		@PageHeaders.NonStart @IntroEvenTopHeader { @IntroPageNumbers @Num @Next @PageNum }
+		//@MidGap
+		@EvenBodyMargins {
+			@PageIntroEvenTopSection @Orient
+			//@MidGap @ChooseIntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @EvenBodyMargins @PageFootSection
+		   //@MidGap @PageHeaders.NonStart @IntroEvenFootHeader
+				{ @IntroPageNumbers @Num @Next @PageNum }
+		}
+	    }
+	//  @SimpleIntroPageList
+		@ColumnNumber { @ColumnNumber }
+		@PageHeaders { @PageHeaders }
+		@Orient { @Orient }
+	    @Next @Next @PageNum
+    }
+
+    def @SimpleOddOrEvenIntroPageList
+	named @ColumnNumber {}
+	named @PageHeaders {}
+	named @Orient {}
+	named extra { No }
+	named @AtTop { @Null }
+	right @PageNum
+    {
+
+        def @SimpleEvenIntroPageList
+	    named @ColumnNumber {}
+	    named @PageHeaders {}
+	    named @Orient {}
+	    named extra { No }
+	    named @AtTop { @Null }
+	    right @PageNum
+       {
+
+	    @PageMarker
+		num { @IntroPageNumbers @Num @PageNum }
+		rawnum { @PageNum }
+	 // @FootNoteThrough @NoDo @BeginFootNoteCounter
+	 // {} @EvenPage @Orient { @Orient }
+	    @Runner&&following @Open
+	    {
+		@PageHeaders.NonStart @IntroEvenTopHeader { @IntroPageNumbers @Num @PageNum }
+		//@MidGap
+		@EvenBodyMargins {
+			@PageIntroEvenTopSection @Orient
+			//@MidGap @ChooseIntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @EvenBodyMargins @PageFootSection
+		   //@MidGap @PageHeaders.NonStart @IntroEvenFootHeader
+				{ @IntroPageNumbers @Num @PageNum }
+		}
+	    }
+	 // @SimpleOddOrEvenIntroPageList
+		@ColumnNumber { @ColumnNumber }
+		@PageHeaders { @PageHeaders }
+		@Orient { @Orient }
+	    @Next @PageNum
+       }
+	    @PageMarker
+		num { @IntroPageNumbers @Num @PageNum }
+		rawnum { @PageNum }
+	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
+	//  { extra @Then @OddBodyMargins @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
+	    {
+		{@PageHeaders.{@SStart @PageNum}} @IntroOddTopHeader
+		    { @IntroPageNumbers @Num @PageNum }
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @PageIntroOddTopSection @Orient
+			//@MidGap @ChooseIntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @OddBodyMargins @PageFootSection
+		   //@MidGap
+		       {@PageHeaders.{@SStart @PageNum}} @IntroOddFootHeader
+			   { @IntroPageNumbers @Num @PageNum }
+		}
+	    }
+	//  @SimpleEvenIntroPageList
+		@ColumnNumber { @ColumnNumber }
+		@PageHeaders { @PageHeaders }
+		@Orient { @Orient }
+		@Next @PageNum
+    }
+
+    def @RunningPageList
+	named @ColumnNumber {}
+	named @PageHeaders {}
+	named extra { No }
+	named @Orient {}
+	named @AtTop { @Null }
+	right @PageNum
+    {
+
+	def @OrdinaryOddPage
+	{
+	    @Runner&&following @Open
+	    {
+		@PageMarker
+		    num { @MakePageNum
+				numbers { @PageNumbers }
+				rawnum  { @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner } }
+		    rawnum { @PageNum }
+		// @PageHeaders.@Start @RunningOddTopHeader
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    {
+			@MakePageNum
+			    numbers { @PageNumbers }
+			    rawnum  { @PageNum }
+			    prefix  { @Prefix }
+			    owner   { @Owner }
+		    }
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @PageOddTopSection @Orient
+			//@MidGap @ChooseColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @OddBodyMargins @PageFootSection
+		   //@MidGap @PageHeaders.@Start @RunningOddFootHeader
+			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+			{
+			    @MakePageNum
+				numbers { @PageNumbers }
+				rawnum  { @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner }
+			}
+		}
+	    }
+	}
+
+	def @FullPageOddPage
+	{
+	    @Runner&&following @Open
+	    {
+		@PageMarker
+		    num { @MakePageNum
+				numbers { @PageNumbers }
+				rawnum  { @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner } }
+		    rawnum { @PageNum }
+		// @PageHeaders.@Start @RunningOddTopHeader
+		    @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+		    @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+		    {
+			@MakePageNum
+			    numbers { @PageNumbers }
+			    rawnum  { @PageNum }
+			    prefix  { @Prefix }
+			    owner   { @Owner }
+		    }
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @OddFullPageSection
+		}
+		//1rt @OneRow
+		{
+		   //@MidGap @PageHeaders.@Start @RunningOddFootHeader
+			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+			{
+			    @MakePageNum
+				numbers { @PageNumbers }
+				rawnum  { @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner }
+			}
+		}
+	    }
+	}
+
+        def @RunningEvenPageList
+	    named @ColumnNumber {}
+	    named @PageHeaders {}
+	    right @PageNum
+        {
+
+	    def @OrdinaryEvenPage
+	    {
+	        @Runner&&following @Open
+	        {
+		    @PageMarker
+			num { @MakePageNum
+				numbers { @PageNumbers }
+				rawnum  { @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner } }
+			rawnum { @PageNum }
+		    // @PageHeaders.@Start @RunningEvenTopHeader
+			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+			{
+			    @MakePageNum
+				numbers { @PageNumbers }
+				rawnum  { @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner }
+			}
+		    //@MidGap
+		    @EvenBodyMargins {
+			@PageEvenTopSection @Orient
+		    	//@MidGap @ChooseColList @ColumnNumber
+		    }
+		    //1rt @OneRow
+		    {  //        @EvenBodyMargins @PageFootSection
+		       //@MidGap @PageHeaders.@Start @RunningEvenFootHeader
+			   @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+			   @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+			   {
+				@MakePageNum
+				    numbers { @PageNumbers }
+				    rawnum  { @PageNum }
+				    prefix  { @Prefix }
+				    owner   { @Owner }
+			   }
+		    }
+	        }
+	    }
+
+	    def @FullPageEvenPage
+	    {
+	        @Runner&&following @Open
+	        {
+		    @PageMarker
+			num { @MakePageNum
+				numbers { @PageNumbers }
+				rawnum  { @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner } }
+			rawnum { @PageNum }
+		    // @PageHeaders.@Start @RunningEvenTopHeader
+			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+			{
+			    @MakePageNum
+				numbers { @PageNumbers }
+				rawnum  { @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner }
+			}
+		    //@MidGap
+		    @EvenBodyMargins @EvenFullPageSection
+		    //1rt @OneRow
+		    {
+		       //@MidGap @PageHeaders.@Start @RunningEvenFootHeader
+			   @MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+			   @MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+			   {
+				@MakePageNum
+				    numbers { @PageNumbers }
+				    rawnum  { @PageNum }
+				    prefix  { @Prefix }
+				    owner   { @Owner }
+			   }
+		    }
+	        }
+	    }
+
+		@FootNoteThrough @NoDo @BeginFootNoteCounter
+	    //  {} @EvenPage @Orient { @Orient }
+	        {
+		    @OrdinaryEvenPage ||{@OrientedWidth @Orient} @FullPageEvenPage
+	        }
+	    //  @RunningPageList
+		    @ColumnNumber { @ColumnNumber }
+		    @PageHeaders { @PageHeaders }
+		    @Orient { @Orient }
+		@Next @PageNum
+        }
+
+	    @FootNoteThrough @NoDo @BeginFootNoteCounter
+	//  { extra @Then @OddBodyMargins @ZeroColList @ColumnNumber } @OddPage @Orient { @Orient }
+	    {
+		@OrdinaryOddPage ||{@OrientedWidth @Orient} @FullPageOddPage
+	    }
+	//  @RunningEvenPageList
+		@ColumnNumber { @ColumnNumber }
+		@PageHeaders { @PageHeaders }
+	    @Next @PageNum
+    }
+
+    def @RunningIntroPageList
+	named @ColumnNumber {}
+	named @PageHeaders {}
+	named @AtTop { @Null }
+	named @Orient {}
+	named extra { No }
+	right @PageNum
+    {
+	    @FootNoteThrough @NoDo @BeginFootNoteCounter
+	//  { extra @Then @OddBodyMargins @ZeroIntroColList @ColumnNumber } @OddPage @Orient { @Orient }
+	    @Runner&&following @Open
+	    {
+		@PageMarker
+		    num { @MakePageNum
+			    numbers { @IntroPageNumbers }
+			    rawnum  { @PageNum }
+			    prefix  { @Prefix }
+			    owner   { @Owner } }
+		    rawnum { @PageNum }
+		// @PageHeaders.@Start @RunningIntroOddTopHeader
+			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+			{
+			    @MakePageNum
+				numbers { @IntroPageNumbers }
+				rawnum  { @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner }
+			}
+		//@MidGap
+		@OddBodyMargins {
+			@AtTop
+			//@MidGap @PageIntroOddTopSection @Orient
+			//@MidGap @IntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @OddBodyMargins @PageFootSection
+		   //@MidGap @PageHeaders.@Start @RunningIntroOddFootHeader
+			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+			{
+			    @MakePageNum
+				numbers { @IntroPageNumbers }
+				rawnum  { @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner }
+			}
+		}
+	    }
+	//  @FootNoteThrough @NoDo @BeginFootNoteCounter
+	//  {} @EvenPage @Orient { @Orient }
+	    @Runner&&following @Open
+	    {
+		@PageMarker
+		    num { @MakePageNum
+			    numbers { @IntroPageNumbers }
+			    rawnum  { @Next @PageNum }
+			    prefix  { @Prefix }
+			    owner   { @Owner } }
+		    rawnum { @Next @PageNum }
+		// @PageHeaders.@Start @RunningIntroEvenTopHeader
+			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+			{
+			    @MakePageNum
+				numbers { @IntroPageNumbers }
+				rawnum  { @Next @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner }
+			}
+		//@MidGap
+		@EvenBodyMargins {
+			@PageIntroEvenTopSection @Orient
+			//@MidGap @ChooseIntroColList @ColumnNumber
+		}
+		//1rt @OneRow
+		{  //        @EvenBodyMargins @PageFootSection
+		   //@MidGap @PageHeaders.@Start @RunningIntroEvenFootHeader
+			@MajorNum { @MajorNum } @MajorTitle { @MajorTitle }
+			@MinorNum { @MinorNum } @MinorTitle { @MinorTitle }
+			{
+			    @MakePageNum
+				numbers { @IntroPageNumbers }
+				rawnum  { @Next @PageNum }
+				prefix  { @Prefix }
+				owner   { @Owner }
+			}
+		}
+	    }
+	//  @RunningIntroPageList
+		@PageHeaders { @PageHeaders }
+		@ColumnNumber { @ColumnNumber }
+		@Orient { @Orient }
+	    @Next @Next @PageNum
+    }
+
+    def @PageList
+	named @ColumnNumber {}
+	named @PageHeaders {}
+	named extra { No }
+	named @Orient {}
+	named @AtTop { @Null }
+	right @FirstPageNum
+    {
+	@PageHeaders @Case {
+	    { None Simple } @Yield @SimplePageList
+		  @ColumnNumber { @ColumnNumber }
+		  @PageHeaders { @PageHeaders }
+		  @Orient { @Orient }
+		  extra { extra }
+		  @AtTop { @AtTop }
+		  @FirstPageNum
+	    { Running Titles NoTitles } @Yield @RunningPageList
+		  @ColumnNumber { @ColumnNumber }
+		  @PageHeaders { @PageHeaders }
+		  @Orient { @Orient }
+		  extra { extra }
+		  @AtTop { @AtTop }
+		  @FirstPageNum
+	}
+	//
+	@PageMark last.page
+    }
+
+    def @IntroPageList
+	named @ColumnNumber {}
+	named @PageHeaders {}
+	named @Orient {}
+	named extra { No }
+	named @AtTop { @Null }
+	right @FirstPageNum
+    {
+	@PageHeaders @Case {
+	    { None Simple } @Yield @SimpleIntroPageList
+		  @ColumnNumber { @ColumnNumber }
+		  @PageHeaders { @PageHeaders }
+		  @Orient { @Orient }
+		  extra { extra }
+		  @AtTop { @AtTop }
+		  @FirstPageNum
+	    { Running Titles NoTitles } @Yield @RunningIntroPageList
+		  @ColumnNumber { @ColumnNumber }
+		  @PageHeaders { @PageHeaders }
+		  @Orient { @Orient }
+		  extra { extra }
+		  @AtTop { @AtTop }
+		  @FirstPageNum
+	}
+    }
+
+    def @ContinuousPageList
+	named @Orient {}
+    {
+	{@OrientedWidth @Orient} @Wide
+	{   //@TopMargin ||@EvenLeftMargin
+	    {
+				@BeginFootNoteCounter
+		//		@ColPlace
+		//@FootAboveGap	@ColFootNoteSection
+		//@FootAboveGap	@PageFootNoteSection
+	    }
+	    ||@EvenRightMargin //@FootMargin
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Table of contents (including lists of figures and tables).             #
+    #                                                                         #
+    ###########################################################################
+
+    def @ContentsItem
+	named indent { 0f }
+	named crosstag {}
+	named number {}
+	named title {}
+	named pagenum {}
+	named pregap { @ContentsGap }
+	named postgap { 0c }
+	named protect { No }
+    {
+	def @Leaders { @ContentsLeader &@ContentsLeaderGap @Leaders }
+
+	def @OptionalCrossLink right x
+	{
+	    crosstag @Case {
+		""   @Yield x
+		else @Yield { crosstag @CrossLink x }
+	    }
+	}
+
+	def @RightPart
+	{
+	    @ContentsRightWidth @Wide {
+		&1rt { @OptionalCrossLink pagenum //0.5vx }
+	    }
+	}
+
+	def @Item
+	{
+	    |indent @OptionalCrossLink number @ContentsFormat @HExpand {
+	        title & @ContentsLeaderGap @Wide &1rt @OneCol {
+		    @Leaders & @RightPart &0io
+	        }
+	    }
+	    |@ContentsRightWidth
+	}
+
+	//pregap
+	//0.5vx
+	protect @Case {
+	   No    @Yield @Item
+	   Yes   @Yield @Protect @Item
+	}
+	//postgap
+    }
+
+    def @ContentsPlace { @Galley }
+    def @FigureContentsPlace { @Galley }
+    def @TableContentsPlace { @Galley }
+
+    def @SendContents into { @ContentsPlace&&foll_or_prec }
+	right x
+    {
+	x
+    }
+
+    def @SendFigureContents into { @FigureContentsPlace&&foll_or_prec }
+	right x
+    {
+	x
+    }
+
+    def @SendTableContents into { @TableContentsPlace&&foll_or_prec }
+	right x
+    {
+	x
+    }
+
+    def @ContentsEntry
+	left  wanted
+	named indent { 0f }
+	named crosstag {}
+	named number {}
+	named title {}
+	named pagenum {}
+	named pregap { @ContentsGap }
+	named postgap { 0c }
+    {
+	@MakeContents.wanted @Case {
+	    Yes.Yes   @Yield { @SendContents @ContentsItem
+				   indent { indent }
+				   crosstag { crosstag }
+				   number { number }
+				   title { title }
+				   pagenum { pagenum }
+				   pregap { pregap }
+				   postgap { postgap }
+			     }
+	    else      @Yield @Null
+	}
+    }
+
+    def @FigureContentsEntry
+	left  wanted
+	named indent { 0f }
+	named crosstag {}
+	named number {}
+	named title {}
+	named pagenum {}
+	named pregap { @ContentsGap }
+	named postgap { 0c }
+    {
+	@MakeFigureContents.wanted @Case {
+	    Yes.Yes   @Yield { @SendFigureContents @ContentsItem
+				   indent { indent }
+				   crosstag { crosstag }
+				   number { number }
+				   title { title }
+				   pagenum { pagenum }
+				   pregap { pregap }
+				   postgap { postgap }
+			     }
+	    else      @Yield @Null
+	}
+    }
+
+    def @TableContentsEntry
+	left  wanted
+	named indent { 0f }
+	named crosstag {}
+	named number {}
+	named title {}
+	named pagenum {}
+	named pregap { @ContentsGap }
+	named postgap { 0c }
+    {
+	@MakeTableContents.wanted @Case {
+	    Yes.Yes   @Yield { @SendTableContents @ContentsItem
+				   indent { indent }
+				   crosstag { crosstag }
+				   number { number }
+				   title { title }
+				   pagenum { pagenum }
+				   pregap { pregap }
+				   postgap { postgap }
+			     }
+	    else      @Yield @Null
+	}
+    }
+
+    def @MajorContentsEntry
+	left  wanted
+	named indent { 0f }
+	named crosstag {}
+	named number {}
+	named title {}
+	named pagenum {}
+	named pregap { @ContentsGapAbove }
+	named postgap { @ContentsGapBelow }
+    {
+	@MakeContents.wanted @Case {
+	    Yes.Yes   @Yield { @SendContents @ContentsItem
+				   indent { indent }
+				   crosstag { crosstag }
+				   number { @ContentsFont @Font number }
+				   title { @ContentsFont @Font title }
+				   pagenum { pagenum }
+				   pregap { pregap }
+				   postgap { postgap }
+				   protect { Yes }
+			     }
+	    else      @Yield @Null
+	}
+    }
+
+    def @VeryMajorContentsEntry
+	left  wanted
+	named indent { 0.5rt }
+	named title {}
+	named pregap { @ContentsPartGapAbove }
+	named postgap { @ContentsPartGapBelow }
+    {
+	def item
+	{
+	    //pregap
+	    //0.5vx
+	    |indent @ContentsFont @Font @OneCol title |
+	    //0.5vx
+	    //postgap
+	}
+
+	@MakeContents.wanted @Case {
+	    Yes.Yes   @Yield @SendContents item
+	    else      @Yield @Null
+	}
+
+    }
+
+    def @ContentsSection
+    {
+	def @ContentsList { @ContentsPlace // @ContentsList }
+
+	@MakeContents @Case {
+	    { Yes Bypass }  @Yield @ContentsList
+	    else	    @Yield @Null
+	}
+    }
+
+    def @FigureContentsSection
+    {
+	def @FigureContentsList { @FigureContentsPlace // @FigureContentsList }
+
+	@MakeFigureContents @Case {
+	    { Yes Bypass }  @Yield @FigureContentsList
+	    else	    @Yield @Null
+	}
+    }
+
+    def @TableContentsSection
+    {
+	def @TableContentsList { @TableContentsPlace // @TableContentsList }
+
+	@MakeTableContents @Case {
+	    { Yes Bypass }  @Yield @TableContentsList
+	    else	    @Yield @Null
+	}
+    }
+
+    ###########################################################################
+    #                                                                         #
+    #  Bypass table of contents.                                              #
+    #                                                                         #
+    ###########################################################################
+
+    def @BypassContentsEntry into { @ContentsPlace&&preceding }
+	named indent { 0f }
+	named crosstag {}
+	named number {}
+	named title {}
+	named pagenum {}
+    {
+	@MakeContents @Case {
+	    Bypass @Yield { @ContentsItem
+				indent { indent }
+				crosstag { crosstag }
+				number { number }
+				title { title }
+				pagenum { pagenum }
+				pregap { @ContentsGap }
+				postgap { 0c }
+			  }
+	    else  @Yield  @Null
+	}
+    }
+
+    def @BypassFigureContentsEntry into { @FigureContentsPlace&&preceding }
+	named indent { 0f }
+	named crosstag {}
+	named number {}
+	named title {}
+	named pagenum {}
+    {
+	@MakeFigureContents @Case {
+	    Bypass @Yield { @ContentsItem
+				indent { indent }
+				crosstag { crosstag }
+				number { number }
+				title { title }
+				pagenum { pagenum }
+				pregap { @ContentsGap }
+				postgap { 0c }
+			  }
+	    else  @Yield  @Null
+	}
+    }
+
+    def @BypassTableContentsEntry into { @TableContentsPlace&&preceding }
+	named indent { 0f }
+	named crosstag {}
+	named number {}
+	named title {}
+	named pagenum {}
+    {
+	@MakeTableContents @Case {
+	    Bypass @Yield { @ContentsItem
+				indent { indent }
+				crosstag { crosstag }
+				number { number }
+				title { title }
+				pagenum { pagenum }
+				pregap { @ContentsGap }
+				postgap { 0c }
+			  }
+	    else  @Yield  @Null
+	}
+    }
+
+    def @BypassMajorContentsEntry into { @ContentsPlace&&preceding }
+	named indent { 0f }
+	named crosstag {}
+	named number {}
+	named title {}
+	named pagenum {}
+    {
+	@MakeContents @Case {
+	    Bypass @Yield { @ContentsItem
+				indent { indent }
+				crosstag { crosstag }
+				number { @B number }
+				title { @B title }
+				pagenum { pagenum }
+				pregap { @ContentsGapAbove }
+				postgap { @ContentsGapBelow }
+			  }
+	    else  @Yield  @Null
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Endnotes.                                                              #
+    #                                                                         #
+    ###########################################################################
+
+    export num
+    def @EndNoteList
+	named @Tag {}
+	right num
+    {
+	@Galley //@EndNoteGap @EndNoteList @Next num
+    }
+
+    def endtag right num
+    {
+        @BackEnd @Case {
+	    PlainText @Yield {
+	        ({@EndNoteNumbers @Num num})
+	    }
+	    else @Yield {
+	        +0.3v @VShift 0.8f @Font @EndNoteNumbers @Num num
+	    }
+        }
+    }
+
+    def @EndNote
+	named @Tag {}
+	right x
+    {
+	def ftag
+	{
+	    @EndNoteFont @Font @EndNoteList&&@Tag @Open { endtag num }
+	}
+
+	def @ENote into { @EndNoteList&&following }
+	{
+	    @EndNoteFont @Font @EndNoteBreak @Break
+	    { { @EndNoteList&&preceding @Tagged @Tag ftag } @EndNoteFormat x }
+	}
+
+	@Null & @EndNoteFont @Font ftag & @ENote
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Margin Notes.                                                          #
+    #                                                                         #
+    ###########################################################################
+
+    def @ZeroSize right x
+    {
+	@HContract @VContract { ^/0io |0io @OneCol @OneRow x |0io /0io }
+    }
+
+    def @MargPut
+	left parity
+	right x
+    {
+	@MarginNoteFont @Font @MarginNoteBreak @Break @ZeroSize {
+	  @BackEnd @Case {
+	    PlainText @Yield ""
+	    PostScript @Yield {
+	    { parity "LoutMargShift gsave" // "grestore" } @Graphic
+	    {
+		|@MarginNoteHGap @MarginNoteWidth @Wide @OneRow x
+		|@MarginNoteHGap //@MarginNoteVGap
+	    }
+	    }
+	    PDF @Yield { "% @MargPut/LoutMargShift UNIMPLEMENTED" @Graphic {
+		  |@MarginNoteHGap @MarginNoteWidth @Wide @OneRow x
+		  |@MarginNoteHGap //@MarginNoteVGap
+	      }	# VT: PDF currently has no output
+	    }
+	  }
+	}
+    }
+
+    def @LeftNote  right x { @Null & 0 @MargPut x }
+    def @RightNote right x { @Null & 1 @MargPut x }
+    def @OuterNote right x { @Null & 2 @MargPut x }
+    def @InnerNote right x { @Null & 3 @MargPut x }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @Place: places an object at an arbitrary point on the page.            #
+    #                                                                         #
+    ###########################################################################
+
+#
+# VT: the expressions in the braces will work for PostScript but not for PDF
+# they should be modified in the way the "named c { " cm" }" blocks were modified above
+# but since the point of @Place is to output a matrix (?), I have not implemented this change
+#
+    def @Place
+      named x
+	named "+" precedence 96 associativity left left a right b { a b "add" }
+	named "-" precedence 96 associativity left left a right b { a b "sub" }
+	named "/" precedence 97 associativity left left a right b { a b "div" }
+	named "*" precedence 98 associativity left left a right b { a b "mul" }
+	named c   precedence 99                    left a         { a "cm"    }
+	named i   precedence 99                    left a         { a "in"    }
+	named e   precedence 99                    left a         { a "em"    }
+	named p   precedence 99                    left a         { a "pt"    }
+	named f   precedence 99                    left a         { a "ft"    }
+	named s   precedence 99                    left a         { a "sp"    }
+	named v   precedence 99                    left a         { a "vs"    }
+	named cm  precedence 99                    left a         { a "cm"    }
+	named in  precedence 99                    left a         { a "in"    }
+	named em  precedence 99                    left a         { a "em"    }
+	named pt  precedence 99                    left a         { a "pt"    }
+	named ft  precedence 99                    left a         { a "ft"    }
+	named sp  precedence 99                    left a         { a "sp"    }
+	named vs  precedence 99                    left a         { a "vs"    }
+	{ 0 }
+      named y
+	named "+" precedence 96 associativity left left a right b { a b "add" }
+	named "-" precedence 96 associativity left left a right b { a b "sub" }
+	named "/" precedence 97 associativity left left a right b { a b "div" }
+	named "*" precedence 98 associativity left left a right b { a b "mul" }
+	named c   precedence 99                    left a         { a "cm"    }
+	named i   precedence 99                    left a         { a "in"    }
+	named e   precedence 99                    left a         { a "em"    }
+	named p   precedence 99                    left a         { a "pt"    }
+	named f   precedence 99                    left a         { a "ft"    }
+	named s   precedence 99                    left a         { a "sp"    }
+	named v   precedence 99                    left a         { a "vs"    }
+	named cm  precedence 99                    left a         { a "cm"    }
+	named in  precedence 99                    left a         { a "in"    }
+	named em  precedence 99                    left a         { a "em"    }
+	named pt  precedence 99                    left a         { a "pt"    }
+	named ft  precedence 99                    left a         { a "ft"    }
+	named sp  precedence 99                    left a         { a "sp"    }
+	named vs  precedence 99                    left a         { a "vs"    }
+	{ 0 }
+      right val
+    {
+	@ZeroSize {
+	  @BackEnd @Case {
+	    PlainText @Yield ""
+	    PostScript @Yield {
+		{ "LoutPageDict begin matr setmatrix" x y "translate end gsave"
+		  // "grestore" } @Graphic val
+	    }
+	    else @Yield { { "% @Place UNIMPLEMENTED" } @Graphic val	# VT: PDF currently has no output
+	    }
+	  }
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @Theorem, @Proof, and @EndProof                                       #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag val
+    def @TheoremCounterMarker
+	named @Tag {}
+	named val {}
+    {
+	@Null
+    }
+
+    def @BeginTheoremCounter
+	right prefix
+    {
+	@TheoremCounterMarker val { prefix @Join 0 }
+    }
+
+    def @TheoremNum right tag
+    {
+	@TheoremCounterMarker&&tag @Open { @Next val }
+    }
+
+    def @TheoremCounterIncrement
+	right tag
+    {
+	@TheoremCounterMarker&&preceding @Tagged tag
+	@TheoremCounterMarker val { @TheoremNum tag }
+	@NumberMarker @Tag { tag } @Value { @TheoremNum tag }
+    }
+
+    def @Theorem
+       named @Tag {}
+       named @Title {}
+       right x
+    {
+	def @TheoremTitle
+	{
+	   @Title @Case {
+		""   @Yield @Null
+		else @Yield @TheoremTitleFormat @Title
+	   }
+	}
+
+	{ @PageMark @Tag & @TheoremCounterIncrement @Tag } @Insert
+	@TheoremFormat
+	    word { theorem @WordVal @TheoremWord }
+	    number { @TheoremNum @Tag }
+	    title { @TheoremTitle }
+	    body { x }
+    }
+
+    macro @Proof { @B { {proof @WordVal @ProofWord}: } &2s }
+
+    macro @EndProof { &1rt @Box {} }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @Definition                                                           #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag val
+    def @DefinitionCounterMarker
+	named @Tag {}
+	named val {}
+    {
+	@Null
+    }
+
+    def @BeginDefinitionCounter
+	right prefix
+    {
+	@DefinitionCounterMarker val { prefix @Join 0 }
+    }
+
+    def @DefinitionNum right tag
+    {
+	@DefinitionCounterMarker&&tag @Open { @Next val }
+    }
+
+    def @DefinitionCounterIncrement
+	right tag
+    {
+	@DefinitionCounterMarker&&preceding @Tagged tag
+	@DefinitionCounterMarker val { @DefinitionNum tag }
+	@NumberMarker @Tag { tag } @Value { @DefinitionNum tag }
+    }
+
+    def @Definition
+       named @Tag {}
+       named @Title {}
+       right x
+    {
+	def @DefinitionTitle
+	{
+	   @Title @Case {
+		""   @Yield @Null
+		else @Yield (@Title)
+	   }
+	}
+
+	{ @PageMark @Tag & @DefinitionCounterIncrement @Tag } @Insert
+	@DefinitionFormat
+	    word { definition @WordVal @DefinitionWord }
+	    number { @DefinitionNum @Tag }
+	    title { @DefinitionTitle }
+	    body { x }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @Claim                                                                #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag val
+    def @ClaimCounterMarker
+	named @Tag {}
+	named val {}
+    {
+	@Null
+    }
+
+    def @BeginClaimCounter
+	right prefix
+    {
+	@ClaimCounterMarker val { prefix @Join 0 }
+    }
+
+    def @ClaimNum right tag
+    {
+	@ClaimCounterMarker&&tag @Open { @Next val }
+    }
+
+    def @ClaimCounterIncrement
+	right tag
+    {
+	@ClaimCounterMarker&&preceding @Tagged tag
+	@ClaimCounterMarker val { @ClaimNum tag }
+	@NumberMarker @Tag { tag } @Value { @ClaimNum tag }
+    }
+
+    def @Claim
+       named @Tag {}
+       named @Title {}
+       right x
+    {
+	def @ClaimTitle
+	{
+	   @Title @Case {
+		""   @Yield @Null
+		else @Yield (@Title)
+	   }
+	}
+
+	{ @PageMark @Tag & @ClaimCounterIncrement @Tag } @Insert
+	@ClaimFormat
+	    word { claim @WordVal @ClaimWord }
+	    number { @ClaimNum @Tag }
+	    title { @ClaimTitle }
+	    body { x }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @Proposition                                                          #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag val
+    def @PropositionCounterMarker
+	named @Tag {}
+	named val {}
+    {
+	@Null
+    }
+
+    def @BeginPropositionCounter
+	right prefix
+    {
+	@PropositionCounterMarker val { prefix @Join 0 }
+    }
+
+    def @PropositionNum right tag
+    {
+	@PropositionCounterMarker&&tag @Open { @Next val }
+    }
+
+    def @PropositionCounterIncrement
+	right tag
+    {
+	@PropositionCounterMarker&&preceding @Tagged tag
+	@PropositionCounterMarker val { @PropositionNum tag }
+	@NumberMarker @Tag { tag } @Value { @PropositionNum tag }
+    }
+
+    def @Proposition
+       named @Tag {}
+       named @Title {}
+       right x
+    {
+	def @PropositionTitle
+	{
+	   @Title @Case {
+		""   @Yield @Null
+		else @Yield (@Title)
+	   }
+	}
+
+	{ @PageMark @Tag & @PropositionCounterIncrement @Tag } @Insert
+	@PropositionFormat
+	    word { proposition @WordVal @PropositionWord }
+	    number { @PropositionNum @Tag }
+	    title { @PropositionTitle }
+	    body { x }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @Lemma                                                                #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag val
+    def @LemmaCounterMarker
+	named @Tag {}
+	named val {}
+    {
+	@Null
+    }
+
+    def @BeginLemmaCounter
+	right prefix
+    {
+	@LemmaCounterMarker val { prefix @Join 0 }
+    }
+
+    def @LemmaNum right tag
+    {
+	@LemmaCounterMarker&&tag @Open { @Next val }
+    }
+
+    def @LemmaCounterIncrement
+	right tag
+    {
+	@LemmaCounterMarker&&preceding @Tagged tag
+	@LemmaCounterMarker val { @LemmaNum tag }
+	@NumberMarker @Tag { tag } @Value { @LemmaNum tag }
+    }
+
+    def @Lemma
+       named @Tag {}
+       named @Title {}
+       right x
+    {
+	def @LemmaTitle
+	{
+	   @Title @Case {
+		""   @Yield @Null
+		else @Yield (@Title)
+	   }
+	}
+
+	{ @PageMark @Tag & @LemmaCounterIncrement @Tag } @Insert
+	@LemmaFormat
+	    word { lemma @WordVal @LemmaWord }
+	    number { @LemmaNum @Tag }
+	    title { @LemmaTitle }
+	    body { x }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @Corollary                                                            #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag val
+    def @CorollaryCounterMarker
+	named @Tag {}
+	named val {}
+    {
+	@Null
+    }
+
+    def @BeginCorollaryCounter
+	right prefix
+    {
+	@CorollaryCounterMarker val { prefix @Join 0 }
+    }
+
+    def @CorollaryNum right tag
+    {
+	@CorollaryCounterMarker&&tag @Open { @Next val }
+    }
+
+    def @CorollaryCounterIncrement
+	right tag
+    {
+	@CorollaryCounterMarker&&preceding @Tagged tag
+	@CorollaryCounterMarker val { @CorollaryNum tag }
+	@NumberMarker @Tag { tag } @Value { @CorollaryNum tag }
+    }
+
+    def @Corollary
+       named @Tag {}
+       named @Title {}
+       right x
+    {
+	def @CorollaryTitle
+	{
+	   @Title @Case {
+		""   @Yield @Null
+		else @Yield (@Title)
+	   }
+	}
+
+	{ @PageMark @Tag & @CorollaryCounterIncrement @Tag } @Insert
+	@CorollaryFormat
+	    word { corollary @WordVal @CorollaryWord }
+	    number { @CorollaryNum @Tag }
+	    title { @CorollaryTitle }
+	    body { x }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @Example                                                              #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag val
+    def @ExampleCounterMarker
+	named @Tag {}
+	named val {}
+    {
+	@Null
+    }
+
+    def @BeginExampleCounter
+	right prefix
+    {
+	@ExampleCounterMarker val { prefix @Join 0 }
+    }
+
+    def @ExampleNum right tag
+    {
+	@ExampleCounterMarker&&tag @Open { @Next val }
+    }
+
+    def @ExampleCounterIncrement
+	right tag
+    {
+	@ExampleCounterMarker&&preceding @Tagged tag
+	@ExampleCounterMarker val { @ExampleNum tag }
+	@NumberMarker @Tag { tag } @Value { @ExampleNum tag }
+    }
+
+    def @Example
+       named @Tag {}
+       named @Title {}
+       right x
+    {
+	def @ExampleTitle
+	{
+	   @Title @Case {
+		""   @Yield @Null
+		else @Yield (@Title)
+	   }
+	}
+
+	{ @PageMark @Tag & @ExampleCounterIncrement @Tag } @Insert
+	@ExampleFormat
+	    word { example @WordVal @ExampleWord }
+	    number { @ExampleNum @Tag }
+	    title { @ExampleTitle }
+	    body { x }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @BeginAllCounters - begin all counters                                 #
+    #                                                                         #
+    ###########################################################################
+
+    def @BeginAllCounters
+	left condition
+	right prefix
+    {
+	condition @Do {
+	    @BeginTheoremCounter prefix
+	    // @BeginDefinitionCounter prefix
+	    // @BeginClaimCounter prefix
+	    // @BeginPropositionCounter prefix
+	    // @BeginLemmaCounter prefix
+	    // @BeginCorollaryCounter prefix
+	    // @BeginExampleCounter prefix
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @Reference - a reference.                                              #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag @Type @Abstract @Address @Annote @Author @Day @Edition
+	   @HowPublished @InAuthor @InTitle @Institution @Journal @Keywords
+	   @Label @Month @Note @Number @Organization @Page @Pages @Pinpoint
+	   @Publisher @Title @TitleNote @TRType @URL @Volume @Year
+
+    def @Reference
+	named compulsory @Tag		{}
+	named compulsory @Type		{}
+	named @Abstract			{}
+	named @Address			{}
+	named @Annote			{}
+	named @Author			{}
+	named @Day			{}
+	named @Edition			{}
+	named @HowPublished		{}
+	named @InAuthor			{}
+	named @InTitle			{}
+	named @Institution		{}
+	named @Journal			{}
+	named @Keywords			{}
+	named @Label			{}
+	named @Month			{}
+	named @Note			{}
+	named @Number			{}
+	named @Organization		{}
+	named @Page			{}
+	named @Pages			{}
+	named @Pinpoint			{}
+	named @Publisher		{}
+	named @Title			{}
+	named @TitleNote		{}
+	named @TRType			{}
+	named @URL
+	  named "~"  { "~"      }
+	  named "/"  { "/"  &0p }
+	  named "//" { "//" &0p }	{}
+	named @Volume			{}
+	named @Year			{}
+    { @Null }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @CiteLabel - the value of the label of a reference within a citation.  #
+    #                                                                         #
+    ###########################################################################
+
+    def @CiteLabel
+	left label
+	right tag 
+    {
+	tag @CrossLink @RefCiteLabels
+	    @RefNum       { @NumberOf tag				}
+	    @Tag          { tag						}
+	    @Type         { @Reference&&tag @Open { @Type }		}
+	    @Abstract     { @Reference&&tag @Open { @Abstract }		}
+	    @Address      { @Reference&&tag @Open { @Address }		}
+	    @Annote       { @Reference&&tag @Open { @Annote }		}
+	    @Author       { @Reference&&tag @Open { @Author }		}
+	    @Day          { @Reference&&tag @Open { @Day }		}
+	    @Edition      { @Reference&&tag @Open { @Edition }		}
+	    @HowPublished { @Reference&&tag @Open { @HowPublished }	}
+	    @InAuthor     { @Reference&&tag @Open { @InAuthor }		}
+	    @InTitle      { @Reference&&tag @Open { @InTitle }		}
+	    @Institution  { @Reference&&tag @Open { @Institution }	}
+	    @Journal      { @Reference&&tag @Open { @Journal }		}
+	    @Keywords     { @Reference&&tag @Open { @Keywords }		}
+
+	    @Label        { label @Case {
+			      "" @Yield {@Reference&&tag @Open {@Label}}
+			      else @Yield label
+			    }						}
+
+	    @Month        { @Reference&&tag @Open { @Month }		}
+	    @Note         { @Reference&&tag @Open { @Note }		}
+	    @Number       { @Reference&&tag @Open { @Number }		}
+	    @Organization { @Reference&&tag @Open { @Organization }	}
+	    @Page         { @Reference&&tag @Open { @Page }		}
+	    @Pages        { @Reference&&tag @Open { @Pages }		}
+	    @Pinpoint     { @Reference&&tag @Open { @Pinpoint }		}
+	    @Publisher    { @Reference&&tag @Open { @Publisher }	}
+	    @Title        { @Reference&&tag @Open { @Title }		}
+	    @TitleNote    { @Reference&&tag @Open { @TitleNote }	}
+	    @TRType       { @Reference&&tag @Open { @TRType }		}
+	    @Volume       { @Reference&&tag @Open { @Volume }		}
+	    @Year         { @Reference&&tag @Open { @Year }		}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @ListLabel - the value of the label of a reference within a ref list.  #
+    #                                                                         #
+    ###########################################################################
+
+    def @ListLabel
+	left label
+	right tag 
+    {
+	@RefListLabels
+	    @RefNum       { @NumberOf tag				}
+	    @Tag          { tag						}
+	    @Type         { @Reference&&tag @Open { @Type }		}
+	    @Abstract     { @Reference&&tag @Open { @Abstract }		}
+	    @Address      { @Reference&&tag @Open { @Address }		}
+	    @Annote       { @Reference&&tag @Open { @Annote }		}
+	    @Author       { @Reference&&tag @Open { @Author }		}
+	    @Day          { @Reference&&tag @Open { @Day }		}
+	    @Edition      { @Reference&&tag @Open { @Edition }		}
+	    @HowPublished { @Reference&&tag @Open { @HowPublished }	}
+	    @InAuthor     { @Reference&&tag @Open { @InAuthor }		}
+	    @InTitle      { @Reference&&tag @Open { @InTitle }		}
+	    @Institution  { @Reference&&tag @Open { @Institution }	}
+	    @Journal      { @Reference&&tag @Open { @Journal }		}
+	    @Keywords     { @Reference&&tag @Open { @Keywords }		}
+
+	    @Label        { label @Case {
+			      "" @Yield {@Reference&&tag @Open {@Label}}
+			      else @Yield label
+			    }						}
+
+	    @Month        { @Reference&&tag @Open { @Month }		}
+	    @Note         { @Reference&&tag @Open { @Note }		}
+	    @Number       { @Reference&&tag @Open { @Number }		}
+	    @Organization { @Reference&&tag @Open { @Organization }	}
+	    @Page         { @Reference&&tag @Open { @Page }		}
+	    @Pages        { @Reference&&tag @Open { @Pages }		}
+	    @Pinpoint     { @Reference&&tag @Open { @Pinpoint }		}
+	    @Publisher    { @Reference&&tag @Open { @Publisher }	}
+	    @Title        { @Reference&&tag @Open { @Title }		}
+	    @TitleNote    { @Reference&&tag @Open { @TitleNote }	}
+	    @TRType       { @Reference&&tag @Open { @TRType }		}
+	    @Volume       { @Reference&&tag @Open { @Volume }		}
+	    @Year         { @Reference&&tag @Open { @Year }		}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @SortKey - the value of the sort key of a reference.                   #
+    #                                                                         #
+    ###########################################################################
+
+    def @SortKey
+	left label
+	right tag 
+    {
+	@RefListSortKey
+	    @Tag          { tag						}
+	    @Type         { @Reference&&tag @Open { @Type }		}
+	    @Abstract     { @Reference&&tag @Open { @Abstract }		}
+	    @Address      { @Reference&&tag @Open { @Address }		}
+	    @Annote       { @Reference&&tag @Open { @Annote }		}
+	    @Author       { @Reference&&tag @Open { @Author }		}
+	    @Day          { @Reference&&tag @Open { @Day }		}
+	    @Edition      { @Reference&&tag @Open { @Edition }		}
+	    @HowPublished { @Reference&&tag @Open { @HowPublished }	}
+	    @InAuthor     { @Reference&&tag @Open { @InAuthor }		}
+	    @InTitle      { @Reference&&tag @Open { @InTitle }		}
+	    @Institution  { @Reference&&tag @Open { @Institution }	}
+	    @Journal      { @Reference&&tag @Open { @Journal }		}
+	    @Keywords     { @Reference&&tag @Open { @Keywords }		}
+
+	    @Label        { label @Case {
+			      "" @Yield {@Reference&&tag @Open {@Label}}
+			      else @Yield label
+			    }						}
+
+	    @Month        { @Reference&&tag @Open { @Month }		}
+	    @Note         { @Reference&&tag @Open { @Note }		}
+	    @Number       { @Reference&&tag @Open { @Number }		}
+	    @Organization { @Reference&&tag @Open { @Organization }	}
+	    @Page         { @Reference&&tag @Open { @Page }		}
+	    @Pages        { @Reference&&tag @Open { @Pages }		}
+	    @Pinpoint     { @Reference&&tag @Open { @Pinpoint }		}
+	    @Publisher    { @Reference&&tag @Open { @Publisher }	}
+	    @Title        { @Reference&&tag @Open { @Title }		}
+	    @TitleNote    { @Reference&&tag @Open { @TitleNote }	}
+	    @TRType       { @Reference&&tag @Open { @TRType }		}
+	    @Volume       { @Reference&&tag @Open { @Volume }		}
+	    @Year         { @Reference&&tag @Open { @Year }		}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @RefStyle - a reference printing style.                                #
+    #                                                                         #
+    ###########################################################################
+
+    export @Style
+    def @RefStyle
+	left @Tag
+	named @Style right reftag {}
+    {}
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @RefPrint - prints reference with tag reftag in appropriate style.     #
+    #                                                                         #
+    ###########################################################################
+
+    def @RefPrint right reftag
+    {	& @RefStyle&&{ @Reference&&reftag @Open { @Type } }
+	@Open { @Style reftag } &
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @ReferencesSection and @ChapReferencesSection - a list of references.  #
+    #                                                                         #
+    ###########################################################################
+
+    def @RefPlace { @Galley }
+    def @ChapRefPlace { @Galley }
+
+    def @BypassRefPlace { @Galley }
+    def @BypassChapRefPlace { @Galley }
+
+    def @ReferencesSection
+    {
+	def @RefList right num
+	{
+	    @NumberMarker @Value { @RefNumbers @Num num } & | @RefPlace
+	    //@RefListGap @RefList @Next num
+	}
+
+	def @BypassRefList
+	{
+	    @BypassRefPlace //@RefListGap @BypassRefList
+	}
+
+	@RefList 1
+	//@RefListGap
+	@BypassRefList
+    }
+
+    def @ChapReferencesSection
+    {
+	def @ChapRefList right num
+	{
+	    @NumberMarker @Value { @RefNumbers @Num num } & | @ChapRefPlace
+	    //@RefListGap @ChapRefList @Next num
+	}
+
+	def @BypassChapRefList
+	{
+	    @BypassChapRefPlace //@RefListGap @BypassChapRefList
+	}
+
+	@ChapRefList 1
+	//@RefListGap
+	@BypassChapRefList
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @RefHeading - heading for reference lists.                            #
+    #                                                                         #
+    ###########################################################################
+
+    def @RefHeading right x
+    {	x @Case {
+	    references @Yield @Word&&references
+	    bibliography @Yield @Word&&bibliography
+	    else @Yield x
+	}
+    }
+
+
+    #######################################################################
+    #                                                                     #
+    #   @ChapRefSection                                                   #
+    #                                                                     #
+    #######################################################################
+
+    def @ChapRefSection
+    {
+	@Heading @RefHeading @ChapRefListTitle
+	@DP
+	@ChapReferencesSection
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @SendRef and @ChapSendRef - send one reference to the reference list.  #
+    #                                                                         #
+    ###########################################################################
+
+    def @RefItem
+	left lab
+	right ref
+    {
+	def @ZeroWidth right x { &0io @OneCol x &0io }
+
+	@RefListFormat @Case {
+	    NoLabels   @Yield {					   ref	}
+	    Labels     @Yield { @ZeroWidth lab |@RefListLabelWidth ref	}
+	    DropLabels @Yield { lab //1vx      |@RefListLabelWidth ref	}
+	    InLabels   @Yield { lab & 2s @Wide &		   ref	}
+	}
+    }
+
+
+    def @RefListItem
+	left label
+	right tag
+    {
+	@RefListFont @Font @RefListBreak @Break {
+	    @NumberMarker&&preceding @Tagged tag & @PageMark tag
+	    |@RefListIndent {label @ListLabel tag} @RefItem {@RefPrint tag}
+	    |@RefListRightIndent
+	}
+    }
+
+
+    def @SendRef into { @RefPlace&&foll_or_prec }
+	left label
+	right tag
+    {
+	def @Key { label @SortKey tag }
+
+	# no @Merge i.e. omit duplicates
+
+	label @RefListItem tag
+    }
+
+
+    def @ChapSendRef into { @ChapRefPlace&&foll_or_prec }
+	left label
+	right tag
+    {
+	def @Key { label @SortKey tag }
+
+	# no @Merge i.e. omit duplicates
+
+	label @RefListItem tag
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @Ref (bare citation) and its variants.                                 #
+    #                                                                         #
+    ###########################################################################
+
+    def @Ref
+	named label {}
+	right tag
+    {
+	@MakeReferences @Case {
+	    Yes	  @Yield { label @CiteLabel tag & label @SendRef tag }
+	    else  @Yield @Null
+	}
+    }
+
+    def @NoRef
+	named label {}
+	right tag
+    {
+	@MakeReferences @Case {
+	    Yes  @Yield { label @SendRef tag }
+	    else @Yield @Null
+	}
+    }
+
+    def @ChapRef
+	named label {}
+	right tag
+    {
+	@MakeReferences @Case {
+	    Yes  @Yield { label @CiteLabel tag & label @ChapSendRef tag }
+	    else @Yield @Null
+	}
+    }
+
+    def @NoChapRef
+	named label {}
+	right tag
+    {
+	@MakeReferences @Case {
+	    Yes  @Yield { label @ChapSendRef tag }
+	    else @Yield @Null
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Bypass references.                                                     #
+    #                                                                         #
+    ###########################################################################
+
+    def @BypassReference into { @BypassRefPlace&&preceding }
+	named label {}
+	named value {}
+    {
+	@MakeReferences @Case {
+	    Bypass @Yield { label @RefItem value }
+	    else   @Yield @Null
+	}
+    }
+
+    def @BypassChapReference into { @BypassChapRefPlace&&preceding }
+	named label {}
+	named value {}
+    {
+	@MakeReferences @Case {
+	    Bypass @Yield { label @RefItem value }
+	    else   @Yield @Null
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @Cite (citation) and its variants.                                     #
+    #                                                                         #
+    ###########################################################################
+
+    export "$" "," ";"
+    def @Cite body cite
+    {
+	macro "$" { @Ref }
+	def "," precedence 90 left x { x"," }
+	def ";" precedence 90 left x { x";" }
+
+	@MakeReferences @Case {
+	    Yes  @Yield {
+	        @RefCiteStyle cite
+	    }
+	    else @Yield @Null
+	}
+    }
+
+    export "$" "," ";"
+    def @NoCite body cite
+    {
+	macro "$" { @NoRef }
+	def "," precedence 90 left x { x"," }
+	def ";" precedence 90 left x { x";" }
+
+	@MakeReferences @Case {
+	    Yes  @Yield { cite }
+	    else @Yield @Null
+	}
+    }
+
+    export "$" "," ";"
+    def @ChapCite body cite
+    {
+	macro "$" { @ChapRef }
+	def "," precedence 90 left x { x"," }
+	def ";" precedence 90 left x { x";" }
+
+	@MakeReferences @Case {
+	    Yes  @Yield { @RefCiteStyle cite }
+	    else @Yield @Null
+	}
+    }
+
+    export "$" "," ";"
+    def @NoChapCite body cite
+    {
+	macro "$" { @NoChapRef }
+	def "," precedence 90 left x { x }
+	def ";" precedence 90 left x { x";" }
+
+	@MakeReferences @Case {
+	    Yes  @Yield { cite }
+	    else @Yield @Null
+	}
+    }
+
+    ###########################################################################
+    #                                                                         #
+    #  Floating figures.                                                      #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag prefix
+    def @FigurePrefixMarker
+	named @Tag {}
+	named prefix {}
+    {
+	@Null
+    }
+
+    export @Tag count
+    def @FigureCounterMarker
+	named @Tag {}
+	named count {}
+    {
+	@Null
+    }
+
+    def @RawFigureNum right tag
+    {
+	@FigureCounterMarker&&tag @Open { @Next count }
+    }
+
+    def @FigureCounterIncrement
+	right tag
+    {
+	   @FigureCounterMarker&&preceding @Tagged tag
+	// @FigurePrefixMarker&&preceding @Tagged tag
+	// @FigureCounterMarker count { @RawFigureNum tag }
+	// @NumberMarker @Tag { tag }
+		@Value { { @FigurePrefixMarker&&tag @Open { prefix } }
+		    @Join {@FigureNumbers @Num @RawFigureNum tag}
+		}
+    }
+
+    def @BeginFigureCounter
+	left condition
+	right prefix
+    {
+	condition @Do {
+	       @FigurePrefixMarker prefix { prefix }
+	    // @FigureCounterMarker count { 0 }
+	}
+    }
+
+    def @EndFigureList { @Galley //@MidGap @EndFigureList }
+
+    def @Figure
+	named @Tag {}
+	named @Caption { dft }
+	named @ShortCaption { dft }
+	named @CaptionPos { @FigureCaptionPos }
+	named @Format
+    	    named @II right x { |@DisplayIndent x |               }
+    	    named @QQ right x { |@DisplayIndent x |@DisplayIndent }
+    	    named @CC right x { |0.5rt x          |               }
+    	    named @RR right x { |1.0rt x          |               }
+		right @Body { @FigureFormat @Body }
+	named @InitialLanguage { @InitialLanguage }
+	named @BypassNumber { dft }
+	named @OnePage { dft }
+	named @Location { @FigureLocation }
+	right @Body
+    {
+	def @FigureNumber
+	{
+	    @BypassNumber @Dft @NumberOf @Tag
+	}
+
+	def @ContentsCaption
+	{
+	    @ShortCaption @Dft @Caption
+	}
+
+	def @OnePg
+	{
+	    @OnePage @Case {
+		{ No  no } @Yield No
+		{ Yes yes } @Yield Yes
+		dft @Yield { @Location @Case {
+				PageTop		@Yield No
+				EvenPageTop	@Yield No
+				FullPage	@Yield No
+				EvenFullPage	@Yield No
+				PageFoot	@Yield Yes
+				ColTop		@Yield No
+				ColFoot		@Yield Yes
+				ColEnd		@Yield No
+				Display		@Yield Yes
+				AfterLine	@Yield Yes
+				TryAfterLine	@Yield Yes
+				Raw		@Yield No
+			     }
+			   }
+	    }
+	}
+
+	def @CaptionState
+	{
+	    @Caption @Case {
+		dft  @Yield None
+		else @Yield { @CaptionPos @Case {
+		    { Below below } @Yield Below
+		    { Above above } @Yield Above
+		} }
+	    }
+	}
+
+	#def @FigureLabel
+	#{
+	#    @FigureNumbers @Case {
+	#	No   @Yield @Null
+	#	else @Yield {
+	#	    @CaptionFormat { {figure @WordVal @FigureWord} @NumSep @FigureNumber }
+	#	}
+	#    }
+	#}
+
+	def @CaptionVal
+	{
+	    @FigureCaptionFont @Font @FigureCaptionBreak @Break
+	    { ||0.5rt @FigureCaptionFormat
+		 word { figure @WordVal @FigureWord }
+		 number { @FigureNumber }
+		 caption { @Caption }
+	    }
+	}
+
+	def @FigureVal
+	{
+	    @InitialLanguage @Language
+	    {
+		@MakeFigureContents @FigureContentsEntry
+		    indent { 0f }
+		    crosstag { @Tag }
+		    number { @FigureNumber }
+		    title { @InitialLanguage @Language @ContentsCaption }
+		    pagenum { @PageOf @Tag }
+		// @FigureCounterIncrement @Tag
+		// @Body
+		// @PageMark @Tag
+	    }
+	}
+
+	def @FigureTarget
+	{
+	    @Location @Case {
+		PageTop		@Yield  @PageTopPlace&&following
+		EvenPageTop	@Yield  @PageTopPlace&&following
+		FullPage	@Yield  @FullPagePlace&&following
+		EvenFullPage	@Yield  @FullPagePlace&&following
+		PageFoot	@Yield  @PageFootAndTopPlace&&following
+		ColTop		@Yield  @ColTopPlace&&following
+		ColFoot		@Yield  @ColFootAndTopPlace&&following
+		ColEnd		@Yield  @EndFigureList&&following
+		Display		@Yield  @AfterLinePlace&&following
+		AfterLine	@Yield  @AfterLinePlace&&following
+		TryAfterLine	@Yield  @TryAfterLinePlace&&following
+	    }
+	}
+
+	def @SendEncl into { @FigureTarget }
+	    right x
+	{
+	    def @Enclose right x
+	    {
+		@OnePg @Case {
+                	No  @Yield @Format x
+                	Yes @Yield x
+            	}
+	    }
+
+	    x
+	}
+
+	def @Send into { @FigureTarget }
+	    right x
+	{
+	    x
+	}
+
+	def @EvenFullPageSend into { @EvenFullPagePlace&&following }
+	    right x
+	{
+	    @OneRow x
+	}
+
+	def @EvenPageSend into { @EvenPagePlace&&following }
+	    right x
+	{
+	    @OneRow x
+	}
+
+	def @RawFigureVal
+	{
+	    @OnePg.@CaptionState @Case
+	    {
+		Yes.Below @Yield @OneRow { @Format @FigureVal @DP @CaptionVal }
+		Yes.Above @Yield @OneRow { @CaptionVal @DP @Format @FigureVal }
+		Yes.None  @Yield @OneRow { @Format @FigureVal }
+		No.Below  @Yield         { @Format @FigureVal @DP @CaptionVal }
+		No.Above  @Yield         { @CaptionVal @DP @Format @FigureVal }
+		No.None   @Yield         { @Format @FigureVal }
+	    }
+	}
+
+	def @NonRawFigureVal
+	{
+	  @OnePg.@CaptionState @Case
+	  {
+	    Yes.Below @Yield {
+		@Send @OneRow { @Format @FigureVal @DP @CaptionVal // @DupRunner}
+	    }
+	    Yes.Above @Yield {
+		@Send @OneRow { @CaptionVal @DP @Format @FigureVal // @DupRunner}
+	    }
+	    Yes.None @Yield {
+		@Send @OneRow { @Format @FigureVal // @DupRunner }
+	    }
+	    No.Below @Yield {
+		@SendEncl { @FigureVal // @Send { @CaptionVal // @DupRunner } }
+	    }
+	    No.Above @Yield {
+		@Send { @CaptionVal // @SendEncl { @FigureVal // @DupRunner } }
+	    }
+	    No.None @Yield {
+		@SendEncl { @FigureVal // @DupRunner }
+	    }
+	  }
+	}
+
+	@Location @Case {
+	    Raw		  @Yield @RawFigureVal
+	    Display	  @Yield { @NonRawFigureVal &1rt }
+	    EvenPageTop   @Yield @EvenPageSend @NonRawFigureVal
+	    EvenFullPage  @Yield @EvenFullPageSend @NonRawFigureVal
+	    else	  @Yield @NonRawFigureVal
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Floating tables (exact clone of figure code immediately above).        #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag prefix
+    def @TablePrefixMarker
+	named @Tag {}
+	named prefix {}
+    {
+	@Null
+    }
+
+    export @Tag count
+    def @TableCounterMarker
+	named @Tag {}
+	named count {}
+    {
+	@Null
+    }
+
+    def @RawTableNum right tag
+    {
+	@TableCounterMarker&&tag @Open { @Next count }
+    }
+
+    def @TableCounterIncrement
+	right tag
+    {
+	   @TableCounterMarker&&preceding @Tagged tag
+	// @TablePrefixMarker&&preceding @Tagged tag
+	// @TableCounterMarker count { @RawTableNum tag }
+	// @NumberMarker @Tag { tag }
+		@Value { { @TablePrefixMarker&&tag @Open { prefix } }
+		    @Join {@TableNumbers @Num @RawTableNum tag}
+		}
+    }
+
+    def @BeginTableCounter
+	left condition
+	right prefix
+    {
+	condition @Do {
+	       @TablePrefixMarker prefix { prefix }
+	    // @TableCounterMarker count { 0 }
+	}
+    }
+
+    def @EndTableList { @Galley //@MidGap @EndTableList }
+
+    def @Table
+	named @Tag {}
+	named @Caption { dft }
+	named @ShortCaption { dft }
+	named @CaptionPos { @TableCaptionPos }
+	named @Format
+    	    named @II right x { |@DisplayIndent x |               }
+    	    named @QQ right x { |@DisplayIndent x |@DisplayIndent }
+    	    named @CC right x { |0.5rt x          |               }
+    	    named @RR right x { |1.0rt x          |               }
+		right @Body { @TableFormat @Body }
+	named @InitialLanguage { @InitialLanguage }
+	named @BypassNumber { dft }
+	named @OnePage { dft }
+	named @Location { @TableLocation }
+	right @Body
+    {
+	def @TableNumber
+	{
+	    @BypassNumber @Dft @NumberOf @Tag
+	}
+
+	def @ContentsCaption
+	{
+	    @ShortCaption @Dft @Caption
+	}
+
+	def @OnePg
+	{
+	    @OnePage @Case {
+		{ No  no } @Yield No
+		{ Yes yes } @Yield Yes
+		dft @Yield { @Location @Case {
+				PageTop		@Yield No
+				EvenPageTop	@Yield No
+				FullPage	@Yield No
+				EvenFullPage	@Yield No
+				PageFoot	@Yield Yes
+				ColTop		@Yield No
+				ColFoot		@Yield Yes
+				ColEnd		@Yield No
+				Display		@Yield Yes
+				AfterLine	@Yield Yes
+				TryAfterLine	@Yield Yes
+				Raw		@Yield No
+			     }
+			   }
+	    }
+	}
+
+	def @CaptionState
+	{
+	    @Caption @Case {
+		dft  @Yield None
+		else @Yield { @CaptionPos @Case {
+		    { Below below } @Yield Below
+		    { Above above } @Yield Above
+		} }
+	    }
+	}
+
+	#def @TableLabel
+	#{
+	#    @TableNumbers @Case {
+	#	No   @Yield @Null
+	#	else @Yield {
+	#	    @CaptionFormat { {table @WordVal @TableWord} @NumSep @TableNumber }
+	#	}
+	#    }
+	#}
+
+	def @CaptionVal
+	{
+	    @TableCaptionFont @Font @TableCaptionBreak @Break
+	    { ||0.5rt @TableCaptionFormat
+		 word { table @WordVal @TableWord }
+		 number { @TableNumber }
+		 caption { @Caption }
+	    }
+	}
+
+	def @TableVal
+	{
+	    @InitialLanguage @Language
+	    {
+		@MakeTableContents @TableContentsEntry
+		    indent { 0f }
+		    crosstag { @Tag }
+		    number { @TableNumber }
+		    title { @InitialLanguage @Language @ContentsCaption }
+		    pagenum { @PageOf @Tag }
+		// @TableCounterIncrement @Tag
+		// @Body
+		// @PageMark @Tag
+	    }
+	}
+
+	def @TableTarget
+	{
+	    @Location @Case {
+		PageTop		@Yield  @PageTopPlace&&following
+		EvenPageTop	@Yield  @PageTopPlace&&following
+		FullPage	@Yield  @FullPagePlace&&following
+		EvenFullPage	@Yield  @FullPagePlace&&following
+		PageFoot	@Yield  @PageFootAndTopPlace&&following
+		ColTop		@Yield  @ColTopPlace&&following
+		ColFoot		@Yield  @ColFootAndTopPlace&&following
+		ColEnd		@Yield  @EndTableList&&following
+		Display		@Yield  @AfterLinePlace&&following
+		AfterLine	@Yield  @AfterLinePlace&&following
+		TryAfterLine	@Yield  @TryAfterLinePlace&&following
+	    }
+	}
+
+	def @SendEncl into { @TableTarget }
+	    right x
+	{
+	    def @Enclose right x
+	    {
+		@OnePg @Case {
+                	No  @Yield @Format x
+                	Yes @Yield x
+            	}
+	    }
+
+	    x
+	}
+
+	def @Send into { @TableTarget }
+	    right x
+	{
+	    x
+	}
+
+	def @EvenFullPageSend into { @EvenFullPagePlace&&following }
+	    right x
+	{
+	    @OneRow x
+	}
+
+	def @EvenPageSend into { @EvenPagePlace&&following }
+	    right x
+	{
+	    @OneRow x
+	}
+
+	def @RawTableVal
+	{
+	    @OnePg.@CaptionState @Case
+	    {
+		Yes.Below @Yield @OneRow { @Format @TableVal @DP @CaptionVal }
+		Yes.Above @Yield @OneRow { @CaptionVal @DP @Format @TableVal }
+		Yes.None  @Yield @OneRow { @Format @TableVal }
+		No.Below  @Yield         { @Format @TableVal @DP @CaptionVal }
+		No.Above  @Yield         { @CaptionVal @DP @Format @TableVal }
+		No.None   @Yield         { @Format @TableVal }
+	    }
+	}
+
+	def @NonRawTableVal
+	{
+	  @OnePg.@CaptionState @Case
+	  {
+	    Yes.Below @Yield {
+		@Send @OneRow { @Format @TableVal @DP @CaptionVal // @DupRunner}
+	    }
+	    Yes.Above @Yield {
+		@Send @OneRow { @CaptionVal @DP @Format @TableVal // @DupRunner}
+	    }
+	    Yes.None @Yield {
+		@Send @OneRow { @Format @TableVal // @DupRunner }
+	    }
+	    No.Below @Yield {
+		@SendEncl { @TableVal // @Send { @CaptionVal // @DupRunner } }
+	    }
+	    No.Above @Yield {
+		@Send { @CaptionVal // @SendEncl { @TableVal // @DupRunner } }
+	    }
+	    No.None @Yield {
+		@SendEncl { @TableVal // @DupRunner }
+	    }
+	  }
+	}
+
+	@Location @Case {
+	    Raw		  @Yield @RawTableVal
+	    Display	  @Yield { @NonRawTableVal &1rt }
+	    EvenPageTop   @Yield @EvenPageSend @NonRawTableVal
+	    EvenFullPage  @Yield @EvenFullPageSend @NonRawTableVal
+	    else	  @Yield @NonRawTableVal
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Index.                                                                 #
+    #                                                                         #
+    ###########################################################################
+
+    def @IndexList { @Galley //1vx @IndexList }
+    def @BypassIndexList { @Galley //1vx @BypassIndexList }
+
+    def @IndexSection into { @IndexPlace&&following }
+	right etc
+    {
+	// @IndexBreak @Break @IndexList
+	// @IndexBreak @Break @BypassIndexList
+	// @ClearHeaderComponent
+	// etc
+    }
+
+    def @DoIndex into { @IndexList&&following }
+	left @Key
+	named indent { 0f }
+	named stem {}
+	right @Body
+    {
+	def @Enclose right x
+	{
+	    @IndexCtd.indent @Case {
+
+		Yes.0f @Yield {
+		    @ClearHeaderComponent
+		    //1vx
+		    x
+		    //1vx
+		    1vx @SetHeaderComponent {
+			indent @Wide &
+			stem @IndexCtdFormat {continued @WordVal @IndexCtdWord}
+		    }
+		    //1vx
+		    1vx @BeginHeaderComponent (unused)
+		}
+
+		Yes.1f @Yield {
+		    @EndHeaderComponent
+		    //1vx
+		    x
+		    //1vx
+		    1vx @BeginHeaderComponent {
+			indent @Wide &
+			stem @IndexCtdFormat {continued @WordVal @IndexCtdWord}
+		    }
+		}
+
+		else @Yield x
+
+	    }
+	}
+
+	def @Merge left x right y
+	{
+	    {x @Rump y} @Case
+	    {
+	        ""      @Yield  x
+		else    @Yield  { { x &"0.03fu" , } @Meld y }
+	    }
+
+	}
+
+	@IndexFont @Font @IndexBreak @Break { indent @Wide & @Body }
+    }
+
+    def @RawIndex
+	left x
+	named @Tag {}
+	named indent { 0f }
+	right y
+    {
+	@MakeIndex @Case {
+	    Yes  @Yield { @PageMark @Tag & x @DoIndex stem { y } indent { indent } y }
+	    else @Yield @Null
+	}
+    }
+
+    macro @RawSubIndex    { @RawIndex indent { "1f" } }
+    macro @RawSubSubIndex { @RawIndex indent { "2f" } }
+
+    def @Index
+	left x
+	named @Tag {}
+	named indent { 0f }
+	named to {}
+	right y
+    {
+	def @PgMk right tag
+	{
+	  tag @CrossLink @PageOf tag
+	}
+
+	def @PgRange
+	{
+	    to @Case
+	    {
+		""    @Yield @PgMk @Tag
+		else  @Yield {
+		    { @PageOf @Tag } @Case
+		    {
+			{ @PageOf to } @Yield { @PgMk @Tag }
+			else	       @Yield { {@PgMk @Tag}--{@PgMk to} }
+		    }
+		}
+	    }
+	}
+
+
+	@MakeIndex @Case {
+	    Yes @Yield {
+	    @PageMark @Tag &
+	    x @DoIndex stem { y } indent { indent } { y &"0.03fu" , @PgRange }
+	    }
+	    else @Yield @Null
+	}
+    }
+
+    macro @SubIndex { @Index indent { "1f" } }
+    macro @SubSubIndex { @Index indent { "2f" } }
+
+    def @IndexBlanks
+    {
+	b @RawIndex {} c @RawIndex {} d @RawIndex {} e @RawIndex {}
+	f @RawIndex {} g @RawIndex {} h @RawIndex {} i @RawIndex {}
+	j @RawIndex {} k @RawIndex {} l @RawIndex {} m @RawIndex {}
+	n @RawIndex {} o @RawIndex {} p @RawIndex {} q @RawIndex {}
+	r @RawIndex {} s @RawIndex {} t @RawIndex {} u @RawIndex {}
+	v @RawIndex {} w @RawIndex {} x @RawIndex {} y @RawIndex {}
+	z @RawIndex {}
+    }
+
+    def @BypassBeginIndexPlace { @Galley }
+
+    def @BypassBeginIndex force into { @BypassBeginIndexPlace&&preceding } {}
+
+    def @BypassRawIndex force into { @BypassIndexList&&preceding }
+	named indent { 0f }
+	right x
+    {
+	&indent x
+    }
+
+    def @BypassEndIndex { @Null }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  IndexA.                                                                #
+    #                                                                         #
+    ###########################################################################
+
+    def @IndexAList { @Galley //1vx @IndexAList }
+    def @BypassIndexAList { @Galley //1vx @BypassIndexAList }
+
+    def @IndexASection into { @IndexAPlace&&following }
+	right etc
+    {
+	// @IndexAList // etc
+	// @BypassIndexAList // etc
+    }
+
+    def @DoIndexA into { @IndexAList&&following }
+	left @Key
+	named indent { 0f }
+	right @Body
+    {
+	def @Merge left x right y
+	{
+	    {x @Rump y} @Case
+	    {
+	        ""      @Yield  x
+		else    @Yield  { { x &"0.03fu" , } @Meld y }
+	    }
+	}
+
+	@IndexAFont @Font @IndexABreak @Break { indent @Wide & @Body }
+    }
+
+    def @RawIndexA
+	left x
+	named @Tag {}
+	named indent { 0f }
+	right y
+    {
+	@MakeIndexA @Case {
+	    Yes  @Yield { @PageMark @Tag & x @DoIndexA indent { indent } y }
+	    else @Yield @Null
+	}
+    }
+
+    macro @RawSubIndexA    { @RawIndexA indent { "1f" } }
+    macro @RawSubSubIndexA { @RawIndexA indent { "2f" } }
+
+    def @IndexA
+	left x
+	named @Tag {}
+	named indent { 0f }
+	named to {}
+	right y
+    {
+	def @PgMk right tag
+	{
+	  tag @CrossLink @PageOf tag
+	}
+
+	def @PgRange
+	{
+	    to @Case
+	    {
+		""    @Yield @PgMk @Tag
+		else  @Yield {
+		    { @PageOf @Tag } @Case
+		    {
+			{ @PageOf to } @Yield { @PgMk @Tag }
+			else	       @Yield { {@PgMk @Tag}--{@PgMk to} }
+		    }
+		}
+	    }
+	}
+
+
+	@MakeIndexA @Case {
+	    Yes @Yield {
+	      @PageMark @Tag &
+	      x @DoIndexA indent { indent } { y &"0.03fu" , @PgRange }
+	    }
+	    else @Yield @Null
+	}
+    }
+
+    macro @SubIndexA { @IndexA indent { "1f" } }
+    macro @SubSubIndexA { @IndexA indent { "2f" } }
+
+    def @IndexABlanks
+    {
+	b @RawIndexA {} c @RawIndexA {} d @RawIndexA {} e @RawIndexA {}
+	f @RawIndexA {} g @RawIndexA {} h @RawIndexA {} i @RawIndexA {}
+	j @RawIndexA {} k @RawIndexA {} l @RawIndexA {} m @RawIndexA {}
+	n @RawIndexA {} o @RawIndexA {} p @RawIndexA {} q @RawIndexA {}
+	r @RawIndexA {} s @RawIndexA {} t @RawIndexA {} u @RawIndexA {}
+	v @RawIndexA {} w @RawIndexA {} x @RawIndexA {} y @RawIndexA {}
+	z @RawIndexA {}
+    }
+
+    def @BypassBeginIndexAPlace { @Galley }
+
+    def @BypassBeginIndexA force into { @BypassBeginIndexAPlace&&preceding } {}
+
+    def @BypassRawIndexA force into { @BypassIndexAList&&preceding }
+	named indent { 0f }
+	right x
+    {
+	&indent x
+    }
+
+    def @BypassEndIndexA { @Null }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  IndexB.                                                                #
+    #                                                                         #
+    ###########################################################################
+
+    def @IndexBList { @Galley //1vx @IndexBList }
+    def @BypassIndexBList { @Galley //1vx @BypassIndexBList }
+
+    def @IndexBSection into { @IndexBPlace&&following }
+	right etc
+    {
+	// @IndexBList // etc
+	// @BypassIndexBList // etc
+    }
+
+    def @DoIndexB into { @IndexBList&&following }
+	left @Key
+	named indent { 0f }
+	right @Body
+    {
+	def @Merge left x right y
+	{
+	    {x @Rump y} @Case
+	    {
+	        ""      @Yield  x
+		else    @Yield  { { x &"0.03fu" , } @Meld y }
+	    }
+	}
+
+	@IndexBFont @Font @IndexBBreak @Break { indent @Wide & @Body }
+    }
+
+    def @RawIndexB
+	left x
+	named @Tag {}
+	named indent { 0f }
+	right y
+    {
+	@MakeIndexB @Case {
+	    Yes  @Yield { @PageMark @Tag & x @DoIndexB indent { indent } y }
+	    else @Yield @Null
+	}
+    }
+
+    macro @RawSubIndexB    { @RawIndexB indent { "1f" } }
+    macro @RawSubSubIndexB { @RawIndexB indent { "2f" } }
+
+    def @IndexB
+	left x
+	named @Tag {}
+	named indent { 0f }
+	named to {}
+	right y
+    {
+	def @PgMk right tag
+	{
+	  tag @CrossLink @PageOf tag
+	}
+
+	def @PgRange
+	{
+	    to @Case
+	    {
+		""    @Yield @PgMk @Tag
+		else  @Yield {
+		    { @PageOf @Tag } @Case
+		    {
+			{ @PageOf to } @Yield { @PgMk @Tag }
+			else	       @Yield { {@PgMk @Tag}--{@PgMk to} }
+		    }
+		}
+	    }
+	}
+
+
+	@MakeIndexB @Case {
+	    Yes @Yield {
+	        @PageMark @Tag &
+	        x @DoIndexB indent { indent } { y &"0.03fu" , @PgRange }
+	    }
+	    else @Yield @Null
+	}
+    }
+
+    macro @SubIndexB { @IndexB indent { "1f" } }
+    macro @SubSubIndexB { @IndexB indent { "2f" } }
+
+    def @IndexBBlanks
+    {
+	b @RawIndexB {} c @RawIndexB {} d @RawIndexB {} e @RawIndexB {}
+	f @RawIndexB {} g @RawIndexB {} h @RawIndexB {} i @RawIndexB {}
+	j @RawIndexB {} k @RawIndexB {} l @RawIndexB {} m @RawIndexB {}
+	n @RawIndexB {} o @RawIndexB {} p @RawIndexB {} q @RawIndexB {}
+	r @RawIndexB {} s @RawIndexB {} t @RawIndexB {} u @RawIndexB {}
+	v @RawIndexB {} w @RawIndexB {} x @RawIndexB {} y @RawIndexB {}
+	z @RawIndexB {}
+    }
+
+    def @BypassBeginIndexBPlace { @Galley }
+
+    def @BypassBeginIndexB force into { @BypassBeginIndexBPlace&&preceding } {}
+
+    def @BypassRawIndexB force into { @BypassIndexBList&&preceding }
+	named indent { 0f }
+	right x
+    {
+	&indent x
+    }
+
+    def @BypassEndIndexB { @Null }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @LargeScaleStructure                                                   #
+    #                                                                         #
+    #  The prototype for the value of each large-scale structure symbol       #
+    #  (@Chapter, @Section, etc.)                                             #
+    #                                                                         #
+    ###########################################################################
+
+    def @LargeScaleStructure
+	named tag {}			# tag of this large-scale structure sym
+	named type {}			# MajorIntro, Major, VeryMajor, or Minor
+	named initiallanguage {}	# its language
+	named title {}			# its full title
+	named runningtitle {}		# its running title
+	named aboveheadinggap { 0f }	# gap above heading
+	named headingfont {}		# its heading font
+	named headingbreak {}		# its heading break
+	named headingformat		# its heading format
+	    left @Num right @Body {}
+	named incontents { No }         # entry in table of contents required
+	named contentsindent { 0f }	# only if type is Major
+	named word {}
+	named numbers { None }
+	named attachnum {}		# only if numbers is not None
+	named retrievenum {}		# only if numbers is not None
+	named bypassnumber {}		# only if numbers is not None, or VeryMajor
+	named prefix {}			# prefix of number of this symbol
+	named pnprefix {}		# prefix for page numbers of this sym
+	named majornum { dft }
+	named majortitle { dft }
+	named minornum { dft }
+	named minortitle { dft }
+	named intheorems { No }
+	named indisplays { No }
+	named infigures { No }
+	named intables { No }
+	named inrunners { No }
+	named sendheader right @Body {}
+	named innergap {}
+	named endifmajor right innergap {
+	    @EndFigureList
+	    //innergap @EndNoteList 1
+	    //innergap @ChapRefSection
+	}
+	named wantindefinite { No }
+	right @Body
+    {
+
+	def @ShortNum
+	{
+	    numbers @Then {
+		bypassnumber @Dft {
+		    prefix @Join { numbers @Num retrievenum }
+		}
+	    }
+	}
+
+	def @LongNum
+	{
+	    numbers @Then {
+		initiallanguage @Language { word @NumSep @ShortNum }
+	    }
+	}
+
+	def @ShortTitle
+	{
+	    initiallanguage @Language { runningtitle @Dft title }
+	}
+
+        def @Run right start
+        {
+	    inrunners @Do type @Case {
+
+		{ Major MajorIntro } @Yield {
+		    start @Runner
+			@MajorNum { majornum @Dft @LongNum }
+			@MajorTitle { majortitle @Dft @ShortTitle }
+			@MinorNum {}
+			@MinorTitle {}
+			@Owner { tag }
+			@Prefix { pnprefix @Join @ShortNum }
+		}
+
+		{ ExtraMajor ExtraMajorIntro } @Yield {
+		    start @Runner
+			@MajorNum { majornum @Dft @LongNum }
+			@MajorTitle { majortitle @Dft @ShortTitle }
+			@MinorNum { majornum @Dft @LongNum }
+			@MinorTitle { majortitle @Dft @ShortTitle }
+			@Owner { tag }
+			@Prefix { pnprefix @Join @ShortNum }
+		}
+
+		{ VeryMajor } @Yield {
+		    start @Runner
+		        @MajorNum { majornum @Dft @LongNum }
+		        @MajorTitle { majortitle @Dft @ShortTitle }
+		        @MinorNum {}
+		        @MinorTitle {}
+		        @Owner { tag }
+		        @Prefix {}
+		}
+
+		Minor @Yield {
+		    start @Runner
+			@MajorNum { majornum @Dft @LongNum }
+			@MajorTitle { majortitle @Dft @ShortTitle }
+			@MinorNum { minornum @Dft @LongNum }
+			@MinorTitle { minortitle @Dft @ShortTitle }
+			@Owner { tag }
+			@Prefix { pnprefix @Join @ShortNum }
+		}
+	    }
+        }
+
+	def @ContentsStuff
+	{
+	    incontents.type @Case {
+
+		Yes.Minor @Yield {
+			incontents @ContentsEntry
+			    indent { contentsindent }
+			    crosstag { tag }
+			    number { @LongNum }
+			    title { initiallanguage @Language title }
+			    pagenum { @PageOf tag }
+	        }
+
+		{ Yes.Major Yes.MajorIntro Yes.ExtraMajor Yes.ExtraMajorIntro } @Yield {
+			incontents @MajorContentsEntry
+			    crosstag { tag }
+			    number { @LongNum }
+			    title { initiallanguage @Language title }
+			    pagenum { @PageOf tag }
+	        }
+
+		{ Yes.VeryMajor } @Yield {
+			incontents @VeryMajorContentsEntry
+			    title { initiallanguage @Language { bypassnumber: &2s title } }
+		}
+
+		else @Yield @Null
+	    }
+	}
+
+	def @Heading
+	{
+
+	    type @Case {
+
+		Minor @Yield {
+		    headingfont @Font
+		    headingbreak @Break @Protect {@LongNum headingformat title}
+		    // @PageMark tag
+		}
+
+		{ Major MajorIntro ExtraMajor ExtraMajorIntro } @Yield {
+		    sendheader {
+		    //aboveheadinggap
+		    headingfont @Font
+		    headingbreak @Break { @LongNum headingformat title }
+		    // @PageMark tag
+		    }
+		}
+
+		{ VeryMajor } @Yield { sendheader {
+		    //aboveheadinggap
+		    headingfont @Font
+		    headingbreak @Break { bypassnumber headingformat title }
+		    // @PageMark tag
+		    }
+		}
+	    }
+	}
+
+	def @IfMajor right x
+	{
+	    type @Case {
+		{ MajorIntro Major ExtraMajor ExtraMajorIntro } @Yield x
+		else @Yield @Null
+	    }
+	}
+
+	def @StartIfMajor {
+	    type @Case {
+		{ MajorIntro Major ExtraMajor ExtraMajorIntro VeryMajor } @Yield Start
+		else @Yield NonStart
+	    }
+	}
+
+	initiallanguage @Language {
+		@Heading
+	    //   wantindefinite @Case {
+		    Yes @Yield @Null
+		    No  @Yield ""
+		}
+            //  numbers @Do {
+		  attachnum & @NumberMarker @Tag { tag } @Value { @ShortNum }
+		}
+	    //  @IfMajor { @FootNoteThrough @Do @BeginFootNoteCounter }
+            //  @Run @StartIfMajor
+            //  @ContentsStuff
+            //  intheorems @BeginAllCounters @ShortNum
+            //  indisplays @BeginDisplayCounter @ShortNum
+            //  infigures @BeginFigureCounter @ShortNum
+            //  intables @BeginTableCounter @ShortNum
+            //  @Body
+	    //innergap  @IfMajor endifmajor innergap
+            //  @Run NonStart
+	}
+    }
+
+@End @DocumentSetup

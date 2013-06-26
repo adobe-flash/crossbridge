@@ -28,6 +28,7 @@ q1build: $(OBJS)
 		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/InMemoryBackingStore.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \
 		Console.as 
 
@@ -41,13 +42,16 @@ q1build: $(OBJS)
 		-import $(call nativepath,$(FLASCC)/usr/lib/InMemoryBackingStore.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/PlayerKernel.abc) \
 		q1vfs*.as
-	make -j2 link linkmt
+	make -j3 link linkmt linkshim
 
 link:
 	cd $(BUILDDIR) && "$(FLASCC)/usr/bin/gcc" $(CFLAGS) $(OBJS) -lSDL -lvgl -o ../Quake1.swf   q1vfs*.abc $(FLASCC)/usr/lib/AlcVFSZip.abc -emit-swf -symbol-abc=Console.abc -swf-size=1024x768 -swf-version=17
 
 linkmt:
 	cd $(BUILDDIR) && "$(FLASCC)/usr/bin/gcc" $(CFLAGS) $(OBJS) -lSDL -lvgl -o ../Quake1MT.swf q1vfs*.abc $(FLASCC)/usr/lib/AlcVFSZip.abc -emit-swf -symbol-abc=Console.abc -swf-size=1024x768 -pthread
+
+linkshim:
+	cd $(BUILDDIR) && "$(FLASCC)/usr/bin/gcc" $(CFLAGS) $(OBJS) -lSDL -lvgl -o ../Quake1Shim.swf $(FLASCC)/usr/lib/AlcVFSZip.abc -emit-swf -symbol-abc=Console.abc -swf-size=1024x768 -swf-version=17
 
 include ../Makefile.common
 

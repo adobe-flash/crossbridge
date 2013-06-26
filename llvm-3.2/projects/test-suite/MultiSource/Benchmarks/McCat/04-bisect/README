@@ -1,0 +1,34 @@
+Program for the calculation of the eigenvalues
+of a symetric tridiagonal matrix by the method of bisection:
+--------------------------------------------------------------
+1) To compile using gcc type:
+
+gcc -o bisect_test  bisect_test.c dbisect.c allocvector.c 
+
+--------------------------------------------------------------
+2) To run the benchmark type:
+
+time bisect_test < bisect_test.in1 > bisect_test.out
+--------------------------------------------------------------
+3) To check whether the results are identical to the results
+computed by the original program, run
+
+diff bisect_test.out.orig  bisect_test.out
+
+
+Two possibly useful modifications to the source code can be
+incorporated by setting the symbols TESTFIRST and RECIPROCAL.  Thus if
+a version of the program where the test (q<0) is moved t the top of
+the loop, you should compile the program using the command:
+
+gcc -DTESTFIRST -o bisect_test  bisect_test.c dbisect.c allocvector.c 
+
+Similarly, if a version where division is relaced by reiprocal
+calculation is required, issue the command:
+
+gcc -DRECIPROCAL -o bisect_test  bisect_test.c dbisect.c allocvector.c 
+
+The two changes can also be applied simultaniously:
+
+gcc -DRECIPROCAL -DTESTFIRST -o bisect_test  bisect_test.c dbisect.c 
+allocvector.c 

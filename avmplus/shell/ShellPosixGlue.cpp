@@ -1301,37 +1301,6 @@ namespace avmplus {
 		return ret;
 	}
 
-	int ShellPosixObject::__getcwd(int A_buf, int A_buflen, int errnoPtr) {
-		char *A_buf_ptr = (char *) domainMemoryPtr(this, A_buf);
-		int saved_err = errno;
-		errno = 0;
-		int ret = 0;
-		::getcwd(A_buf_ptr, A_buflen);
-		if (errno) {
-			int *alc_errno = (int *) domainMemoryPtr(this, errnoPtr);
-			*alc_errno = errno;
-		}
-		errno = saved_err;
-		return ret;
-	}
-
-	int ShellPosixObject::issetugid(int errnoPtr) {
-#ifdef __APPLE__
-		int saved_err = errno;
-		errno = 0;
-		int ret = ::issetugid();
-		if (errno) {
-			int *alc_errno = (int *) domainMemoryPtr(this, errnoPtr);
-			*alc_errno = errno;
-		}
-		errno = saved_err;
-		return ret;
-#else
-		(void)errnoPtr;
-		return -1;
-#endif /* __APPLE__ */
-	}
-
 	ShellPosixClass::ShellPosixClass(VTable *vtable)
 		: ClassClosure(vtable)
 	{}

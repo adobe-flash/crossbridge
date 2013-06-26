@@ -1,0 +1,2916 @@
+\input texinfo	@c -*-texinfo-*-
+@c %** start of header
+@setfilename treecc.info
+@settitle Tree Compiler-Compiler
+@setchapternewpage off
+@c %** end of header
+
+@dircategory DotGNU
+@direntry
+* TreeCC: (treecc).             Generate code for compilers to build
+                                abstract syntax trees.
+@end direntry
+
+@ifinfo
+The treecc program converts descriptions of abstract syntax
+trees into source code that can be used to support compiler
+development.
+
+@noindent
+Copyright @copyright{} 2001 Southern Storm Software, Pty Ltd
+@*Copyright @copyright{} 2003 Free Software Foundation, Inc.
+@end ifinfo
+
+@titlepage
+@sp 10
+@center @titlefont{Tree Compiler-Compiler}
+
+@vskip 50pt
+
+@center{Rhys Weatherley}
+
+@vskip 50pt
+@center{Copyright @copyright{} 2001, 2002 Southern Storm Software, Pty Ltd}
+@center{Copyright @copyright{} 2003 Free Software Foundation, Inc.}
+@end titlepage
+
+@c -----------------------------------------------------------------------
+
+@node Top, Overview, , (dir)
+@menu
+* Overview::                Treecc in brief
+* Expression Example::      A simple example of using treecc
+* Invoking Treecc::         Invoking treecc from the command-line
+* Syntax::                  Syntax of input files
+* Line Tracking::           Tracking line numbers in source files
+* Output APIs::             API's that are available in the generated output
+* Full Expression Example:: Full code for the expression example
+* EBNF Syntax::             Full EBNF syntax for treecc input files
+* Index::                   Index of concepts and facilities
+@end menu
+
+@c -----------------------------------------------------------------------
+
+@node Overview, Expression Example, Top, Top
+@chapter Overview
+@cindex Overview
+
+@section Introduction
+
+Traditional compiler construction tools such as lex and yacc focus on
+the lexical analysis and parsing phases of compilation.  But they
+provide very little to support semantic analysis and code generation.
+
+Yacc allows grammar rules to be tagged with semantic actions and values,
+but it doesn't provide any routines that assist in the process of tree
+building, semantic analysis, or code generation.  Because those processes
+are language-specific, yacc leaves the details to the programmer.
+
+Support for semantic analysis was also a lot simpler in the languages
+that were prevalent when lex and yacc were devised.  C and Pascal
+require declare before use, which allows the semantic information
+about a statement to be determined within the parser at the point of
+use.@footnote{K&R C did allow functions that weren't declared to be called,
+but only if they returned an "int".  This allowed the compiler to
+guess the declaration if it wasn't available, and to proceed as
+though all symbols were declared before use.}  If extensive optimization
+is not required, then code generation can also be performed within
+the grammar, leading to a simple one-pass compiler structure.
+
+Modern languages allow deferred declaration of methods, fields, and
+types.  For example, Java allows a method to refer to a field that
+is declared further down the .java source file.  A field can be
+declared with a type whose class definition has not yet been parsed.
+
+Hence, most of the semantic analysis that used to be performed inline
+within a yacc grammar must now be performed after the entire program
+has been parsed.  Tree building and walking is now more important
+than it was in older declare before use languages.
+
+@section Tree walking: the need for something better
+
+Building parse tree data structures and walking them is not terribly
+difficult, but it is extremely time-consuming and error-prone.  A
+modern programming language may have hundreds of node types, divided
+into categories for statements, expressions, types, declarations, etc.
+When a new programming language is being devised, new node types may
+be added quite frequently.  This has ramifications in trying to manage
+the code's complexity.@footnote{Implementing an existing programming
+language has the same problems as a new language.  Most programming
+languages are too large to be implemented all at once, and so the problem
+must be tackled in stages.  These stages are very similar to those the
+programmer goes through implementing a new language.}
+
+For example, consider nodes that correspond to programming language
+types in a C-like language.  There will be node types for integer
+types, floating-point types, pointers, structures, functions, etc.
+There will be semantic analysis routines for testing types for
+equality, comparing types for coercions and casts, evaluating the
+size of a type for memory layout purposes, determining if the type
+falls into a general category such as "integer" or "pointer", etc.
+
+Let's say we wanted to add a new "128-bit integer" type to this
+language.  Adding a new node type is fairly straight-forward.
+But we also need to track down every place in the code where the
+compiler walks a type or deals with integers and add an appropriate
+case for the new type.  This is very error-prone.  Such code is
+likely to be split over many files, and good coding practices only
+help to a certain extent.
+
+This problem gets worse when new kinds of expressions and statements
+are added to the language.  The change not only affects semantic
+analysis, but also optimization and code generation.  Some compilers
+use multiple passes over the tree to perform optimization, with
+different algorithms used in each pass.  Code generation may use a
+number of different strategies, depending upon how an expression or
+statement is used.  If even one of these places is missed when the
+new node type is added, then there is the potential for a very nasty
+bug that may go unnoticed for months or years.
+
+Object-oriented languages such as C++ can help a bit in constructing
+robust tree structures.  The base class can declare abstract methods
+for any semantic analysis, optimization, or code generation routine
+that needs to be implemented for all members of the node category.
+But another code maintainence problem arises.  What happens when
+we want to add a new optimization pass in the future?  We must go
+into hundreds of classes and implement the methods.
+
+To avoid changing hundreds of classes, texts on Design Patterns
+suggest using a Visitor pattern.  Then the new optimization pass
+can be encapsulated in a visitor.  This would work, except for
+the following drawback of visitor patterns, as described in Gamma,
+et al:
+
+@quotation
+@emph{The Visitor pattern makes it hard to add new subclasses of
+Element.  Each new ConcreteElement gives rise to a new abstract
+operation on Visitor and a corresponding implementation in
+every ConcreteVisitor class.}
+
+@emph{... The Visitor class hierarchy can be difficult to maintain
+when new ConcreteElement classes are added frequently.  In such
+cases, it's probably easier just to define operations on the
+classes that make up the structure.}
+@end quotation
+
+That is, if we add a new node type in the future, we have a large
+maintainence problem on our hands.  The solution is to scatter the
+implementation through-out every class, which is the situation we
+were trying to avoid by using the Visitor pattern.
+
+Because compiler construction deals with a large set of rapidly
+changing node types and operations, neither of the usual approaches
+work very well.
+
+The ideal programming language for designing compilers needs to have
+some way to detect when the programmer forgets to implement an operation
+for a new node type, and to ensure that a new operation covers all
+existing node types adequately.  Existing OO languages do not perform
+this kind of global error checking.  What few checking procedures they
+have change the maintainence problem into a different problem of
+similar complexity.
+
+@section Aspect-oriented programming
+
+A new field in language design has emerged in recent years called
+"Aspect-Oriented Programming" (AOP).  A good review of the field
+can be found in the October 2001 issue of the @emph{Communications of
+the ACM}, and on the AspectJ Web site, @url{http://www.aspectj.org/}.
+
+The following excerpt from the introduction to the AOP section in the
+CACM issue describes the essential aspects of AOP, and the difference
+between OOP and AOP:
+
+@quotation
+@emph{AOP is based on the idea that computer systems are better programmed
+by separately specifying the various concerns (properties or areas
+of interest) of a system and some description of their relationships,
+and then relying on mechanisms in the underlying AOP environment to
+weave or compose them together into a coherent program. ...
+While the tendancy in OOP's is to find commonality among classes
+and push it up the inheritance tree, AOP attempts to realize
+scattered concerns as first-class elements, and eject them
+horizontally from the object structure.}
+@end quotation
+
+Aspect-orientation gives us some hope of solving our compiler
+complexity problems.  We can view each operation on node types
+(semantic analysis, optimization, code generation, etc) as an
+"aspect" of the compiler's construction.  The AOP language weaves
+these aspects with the node types to create the final compiler.
+
+@section The treecc approach
+
+We don't really want to implement a new programming language
+just for compiler construction.  Especially since the new language's
+implementation would have all of the problems described above and would
+therefore also be difficult to debug and maintain.
+
+The approach that we take with "treecc" is similar to that used by
+"yacc".  A simple rule-based language is devised that is used to describe
+the intended behaviour declaratively.  Embedded code is used to provide
+the specific implementation details.  A translator then converts the input
+into source code that can be compiled in the usual fashion.
+
+The translator is responsible for generating the tree building and
+walking code, and for checking that all relevant operations have been
+implemented on the node types.  Functions are provided that make
+it easier to build and walk the tree data structures from within
+a "yacc" grammar and other parts of the compiler.
+
+@c -----------------------------------------------------------------------
+
+@node Expression Example, Invoking Treecc, Overview, Top
+@chapter A simple example for expressions
+@cindex Expression example
+
+Consider the following yacc grammar for a simple expression language:
+
+@example
+%token INT FLOAT
+
+%%
+
+expr: INT
+    | FLOAT
+    | '(' expr ')'
+    | expr '+' expr
+    | expr '-' expr
+    | expr '*' expr
+    | expr '/' expr
+    | '-' expr
+    ;
+@end example
+
+(We will ignore the problems of precedence and associativity and
+assume that the reader is familiar with how to resolve such issues
+in yacc grammars).
+
+There are 7 types of nodes for this grammar: @samp{intnum}, @samp{floatnum},
+@samp{plus}, @samp{minus}, @samp{multiply}, @samp{divide}, and @samp{negate}.
+They are defined in treecc as follows:
+
+@example
+%node expression %abstract %typedef
+
+%node binary expression %abstract =
+@{
+    expression *expr1;
+    expression *expr2;
+@}
+
+%node unary expression %abstract =
+@{
+    expression *expr;
+@}
+
+%node intnum expression =
+@{
+    int num;
+@}
+
+%node floatnum expression =
+@{
+    float num;
+@}
+
+%node plus binary
+%node minus binary
+%node multiply binary
+%node divide binary
+%node negate unary
+@end example
+
+We have introduced three extra node types that refer
+to any expression, binary expressions, and unary expressions.  These
+can be seen as superclasses in an OO-style framework.  We have
+declared these node types as @samp{abstract} because the yacc grammar
+will not be permitted to create instances of these classes directly.
+
+The @samp{binary}, @samp{unary}, @samp{intnum}, and @samp{floatnum}
+node types have field definitions associated with them.  These have
+a similar syntax to C @code{struct} declarations.
+
+The yacc grammar is augmented as follows to build the parse tree:
+
+@example
+%union @{
+    expression *node;
+    int         inum;
+    float       fnum;
+@}
+
+%token INT FLOAT
+
+%type <node> expr
+%type <inum> INT
+%type <fnum> FLOAT
+
+%%
+
+expr: INT               @{ $$ = intnum_create($1); @}
+    | FLOAT             @{ $$ = floatnum_create($1); @}
+    | '(' expr ')'      @{ $$ = $2; @}
+    | expr '+' expr     @{ $$ = plus_create($1, $3); @}
+    | expr '-' expr     @{ $$ = minus_create($1, $3); @}
+    | expr '*' expr     @{ $$ = multiply_create($1, $3); @}
+    | expr '/' expr     @{ $$ = divide_create($1, $3); @}
+    | '-' expr          @{ $$ = negate_create($2); @}
+    ;
+@end example
+
+The treecc translator generates the @samp{*_create} functions so that
+the rest of the compiler can build the necessary data structures
+on demand.  The parameters to the @samp{*_create} functions
+are identical in type and order to the members of the structure for
+that node type.
+
+Because @samp{expression}, @samp{binary}, and @samp{unary} are abstract,
+there will be no @samp{*_create} functions associated with them.  This will
+help the programmer catch certain kinds of errors.
+
+The type that is returned from a @samp{*_create} function is the first
+superclass of the node that has a @samp{%typedef} keyword associated with it;
+@samp{expression *} in this case.
+
+@section Storing extra information
+
+Normally we will want to store extra information with a node beyond
+that which is extracted by the yacc grammar.  In our expression
+example, we probably want to store type information in the nodes
+so that we can determine if the whole expression is integer or
+floating point during semantic analysis.  We can add type information
+to the @samp{expression} node type as follows:
+
+@example
+%node expression %abstract %typedef =
+@{
+    %nocreate type_code type;
+@}
+@end example
+
+The @samp{%nocreate} flag indicates that the field should not be passed
+to the @samp{*_create} functions as a parameter.  i.e. it provides semantic
+information that isn't present in the grammar.  When nodes are created,
+any fields that are declared as @samp{%nocreate} will be undefined in value.
+A default value can be specified as follows:
+
+@example
+%node expression %abstract %typedef =
+@{
+    %nocreate type_code type = @{int_type@};
+@}
+@end example
+
+Default values must be enclosed in @samp{@{} and @samp{@}} because they are
+pieces of code in the underlying source language (C, C++, etc), instead
+of tokens in the treecc syntax.  Any legitimate expression in the
+underlying source language may be used.
+
+We also need to arrange for @samp{type_code} to be declared.  One way to
+do this is by adding a @samp{%decls} section to the front of the treecc
+input file:
+
+@example
+%decls %@{
+
+typedef enum
+@{
+    int_type,
+    float_type
+
+@} type_code;
+
+%@}
+@end example
+
+We could have introduced the definition by placing a @samp{#include}
+directive into the @samp{%decls} section instead, or by defining a
+treecc enumerated type:
+
+@example
+%enum type_code =
+@{
+    int_type,
+    float_type
+@}
+@end example
+
+Now that we have these definitions, type-inferencing can be implemented
+as follows:
+
+@example
+%operation void infer_type(expression *e)
+
+infer_type(binary)
+@{
+    infer_type(e->expr1);
+    infer_type(e->expr2);
+
+    if(e->expr1->type == float_type || e->expr2->type == float_type)
+    @{
+        e->type = float_type;
+    @}
+    else
+    @{
+        e->type = int_type;
+    @}
+@}
+
+infer_type(unary)
+@{
+    infer_type(e->expr);
+    e->type = e->expr->type;
+@}
+
+infer_type(intnum)
+@{
+    e->type = int_type;
+@}
+@end example
+
+This example demonstrates using the abstract node types @samp{binary} and
+@samp{unary} to define operations on all subclasses.  The treecc translator
+will generate code for a full C function called @samp{infer_type} that
+incorporates all of the cases.
+
+But hang on a second!  What happened to @samp{floatnum}?  Where did it
+go?  It turns out that treecc will catch this.  It will report
+an error to the effect that @samp{node type `floatnum' is not handled in
+operation `infer_type'}.  Here is its definition:
+
+@example
+infer_type(floatnum)
+@{
+    e->type = float_type;
+@}
+@end example
+
+As we can see, treecc has just caught a bug in the language
+implementation and reported it to us as soon as we introduced it.
+
+Let's now extend the language with a @samp{power} operator:
+
+@example
+yacc:
+
+expr: expr '^' expr     @{ $$ = create_power($1, $3); @}
+    ;
+
+treecc:
+
+%node power binary
+@end example
+
+That's all there is to it!  When treecc re-translates the input
+file, it will modify the definition of @samp{infer_type} to include the
+extra case for @samp{power} nodes.  Because @samp{power} is a subclass of
+@samp{binary}, treecc already knows how to perform type inferencing for the
+new node and it doesn't warn us about a missing declaration.
+
+What if we wanted to restrict the second argument of @samp{power} to be
+an integer value?  We can add the following case to @samp{infer_type}:
+
+@example
+infer_type(power)
+@{
+    infer_type(e->expr1);
+    infer_type(e->expr2);
+
+    if(e->expr2->type != int_type)
+    @{
+        error("second argument to `^' is not an integer");
+    @}
+
+    e->type = e->expr1->type;
+@}
+@end example
+
+The translator now notices that there is a more specific implementation
+of @samp{infer_type} for @samp{power}, and won't use the @samp{binary}
+case for it.
+
+The most important thing to realise here is that the translator always
+checks that there are sufficient declarations for @samp{infer_type} to cover
+all relevant node types.  If it detects a lack, it will immediately
+raise an error to the user.  This allows tree coverage problems to
+be found a lot sooner than with the traditional approach.
+
+@xref{Full Expression Example}, for a complete listing of the above
+example files.
+
+@c -----------------------------------------------------------------------
+
+@node Invoking Treecc, Syntax, Expression Example, Top
+@chapter Invoking treecc from the command-line
+@cindex Invoking treecc
+@cindex Command-line options
+
+The general form of treecc's command-line syntax is as follows:
+
+@example
+treecc [OPTIONS] INPUT ...
+@end example
+
+Treecc accepts the following command-line options:
+
+@table @code
+@item -o FILE
+@itemx --output FILE
+Set the name of the output file to @samp{FILE}.  If this option is not
+supplied, then the name of the first input file will be used, with its
+extension changed to @samp{.c}.  If the input is standard input,
+the default output file is @samp{yy_tree.c}.
+
+This option may be overridden using the @samp{%output} keyword in
+the input files.
+
+@item -h FILE
+@itemx --header FILE
+Set the name of the header output file to @samp{FILE}.  This is only
+used for the C and C++ output languages.  If this option is not supplied,
+then the name of the output file will be used, with its extension
+changed to @samp{.h}.  If the input is standard input, the default header
+output file is @samp{yy_tree.h}.
+
+This option may be overriden using the @samp{%header} keyword in the
+input files.  If this option is used with a language that does not require
+headers, it will be ignored.
+
+@item -d DIR
+@itemx --output-dir DIR
+Set the name of the Java output directory to @samp{DIR}.  This is only
+used for the Java language.  If this option is not supplied, then the
+directory corresponding to the first input file is used.  If the input
+is standard input, the default is the current directory.
+
+This option may be overriden using the @samp{%outdir} keyword in the
+input files.  If this option is used with a language other than Java,
+it will be ignored.
+
+@item -e EXT
+@itemx --extension EXT
+Change the default output file extension to @samp{ext}, instead of
+@samp{.c}.  The value @samp{ext} can have a leading dot, but this is
+not required.
+
+@item -f
+@itemx --force-create
+Treecc normally attempts to optimise the creation of output files
+so that they are only modified if a non-trivial change has
+occurred in the input.  This can reduce the number of source
+code recompiles when treecc is used in combination with make.
+
+This option forces the output files to be created, even if they
+are the same as existing files with the same name.
+
+The declaration @samp{%option force} can be used in the input files
+to achieve the same effect as this option.
+
+@item -O OPT
+@itemx --option OPT
+Set a treecc option value.  This is a command-line version of
+the @samp{%option} keyword in the input files.
+
+@item -n
+@itemx --no-output
+Suppress the generation of output files.  Treecc parses the
+input files, checks for errors, and then stops.
+
+@item --help
+Print a usage message for the treecc program.
+
+@item -v
+@itemx --version
+Print the version of the treecc program.
+
+@item --
+Marks the end of the command-line options, and the beginning of
+the input filenames.  You may need to use this if your filename
+begins with @samp{-}.  e.g. @samp{treecc -- -input.tc}.  This is
+not needed if the input is standard input: @samp{treecc -}
+is perfectly valid.
+@end table
+
+@c -----------------------------------------------------------------------
+
+@node Syntax, Nodes, Invoking Treecc, Top
+@chapter Syntax of input files
+@cindex Syntax
+
+Treecc input files consist of zero or more declarations that define
+nodes, operations, options, etc.  The following sections describe each
+of these elements.
+
+@menu
+* Nodes::          Node declarations
+* Types::          Types used in fields and parameters
+* Enumerations::   Enumerated type declarations
+* Operations::     Operation declarations
+* Options::        Options that modify treecc's behaviour
+* Literal Code::   Literal code declarations
+* Changing Files:: Changing input and output files
+@end menu
+
+@c -----------------------------------------------------------------------
+
+@node Nodes, Types, Syntax, Syntax
+@section Node declarations
+@cindex Nodes
+@cindex %node keyword
+@cindex Fields
+
+Node types are defined using the @samp{node} keyword in input files.
+The general form of the declaration is:
+
+@example
+%node NAME [ PNAME ] [ FLAGS ] [ = FIELDS ]
+@end example
+
+@table @samp
+@item NAME
+An identifier that is used to refer to the node type elsewhere
+in the treecc definition.  It is also the name of the type that will be
+visible to the programmer in literal code blocks.
+
+@item PNAME
+An identifier that refers to the parent node type that @samp{NAME} inherits
+from.  If @samp{PNAME} is not supplied, then @samp{NAME} is a top-level
+declaration.  It is legal to supply a @samp{PNAME} that has not yet
+been defined in the input.
+
+@item FLAGS
+Any combination of @samp{%abstract} and @samp{%typedef}:
+
+@table @samp
+@item %abstract
+@cindex %abstract keyword
+The node type cannot be constructed by the programmer.  In addition,
+the programmer does not need to define operation cases for this node
+type if all subtypes have cases associated with them.
+
+@item %typedef
+@cindex %typedef keyword
+The node type is used as the common return type for node creation
+functions.  Top-level declarations must have a @samp{%typedef} keyword.
+@end table
+@end table
+
+The @samp{FIELDS} part of a node declaration defines the fields that
+make up the node type.  Each field has the following general form:
+
+@example
+[ %nocreate ] TYPE FNAME [ = VALUE ] ';'
+@end example
+
+@table @samp
+@item %nocreate
+@cindex %nocreate keyword
+The field is not used in the node's constructor.  When the node is
+constructed, the value of this field will be undefined unless
+@samp{VALUE} is specified.
+
+@item TYPE
+The type that is associated with the field.  Types can be declared
+using a subset of the C declaration syntax, augmented with some C++
+and Java features.  @xref{Types}, for more information.
+
+@item FNAME
+The name to associate with the field.  Treecc verifies that the field
+does not currently exist in this node type, or in any of its ancestor
+node types.
+
+@item VALUE
+The default value to assign to the field in the node's constructor.
+This can only be used on fields that are declared with @samp{%nocreate}.
+The value must be enclosed in braces.  For example @samp{@{NULL@}} would
+be used to initialize a field with @samp{NULL}.
+
+The braces are required because the default value is expressed in
+the underlying source language, and can use any of the usual constant
+declaration features present in that language.
+@end table
+
+When the output language is C, treecc creates a struct-based type
+called @samp{NAME} that contains the fields for @samp{NAME} and 
+all of its ancestor classes.  The type also contains some house-keeping
+fields that are used internally by the generated code.  The following
+is an example:
+
+@example
+typedef struct binary__ binary;
+struct binary__ @{
+    const struct binary_vtable__ *vtable__;
+    int kind__;
+    char *filename__;
+    long linenum__;
+    type_code type;
+    expression * expr1;
+    expression * expr2;
+@};
+@end example
+
+The programmer should avoid using any identifier that
+ends with @samp{__}, because it may clash with house-keeping
+identifiers that are generated by treecc.
+
+When the output language is C++, Java, or C#, treecc creates a class
+called @samp{NAME}, that inherits from the class @samp{PNAME}.
+The field definitions for @samp{NAME} are converted into public members
+in the output.
+
+@c -----------------------------------------------------------------------
+
+@node Types, Enumerations, Nodes, Syntax
+@section Types used in fields and parameters
+@cindex Types
+
+Types that are used in field and parameter declarations have a
+syntax which is subset of features found in C, C++, and Java:
+
+@example
+TypeAndName ::= Type [ IDENTIFIER ]
+
+Type ::= TypeName
+       | Type '*'
+       | Type '&'
+       | Type '[' ']'
+
+TypeName ::= IDENTIFIER @{ IDENTIFIER @}
+@end example
+
+Types are usually followed by an identifier that names the field or
+parameter.  The name is required for fields and is optional for parameters.
+For example @samp{int} is usually equivalent to @samp{int x} in parameter
+declarations.
+
+The following are some examples of using types:
+
+@example
+int
+int x
+const char *str
+expression *expr
+Element[][] array
+Item&
+unsigned int y
+const Element
+@end example
+
+The grammar used by treecc is slightly ambiguous.  The last example above
+declares a parameter called @samp{Element}, that has type @samp{const}.
+The programmer probably intended to declare an anonymous parameter with type 
+@samp{const Element} instead.
+
+This ambiguity is unavoidable given that treecc is not fully
+aware of the underlying language's type system.  When treecc
+sees a type that ends in a sequence of identifiers, it will
+always interpret the last identifier as the field or parameter
+name.  Thus, the programmer must write the following instead:
+
+@example
+const Element e
+@end example
+
+Treecc cannot declare types using the full power of C's type system.
+The most common forms of declarations are supported, and the rest
+can usually be obtained by defining a @samp{typedef} within a
+literal code block.  @xref{Literal Code}, for more information
+on literal code blocks.
+
+It is the responsibility of the programmer to use type constructs
+that are supported by the underlying programming language.  Types such
+as @samp{const char *} will give an error when the output is compiled
+with a Java compiler, for example.
+
+@c -----------------------------------------------------------------------
+
+@node Enumerations, Operations, Types, Syntax
+@section Enumerated type declarations
+@cindex Enumerations
+@cindex enum declaration
+@cindex %enum keyword
+
+Enumerated types are a special kind of node type that can be used
+by the programmer for simple values that don't require a full abstract
+syntax tree node.  The following is an example of defining a list
+of the primitive machine types used in a Java virtual machine:
+
+@example
+%enum JavaType =
+@{
+    JT_BYTE,
+    JT_SHORT,
+    JT_CHAR,
+    JT_INT,
+    JT_LONG,
+    JT_FLOAT,
+    JT_DOUBLE,
+    JT_OBJECT_REF
+@}
+@end example
+
+Enumerations are useful when writing code generators and type
+inferencing routines.  The general form is:
+
+@example
+%enum NAME = @{ VALUES @}
+@end example
+
+@table @samp
+@item NAME
+An identifier to be used to name the enumerated type.  The name must
+not have been previously used as a node type, an enumerated type, or
+an enumerated value.
+
+@item VALUES
+A comma-separated list of identifiers that name the values within
+the enumeration.  Each of the names must be unique, and must not have
+been used previously as a node type, an enumerated type, or an
+enumerated value.
+@end table
+
+Logically, each enumerated value is a special node type that inherits from
+a parent node type corresponding to the enumerated type @samp{NAME}.
+
+When the output language is C or C++, treecc generates an enumerated
+typedef for @samp{NAME} that contains the enumerated values in the
+same order as was used in the input file.  The typedef name can be
+used elsewhere in the code as the type of the enumeration.
+
+When the output language is Java, treecc generates a class called
+@samp{NAME} that contains the enumerated values as integer constants.
+Elsewhere in the code, the type @samp{int} must be used to declare
+variables of the enumerated type.  Enumerated values are referred
+to as @samp{NAME.VALUE}.  If the enumerated type is used as a trigger
+parameter, then @samp{NAME} must be used instead of @samp{int}:
+treecc will convert the type when the Java code is output.
+
+When the output language is C#, treecc generates an enumerated value
+type called @samp{NAME} that contains the enumerated values as
+members.  The C# type @samp{NAME} can be used elsewhere in the code
+as the type of the enumeration.  Enumerated values are referred to
+as @samp{NAME.VALUE}.
+
+@c -----------------------------------------------------------------------
+
+@node Operations, Options, Enumerations, Syntax
+@section Operation declarations
+@cindex Operations
+@cindex operation declarations
+@cindex operation cases
+@cindex %operation keyword
+@cindex trigger parameters
+
+Operations are declared in two parts: the declaration, and the
+cases.  The declaration part defines the prototype for the
+operation and the cases define how to handle specific kinds of
+nodes for the operation.
+
+Operations are defined over one or more trigger parameters.  Each
+trigger parameter specifies a node type or an enumerated type that
+is selected upon to determine what course of action to take.  The
+following are some examples of operation declarations:
+
+@example
+%operation void infer_type(expression *e)
+%operation type_code common_type([type_code t1], [type_code t2])
+@end example
+
+Trigger parameters are specified by enclosing them in square
+brackets.  If none of the parameters are enclosed in square
+brackets, then treecc assumes that the first parameter is the
+trigger.
+
+The general form of an operation declaration is as follows:
+
+@example
+%operation @{ %virtual | %inline | %split @} RTYPE [CLASS::]NAME(PARAMS)
+@end example
+
+@table @samp
+@item %virtual
+@cindex %virtual keyword
+Specifies that the operation is associated with a node type as
+a virtual method.  There must be only one trigger parameter,
+and it must be the first parameter.
+
+Non-virtual operations are written to the output source files
+as global functions.
+
+@item %inline
+@cindex %inline keyword
+Optimise the generation of the operation code so that all cases
+are inline within the code for the function itself.  This can
+only be used with non-virtual operations, and may improve
+code efficiency if there are lots of operation cases with a
+small amount of code in each.
+
+@item %split
+@cindex %split keyword
+Split the generation of the multi-trigger operation code across
+multiple functions, to reduce the size of each individual function.
+It is sometimes necessary to split large @code{%inline} operations
+to avoid compiler limits on function size.
+
+@item RTYPE
+The type of the return value for the operation.  This should be
+@samp{void} if the operation does not have a return value.
+
+@item CLASS
+The name of the class to place the operation's definition within.
+This can only be used with non-virtual operations, and is
+intended for languages such as Java and C# that cannot declare
+methods outside of classes.  The class name will be ignored if
+the output language is C.
+
+If a class name is required, but the programmer did not supply it,
+then @samp{NAME} will be used as the default.  The exception to
+this is the C# language: @samp{CLASS} must always be supplied and
+it must be different from @samp{NAME}.  This is due to a "feature"
+in some C# compilers that forbid a method with the same name as
+its enclosing class.
+
+@item NAME
+The name of the operation.
+
+@item PARAMS
+The parameters to the operation.  Trigger parameters may be
+enclosed in square brackets.  Trigger parameters must be
+either node types or enumerated types.
+@end table
+
+Once an operation has been declared, the programmer can specify
+its cases anywhere in the input files.  It is not necessary that
+the cases appear after the operation, or that they be contiguous
+within the input files.  This permits the programmer to place
+operation cases where they are logically required for maintainence
+reasons.
+
+There must be sufficient operation cases defined to cover every
+possible combination of node types and enumerated values that
+inherit from the specified trigger types.  An operation case
+has the following general form:
+
+@example
+NAME(TRIGGERS) [, NAME(TRIGGERS2) ...]
+@{
+    CODE
+@}
+@end example
+
+@table @samp
+@item NAME
+The name of the operation for which this case applies.
+
+@item TRIGGERS
+A comma-separated list of node types or enumerated values that
+define the specific case that is handled by the following code.
+
+@item CODE
+Source code in the output source language that implements the
+operation case.
+@end table
+
+Multiple trigger combinations can be associated with a single
+block of code, by listing them all, separated by commas.  For
+example:
+
+@example
+common_type(int_type, int_type)
+@{
+    return int_type;
+@}
+
+common_type(int_type, float_type),
+common_type(float_type, int_type),
+common_type(float_type, float_type)
+@{
+    return float_type;
+@}
+@end example
+
+@c -----------------------------------------------------------------------
+
+@node Options, Literal Code, Operations, Syntax
+@section Options that modify treecc's behaviour
+@cindex Options
+@cindex option declaration
+@cindex %option keyword
+
+"(*)" is used below to indicate an option that is enabled by default.
+
+@table @samp
+@item %option track_lines
+@cindex track_lines option
+Enable the generation of code that can track the current filename and
+line number when nodes are created.  @xref{Line Tracking}, for more
+information. (*)
+
+@item %option no_track_lines
+@cindex no_track_lines option
+Disable the generation of code that performs line number tracking.
+
+@item %option singletons
+@cindex singletons option
+Optimise the creation of singleton node types.  These are
+node types without any fields.  Treecc can optimise the code
+so that only one instance of a singleton node type exists in
+the system.  This can speed up the creation of nodes for
+constants within compilers. (*)
+
+Singleton optimisations will have no effect if @samp{track_lines}
+is enabled, because line tracking uses special hidden fields in
+every node.
+
+@item %option no_singletons
+@cindex no_singletons option
+Disable the optimisation of singleton node types.
+
+@item %option reentrant
+@cindex reentrant option
+Enable the generation of reentrant code that does not rely
+upon any global variables.  Separate copies of the compiler
+state can be used safely in separate threads.  However, the
+same copy of the compiler state cannot be used safely in two or
+more threads.
+
+@item %option no_reentrant
+@cindex no_reentrant option
+Disable the generation of reentrant code.  The interface to
+node management functions is simpler, but cannot be used
+in a threaded environment. (*)
+
+@item %option force
+@cindex force option
+Force output source files to be written, even if they are
+unchanged.  This option can also be set using the @samp{-f}
+command-line option.
+
+@item %option no_force
+@cindex no_force option
+Don't force output source files to be written if they are the
+same as before. (*)
+
+This option can help smooth integration of treecc with make.
+Only those output files that have changed will be modified.
+This reduces the number of files that the underlying source
+language compiler must process after treecc is executed.
+
+@item %option virtual_factory
+@cindex virtual_factory option
+Use virtual methods in the node type factories, so that the
+programmer can subclass the factory and provide new
+implementations of node creation functions.  This option is
+ignored for C, which does not use factories.
+
+@item %option no_virtual_factory
+@cindex no_virtual_factory option
+Don't use virtual methods in the node type factories. (*)
+
+@item %option abstract_factory
+@cindex abstract_factory option
+Use abstract virtual methods in the node type factories.
+The programmer is responsible for subclassing the factory
+to provide node creation functionality.
+
+@item %option no_abstract_factory
+@cindex no_abstract_factory option
+Don't use abstract virtual methods in the node type factories. (*)
+
+@item %option kind_in_node
+@cindex kind_in_node option
+Put the kind field in the node, for more efficient access at runtime. (*)
+
+@item %option kind_in_vtable
+@cindex kind_in_vtable option
+Put the kind field in the vtable, and not the node.  This saves some
+memory, at the cost of slower access to the kind value at runtime.
+This option only applies when the language is C.  The kind field is
+always placed in the node in other languages, because it isn't possible
+to modify the vtable.
+
+@item %option prefix = PREFIX
+@cindex prefix option
+Specify the prefix to be used in output files in place of "yy".
+
+@item %option state_type = NAME
+@cindex state_type option
+Specify the name of the state type.  The state type is generated
+by treecc to perform centralised memory management and reentrancy
+support.  The default value is @samp{YYNODESTATE}.  If the output language
+uses factories, then this will also be the name of the factory
+base class.
+
+@item %option namespace = NAME
+@cindex namespace option
+Specify the namespace to write definitions to in the output
+source files.  This option is ignored when the output language
+is C.
+
+@item %option package = NAME
+@cindex package option
+Same as @samp{%option namespace = NAME}.  Provided because @samp{package}
+is more natural for Java programmers.
+
+@item %option base = NUM
+@cindex base option
+Specify the numeric base to use for allocating numeric values to
+node types.  By default, node type allocation begins at 1.
+
+@item %option lang = LANGUAGE
+@cindex lang option
+Specify the output language.  Must be one of @code{"C"}, @code{"C++"},
+@code{"Java"}, or @code{"C#"}.  The default is @code{"C"}.
+
+@item %option block_size = NUM
+@cindex block_size option
+Specify the size of the memory blocks to use in C and C++ node allocators.
+
+@item %option strip_filenames
+@cindex strip_filenames option
+Strip filenames down to their base name in @code{#line} directives.
+i.e. strip off the directory component.  This can be helpful in
+combination with the @code{%include %readonly} command when
+treecc input files may processed from different directories,
+causing common output files to change unexpectedly.
+
+@item %option no_strip_filenames
+@cindex no_strip_filenames option
+Don't strip filenames in @code{#line} directives. (*)
+
+@item %option internal_access
+@cindex internal_access option
+Use @code{internal} as the access mode for classes in C#, rather than
+@code{public}.
+
+@item %option public_access
+@cindex public_access option
+Use @code{public} as the access mode for classes in C#, rather than
+@code{internal}. (*)
+
+@item %option print_lines
+@cindex print_lines option
+Print @code{#line} markers in languages that use them. (*)
+
+@item %option no_print_lines
+@cindex no_print_lines option
+Do not print @code{#line} markers, even in languages that normally
+use them.
+
+@item %option allocator
+@cindex allocator option
+Use treecc's standard node allocator for C and C++.  This option has
+no effect for other output languages. (*)
+
+@item %option no_allocator
+@cindex no_allocator option
+Do not use treecc's standard node allocator for C and C++.  This can be
+useful when the programmer wants to redirect node allocation to their
+own routines.
+
+@item %option gc_allocator
+@cindex gc_allocator option
+Use libgc as a garbage-collecting node allocator for C and C++.  This
+option has no effect for other output languages.
+
+@item %option no_gc_allocator
+@cindex no_gc_allocator option
+Do not use libgc as a garbage-collecting node allocator for C and C++. (*)
+
+@item %option base_type
+@cindex base_type option
+Specify the base type for the root node of the treecc node heirarchy.
+The default is no base type.
+
+@end table
+
+@c -----------------------------------------------------------------------
+
+@node Literal Code, Changing Files, Options, Syntax
+@section Literal code declarations
+@cindex Literal code
+
+Sometimes it is necessary to embed literal code within output @samp{.h}
+and source files.  Usually this is to @samp{#include} definitions
+from other files, or to define functions that cannot be easily expressed
+as operations.
+
+A literal code block is specified by enclosing it in @samp{%@{} and
+@samp{%@}}.  The block can also be prefixed with the following flags:
+
+@table @samp
+@item %decls
+@cindex %decls keyword
+Write the literal code to the currently active declaration header file,
+instead of the source file.
+
+@item %both
+@cindex %both keyword
+Write the literal code to both the currently active declaration header file
+and the currently active source file.
+
+@item %end
+@cindex %end keyword
+Write the literal code to the end of the file, instead of the beginning.
+@end table
+
+Another form of literal code block is one which begins with @samp{%%} and
+extends to the end of the current input file.  This form implicitly has
+the @samp{%end} flag.
+
+@c -----------------------------------------------------------------------
+
+@node Changing Files, Line Tracking, Literal Code, Syntax
+@section Changing input and output files
+@cindex Changing files
+
+Most treecc compiler definitions will be too large to be manageable
+in a single input file.  They also will be too large to write to a
+single output file, because that may overload the source language
+compiler.
+
+Multiple input files can be specified on the command-line, or
+they can be explicitly included by other input files with
+the following declarations:
+
+@table @samp
+@item %include [ %readonly ] FILENAME
+@cindex include declaration
+@cindex %include keyword
+@cindex %readonly keyword
+Include the contents of the specified file at the current point
+within the current input file.  @samp{FILENAME} is interpreted
+relative to the name of the current input file.
+
+If the @samp{%readonly} keyword is supplied, then any output
+files that are generated by the included file must be read-only.
+That is, no changes are expected by performing the inclusion.
+
+The @samp{%readonly} keyword is useful for building compilers
+in layers.  The programmer may group a large number of useful
+node types and operations together that are independent of the
+particulars of a given language.  The programmer then defines
+language-specific compilers that "inherit" the common definitions.
+
+Read-only inclusions ensure that any extensions that are added
+by the language-specific parts do not "leak" into the common code.
+@end table
+
+Output files can be changed using the follow declarations:
+
+@table @samp
+@item %header FILENAME
+@cindex header declaration
+@cindex %header keyword
+Change the currently active declaration header file to @samp{FILENAME},
+which is interpreted relative to the current input file.  This option
+has no effect for languages without header files (Java and C#).
+
+Any node types and operations that are defined after a @samp{%header}
+declaration will be declared in @samp{FILENAME}.
+
+@item %output FILENAME
+@cindex output declaration
+@cindex %output keyword
+Change the currently active source file to @samp{FILENAME},
+which is interpreted relative to the current input file.  This option
+has no effect for languages that require a single class per file (Java).
+
+Any node types and operations that are defined after a @samp{%header}
+declaration will have their implementations placed in @samp{FILENAME}.
+
+@item %outdir DIRNAME
+@cindex outdir declaration
+@cindex %outdir keyword
+Change the output source directory to @samp{DIRNAME}.  This is only
+used for Java, which requires that a single file be used for each class.
+All classes are written to the specified directory.  By default,
+@samp{DIRNAME} is the current directory where treecc was invoked.
+@end table
+
+When treecc generates the output source code, it must insert several
+common house-keeping functions and classes into the code.  By default,
+these are written to the first header and source files.  This can
+be changed with the @samp{%common} declaration:
+
+@table @samp
+@item %common
+@cindex common declaration
+@cindex %common keyword
+Output the common house-keeping code to the currently active
+declaration header file and the currently active source file.
+This is typically used as follows:
+
+@example
+%header "common.h"
+%output "common.c"
+%common
+@end example
+@end table
+
+@c -----------------------------------------------------------------------
+
+@node Line Tracking, Output APIs, Changing Files, Top
+@chapter Tracking line numbers in source files
+@cindex Line tracking
+
+When compilers emit error messages to the programmer, it is generally
+a good idea to indicate which file and which line gave rise to the
+error.  Syntax errors can be emitted fairly easily because the parser
+usually has access to the current line number.  However, semantic
+errors are harder to report because the parser may no longer be
+active when the error is detected.
+
+Treecc can generate code that automatically keeps track of what line
+in the source file was active when a node is created.  Every node
+has two extra private fields that specify the name of the file and the
+line number.  Semantic analysis routines can query this information
+when reporting errors.
+
+Because treecc is not aware of how to obtain this information, the
+programmer must supply some additional functions.  @xref{Output APIs},
+for more information.
+
+@xref{Output APIs}, for more information.
+
+@c -----------------------------------------------------------------------
+
+@node Output APIs, C Language, Line Tracking, Top
+@chapter API's available in the generated output
+@cindex Output APIs
+
+The source code that is generated by treecc exports a number of
+application programmer interfaces (API's) to the programmer.  These
+can be used elsewhere in the compiler implementation to manipulate
+abstract syntax trees.  The following sections describe the API's
+for each of the output languages.
+
+@menu
+* C Language::     C Language API's
+* C++ Language::   C++ Language API's
+* Java Language::  Java Language API's
+* C# Language::    C# Language API's
+* Ruby Language::  Ruby Language API's
+@end menu
+
+@c -----------------------------------------------------------------------
+
+@node C Language, C++ Language, Output APIs, Output APIs
+@section C Language APIs
+@cindex C APIs
+
+In the C output language, each node type is converted into a @samp{typedef}
+that contains the node's fields, and the fields of its ancestor node
+types.  The following example demonstrates how treecc node declarations
+are converted into C source code:
+
+@example
+%node expression %abstract %typedef =
+@{
+    %nocreate type_code type;
+@}
+%node binary expression %abstract =
+@{
+    expression *expr1;
+    expression *expr2;
+@}
+%node plus binary
+@end example
+
+becomes:
+
+@example
+typedef struct expression__ expression;
+typedef struct binary__ binary;
+typedef struct plus__ plus;
+
+struct expression__ @{
+    const struct expression_vtable__ *vtable__;
+    int kind__;
+    char *filename__;
+    long linenum__;
+    type_code type;
+@};
+struct binary__ @{
+    const struct binary_vtable__ *vtable__;
+    int kind__;
+    char *filename__;
+    long linenum__;
+    type_code type;
+    expression * expr1;
+    expression * expr2;
+@};
+struct plus__ @{
+    const struct plus_vtable__ *vtable__;
+    int kind__;
+    char *filename__;
+    long linenum__;
+    type_code type;
+    expression * expr1;
+    expression * expr2;
+@};
+@end example
+
+Programmers should avoid using any identifiers that end in
+@samp{__}.  Such identifiers are reserved for internal use by treecc
+and its support routines.
+
+For each non-abstract node type called @samp{NAME}, treecc generates a
+function called @samp{NAME_create} that creates nodes of that type.
+The general form of the function's prototype is as follows:
+
+@example
+TYPE *NAME_create([YYNODESTATE *state,] PARAMS)
+@end example
+
+@table @samp
+@item TYPE
+The return node type, which is the nearest ancestor that has the
+@samp{%typedef} flag.
+
+@item NAME
+The name of the node type that is being created.
+
+@item state
+The system state, if reentrant code is being generated.
+
+@item PARAMS
+The create parameters, consisting of every field that does not
+have the @samp{%nocreate} flag.  The parameters appear in the
+same order as the fields in the node types, from the top-most
+ancestor down to the node type itself.  For example:
+
+@example
+expression *plus_create(expression * expr1, expression * expr2);
+@end example
+@end table
+
+Enumerated types are converted into a C @samp{typedef} with the
+same name and values:
+
+@example
+%enum JavaType =
+@{
+    JT_BYTE,
+    JT_SHORT,
+    JT_CHAR,
+    JT_INT,
+    JT_LONG,
+    JT_FLOAT,
+    JT_DOUBLE,
+    JT_OBJECT_REF
+@}
+@end example
+
+becomes:
+
+@example
+typedef enum
+@{
+    JT_BYTE,
+    JT_SHORT,
+    JT_CHAR,
+    JT_INT,
+    JT_LONG,
+    JT_FLOAT,
+    JT_DOUBLE,
+    JT_OBJECT_REF
+
+@} JavaType;
+@end example
+
+Virtual operations are converted into C macros that invoke the
+correct vtable entry on a node type:
+
+@example
+%operation %virtual void infer_type(expression *e)
+@end example
+
+becomes:
+
+@example
+#define infer_type(this__) \
+    ((*(((struct expression_vtable__ *) \
+        ((this__)->vtable__))->infer_type_v__)) \
+            ((expression *)(this__)))
+@end example
+
+Calls to @samp{infer_type} can then be made with @samp{infer_type(node)}.
+
+Non-virtual operations are converted into C functions:
+
+@example
+%operation void infer_type(expression *e)
+@end example
+
+becomes:
+
+@example
+extern void infer_type(expression *e);
+@end example
+
+Because virtual and non-virtual operations use a similar call syntax,
+it is very easy to convert a virtual operation into a non-virtual
+operation when the output language is C.  This isn't possible with
+the other output languages.
+
+Other house-keeping tasks are performed by the following functions
+and macros.  Some of these must be supplied by the programmer.
+The @samp{state} parameter is required only if a reentrant compiler is
+being built.
+
+@table @code
+@item int yykind(ANY *node)
+@cindex yykind macro
+Gets the numeric kind value associated with a particular node.
+The kind value for node type @samp{NAME} is called @samp{NAME_kind}.
+
+@item const char *yykindname(ANY *node)
+@cindex yykindname macro
+Gets the name of the node kind associated with a particular node.
+This may be helpful for debugging and logging code.
+
+@item int yyisa(ANY *node, type)
+@cindex yyisa macro
+Determines if @samp{node} is an instance of the node type @samp{type}.
+
+@item char *yygetfilename(ANY *node)
+@cindex yygetfilename macro
+Gets the filename corresponding to where @samp{node} was created
+during parsing.  This macro is only generated if @samp{%option track_lines}
+was specified.
+
+@item long yygetlinenum(ANY *node)
+@cindex yygetlinenum macro
+Gets the line number corresponding to where @samp{node} was created
+during parsing.  This macro is only generated if @samp{%option track_lines}
+was specified.
+
+@item void yysetfilename(ANY *node, char *value)
+@cindex yysetfilename macro
+Sets the filename associated with @samp{node} to @samp{value}.  The
+string is not copied, so @samp{value} must persist for the lifetime
+of the node.  This macro will rarely be required, unless a node
+corresponds to a different line than the current parse line.  This
+macro is only generated if @samp{%option track_lines} was specified.
+
+@item void yysetlinenum(ANY *node, long value)
+@cindex yysetlinenum macro
+Sets the line number associated with @samp{node} to @samp{value}.
+This macro will rarely be required, unless a node corresponds to a
+different line than the current parse line.  This macro is only
+generated if @samp{%option track_lines} was specified.
+
+@item char *yycurrfilename([YYNODESTATE *state])
+@cindex yycurrfilename function
+Get the name of the current input file from the parser.  The pointer
+that is returned from this function is stored as-is: the string is
+not copied.  Therefore, the value must persist for at least as long
+as the node will persist.  This function must be supplied by the programmer
+if @samp{%option track_lines} was specified.
+
+@item long yycurrlinenum([YYNODESTATE *state])
+@cindex yycurrlinenum function
+Get the number of the current input line from the parser.  This
+function must be supplied by the programmer if @samp{%option track_lines}
+was specified.
+
+@item void yynodeinit([YYNODESTATE *state])
+@cindex yynodeinit function
+Initializes the node memory manager.  If the system is reentrant, then
+the node memory manager is @samp{state}.  Otherwise a global node
+memory manager is used.
+
+@item void *yynodealloc([YYNODESTATE *state,] unsigned int size)
+@cindex yynodealloc function
+Allocates a block of memory of @samp{size} bytes in size from the
+node memory manager.  This function is called automatically from
+the node-specific @samp{*_create} functions.  The programmer will
+not normally need to call this function.
+
+This function will return @code{NULL} if the system is out of
+memory, or if @samp{size} is too large to be allocated within
+the node memory manager.  If the system is out of memory, then
+@samp{yynodealloc} will call @samp{yynodefailed} prior to
+returning @code{NULL}.
+
+@item int yynodepush([YYNODESTATE *state])
+@cindex yynodepush function
+Pushes the current node memory manager position.  The next time
+@code{yynodepop} is called, the node memory manager will reset to
+the pushed position.  This function returns zero if the system
+is out of memory.
+
+@item void yynodepop([YYNODESTATE *state])
+@cindex yynodepop function
+Pops the current node memory manager position.  This function has
+no effect if @code{yynodepush} was not called previously.
+
+The @code{yynodepush} and @code{yynodepop} functions can be used
+to perform a simple kind of garbage collection on nodes.  When
+the parser enters a scope, it pushes the node memory manager
+position.  After all definitions in the scope have been dealt
+with, the parser pops the node memory manager to reclaim all
+of the memory used.
+
+@item void yynodeclear([YYNODESTATE *state])
+@cindex yynodeclear function
+Clears the entire node memory manager and returns it to the
+state it had after calling @code{yynodeinit}.  This is typically
+used upon program shutdown to free all remaining node memory.
+
+@item void yynodefailed([YYNODESTATE *state])
+@cindex yynodefailed function
+Called when @code{yynodealloc} or @code{yynodepush} detects that
+the system is out of memory.  This function must be supplied by
+the programmer.  The programmer may choose to exit to program
+when the system is out of memory; in which case @code{yynodealloc}
+will never return @code{NULL}.
+@end table
+
+@c -----------------------------------------------------------------------
+
+@node C++ Language, Java Language, C Language, Output APIs
+@section C++ Language APIs
+@cindex C++ APIs
+
+In the C++ output language, each node type is converted into a @samp{class}
+that contains the node's fields, virtual operations, and other house-keeping
+definitions.  The following example demonstrates how treecc node declarations
+are converted into C++ source code:
+
+@example
+%node expression %abstract %typedef =
+@{
+    %nocreate type_code type;
+@}
+%node binary expression %abstract =
+@{
+    expression *expr1;
+    expression *expr2;
+@}
+%node plus binary
+@end example
+
+becomes:
+
+@example
+class expression
+@{
+protected:
+
+    int kind__;
+    char *filename__;
+    long linenum__;
+
+public:
+
+    int getKind() const @{ return kind__; @}
+    const char *getFilename() const @{ return filename__; @}
+    int getLinenum() const @{ return linenum__; @}
+    void setFilename(char *filename) @{ filename__ = filename; @}
+    void setLinenum(long linenum) @{ linenum__ = linenum; @}
+
+    void *operator new(size_t);
+    void operator delete(void *, size_t);
+
+protected:
+
+    expression();
+
+public:
+
+    type_code type;
+
+    virtual int isA(int kind) const;
+    virtual const char *getKindName() const;
+
+protected:
+
+    virtual ~expression();
+
+@};
+
+class binary : public expression
+@{
+protected:
+
+    binary(expression * expr1, expression * expr2);
+
+public:
+
+    expression * expr1;
+    expression * expr2;
+
+    virtual int isA(int kind) const;
+    virtual const char *getKindName() const;
+
+protected:
+
+    virtual ~binary();
+
+@};
+
+class plus : public binary
+@{
+public:
+
+    plus(expression * expr1, expression * expr2);
+
+public:
+
+    virtual int isA(int kind) const;
+    virtual const char *getKindName() const;
+
+protected:
+
+    virtual ~plus();
+
+@};
+@end example
+
+The following standard methods are available on every node type:
+
+@table @code
+@item int getKind()
+@cindex getKind method (C++)
+Gets the numeric kind value associated with a particular node.
+The kind value for node type @samp{NAME} is called @samp{NAME_kind}.
+
+@item virtual const char *getKindName()
+@cindex getKindName method (C++)
+Gets the name of the node kind associated with a particular node.
+This may be helpful for debugging and logging code.
+
+@item virtual int isA(int kind)
+@cindex isA method (C++)
+Determines if the node is a member of the node type that corresponds
+to the numeric kind value @samp{kind}.
+
+@item const char *getFilename()
+@cindex getFilename method (C++)
+Gets the filename corresponding to where the node was created
+during parsing.  This method is only generated if @samp{%option track_lines}
+was specified.
+
+@item long getLinenum()
+@cindex getLinenum method (C++)
+Gets the line number corresponding to where the node was created
+during parsing.  This method is only generated if @samp{%option track_lines}
+was specified.
+
+@item void setFilename(char *value)
+@cindex setFilename method (C++)
+Sets the filename associated with the node to @samp{value}.  The
+string is not copied, so @samp{value} must persist for the lifetime
+of the node.  This method will rarely be required, unless a node
+corresponds to a different line than the current parse line.  This
+method is only generated if @samp{%option track_lines} was specified.
+
+@item void setLinenum(long value)
+@cindex setLinenum method (C++)
+Sets the line number associated with the node to @samp{value}.
+This method will rarely be required, unless a node corresponds to a
+different line than the current parse line.  This method is only
+generated if @samp{%option track_lines} was specified.
+@end table
+
+If the generated code is non-reentrant, then the constructor for the
+class can be used to construct nodes of the specified node type.  The
+constructor parameters are the same as the fields within the node type's
+definition, except for @samp{%nocreate} fields.
+
+If the generated code is reentrant, then nodes cannot be constructed
+using the C++ @samp{new} operator.  The @samp{*Create} methods
+on the @samp{YYNODESTATE} factory class must be used instead.
+
+The @samp{YYNODESTATE} class contains a number of house-keeping methods
+that are used to manage nodes:
+
+@table @code
+@item static YYNODESTATE *getState()
+@cindex getState method (C++)
+Gets the global @samp{YYNODESTATE} instance that is being used by
+non-reentrant code.  If an instance has not yet been created,
+this method will create one.
+
+When using non-reentrant code, the programmer will normally subclass
+@samp{YYNODESTATE}, override some of the methods below, and then
+construct an instance of the subclass.  This constructed instance
+will then be returned by future calls to @samp{getState}.
+
+@item void *alloc(size_t size)
+@cindex alloc method (C++)
+Allocates a block of memory of @samp{size} bytes in size from the
+node memory manager.  This function is called automatically from
+the node-specific constructors and @samp{*Create} methods.  The programmer
+will not normally need to call this function.
+
+This function will return @code{NULL} if the system is out of
+memory, or if @samp{size} is too large to be allocated within
+the node memory manager.  If the system is out of memory, then
+@samp{alloc} will call @samp{failed} prior to returning @code{NULL}.
+
+@item int push()
+@cindex push method (C++)
+Pushes the current node memory manager position.  The next time
+@code{pop} is called, the node memory manager will reset to
+the pushed position.  This function returns zero if the system
+is out of memory.
+
+@item void pop()
+@cindex pop method (C++)
+Pops the current node memory manager position.  This function has
+no effect if @code{push} was not called previously.
+
+The @code{push} and @code{pop} methods can be used
+to perform a simple kind of garbage collection on nodes.  When
+the parser enters a scope, it pushes the node memory manager
+position.  After all definitions in the scope have been dealt
+with, the parser pops the node memory manager to reclaim all
+of the memory used.
+
+@item void clear()
+@cindex clear method (C++)
+Clears the entire node memory manager and returns it to the
+state it had after construction.
+
+@item virtual void failed()
+@cindex failed method (C++)
+Called when @code{alloc} or @code{push} detects that
+the system is out of memory.  This method is typically
+overridden by the programmer in subclasses.  The programmer may
+choose to exit to program when the system is out of memory; in
+which case @code{alloc} will never return @code{NULL}.
+
+@item virtual char *currFilename()
+@cindex currFilename method (C++)
+Get the name of the current input file from the parser.  The pointer
+that is returned from this function is stored as-is: the string is
+not copied.  Therefore, the value must persist for at least as long
+as the node will persist.  This method is usually overrriden by
+the programmer in subclasses if @samp{%option track_lines} was specified.
+
+@item virtual long currLinenum()
+@cindex currLinenum method (C++)
+Get the number of the current input line from the parser.  This
+method is usually overridden by the programmer in subclasses
+if @samp{%option track_lines} was specified.
+@end table
+
+The programmer will typically subclass @samp{YYNODESTATE} to provide
+additional functionality, and then create an instance of this class
+to act as the node memory manager and node creation factory.
+
+@c -----------------------------------------------------------------------
+
+@node Java Language, C# Language, C++ Language, Output APIs
+@section Java Language APIs
+@cindex Java APIs
+
+In the Java output language, each node type is converted into a @samp{class}
+that contains the node's fields, virtual operations, and other house-keeping
+definitions.  The following example demonstrates how treecc node declarations
+are converted into Java source code:
+
+@example
+%node expression %abstract %typedef =
+@{
+    %nocreate type_code type;
+@}
+%node binary expression %abstract =
+@{
+    expression expr1;
+    expression expr2;
+@}
+%node plus binary
+@end example
+
+becomes:
+
+@example
+public class expression
+@{
+    protected int kind__;
+    protected String filename__;
+    protected long linenum__;
+
+    public int getKind() @{ return kind__; @}
+    public String getFilename() @{ return filename__; @}
+    public long getLinenum() const @{ return linenum__; @}
+    public void setFilename(String filename) @{ filename__ = filename; @}
+    public void setLinenum(long linenum) @{ linenum__ = linenum; @}
+
+    public static final int KIND = 1;
+
+    public type_code type;
+
+    protected expression()
+    @{
+        this.kind__ = KIND;
+        this.filename__ = YYNODESTATE.getState().currFilename();
+        this.linenum__ = YYNODESTATE.getState().currLinenum();
+    @}
+
+    public int isA(int kind)
+    @{
+        if(kind == KIND)
+            return 1;
+        else
+            return 0;
+    @}
+
+    public String getKindName()
+    @{
+        return "expression";
+    @}
+@}
+
+public class binary extends expression
+@{
+    public static final int KIND = 2;
+
+    public expression expr1;
+    public expression expr2;
+
+    protected binary(expression expr1, expression expr2)
+    @{
+        super();
+        this.kind__ = KIND;
+        this.expr1 = expr1;
+        this.expr2 = expr2;
+    @}
+
+    public int isA(int kind)
+    @{
+        if(kind == KIND)
+            return 1;
+        else
+            return super.isA(kind);
+    @}
+
+    public String getKindName()
+    @{
+        return "binary";
+    @}
+@}
+
+public class plus extends binary
+@{
+    public static final int KIND = 3;
+
+    public plus(expression expr1, expression expr2)
+    @{
+        super(expr1, expr2);
+        this.kind__ = KIND;
+    @}
+
+    public int isA(int kind)
+    @{
+        if(kind == KIND)
+            return 1;
+        else
+            return super.isA(kind);
+    @}
+
+    public String getKindName()
+    @{
+        return "plus";
+    @}
+@}
+@end example
+
+The following standard members are available on every node type:
+
+@table @code
+@item int KIND
+@cindex KIND field (Java)
+The kind value for the node type corresponding to this class.
+
+@item int getKind()
+@cindex getKind method (Java)
+Gets the numeric kind value associated with a particular node.
+The kind value for node type @samp{NAME} is called @samp{NAME.KIND}.
+
+@item String getKindName()
+@cindex getKindName method (Java)
+Gets the name of the node kind associated with a particular node.
+This may be helpful for debugging and logging code.
+
+@item int isA(int kind)
+@cindex isA method (Java)
+Determines if the node is a member of the node type that corresponds
+to the numeric kind value @samp{kind}.
+
+@item String getFilename()
+@cindex getFilename method (Java)
+Gets the filename corresponding to where the node was created
+during parsing.  This method is only generated if @samp{%option track_lines}
+was specified.
+
+@item long getLinenum()
+@cindex getLinenum method (Java)
+Gets the line number corresponding to where the node was created
+during parsing.  This method is only generated if @samp{%option track_lines}
+was specified.
+
+@item void setFilename(String value)
+@cindex setFilename method (Java)
+Sets the filename associated with the node to @samp{value}.
+This method will rarely be required, unless a node corresponds to
+a different line than the current parse line.  This method is only
+generated if @samp{%option track_lines} was specified.
+
+@item void setLinenum(long value)
+@cindex setLinenum method (Java)
+Sets the line number associated with the node to @samp{value}.
+This method will rarely be required, unless a node corresponds to a
+different line than the current parse line.  This method is only
+generated if @samp{%option track_lines} was specified.
+@end table
+
+If the generated code is non-reentrant, then the constructor for the
+class can be used to construct nodes of the specified node type.  The
+constructor parameters are the same as the fields within the node type's
+definition, except for @samp{%nocreate} fields.
+
+If the generated code is reentrant, then nodes cannot be constructed
+using the Java @samp{new} operator.  The @samp{*Create} methods
+on the @samp{YYNODESTATE} factory class must be used instead.
+
+Enumerated types are converted into a Java @samp{class}:
+
+@example
+%enum JavaType =
+@{
+    JT_BYTE,
+    JT_SHORT,
+    JT_CHAR,
+    JT_INT,
+    JT_LONG,
+    JT_FLOAT,
+    JT_DOUBLE,
+    JT_OBJECT_REF
+@}
+@end example
+
+becomes:
+
+@example
+public class JavaType
+@{
+    public static final int JT_BYTE = 0;
+    public static final int JT_SHORT = 1;
+    public static final int JT_CHAR = 2;
+    public static final int JT_INT = 3;
+    public static final int JT_LONG = 4;
+    public static final int JT_FLOAT = 5;
+    public static final int JT_DOUBLE = 6;
+    public static final int JT_OBJECT_REF = 7;
+@}
+@end example
+
+References to enumerated types in fields and operation parameters
+are replaced with the type @samp{int}.
+
+Virtual operations are converted into public methods on the Java
+node classes.
+
+Non-virtual operations are converted into a static method within
+a class named for the operation.  For example,
+
+@example
+%operation void InferType::infer_type(expression e)
+@end example
+
+becomes:
+
+@example
+public class InferType
+@{
+    public static void infer_type(expression e)
+    @{
+        ...
+    @}
+@}
+@end example
+
+If the class name (@samp{InferType} in the above example) is omitted,
+then the name of the operation is used as both the class name and the
+the method name.
+
+The @samp{YYNODESTATE} class contains a number of house-keeping methods
+that are used to manage nodes:
+
+@table @code
+@item static YYNODESTATE getState()
+@cindex getState method (Java)
+Gets the global @samp{YYNODESTATE} instance that is being used by
+non-reentrant code.  If an instance has not yet been created,
+this method will create one.
+
+When using non-reentrant code, the programmer will normally subclass
+@samp{YYNODESTATE}, override some of the methods below, and then
+construct an instance of the subclass.  This constructed instance
+will then be returned by future calls to @samp{getState}.
+
+This method will not be present if a reentrant system is being
+generated.
+
+@item String currFilename()
+@cindex currFilename method (Java)
+Get the name of the current input file from the parser.  This method
+is usually overrriden by the programmer in subclasses if
+@samp{%option track_lines} was specified.
+
+@item long currLinenum()
+@cindex currLinenum method (Java)
+Get the number of the current input line from the parser.  This
+method is usually overridden by the programmer in subclasses
+if @samp{%option track_lines} was specified.
+@end table
+
+The programmer will typically subclass @samp{YYNODESTATE} to provide
+additional functionality, and then create an instance of this class
+to act as the global state and node creation factory.
+
+@c -----------------------------------------------------------------------
+
+@node C# Language, Ruby Language, Java Language, Output APIs
+@section C# Language APIs
+@cindex C# APIs
+
+In the C# output language, each node type is converted into a @samp{class}
+that contains the node's fields, virtual operations, and other house-keeping
+definitions.  The following example demonstrates how treecc node declarations
+are converted into C# source code:
+
+@example
+%node expression %abstract %typedef =
+@{
+    %nocreate type_code type;
+@}
+%node binary expression %abstract =
+@{
+    expression expr1;
+    expression expr2;
+@}
+%node plus binary
+@end example
+
+becomes:
+
+@example
+public class expression
+@{
+    protected int kind__;
+    protected String filename__;
+    protected long linenum__;
+
+    public int getKind() @{ return kind__; @}
+    public String getFilename() @{ return filename__; @}
+    public long getLinenum() const @{ return linenum__; @}
+    public void setFilename(String filename) @{ filename__ = filename; @}
+    public void setLinenum(long linenum) @{ linenum__ = linenum; @}
+
+    public const int KIND = 1;
+
+    public type_code type;
+
+    protected expression()
+    @{
+        this.kind__ = KIND;
+        this.filename__ = YYNODESTATE.getState().currFilename();
+        this.linenum__ = YYNODESTATE.getState().currLinenum();
+    @}
+
+    public virtual int isA(int kind)
+    @{
+        if(kind == KIND)
+            return 1;
+        else
+            return 0;
+    @}
+
+    public virtual String getKindName()
+    @{
+        return "expression";
+    @}
+@}
+
+public class binary : expression
+@{
+    public const int KIND = 2;
+
+    public expression expr1;
+    public expression expr2;
+
+    protected binary(expression expr1, expression expr2)
+        : expression()
+    @{
+        this.kind__ = KIND;
+        this.expr1 = expr1;
+        this.expr2 = expr2;
+    @}
+
+    public override int isA(int kind)
+    @{
+        if(kind == KIND)
+            return 1;
+        else
+            return base.isA(kind);
+    @}
+
+    public override String getKindName()
+    @{
+        return "binary";
+    @}
+@}
+
+public class plus : binary
+@{
+    public const int KIND = 5;
+
+    public plus(expression expr1, expression expr2)
+        : binary(expr1, expr2)
+    @{
+        this.kind__ = KIND;
+    @}
+
+    public override int isA(int kind)
+    @{
+        if(kind == KIND)
+            return 1;
+        else
+            return base.isA(kind);
+    @}
+
+    public override String getKindName()
+    @{
+        return "plus";
+    @}
+@}
+@end example
+
+The following standard members are available on every node type:
+
+@table @code
+@item const int KIND
+@cindex KIND field (C#)
+The kind value for the node type corresponding to this class.
+
+@item int getKind()
+@cindex getKind method (C#)
+Gets the numeric kind value associated with a particular node.
+The kind value for node type @samp{NAME} is called @samp{NAME.KIND}.
+
+@item virtual String getKindName()
+@cindex getKindName method (C#)
+Gets the name of the node kind associated with a particular node.
+This may be helpful for debugging and logging code.
+
+@item virtual int isA(int kind)
+@cindex isA method (C#)
+Determines if the node is a member of the node type that corresponds
+to the numeric kind value @samp{kind}.
+
+@item String getFilename()
+@cindex getFilename method (C#)
+Gets the filename corresponding to where the node was created
+during parsing.  This method is only generated if @samp{%option track_lines}
+was specified.
+
+@item long getLinenum()
+@cindex getLinenum method (C#)
+Gets the line number corresponding to where the node was created
+during parsing.  This method is only generated if @samp{%option track_lines}
+was specified.
+
+@item void setFilename(String value)
+@cindex setFilename method (C#)
+Sets the filename associated with the node to @samp{value}.
+This method will rarely be required, unless a node corresponds to
+a different line than the current parse line.  This method is only
+generated if @samp{%option track_lines} was specified.
+
+@item void setLinenum(long value)
+@cindex setLinenum method (C#)
+Sets the line number associated with the node to @samp{value}.
+This method will rarely be required, unless a node corresponds to a
+different line than the current parse line.  This method is only
+generated if @samp{%option track_lines} was specified.
+@end table
+
+If the generated code is non-reentrant, then the constructor for the
+class can be used to construct nodes of the specified node type.  The
+constructor parameters are the same as the fields within the node type's
+definition, except for @samp{%nocreate} fields.
+
+If the generated code is reentrant, then nodes cannot be constructed
+using the C# @samp{new} operator.  The @samp{*Create} methods
+on the @samp{YYNODESTATE} factory class must be used instead.
+
+Enumerated types are converted into a C# @samp{enum} definition:
+
+@example
+%enum JavaType =
+@{
+    JT_BYTE,
+    JT_SHORT,
+    JT_CHAR,
+    JT_INT,
+    JT_LONG,
+    JT_FLOAT,
+    JT_DOUBLE,
+    JT_OBJECT_REF
+@}
+@end example
+
+becomes:
+
+@example
+public enum JavaType
+@{
+    JT_BYTE,
+    JT_SHORT,
+    JT_CHAR,
+    JT_INT,
+    JT_LONG,
+    JT_FLOAT,
+    JT_DOUBLE,
+    JT_OBJECT_REF,
+@}
+@end example
+
+Virtual operations are converted into public virtual methods on the C#
+node classes.
+
+Non-virtual operations are converted into a static method within
+a class named for the operation.  For example,
+
+@example
+%operation void InferType::infer_type(expression e)
+@end example
+
+becomes:
+
+@example
+public class InferType
+@{
+    public static void infer_type(expression e)
+    @{
+        ...
+    @}
+@}
+@end example
+
+If the class name (@samp{InferType} in the above example) is omitted,
+then the name of the operation is used as both the class name and the
+the method name.
+
+The @samp{YYNODESTATE} class contains a number of house-keeping methods
+that are used to manage nodes:
+
+@table @code
+@item static YYNODESTATE getState()
+@cindex getState method (C#)
+Gets the global @samp{YYNODESTATE} instance that is being used by
+non-reentrant code.  If an instance has not yet been created,
+this method will create one.
+
+When using non-reentrant code, the programmer will normally subclass
+@samp{YYNODESTATE}, override some of the methods below, and then
+construct an instance of the subclass.  This constructed instance
+will then be returned by future calls to @samp{getState}.
+
+This method will not be present if a reentrant system is being
+generated.
+
+@item virtual String currFilename()
+@cindex currFilename method (C#)
+Get the name of the current input file from the parser.  This method
+is usually overrriden by the programmer in subclasses if
+@samp{%option track_lines} was specified.
+
+@item virtual long currLinenum()
+@cindex currLinenum method (C#)
+Get the number of the current input line from the parser.  This
+method is usually overridden by the programmer in subclasses
+if @samp{%option track_lines} was specified.
+@end table
+
+The programmer will typically subclass @samp{YYNODESTATE} to provide
+additional functionality, and then create an instance of this class
+to act as the global state and node creation factory.
+
+@c -----------------------------------------------------------------------
+
+@node Ruby Language, Full Expression Example, C# Language, Output APIs
+@section Ruby Language APIs
+@cindex Ruby APIs
+
+In the Ruby output language, each node type is converted into a
+@samp{class} that contains the node's fields, operations, and other
+house-keeping definitions.  The following example demonstrates how
+treecc node declarations are converted into Ruby source code:
+
+@example
+%node expression %abstract %typedef =
+@{
+    %nocreate type_code type;
+@}
+%node binary expression %abstract =
+@{
+    expression expr1;
+    expression expr2;
+@}
+%node plus binary
+@end example
+
+becomes:
+
+@example
+class YYNODESTATE
+
+  @@@@state = nil
+
+  def YYNODESTATE.state
+    return @@@@state unless @@@@state.nil?
+    @@@@state = YYNODESTATE.new()
+    return @@@@state
+  end
+
+  def intialize 
+     @@@@state = self 
+   end
+
+  def currFilename 
+     return nil
+  end
+
+  def currLinenum 
+     return 0 
+  end
+end
+
+class Expression
+  protected
+  attr_reader :kind
+  public 
+
+  attr_accessor :Linenum, :Filename
+
+  attr_accessor :type
+
+  KIND = 1
+
+  def initialize()
+    @@kind = KIND
+    @@Filename = YYNODESTATE.state.currFilename()
+    @@Linenum = YYNODESTATE.state.currLinenum()
+  end
+
+  def isA(kind)
+    if(@@kind == KIND) then
+      return true
+    else
+      return 0
+    end
+  end
+
+  def KindName
+    return "Expression"
+  end
+
+end
+
+class Binary < Expression
+
+  attr_accessor :expr1
+  attr_accessor :expr2
+
+  KIND = 2
+
+  def initialize(expr1, expr2)
+  super(expr1, expr2)
+    @@kind = KIND
+    self.expr1 = expr1
+    self.expr2 = expr2
+  end
+
+  def isA(kind)
+    if(@@kind == Kind) then
+      return true
+    else
+      return super(kind)
+    end
+  end
+
+  def KindName
+    return "Binary"
+  end
+
+end
+
+class Plus < Binary
+
+  KIND = 3
+
+  def initialize(expr1, expr2)
+  super(expr1, expr2expr1, expr2)
+    @@kind = KIND
+  end
+
+  def isA(kind)
+    if(@@kind == KIND) then
+      return true
+    else
+      return super(kind)
+    end
+  end
+
+  def KindName
+    return "Plus"
+  end
+
+end
+@end example
+
+The following standard members are available on every node type:
+
+@table @code
+@item KIND
+@cindex KIND field (Ruby)
+The kind value for the node type corresponding to this class.
+The kind value for node type @samp{NAME} is called @samp{NAME::KIND}.
+
+@item KindName
+@cindex KindName field (Ruby)
+The name of the node kind associated with a particular node.  This may
+be helpful for debugging and logging code.
+
+@item isA(int kind)
+@cindex isA method (Ruby)
+Determines if the node is a member of the node type that corresponds
+to the numeric kind value @samp{kind}.
+
+@item Filename
+@cindex Filename field (Ruby)
+The filename corresponding to where the node was created during parsing.
+This method is only generated if @samp{%option track_lines} was
+specified.
+
+@item Linenum()
+@cindex Linenum field (Ruby)
+The line number corresponding to where the node was created during
+parsing.  This method is only generated if @samp{%option track_lines}
+was specified.
+
+@end table
+
+@c Don't know if this is true for ruby
+@ignore
+If the generated code is non-reentrant, then the constructor for the
+class can be used to construct nodes of the specified node type.  The
+constructor parameters are the same as the fields within the node type's
+definition, except for @samp{%nocreate} fields.
+
+If the generated code is reentrant, then nodes cannot be constructed
+using the C# @samp{new} operator.  The @samp{*Create} methods
+on the @samp{YYNODESTATE} factory class must be used instead.
+@end ignore
+
+Enumerated types are converted into a Ruby @samp{class} definition:
+
+@example
+%enum JavaType =
+@{
+    JT_BYTE,
+    JT_SHORT,
+    JT_CHAR,
+    JT_INT,
+    JT_LONG,
+    JT_FLOAT,
+    JT_DOUBLE,
+    JT_OBJECT_REF
+@}
+@end example
+
+becomes:
+
+@example
+
+class JavaType 
+  JT_BYTE = 0
+  JT_SHORT = 1
+  JT_CHAR = 2
+  JT_INT = 3
+  JT_LONG = 4
+  JT_FLOAT = 5
+  JT_DOUBLE = 6
+  JT_OBJECT_REF = 7
+end
+
+@end example
+
+@c 
+Virtual operations are converted into public methods on the Ruby
+node classes.
+
+Non-virtual operations are converted into a class method within
+a class named for the operation.  For example,
+
+@example
+%operation void InferType::infer_type(expression e)
+@end example
+
+becomes:
+
+@example
+class InferType
+    def InferType.infer_type(expression e)   
+        ...
+    end
+end
+@end example
+
+If the class name (@samp{InferType} in the above example) is omitted,
+then the name of the operation is used as both the class name and the
+the method name. You then get a method with a name starting with an
+uppercase letter. However, Ruby methods start with lowercase methods.
+So never forget the class name.
+
+The @samp{YYNODESTATE} class contains a number of house-keeping methods
+that are used to manage nodes:
+
+@table @code
+@item YYNODESTATE::state()
+@cindex state field (Ruby)
+Gets the global @samp{YYNODESTATE} instance that is being used by
+non-reentrant code.  If an instance has not yet been created,
+this method will create one.
+
+@c Don't know if the following is correct
+@ignore
+
+When using non-reentrant code, the programmer will normally subclass
+@samp{YYNODESTATE}, override some of the methods below, and then
+construct an instance of the subclass.  This constructed instance
+will then be returned by future calls to @samp{getState}.
+
+This method will not be present if a reentrant system is being
+generated.
+
+@end ignore
+
+@item currFilename
+@cindex currFilename field (Ruby)
+The name of the current input file from the parser.  This fields
+accessor method is usually overrriden by the programmer in subclasses if
+@samp{%option track_lines} was specified.
+
+@item currLinenum
+@cindex currLinenum field (Ruby)
+The number of the current input line from the parser.  This fields
+accessor method is usually overridden by the programmer in subclasses if
+@samp{%option track_lines} was specified.
+@end table
+
+The programmer will typically subclass @samp{YYNODESTATE} to provide
+additional functionality, and then create an instance of this class
+to act as the global state and node creation factory.
+
+@c -----------------------------------------------------------------------
+
+@node Full Expression Example, EBNF Syntax, Ruby Language, Top
+@appendix Full expression example code
+@cindex Full expression example
+
+The full treecc input file for the expression example is as follows:
+
+@example
+%enum type_code =
+@{
+    int_type,
+    float_type
+@}
+
+%node expression %abstract %typedef =
+@{
+    %nocreate type_code type = @{int_type@};
+@}
+
+%node binary expression %abstract =
+@{
+    expression *expr1;
+    expression *expr2;
+@}
+
+%node unary expression %abstract =
+@{
+    expression *expr;
+@}
+
+%node intnum expression =
+@{
+    int num;
+@}
+
+%node floatnum expression =
+@{
+    float num;
+@}
+
+%node plus binary
+%node minus binary
+%node multiply binary
+%node divide binary
+%node power binary
+%node negate unary
+
+%operation void infer_type(expression *e)
+
+infer_type(binary)
+@{
+    infer_type(e->expr1);
+    infer_type(e->expr2);
+
+    if(e->expr1->type == float_type || e->expr2->type == float_type)
+    @{
+        e->type = float_type;
+    @}
+    else
+    @{
+        e->type = int_type;
+    @}
+@}
+
+infer_type(unary)
+@{
+    infer_type(e->expr);
+    e->type = e->expr->type;
+@}
+
+infer_type(intnum)
+@{
+    e->type = int_type;
+@}
+
+infer_type(floatnum)
+@{
+    e->type = float_type;
+@}
+
+infer_type(power)
+@{
+    infer_type(e->expr1);
+    infer_type(e->expr2);
+
+    if(e->expr2->type != int_type)
+    @{
+        error("second argument to `^' is not an integer");
+    @}
+
+    e->type = e->expr1->type;
+@}
+@end example
+
+The full yacc grammar is as follows:
+
+@example
+%union @{
+    expression *node;
+    int         inum;
+    float       fnum;
+@}
+
+%token INT FLOAT
+
+%type <node> expr
+%type <inum> INT
+%type <fnum> FLOAT
+
+%%
+
+expr: INT               @{ $$ = intnum_create($1); @}
+    | FLOAT             @{ $$ = floatnum_create($1); @}
+    | '(' expr ')'      @{ $$ = $2; @}
+    | expr '+' expr     @{ $$ = plus_create($1, $3); @}
+    | expr '-' expr     @{ $$ = minus_create($1, $3); @}
+    | expr '*' expr     @{ $$ = multiply_create($1, $3); @}
+    | expr '/' expr     @{ $$ = divide_create($1, $3); @}
+    | expr '^' expr     @{ $$ = power_create($1, $3); @}
+    | '-' expr          @{ $$ = negate_create($2); @}
+    ;
+@end example
+
+@c -----------------------------------------------------------------------
+
+@node EBNF Syntax, Index, Full Expression Example, Top
+@appendix EBNF syntax for treecc input files
+@cindex EBNF syntax
+
+The EBNF syntax for treecc input files uses the following
+lexical tokens:
+
+@example
+IDENTIFIER ::= <A-Za-z_> @{ <A-Za-z0-9_> @}
+
+STRING ::= '"' <anything that does not include '"'> '"'
+         | "'" <anything that does not include "'"> "'"
+
+LITERAL_DEFNS ::= "%@{" <anything except "%@}"> "%@}"
+
+LITERAL_END ::= "%%" <any character sequence until EOF>
+
+LITERAL_CODE ::= '@{' <anything with matched '@{' and '@}'> '@}'
+@end example
+
+In addition, anything that begins with "%" in the following syntax
+is a lexical keyword.
+
+The EBNF syntax is as follows:
+
+@example
+File ::= @{ Declaration @}
+
+Declaration ::= Node
+              | Operation
+              | OperationCase
+              | Option
+              | Enum
+              | Literal
+              | Header
+              | Output
+              | Common
+              | Include
+
+Node ::= %node IDENTIFIER [ IDENTIFIER ] @{ NodeFlag @} [ '=' Fields ]
+
+NodeFlag ::= %abstract | %typedef
+
+Fields ::= '@{' @{ Field @} '@}'
+
+Field ::= [ %nocreate ] TypeAndName [ '=' LITERAL_CODE ] ';'
+
+TypeAndName ::= Type [ IDENTIFIER ]
+
+Type ::= TypeName
+       | Type '*'
+       | Type '&'
+       | Type '[' ']'
+
+TypeName ::= IDENTIFIER @{ IDENTIFIER @}
+
+Operation ::= %operation @{ OperFlag @} Type
+                   [ ClassName ] IDENTIFIER '(' [ Params ] ')'
+                   [ '=' LITERAL_CODE ] [ ';' ]
+
+OperFlag ::= %virtual | %inline | %split
+
+ClassName ::= IDENTIFIER "::"
+
+Params ::= Param @{ ',' Param @}
+
+Param ::= TypeAndName | '[' TypeAndName ']'
+
+OperationCase ::= OperationHead @{ ',' OperationHead @} LITERAL_CODE
+
+OperationHead ::= IDENTIFIER '(' [ TypeList ] ')'
+
+TypeList ::= IDENTIFIER @{ ',' IDENTIFIER @}
+
+Option ::= %option IDENTIFIER [ '=' Value ]
+
+Value ::= IDENTIFIER | STRING
+
+Enum ::= %enum IDENTIFIER '=' '@{' EnumBody [ ',' ] '@}'
+
+EnumBody ::= IDENTIFIER @{ ',' IDENTIFIER @}
+
+Literal ::= @{ LiteralFlag @} (LITERAL_DEFNS | LITERAL_END)
+
+LiteralFlag ::= %both | %decls | %end
+
+Header ::= %header STRING
+
+Output ::= %output STRING
+
+Common ::= %common
+
+Include ::= %include [ %readonly ] STRING
+
+@end example
+
+@c -----------------------------------------------------------------------
+
+@page
+
+@node Index, , EBNF Syntax, Top
+@unnumbered Index
+
+@printindex cp
+
+@contents
+@bye

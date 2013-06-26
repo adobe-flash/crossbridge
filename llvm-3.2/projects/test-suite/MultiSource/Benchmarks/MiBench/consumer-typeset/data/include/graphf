@@ -1,0 +1,1084 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @Graph package for drawing graphs (Version 1.0)                       #
+#                                                                             #
+#  Version 1.0 by Jeffrey H. Kingston, December 1993.                         #
+#                                                                             #
+#  This package draws graphs, the statistical kind not the graph-theoretical  #
+#  kind.  See the User's Guide (Advanced Graphics) for user info.             #
+#                                                                             #
+###############################################################################
+
+@SysPrependGraphic { graphf.lpg }
+@SysInclude { graphf.etc }
+
+def @GraphObj
+    left p
+    named margin { 0c }
+    named adj { 0 0 }
+    right x
+{
+  @BackEnd @Case {
+    PostScript @Yield {
+	@Null &  # kills previous white space
+	@HContract @VContract {
+	  //0io ||0io @HContract @VContract 
+	  { p "trpoint translate" adj "translate gsave" // "grestore" }
+	  @Graphic { //margin ||margin x ||margin //margin }
+	  ||0io //0io
+	}
+    }
+# VT: PDF does nothing
+    PDF @Yield {
+	@Null &  # kills previous white space
+	@HContract @VContract {
+	  //0io ||0io @HContract @VContract 
+	  { "% @GraphObj UNIMPLEMENTED" }
+	  @Graphic { //margin ||margin x ||margin //margin }
+	  ||0io //0io
+	}
+    }
+  }
+}
+
+def @GraphCross
+    named symbolsize
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 0.15 ft }
+{
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 0 moveto xsize ysize lineto 0 ysize moveto"
+	  "xsize 0 lineto [] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 0 m __xsize __ysize l 0 __ysize m __xsize 0 l S"}	# uses S because PostScript version does NOT use closepath
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
+}
+
+def @GraphPlus
+    named symbolsize
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 0.15 ft }
+{
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath xmark 0 moveto xmark ysize lineto 0 ymark moveto"
+	  "xsize ymark lineto [] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d __xmark 0 m __xmark __ysize l 0 __ymark m __xsize __ymark l S"}	# uses S because PostScript version does NOT use closepath
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
+}
+
+def @GraphSquare
+    named symbolsize
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 0.15 ft }
+{
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
+	  "0 ysize lineto closepath [] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 0 __xsize __ysize re s"}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
+}
+
+def @GraphFilledSquare
+    named symbolsize
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 0.15 ft }
+{
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 0 moveto xsize 0 lineto xsize ysize lineto"
+	  "0 ysize lineto closepath gsave [] 0 setdash stroke grestore fill"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 0 __xsize __ysize re b"}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
+}
+
+def @GraphDiamond
+    named symbolsize
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 0.15 ft }
+{
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 ymark moveto xmark 0 lineto xsize ymark lineto"
+	  "xmark ysize lineto closepath [] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 __ymark m __xmark 0 l __xsize __ymark l __xmark __ysize l s"}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
+}
+
+def @GraphFilledDiamond
+    named symbolsize
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 0.15 ft }
+{
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 ymark moveto xmark 0 lineto xsize ymark lineto"
+	  "xmark ysize lineto closepath gsave [] 0 setdash stroke grestore fill"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 __ymark m __xmark 0 l __xsize __ymark l __xmark __ysize l b"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
+}
+
+def @GraphCircle
+    named symbolsize
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 0.15 ft }
+{
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath xmark ymark xmark 0 360 arc"
+	  "[] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+    PDF @Yield {
+	@HContract @VContract
+#
+# draw a circle whose centre is at (xmark, ymark) and whose radius is xmark units;
+#
+# for curveto to work, we need to calculate the control points of the Bezier curve
+# as well as move the pen to the correct initial point. The circle is drawn as two
+# arcs of 180 degrees
+#
+#   pt0 = (xmark + xmark, ymark)
+#   pt1 = (xmark + xmark, ymark + 4/3 * xmark)
+#   pt2 = (0, ymark + 4/3 * xmark)
+#   pt3 = (0, ymark)
+#
+#   pt0 = (0, ymark)
+#   pt1 = (0, ymark - 4/3 * xmark)
+#   pt2 = (xmark + xmark, ymark - 4/3 * xmark)
+#   pt3 = (xmark + xmark, ymark)
+#
+	{"n [] 0 d"
+	 "__mul(2, __xmark) __ymark m"
+	 "__mul(2, __xmark) __add(__ymark, __div(__mul(4, __xmark), 3))"	# pt1
+	 "0 __add(__ymark, __div(__mul(4, __xmark), 3))"			# pt2
+	 "0 __ymark c"									# pt3
+
+	 "0 __sub(__ymark, __div(__mul(4, __xmark), 3))"			# pt1
+	 "__mul(2, __xmark) __sub(__ymark, __div(__mul(4, __xmark), 3))"	# pt2
+	 "__mul(2, __xmark) __ymark c S"						# pt3
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
+}
+
+def @GraphFilledCircle
+    named symbolsize
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 0.15 ft }
+{
+  @BackEnd @Case {
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath xmark ymark xmark 0 360 arc"
+	  "gsave [] 0 setdash stroke grestore fill"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+    PDF @Yield {
+	@HContract @VContract
+#
+# draw a filled circle whose centre is at (xmark, ymark) and whose radius is xmark units;
+#
+# for curveto to work, we need to calculate the control points of the Bezier curve
+# as well as move the pen to the correct initial point. The circle is drawn as two
+# arcs of 180 degrees
+#
+#   pt0 = (xmark + xmark, ymark)
+#   pt1 = (xmark + xmark, ymark + 4/3 * xmark)
+#   pt2 = (0, ymark + 4/3 * xmark)
+#   pt3 = (0, ymark)
+#
+#   pt0 = (0, ymark)
+#   pt1 = (0, ymark - 4/3 * xmark)
+#   pt2 = (xmark + xmark, ymark - 4/3 * xmark)
+#   pt3 = (xmark + xmark, ymark)
+#
+# Note: this is not a strict translation because there is a setdash bracketed by
+#   gsave/grestore in the above PostScript but there is no closepath before it;
+#   but in PDF, it is not possible to execute a setdash within a path definition.
+#
+	{"n [] 0 d"
+	 "__mul(2, __xmark) __ymark m"
+	 "__mul(2, __xmark) __add(__ymark, __div(__mul(4, __xmark), 3))"	# pt1
+	 "0 __add(__ymark, __div(__mul(4, __xmark), 3))"			# pt2
+	 "0 __ymark c"									# pt3
+
+	 "0 __sub(__ymark, __div(__mul(4, __xmark), 3))"			# pt1
+	 "__mul(2, __xmark) __sub(__ymark, __div(__mul(4, __xmark), 3))"	# pt2
+	 "__mul(2, __xmark) __ymark c b"						# pt3
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
+}
+
+def @GraphTriangle
+    named symbolsize
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 0.15 ft }
+{
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 0 moveto xsize 0 lineto xmark ysize 1.25 mul lineto"
+	  "closepath [] 0 setdash stroke"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 0 m __xsize 0 l __xmark __mul(__ysize, 1.25) l s"}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
+}
+
+def @GraphFilledTriangle
+    named symbolsize
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 0.15 ft }
+{
+  @BackEnd @Case {
+
+    PostScript @Yield {
+	@HContract @VContract
+	{ "newpath 0 0 moveto xsize 0 lineto xmark ysize 1.25 mul lineto"
+	  "closepath gsave [] 0 setdash stroke grestore fill"
+	}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+    PDF @Yield {
+	@HContract @VContract
+	{"n [] 0 d 0 0 m __xsize 0 l __xmark __mul(__ysize, 1.25) l h b"}
+	@Graphic
+	{symbolsize @High symbolsize @Wide ^| symbolsize @Wide ^/ symbolsize @High}
+    }
+
+  }
+}
+
+def @GraphNoLine
+    named dashlength { 0.2 ft }
+    named linewidth  { "currentlinewidth" }
+    named length
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 1.0 ft }
+{
+    length @Wide {}
+}
+
+def @GraphSolid
+    named dashlength { 0.2 ft }
+    named linewidth  { "currentlinewidth" }
+    named length
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 1.0 ft }
+{
+  @BackEnd @Case {
+    PostScript @Yield {
+	@HContract @VContract
+	{ "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
+	   "/linewidth" linewidth "def xsize" dashlength "solid end"
+	} @Graphic { length @Wide }
+    }
+# VT: PDF does nothing
+    PDF @Yield {
+	@HContract @VContract
+      { "% @GraphSolid UNIMPLEMENTED" } @Graphic { length @Wide }
+    }
+  }
+}
+
+def @GraphDashed
+    named dashlength { 0.2 ft }
+    named linewidth  { "currentlinewidth" }
+    named length
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 1.0 ft }
+{
+  @BackEnd @Case {
+    PostScript @Yield {
+	@HContract @VContract
+	{ "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
+	   "/linewidth" linewidth "def xsize" dashlength "dashed end"
+	} @Graphic { length @Wide }
+    }
+# VT: PDF does nothing
+    PDF @Yield {
+	@HContract @VContract
+      { "% @GraphDashed UNIMPLEMENTED" } @Graphic { length @Wide }
+    }
+  }
+}
+
+def @GraphDotted
+    named dashlength { 0.2 ft }
+    named linewidth  { "currentlinewidth" }
+    named length
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+    { 1.0 ft }
+{
+  @BackEnd @Case {
+    PostScript @Yield {
+	@HContract @VContract
+	{ "xsize 0 lgraphdict begin newpath 0 0 moveto lineto"
+	   "/linewidth" linewidth "def xsize" dashlength "dotted end"
+	} @Graphic { length @Wide }
+    }
+# VT: PDF does nothing
+    PDF @Yield {
+	@HContract @VContract
+      { "% @GraphDotted UNIMPLEMENTED" } @Graphic { length @Wide }
+    }
+  }
+}
+
+
+export @Data
+def @Graph
+    named save         { no       }
+    named style        { frame    }
+    named width
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+		       { 6.0 cm   }
+    named height
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+		       { 4.0 cm   }
+    named xextra       { "none"   }
+    named yextra       { "none"   }
+    named xdecreasing  { no       }
+    named ydecreasing  { no       }
+    named leftcaption  {          }
+    named rightcaption {          }
+    named abovecaption {          }
+    named belowcaption {          }
+    named leftgap
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+		       { 1.5 cm   }
+    named rightgap
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+		       { 0.5 cm   }
+    named abovegap
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+		       { 0.5 cm   }
+    named belowgap
+	named cm left x { x"c" }
+	named in left x { x"i" }
+	named em left x { x"m" }
+	named pt left x { x"p" }
+	named ft left x { x"f" }
+	named sp left x { x"s" }
+	named vs left x { x"v" }
+		       { 0.5 cm   }
+    named hidecaptions { yes       }
+    named objects
+	named @NW
+	    import @GraphMath named at { 0 0 }
+	    named margin
+		named cm left x { x"c" }
+		named in left x { x"i" }
+		named em left x { x"m" }
+		named pt left x { x"p" }
+		named ft left x { x"f" }
+		named sp left x { x"s" }
+		named vs left x { x"v" }
+	    { 0.3 ft }
+	    right x
+	{ at @GraphObj adj { "xsize neg ysize" } margin { margin } x }
+	named @SW
+	    import @GraphMath named at { 0 0 }
+	    named margin
+		named cm left x { x"c" }
+		named in left x { x"i" }
+		named em left x { x"m" }
+		named pt left x { x"p" }
+		named ft left x { x"f" }
+		named sp left x { x"s" }
+		named vs left x { x"v" }
+	    { 0.3 ft }
+	    right x
+	{ at @GraphObj adj { "xsize neg 0" } margin { margin } x }
+	named @SE
+	    import @GraphMath named at { 0 0 }
+	    named margin
+		named cm left x { x"c" }
+		named in left x { x"i" }
+		named em left x { x"m" }
+		named pt left x { x"p" }
+		named ft left x { x"f" }
+		named sp left x { x"s" }
+		named vs left x { x"v" }
+	    { 0.3 ft }
+	    right x
+	{ at @GraphObj adj { "0 0" } margin { margin } x }
+	named @NE
+	    import @GraphMath named at { 0 0 }
+	    named margin
+		named cm left x { x"c" }
+		named in left x { x"i" }
+		named em left x { x"m" }
+		named pt left x { x"p" }
+		named ft left x { x"f" }
+		named sp left x { x"s" }
+		named vs left x { x"v" }
+	    { 0.3 ft }
+	    right x
+	{ at @GraphObj adj { "0 ysize" } margin { margin } x }
+	named @W
+	    import @GraphMath named at { 0 0 }
+	    named margin
+		named cm left x { x"c" }
+		named in left x { x"i" }
+		named em left x { x"m" }
+		named pt left x { x"p" }
+		named ft left x { x"f" }
+		named sp left x { x"s" }
+		named vs left x { x"v" }
+	    { 0.3 ft }
+	    right x
+	{ at @GraphObj adj { "xsize neg ysize 2 div" } margin { margin } x }
+	named @S
+	    import @GraphMath named at { 0 0 }
+	    named margin
+		named cm left x { x"c" }
+		named in left x { x"i" }
+		named em left x { x"m" }
+		named pt left x { x"p" }
+		named ft left x { x"f" }
+		named sp left x { x"s" }
+		named vs left x { x"v" }
+	    { 0.3 ft }
+	    right x
+	{ at @GraphObj adj { "xsize neg 2 div 0" } margin { margin } x }
+	named @E
+	    import @GraphMath named at { 0 0 }
+	    named margin
+		named cm left x { x"c" }
+		named in left x { x"i" }
+		named em left x { x"m" }
+		named pt left x { x"p" }
+		named ft left x { x"f" }
+		named sp left x { x"s" }
+		named vs left x { x"v" }
+	    { 0.3 ft }
+	    right x
+	{ at @GraphObj adj { "0 ysize 2 div" } margin { margin } x }
+	named @N
+	    import @GraphMath named at { 0 0 }
+	    named margin
+		named cm left x { x"c" }
+		named in left x { x"i" }
+		named em left x { x"m" }
+		named pt left x { x"p" }
+		named ft left x { x"f" }
+		named sp left x { x"s" }
+		named vs left x { x"v" }
+	    { 0.3 ft }
+	    right x
+	{ at @GraphObj adj { "xsize neg 2 div ysize" } margin { margin } x }
+	named @CTR
+	    import @GraphMath named at { 0 0 }
+	    named margin
+		named cm left x { x"c" }
+		named in left x { x"i" }
+		named em left x { x"m" }
+		named pt left x { x"p" }
+		named ft left x { x"f" }
+		named sp left x { x"s" }
+		named vs left x { x"v" }
+	    { 0.3 ft }
+	    right x
+	{ at @GraphObj adj { "xsize neg 2 div ysize 2 div" } margin {margin} x }
+		       {}
+    named xorigin  named none { "false" }           { none           }
+    named yorigin  named none { "false" }           { none           }
+    named xlog     named none { "0" }               { none           }
+    named ylog     named none { "0" }               { none           }
+    named points   named none { "none" }            { none           }
+    named pairs    named none { "none" }            { none           }
+    named colour   named none { "none" }            { none           }
+    named color    named none { "none" }            { none           }
+    named paint    named none { "none"  }           { none           }
+    named xmin     named none { "false" }           { none           }
+    named xmax     named none { "false" }           { none           }
+    named ymin     named none { "false" }           { none           }
+    named ymax     named none { "false" }           { none           }
+    named xticksep named none { "0" }               { none           }
+    named yticksep named none { "0" }               { none           }
+    named rticksep named none { "0" }               { none           }
+    import @GraphMath named xticks
+	named none                                  { "false"        }
+	named auto                                  { "false"        }
+	named "@"                                   { " lgen"        }
+	named "^"                                   { "^"            }
+		       { false    }
+    import @GraphMath named yticks
+	named none                                  { "false"        }
+	named auto                                  { "false"        }
+	named "@"                                   { " lgen"        }
+	named "^"                                   { "^"            }
+		       { false    }
+    import @GraphMath named rticks
+	named none                                  { "false"        }
+	named auto                                  { "false"        }
+	named "@"                                   { " lgen"        }
+	named "^"                                   { "^"            }
+		       { }
+    named xticklength                               { 0.5 ft   }
+    named yticklength                               { 0.5 ft   }
+    named rticklength                               { 0.5 ft   }
+    named dataformat                                { xandy    }
+    named dashlength                                { 0.2 ft   }
+    named linewidth				    { "currentlinewidth"   }
+    named symbolsize                                { 0.15 ft  }
+    body @Body
+@Begin
+
+    def @Above
+    {
+	abovecaption @Case {
+	    ""   @Yield {}
+	    else @Yield @OneCol { ||0.5rt clines @Break abovecaption || //abovegap }
+	}
+    }
+
+    def @Below
+    {
+	belowcaption @Case {
+	    ""   @Yield {}
+	    else @Yield @OneCol { //belowgap ||0.5rt clines @Break belowcaption || }
+	}
+    }
+
+    def @Left
+    {
+	leftcaption @Case {
+	    ""   @Yield {}
+	    else @Yield @OneCol @OneRow {
+		 { //0.5rt @OneRow clines @Break leftcaption // } ^||leftgap }
+	}
+    }
+
+    def @Right
+    {
+	rightcaption @Case {
+	    ""   @Yield {}
+	    else @Yield @OneCol @OneRow {
+		 ||rightgap { //0.5rt @OneRow lines @Break rightcaption // } }
+	}
+    }
+
+    def @ZeroWidth
+	right x
+    {
+	hidecaptions @Case {
+	    { No  no  } @Yield x
+	    { Yes yes } @Yield @OneCol { ||0io x ||0io }
+	}
+    }
+
+    def @AddCaptions right x
+    {
+	def belowextra
+	{
+	    xticks @Case {
+		""   @Yield { 0i }
+		else @Yield { 1.7f }
+	    }
+	}
+
+	@HContract @VContract
+	{
+	                       | @Above    |
+	    / @ZeroWidth @Left | &0.5rt x  | @ZeroWidth @Right
+	    /belowextra        | @Below    |
+	}
+    }
+
+    export pi e sqrt abs ceiling floor truncate round cos sin atan exp log rand
+	   "*" "/" idiv mod "-" "-0" "-1" "-2" "-3" "-4" "-5" "-6" "-7" "-8"
+	   "-9" "-." "+" "=" "!=" "<" "<=" ">" ">=" not and xor or
+	   if xloop yloop zloop
+
+    def @Data
+	named points   named none { "none" }            { points     }
+	named pairs    named none { "none" }            { pairs      }
+	named colour   named none { "none" }            { colour     }
+	named color    named none { "none" }            { color      }
+	named paint    named none { "none" }            { paint      }
+	named dashlength                                { dashlength }
+	named linewidth                                 { linewidth  }
+	named symbolsize                                { symbolsize }
+	named dataformat                                { dataformat }
+	body data
+    {
+	def pi                                    {     "3.14159"  }
+	def e                                     {     "2.71828"  }
+	def sqrt     precedence 40        right y {   y "sqrt"     }
+	def abs      precedence 40        right y {   y "abs"      }
+	def ceiling  precedence 40        right y {   y "ceiling"  }
+	def floor    precedence 40        right y {   y "floor"    }
+	def truncate precedence 40        right y {   y "truncate" }
+	def round    precedence 40        right y {   y "round"    }
+	def cos      precedence 40        right y {   y "cos"      }
+	def sin      precedence 40        right y {   y "sin"      }
+	def atan     precedence 39 left x right y { x y "atan"     }
+	def exp      precedence 38 left x right y { x y "exp"      }
+	def log      precedence 37 left x right y { x y "dolog"    }
+	def rand     precedence 36 left x right y { x y "dorand"   }
+	def "*"      precedence 35 left x right y { x y "mul"      }
+	def "/"      precedence 34 left x right y { x y "div"      }
+	def idiv     precedence 34 left x right y { x y "idiv"     }
+	def mod      precedence 34 left x right y { x y "mod"      }
+	def "-"      precedence 33 left x right y
+	{ x @Case { "" @Yield {y "neg"} else @Yield { x y "sub" } }  }
+	def "-0"				    {     "-0"       }
+	def "-1"				    {     "-1"       }
+	def "-2"				    {     "-2"       }
+	def "-3"				    {     "-3"       }
+	def "-4"				    {     "-4"       }
+	def "-5"				    {     "-5"       }
+	def "-6"				    {     "-6"       }
+	def "-7"				    {     "-7"       }
+	def "-8"				    {     "-8"       }
+	def "-9"				    {     "-9"       }
+	def "-."				    {     "-."       }
+	def "+"      precedence 32 left x right y
+	{ x @Case { "" @Yield { y }     else @Yield { x y "add" } }  }
+	def "="      precedence 30 left x right y { x y "eq"       }
+	def "!="     precedence 30 left x right y { x y "ne"       }
+	def "<"      precedence 30 left x right y { x y "lt"       }
+	def "<="     precedence 30 left x right y { x y "le"       }
+	def ">"      precedence 30 left x right y { x y "gt"       }
+	def ">="     precedence 30 left x right y { x y "ge"       }
+	def not      precedence 25        right y {   y "not"      }
+	def and      precedence 24 left x right y { x y "and"      }
+	def xor      precedence 23 left x right y { x y "xor"      }
+	def or       precedence 22 left x right y { x y "or"       }
+	def if
+	    named cond { true }
+	    named then {}
+	    named else {}
+	{ cond "{" then "} {" else "} ifelse" }
+	def xloop
+	    named from { 0 }
+	    named to { 0 }
+	    named by { 1 }
+	    named do named x { "xval" } {}
+	{ from by to "{ /xval exch def" do "} for" }
+	def yloop
+	    named from { 0 }
+	    named to { 0 }
+	    named by { 1 }
+	    named do named y { "yval" } {}
+	{ from by to "{ /yval exch def" do "} for" }
+	def zloop
+	    named from { 0 }
+	    named to { 0 }
+	    named by { 1 }
+	    named do named z { "zval" } {}
+	{ from by to "{ /zval exch def" do "} for" }
+
+	def @IfPt
+	   left no
+	   right yes
+	{
+	    points @Case {
+		none @Yield no
+		else @Yield yes
+	    }
+	}
+
+	def @Points
+	{
+	    points @Case {
+		none            @Yield ""
+		plus            @Yield "plus"
+		cross           @Yield "cross"
+		square          @Yield "square"
+		filledsquare    @Yield "filledsquare"
+		diamond         @Yield "diamond"
+		filleddiamond   @Yield "filleddiamond"
+		circle          @Yield "circle"
+		filledcircle    @Yield "filledcircle"
+		triangle        @Yield "triangle"
+		filledtriangle  @Yield "filledtriangle"
+	    }
+	}
+
+	def @Pairs
+	{
+	  pairs @Case {
+	    none       @Yield {}
+	    solid      @Yield { "linesetup solid"   @IfPt "ilinesetup solid"  }
+	    dashed     @Yield { "linesetup cdashed" @IfPt "ilinesetup dashed" }
+	    dotted     @Yield { "linesetup dotted"  @IfPt "ilinesetup dotted" }
+	    surfacexhisto @Yield { "surfacexhisto" }
+	    surfaceyhisto @Yield { "surfaceyhisto" }
+	    xhisto        @Yield { "xhisto" }
+	    yhisto        @Yield { "yhisto" }
+	    filledxhisto  @Yield { "filledxhisto" }
+	    filledyhisto  @Yield { "filledyhisto" }
+	  }
+	}
+
+        def @DataFormat
+        {
+	    dataformat @Case {
+	        xandy     @Yield xandy
+	        yonly     @Yield yonly
+	        xonly     @Yield xonly
+	    }
+        }
+
+	def @Col
+	{
+	    { colour @Case { "none" @Yield color else @Yield colour } } @Case {
+		none		@Yield	{                         }
+		nochange	@Yield	{                         }
+		darkblue	@Yield	{ 0.0 0.0 0.5 setrgbcolor }
+		blue		@Yield	{ 0.0 0.0 1.0 setrgbcolor }
+		lightblue	@Yield	{ 0.5 0.5 1.0 setrgbcolor }
+		darkgreen	@Yield	{ 0.0 0.5 0.0 setrgbcolor }
+		green		@Yield	{ 0.0 1.0 0.0 setrgbcolor }
+		lightgreen	@Yield	{ 0.5 1.0 0.5 setrgbcolor }
+		darkred		@Yield	{ 0.5 0.0 0.0 setrgbcolor }
+		red		@Yield	{ 1.0 0.0 0.0 setrgbcolor }
+		lightred	@Yield	{ 1.0 0.5 0.5 setrgbcolor }
+		darkcyan	@Yield	{ 0.0 0.5 0.5 setrgbcolor }
+		cyan		@Yield	{ 0.0 1.0 1.0 setrgbcolor }
+		lightcyan	@Yield	{ 0.5 1.0 1.0 setrgbcolor }
+		darkmagenta	@Yield	{ 0.5 0.0 0.5 setrgbcolor }
+		magenta		@Yield	{ 1.0 0.0 1.0 setrgbcolor }
+		lightmagenta	@Yield	{ 1.0 0.5 1.0 setrgbcolor }
+		darkyellow	@Yield	{ 0.5 0.5 0.0 setrgbcolor }
+		yellow		@Yield	{ 1.0 1.0 0.0 setrgbcolor }
+		lightyellow	@Yield	{ 1.0 1.0 0.5 setrgbcolor }
+		darkgray	@Yield	{ 0.2 0.2 0.2 setrgbcolor }
+		gray		@Yield	{ 0.5 0.5 0.5 setrgbcolor }
+		lightgray	@Yield	{ 0.7 0.7 0.7 setrgbcolor }
+		darkgrey	@Yield	{ 0.2 0.2 0.2 setrgbcolor }
+		grey		@Yield	{ 0.5 0.5 0.5 setrgbcolor }
+		lightgrey	@Yield	{ 0.7 0.7 0.7 setrgbcolor }
+		black		@Yield	{ 0.0 0.0 0.0 setrgbcolor }
+		white		@Yield	{ 1.0 1.0 1.0 setrgbcolor }
+	    }
+	}
+
+	def @Paint
+	{
+	    paint @Case {
+	       { none no No } @Yield "false"
+	       { yes Yes } @Yield "true"
+	    }
+	}
+
+       "[ [" data "]" dataformat
+	  "{" @Points "}"
+	  "{" @Pairs "}"
+	  "{ /dashlength" dashlength "def"
+	  "  /linewidth"  linewidth  "def" @Col
+	  "  /symbolsize" symbolsize "def }"
+	  "{" @Paint "}"
+       "]"
+    }
+
+    def @Style
+    {
+	style @Case {
+	    frame    @Yield { "framestyle" }
+	    none     @Yield { "nonestyle"  }
+	    axes     @Yield { "axesstyle"  }
+	}
+    }
+
+    def @XExtra
+    {
+	xextra @Case {
+	    "none" @Yield {
+		style @Case {
+	            frame    @Yield { "0.5 cm" }
+	            none     @Yield { "0"  }
+	            axes     @Yield { "0"  }
+		}
+	    }
+	    else @Yield xextra
+	}
+    }
+
+    def @YExtra
+    {
+	yextra @Case {
+	    "none" @Yield {
+		style @Case {
+	            frame @Yield { "0.5 cm" }
+	            none  @Yield { "0"  }
+	            axes  @Yield { "0"  }
+		}
+	    }
+	    else @Yield yextra
+	}
+    }
+
+    def @XDecreasing
+    {
+	xdecreasing @Case {
+	    { No no } @Yield "false"
+	    { Yes yes } @Yield "true"
+	}
+    }
+
+    def @YDecreasing
+    {
+	ydecreasing @Case {
+	    { No no } @Yield "false"
+	    { Yes yes } @Yield "true"
+	}
+    }
+
+    @AddCaptions width @Wide height @High
+    @BackEnd @Case {
+	PostScript @Yield {
+	    {
+		"grestore"
+		save @Case { { Yes yes } @Yield "save" else @Yield {} }
+		"gsave xsize ysize lgraphdict begin /ysize exch def /xsize exch def"
+		"/alldata [" @Body "] def"
+		xticksep "[" xticks "] 0 alldata" xmin xmax xlog
+		  @XExtra @XDecreasing xorigin xticklength "xset"
+		yticksep "[" yticks "] 1 alldata" ymin ymax ylog
+		  @YExtra @YDecreasing yorigin yticklength "yset"
+
+		rticks @Case {
+
+		  ""   @Yield "norset"
+
+		  else @Yield {
+		    rticksep "[" rticks "] 1 alldata" ymin ymax ylog
+		    @YExtra @YDecreasing yorigin rticklength "rset"
+		  }
+		}
+
+		"rundata" @Style // "end"
+		save @Case { { Yes yes } @Yield "restore" else @Yield {} }
+	    } @Graphic { //1rt objects }
+	}
+	PDF @Yield { {"% @Graph UNIMPLEMENTED"} @Graphic { //1rt objects } }
+    }
+
+@End @Graph                  

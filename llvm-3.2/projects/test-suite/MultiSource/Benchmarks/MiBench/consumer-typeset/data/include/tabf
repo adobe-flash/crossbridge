@@ -1,0 +1,936 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @Tab package for formatting tables (Version 2.0)                      #
+#                                                                             #
+#  Version 1.0 by Jeffrey H. Kingston, September 1991.                        #
+#  Version 2.0 by Jeffrey H. Kingston, 22 December 1992.                      #
+#  Version 3.0 by Jeffrey H. Kingston, 13 September 1993.                     #
+#                                                                             #
+#  The only change between Versions 2 and 3 is to make the linewidth          #
+#  option accept a Lout length rather than a Fig length.  See the User's      #
+#  Guide for user information.                                                #
+#                                                                             #
+###############################################################################
+
+@SysPrependGraphic { "tabf.lpg" }
+
+export	@CC @RR @Rule @DoubleRule @Line @DoubleLine @NP
+	@Rowa @Rowb @Rowc @Rowd @Rowe @Rowf @Rowg @Rowh @Rowi @Rowj
+	@MarkRowa @MarkRowb @MarkRowc @MarkRowd @MarkRowe @MarkRowf 
+	@MarkRowg @MarkRowh @MarkRowi @MarkRowj 
+	@FirstRowa @FirstRowb @FirstRowc @FirstRowd @FirstRowe @FirstRowf 
+	@FirstRowg @FirstRowh @FirstRowi @FirstRowj 
+
+def @Tab                 
+
+    named above     { no      }
+    named below     { no      }
+    named between   { no      }
+    named side      { no      }
+    named hmargin   { 0.3c    }
+    named vmargin	{
+    	@BackEnd @Case {
+    		PostScript @Yield 0.2v
+    		PDF @Yield 0.2v		# VT: PDF case added
+    		PlainText @Yield 0.5v
+    	}
+    }
+
+    named linewidth
+		named c left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" cm" }
+		    	PDF        @Yield { "__mul(__cm, "x")" }
+		    }
+		}
+		named i left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" in" }
+		    	PDF        @Yield { "__mul(__in, "x")" }
+		    }
+		}
+		named e left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" em" }
+		    	PDF        @Yield { "__mul(__em, "x")" }
+		    }
+		}
+		named p left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" pt" }
+		    	PDF        @Yield { "__mul(__pt, "x")" }
+		    }
+		}
+		named f left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" ft" }
+		    	PDF        @Yield { "__mul(__loutf, "x")" }
+		    }
+		}
+		named s left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" sp" }
+		    	PDF        @Yield { "__mul(__louts, "x")" }
+		    }
+		}
+		named v left x {
+		    @BackEnd @Case {
+		    	PostScript @Yield { x" vs" }
+		    	PDF        @Yield { "__mul(__loutv, "x")" }
+		    }
+		}
+		    { 0.5p    }
+
+    named @Fmta
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named "!"     precedence 10 left x named between { dft } right y {}
+	named "!!"    precedence 10 left x right y {}
+	named "!!!"   precedence 10 left x right y {}
+	named "@Over" precedence 11 left x right y { x // y }
+	named ","     precedence 12 left x right y {}
+	named @Col    precedence 12        right x {}
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
+    {}
+
+    named @Fmtb
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named "!"     precedence 10 left x named between { dft } right y {}
+	named "!!"    precedence 10 left x right y {}
+	named "!!!"   precedence 10 left x right y {}
+	named "@Over" precedence 11 left x right y { x // y }
+	named ","     precedence 12 left x right y {}
+	named @Col    precedence 12        right x {}
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
+    {}
+
+    named @Fmtc
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named "!"     precedence 10 left x named between { dft } right y {}
+	named "!!"    precedence 10 left x right y {}
+	named "!!!"   precedence 10 left x right y {}
+	named "@Over" precedence 11 left x right y { x // y }
+	named ","     precedence 12 left x right y {}
+	named @Col    precedence 12        right x {}
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
+    {}
+
+    named @Fmtd
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named "!"     precedence 10 left x named between { dft } right y {}
+	named "!!"    precedence 10 left x right y {}
+	named "!!!"   precedence 10 left x right y {}
+	named "@Over" precedence 11 left x right y { x // y }
+	named ","     precedence 12 left x right y {}
+	named @Col    precedence 12        right x {}
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
+    {}
+
+    named @Fmte
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named "!"     precedence 10 left x named between { dft } right y {}
+	named "!!"    precedence 10 left x right y {}
+	named "!!!"   precedence 10 left x right y {}
+	named "@Over" precedence 11 left x right y { x // y }
+	named ","     precedence 12 left x right y {}
+	named @Col    precedence 12        right x {}
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
+    {}
+
+    named @Fmtf
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named "!"     precedence 10 left x named between { dft } right y {}
+	named "!!"    precedence 10 left x right y {}
+	named "!!!"   precedence 10 left x right y {}
+	named "@Over" precedence 11 left x right y { x // y }
+	named ","     precedence 12 left x right y {}
+	named @Col    precedence 12        right x {}
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
+    {}
+
+    named @Fmtg
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named "!"     precedence 10 left x named between { dft } right y {}
+	named "!!"    precedence 10 left x right y {}
+	named "!!!"   precedence 10 left x right y {}
+	named "@Over" precedence 11 left x right y { x // y }
+	named ","     precedence 12 left x right y {}
+	named @Col    precedence 12        right x {}
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
+    {}
+
+    named @Fmth
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named "!"     precedence 10 left x named between { dft } right y {}
+	named "!!"    precedence 10 left x right y {}
+	named "!!!"   precedence 10 left x right y {}
+	named "@Over" precedence 11 left x right y { x // y }
+	named ","     precedence 12 left x right y {}
+	named @Col    precedence 12        right x {}
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
+    {}
+
+    named @Fmti
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named "!"     precedence 10 left x named between { dft } right y {}
+	named "!!"    precedence 10 left x right y {}
+	named "!!!"   precedence 10 left x right y {}
+	named "@Over" precedence 11 left x right y { x // y }
+	named ","     precedence 12 left x right y {}
+	named @Col    precedence 12        right x {}
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
+    {}
+
+    named @Fmtj
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named "!"     precedence 10 left x named between { dft } right y {}
+	named "!!"    precedence 10 left x right y {}
+	named "!!!"   precedence 10 left x right y {}
+	named "@Over" precedence 11 left x right y { x // y }
+	named ","     precedence 12 left x right y {}
+	named @Col    precedence 12        right x {}
+	named @CC     right x { clines @Break { & x & } }
+	named @RR     right x { rlines @Break { & x & } }
+    {}
+
+    body @Body
+
+@Begin
+
+    macro @NP { /1.1b }
+
+    def @CC right x { clines @Break { & x & } }
+    def @RR right x { rlines @Break { & x & } }
+#
+#	VT: these definitions have been modified for PDF support
+#
+    def @HSingle	{
+	@BackEnd @Case {
+	  PostScript @Yield { linewidth ltabhs   }
+	  PDF        @Yield { "0 0 m __xsize 0 l" linewidth "w 0 J S" }
+    	}
+    }
+
+    def @HSingleProject	{
+	@BackEnd @Case {
+	  PostScript @Yield { linewidth ltabhsp  }
+	  PDF        @Yield { "0 0 m __xsize 0 l" linewidth "w 2 J S" }
+    	}
+    }
+
+    def @HDouble	{
+	@BackEnd @Case {
+	  PostScript @Yield { linewidth ltabhd   }
+	  PDF        @Yield {		#   dup dup
+	  	"0 0 m __xsize 0 l"	#   0 0 moveto xsize 0 lineto
+	  	"0 __mul(3, " linewidth ") m __xsize __mul(3, " linewidth ") l"	#  0 exch 3 mul moveto xsize exch 3 mul lineto
+	  	linewidth "w 0 J S"	#   setlinewidth 0 setlinecap stroke
+	  }
+    	}
+    }
+
+    def @HDoubleBelow	{
+	@BackEnd @Case {
+	  PostScript @Yield { linewidth ltabhdb  }
+	  PDF        @Yield {		#   dup dup
+		"0 0 m __xsize 0 l"	#   0 0 moveto xsize 0 lineto
+		"0 __mul(-3, "linewidth") m __xsize __mul(-3, "linewidth") l"	#  0 exch -3 mul moveto xsize exch -3 mul lineto
+		linewidth "w 0 J S"	#   setlinewidth 0 setlinecap stroke
+	  }
+    	}
+    }
+
+    def @HDoubleNW	{
+	@BackEnd @Case {
+	  PostScript @Yield { linewidth ltabhdnw  }
+	  PDF        @Yield {		#   dup dup dup dup
+		"0 0 m __xsize 0 l"	#   0 0 moveto xsize 0 lineto
+		"__xsize __mul(3, "linewidth") m"	#	xsize exch 3 mul moveto
+		"__mul(-3, "linewidth") __mul(3, "linewidth") l"	#	-3 mul exch 3 mul lineto
+		"__mul(-3, "linewidth") 0 l"	#	-3 mul 0 lineto
+		linewidth "w 0 j 2 J S"	#   setlinewidth 0 setlinejoin 2 setlinecap stroke
+	  }
+    	}
+    }
+
+    def @HDoubleNE	{
+	@BackEnd @Case {
+	  PostScript @Yield { linewidth ltabhdne  }
+	  PDF        @Yield {		#   dup dup dup dup
+		"0 0 m __xsize 0 l"	#   0 0 moveto xsize 0 lineto
+		"0 __mul(3, "linewidth") m"	#	0 exch 3 mul moveto
+		"__add(__xsize, __mul(3, "linewidth")) __mul(3, "linewidth") l"	#	3 mul xsize add exch 3 mul lineto
+		"__add(__xsize, __mul(3, "linewidth")) 0 l"	#	3 mul xsize add 0 lineto
+		linewidth "w 0 j 2 J S"	#   setlinewidth 0 setlinejoin 2 setlinecap stroke
+	  }
+    	}
+    }
+
+    def @HDoubleSW	{
+	@BackEnd @Case {
+	  PostScript @Yield { linewidth ltabhdsw  }
+	  PDF        @Yield {		#   dup dup dup dup
+		"0 0 m __xsize 0 l"	#	0 0 moveto xsize 0 lineto
+		"__xsize __mul(-3, "linewidth") m"	#	xsize exch -3 mul moveto
+		"__mul(-3, "linewidth") __mul(-3, "linewidth") l"	#	-3 mul exch -3 mul lineto
+		"__mul(-3, "linewidth") 0 l"	#	-3 mul 0 lineto
+		linewidth "w 0 j 2 J S"	#   setlinewidth 0 setlinejoin 2 setlinecap stroke
+	  }
+    	}
+    }
+
+    def @HDoubleSE	{
+	@BackEnd @Case {
+	  PostScript @Yield { linewidth ltabhdse  }
+	  PDF        @Yield {		#   dup dup dup dup
+		"0 0 m __xsize 0 l"	#	0 0 moveto xsize 0 lineto
+		"0 __mul(-3, "linewidth") m"	#	0 exch -3 mul moveto
+		"__add(__xsize, __mul(-3, "linewidth")) __mul(-3, "linewidth") l"	#	3 mul xsize add exch -3 mul lineto
+		"__add(__xsize, __mul( 3, "linewidth")) 0 l"	#	3 mul xsize add 0 lineto
+		linewidth "w 0 j 2 J S"	#   setlinewidth 0 setlinejoin 2 setlinecap stroke
+	  }
+    	}
+    }
+
+    def @VSingle	{
+	@BackEnd @Case {
+	  PostScript @Yield { linewidth ltabvs  }
+	  PDF        @Yield {
+		"0 0 m 0 __ysize l"	#	0 0 moveto 0 ysize lineto
+		linewidth "w 0 J S"	#	setlinewidth 0 setlinecap stroke
+	  }
+    	}
+    }
+
+    def @VDouble	{
+	@BackEnd @Case {
+	  PostScript @Yield { linewidth ltabvd  }
+	  PDF        @Yield {	#	dup dup
+		"0 0 m 0 __ysize l"	#	0 0 moveto 0 ysize lineto
+		"__mul(-3, "linewidth") 0 m __mul(-3, "linewidth") __ysize l"	#	-3 mul 0 moveto -3 mul ysize lineto
+		linewidth "w 0 J S"	#	setlinewidth 0 setlinecap stroke
+	  }
+    	}
+    }
+
+    def @VDoubleRight	{
+	@BackEnd @Case {
+	  PostScript @Yield { linewidth ltabvdr  }
+	  PDF        @Yield {	#	dup dup
+		"0 0 m 0 __ysize l"	#	0 0 moveto 0 ysize lineto
+		"__mul(3, "linewidth") 0 m __mul(3, "linewidth") __ysize l"		#	3 mul 0 moveto 3 mul ysize lineto
+		linewidth "w 0 J S"	#	setlinewidth 0 setlinecap stroke
+	  }
+    	}
+    }
+
+    def @MidHRule
+	left rule
+	right x
+    {
+	rule @Case
+	{
+	    no				@Yield { @OneCol x }
+	    { yes single }		@Yield { @HSingle @Graphic x }
+	    { double doubleboxabove }	@Yield { @HDouble @Graphic x }
+	    doubleboxbelow		@Yield { @HDoubleBelow @Graphic x }
+	}
+    }
+
+    def @LeftHRule
+	left rule
+	right x
+    {
+	rule @Case
+	{
+	    no			@Yield { @OneCol x }
+	    { yes single }	@Yield { @HSingleProject @Graphic x }
+	    double		@Yield { @HDouble @Graphic x }
+	    doubleboxabove	@Yield { @HDoubleNW @Graphic x }
+	    doubleboxbelow	@Yield { @HDoubleSW @Graphic x }
+	}
+    }
+
+    def @RightHRule
+	left rule
+	right x
+    {
+	rule @Case
+	{
+	    no			@Yield { @OneCol x }
+	    { yes single }	@Yield { @HSingleProject @Graphic x }
+	    double		@Yield { @HDouble @Graphic x }
+	    doubleboxabove	@Yield { @HDoubleNE @Graphic x }
+	    doubleboxbelow	@Yield { @HDoubleSE @Graphic x }
+	}
+    }
+
+    def @HSRule
+	left rule
+    {
+	rule @Case
+	{
+	    no		   @Yield {}
+	    { yes single } @Yield { @HSingle @Graphic {} }
+	    double	   @Yield { @HDouble @Graphic {} }
+	    doubleboxabove @Yield { @HDouble @Graphic {} }
+	    doubleboxbelow @Yield { @HDoubleBelow @Graphic {} }
+	}
+    }
+
+    def @ZeroWidth
+	right x
+    { @OneCol { |0io x |0io }
+    }
+
+    def @Line
+    { single @HSRule
+    }
+
+    def @DoubleLine
+    { double @HSRule
+    }
+
+    def @Rule
+    {
+	@OneRow
+	{
+	    @ZeroWidth @HSingle @Graphic { ^|hmargin }
+	    / @Line /
+	    &1rt @ZeroWidth @HSingle @Graphic { |hmargin }
+	}
+    }
+
+    def @DoubleRule
+    {
+	@OneRow
+	{
+	    @ZeroWidth @HDouble @Graphic { ^|hmargin }
+	    / @DoubleLine /
+	    &1rt @ZeroWidth @HDouble @Graphic { |hmargin }
+	}
+    }
+
+    def @VRule
+	left rule
+	right x
+    {
+	rule @Case
+	{
+	    no		   @Yield {}
+	    { yes single } @Yield @OneRow { /0io @VSingle @Graphic x /0io }
+	    double	   @Yield @OneRow { /0io @VDouble @Graphic x /0io }
+	}
+    }
+
+    def @VRuleRight
+	left rule
+	right x
+    {
+	rule @Case
+	{
+	    no		 @Yield {}
+	    {yes single} @Yield @OneRow { /0io @VSingle @Graphic x /0io }
+	    double	 @Yield @OneRow { /0io @VDoubleRight @Graphic x /0io }
+	}
+    }
+
+    def @VSRule
+	left rule
+    {
+	rule @Case
+	{
+	    no		   @Yield {}
+	    { yes single } @Yield { @VSingle @Graphic {} }
+	    double	   @Yield { @VDouble @Graphic {} }
+	}
+    }
+
+    def @VSRuleRight
+	left rule
+    {
+	rule @Case
+	{
+	    no		 @Yield {}
+	    {yes single} @Yield { @VSingle @Graphic {} }
+	    double	 @Yield { @VDoubleRight @Graphic {} }
+	}
+    }
+
+    def @Wrap
+	named ur { no }			# Rule up above entry
+	named dr { no }			# Rule down below entry
+	named vm { vmargin }		# Vertical margin
+	right x				# The object to be wrapped
+    {
+	      ur @HSRule
+	^/vm  @OneCol @OneRow x
+	 /vm  dr @HSRule
+    }
+
+    def @Sep
+	left x
+	named ur { no }			# Rule up above entry
+	named dr { no }			# Rule down below entry
+	named sr { no }			# Rule separating x from y
+	named hm { hmargin }		# Horizontal margin
+	named vm { vmargin }		# Vertical margin
+	right y
+    {
+	def vr
+	{
+	    sr @Case
+	    {	dft	@Yield between 
+		else	@Yield sr
+	    }
+	}
+
+	x | @OneCol
+	{      ur @MidHRule {|hm}
+	  /vm
+	  /vm  dr @MidHRule {|hm}
+	}
+	| @OneCol
+	{      vr @VRule { /vm }  |  ur @MidHRule {|hm}
+	  /vm  vr @VSRule         |
+	  /vm  vr @VRule {^/vm }  |  dr @MidHRule {|hm}
+	}
+	| y
+    }
+
+    def @NSep
+	left x
+	named hm { hmargin }
+	right y
+    {
+	x | @OneCol { |hm } | @OneCol { |hm } | y
+    }
+
+    def @LeftEdge
+	named ur { no }			# Rule up above entry
+	named dr { no }			# Rule down below entry
+	named sr { no }			# Rule separating x from y
+	named hm { hmargin }		# Horizontal margin
+	named vm { vmargin }		# Vertical margin
+	right x
+    {
+	sr @Case
+	{
+	    no @Yield { x }
+	    else @Yield
+	    { @OneCol
+	      {
+		      sr @VRule { /vm }	 |  ur @LeftHRule { |hm }
+	         ^/vm sr @VSRule	 |
+		  /vm sr @VRule { ^/vm } |  dr @LeftHRule { |hm }
+	      }
+	      | x
+	    }
+	}
+    }
+
+    def @RightEdge
+	left x
+	named ur { no }			# Rule up above entry
+	named dr { no }			# Rule down below entry
+	named sr { no }			# Rule separating x from y
+	named hm { hmargin }		# Horizontal margin
+	named vm { vmargin }		# Vertical margin
+    {
+	sr @Case
+	{
+	    no @Yield { x }
+	    else @Yield
+	    {
+	      x | @OneCol
+	      {
+		    ur @RightHRule { |hm }
+		/vm
+		/vm dr @RightHRule { |hm }
+	      }
+	      | @OneCol
+	      {
+		     sr @VRuleRight { /vm }
+		/vm  sr @VSRuleRight
+		/vm  sr @VRuleRight { ^/vm }
+	      }
+	    }
+	}
+    }
+
+    def @DoRowa
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named above	{ above   }
+	named below	{ below   }
+	named side 	{ side    }
+	named vmargin   { vmargin }
+    {
+	@LeftEdge ur { above } dr { below } sr { side } vm { vmargin }
+	@Fmta
+	  A { A }  B { B }  C { C }  D { D }  E { E }
+	  F { F }  G { G }  H { H }  I { I }  J { J }
+	  K { K }  L { L }  M { M }  N { N }  O { O }
+	  P { P }  Q { Q }  R { R }  S { S }  T { T }
+	  U { U }  V { V }  W { W }  X { X }  Y { Y }
+	  Z { Z }
+	  @Col { @Wrap ur {above} dr {below} vm {vmargin} x}
+	  !    { x @Sep ur {above} dr {below} sr { between } vm {vmargin} y}
+	  !!   { x @Sep ur {above} dr {below} sr { single  } vm {vmargin} y}
+	  !!!  { x @Sep ur {above} dr {below} sr { double  } vm {vmargin} y}
+	  ,    { x @NSep y }
+	@RightEdge ur { above } dr { below } sr { side } vm { vmargin }
+    }
+
+    def @DoRowb
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named above	{ above   }
+	named below	{ below   }
+	named side 	{ side    }
+	named vmargin   { vmargin }
+    {
+	@LeftEdge ur { above } dr { below } sr { side } vm { vmargin }
+	@Fmtb
+	  A { A }  B { B }  C { C }  D { D }  E { E }
+	  F { F }  G { G }  H { H }  I { I }  J { J }
+	  K { K }  L { L }  M { M }  N { N }  O { O }
+	  P { P }  Q { Q }  R { R }  S { S }  T { T }
+	  U { U }  V { V }  W { W }  X { X }  Y { Y }
+	  Z { Z }
+	  @Col { @Wrap ur {above} dr {below} vm {vmargin} x}
+	  !    { x @Sep ur {above} dr {below} sr { between } vm {vmargin} y}
+	  !!   { x @Sep ur {above} dr {below} sr { single  } vm {vmargin} y}
+	  !!!  { x @Sep ur {above} dr {below} sr { double  } vm {vmargin} y}
+	  ,    { x @NSep y }
+	@RightEdge ur { above } dr { below } sr { side } vm { vmargin }
+    }
+
+    def @DoRowc
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named above	{ above   }
+	named below	{ below   }
+	named side 	{ side    }
+	named vmargin   { vmargin }
+    {
+	@LeftEdge ur { above } dr { below } sr { side } vm { vmargin }
+	@Fmtc
+	  A { A }  B { B }  C { C }  D { D }  E { E }
+	  F { F }  G { G }  H { H }  I { I }  J { J }
+	  K { K }  L { L }  M { M }  N { N }  O { O }
+	  P { P }  Q { Q }  R { R }  S { S }  T { T }
+	  U { U }  V { V }  W { W }  X { X }  Y { Y }
+	  Z { Z }
+	  @Col { @Wrap ur {above} dr {below} vm {vmargin} x}
+	  !    { x @Sep ur {above} dr {below} sr { between } vm {vmargin} y}
+	  !!   { x @Sep ur {above} dr {below} sr { single  } vm {vmargin} y}
+	  !!!  { x @Sep ur {above} dr {below} sr { double  } vm {vmargin} y}
+	  ,    { x @NSep y }
+	@RightEdge ur { above } dr { below } sr { side } vm { vmargin }
+    }
+
+    def @DoRowd
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named above	{ above   }
+	named below	{ below   }
+	named side 	{ side    }
+	named vmargin   { vmargin }
+    {
+	@LeftEdge ur { above } dr { below } sr { side } vm { vmargin }
+	@Fmtd
+	  A { A }  B { B }  C { C }  D { D }  E { E }
+	  F { F }  G { G }  H { H }  I { I }  J { J }
+	  K { K }  L { L }  M { M }  N { N }  O { O }
+	  P { P }  Q { Q }  R { R }  S { S }  T { T }
+	  U { U }  V { V }  W { W }  X { X }  Y { Y }
+	  Z { Z }
+	  @Col { @Wrap ur {above} dr {below} vm {vmargin} x}
+	  !    { x @Sep ur {above} dr {below} sr { between } vm {vmargin} y}
+	  !!   { x @Sep ur {above} dr {below} sr { single  } vm {vmargin} y}
+	  !!!  { x @Sep ur {above} dr {below} sr { double  } vm {vmargin} y}
+	  ,    { x @NSep y }
+	@RightEdge ur { above } dr { below } sr { side } vm { vmargin }
+    }
+
+    def @DoRowe
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named above	{ above   }
+	named below	{ below   }
+	named side 	{ side    }
+	named vmargin   { vmargin }
+    {
+	@LeftEdge ur { above } dr { below } sr { side } vm { vmargin }
+	@Fmte
+	  A { A }  B { B }  C { C }  D { D }  E { E }
+	  F { F }  G { G }  H { H }  I { I }  J { J }
+	  K { K }  L { L }  M { M }  N { N }  O { O }
+	  P { P }  Q { Q }  R { R }  S { S }  T { T }
+	  U { U }  V { V }  W { W }  X { X }  Y { Y }
+	  Z { Z }
+	  @Col { @Wrap ur {above} dr {below} vm {vmargin} x}
+	  !    { x @Sep ur {above} dr {below} sr { between } vm {vmargin} y}
+	  !!   { x @Sep ur {above} dr {below} sr { single  } vm {vmargin} y}
+	  !!!  { x @Sep ur {above} dr {below} sr { double  } vm {vmargin} y}
+	  ,    { x @NSep y }
+	@RightEdge ur { above } dr { below } sr { side } vm { vmargin }
+    }
+
+    def @DoRowf
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named above	{ above   }
+	named below	{ below   }
+	named side 	{ side    }
+	named vmargin   { vmargin }
+    {
+	@LeftEdge ur { above } dr { below } sr { side } vm { vmargin }
+	@Fmtf
+	  A { A }  B { B }  C { C }  D { D }  E { E }
+	  F { F }  G { G }  H { H }  I { I }  J { J }
+	  K { K }  L { L }  M { M }  N { N }  O { O }
+	  P { P }  Q { Q }  R { R }  S { S }  T { T }
+	  U { U }  V { V }  W { W }  X { X }  Y { Y }
+	  Z { Z }
+	  @Col { @Wrap ur {above} dr {below} vm {vmargin} x}
+	  !    { x @Sep ur {above} dr {below} sr { between } vm {vmargin} y}
+	  !!   { x @Sep ur {above} dr {below} sr { single  } vm {vmargin} y}
+	  !!!  { x @Sep ur {above} dr {below} sr { double  } vm {vmargin} y}
+	  ,    { x @NSep y }
+	@RightEdge ur { above } dr { below } sr { side } vm { vmargin }
+    }
+
+    def @DoRowg
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named above	{ above   }
+	named below	{ below   }
+	named side 	{ side    }
+	named vmargin   { vmargin }
+    {
+	@LeftEdge ur { above } dr { below } sr { side } vm { vmargin }
+	@Fmtg
+	  A { A }  B { B }  C { C }  D { D }  E { E }
+	  F { F }  G { G }  H { H }  I { I }  J { J }
+	  K { K }  L { L }  M { M }  N { N }  O { O }
+	  P { P }  Q { Q }  R { R }  S { S }  T { T }
+	  U { U }  V { V }  W { W }  X { X }  Y { Y }
+	  Z { Z }
+	  @Col { @Wrap ur {above} dr {below} vm {vmargin} x}
+	  !    { x @Sep ur {above} dr {below} sr { between } vm {vmargin} y}
+	  !!   { x @Sep ur {above} dr {below} sr { single  } vm {vmargin} y}
+	  !!!  { x @Sep ur {above} dr {below} sr { double  } vm {vmargin} y}
+	  ,    { x @NSep y }
+	@RightEdge ur { above } dr { below } sr { side } vm { vmargin }
+    }
+
+    def @DoRowh
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named above	{ above   }
+	named below	{ below   }
+	named side 	{ side    }
+	named vmargin   { vmargin }
+    {
+	@LeftEdge ur { above } dr { below } sr { side } vm { vmargin }
+	@Fmth
+	  A { A }  B { B }  C { C }  D { D }  E { E }
+	  F { F }  G { G }  H { H }  I { I }  J { J }
+	  K { K }  L { L }  M { M }  N { N }  O { O }
+	  P { P }  Q { Q }  R { R }  S { S }  T { T }
+	  U { U }  V { V }  W { W }  X { X }  Y { Y }
+	  Z { Z }
+	  @Col { @Wrap ur {above} dr {below} vm {vmargin} x}
+	  !    { x @Sep ur {above} dr {below} sr { between } vm {vmargin} y}
+	  !!   { x @Sep ur {above} dr {below} sr { single  } vm {vmargin} y}
+	  !!!  { x @Sep ur {above} dr {below} sr { double  } vm {vmargin} y}
+	  ,    { x @NSep y }
+	@RightEdge ur { above } dr { below } sr { side } vm { vmargin }
+    }
+
+    def @DoRowi
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named above	{ above   }
+	named below	{ below   }
+	named side 	{ side    }
+	named vmargin   { vmargin }
+    {
+	@LeftEdge ur { above } dr { below } sr { side } vm { vmargin }
+	@Fmti
+	  A { A }  B { B }  C { C }  D { D }  E { E }
+	  F { F }  G { G }  H { H }  I { I }  J { J }
+	  K { K }  L { L }  M { M }  N { N }  O { O }
+	  P { P }  Q { Q }  R { R }  S { S }  T { T }
+	  U { U }  V { V }  W { W }  X { X }  Y { Y }
+	  Z { Z }
+	  @Col { @Wrap ur {above} dr {below} vm {vmargin} x}
+	  !    { x @Sep ur {above} dr {below} sr { between } vm {vmargin} y}
+	  !!   { x @Sep ur {above} dr {below} sr { single  } vm {vmargin} y}
+	  !!!  { x @Sep ur {above} dr {below} sr { double  } vm {vmargin} y}
+	  ,    { x @NSep y }
+	@RightEdge ur { above } dr { below } sr { side } vm { vmargin }
+    }
+
+    def @DoRowj
+	named A {} named B {} named C {} named D {} named E {}
+	named F {} named G {} named H {} named I {} named J {}
+	named K {} named L {} named M {} named N {} named O {}
+	named P {} named Q {} named R {} named S {} named T {}
+	named U {} named V {} named W {} named X {} named Y {}
+	named Z {}
+	named above	{ above   }
+	named below	{ below   }
+	named side 	{ side    }
+	named vmargin   { vmargin }
+    {
+	@LeftEdge ur { above } dr { below } sr { side } vm { vmargin }
+	@Fmtj
+	  A { A }  B { B }  C { C }  D { D }  E { E }
+	  F { F }  G { G }  H { H }  I { I }  J { J }
+	  K { K }  L { L }  M { M }  N { N }  O { O }
+	  P { P }  Q { Q }  R { R }  S { S }  T { T }
+	  U { U }  V { V }  W { W }  X { X }  Y { Y }
+	  Z { Z }
+	  @Col { @Wrap ur {above} dr {below} vm {vmargin} x}
+	  !    { x @Sep ur {above} dr {below} sr { between } vm {vmargin} y}
+	  !!   { x @Sep ur {above} dr {below} sr { single  } vm {vmargin} y}
+	  !!!  { x @Sep ur {above} dr {below} sr { double  } vm {vmargin} y}
+	  ,    { x @NSep y }
+	@RightEdge ur { above } dr { below } sr { side } vm { vmargin }
+    }
+
+    macro @Rowa { / @DoRowa }
+    macro @Rowb { / @DoRowb }
+    macro @Rowc { / @DoRowc }
+    macro @Rowd { / @DoRowd }
+    macro @Rowe { / @DoRowe }
+    macro @Rowf { / @DoRowf }
+    macro @Rowg { / @DoRowg }
+    macro @Rowh { / @DoRowh }
+    macro @Rowi { / @DoRowi }
+    macro @Rowj { / @DoRowj }
+
+    macro @FirstRowa { @DoRowa }
+    macro @FirstRowb { @DoRowb }
+    macro @FirstRowc { @DoRowc }
+    macro @FirstRowd { @DoRowd }
+    macro @FirstRowe { @DoRowe }
+    macro @FirstRowf { @DoRowf }
+    macro @FirstRowg { @DoRowg }
+    macro @FirstRowh { @DoRowh }
+    macro @FirstRowi { @DoRowi }
+    macro @FirstRowj { @DoRowj }
+
+    macro @MarkRowa { ^/ @DoRowa }
+    macro @MarkRowb { ^/ @DoRowb }
+    macro @MarkRowc { ^/ @DoRowc }
+    macro @MarkRowd { ^/ @DoRowd }
+    macro @MarkRowe { ^/ @DoRowe }
+    macro @MarkRowf { ^/ @DoRowf }
+    macro @MarkRowg { ^/ @DoRowg }
+    macro @MarkRowh { ^/ @DoRowh }
+    macro @MarkRowi { ^/ @DoRowi }
+    macro @MarkRowj { ^/ @DoRowj }
+
+
+    @Body
+
+@End @Tab

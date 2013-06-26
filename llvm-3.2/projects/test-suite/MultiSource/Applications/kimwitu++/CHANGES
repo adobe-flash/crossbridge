@@ -1,0 +1,129 @@
+This is the list of user-visible changes in kimwitu++. Please see
+src/ChangeLog for a more detailed list.
+
+* Changes in kimwitu++ 2.3.7
+** new option --operator-cast to have an operator_cast<>() just like
+   phylum_cast<>() or dynamic_cast<>()
+** support for named subphyla for greater type safety
+
+* Changes in kimwitu++ 2.3.6
+** new option -W allows greater control of warning levels
+** new option --rw-loop generates iterative rewrite algorithm (instead of
+   recursive) and greater control (or hacking)
+
+* Changes in kimwitu++ 2.3.5
+** New options for error reporting format
+** Allow {con,de}structors for any class (but give warning)
+** Add options to morph line directives into comments
+                                                                                                    
+* Changes in kimwitu++ 2.3.1
+** Version number of generating Kimwitu++ goes into the generated code as
+   a number of #define's (KIMWITUVERSIONMAJOR, *MINOR, *MICRO)
+** Rename kc_.views to .views (should have happened before).
+** Added a virtual default_unparse method to have replaceable default
+   unparse behaviour. There is not yet a Kimwitu++ syntax extension for it.
+
+* Changes in kimwitu++ 2.3.0
+** Change back the semantic of append to return the element for the list
+   where we insert the value.
+** This warrants a version number bump 3.0: Give warnings for overlapping
+   patterns in unparse, rewrite and with.
+** Support for g++ 3.2
+** --no-linedirec does not emit any line directives now.
+
+* Changes in kimwitu++ 2.2.0
+** Removed the kc_ prefix in many places. There are some macros you can use
+   to get the old names, you just have to define DEPRECATED.
+** Renamed kc_tag_ to impl_; macros as above.
+** Changed language macros to is_language and set_language.
+
+* Changes in kimwitu++ 2.1.4
+** Allow conversion operators in phyla.
+
+* Changes in kimwitu++ 2.1.3
+** Lines can have arbitrary lengths now.
+
+* Changes in kimwitu++ 2.1.2
+** User-defined member functions now possible for primitive phyla. This
+   is actually a bug fix, but since it never worked before it can be
+   considered a new feature.
+
+* Changes in kimwitu++ 2.1.0
+** Some care is taken to allow unparsing of lists to be done iteratively
+   instead of recursively by default. Faster and leaner on stack space.
+** Some more lists in kimwitu++ itself unparsing iteratively even though not
+   using default unparsing. Now very large files can be processed.
+** If available, kimwitu++ now uses hash sets for storing casestrings. This can
+   speed up things dramatically. Use -DUSE_HASHSET while compiling k.cc
+
+* Changes in kimwitu++ 2.0.3
+** Using getopt_long now, this make option parsing more robust
+
+* Changes in kimwitu++ 2.0.2
+** Added terminator statement to attributeOf
+** Fixed some namespace-related bugs
+
+* Changes in kimwitu++ 2.0.0
+** Brought Kimwitu++ in sync with Kimwitu 4.6
+** Added option --overwrite to always overwrite generated files, even if they
+   did not change
+** Renamed the fprintdotheader and fprintdotfooter functions into ...prologue
+   and ...epilogue, because these names better reflect their use
+
+* Changes in kimwitu++ 1.3.12
+** Note: This really is not a step from 1.3.5, but rather one from 2.0; I just
+   missed the chance to change to 1.9999 earlier
+** Added option --yystype (generates YYSTYPE in yystype.h)
+** Changed CSGIO functions (read takes reference, both throw exceptions)
+** Keywords `%member' and `%attr';
+   the latter generates attributes which are handled by CSGIO
+** Keywords `%ctor' and `%dtor' (not really, they appeared in some
+   earlier version, but I forget which)
+** All in namespace kc
+** Keyword `%option' to specify fixed options in file instead of
+   on command line
+
+* Changes in kimwitu++ 1.3.5
+** Added options --smart-pointer and --weak-pointer
+** Made rviews and uviews work the same way once more
+
+* Changes in kimwitu++ 1.3.4
+** Changed a whole lot of type names for printer functions
+** Added real old-style printer function support
+
+* Changes in kimwitu++ 1.3.3
+** Fixed old nullary operators bug
+
+* Changes in kimwitu++ 1.3.2
+** Added keyword `provided'
+** made option `--verbose' work
+
+* Changes in kimwitu++ 1.2.3
+** Prettied up print method
+
+* Changes in kimwitu++ 1.2.1
+** Change kc_uviews::view to be a pointer type.
+
+* Changes in kimwitu++ 1.2
+** Rename KC_UView and uview to uview_class and uview_enum;
+   introduce uview as uview_class &.
+** Change option names to use dashes instead of underscores.
+** Remove support for non-sharing CSGIO
+   (This was a feature to make kimwitu 4 compatible with earlier versions)
+** Add is_nil method to lists.
+
+* Changes in kimwitu++ 1.1.1
+** Rename kc_view_count to kc_last_uview; add kc_last_rview.
+** Fix old kimwitu double-rewrite bug.
+
+* Changes in kimwitu++ 1.1
+** Rename kc_view_names to kc_uviews
+   To access view objects, you can use the kc_uviews array.
+** The subphyla union has been removed; 
+   the subphyla are now called <phylum>_<number>.
+** The KC_SUBPHYLUM data structurs have been removed;
+   access to subphyla is now possible via the subphylum method.
+** Lists now produce a single class only;
+   the Nillist is represented with two null subphyla.
+** Syntax for C++ operators and overloading is now recognized.
+

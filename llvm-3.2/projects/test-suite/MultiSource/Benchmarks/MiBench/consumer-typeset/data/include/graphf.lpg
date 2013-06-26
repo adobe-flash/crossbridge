@@ -1,0 +1,768 @@
+%%BeginResource: procset LoutGraphPrependGraphic
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                    %
+%  PostScript @SysPrependGraphic file for @Graph (Version 1.0)       %
+%                                                                    %
+%  Version 1.0 by Jeffrey H. Kingston, December 1993.                %
+%                                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+errordict begin
+   /handleerror
+   {
+      {  /Times-Roman findfont 8 pt scalefont setfont
+	 0 setgray 4 pt 4 pt moveto
+	 $error /errorname get
+	 dup lgraphdict exch known
+	 { lgraphdict exch get }
+	 { 30 string cvs } ifelse
+	 show
+	 (  Command: ) show
+	 $error /command get 30 string cvs show
+      } stopped {} if
+      showpage stop
+   } def
+end
+
+/lgraphdict 200 dict def
+lgraphdict begin
+
+% error messages
+/dictfull (dictfull error) def
+/dictstackoverflow (dictstackoverflow error) def
+/execstackoverflow (execstackoverflow error:  expression too complex?) def
+/limitcheck (limitcheck error:  graph too complex or too large?) def
+/syntaxerror (syntaxerror error:  syntax error in text of graph?) def
+/typecheck (typecheck error:  syntax error in text of graph?) def
+/undefined (undefined error:  unknown or misspelt symbol?) def
+/rangecheck (rangecheck error:  undefined expression (e.g. divide by zero)?) def
+/VMError (VMError error:  run out of memory?) def
+
+% random number between x and y inclusive: x y dorand num
+/dorand { 1 index sub 1 add rand exch mod add } def
+
+% log to given base: base num dolog num
+/dolog { ln exch ln div } def
+
+% maximum of two numbers:  <num> <num> max <num>
+/max { 2 copy gt { pop } { exch pop } ifelse } def
+
+% add two points:  <point> <point> padd <point>
+/padd { exch 3 1 roll add 3 1 roll add exch } def
+
+% subtract first point from second:  <point> <point> psub <point>
+/psub { 3 2 roll sub 3 1 roll exch sub exch } def
+
+% distance between two points:  <point> <point> distance <length>
+/distance { psub dup mul exch dup mul add sqrt } def
+
+% point at angle and distance:  <point> <length> <angle> atangle <point>
+/atangle { 2 copy cos mul 3 1 roll sin mul padd } def
+
+% angle from one point to another:  <point> <point> angle <angle>
+/angle { psub 2 copy 0 eq exch 0 eq and {pop} {exch atan} ifelse } def
+
+
+% set up for line
+% - linesetup <length> <dashlength>
+/linesetup
+{ newpath
+  xcurr ycurr trpoint xprev yprev trpoint
+  4 copy moveto lineto distance dashlength
+} def
+
+% set up for icon-avoiding line
+% - ilinesetup <length> <dashlength>
+/ilinesetup
+{ newpath
+  xprev yprev trpoint xcurr ycurr trpoint 4 copy
+  4 copy angle symbolsize 1.5 mul exch 4 2 roll pop pop atangle
+  6 2 roll 4 2 roll
+  4 copy angle symbolsize 1.5 mul exch 4 2 roll pop pop atangle 
+  4 copy moveto lineto distance dashlength
+} def
+
+
+% stroke a solid line:  <length> <dashlength> solid -
+/solid
+{ pop pop [] 0 setdash linewidth setlinewidth stroke
+} def
+  
+% stroke a dashed line:   <length> <dashlength> dashed -
+/dashed
+{  2 copy 2 mul le 1 index 0 le or
+   {  exch pop 1 pt max [ exch dup ] 0 setdash }
+   {  dup [ exch 4 2 roll 2 copy div
+      1 sub 2 div ceiling dup 4 1 roll
+      1 add mul sub exch div ] 0 setdash
+   } ifelse linewidth setlinewidth stroke
+} def
+
+% stroke a cdashed line:  <length> <dashlength> cdashed -
+/cdashed
+{  2 copy le 1 index 0 le or
+   { exch pop 1 pt max [ exch dup ] dup 0 get 2 div setdash }
+   { dup [ 4 2 roll exch 2 copy exch div
+     2 div ceiling div 1 index sub
+     ] exch 2 div setdash
+   } ifelse linewidth setlinewidth stroke
+} def
+
+% stroke a dotted line:  <length> <dashlength> dotted -
+/dotted
+{  2 copy le 1 index 0 le or
+   { exch pop 1 pt max [ exch 0 exch ] 0 setdash }
+   { 1 index exch div ceiling div 0.99999 mul
+     [ 0 3 2 roll ] 0 setdash
+   } ifelse gsave 1 setlinecap linewidth setlinewidth stroke grestore newpath
+} def
+
+% stroke a noline line:  <length> <dashlength> noline -
+/noline
+{ pop pop
+} def
+
+% stroke a y histogram: - yhisto -
+/yhisto
+{ xprev yleft trpoint yextra sub moveto
+  xprev yprev trpoint lineto
+  xcurr yprev trpoint lineto
+  xcurr yleft trpoint yextra sub lineto 
+  linewidth setlinewidth stroke
+} def
+
+% stroke an x histogram: - xhisto -
+/xhisto
+{ xleft yprev trpoint exch xextra sub exch moveto
+  xcurr yprev trpoint lineto
+  xcurr ycurr trpoint lineto
+  xleft ycurr trpoint exch xextra sub exch lineto 
+  linewidth setlinewidth stroke
+} def
+
+% stroke a surface y histogram: - surfaceyhisto -
+/surfaceyhisto
+{ firstpair
+  { xprev yleft trpoint yextra sub moveto
+    xprev yprev trpoint lineto
+  }
+  { xprev yprev trpoint moveto
+  } ifelse
+  xcurr yprev trpoint lineto
+  lastpair
+  { xcurr yleft trpoint yextra sub lineto 
+  }
+  { xcurr ycurr trpoint lineto
+  } ifelse
+  linewidth setlinewidth stroke
+} def
+
+% stroke a surface x histogram: - surfacexhisto -
+/surfacexhisto
+{ firstpair
+  { xleft yprev trpoint exch xextra sub exch moveto
+  }
+  { xprev yprev trpoint moveto
+  } ifelse
+  xcurr yprev trpoint lineto
+  xcurr ycurr trpoint lineto
+  lastpair
+  { xleft ycurr trpoint exch xextra sub exch lineto 
+  } if
+  linewidth setlinewidth stroke
+} def
+
+% stroke a filled y histogram: - filledyhisto -
+/filledyhisto
+{
+  linewidth setlinewidth
+  xprev yleft trpoint exch currentlinewidth 2 div add exch yextra sub moveto
+  xprev yprev trpoint exch currentlinewidth 2 div add exch lineto
+  xcurr yprev trpoint exch currentlinewidth 2 div sub exch lineto
+  xcurr yleft trpoint exch currentlinewidth 2 div sub exch yextra sub lineto 
+  closepath fill
+} def
+
+% stroke a filled x histogram: - filledxhisto -
+/filledxhisto
+{
+  linewidth setlinewidth
+  xleft yprev trpoint currentlinewidth 2 div add exch xextra sub exch moveto
+  xcurr yprev trpoint currentlinewidth 2 div add lineto
+  xcurr ycurr trpoint currentlinewidth 2 div sub lineto
+  xleft ycurr trpoint currentlinewidth 2 div sub exch xextra sub exch lineto 
+  closepath fill
+} def
+
+
+% cross: show a small cross
+/cross
+{ newpath
+  xcurr ycurr trpoint moveto
+  symbolsize neg symbolsize neg rmoveto
+  symbolsize 2 mul symbolsize 2 mul rlineto
+  0 symbolsize -2 mul rmoveto
+  symbolsize -2 mul symbolsize 2 mul rlineto
+  [] 0 setdash stroke
+} def
+
+% plus: show a small plus
+/plus
+{ newpath
+  xcurr ycurr trpoint moveto
+  symbolsize neg 0 rmoveto
+  symbolsize 2 mul 0 rlineto
+  symbolsize neg symbolsize neg rmoveto
+  0 symbolsize 2 mul rlineto
+  [] 0 setdash stroke
+} def
+
+% square: show a small square
+/square
+{ newpath
+  xcurr ycurr trpoint moveto
+  symbolsize neg symbolsize neg rmoveto
+  symbolsize 2 mul 0 rlineto
+  0 symbolsize 2 mul rlineto
+  symbolsize -2 mul 0 rlineto
+  closepath [] 0 setdash stroke
+} def
+
+% filledsquare: show a small filled square
+/filledsquare
+{ newpath
+  xcurr ycurr trpoint moveto
+  symbolsize neg symbolsize neg rmoveto
+  symbolsize 2 mul 0 rlineto
+  0 symbolsize 2 mul rlineto
+  symbolsize -2 mul 0 rlineto
+  closepath gsave [] 0 setdash stroke grestore fill
+} def
+
+% diamond: show a small diamond
+/diamond
+{ newpath
+  xcurr ycurr trpoint moveto
+  symbolsize neg 0 rmoveto
+  symbolsize symbolsize neg rlineto
+  symbolsize symbolsize rlineto
+  symbolsize neg symbolsize rlineto
+  closepath [] 0 setdash stroke
+} def
+
+% filleddiamond: show a small filled diamond
+/filleddiamond
+{ newpath
+  xcurr ycurr trpoint moveto
+  symbolsize neg 0 rmoveto
+  symbolsize symbolsize neg rlineto
+  symbolsize symbolsize rlineto
+  symbolsize neg symbolsize rlineto
+  closepath gsave [] 0 setdash stroke grestore fill
+} def
+
+% circle: show a small circle
+/circle
+{ newpath
+  xcurr ycurr trpoint symbolsize 0 360 arc [] 0 setdash stroke
+} def
+
+% filledcircle: show a small filled circle
+/filledcircle
+{ newpath
+  xcurr ycurr trpoint symbolsize 0 360 arc gsave [] 0 setdash stroke grestore fill
+} def
+
+% triangle: show a small triangle
+/triangle
+{ newpath
+  xcurr ycurr trpoint moveto
+  0 symbolsize 1.5 mul rmoveto
+  symbolsize neg symbolsize -2.5 mul rlineto
+  symbolsize 2 mul 0 rlineto
+  closepath [] 0 setdash stroke
+} def
+
+% filledtriangle: show a small filled triangle
+/filledtriangle
+{ newpath
+  xcurr ycurr trpoint moveto
+  0 symbolsize 1.5 mul rmoveto
+  symbolsize neg symbolsize -2.5 mul rlineto
+  symbolsize 2 mul 0 rlineto
+  closepath gsave [] 0 setdash stroke grestore fill
+} def
+
+
+%plog: like log only with a base, and protected from failing if <= 0
+% base x plog res
+/plog { dup 0 le { pop pop 0 } { ln exch ln div } ifelse } def
+
+% xtr: transform one x value logarithmically if xlog > 1
+% <num> xtr <num>
+/xtr
+{ xlog 1 gt
+  { xlog exch plog
+  } if
+} def
+
+% ytr: transform one y value logarithmically if ylog > 1
+% <num> ytr <num>
+/ytr
+{ ylog 1 gt
+  { ylog exch plog
+  } if
+} def
+
+% % trpoint: transform (x, y) in graph space into (x', y') in print space
+% % x y trpoint x' y'
+% /trpoint
+% { exch xtr trxmin sub trxmax trxmin sub div xwidth mul xextra add
+%   exch ytr trymin sub trymax trymin sub div ywidth mul yextra add
+% } def
+
+
+% trpoint: transform (x, y) in graph space into (x', y') in print space
+% x y trpoint x' y'
+/trpoint
+{ exch xtr xdecr { trxmax exch sub } { trxmin sub } ifelse
+  trxmax trxmin sub div xwidth mul xextra add
+
+  exch ytr ydecr { trymax exch sub } { trymin sub } ifelse
+  trymax trymin sub div ywidth mul yextra add
+} def
+
+
+% yonly: interpolate x values 1, 2, ... into data
+% [ data ] yonly [ newdata ]
+/yonly
+{ dup /tmp exch def
+  length [ exch 1 exch 1 exch
+  { dup tmp exch 1 sub get
+  } for
+  ]
+} def
+
+% xonly: interpolate y values 1, 2, ... into data
+% [ data ] yonly [ newdata ]
+/xonly
+{ dup /tmp exch def
+  length [ exch 1 exch 1 exch
+  { dup tmp exch 1 sub get exch
+  } for
+  ]
+} def
+
+% xandy: no interpolation of x or y values
+% [ data ] xandy [ data ]
+/xandy {} def
+
+
+% expstringwidth: calculate width of string containing optional exponent
+% <string> expstringwidth <width>
+/expstringwidth
+{ (^) search
+  { exch pop stringwidth pop exch stringwidth pop 0.7 mul add }
+  { stringwidth pop }
+  ifelse
+} def
+
+% expstringshow: show string containing optional exponent
+% <string> expstringshow -
+/expstringshow
+{ (^) search
+  { exch pop show 0 0.5 ft rmoveto
+    gsave currentfont 0.7 scalefont setfont show grestore
+  }
+  { show
+  }
+  ifelse
+} def
+
+% concatenate two strings: <string> <string> strconcat <string>
+/strconcat
+{ 2 copy length exch length add string
+  dup 0 4 index putinterval
+  dup 3 index length 3 index putinterval
+  3 1 roll pop pop
+} def
+
+% lgen: generate one label automatically
+% num lgen num string
+/lgen { dup 20 string cvs } def
+
+% loglgen: generate one logarithmic label (with exponent)
+% <base> <exponent> loglgen <string>
+/loglgen
+{ 20 string cvs exch 20 string cvs
+  (^) strconcat exch strconcat
+} def
+
+
+% printxtick: print one x tick
+% xpos printxtick -
+/printxtick
+{ newpath
+  yleft trpoint moveto 0 yextra neg rmoveto
+  0 xticklength neg rlineto [] 0 setdash stroke
+} def
+
+% printxlabel: print one x label
+% (xlabel) xpos printxlabel -
+/printxlabel
+{ yleft trpoint moveto 0 yextra neg rmoveto
+  0 xticklength neg rmoveto 0 0.9 ft neg rmoveto
+  xlog 1 gt { 0 0.3 ft neg rmoveto } if
+  dup expstringwidth -2 div 0 rmoveto expstringshow
+} def
+
+% printytick: print one y tick
+% ypos printytick -
+/printytick
+{ newpath
+  xleft exch trpoint moveto xextra neg 0 rmoveto
+  yticklength neg 0 rlineto [] 0 setdash stroke
+} def
+
+% printylabel: print one y label
+% (ylabel) ypos printylabel -
+/printylabel
+{ xleft exch trpoint moveto xextra neg 0 rmoveto
+  yticklength neg 0 rmoveto -0.3 ft -0.3 ft rmoveto
+  dup expstringwidth neg 0 rmoveto expstringshow
+} def
+
+% printrtick: print one r tick
+% ypos printrtick -
+/printrtick
+{ newpath
+  xright exch trpoint moveto xextra 0 rmoveto
+  rticklength 0 rlineto [] 0 setdash stroke
+} def
+
+% printrlabel: print one r label
+% (rlabel) ypos printrlabel -
+/printrlabel
+{ xright exch trpoint moveto xextra 0 rmoveto
+  rticklength 0 rmoveto  0.3 ft -0.3 ft rmoveto
+  expstringshow
+} def
+
+% printticks: print ticks and labels
+% /tickproc /labelproc [ tickandlabeldata ] min printticks -
+/printticks
+{ /prev exch def
+  { dup type dup dup /integertype eq exch /realtype eq or
+    { pop dup /prev exch def 2 index cvx exec
+    }
+    { /stringtype eq
+      { prev 2 index cvx exec
+      }
+      { pop
+      } ifelse
+    } ifelse
+  } forall
+  pop pop
+} def
+
+
+% printxaxistick: print one x axis tick
+% xpos printxaxistick -
+/printxaxistick
+{ newpath
+  yaxis trpoint moveto 0 xticklength -2 div rmoveto
+  0 xticklength rlineto [] 0 setdash stroke
+} def
+
+% printxaxislabel: print one x axis label
+% (xlabel) xpos printxaxislabel -
+/printxaxislabel
+{ yaxis trpoint moveto
+  0 xticklength -2 div rmoveto 0 0.9 ft neg rmoveto
+  xlog 1 gt { 0 0.3 ft neg rmoveto } if
+  dup expstringwidth -2 div 0 rmoveto expstringshow
+} def
+
+% printyaxistick: print one y axis tick
+% ypos printyaxistick -
+/printyaxistick
+{ newpath
+  xaxis exch trpoint moveto
+  yticklength -2 div 0 rmoveto
+  yticklength 0 rlineto [] 0 setdash stroke
+} def
+
+% printyaxislabel: print one y axis label
+% (ylabel) ypos printyaxislabel -
+/printyaxislabel
+{ xaxis exch trpoint moveto
+  yticklength -2 div 0 rmoveto -0.3 ft -0.3 ft rmoveto
+  dup expstringwidth neg 0 rmoveto expstringshow
+} def
+
+
+% <val> minmax -
+% perform minv := min(minv, val); maxv := max(maxv, val)
+% allowing for the possibility of minv, maxv, val being false (undefined)
+/minmax
+{ dup false eq
+  { pop }
+  { minv false eq
+    { dup /minv exch def /maxv exch def }
+    { dup minv lt
+      { /minv exch def }
+      { dup maxv gt
+	{ /maxv exch def }
+	{ pop }
+	ifelse
+      } ifelse
+    } ifelse
+  } ifelse
+} def
+
+% <ticks> ticksundef <ticks> <bool>
+% returns true iff the ticks array is undefined (one false entry)
+/ticksundef
+{ dup length 1 eq
+  { dup 0 get false eq
+  }
+  { false }
+  ifelse
+} def
+
+% <number> integral <boolean>
+% true if the number has an integral value
+/integral { dup round eq } def
+
+% ticksep ticks xory alldata minval maxval axis base ticksandlimits ticks min max base
+% ticksandlimits: sort out value of x or y ticks and limits and log base
+/ticksandlimits
+{ /base exch def
+  /minv false def
+  /maxv false def
+
+  % min and max of user-supplied minval, maxval, and axis
+  minmax minmax minmax
+
+  % min and max of data points
+  { 0 get dup dup length 1 sub 3 index exch 2 exch
+    { get minmax dup
+    } for pop pop
+  } forall
+  pop dup
+
+  % min and max of tick values
+  { dup type /stringtype eq
+    { pop } { minmax } ifelse
+  } forall
+
+  % fix minv and maxv if undefined (false) or equal
+  minv false eq
+  { /minv -1 def /maxv 1 def }
+  { minv maxv eq
+    { minv 0 lt
+      { /minv 2 minv mul def /maxv 0 def
+      }
+      { minv 0 eq
+	{ /minv -1 def /maxv 1 def
+	}
+	{ /minv 0 def /maxv 2 maxv mul def
+	} ifelse
+      } ifelse
+    } if
+  } ifelse
+
+  % invent ticks if undefined
+  ticksundef
+  { pop /ticksep exch def
+
+    % if base is reasonable and minv is positive, logarithmic ticks
+    base 1 gt minv 0 gt and
+    {
+      % get integral log of minv and maxv
+      /logminv base minv plog floor   cvi def
+      /logmaxv base maxv plog ceiling cvi def
+
+      % if minv close to base, make it 1; reset minv and maxv
+      logminv 1 eq logmaxv 4 ge and { /logminv 0 def } if
+      /minv base logminv exp def
+      /maxv base logmaxv exp def
+
+      % ticks := [ base**logminv, ... , base**logmaxv ]
+      [ logminv 1 logmaxv
+	{ dup base exch exp
+	  exch base exch loglgen
+	} for
+      ]
+    }
+    { % non-logarithmic ticks
+      {
+        % fix tick separation if undefined (0) or too small
+	/base 0 def
+        /delta maxv minv sub def
+        ticksep delta 30 div le
+        { /ticksep 10 delta log 1 sub ceiling exp def
+	  ticksep delta 2 div ge
+	  { /ticksep ticksep 2 div def }
+	  { ticksep delta 5 div lt
+	    { /ticksep 2 ticksep mul def
+	    } if
+	  } ifelse
+        } if
+
+        % adjust minv and maxv to be multiples of ticksep
+        /minv minv ticksep div floor   ticksep mul def
+        /maxv maxv ticksep div ceiling ticksep mul def
+        /delta maxv minv sub def
+
+        % if minv or maxv near zero, move to zero and redo
+        minv ticksep eq
+        { /minv 0 def }
+        { maxv ticksep neg eq { /maxv 0 def } { exit } ifelse
+        } ifelse
+      } loop
+
+      % if minv, maxv, and ticksep are all integral, set "makeint" to true
+      /makeint minv integral maxv integral ticksep integral and and def
+
+      % ticks := [ minv, minv+ticksep, ... , maxv ]
+      [ 0 1 delta ticksep div round
+	{ ticksep mul minv add makeint { cvi } if lgen }
+	for
+      ]
+    } ifelse
+  }
+  { exch pop
+  } ifelse
+  minv maxv base
+} def
+
+% xset: set up all data for x axis, including limits and ticks
+% xticksep xticks 0 alldata xmin xmax xlog xextra xdecr xaxis xticklength xset -
+/xset
+{ /xticklength exch def
+  /xaxis exch def
+  /xdecr exch def
+  /xextra exch def
+  xaxis exch ticksandlimits
+  /xlog exch def /xmax exch def /xmin exch def /xticks exch def
+  /xleft xdecr { xmax } { xmin } ifelse def
+  /xright xdecr { xmin } { xmax } ifelse def
+  /xwidth xsize xextra 2 mul sub def
+  /trxmin xmin xtr def /trxmax xmax xtr def
+} def
+
+% yset: set up all data for y axis, including limits and yticks
+% yticksep yticks 0 alldata ymin ymax ylog yextra ydecr yaxis yticklength yset -
+/yset
+{ /yticklength exch def
+  /yaxis exch def
+  /ydecr exch def
+  /yextra exch def
+  yaxis exch ticksandlimits
+  /ylog exch def /ymax exch def /ymin exch def /yticks exch def
+  /yleft ydecr { ymax } { ymin } ifelse def
+  /yright ydecr { ymin } { ymax } ifelse def
+  /ywidth ysize yextra 2 mul sub def
+  /trymin ymin ytr def /trymax ymax ytr def
+} def
+
+% rset: set up all data for y axis (again), but including limits and rticks
+% rticksep rticks 0 alldata ymin ymax ylog yextra ydecr yaxis rticklength rset -
+/rset
+{ /rticklength exch def
+  /yaxis exch def
+  /ydecr exch def
+  /yextra exch def
+  yaxis exch ticksandlimits
+  /ylog exch def /ymax exch def /ymin exch def /rticks exch def
+  /yleft ydecr { ymax } { ymin } ifelse def
+  /yright ydecr { ymin } { ymax } ifelse def
+  /ywidth ysize yextra 2 mul sub def
+  /trymin ymin ytr def /trymax ymax ytr def
+} def
+
+% norset: set up data for no rticks
+% - norset -
+/norset
+{ /rticklength 0 def
+  /rticks [] def
+} def
+
+% framestyle: print a frame around the graph
+/framestyle
+{ 0 0 moveto xsize 0 lineto xsize ysize lineto
+  0 ysize lineto closepath stroke
+  /printxtick /printxlabel xticks xleft printticks
+  /printytick /printylabel yticks ymin printticks
+  /printrtick /printrlabel rticks ymin printticks
+} def
+
+% nonestyle: print nothing around the graph
+/nonestyle
+{
+} def
+
+% axesstyle: print axes for the graph (unless axis values missing)
+/axesstyle
+{
+  xaxis false eq yaxis false eq or
+  { framestyle }
+  { xaxis yaxis trpoint dup 0 exch moveto xsize exch lineto
+    dup 0 moveto ysize lineto stroke
+    /printxaxistick /printxaxislabel xticks xleft printticks
+    /printyaxistick /printyaxislabel yticks ymin printticks
+  } ifelse
+} def
+
+% rundata: run all data sets
+/rundata
+{ alldata
+  { gsave
+    dup dup dup dup
+    4 get /dopaint exch def
+    3 get /initrun exch def
+    2 get /pairs exch def
+    1 get /points exch def
+    0 get /data exch def
+    dopaint
+    { data length 4 ge
+      { initrun
+	newpath
+	data 0 get ymin trpoint yextra sub moveto
+	0 2 data length 2 sub
+	{ dup 1 add
+	  data exch get /ycurr exch def
+	  data exch get /xcurr exch def
+	  xcurr ycurr trpoint lineto
+	} for
+	data dup length 2 sub get ymin trpoint yextra sub lineto
+	closepath fill
+      } if
+    } if
+    initrun
+    data length 2 ge
+    {
+      /xcurr data 0 get def
+      /ycurr data 1 get def
+      points
+      data length 4 ge
+      { 2 2 data length 2 sub
+	{ /xprev xcurr def
+          /yprev ycurr def
+	  dup dup 2 eq /firstpair exch def
+	  data length 2 sub eq /lastpair exch def
+	  dup 1 add
+          data exch get /ycurr exch def
+          data exch get /xcurr exch def
+	  pairs
+	  points
+	} for
+      } if
+    } if
+    grestore
+  } forall
+} def
+
+end
+%%EndResource

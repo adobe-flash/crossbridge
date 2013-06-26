@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# mkdoc - Make all forms of documentation for treecc from Texinfo input.
+#
+# Usage: mkdir outdir
+
+# Check the command-line.
+if [ -z "$1" ]; then
+	echo "Usage: $0 outdir"
+	exit 1
+fi
+
+# Check that we are executed in the correct directory.
+if [ ! -f treecc.texi ]; then
+	echo "Cannot find treecc.texi"
+	exit 1
+fi
+
+# Create the output directory.
+if [ ! -d "$1" ]; then
+	mkdir "$1"
+fi
+
+# Create the online HTML documentation.
+./mkhtml "$1"
+
+# Create the PDF documentation.
+./mkpdf
+cp treecc.pdf "$1"
+
+# Pack up the HTML documentation into a tar.gz file.
+cd "$1"
+tar cfz treecc-doc.tar.gz *.html
+exit 0

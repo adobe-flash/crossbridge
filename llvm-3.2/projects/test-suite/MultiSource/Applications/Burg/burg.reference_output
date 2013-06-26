@@ -1,0 +1,347 @@
+
+#include <stdio.h>
+
+typedef struct node *NODEPTR_TYPE;
+
+struct node {
+	int op, state_label;
+	NODEPTR_TYPE left, right;
+};
+
+#define OP_LABEL(p)	((p)->op)
+#define STATE_LABEL(p)	((p)->state_label)
+#define LEFT_CHILD(p)	((p)->left)
+#define RIGHT_CHILD(p)	((p)->right)
+#define PANIC		printf
+#ifndef burm_PANIC
+#define burm_PANIC	PANIC
+#endif /* burm_PANIC */
+#ifdef __STDC__
+extern void abort(void);
+#else
+extern void abort();
+#endif
+#ifdef NDEBUG
+#define burm_assert(x,y)	;
+#else
+#define burm_assert(x,y)	if(!(x)) {y; abort();}
+#endif
+static short burm_r1_nts[] ={ 0 };
+static short burm_r3_nts[] ={ 2, 0 };
+static short burm_r4_nts[] ={ 2, 1, 0 };
+static short burm_r6_nts[] ={ 3, 0 };
+static short burm_r7_nts[] ={ 3, 1, 0 };
+short *burm_nts[] = {
+	0,
+	burm_r1_nts,
+	burm_r1_nts,
+	burm_r3_nts,
+	burm_r4_nts,
+	burm_r4_nts,
+	burm_r6_nts,
+	burm_r7_nts,
+};
+static unsigned char burm_Assign_transition[2][2] = {
+{    0,    0}	/* row 0 */,
+{    0,    1}	/* row 1 */
+};
+static unsigned char burm_Mul_transition[2][2] = {
+{    0,    0}	/* row 0 */,
+{    0,    1}	/* row 1 */
+};
+static unsigned char burm_Plus_transition[2][3] = {
+{    0,    0,    0}	/* row 0 */,
+{    0,    1,    2}	/* row 1 */
+};
+static struct {
+	unsigned int f0:2;
+	unsigned int f1:2;
+	unsigned int f2:2;
+	unsigned int f3:2;
+	unsigned int f4:2;
+	unsigned int f5:3;
+	unsigned int f6:2;
+	unsigned int f7:2;
+} burm_plank_0[] = {
+	{   0,   0,   0,   0,   0,   0,   0,   0,},	/* row 0 */
+	{   0,   1,   0,   0,   1,   0,   0,   1,},	/* row 1 */
+	{   1,   0,   0,   1,   0,   3,   1,   0,},	/* row 2 */
+	{   0,   1,   0,   0,   1,   0,   0,   2,},	/* row 3 */
+	{   1,   0,   1,   1,   0,   3,   2,   0,},	/* row 4 */
+	{   0,   0,   0,   0,   2,   0,   0,   0,},	/* row 5 */
+	{   1,   0,   0,   0,   0,   1,   0,   0,},	/* row 6 */
+	{   1,   0,   0,   0,   0,   2,   0,   0,},	/* row 7 */
+};
+static short burm_eruleMap[] = {
+    0,    4,    5,    3,    0,    1,    2,    0,    7,    6
+};
+#define burm_reg_rule(state)	burm_eruleMap[burm_plank_0[state].f7 +7]
+#define burm_con_rule(state)	burm_eruleMap[burm_plank_0[state].f6 +4]
+#define burm_addr_rule(state)	burm_eruleMap[burm_plank_0[state].f5 +0]
+
+#ifdef __STDC__
+int burm_rule(int state, int goalnt) {
+#else
+int burm_rule(state, goalnt) int state; int goalnt; {
+#endif
+	burm_assert(state >= 0 && state < 8, burm_PANIC("Bad state %d passed to burm_rule\n", state));
+	switch(goalnt) {
+	case 1:
+		return burm_reg_rule(state);
+	case 2:
+		return burm_con_rule(state);
+	case 3:
+		return burm_addr_rule(state);
+	default:
+		burm_PANIC("Unknown nonterminal %d in burm_rule;\n", goalnt);
+		abort();
+		return 0;
+	}
+}
+
+int burm_TEMP;
+#define burm_Assign_state(l,r)	( (burm_TEMP = burm_Assign_transition[burm_plank_0[l].f0][burm_plank_0[r].f1]) ? burm_TEMP + 0 : 0 )
+#define burm_Constant_state	2
+#define burm_Fetch_state(l)	( (burm_TEMP = burm_plank_0[l].f0) ? burm_TEMP + 2 : 0 )
+#define burm_Four_state	4
+#define burm_Mul_state(l,r)	( (burm_TEMP = burm_Mul_transition[burm_plank_0[l].f2][burm_plank_0[r].f1]) ? burm_TEMP + 4 : 0 )
+#define burm_Plus_state(l,r)	( (burm_TEMP = burm_Plus_transition[burm_plank_0[l].f3][burm_plank_0[r].f4]) ? burm_TEMP + 5 : 0 )
+
+#ifdef __STDC__
+int burm_state(int op, int l, int r) {
+#else
+int burm_state(op, l, r) int op; int l; int r; {
+#endif
+	register int burm_TEMP;
+#ifndef NDEBUG
+	switch (op) {
+	case 1:
+	case 5:
+	case 6:
+		burm_assert(r >= 0 && r < 8, burm_PANIC("Bad state %d passed to burm_state\n", r));
+		/*FALLTHROUGH*/
+	case 3:
+		burm_assert(l >= 0 && l < 8, burm_PANIC("Bad state %d passed to burm_state\n", l));
+		/*FALLTHROUGH*/
+	case 2:
+	case 4:
+		break;
+	}
+#endif
+	switch (op) {
+	default: burm_PANIC("Unknown op %d in burm_state\n", op); abort(); return 0;
+	case 1:
+		return burm_Assign_state(l,r);
+	case 2:
+		return burm_Constant_state;
+	case 3:
+		return burm_Fetch_state(l);
+	case 4:
+		return burm_Four_state;
+	case 5:
+		return burm_Mul_state(l,r);
+	case 6:
+		return burm_Plus_state(l,r);
+	}
+}
+#ifdef burm_STATE_LABEL
+#define burm_INCLUDE_EXTRA
+#else
+#ifdef STATE_LABEL
+#define burm_INCLUDE_EXTRA
+#define burm_STATE_LABEL 	STATE_LABEL
+#define burm_NODEPTR_TYPE	NODEPTR_TYPE
+#define burm_LEFT_CHILD  	LEFT_CHILD
+#define burm_OP_LABEL    	OP_LABEL
+#define burm_RIGHT_CHILD 	RIGHT_CHILD
+#endif /* STATE_LABEL */
+#endif /* burm_STATE_LABEL */
+
+#ifdef burm_INCLUDE_EXTRA
+
+#ifdef __STDC__
+int burm_label(burm_NODEPTR_TYPE n) {
+#else
+int burm_label(n) burm_NODEPTR_TYPE n; {
+#endif
+	burm_assert(n, burm_PANIC("NULL pointer passed to burm_label\n"));
+	switch (burm_OP_LABEL(n)) {
+	default: burm_PANIC("Bad op %d in burm_label\n", burm_OP_LABEL(n)); abort(); return 0;
+	case 2:
+	case 4:
+		return burm_STATE_LABEL(n) = burm_state(burm_OP_LABEL(n), 0, 0);
+	case 3:
+		return burm_STATE_LABEL(n) = burm_state(burm_OP_LABEL(n), burm_label(burm_LEFT_CHILD(n)), 0);
+	case 1:
+	case 5:
+	case 6:
+		return burm_STATE_LABEL(n) = burm_state(burm_OP_LABEL(n), burm_label(burm_LEFT_CHILD(n)), burm_label(burm_RIGHT_CHILD(n)));
+	}
+}
+#ifdef __STDC__
+burm_NODEPTR_TYPE * burm_kids(burm_NODEPTR_TYPE p, int rulenumber, burm_NODEPTR_TYPE *kids) {
+#else
+burm_NODEPTR_TYPE * burm_kids(p, rulenumber, kids) burm_NODEPTR_TYPE p; int rulenumber; burm_NODEPTR_TYPE *kids; {
+#endif
+	burm_assert(p, burm_PANIC("NULL node pointer passed to burm_kids\n"));
+	burm_assert(kids, burm_PANIC("NULL kids pointer passed to burm_kids\n"));
+	switch (rulenumber) {
+	default:
+		burm_PANIC("Unknown Rule %d in burm_kids;\n", rulenumber);
+		abort();
+		/* NOTREACHED */
+	case 1:
+	case 2:
+		break;
+	case 3:
+		kids[0] = p;
+		break;
+	case 5:
+		kids[0] = burm_LEFT_CHILD(p);
+		kids[1] = burm_RIGHT_CHILD(burm_RIGHT_CHILD(p));
+		break;
+	case 6:
+		kids[0] = burm_LEFT_CHILD(p);
+		break;
+	case 4:
+	case 7:
+		kids[0] = burm_LEFT_CHILD(p);
+		kids[1] = burm_RIGHT_CHILD(p);
+		break;
+	}
+	return kids;
+}
+#endif /* burm_INCLUDE_EXTRA */
+#define burm_addr_NT 3
+#define burm_con_NT 2
+#define burm_reg_NT 1
+#define burm_NT 3
+short burm_closure[4][4] = {
+	{    0,    0,    0,    0,},
+	{    0,    0,    0,    0,},
+	{    0,    0,    0,    0,},
+	{    0,    0,    3,    0,},
+};
+
+
+#define Assign 1
+#define Constant 2
+#define Fetch 3
+#define Four 4
+#define Mul 5
+#define Plus 6
+
+#ifdef __STDC__
+#define ARGS(x) x
+#else
+#define ARGS(x) ()
+#endif
+
+NODEPTR_TYPE buildtree ARGS((int, NODEPTR_TYPE, NODEPTR_TYPE));
+void printcover ARGS((NODEPTR_TYPE, int, int));
+void printtree ARGS((NODEPTR_TYPE));
+int treecost ARGS((NODEPTR_TYPE, int, int));
+void printMatches ARGS((NODEPTR_TYPE));
+int main ARGS((void));
+
+NODEPTR_TYPE buildtree(op, left, right) int op; NODEPTR_TYPE left; NODEPTR_TYPE right; {
+	NODEPTR_TYPE p;
+	extern void *malloc ARGS((unsigned));
+
+	p = (NODEPTR_TYPE) malloc(sizeof *p);
+	p->op = op;
+	p->left = left;
+	p->right = right;
+	return p;
+}
+
+void printcover(p, goalnt, indent) NODEPTR_TYPE p; int goalnt; int indent; {
+	int eruleno = burm_rule(STATE_LABEL(p), goalnt);
+	short *nts = burm_nts[eruleno];
+	NODEPTR_TYPE kids[10];
+	int i;
+	
+	if (eruleno == 0) {
+		printf("no cover\n");
+		return;
+	}
+	for (i = 0; i < indent; i++)
+		printf(".");
+	printf("%s\n", burm_string[eruleno]);
+	burm_kids(p, eruleno, kids);
+	for (i = 0; nts[i]; i++)
+		printcover(kids[i], nts[i], indent+1);
+}
+
+void printtree(p) NODEPTR_TYPE p; {
+	int op = burm_op_label(p);
+
+	printf("%s", burm_opname[op]);
+	switch (burm_arity[op]) {
+	case 0:
+		break;
+	case 1:
+		printf("(");
+		printtree(burm_child(p, 0));
+		printf(")");
+		break;
+	case 2:
+		printf("(");
+		printtree(burm_child(p, 0));
+		printf(", ");
+		printtree(burm_child(p, 1));
+		printf(")");
+		break;
+	}
+}
+
+int treecost(p, goalnt, costindex) NODEPTR_TYPE p; int goalnt; int costindex; {
+	int eruleno = burm_rule(STATE_LABEL(p), goalnt);
+	int cost = burm_cost[eruleno][costindex], i;
+	short *nts = burm_nts[eruleno];
+	NODEPTR_TYPE kids[10];
+
+	burm_kids(p, eruleno, kids);
+	for (i = 0; nts[i]; i++)
+		cost += treecost(kids[i], nts[i], costindex);
+	return cost;
+}
+
+void printMatches(p) NODEPTR_TYPE p; {
+	int nt;
+	int eruleno;
+
+	printf("Node 0x%lx= ", (unsigned long)p);
+	printtree(p);
+	printf(" matched rules:\n");
+	for (nt = 1; burm_ntname[nt] != (char*)NULL; nt++)
+		if ((eruleno = burm_rule(STATE_LABEL(p), nt)) != 0)
+			printf("\t%s\n", burm_string[eruleno]);
+}
+
+main() {
+	NODEPTR_TYPE p;
+
+	p = buildtree(Assign,
+		buildtree(Constant, 0, 0),
+		buildtree(Fetch,
+			buildtree(Plus,
+				buildtree(Constant, 0, 0),
+				buildtree(Mul,
+					buildtree(Four, 0, 0),
+					buildtree(Fetch, buildtree(Constant, 0, 0), 0)
+				)
+			),
+			0
+		)
+	);
+	printtree(p);
+	printf("\n\n");
+	burm_label(p);
+	printcover(p, 1, 0);
+	printf("\nCover cost == %d\n\n", treecost(p, 1, 0));
+	printMatches(p);
+	return 0;
+}
+
+exit 0

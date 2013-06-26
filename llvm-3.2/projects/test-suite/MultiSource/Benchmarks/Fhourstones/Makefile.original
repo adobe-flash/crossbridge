@@ -1,0 +1,42 @@
+# current options include TRANSIZE PROBES REPORTPLY
+# suggested values for benching are
+# TRANSIZE: 1050011 or 6249979 (see c4.h for other possibilities)
+# PROBES: 8
+# REPORTPLY: 8
+
+DEFINES = -DUNIX -DTRANSIZE=1050011 -DPROBES=8 -DREPORTPLY=8
+FLAGS = -Ofast $(DEFINES)
+FILES = Makefile input \
+        play.c c4.h c4.c trans.c time.c types.h
+
+
+CC = cc $(FLAGS)
+
+c4		: play.o c4.o trans.o time.o
+		$(CC) -o c4 play.o c4.o trans.o time.o
+
+play.o		: play.c c4.h types.h Makefile
+		$(CC) -c play.c
+
+trans.o	: trans.c c4.h c4.h types.h Makefile
+		$(CC) -c trans.c
+
+c4.o	: c4.c c4.h c4.h types.h Makefile
+		$(CC) -c c4.c
+
+time.o		: time.c types.h Makefile
+		$(CC) -c time.c
+
+# use the following for optimization levels that preclude separate compilation
+together	: play.c c4.h c4.h c4.c trans.c time.c types.h Makefile
+		$(CC) -o c4 play.c c4.c trans.c time.c
+
+MANIFEST	: $(FILES)
+		ls -l $(FILES) > MANIFEST
+
+shar		: $(FILES) MANIFEST
+		shar -o c4.shar MANIFEST $(FILES)
+
+tar		: $(FILES) MANIFEST
+		tar -cf c4.tar MANIFEST  $(FILES)
+		gzip c4.tar

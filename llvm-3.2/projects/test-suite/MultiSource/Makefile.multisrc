@@ -1,0 +1,99 @@
+##==- MultiSource/Makefile.multisrc ------------------------*- Makefile -*-===##
+#
+# This makefile should be used by subdirectories that have multiple source files
+# to be linked together.  This contains all of the common makefile code required
+# to link an application together based on the $(Source) variable.
+#
+# Variables to be defined before including this makefile:
+#
+# 1. LEVEL - Must be set as per normal semantics: The depth from the top of tree
+#
+##===----------------------------------------------------------------------===##
+
+PROGRAMS_TO_TEST := $(PROG)
+
+## LLVM bytecode libraries that must be linked with an application
+# FIXME: LIBS SHOULD BE SPECIFIED
+LIBS += -lm
+
+include $(LEVEL)/Makefile.programs
+
+# Figure out what object files we want to build...
+LObjs    := $(sort $(addsuffix .bc, $(notdir $(basename $(Source)))))
+LObjects := $(addprefix Output/,$(LObjs))
+
+NObjs    := $(sort $(addsuffix .o, $(notdir $(basename $(Source)))))
+NObjects := $(addprefix Output/,$(NObjs))
+
+NLObjs    := $(sort $(addsuffix .llvm.o, $(notdir $(basename $(Source)))))
+NLObjects := $(addprefix Output/,$(NLObjs))
+
+.PRECIOUS: $(LObjects) $(NObjects) $(NLObjects)
+
+Output/%.o: %.c Output/.dir
+	-$(CC) $(CPPFLAGS) $(CFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+
+Output/%.o: %.C Output/.dir
+	-$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+
+Output/%.o: %.cpp Output/.dir
+	-$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+
+Output/%.o: %.cc Output/.dir
+	-$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+
+Output/%.llvm.o: %.c Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCC) $(CPPFLAGS) $(CFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+Output/%.llvm.o: %.m Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCC) $(CPPFLAGS) $(CFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+Output/%.llvm.o: %.C Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+Output/%.llvm.o: %.cpp Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+Output/%.llvm.o: %.cc Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+Output/%.llvm.o: %.mm Output/.dir
+	$(RUNSAFELYLOCAL) /dev/null $@.compile \
+	  $(LCXX) $(CPPFLAGS) $(CXXFLAGS) $(OPTFLAGS) $(TARGET_FLAGS) -c $< -o $@
+
+bugpoint-opt: Output/$(PROG).bugpoint-opt
+bugpoint-gccas: Output/$(PROG).bugpoint-opt
+bugpoint-jit:   Output/$(PROG).bugpoint-jit
+bugpoint-llc:   Output/$(PROG).bugpoint-llc
+bugpoint-llc-beta: Output/$(PROG).bugpoint-llc-beta
+bugpoint-cbe:   Output/$(PROG).bugpoint-cbe
+misopt: Output/$(PROG).misopt.out
+
+
+ifndef USE_PRECOMPILED_BYTECODE
+
+$(PROGRAMS_TO_TEST:%=Output/%.linked.rbc): \
+Output/%.linked.rbc: $(LObjects) $(LLINK)
+	-$(LLINK) $(LObjects) -o $@
+
+$(PROGRAMS_TO_TEST:%=Output/%.LOC.txt): \
+Output/%.LOC.txt: $(Source)
+	cat $^ $(wildcard $(SourceDir)/*.h) | wc -l > $@
+
+endif
+
+Output/%.simple: $(NLObjects) $(GeneratedTestInputs)
+	@-cat $(NLObjects:%=%.compile.time) | awk -- '\
+BEGIN   { real = 0.0; user = 0.0; sys = 0.0; }\
+/^real/ { real += $$2; }\
+/^user/ { user += $$2; }\
+/^sys/ { sys += $$2; }\
+END { printf("real %f\nuser %f\nsys %f\n", real, user, sys); }' > $@.compile.time
+	-$(LD_ENV_OVERRIDES) $(LCXX) -o $@ $(NLObjects) $(LDFLAGS) $(CFLAGS) $(TARGET_FLAGS)
+
+Output/%.native: $(NObjects) $(GeneratedTestInputs)
+	-$(CXX) -o $@ $(NObjects) $(LDFLAGS) $(CFLAGS) $(TARGET_FLAGS)
+
+# A simple target to run findmisopt when bugpoint isn't helping
+findmisopt:
+	$(LLVM_SRC_ROOT)/utils/findmisopt Output/$(PROG).linked.rbc misopt "$(RUN_OPTIONS)" "$(STDIN_FILENAME)"

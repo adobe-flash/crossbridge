@@ -1,0 +1,7 @@
+#!/bin/sh
+rm -f gdevs.h
+echo >gdevs.h
+for dev in $*
+do
+	echo d\(gs_${dev}_device\) >>gdevs.h
+done

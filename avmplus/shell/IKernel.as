@@ -268,11 +268,5 @@ package flash.utils {
 		/**
 		*/
 		function pselect(A_nd:int, A_in:int, A_ou:int, A_ex:int, A_ts:int, A_sm:int, errnoPtr:int):int;
-		/**
-		*/
-		function __getcwd(A_buf:int, A_buflen:int, errnoPtr:int):int;
-		/**
-		*/
-		function issetugid(errnoPtr:int):int;
 	}
 }

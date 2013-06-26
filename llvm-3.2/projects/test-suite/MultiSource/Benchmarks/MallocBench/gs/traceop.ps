@@ -1,0 +1,10 @@
+% Trace vmem usage after individual operators
+/.traceop
+ { vmstatus exch =only ( ) print = pop flush
+   systemdict exch get exec
+ } bind def
+/traceop
+ { dup [ exch /.traceop cvx ] cvx def
+ } bind def
+
+/setcachedevice traceop
