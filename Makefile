@@ -92,12 +92,14 @@ ifneq (,$(findstring 2.9,$(LLVMVERSION)))
 	$?FLASCC_CXX=g++
 else
 	$?LLVMTARGETS=AVM2;X86
-	$?LLVMCMAKEFLAGS=-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
+	#$?LLVMCMAKEFLAGS=-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
 		-DDEFAULT_SYSROOT=$(SDK) 
 		
-	#$?LLVMCMAKEFLAGS=-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
+	$?LLVMCMAKEFLAGS=-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
 		-DDEFAULT_SYSROOT=$(SDK) \
-		-DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8
+		-DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8 \
+		-DLLVM_BUILD_RUNTIME=OFF
+		
 	$?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SDK)/usr/bin/clang -emit-llvm -DSTRIP_FBSDID" MAKEFLAGS="" MFLAGS="" $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 	$?LLVMBUILDTYPE=Debug
 	$?FLASCC_CC=clang
