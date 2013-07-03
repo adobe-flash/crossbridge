@@ -79,7 +79,7 @@ $?LLVMCMAKEOPTS=
 $?LLVMLDFLAGS=
 $?LLVMINSTALLPREFIX=$(BUILD)
 $?LLVM_ONLYLLC=false
-$?LLVMVERSION=2.9
+$?LLVMVERSION=3.2
 
 ifneq (,$(findstring 2.9,$(LLVMVERSION)))
 	$?LLVMTARGETS=AVM2;AVM2Shim;X86;CBackend
@@ -91,18 +91,13 @@ ifneq (,$(findstring 2.9,$(LLVMVERSION)))
 	$?FLASCC_CC=gcc
 	$?FLASCC_CXX=g++
 else
-	$?LLVMTARGETS=AVM2;X86
-	$?LLVMCMAKEFLAGS=-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
-		-DDEFAULT_SYSROOT=$(SDK) 
-		
-	#$?LLVMCMAKEFLAGS=-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
-		-DDEFAULT_SYSROOT=$(SDK) \
-		-DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8
-	$?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SDK)/usr/bin/clang -emit-llvm -DSTRIP_FBSDID" MAKEFLAGS="" MFLAGS="" $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
-	$?LLVMBUILDTYPE=Debug
-	$?FLASCC_CC=clang
-	$?FLASCC_CXX=clang++
-	$?CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-install/bin/clang$(EXEEXT) \
+	LLVMTARGETS=AVM2;X86
+	LLVMCMAKEFLAGS=-DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8 \
+		-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include
+	LLVMBUILDTYPE=Debug
+	FLASCC_CC=clang
+	FLASCC_CXX=clang++
+	CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-install/bin/clang$(EXEEXT) \
 		$(SDK)/usr/bin/clang$(EXEEXT) && \
 		cp $(LLVMINSTALLPREFIX)/llvm-install/bin/clang++$(EXEEXT) \
 		$(SDK)/usr/bin/clang++$(EXEEXT)
@@ -138,11 +133,24 @@ endif
 export CCACHE_DIR=$(SRCROOT)/ccache
 
 #TODO are we done sweeping for asm?
-#$?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SDK)/usr/bin/gcc -emit-llvm"' -DSTRIP_FBSDID -D__asm__\(X...\)="\error" -D__asm\(X...\)="\error"' MAKEFLAGS="" MFLAGS="" $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
-$?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -DSTRIP_FBSDID" MAKEFLAGS="" MFLAGS="" $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
-BUILDORDER=cmake abclibs basictools llvm binutils plugins gcc bmake \
-			stdlibs gcclibs as3wig abcstdlibs sdkcleanup tr trd extralibs \
-			extratools finalcleanup submittests
+#BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm"' -DSTRIP_FBSDID -D__asm__\(X...\)="\error" -D__asm\(X...\)="\error"' MAKEFLAGS="" MFLAGS="" NO_WERROR=true $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
+
+BMAKE+= AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true 
+BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -DSTRIP_FBSDID " 
+BMAKE+= MAKEFLAGS="" MFLAGS="" 
+BMAKE+= MACHINE_ARCH=avm2  NO_WERROR=true SSP_CFLAGS=
+BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
+
+BUILDORDER= cmake abclibs basictools llvm binutils plugins 
+ifneq (,$(findstring 2.9,$(LLVMVERSION)))
+BUILDORDER+= gcc
+endif
+BUILDORDER+= bmake binutils plugins bmake stdlibs 
+ifneq (,$(findstring 2.9,$(LLVMVERSION)))
+BUILDORDER+= gcclibs
+endif
+BUILDORDER+= as3wig abcstdlibs sdkcleanup tr trd extralibs 
+BUILDORDER+= extratools finalcleanup submittests
 
 all:
 	@echo "~~~ Crossbridge $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
@@ -210,6 +218,7 @@ abclibs_asdocs:
 				-main-title "Crossbridge API Reference" \
 				-window-title "Crossbridge API Reference" \
 				-output apidocs &> $(BUILD)/logs/asdoc.txt
+	if [ -d $(BUILDROOT)/tempdita ]; then rm -rf $(BUILDROOT)/tempdita; fi
 	mv $(BUILDROOT)/apidocs/tempdita $(BUILDROOT)/
 
 CROSS=PATH="$(BUILD)/ccachebin:$(CYGWINMAC):$(PATH):$(SDK)/usr/bin" $(MAKE) SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin LLVMINSTALLPREFIX=$(WIN_BUILD) NATIVE_AR=$(CYGTRIPLE)-ar CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ RANLIB=$(CYGTRIPLE)-ranlib
@@ -471,7 +480,7 @@ llvmtests:
 	rm -rf $(BUILD)/llvm-tests
 	mkdir -p $(BUILD)/llvm-tests
 	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
-	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-2.9/configure --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --without-f2c --without-f95 --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-install
+	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-$(LLVMVERSION)/configure --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --without-f2c --without-f95 --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
 	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
 	cd $(BUILD)/llvm-tests/projects/test-suite/MultiSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
 	cd $(BUILD)/llvm-tests/projects/test-suite/SingleSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
@@ -485,7 +494,7 @@ llvmtests-speccpu2006: # works only on mac!
 	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
 	mkdir -p $(BUILD)/llvm-externals && cd $(BUILD)/llvm-externals && curl http://alchemy.corp.adobe.com/speccpu2006.tar.bz2 | tar xvjf -
 	#mkdir -p $(BUILD)/llvm-externals && cd $(BUILD)/llvm-externals && cat $(SRCROOT)/speccpu2006.tar.bz2 | tar xvjf -
-	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-2.9/configure --without-f2c --without-f95 --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --with-externals=$(BUILD)/llvm-externals --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-install
+	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-$(LLVMVERSION)/configure --without-f2c --without-f95 --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --with-externals=$(BUILD)/llvm-externals --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
 	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
 	cd $(BUILD)/llvm-tests/projects/test-suite/External && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1 CXXFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP' CFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP')
 	python $(SRCROOT)/tools/llvmtestcheck.py --fpcmp $(FPCMP) --srcdir $(SRCROOT)/llvm-2.9/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ > $(BUILD)/llvm-tests/passfail.txt
@@ -538,8 +547,8 @@ gcc:
 
 csu:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE) SSP_CFLAGS="" MACHINE_ARCH=avm2 crt1_c.o
-	cp -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
+	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE)   crt1_c.o
+	mv -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
 
 stdlibs:
 	$(MAKE) -j$(THREADS) csu libc libthr libm libBlocksRuntime
@@ -555,13 +564,13 @@ libc:
 	cp $(BUILD)/posix/ShellPosixGlue.cpp $(SRCROOT)/avmplus/shell
 	cp $(BUILD)/posix/ShellPosixGlue.h $(SRCROOT)/avmplus/shell
 	cd $(SRCROOT)/avmplus/shell && python ./shell_toplevel.py -config CONFIG::VMCFG_ALCHEMY_POSIX=true
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c posix.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/vgl.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -D_KERNEL -c $(SRCROOT)/avm2_env/usr/src/kern/kern_umtx.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -c $(SRCROOT)/posix/thrStubs.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/kpmalloc.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector -D__AVM2__ $(LIBHELPEROPTFLAGS) -c posix.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector -D__AVM2__ $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/vgl.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector -D__AVM2__ $(LIBHELPEROPTFLAGS) -D_KERNEL -c $(SRCROOT)/avm2_env/usr/src/kern/kern_umtx.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector -D__AVM2__ $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -c $(SRCROOT)/posix/thrStubs.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector -D__AVM2__ $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/kpmalloc.c
 	cd $(BUILD)/posix && cp *.o $(BUILD)/lib/src/lib/libc/
-	cd $(BUILD)/lib/src/lib/libc && $(BMAKE) -j$(THREADS) SSP_CFLAGS="" MACHINE_ARCH=avm2 libc.a
+	cd $(BUILD)/lib/src/lib/libc && $(BMAKE) -j$(THREADS)   libc.a
 	# find bitcode (and ignore non-bitcode genned from .s files) and put
 	# it in our lib
 	rm -f $(BUILD)/lib/src/lib/libc/tmp/*
@@ -648,7 +657,7 @@ libBlocksRuntime:
 
 libvgl:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-	cd $(BUILD)/lib/src/lib/libvgl && $(BMAKE) -j$(THREADS) SSP_CFLAGS="" MACHINE_ARCH=avm2 libvgl.a
+	cd $(BUILD)/lib/src/lib/libvgl && $(BMAKE) -j$(THREADS)   libvgl.a
 	rm -f $(SDK)/usr/lib/libvgl.a
 	$(AR) $(SDK)/usr/lib/libvgl.a $(BUILD)/lib/src/lib/libvgl/*.o
 
@@ -706,7 +715,7 @@ libm:
 	rm -rf $(BUILD)/msun/ $(BUILD)/libmbc $(SDK)/usr/lib/libm.a $(SDK)/usr/lib/libm.o
 	mkdir -p $(BUILD)/msun
 	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/msun/
-	cd $(BUILD)/msun/msun && $(BMAKE) -j$(THREADS) SSP_CFLAGS="" MACHINE_ARCH=avm2 libm.a
+	cd $(BUILD)/msun/msun && $(BMAKE) -j$(THREADS)   libm.a
 	# find bitcode (and ignore non-bitcode genned from .s files) and put
 	# it in our lib
 	cd $(BUILD)/msun/msun && rm -f libm.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libm.a
@@ -716,6 +725,7 @@ libm:
 	mkdir -p $(BUILD)/libmbc
 	cd $(BUILD)/libmbc && $(SDK)/usr/bin/ar x $(BUILD)/msun/msun/libm.a
 	cd $(BUILD)/libmbc && $(SDK)/usr/bin/llvm-link -o $(BUILD)/libmbc/libm.o $(BUILD)/libcompiler_rt.o *.o
+	cp -f $(BUILD)/libmbc/libm.o $(SDK)/usr/lib/libm.o
 	$(SDK)/usr/bin/opt -O3 -o $(SDK)/usr/lib/libm.o $(BUILD)/libmbc/libm.o
 	$(SDK)/usr/bin/nm $(SDK)/usr/lib/libm.o | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/libm.bc.txt
 
@@ -725,7 +735,7 @@ libthr:
 	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/libthr/
 	cd $(BUILD)/libthr/libthr && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/thrHelpers.c
 	# CWARNFLAGS= because thr_exit() can return and pthread_exit() is marked noreturn (where?)...
-	cd $(BUILD)/libthr/libthr && $(BMAKE) -j$(THREADS) SSP_CFLAGS="" MACHINE_ARCH=avm2 CWARNFLAGS= libthr.a
+	cd $(BUILD)/libthr/libthr && $(BMAKE) -j$(THREADS)   CWARNFLAGS= libthr.a
 	# find bitcode (and ignore non-bitcode genned from .s files) and put
 	# it in our lib
 	cd $(BUILD)/libthr/libthr && rm -f libthr.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libthr.a
@@ -958,7 +968,7 @@ base:
 	cp -f avmplus/generated/*.abc $(SDK)/usr/lib/
 
 	$(RSYNC) --exclude '*iconv.h' avm2_env/usr/include/ $(SDK)/usr/include
-	$(RSYNC) avm2_env/usr/lib/ $(SDK)/usr/lib
+	#$(RSYNC) avm2_env/usr/lib/ $(SDK)/usr/lib
 
 	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/swfmake.as) -outdir . -out swfmake
 	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/projectormake.as) -outdir . -out projectormake
