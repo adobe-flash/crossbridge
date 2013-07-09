@@ -22,7 +22,7 @@
 
 extern char **environ;
 
-int main(int argc, const **argv)
+int main(int argc, char **argv)
 {
   char *noenv = NULL;
   environ = &noenv;
