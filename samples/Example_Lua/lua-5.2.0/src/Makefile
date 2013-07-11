@@ -6,7 +6,7 @@
 # Your platform. See PLATS for possible values.
 PLAT= none
 
-CC= gcc
+CC= clang
 CFLAGS= -O2 -Wall -DLUA_COMPAT_ALL $(SYSCFLAGS) $(MYCFLAGS)
 LDFLAGS= $(SYSLDFLAGS) $(MYLDFLAGS)
 LIBS= -lm $(SYSLIBS) $(MYLIBS)
@@ -124,7 +124,7 @@ flash:
 	PATH="$(FLASCC)/usr/bin:$(PATH)" $(MAKE) liblua.a SYSCFLAGS="-DLUA_USE_POSIX" MYCFLAGS="-emit-llvm"
 	"$(FLASCC)/usr/bin/swig" -as3 -module Lua -outdir . -includeall -ignoremissing as3api.h
 	java -jar "$(NP_FLASCC)/usr/lib/asc2.jar" -import "$(NP_FLASCC)/usr/lib/builtin.abc" -import "$(NP_FLASCC)/usr/lib/playerglobal.abc" Lua.as
-	"$(FLASCC)/usr/bin/gcc" $(OPT_FLAGS) -c as3api_wrap.c
+	"$(FLASCC)/usr/bin/clang" $(OPT_FLAGS) -c as3api_wrap.c
 	"$(FLASCC)/usr/bin/nm" -f posix as3api_wrap.o | awk '{print $$1}' | sed 's/_//' > exports.txt
 	echo "_start1" >> exports.txt
 	echo "_Unwind_SjLj_Register"  >> exports.txt
@@ -137,7 +137,7 @@ flash:
 	echo "memmove" >> exports.txt
 	echo "vglttyioctl" >> exports.txt
 
-	"$(FLASCC)/usr/bin/gcc" $(OPT_FLAGS) as3api_wrap.o liblua.a Lua.abc -jvmopt="-Xmx2000M" -emit-swc=sample.lua -o ../../lua.swc
+	"$(FLASCC)/usr/bin/clang" $(OPT_FLAGS) as3api_wrap.o liblua.a Lua.abc -jvmopt="-Xmx2000M" -emit-swc=sample.lua -o ../../lua.swc
 
 # list targets that do not create files (but not all makes understand .PHONY)
 .PHONY: all $(PLATS) default o a clean depend echo none

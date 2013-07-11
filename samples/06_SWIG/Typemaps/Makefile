@@ -10,7 +10,7 @@ all: check
 	mv IntArrayLib.as IntArrayLib.as3
 
 	@echo "-> Compile the library into a SWC"
-	"$(FLASCC)/usr/bin/gcc" -Werror IntArrayLib.abc IntArrayLib_wrapper.c intarraylibmain.c intarraylib.c -emit-swc=sample.IntArrayLib -o IntArrayLib.swc
+	"$(FLASCC)/usr/bin/clang" -Werror IntArrayLib.abc IntArrayLib_wrapper.c intarraylibmain.c intarraylib.c -emit-swc=sample.IntArrayLib -o IntArrayLib.swc
 
 	@echo "-> Compile an example SWF that uses that SWC"
 	"$(FLEX)/bin/mxmlc" -static-link-runtime-shared-libraries -library-path+=IntArrayLib.swc Main.as -debug=true -o Main.swf
