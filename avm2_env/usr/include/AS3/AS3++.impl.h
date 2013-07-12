@@ -92,14 +92,6 @@ var new_undefined();
 */
 var new_null();
 
-/** Create an AS3 null object of a given type
-*/
-template <typename T> T new_null()
-{
-  var v;
-  return v;
-}
-
 #ifdef AS3_UI
 /** Get a reference to the flash Stage object
 */
@@ -540,6 +532,16 @@ public:
     }
 };
 
+}
+
+namespace internal {
+  /** Create an AS3 null object of a given type
+   */
+  template <typename T> T new_null()
+  {
+    var v;
+    return v;
+  }
 }
 
 /** Crete a new propref that references a different property on the same object

@@ -899,7 +899,7 @@ as3wig:
 	cp -f $(SRCROOT)/tools/aet/AS3Wig.cpp $(BUILD)/as3wig/
 	echo "#include <AS3++/builtin.h>\n" > $(BUILD)/as3wig/AS3WigIncludes.h
 	echo "#include <AS3++/playerglobal.h>\n" >> $(BUILD)/as3wig/AS3WigIncludes.h
-	cd $(BUILD)/as3wig && $(SDK)/usr/bin/g++ -c -emit-llvm -I. AS3Wig.cpp -o Flash++.o
+	cd $(BUILD)/as3wig && $(SDK)/usr/bin/$(FLASCC_CXX) -c -emit-llvm -I. AS3Wig.cpp -o Flash++.o
 	cd $(BUILD)/as3wig && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libFlash++.a Flash++.o
 
 alctool:

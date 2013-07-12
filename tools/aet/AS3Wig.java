@@ -392,10 +392,12 @@ public class AS3Wig {
 					result = result + ",";
 				if(types)
 					result = result + " " + argTypes[i];
-				if(argNames)
+				if(argNames) {
 					result = result + " arg" + i;
-				else
-					result = result + argDefaults[i];
+				} else {
+					// FIXME: clang does not support default values for forward delclared types. Disable them for now
+					// result = result + argDefaults[i];
+				}
 			}
 			if(isVarArgs)
 			{
