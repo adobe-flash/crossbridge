@@ -192,6 +192,8 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
 
     setOperationAction(ISD::CTTZ_ZERO_UNDEF, MVT::i32, Expand);
     setOperationAction(ISD::CTLZ_ZERO_UNDEF, MVT::i32, Expand);
+    setOperationAction(ISD::CTTZ_ZERO_UNDEF, MVT::i64, Expand);
+    setOperationAction(ISD::CTLZ_ZERO_UNDEF, MVT::i64, Expand);
  
     setOperationAction(ISD::CTPOP, MVT::i64, Expand);
     setOperationAction(ISD::CTTZ , MVT::i64, Expand);
@@ -209,6 +211,11 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
     setOperationAction(ISD::SHL_PARTS, MVT::i64, Expand);
     setOperationAction(ISD::SRA_PARTS, MVT::i64, Expand);
     setOperationAction(ISD::SRL_PARTS, MVT::i64, Expand);
+
+    
+    setOperationAction(ISD::FMA, MVT::i32, Expand);
+    setOperationAction(ISD::FMA, MVT::i64, Expand);
+    setOperationAction(ISD::ATOMIC_FENCE, MVT::Other, Expand);
 
     /*
      http://llvm.org/viewvc/llvm-project?view=rev&revision=78142
