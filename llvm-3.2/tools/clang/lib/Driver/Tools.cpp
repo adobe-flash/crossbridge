@@ -5704,8 +5704,11 @@ void avm2::Link::ConstructJob(Compilation &C, const JobAction &JA,
   Args.ClaimAllArgs(options::OPT_w);
 
   CmdArgs.push_back("--plugin");
-  CmdArgs.push_back(Args.MakeArgString( 
-    ToolChain.GetFilePath("multiplug.dylib"))); // TODO MCANNIZZ: cygwin
+#ifdef __CYGWIN__
+  CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath("multiplug.dll")));
+#else
+  CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath("multiplug.dylib")));
+#endif
 
   // If use verbose mode.
   if (Args.hasArg(options::OPT_v)) {
