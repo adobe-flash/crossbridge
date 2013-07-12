@@ -146,7 +146,7 @@ BUILDORDER= cmake abclibs basictools llvm binutils plugins
 ifneq (,$(findstring 2.9,$(LLVMVERSION)))
 BUILDORDER+= gcc
 endif
-BUILDORDER+= bmake binutils plugins bmake stdlibs 
+BUILDORDER+= bmake stdlibs 
 ifneq (,$(findstring 2.9,$(LLVMVERSION)))
 BUILDORDER+= gcclibs
 endif
