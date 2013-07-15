@@ -343,7 +343,8 @@ void LTOCodeGenerator::applyScopeRestrictions() {
 
   LLVMCompilerUsed->setSection("llvm.metadata");
 
-  passes.add(createInternalizePass(mustPreserveList));
+  //There may be a better way to avoid internalize weak alias functions in lto phase
+  //passes.add(createInternalizePass(mustPreserveList));
 
   // apply scope restrictions
   passes.run(*mergedModule);
