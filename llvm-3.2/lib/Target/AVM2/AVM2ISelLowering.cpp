@@ -213,8 +213,6 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
     setOperationAction(ISD::SRL_PARTS, MVT::i64, Expand);
 
     
-    setOperationAction(ISD::FMA, MVT::i32, Expand);
-    setOperationAction(ISD::FMA, MVT::i64, Expand);
     setOperationAction(ISD::ATOMIC_FENCE, MVT::Other, Expand);
 
     /*

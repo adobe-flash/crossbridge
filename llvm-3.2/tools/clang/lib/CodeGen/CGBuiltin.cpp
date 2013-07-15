@@ -1272,10 +1272,10 @@ RValue CodeGenFunction::EmitBuiltinExpr(const FunctionDecl *FD,
     Value *F = CGM.getIntrinsic(Intrinsic::pow, ArgType);
     return RValue::get(Builder.CreateCall2(F, Base, Exponent));
   }
-
+/*
   case Builtin::BIfma:
   case Builtin::BIfmaf:
-  case Builtin::BIfmal:
+  case Builtin::BIfmal:*/
   case Builtin::BI__builtin_fma:
   case Builtin::BI__builtin_fmaf:
   case Builtin::BI__builtin_fmal: {
