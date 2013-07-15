@@ -207,15 +207,15 @@ abclibs_asdocs:
 	mkdir -p $(BUILD)/logs
 	cd $(BUILDROOT) && $(ASDOC) \
 				-load-config= \
-				-external-library-path=$(SRCROOT)/tools/flex/frameworks/libs/player/11.1/playerglobal.swc \
+				-external-library-path=$(call nativepath,$(SRCROOT)/tools/flex/frameworks/libs/player/11.1/playerglobal.swc) \
 				-strict=false -define+=CONFIG::player,1 -define+=CONFIG::asdocs,true -define+=CONFIG::actual,false \
-				-doc-sources+=$(SRCROOT)/posix/vfs \
-				-doc-sources+=$(SRCROOT)/posix \
+				-doc-sources+=$(call nativepath,$(SRCROOT)/posix/vfs) \
+				-doc-sources+=$(call nativepath,$(SRCROOT)/posix) \
 				-keep-xml=true \
-				-exclude-sources+=$(SRCROOT)/posix/startHack.as \
-				-exclude-sources+=$(SRCROOT)/posix/IKernel.as \
-				-exclude-sources+=$(SRCROOT)/posix/vfs/nochump \
-				-package-description-file=$(SRCROOT)/test/aspackages.xml \
+				-exclude-sources+=$(call nativepath,$(SRCROOT)/posix/startHack.as) \
+				-exclude-sources+=$(call nativepath,$(SRCROOT)/posix/IKernel.as) \
+				-exclude-sources+=$(call nativepath,$(SRCROOT)/posix/vfs/nochump) \
+				-package-description-file=$(call nativepath,$(SRCROOT)/test/aspackages.xml) \
 				-main-title "Crossbridge API Reference" \
 				-window-title "Crossbridge API Reference" \
 				-output apidocs &> $(BUILD)/logs/asdoc.txt
