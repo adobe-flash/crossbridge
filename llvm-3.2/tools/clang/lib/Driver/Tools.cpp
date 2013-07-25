@@ -6029,11 +6029,11 @@ void avm2::Link::ConstructJob(Compilation &C, const JobAction &JA,
   if (!Args.hasArg(options::OPT_nostdlib) &&
       !Args.hasArg(options::OPT_nodefaultlibs)) {
     if (D.CCCIsCXX) {
-      llvm::errs() << "compiling for C++\n";
-      CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath(
-        (postfix + "libstdc++.a").c_str())));
-      CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath(
-        (postfix + "libsupc++.a").c_str())));
+      ToolChain.AddCXXStdlibLibArgs(Args, CmdArgs);
+      if (Args.hasArg(options::OPT_pg))
+        CmdArgs.push_back("-lm_p");
+      else
+        CmdArgs.push_back("-lm");
     }
     CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath(
         (postfix + "crt1_c.o").c_str())));
@@ -6041,21 +6041,9 @@ void avm2::Link::ConstructJob(Compilation &C, const JobAction &JA,
         (postfix + "libcHack.o").c_str())));
     CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath(
         (postfix + "libm.o").c_str())));
-    //CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath(
-    //    (postfix + "libgcc.a").c_str())));
     CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath(
         (postfix + "libc.a").c_str())));
   }
-
-
-  if (D.CCCIsCXX) {
-    ToolChain.AddCXXStdlibLibArgs(Args, CmdArgs);
-    if (Args.hasArg(options::OPT_pg))
-      CmdArgs.push_back("-lm_p");
-    else
-      CmdArgs.push_back("-lm");
-  }
-
 
   addProfileRT(ToolChain, Args, CmdArgs, ToolChain.getTriple());
 
