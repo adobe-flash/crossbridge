@@ -40,6 +40,8 @@
 #include <machine/atomic.h>
 #include "setlocale.h"
 
+#define __NO_TLS
+
 enum {
 	XLC_COLLATE = 0,
 	XLC_CTYPE,

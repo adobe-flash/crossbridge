@@ -42,6 +42,7 @@
 #define	_CACHED_RUNES	(1 <<8 )	/* Must be a power of 2 */
 #define	_CRMASK		(~(_CACHED_RUNES - 1))
 
+#define __NO_TLS
 /*
  * The lower 8 bits of runetype[] contain the digit value of the rune.
  */
