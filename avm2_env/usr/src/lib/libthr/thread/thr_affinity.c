@@ -23,7 +23,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libthr/thread/thr_affinity.c,v 1.4.4.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  *
  */
 
@@ -50,12 +50,7 @@ _pthread_setaffinity_np(pthread_t td, size_t cpusetsize, const cpuset_t *cpusetp
 			-1, cpusetsize, cpusetp);
 		if (error == -1)
 			error = errno;
-	} else {
-		THR_THREAD_LOCK(curthread, td);
-		if (td->state == PS_DEAD) {
-			THR_THREAD_UNLOCK(curthread, td);
-			return (EINVAL);
-		}
+	} else if ((error = _thr_find_thread(curthread, td, 0)) == 0) {
 		tid = TID(td);
 		error = cpuset_setaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID, tid,
 			cpusetsize, cpusetp);
@@ -73,10 +68,18 @@ _pthread_getaffinity_np(pthread_t td, size_t cpusetsize, cpuset_t *cpusetp)
 	lwpid_t tid;
 	int error;
 
-	tid = TID(td);
-	error = cpuset_getaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID,
-		(td == curthread) ? -1 : tid, cpusetsize, cpusetp);
-	if (error == -1)
-		error = errno;
+	if (td == curthread) {
+		error = cpuset_getaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID,
+			-1, cpusetsize, cpusetp);
+		if (error == -1)
+			error = errno;
+	} else if ((error = _thr_find_thread(curthread, td, 0)) == 0) {
+		tid = TID(td);
+		error = cpuset_getaffinity(CPU_LEVEL_WHICH, CPU_WHICH_TID, tid,
+			    cpusetsize, cpusetp);
+		if (error == -1)
+			error = errno;
+		THR_THREAD_UNLOCK(curthread, td);
+	}
 	return (error);
 }

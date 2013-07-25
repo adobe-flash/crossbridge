@@ -5,6 +5,11 @@
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -34,7 +39,7 @@
 static char sccsid[] = "@(#)fscanf.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/stdio/fscanf.c,v 1.13.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <stdio.h>
@@ -42,6 +47,7 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fscanf.c,v 1.13.10.1.6.1 2010/12/21 17:09
 #include "un-namespace.h"
 #include "libc_private.h"
 #include "local.h"
+#include "xlocale_private.h"
 
 int
 fscanf(FILE * __restrict fp, char const * __restrict fmt, ...)
@@ -51,7 +57,21 @@ fscanf(FILE * __restrict fp, char const * __restrict fmt, ...)
 
 	va_start(ap, fmt);
 	FLOCKFILE(fp);
-	ret = __svfscanf(fp, fmt, ap);
+	ret = __svfscanf(fp, __get_locale(), fmt, ap);
+	va_end(ap);
+	FUNLOCKFILE(fp);
+	return (ret);
+}
+int
+fscanf_l(FILE * __restrict fp, locale_t locale, char const * __restrict fmt, ...)
+{
+	int ret;
+	va_list ap;
+	FIX_LOCALE(locale);
+
+	va_start(ap, fmt);
+	FLOCKFILE(fp);
+	ret = __svfscanf(fp, locale, fmt, ap);
 	va_end(ap);
 	FUNLOCKFILE(fp);
 	return (ret);

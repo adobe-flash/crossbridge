@@ -30,7 +30,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libthr/thread/thr_mutex.c,v 1.75.2.2.2.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #include "namespace.h"
@@ -92,7 +92,7 @@ int	__pthread_mutex_setyieldloops_np(pthread_mutex_t *mutex, int count);
 static int	mutex_self_trylock(pthread_mutex_t);
 static int	mutex_self_lock(pthread_mutex_t,
 				const struct timespec *abstime);
-static int	mutex_unlock_common(pthread_mutex_t *);
+static int	mutex_unlock_common(struct pthread_mutex *, int);
 static int	mutex_lock_sleep(struct pthread *, pthread_mutex_t,
 				const struct timespec *);
 
@@ -170,10 +170,9 @@ mutex_init(pthread_mutex_t *mutex,
 		calloc_cb(1, sizeof(struct pthread_mutex))) == NULL)
 		return (ENOMEM);
 
-	pmutex->m_type = attr->m_type;
+	pmutex->m_flags = attr->m_type;
 	pmutex->m_owner = NULL;
 	pmutex->m_count = 0;
-	pmutex->m_refcount = 0;
 	pmutex->m_spinloops = 0;
 	pmutex->m_yieldloops = 0;
 	MUTEX_INIT_LINK(pmutex);
@@ -193,7 +192,7 @@ mutex_init(pthread_mutex_t *mutex,
 		break;
 	}
 
-	if (pmutex->m_type == PTHREAD_MUTEX_ADAPTIVE_NP) {
+	if (PMUTEX_TYPE(pmutex->m_flags) == PTHREAD_MUTEX_ADAPTIVE_NP) {
 		pmutex->m_spinloops =
 		    _thr_spinloops ? _thr_spinloops: MUTEX_ADAPTIVE_SPINS;
 		pmutex->m_yieldloops = _thr_yieldloops;
@@ -250,8 +249,12 @@ _pthread_mutex_init_calloc_cb(pthread_mutex_t *mutex,
 		.m_protocol = PTHREAD_PRIO_NONE,
 		.m_ceiling = 0
 	};
+	int ret;
 
-	return mutex_init(mutex, &attr, calloc_cb);
+	ret = mutex_init(mutex, &attr, calloc_cb);
+	if (ret == 0)
+		(*mutex)->m_flags |= PMUTEX_FLAG_PRIVATE;
+	return (ret);
 }
 
 void
@@ -278,10 +281,8 @@ _mutex_fork(struct pthread *curthread)
 int
 _pthread_mutex_destroy(pthread_mutex_t *mutex)
 {
-	struct pthread *curthread = _get_curthread();
 	pthread_mutex_t m;
-	uint32_t id;
-	int ret = 0;
+	int ret;
 
 	m = *mutex;
 	if (m < THR_MUTEX_DESTROYED) {
@@ -289,34 +290,13 @@ _pthread_mutex_destroy(pthread_mutex_t *mutex)
 	} else if (m == THR_MUTEX_DESTROYED) {
 		ret = EINVAL;
 	} else {
-		id = TID(curthread);
-
-		/*
-		 * Try to lock the mutex structure, we only need to
-		 * try once, if failed, the mutex is in used.
-		 */
-		ret = _thr_umutex_trylock(&m->m_lock, id);
-		if (ret)
-			return (ret);
-		/*
-		 * Check mutex other fields to see if this mutex is
-		 * in use. Mostly for prority mutex types, or there
-		 * are condition variables referencing it.
-		 */
-		if (m->m_owner != NULL || m->m_refcount != 0) {
-			if (m->m_lock.m_flags & UMUTEX_PRIO_PROTECT)
-				set_inherited_priority(curthread, m);
-			_thr_umutex_unlock(&m->m_lock, id);
+		if (m->m_owner != NULL) {
 			ret = EBUSY;
 		} else {
 			*mutex = THR_MUTEX_DESTROYED;
-
-			if (m->m_lock.m_flags & UMUTEX_PRIO_PROTECT)
-				set_inherited_priority(curthread, m);
-			_thr_umutex_unlock(&m->m_lock, id);
-
 			MUTEX_ASSERT_NOT_OWNED(m);
 			free(m);
+			ret = 0;
 		}
 	}
 
@@ -333,6 +313,17 @@ _pthread_mutex_destroy(pthread_mutex_t *mutex)
 		else							\
 			TAILQ_INSERT_TAIL(&curthread->pp_mutexq, (m), m_qe);\
 	} while (0)
+
+#define DEQUEUE_MUTEX(curthread, m)					\
+		(m)->m_owner = NULL;					\
+		MUTEX_ASSERT_IS_OWNED(m);				\
+		if (__predict_true(((m)->m_lock.m_flags & UMUTEX_PRIO_PROTECT) == 0)) \
+			TAILQ_REMOVE(&curthread->mutexq, (m), m_qe);		\
+		else {							\
+			TAILQ_REMOVE(&curthread->pp_mutexq, (m), m_qe);	\
+			set_inherited_priority(curthread, m);		\
+		}							\
+		MUTEX_INIT_LINK(m);
 
 #define CHECK_AND_INIT_MUTEX						\
 	if (__predict_false((m = *mutex) <= THR_MUTEX_DESTROYED)) {	\
@@ -354,13 +345,16 @@ mutex_trylock_common(pthread_mutex_t *mutex)
 	int ret;
 
 	id = TID(curthread);
+	if (m->m_flags & PMUTEX_FLAG_PRIVATE)
+		THR_CRITICAL_ENTER(curthread);
 	ret = _thr_umutex_trylock(&m->m_lock, id);
 	if (__predict_true(ret == 0)) {
 		ENQUEUE_MUTEX(curthread, m);
 	} else if (m->m_owner == curthread) {
 		ret = mutex_self_trylock(m);
 	} /* else {} */
-
+	if (ret && (m->m_flags & PMUTEX_FLAG_PRIVATE))
+		THR_CRITICAL_LEAVE(curthread);
 	return (ret);
 }
 
@@ -444,16 +438,22 @@ done:
 
 static inline int
 mutex_lock_common(struct pthread_mutex *m,
-	const struct timespec *abstime)
+	const struct timespec *abstime, int cvattach)
 {
 	struct pthread *curthread  = _get_curthread();
+	int ret;
 
+	if (!cvattach && m->m_flags & PMUTEX_FLAG_PRIVATE)
+		THR_CRITICAL_ENTER(curthread);
 	if (_thr_umutex_trylock2(&m->m_lock, TID(curthread)) == 0) {
 		ENQUEUE_MUTEX(curthread, m);
-		return (0);
+		ret = 0;
+	} else {
+		ret = mutex_lock_sleep(curthread, m, abstime);
 	}
-	
-	return (mutex_lock_sleep(curthread, m, abstime));
+	if (ret && (m->m_flags & PMUTEX_FLAG_PRIVATE) && !cvattach)
+		THR_CRITICAL_LEAVE(curthread);
+	return (ret);
 }
 
 int
@@ -465,7 +465,7 @@ __pthread_mutex_lock(pthread_mutex_t *mutex)
 
 	CHECK_AND_INIT_MUTEX
 
-	return (mutex_lock_common(m, NULL));
+	return (mutex_lock_common(m, NULL, 0));
 }
 
 int
@@ -477,28 +477,82 @@ __pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *abstime
 
 	CHECK_AND_INIT_MUTEX
 
-	return (mutex_lock_common(m, abstime));
+	return (mutex_lock_common(m, abstime, 0));
 }
 
 int
-_pthread_mutex_unlock(pthread_mutex_t *m)
+_pthread_mutex_unlock(pthread_mutex_t *mutex)
 {
-	return (mutex_unlock_common(m));
+	struct pthread_mutex *mp;
+
+	mp = *mutex;
+	return (mutex_unlock_common(mp, 0));
 }
 
 int
-_mutex_cv_lock(pthread_mutex_t *mutex, int count)
+_mutex_cv_lock(struct pthread_mutex *m, int count)
 {
-	struct pthread_mutex	*m;
-	int	ret;
+	int	error;
 
-	m = *mutex;
-	ret = mutex_lock_common(m, NULL);
-	if (ret == 0) {
-		m->m_refcount--;
-		m->m_count += count;
+	error = mutex_lock_common(m, NULL, 1);
+	if (error == 0)
+		m->m_count = count;
+	return (error);
+}
+
+int
+_mutex_cv_unlock(struct pthread_mutex *m, int *count)
+{
+
+	/*
+	 * Clear the count in case this is a recursive mutex.
+	 */
+	*count = m->m_count;
+	m->m_count = 0;
+	(void)mutex_unlock_common(m, 1);
+        return (0);
+}
+
+int
+_mutex_cv_attach(struct pthread_mutex *m, int count)
+{
+	struct pthread *curthread = _get_curthread();
+
+	ENQUEUE_MUTEX(curthread, m);
+	m->m_count = count;
+	return (0);
+}
+
+int
+_mutex_cv_detach(struct pthread_mutex *mp, int *recurse)
+{
+	struct pthread *curthread = _get_curthread();
+	int     defered;
+	int     error;
+
+	if ((error = _mutex_owned(curthread, mp)) != 0)
+                return (error);
+
+	/*
+	 * Clear the count in case this is a recursive mutex.
+	 */
+	*recurse = mp->m_count;
+	mp->m_count = 0;
+	DEQUEUE_MUTEX(curthread, mp);
+
+	/* Will this happen in real-world ? */
+        if ((mp->m_flags & PMUTEX_FLAG_DEFERED) != 0) {
+		defered = 1;
+		mp->m_flags &= ~PMUTEX_FLAG_DEFERED;
+	} else
+		defered = 0;
+
+	if (defered)  {
+		_thr_wake_all(curthread->defer_waiters,
+				curthread->nwaiter_defer);
+		curthread->nwaiter_defer = 0;
 	}
-	return (ret);
+	return (0);
 }
 
 static int
@@ -506,9 +560,10 @@ mutex_self_trylock(struct pthread_mutex *m)
 {
 	int	ret;
 
-	switch (m->m_type) {
+	switch (PMUTEX_TYPE(m->m_flags)) {
 	case PTHREAD_MUTEX_ERRORCHECK:
 	case PTHREAD_MUTEX_NORMAL:
+	case PTHREAD_MUTEX_ADAPTIVE_NP:
 		ret = EBUSY; 
 		break;
 
@@ -535,7 +590,7 @@ mutex_self_lock(struct pthread_mutex *m, const struct timespec *abstime)
 	struct timespec	ts1, ts2;
 	int	ret;
 
-	switch (m->m_type) {
+	switch (PMUTEX_TYPE(m->m_flags)) {
 	case PTHREAD_MUTEX_ERRORCHECK:
 	case PTHREAD_MUTEX_ADAPTIVE_NP:
 		if (abstime) {
@@ -599,13 +654,12 @@ mutex_self_lock(struct pthread_mutex *m, const struct timespec *abstime)
 }
 
 static int
-mutex_unlock_common(pthread_mutex_t *mutex)
+mutex_unlock_common(struct pthread_mutex *m, int cv)
 {
 	struct pthread *curthread = _get_curthread();
-	struct pthread_mutex *m;
 	uint32_t id;
+	int defered;
 
-	m = *mutex;
 	if (__predict_false(m <= THR_MUTEX_DESTROYED)) {
 		if (m == THR_MUTEX_DESTROYED)
 			return (EINVAL);
@@ -620,61 +674,27 @@ mutex_unlock_common(pthread_mutex_t *mutex)
 
 	id = TID(curthread);
 	if (__predict_false(
-		m->m_type == PTHREAD_MUTEX_RECURSIVE &&
+		PMUTEX_TYPE(m->m_flags) == PTHREAD_MUTEX_RECURSIVE &&
 		m->m_count > 0)) {
 		m->m_count--;
 	} else {
-		m->m_owner = NULL;
-		/* Remove the mutex from the threads queue. */
-		MUTEX_ASSERT_IS_OWNED(m);
-		if (__predict_true((m->m_lock.m_flags & UMUTEX_PRIO_PROTECT) == 0))
-			TAILQ_REMOVE(&curthread->mutexq, m, m_qe);
-		else {
-			TAILQ_REMOVE(&curthread->pp_mutexq, m, m_qe);
-			set_inherited_priority(curthread, m);
-		}
-		MUTEX_INIT_LINK(m);
+		if ((m->m_flags & PMUTEX_FLAG_DEFERED) != 0) {
+			defered = 1;
+			m->m_flags &= ~PMUTEX_FLAG_DEFERED;
+        	} else
+                	defered = 0;
+
+		DEQUEUE_MUTEX(curthread, m);
 		_thr_umutex_unlock(&m->m_lock, id);
+
+		if (curthread->will_sleep == 0 && defered)  {
+			_thr_wake_all(curthread->defer_waiters,
+				curthread->nwaiter_defer);
+			curthread->nwaiter_defer = 0;
+		}
 	}
-	return (0);
-}
-
-int
-_mutex_cv_unlock(pthread_mutex_t *mutex, int *count)
-{
-	struct pthread *curthread = _get_curthread();
-	struct pthread_mutex *m;
-
-	m = *mutex;
-	if (__predict_false(m <= THR_MUTEX_DESTROYED)) {
-		if (m == THR_MUTEX_DESTROYED)
-			return (EINVAL);
-		return (EPERM);
-	}
-
-	/*
-	 * Check if the running thread is not the owner of the mutex.
-	 */
-	if (__predict_false(m->m_owner != curthread))
-		return (EPERM);
-
-	/*
-	 * Clear the count in case this is a recursive mutex.
-	 */
-	*count = m->m_count;
-	m->m_refcount++;
-	m->m_count = 0;
-	m->m_owner = NULL;
-	/* Remove the mutex from the threads queue. */
-	MUTEX_ASSERT_IS_OWNED(m);
-	if (__predict_true((m->m_lock.m_flags & UMUTEX_PRIO_PROTECT) == 0))
-		TAILQ_REMOVE(&curthread->mutexq, m, m_qe);
-	else {
-		TAILQ_REMOVE(&curthread->pp_mutexq, m, m_qe);
-		set_inherited_priority(curthread, m);
-	}
-	MUTEX_INIT_LINK(m);
-	_thr_umutex_unlock(&m->m_lock, TID(curthread));
+	if (!cv && m->m_flags & PMUTEX_FLAG_PRIVATE)
+		THR_CRITICAL_LEAVE(curthread);
 	return (0);
 }
 
@@ -786,4 +806,17 @@ _pthread_mutex_isowned_np(pthread_mutex_t *mutex)
 	if (m <= THR_MUTEX_DESTROYED)
 		return (0);
 	return (m->m_owner == _get_curthread());
+}
+
+int
+_mutex_owned(struct pthread *curthread, const struct pthread_mutex *mp)
+{
+	if (__predict_false(mp <= THR_MUTEX_DESTROYED)) {
+		if (mp == THR_MUTEX_DESTROYED)
+			return (EINVAL);
+		return (EPERM);
+	}
+      	if (mp->m_owner != curthread)
+		return (EPERM);
+	return (0);                  
 }

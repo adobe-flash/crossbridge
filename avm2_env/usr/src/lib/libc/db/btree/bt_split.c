@@ -34,9 +34,10 @@
 static char sccsid[] = "@(#)bt_split.c	8.10 (Berkeley) 1/9/95";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/db/btree/bt_split.c,v 1.14.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/types.h>
+#include <sys/param.h>
 
 #include <limits.h>
 #include <stdio.h>
@@ -57,6 +58,12 @@ static recno_t	 rec_total(PAGE *);
 #ifdef STATISTICS
 u_long	bt_rootsplit, bt_split, bt_sortsplit, bt_pfxsaved;
 #endif
+
+
+#ifndef __PAST_END
+#define __PAST_END(array, offset) (((typeof(*(array)) *)(array))[offset])
+#endif
+
 
 /*
  * __BT_SPLIT -- Split the tree.
@@ -482,7 +489,7 @@ bt_rroot(BTREE *t, PAGE *h, PAGE *l, PAGE *r)
 	WR_RINTERNAL(dest,
 	    l->flags & P_RLEAF ? NEXTINDEX(l) : rec_total(l), l->pgno);
 
-	h->linp[1] = h->upper -= NRINTERNAL;
+	__PAST_END(h->linp, 1) = h->upper -= NRINTERNAL;
 	dest = (char *)h + h->upper;
 	WR_RINTERNAL(dest,
 	    r->flags & P_RLEAF ? NEXTINDEX(r) : rec_total(r), r->pgno);
@@ -534,7 +541,7 @@ bt_broot(BTREE *t, PAGE *h, PAGE *l, PAGE *r)
 	case P_BLEAF:
 		bl = GETBLEAF(r, 0);
 		nbytes = NBINTERNAL(bl->ksize);
-		h->linp[1] = h->upper -= nbytes;
+		__PAST_END(h->linp, 1) = h->upper -= nbytes;
 		dest = (char *)h + h->upper;
 		WR_BINTERNAL(dest, bl->ksize, r->pgno, 0);
 		memmove(dest, bl->bytes, bl->ksize);
@@ -550,7 +557,7 @@ bt_broot(BTREE *t, PAGE *h, PAGE *l, PAGE *r)
 	case P_BINTERNAL:
 		bi = GETBINTERNAL(r, 0);
 		nbytes = NBINTERNAL(bi->ksize);
-		h->linp[1] = h->upper -= nbytes;
+		__PAST_END(h->linp, 1) = h->upper -= nbytes;
 		dest = (char *)h + h->upper;
 		memmove(dest, bi, nbytes);
 		((BINTERNAL *)dest)->pgno = r->pgno;

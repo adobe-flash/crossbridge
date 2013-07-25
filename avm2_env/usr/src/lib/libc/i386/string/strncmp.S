@@ -29,7 +29,7 @@
  */
 
 #include <machine/asm.h>
-__FBSDID("$FreeBSD: src/lib/libc/i386/string/strncmp.S,v 1.10.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
  * strncmp(s1, s2, n)
@@ -165,3 +165,5 @@ L4:	xorl	%eax,%eax
 	popl	%ebx
 	ret
 END(strncmp)
+
+	.section .note.GNU-stack,"",%progbits

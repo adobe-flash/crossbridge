@@ -31,12 +31,12 @@
 static char sccsid[] = "@(#)errlst.c	8.2 (Berkeley) 11/16/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/errlst.c,v 1.9.10.2.4.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <stdio.h>
 
 const char *const sys_errlist[] = {
-	"Undefined error: 0",			/*  0 - ENOERROR */
+	"No error: 0",				/*  0 - ENOERROR */
 	"Operation not permitted",		/*  1 - EPERM */
 	"No such file or directory",		/*  2 - ENOENT */
 	"No such process",			/*  3 - ESRCH */
@@ -151,5 +151,6 @@ const char *const sys_errlist[] = {
 	"Link has been severed",		/* 91 - ENOLINK */
 	"Protocol error",			/* 92 - EPROTO */
 	"Capabilities insufficient",		/* 93 - ENOTCAPABLE */
+	"Not permitted in capability mode",	/* 94 - ECAPMODE */
 };
 const int sys_nerr = sizeof(sys_errlist) / sizeof(sys_errlist[0]);

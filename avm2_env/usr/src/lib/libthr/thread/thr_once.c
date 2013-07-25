@@ -23,7 +23,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libthr/thread/thr_once.c,v 1.7.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  *
  */
 
@@ -63,6 +63,8 @@ _pthread_once(pthread_once_t *once_control, void (*init_routine) (void))
 {
 	struct pthread *curthread;
 	int state;
+
+	_thr_check_init();
 
 	for (;;) {
 		state = once_control->state;

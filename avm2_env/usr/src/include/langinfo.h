@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/include/langinfo.h,v 1.6.36.2.4.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #ifndef _LANGINFO_H_
@@ -130,6 +130,10 @@ typedef	__nl_item	nl_item;
 
 __BEGIN_DECLS
 char	*nl_langinfo(nl_item);
+
+#if __POSIX_VISIBLE >= 200809 || defined(_XLOCALE_H_)
+#include <xlocale/_langinfo.h>
+#endif
 __END_DECLS
 
 #endif /* !_LANGINFO_H_ */

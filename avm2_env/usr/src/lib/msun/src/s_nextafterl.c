@@ -11,7 +11,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/msun/src/s_nextafterl.c,v 1.2.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /* IEEE functions
  *	nextafter(x,y)
@@ -77,10 +77,4 @@ nextafterl(long double x, long double y)
 	return ux.e;
 }
 
-//__strong_reference(nextafterl, nexttowardl);
-//AVM2: remove when strong refs work properly
-long double
-nextafterl(long double x, long double y)
-{
-    return nexttowardl(x,y);
-}
+__strong_reference(nextafterl, nexttowardl);

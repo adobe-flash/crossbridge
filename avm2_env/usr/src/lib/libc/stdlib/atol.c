@@ -2,6 +2,11 @@
  * Copyright (c) 1988, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -31,13 +36,22 @@
 static char sccsid[] = "@(#)atol.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/stdlib/atol.c,v 1.5.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <stdlib.h>
+#include <xlocale.h>
 
 long
 atol(str)
 	const char *str;
 {
 	return strtol(str, (char **)NULL, 10);
+}
+
+long
+atol_l(str, locale)
+	const char *str;
+	locale_t locale;
+{
+	return strtol_l(str, (char **)NULL, 10, locale);
 }

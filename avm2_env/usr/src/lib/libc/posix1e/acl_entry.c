@@ -25,7 +25,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_entry.c,v 1.10.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/types.h>
 #include "namespace.h"
@@ -55,8 +55,7 @@ acl_create_entry(acl_t *acl_p, acl_entry_t *entry_p)
 	 * +1, because we are checking if there is space left for one more
 	 * entry.
 	 */
-	if ((acl_int->acl_cnt + 1 >= ACL_MAX_ENTRIES) ||
-	    (acl_int->acl_cnt < 0)) {
+	if (acl_int->acl_cnt + 1 >= ACL_MAX_ENTRIES) {
 		errno = EINVAL;
 		return (-1);
 	}
@@ -87,7 +86,7 @@ acl_create_entry_np(acl_t *acl_p, acl_entry_t *entry_p, int offset)
 
 	acl_int = &(*acl_p)->ats_acl;
 
-	if ((acl_int->acl_cnt + 1 >= ACL_MAX_ENTRIES) || (acl_int->acl_cnt < 0)) {
+	if (acl_int->acl_cnt + 1 >= ACL_MAX_ENTRIES) {
 		errno = EINVAL;
 		return (-1);
 	}

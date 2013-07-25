@@ -31,7 +31,7 @@
 static char sccsid[] = "@(#)strerror.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/string/strerror.c,v 1.16.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #if defined(NLS)
 #include <nl_types.h>
@@ -87,7 +87,7 @@ strerror_r(int errnum, char *strerrbuf, size_t buflen)
 	catd = catopen("libc", NL_CAT_LOCALE);
 #endif
 
-	if (errnum < 1 || errnum >= sys_nerr) {
+	if (errnum < 0 || errnum >= sys_nerr) {
 		errstr(errnum,
 #if defined(NLS)
 			catgets(catd, 1, 0xffff, UPREFIX),
@@ -121,6 +121,6 @@ strerror(int num)
 	static char ebuf[NL_TEXTMAX];
 
 	if (strerror_r(num, ebuf, sizeof(ebuf)) != 0)
-	errno = EINVAL;
+		errno = EINVAL;
 	return (ebuf);
 }

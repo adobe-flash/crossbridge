@@ -31,18 +31,17 @@
 static char sccsid[] = "@(#)raise.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/raise.c,v 1.5.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <signal.h>
 #include <unistd.h>
 
 int
-__raise(s)
-	int s;
+__raise(int s)
 {
 	return(kill(getpid(), s));
 }
 
 __weak_reference2(__raise, raise);
-__weak_reference3(__raise, _raise);
+__weak_reference(__raise, _raise);
 

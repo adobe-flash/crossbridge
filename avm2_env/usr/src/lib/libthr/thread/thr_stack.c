@@ -24,14 +24,17 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libthr/thread/thr_stack.c,v 1.7.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <sys/queue.h>
+#include <sys/resource.h>
+#include <sys/sysctl.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <link.h>
 
 #include "thr_private.h"
 
@@ -130,6 +133,62 @@ round_up(size_t size)
 	return size;
 }
 
+void
+_thr_stack_fix_protection(struct pthread *thrd)
+{
+
+	mprotect((char *)thrd->attr.stackaddr_attr +
+	    round_up(thrd->attr.guardsize_attr),
+	    round_up(thrd->attr.stacksize_attr),
+	    _rtld_get_stack_prot());
+}
+
+static void
+singlethread_map_stacks_exec(void)
+{
+	int mib[2];
+	struct rlimit rlim;
+	u_long usrstack;
+	size_t len;
+
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_USRSTACK;
+	len = sizeof(usrstack);
+	if (sysctl(mib, sizeof(mib) / sizeof(mib[0]), &usrstack, &len, NULL, 0)
+	    == -1)
+		return;
+	if (getrlimit(RLIMIT_STACK, &rlim) == -1)
+		return;
+	mprotect((void *)(uintptr_t)(usrstack - rlim.rlim_cur),
+	    rlim.rlim_cur, _rtld_get_stack_prot());
+}
+
+void __pthread_map_stacks_exec(void);
+void
+__pthread_map_stacks_exec(void)
+{
+	struct pthread *curthread, *thrd;
+	struct stack *st;
+
+	if (!_thr_is_inited()) {
+		singlethread_map_stacks_exec();
+		return;
+	}
+	curthread = _get_curthread();
+	THREAD_LIST_RDLOCK(curthread);
+	LIST_FOREACH(st, &mstackq, qe)
+		mprotect((char *)st->stackaddr + st->guardsize, st->stacksize,
+		    _rtld_get_stack_prot());
+	LIST_FOREACH(st, &dstackq, qe)
+		mprotect((char *)st->stackaddr + st->guardsize, st->stacksize,
+		    _rtld_get_stack_prot());
+	TAILQ_FOREACH(thrd, &_thread_gc_list, gcle)
+		_thr_stack_fix_protection(thrd);
+	TAILQ_FOREACH(thrd, &_thread_list, tle)
+		_thr_stack_fix_protection(thrd);
+	THREAD_LIST_UNLOCK(curthread);
+}
+
 int
 _thr_stack_alloc(struct pthread_attr *attr)
 {
@@ -156,7 +215,7 @@ _thr_stack_alloc(struct pthread_attr *attr)
 	 * Use the garbage collector lock for synchronization of the
 	 * spare stack lists and allocations from usrstack.
 	 */
-	THREAD_LIST_LOCK(curthread);
+	THREAD_LIST_WRLOCK(curthread);
 	/*
 	 * If the stack and guard sizes are default, try to allocate a stack
 	 * from the default-size stack cache:
@@ -219,7 +278,7 @@ _thr_stack_alloc(struct pthread_attr *attr)
 		/* Map the stack and guard page together, and split guard
 		   page from allocated space: */
 		if ((stackaddr = mmap(stackaddr, stacksize+guardsize,
-		     PROT_READ | PROT_WRITE, MAP_STACK,
+		     _rtld_get_stack_prot(), MAP_STACK,
 		     -1, 0)) != MAP_FAILED &&
 		    (guardsize == 0 ||
 		     mprotect(stackaddr, guardsize, PROT_NONE) == 0)) {

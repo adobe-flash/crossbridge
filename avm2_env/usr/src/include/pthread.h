@@ -30,7 +30,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/include/pthread.h,v 1.44.2.2.2.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 #ifndef _PTHREAD_H_
 #define _PTHREAD_H_
@@ -233,11 +233,14 @@ int		pthread_rwlock_tryrdlock(pthread_rwlock_t *);
 int		pthread_rwlock_trywrlock(pthread_rwlock_t *);
 int		pthread_rwlock_unlock(pthread_rwlock_t *);
 int		pthread_rwlock_wrlock(pthread_rwlock_t *);
-int		pthread_rwlockattr_init(pthread_rwlockattr_t *);
+int		pthread_rwlockattr_destroy(pthread_rwlockattr_t *);
+int		pthread_rwlockattr_getkind_np(const pthread_rwlockattr_t *,
+			int *);
 int		pthread_rwlockattr_getpshared(const pthread_rwlockattr_t *,
 			int *);
+int		pthread_rwlockattr_init(pthread_rwlockattr_t *);
+int		pthread_rwlockattr_setkind_np(pthread_rwlockattr_t *, int);
 int		pthread_rwlockattr_setpshared(pthread_rwlockattr_t *, int);
-int		pthread_rwlockattr_destroy(pthread_rwlockattr_t *);
 pthread_t	pthread_self(void);
 int		pthread_setspecific(pthread_key_t, const void *);
 

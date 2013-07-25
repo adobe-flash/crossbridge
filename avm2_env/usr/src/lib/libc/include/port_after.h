@@ -1,4 +1,4 @@
-/* $FreeBSD: src/lib/libc/include/port_after.h,v 1.2.12.1.6.1 2010/12/21 17:09:25 kensmith Exp $ */
+/* $FreeBSD$ */
 
 #ifndef _PORT_AFTER_H_
 #define _PORT_AFTER_H_

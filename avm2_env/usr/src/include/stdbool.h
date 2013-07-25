@@ -23,12 +23,13 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/include/stdbool.h,v 1.7.22.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #ifndef _STDBOOL_H_
 #define	_STDBOOL_H_	
 
+#ifndef __bool_true_false_are_defined
 #define	__bool_true_false_are_defined	1
 
 #ifndef __cplusplus
@@ -42,5 +43,6 @@ typedef	int	_Bool;
 #endif
 
 #endif /* !__cplusplus */
+#endif /* __bool_true_false_are_defined */
 
 #endif /* !_STDBOOL_H_ */

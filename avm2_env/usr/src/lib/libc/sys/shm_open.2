@@ -26,7 +26,7 @@
 .\" OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.\" $FreeBSD: src/lib/libc/sys/shm_open.2,v 1.13.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
 .Dd March 20, 2007
 .Dt SHM_OPEN 2
@@ -39,6 +39,7 @@
 .Sh SYNOPSIS
 .In sys/types.h
 .In sys/mman.h
+.In fcntl.h
 .Ft int
 .Fn shm_open "const char *path" "int flags" "mode_t mode"
 .Ft int
@@ -87,7 +88,7 @@ already exists,
 then
 .Fn shm_open
 will fail with
-.Er EEXIST.
+.Er EEXIST .
 .Pp
 Newly created objects start off with a size of zero.
 If an existing shared memory object is opened with
@@ -230,7 +231,7 @@ is specified and the named shared memory object does not exist.
 .Dv O_CREAT
 and
 .Dv O_EXCL
-are specified and the named shared memory object dies exist.
+are specified and the named shared memory object does exist.
 .It Bq Er EACCES
 The required permissions (for reading or reading and writing) are denied.
 .El

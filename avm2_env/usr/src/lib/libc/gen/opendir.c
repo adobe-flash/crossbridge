@@ -31,7 +31,7 @@
 static char sccsid[] = "@(#)opendir.c	8.8 (Berkeley) 5/1/95";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/opendir.c,v 1.25.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <sys/param.h>
@@ -86,7 +86,7 @@ __opendir2(const char *name, int flags)
 		errno = ENOTDIR;
 		return (NULL);
 	}
-	if ((fd = _open(name, O_RDONLY | O_NONBLOCK)) == -1)
+	if ((fd = _open(name, O_RDONLY | O_NONBLOCK | O_DIRECTORY)) == -1)
 		return (NULL);
 
 	return __opendir_common(fd, name, flags);
@@ -200,7 +200,7 @@ __opendir_common(int fd, const char *name, int flags)
 		 */
 		if (flags & DTF_REWIND) {
 			(void)_close(fd);
-			if ((fd = _open(name, O_RDONLY)) == -1) {
+			if ((fd = _open(name, O_RDONLY | O_DIRECTORY)) == -1) {
 				saved_errno = errno;
 				free(buf);
 				free(dirp);

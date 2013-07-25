@@ -1,4 +1,4 @@
-# $FreeBSD: src/lib/libc/sparc64/sys/Makefile.inc,v 1.12.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+# $FreeBSD$
 
 SRCS+=	__sparc_sigtramp_setup.c \
 	__sparc_utrap.c \
@@ -11,9 +11,6 @@ SRCS+=	__sparc_sigtramp_setup.c \
 	sigcode.S
 
 CFLAGS+= -I${.CURDIR}/sparc64/fpu
-.if ${MACHINE} == "sun4v"
-CFLAGS+= -DSUN4V
-.endif
 
 MDASM+=	brk.S cerror.S exect.S pipe.S ptrace.S sbrk.S setlogin.S sigaction.S
 

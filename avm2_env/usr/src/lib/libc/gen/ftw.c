@@ -1,4 +1,4 @@
-/*	$OpenBSD: ftw.c,v 1.4 2004/07/07 16:05:23 millert Exp $	*/
+/*	$OpenBSD: ftw.c,v 1.5 2005/08/08 08:05:34 espie Exp $	*/
 
 /*
  * Copyright (c) 2003, 2004 Todd C. Miller <Todd.Miller@courtesan.com>
@@ -20,14 +20,8 @@
  * Materiel Command, USAF, under agreement number F39502-99-1-0512.
  */
 
-#if 0
-#if defined(LIBC_SCCS) && !defined(lint)
-static const char rcsid[] = "$OpenBSD: ftw.c,v 1.4 2004/07/07 16:05:23 millert Exp $";
-#endif /* LIBC_SCCS and not lint */
-#endif
-
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/ftw.c,v 1.4.22.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/types.h>
 #include <sys/stat.h>

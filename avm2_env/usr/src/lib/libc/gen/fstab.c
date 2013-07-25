@@ -31,7 +31,7 @@
 static char sccsid[] = "@(#)fstab.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/fstab.c,v 1.15.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <sys/param.h>
@@ -39,6 +39,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/fstab.c,v 1.15.10.1.6.1 2010/12/21 17:09:25
 #include <sys/stat.h>
 
 #include <errno.h>
+#include <fcntl.h>
 #include <fstab.h>
 #include <paths.h>
 #include <stdio.h>
@@ -91,7 +92,7 @@ fixfsfile()
 	struct stat sb;
 	struct statfs sf;
 
-	if (strcmp(_fs_fstab.fs_file, "/") != 0)
+	if (_fs_fstab.fs_file != NULL && strcmp(_fs_fstab.fs_file, "/") != 0)
 		return;
 	if (statfs("/", &sf) != 0)
 		return;
@@ -246,6 +247,8 @@ getfsfile(name)
 int 
 setfsent()
 {
+	int fd;
+
 	if (_fs_fp) {
 		rewind(_fs_fp);
 		LineNo = 0;
@@ -257,11 +260,18 @@ setfsent()
 		else
 			setfstab(getenv("PATH_FSTAB"));
 	}
-	if ((_fs_fp = fopen(path_fstab, "r")) != NULL) {
+	fd = _open(path_fstab, O_RDONLY | O_CLOEXEC);
+	if (fd == -1) {
+		error(errno);
+		return (0);
+	}
+	_fs_fp = fdopen(fd, "r");
+	if (_fs_fp  != NULL) {
 		LineNo = 0;
 		return(1);
 	}
 	error(errno);
+	_close(fd);
 	return(0);
 }
 

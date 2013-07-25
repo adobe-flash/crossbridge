@@ -31,7 +31,7 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     @(#)strstr.3	8.1 (Berkeley) 6/4/93
-.\" $FreeBSD: src/lib/libc/string/strstr.3,v 1.15.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
 .Dd October 11, 2001
 .Dt STRSTR 3
@@ -49,6 +49,10 @@
 .Fn strcasestr "const char *big" "const char *little"
 .Ft char *
 .Fn strnstr "const char *big" "const char *little" "size_t len"
+.In string.h
+.In xlocale.h
+.Ft char *
+.Fn strcasestr_l "const char *big" "const char *little" "locale_t loc"
 .Sh DESCRIPTION
 The
 .Fn strstr
@@ -63,6 +67,12 @@ The
 function is similar to
 .Fn strstr ,
 but ignores the case of both strings.
+.Pp
+The
+.Fn strcasestr_l
+function does the same as
+.Fn strcasestr
+but takes an explicit locale rather than using the current locale.
 .Pp
 The
 .Fn strnstr

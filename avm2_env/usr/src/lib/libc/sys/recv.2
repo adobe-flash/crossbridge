@@ -26,7 +26,7 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     @(#)recv.2	8.3 (Berkeley) 2/21/94
-.\" $FreeBSD: src/lib/libc/sys/recv.2,v 1.35.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
 .Dd December 28, 2006
 .Dt RECV 2
@@ -165,7 +165,6 @@ system call uses a
 structure to minimize the number of directly supplied arguments.
 This structure has the following form, as defined in
 .In sys/socket.h :
-.Pp
 .Bd -literal
 struct msghdr {
 	void		*msg_name;	/* optional address */
@@ -242,7 +241,6 @@ should be a structure of type
 which is defined in
 .In sys/socket.h
 as follows:
-.Pp
 .Bd -literal
 struct cmsgcred {
 	pid_t	cmcred_pid;		/* PID of sending process */

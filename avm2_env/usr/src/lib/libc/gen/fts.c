@@ -36,7 +36,7 @@ static char sccsid[] = "@(#)fts.c	8.6 (Berkeley) 8/14/94";
 #endif
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/fts.c,v 1.30.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <sys/param.h>
@@ -100,6 +100,7 @@ struct _fts_private {
 
 static const char *ufslike_filesystems[] = {
 	"ufs",
+	"zfs",
 	"nfs",
 	"nfs4",
 	"ext2fs",
@@ -120,6 +121,12 @@ fts_open(argv, options, compar)
 
 	/* Options check. */
 	if (options & ~FTS_OPTIONMASK) {
+		errno = EINVAL;
+		return (NULL);
+	}
+
+	/* fts_open() requires at least one path */
+	if (*argv == NULL) {
 		errno = EINVAL;
 		return (NULL);
 	}

@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/msun/amd64/fenv.c,v 1.4.10.2.4.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #include <sys/cdefs.h>
@@ -120,12 +120,12 @@ __feenableexcept(int mask)
 	mask &= FE_ALL_EXCEPT;
 	__fnstcw(&control);
 	__stmxcsr(&mxcsr);
-	omask = (control | mxcsr >> _SSE_EMASK_SHIFT) & FE_ALL_EXCEPT;
+	omask = ~(control | mxcsr >> _SSE_EMASK_SHIFT) & FE_ALL_EXCEPT;
 	control &= ~mask;
 	__fldcw(control);
 	mxcsr &= ~(mask << _SSE_EMASK_SHIFT);
 	__ldmxcsr(mxcsr);
-	return (~omask);
+	return (omask);
 }
 
 int
@@ -137,12 +137,12 @@ __fedisableexcept(int mask)
 	mask &= FE_ALL_EXCEPT;
 	__fnstcw(&control);
 	__stmxcsr(&mxcsr);
-	omask = (control | mxcsr >> _SSE_EMASK_SHIFT) & FE_ALL_EXCEPT;
+	omask = ~(control | mxcsr >> _SSE_EMASK_SHIFT) & FE_ALL_EXCEPT;
 	control |= mask;
 	__fldcw(control);
 	mxcsr |= mask << _SSE_EMASK_SHIFT;
 	__ldmxcsr(mxcsr);
-	return (~omask);
+	return (omask);
 }
 
 __weak_reference(__feenableexcept, feenableexcept);

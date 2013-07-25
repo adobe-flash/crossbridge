@@ -32,7 +32,7 @@ static const char sccsid[] = "@(#)inet_ntoa.c	8.1 (Berkeley) 6/4/93";
 static const char rcsid[] = "$Id: inet_ntoa.c,v 1.1.352.1 2005/04/27 05:00:54 sra Exp $";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/inet/inet_ntoa.c,v 1.6.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "port_before.h"
 
@@ -45,7 +45,6 @@ __FBSDID("$FreeBSD: src/lib/libc/inet/inet_ntoa.c,v 1.6.10.1.6.1 2010/12/21 17:0
 #include <string.h>
 
 #include "port_after.h"
-
 
 /*%
  * Convert network-format internet address
@@ -73,9 +72,7 @@ inet_ntoa_r(struct in_addr in, char *buf, socklen_t size)
  * and fail to include <arpa/inet.h>.
  */
 #undef inet_ntoa
-#undef inet_ntoa_r
 __weak_reference4(__inet_ntoa, inet_ntoa);
-__weak_reference4(__inet_ntoa_r, inet_ntoa_r);
-
+__weak_reference2(__inet_ntoa_r, inet_ntoa_r);
 
 /*! \file */

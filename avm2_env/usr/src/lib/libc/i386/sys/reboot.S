@@ -34,10 +34,12 @@
 	.asciz "@(#)reboot.s	5.1 (Berkeley) 4/23/90"
 #endif /* SYSLIBC_SCCS and not lint */
 #include <machine/asm.h>
-__FBSDID("$FreeBSD: src/lib/libc/i386/sys/reboot.S,v 1.10.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "SYS.h"
 
 SYSCALL(reboot)
 	iret
 END(__sys_reboot)
+
+	.section .note.GNU-stack,"",%progbits

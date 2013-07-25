@@ -5,6 +5,11 @@
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -34,12 +39,13 @@
 static char sccsid[] = "@(#)sprintf.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/stdio/sprintf.c,v 1.16.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <stdio.h>
 #include <stdarg.h>
 #include <limits.h>
 #include "local.h"
+#include "xlocale_private.h"
 
 int
 sprintf(char * __restrict str, char const * __restrict fmt, ...)
@@ -49,6 +55,19 @@ sprintf(char * __restrict str, char const * __restrict fmt, ...)
 
 	va_start(ap, fmt);
 	ret = vsprintf(str, fmt, ap);
+	va_end(ap);
+	return (ret);
+}
+int
+sprintf_l(char * __restrict str, locale_t locale, char const * __restrict fmt,
+		...)
+{
+	int ret;
+	va_list ap;
+	FIX_LOCALE(locale);
+
+	va_start(ap, fmt);
+	ret = vsprintf_l(str, locale, fmt, ap);
 	va_end(ap);
 	return (ret);
 }

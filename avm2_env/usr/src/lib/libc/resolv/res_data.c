@@ -19,7 +19,7 @@
 static const char rcsid[] = "$Id: res_data.c,v 1.3.18.2 2007/09/14 05:35:47 marka Exp $";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/resolv/res_data.c,v 1.5.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "port_before.h"
 
@@ -299,21 +299,21 @@ local_hostname_length(const char *hostname) {
  * and fail to include <resolv.h>.
  */
 #undef res_init
-__weak_reference4(__res_init, res_init);
+__weak_reference3(__res_init, res_init);
 #undef p_query
-__weak_reference4(__p_query, p_query);
+__weak_reference3(__p_query, p_query);
 #undef res_mkquery
-__weak_reference4(__res_mkquery, res_mkquery);
+__weak_reference3(__res_mkquery, res_mkquery);
 #undef res_query
-__weak_reference4(__res_query, res_query);
+__weak_reference3(__res_query, res_query);
 #undef res_send
-__weak_reference4(__res_send, res_send);
+__weak_reference3(__res_send, res_send);
 #undef res_close
-__weak_reference4(__res_close, res_close);
+__weak_reference3(__res_close, _res_close);
 #undef res_search
-__weak_reference4(__res_search, res_search);
+__weak_reference3(__res_search, res_search);
 #undef res_querydomain
-__weak_reference4(__res_querydomain, res_querydomain);
+__weak_reference3(__res_querydomain, res_querydomain);
 
 #endif
 

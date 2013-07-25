@@ -28,12 +28,12 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/sys/__error.c,v 1.5.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 extern int errno;
 
 int *
-__error_unthreaded()
+__error_unthreaded(void)
 {
 	return(&errno);
 }
@@ -43,3 +43,4 @@ __error_unthreaded()
  * with libpthread.
  */
 __weak_reference3(__error_unthreaded, __error);
+

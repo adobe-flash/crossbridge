@@ -29,7 +29,7 @@
  */
 
 #include <machine/asm.h>
-__FBSDID("$FreeBSD: src/lib/libc/i386/string/memchr.S,v 1.13.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
  * memchr (b, c, len)
@@ -57,3 +57,5 @@ L1:	xorl	%eax,%eax
 	popl	%edi
 	ret
 END(memchr)
+
+	.section .note.GNU-stack,"",%progbits

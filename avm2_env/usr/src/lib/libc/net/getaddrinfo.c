@@ -54,7 +54,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/net/getaddrinfo.c,v 1.91.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <sys/types.h>
@@ -71,9 +71,9 @@ __FBSDID("$FreeBSD: src/lib/libc/net/getaddrinfo.c,v 1.91.2.1.6.1 2010/12/21 17:
 #endif
 #include <arpa/inet.h>
 #include <arpa/nameser.h>
-//#include <rpc/rpc.h>
-//#include <rpcsvc/yp_prot.h>
-//#include <rpcsvc/ypclnt.h>
+#include <rpc/rpc.h>
+#include <rpcsvc/yp_prot.h>
+#include <rpcsvc/ypclnt.h>
 #include <netdb.h>
 #include <resolv.h>
 #include <string.h>
@@ -464,7 +464,7 @@ getaddrinfo(const char *hostname, const char *servname,
 		}
 		error = get_portmatch(pai, servname);
 		if (error)
-			ERR(error);
+			goto bad;
 
 		*pai = ai0;
 	}
@@ -693,6 +693,8 @@ get_addrselectpolicy(struct policyhead *head)
 
 	if (sysctl(mib, sizeof(mib) / sizeof(mib[0]), NULL, &l, NULL, 0) < 0)
 		return (0);
+	if (l == 0)
+		return (0);
 	if ((buf = malloc(l)) == NULL)
 		return (0);
 	if (sysctl(mib, sizeof(mib) / sizeof(mib[0]), buf, &l, NULL, 0) < 0) {
@@ -847,8 +849,6 @@ set_source(struct ai_order *aio, struct policyhead *ph)
 		struct in6_ifreq ifr6;
 		u_int32_t flags6;
 
-		/* XXX: interface name should not be hardcoded */
-		strncpy(ifr6.ifr_name, "lo0", sizeof(ifr6.ifr_name));
 		memset(&ifr6, 0, sizeof(ifr6));
 		memcpy(&ifr6.ifr_addr, ai.ai_addr, ai.ai_addrlen);
 		if (_ioctl(s, SIOCGIFAFLAG_IN6, &ifr6) == 0) {
@@ -1576,7 +1576,8 @@ ip6_str2scopeid(char *scope, struct sockaddr_in6 *sin6, u_int32_t *scopeid)
 	if (*scope == '\0')
 		return -1;
 
-	if (IN6_IS_ADDR_LINKLOCAL(a6) || IN6_IS_ADDR_MC_LINKLOCAL(a6)) {
+	if (IN6_IS_ADDR_LINKLOCAL(a6) || IN6_IS_ADDR_MC_LINKLOCAL(a6) ||
+	    IN6_IS_ADDR_MC_NODELOCAL(a6)) {
 		/*
 		 * We currently assume a one-to-one mapping between links
 		 * and interfaces, so we simply use interface indices for

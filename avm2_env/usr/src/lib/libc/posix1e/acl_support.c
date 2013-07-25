@@ -29,7 +29,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_support.c,v 1.17.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/types.h>
 #include "namespace.h"
@@ -80,7 +80,7 @@ _acl_differs(const acl_t a, const acl_t b)
 
 	return (0);
 }
-		    
+
 /*
  * _posix1e_acl_entry_compare -- compare two acl_entry structures to
  * determine the order they should appear in.  Used by _posix1e_acl_sort to
@@ -127,11 +127,9 @@ _posix1e_acl_entry_compare(struct acl_entry *a, struct acl_entry *b)
 }
 
 /*
- * _posix1e_acl_sort -- sort ACL entries in POSIX.1e-formatted ACLs
- * Give the opportunity to fail, although we don't currently have a way
- * to fail.
+ * _posix1e_acl_sort -- sort ACL entries in POSIX.1e-formatted ACLs.
  */
-int
+void
 _posix1e_acl_sort(acl_t acl)
 {
 	struct acl *acl_int;
@@ -140,8 +138,6 @@ _posix1e_acl_sort(acl_t acl)
 
 	qsort(&acl_int->acl_entry[0], acl_int->acl_cnt,
 	    sizeof(struct acl_entry), (compare) _posix1e_acl_entry_compare);
-
-	return (0);
 }
 
 /*
@@ -164,7 +160,7 @@ _posix1e_acl(acl_t acl, acl_type_t type)
  * from code in sys/kern/kern_acl.c, and if changes are made in one, they
  * should be made in the other also.  This copy of acl_check is made
  * available * in userland for the benefit of processes wanting to check ACLs
- * for validity before submitting them to the kernel, or for performing 
+ * for validity before submitting them to the kernel, or for performing
  * in userland file system checking.  Needless to say, the kernel makes
  * the real checks on calls to get/setacl.
  *
@@ -203,7 +199,7 @@ _posix1e_acl_check(acl_t acl)
 			stage = ACL_USER;
 			count_user_obj++;
 			break;
-	
+
 		case ACL_USER:
 			/* printf("_posix1e_acl_check: %d: ACL_USER\n", i); */
 			if (stage > ACL_USER)
@@ -213,8 +209,8 @@ _posix1e_acl_check(acl_t acl)
 				return (EINVAL);
 			highest_uid = entry->ae_id;
 			count_user++;
-			break;	
-	
+			break;
+
 		case ACL_GROUP_OBJ:
 			/* printf("_posix1e_acl_check: %d: ACL_GROUP_OBJ\n",
 			    i); */
@@ -223,7 +219,7 @@ _posix1e_acl_check(acl_t acl)
 			stage = ACL_GROUP;
 			count_group_obj++;
 			break;
-	
+
 		case ACL_GROUP:
 			/* printf("_posix1e_acl_check: %d: ACL_GROUP\n", i); */
 			if (stage > ACL_GROUP)
@@ -234,7 +230,7 @@ _posix1e_acl_check(acl_t acl)
 			highest_gid = entry->ae_id;
 			count_group++;
 			break;
-			
+
 		case ACL_MASK:
 			/* printf("_posix1e_acl_check: %d: ACL_MASK\n", i); */
 			if (stage > ACL_MASK)
@@ -242,7 +238,7 @@ _posix1e_acl_check(acl_t acl)
 			stage = ACL_MASK;
 			count_mask++;
 			break;
-	
+
 		case ACL_OTHER:
 			/* printf("_posix1e_acl_check: %d: ACL_OTHER\n", i); */
 			if (stage > ACL_OTHER)
@@ -250,7 +246,7 @@ _posix1e_acl_check(acl_t acl)
 			stage = ACL_OTHER;
 			count_other++;
 			break;
-	
+
 		default:
 			/* printf("_posix1e_acl_check: %d: INVALID\n", i); */
 			return (EINVAL);
@@ -260,7 +256,7 @@ _posix1e_acl_check(acl_t acl)
 
 	if (count_user_obj != 1)
 		return (EINVAL);
-	
+
 	if (count_group_obj != 1)
 		return (EINVAL);
 
@@ -271,61 +267,6 @@ _posix1e_acl_check(acl_t acl)
 		return (EINVAL);
 
 	return (0);
-}
-
-
-/*
- * Given a uid/gid, return a username/groupname for the text form of an ACL.
- * Note that we truncate user and group names, rather than error out, as
- * this is consistent with other tools manipulating user and group names.
- * XXX NOT THREAD SAFE, RELIES ON GETPWUID, GETGRGID
- * XXX USES *PW* AND *GR* WHICH ARE STATEFUL AND THEREFORE THIS ROUTINE
- * MAY HAVE SIDE-EFFECTS
- */
-int
-_posix1e_acl_id_to_name(acl_tag_t tag, uid_t id, ssize_t buf_len, char *buf,
-    int flags)
-{
-	struct group	*g;
-	struct passwd	*p;
-	int	i;
-
-	switch(tag) {
-	case ACL_USER:
-		if (flags & ACL_TEXT_NUMERIC_IDS)
-			p = NULL;
-		else
-			p = getpwuid(id);
-		if (!p)
-			i = snprintf(buf, buf_len, "%d", id);
-		else
-			i = snprintf(buf, buf_len, "%s", p->pw_name);
-
-		if (i < 0) {
-			errno = ENOMEM;
-			return (-1);
-		}
-		return (0);
-
-	case ACL_GROUP:
-		if (flags & ACL_TEXT_NUMERIC_IDS)
-			g = NULL;
-		else
-			g = getgrgid(id);
-		if (g == NULL) 
-			i = snprintf(buf, buf_len, "%d", id);
-		else
-			i = snprintf(buf, buf_len, "%s", g->gr_name);
-
-		if (i < 0) {
-			errno = ENOMEM;
-			return (-1);
-		}
-		return (0);
-
-	default:
-		return (EINVAL);
-	}
 }
 
 /*

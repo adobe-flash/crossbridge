@@ -26,9 +26,9 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     @(#)swab.3	8.1 (Berkeley) 6/4/93
-.\" $FreeBSD: src/lib/libc/string/swab.3,v 1.10.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
-.Dd December 10, 2004
+.Dd March 4, 2012
 .Dt SWAB 3
 .Os
 .Sh NAME
@@ -54,6 +54,9 @@ swapping adjacent bytes.
 The argument
 .Fa len
 must be an even number.
+If
+.Fa len
+is less than zero, nothing will be done.
 .Sh SEE ALSO
 .Xr bzero 3 ,
 .Xr memset 3

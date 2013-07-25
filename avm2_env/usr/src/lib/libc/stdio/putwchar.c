@@ -2,6 +2,11 @@
  * Copyright (c) 2002 Tim J. Robbins.
  * All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -25,7 +30,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/stdio/putwchar.c,v 1.3.30.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <stdio.h>
@@ -33,6 +38,7 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/putwchar.c,v 1.3.30.1.6.1 2010/12/21 17:0
 #include "un-namespace.h"
 #include "libc_private.h"
 #include "local.h"
+#include "xlocale_private.h"
 
 #undef putwchar
 
@@ -40,8 +46,13 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/putwchar.c,v 1.3.30.1.6.1 2010/12/21 17:0
  * Synonym for fputwc(wc, stdout).
  */
 wint_t
+putwchar_l(wchar_t wc, locale_t locale)
+{
+	FIX_LOCALE(locale);
+	return (fputwc_l(wc, stdout, locale));
+}
+wint_t
 putwchar(wchar_t wc)
 {
-
-	return (fputwc(wc, stdout));
+	return putwchar_l(wc, __get_locale());
 }

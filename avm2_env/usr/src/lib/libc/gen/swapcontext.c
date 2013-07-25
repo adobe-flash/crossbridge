@@ -25,7 +25,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/swapcontext.c,v 1.5.36.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/signal.h>
@@ -34,7 +34,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/swapcontext.c,v 1.5.36.1.6.1 2010/12/21 17:
 #include <errno.h>
 #include <stddef.h>
 
-__weak_reference2(__swapcontext, swapcontext);
+__weak_reference(__swapcontext, swapcontext);
 
 int
 __swapcontext(ucontext_t *oucp, const ucontext_t *ucp)
@@ -53,5 +53,3 @@ __swapcontext(ucontext_t *oucp, const ucontext_t *ucp)
 	}
 	return (ret);
 }
-
-

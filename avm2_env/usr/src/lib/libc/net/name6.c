@@ -88,7 +88,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/net/name6.c,v 1.62.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <sys/param.h>
@@ -884,8 +884,6 @@ set_source(struct hp_order *aio, struct policyhead *ph)
 		struct in6_ifreq ifr6;
 		u_int32_t flags6;
 
-		/* XXX: interface name should not be hardcoded */
-		strncpy(ifr6.ifr_name, "lo0", sizeof(ifr6.ifr_name));
 		memset(&ifr6, 0, sizeof(ifr6));
 		memcpy(&ifr6.ifr_addr, &ss, ss.ss_len);
 		if (_ioctl(s, SIOCGIFAFLAG_IN6, &ifr6) == 0) {

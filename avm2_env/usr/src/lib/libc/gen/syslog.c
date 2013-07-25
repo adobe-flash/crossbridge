@@ -31,7 +31,7 @@
 static char sccsid[] = "@(#)syslog.c	8.5 (Berkeley) 4/29/95";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/syslog.c,v 1.39.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <sys/types.h>
@@ -265,7 +265,7 @@ vsyslog(int pri, const char *fmt, va_list ap)
 	 *  1) syslogd was restarted
 	 *  2) /var/run/log is out of socket buffer space, which
 	 *     in most cases means local DoS.
-	 * We attempt to reconnect to /var/run/log to take care of
+	 * We attempt to reconnect to /var/run/log[priv] to take care of
 	 * case #1 and keep send()ing data to cover case #2
 	 * to give syslogd a chance to empty its socket buffer.
 	 *
@@ -281,13 +281,13 @@ vsyslog(int pri, const char *fmt, va_list ap)
 			connectlog();
 		}
 		do {
+			if (status == CONNPRIV)
+				break;
 			_usleep(1);
 			if (send(LogFile, tbuf, cnt, 0) >= 0) {
 				THREAD_UNLOCK();
 				return;
 			}
-			if (status == CONNPRIV)
-				break;
 		} while (errno == ENOBUFS);
 	} else {
 		THREAD_UNLOCK();
@@ -342,7 +342,7 @@ connectlog(void)
 	if (LogFile == -1) {
 		if ((LogFile = _socket(AF_UNIX, SOCK_DGRAM, 0)) == -1)
 			return;
-		(void)_fcntl(LogFile, F_SETFD, 1);
+		(void)_fcntl(LogFile, F_SETFD, FD_CLOEXEC);
 	}
 	if (LogFile != -1 && status == NOCONN) {
 		SyslogAddr.sun_len = sizeof(SyslogAddr);
@@ -413,8 +413,10 @@ void
 closelog(void)
 {
 	THREAD_LOCK();
-	(void)_close(LogFile);
-	LogFile = -1;
+	if (LogFile != -1) {
+		(void)_close(LogFile);
+		LogFile = -1;
+	}
 	LogTag = NULL;
 	status = NOCONN;
 	THREAD_UNLOCK();

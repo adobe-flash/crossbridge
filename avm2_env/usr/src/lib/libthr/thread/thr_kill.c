@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libthr/thread/thr_kill.c,v 1.3.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #include "namespace.h"
@@ -54,11 +54,15 @@ _pthread_kill(pthread_t pthread, int sig)
 	 * signal is valid (signal 0 specifies error checking only) and
 	 * not being ignored:
 	 */
-	else if ((ret = _thr_ref_add(curthread, pthread, /*include dead*/0))
+	else if (curthread == pthread) {
+		if (sig > 0)
+			_thr_send_sig(pthread, sig);
+		ret = 0;
+	} if ((ret = _thr_find_thread(curthread, pthread, /*include dead*/0))
 	    == 0) {
 		if (sig > 0)
 			_thr_send_sig(pthread, sig);
-		_thr_ref_delete(curthread, pthread);
+		THR_THREAD_UNLOCK(curthread, pthread);
 	}
 
 	/* Return the completion status: */

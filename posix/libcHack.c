@@ -847,11 +847,6 @@ void _init()
     inline_as3("CModule.runCtors()");
 }
 
-long double strtold(const char *nptr, char **endptr)
-{
-  return strtod(nptr, endptr);
-}
-
 //TODO: replace me with something efficient
 double ldexp(double x, int n)
 {

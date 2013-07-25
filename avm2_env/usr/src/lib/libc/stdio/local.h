@@ -5,6 +5,11 @@
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -30,13 +35,14 @@
  * SUCH DAMAGE.
  *
  *	@(#)local.h	8.3 (Berkeley) 7/3/94
- * $FreeBSD: src/lib/libc/stdio/local.h,v 1.33.2.2.2.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #include <sys/types.h>	/* for off_t */
 #include <pthread.h>
 #include <string.h>
 #include <wchar.h>
+#include <locale.h>
 
 /*
  * Information local to this implementation of stdio,
@@ -50,8 +56,8 @@ extern int	_ftello(FILE *, fpos_t *);
 extern int	_fseeko(FILE *, off_t, int, int);
 extern int	__fflush(FILE *fp);
 extern void	__fcloseall(void);
-extern wint_t	__fgetwc(FILE *);
-extern wint_t	__fputwc(wchar_t, FILE *);
+extern wint_t	__fgetwc(FILE *, locale_t);
+extern wint_t	__fputwc(wchar_t, FILE *, locale_t);
 extern int	__sflush(FILE *);
 extern FILE	*__sfp(void);
 extern int	__slbexpand(FILE *, size_t);
@@ -65,15 +71,15 @@ extern void	_cleanup(void);
 extern void	__smakebuf(FILE *);
 extern int	__swhatbuf(FILE *, size_t *, int *);
 extern int	_fwalk(int (*)(FILE *));
-extern int	__svfscanf(FILE *, const char *, __va_list);
+extern int	__svfscanf(FILE *, locale_t, const char *, __va_list);
 extern int	__swsetup(FILE *);
 extern int	__sflags(const char *, int *);
 extern int	__ungetc(int, FILE *);
-extern wint_t	__ungetwc(wint_t, FILE *);
-extern int	__vfprintf(FILE *, const char *, __va_list);
+extern wint_t	__ungetwc(wint_t, FILE *, locale_t);
+extern int	__vfprintf(FILE *, locale_t, const char *, __va_list);
 extern int	__vfscanf(FILE *, const char *, __va_list);
-extern int	__vfwprintf(FILE *, const wchar_t *, __va_list);
-extern int	__vfwscanf(FILE * __restrict, const wchar_t * __restrict,
+extern int	__vfwprintf(FILE *, locale_t, const wchar_t *, __va_list);
+extern int	__vfwscanf(FILE * __restrict, locale_t, const wchar_t * __restrict,
 		    __va_list);
 extern size_t	__fread(void * __restrict buf, size_t size, size_t count,
 		FILE * __restrict fp);

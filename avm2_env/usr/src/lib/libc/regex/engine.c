@@ -34,7 +34,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/regex/engine.c,v 1.21.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
  * The matching engine and friends.  This file is #included by regexec.c
@@ -246,6 +246,8 @@ matcher(struct re_guts *g,
 	/* Adjust start according to moffset, to speed things up */
 	if (g->moffset > -1)
 		start = ((dp - g->moffset) < start) ? start : dp - g->moffset;
+
+	SP("mloop", m->st, *start);
 
 	/* this loop does only one repetition except for backrefs */
 	for (;;) {
@@ -787,6 +789,7 @@ fast(	struct match *m,
 
 	CLEAR(st);
 	SET1(st, startst);
+	SP("fast", st, *p);
 	st = step(m->g, startst, stopst, st, NOTHING, st);
 	ASSIGN(fresh, st);
 	SP("start", st, *p);
@@ -1072,7 +1075,7 @@ step(struct re_guts *g,
 						OP(s = g->strip[pc+look]) != O_CH;
 						look += OPND(s))
 					assert(OP(s) == OOR2);
-				FWD(aft, aft, look);
+				FWD(aft, aft, look + 1);
 			}
 			break;
 		case OOR2:		/* propagate OCH_'s marking */
