@@ -715,7 +715,7 @@ libobjc:
 	rm -rf $(BUILD)/libobjc
 	mkdir -p $(BUILD)/libobjc
 	python $(SRCROOT)/tools/build-objc.py $(SRCROOT)/cached_build/libobjc/compile.log $(SRCROOT)/cached_build/libobjc/install.log $(SRCROOT) > $(BUILD)/libobjc/build.sh
-	cd $(BUILD)/libobjc && PATH=$(SDK)/usr/bin:$(PATH) bash -x build.sh
+	cd $(BUILD)/libobjc && PATH="$(SDK)/usr/bin:$(PATH)" bash -x build.sh
 	# link bitcode
 	cd $(BUILD)/libobjc && rm -f libobjc.a && mkdir NXConstStr && mv NXConstStr.o NXConstStr/. && $(SDK)/usr/bin/llvm-link -o libobjc.o *.o && $(AR) libobjc.a libobjc.o NXConstStr/*.o && cp libobjc.a $(SDK)/usr/lib/.
 
