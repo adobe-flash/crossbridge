@@ -176,7 +176,7 @@ Sema::CheckBuiltinFunctionCall(unsigned BuiltinID, CallExpr *TheCall) {
     if (checkArgCount(*this, TheCall, 1)) return true;
     TheCall->setType(Context.IntTy);
     break;
-  case Builtin::BI__sync_fetch_and_add:
+  /*case Builtin::BI__sync_fetch_and_add:
   case Builtin::BI__sync_fetch_and_add_1:
   case Builtin::BI__sync_fetch_and_add_2:
   case Builtin::BI__sync_fetch_and_add_4:
@@ -259,7 +259,7 @@ Sema::CheckBuiltinFunctionCall(unsigned BuiltinID, CallExpr *TheCall) {
   case Builtin::BI__sync_lock_release_2:
   case Builtin::BI__sync_lock_release_4:
   case Builtin::BI__sync_lock_release_8:
-  case Builtin::BI__sync_lock_release_16:
+  case Builtin::BI__sync_lock_release_16:*/
   case Builtin::BI__sync_swap:
   case Builtin::BI__sync_swap_1:
   case Builtin::BI__sync_swap_2:
