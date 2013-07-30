@@ -260,7 +260,7 @@ __FBSDID("$FreeBSD$");
 #  define LG_SIZEOF_PTR		2
 #  define CPU_SPINWAIT		
 #  ifdef __clang__
-#    define TLS_MODEL		/* clang does not support tls_model yet */
+#    define NO_TLS		/* clang does not support tls_model yet */
 #  else
 #    define TLS_MODEL		__attribute__((tls_model("initial-exec")))
 #  endif
