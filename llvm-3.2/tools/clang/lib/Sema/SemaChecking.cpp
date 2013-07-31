@@ -1016,7 +1016,7 @@ Sema::SemaBuiltinAtomicOverloaded(ExprResult TheCallResult) {
     Builtin::BI##x##_8, Builtin::BI##x##_16 }
 
   static const unsigned BuiltinIndices[][5] = {
-    BUILTIN_ROW(__sync_fetch_and_add),
+    /*BUILTIN_ROW(__sync_fetch_and_add),
     BUILTIN_ROW(__sync_fetch_and_sub),
     BUILTIN_ROW(__sync_fetch_and_or),
     BUILTIN_ROW(__sync_fetch_and_and),
@@ -1031,7 +1031,7 @@ Sema::SemaBuiltinAtomicOverloaded(ExprResult TheCallResult) {
     BUILTIN_ROW(__sync_val_compare_and_swap),
     BUILTIN_ROW(__sync_bool_compare_and_swap),
     BUILTIN_ROW(__sync_lock_test_and_set),
-    BUILTIN_ROW(__sync_lock_release),
+    BUILTIN_ROW(__sync_lock_release),*/
     BUILTIN_ROW(__sync_swap)
   };
 #undef BUILTIN_ROW
@@ -1058,7 +1058,7 @@ Sema::SemaBuiltinAtomicOverloaded(ExprResult TheCallResult) {
   unsigned BuiltinIndex, NumFixed = 1;
   switch (BuiltinID) {
   default: llvm_unreachable("Unknown overloaded atomic builtin!");
-  case Builtin::BI__sync_fetch_and_add: 
+  /*case Builtin::BI__sync_fetch_and_add: 
   case Builtin::BI__sync_fetch_and_add_1:
   case Builtin::BI__sync_fetch_and_add_2:
   case Builtin::BI__sync_fetch_and_add_4:
@@ -1187,7 +1187,7 @@ Sema::SemaBuiltinAtomicOverloaded(ExprResult TheCallResult) {
     BuiltinIndex = 13;
     NumFixed = 0;
     ResultType = Context.VoidTy;
-    break;
+    break;*/
       
   case Builtin::BI__sync_swap: 
   case Builtin::BI__sync_swap_1:
