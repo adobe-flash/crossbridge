@@ -10,7 +10,7 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
 	$?THREADS=3
-	$?nativepath=$(shell cygpath -at mixed $(1))
+	$?nativepath=$(shell cygpath -at mixed "$(1)")
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?CC=gcc-4
 	$?CXX=g++-4
