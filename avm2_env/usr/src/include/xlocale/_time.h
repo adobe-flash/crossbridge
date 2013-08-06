@@ -40,7 +40,7 @@ typedef struct	_xlocale *locale_t;
  * if we are in POSIX2008 mode if included from locale.h.
  */
 
-#include <cdefs.h>
+#include <sys/cdefs.h>
 #ifndef _XLOCALE_LOCALE1_H
 #define _XLOCALE_LOCALE1_H
 

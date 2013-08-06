@@ -88,8 +88,13 @@ extern void kfree(void *ptr, ...);
 #define fuword32(A) (*(volatile uint32_t *)(A))
 #define suword(A, B) (((*(volatile u_long *)(A)) = (B)), 0)
 #define suword32(A, B) (((*(volatile uint32_t *)(A)) = (B)), 0)
+#ifdef __clang__
+#define casuword __sync_val_compare_and_swap_4
+#define casuword32 __sync_val_compare_and_swap_4
+#else
 #define casuword __sync_val_compare_and_swap
 #define casuword32 __sync_val_compare_and_swap
+#endif
 #define curthread ((void *)__curthread())
 
 #define mtx_assert(...) /*mtx_assert*/
