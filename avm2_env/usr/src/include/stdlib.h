@@ -158,6 +158,7 @@ _Noreturn void	 _Exit(int);
 _Noreturn void
 	quick_exit(int);
 int	at_quick_exit(void (*)(void));
+void *	aligned_alloc(size_t, size_t);
 #endif /* __ISO_C_VISIBLE >= 2011 */
 /*
  * Extensions made by POSIX relative to C.  We don't know yet which edition
