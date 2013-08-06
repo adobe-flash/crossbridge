@@ -105,7 +105,7 @@ else
 endif
 
 $?FLEX=$(SRCROOT)/tools/flex/
-$?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
+$?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX -l
 $?ASDOC=$(SRCROOT)/tools/flex/bin/asdoc
 $?ASC=$(call nativepath,$(SRCROOT)/avmplus/utils/asc.jar)
 $?SCOMP=java $(JAVAFLAGS) -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
@@ -138,7 +138,8 @@ export CCACHE_DIR=$(SRCROOT)/ccache
 #BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm"' -DSTRIP_FBSDID -D__asm__\(X...\)="\error" -D__asm\(X...\)="\error"' MAKEFLAGS="" MFLAGS="" NO_WERROR=true $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 
 BMAKE+= AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true 
-BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -DSTRIP_FBSDID " CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm -DSTRIP_FBSDID "
+BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-builtin -DSTRIP_FBSDID " 
+BMAKE+= CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm -fno-builtin -DSTRIP_FBSDID "
 BMAKE+= MAKEFLAGS="" MFLAGS="" MK_ICONV=
 BMAKE+= MACHINE_ARCH=avm2 MACHINE_CPUARCH=AVM2 NO_WERROR=true SSP_CFLAGS=
 BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
@@ -427,7 +428,7 @@ finalcleanup:
 	$(RSYNC) $(SRCROOT)/tools/projector-dis.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/swfdink.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/posix/avm2_tramp.cpp $(SDK)/usr/share/
-	$(RSYNC) $(SRCROOT)/posix/vgl:.c $(SDK)/usr/share/
+	$(RSYNC) $(SRCROOT)/posix/vgl.c $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/Console.as $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/DefaultPreloader.as $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/vfs/HTTPBackingStore.as $(SDK)/usr/share/
