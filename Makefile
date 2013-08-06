@@ -74,7 +74,7 @@ $?JAVAFLAGS=
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?LN=ln -sfn
 $?COPY_DOCS=false
-$?ASSERTIONS=OFF
+$?ASSERTIONS=ON
 $?LLVMCMAKEOPTS= 
 $?LLVMLDFLAGS=
 $?LLVMINSTALLPREFIX=$(BUILD)
@@ -117,6 +117,7 @@ $?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
 $?AR=$(SDK)/usr/bin/ar scru -v
+$?CMAKE=$(SDK)/usr/bin/cmake
 
 $?FLASCC_VERSION_MAJOR:=1
 $?FLASCC_VERSION_MINOR:=1
@@ -137,9 +138,9 @@ export CCACHE_DIR=$(SRCROOT)/ccache
 #BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm"' -DSTRIP_FBSDID -D__asm__\(X...\)="\error" -D__asm\(X...\)="\error"' MAKEFLAGS="" MFLAGS="" NO_WERROR=true $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 
 BMAKE+= AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true 
-BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -DSTRIP_FBSDID " 
-BMAKE+= MAKEFLAGS="" MFLAGS="" 
-BMAKE+= MACHINE_ARCH=avm2  NO_WERROR=true SSP_CFLAGS=
+BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -DSTRIP_FBSDID " CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm -DSTRIP_FBSDID "
+BMAKE+= MAKEFLAGS="" MFLAGS="" MK_ICONV=
+BMAKE+= MACHINE_ARCH=avm2 MACHINE_CPUARCH=AVM2 NO_WERROR=true SSP_CFLAGS=
 BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 
 BUILDORDER= cmake abclibs basictools llvm binutils plugins 
@@ -236,7 +237,7 @@ win:
 
 	@echo "-  make (win)"
 	@$(CROSS) make &> $(WIN_BUILD)/logs/make_win.txt
-	
+
 	@echo "-  uname (win)"
 	@$(CROSS) uname  &> $(WIN_BUILD)/logs/uname_win.txt
 
@@ -254,13 +255,13 @@ win:
 
 	@echo "-  binutils (win)"
 	@$(CROSS) binutils &> $(WIN_BUILD)/logs/binutils_win.txt
-	
+
 	@echo "-  plugins (win)"
 	@$(CROSS) plugins &> $(WIN_BUILD)/logs/plugins_win.txt
-	
+
 	@echo "-  gcc (win)"
 	@$(CROSS) gcc &> $(WIN_BUILD)/logs/gcc_win.txt
-	
+
 	@echo "-  swig (win)"
 	@$(CROSS) swig &> $(WIN_BUILD)/logs/swig_win.txt
 
@@ -269,7 +270,7 @@ win:
 
 	@echo "-  tr (win)"
 	@$(CROSS) tr &> $(WIN_BUILD)/logs/tr_win.txt
-	
+
 	@echo "-  trd (win)"
 	@$(CROSS) trd &> $(WIN_BUILD)/logs/trd_win.txt
 
@@ -283,7 +284,7 @@ cross_llvm_mingw:
 	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
 	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
 	echo  "set(CMAKE_RC_COMPILER $(MINGWTRIPLE)-gcc)" >> $(BUILD)/llvmcross.toolchain
-	
+
 	PATH="$(BUILD)/ccachebin:$(SRCROOT)/mingwmac/sdk/usr/bin:$(PATH)" $(MAKE) \
 		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(MINGWTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
 		CC=$(MINGWTRIPLE)-gcc CXX=$(MINGWTRIPLE)-g++ \
@@ -296,7 +297,7 @@ cross_llvm_cygwin:
 	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
 	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
 	echo  "set(CMAKE_RC_COMPILER $(CC))" >> $(BUILD)/llvmcross.toolchain
-	
+
 	PATH="$(BUILD)/ccachebin:$(CYGWINMAC)/../altbin:$(CYGWINMAC):$(PATH)" $(MAKE) \
 		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(CYGTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
 		CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ LLVMLDFLAGS="-Wl,--stack,16000000" \
@@ -316,7 +317,7 @@ nightly:
 	$(MAKE) ieeetests_basicops
 	$(MAKE) swigtests
 	#$(MAKE)checkasm
-		
+
 weekly:
 	$(MAKE) nightly
 	$(MAKE) gcctests
@@ -374,7 +375,7 @@ dmg:
 	hdiutil convert $(BUILDROOT)/$(SDKNAME).dmg.tmp -format UDZO -imagekey zlib-level=9 -o $(BUILDROOT)/$(SDKNAME).dmg
 	rm -f $(BUILDROOT)/$(SDKNAME).dmg.tmp
 	find $(BUILDROOT)/staging > $(BUILDROOT)/dmgcontents.txt
-	
+
 zip:
 	cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
 	find $(BUILDROOT)/staging > $(BUILDROOT)/zipcontents.txt
@@ -426,7 +427,7 @@ finalcleanup:
 	$(RSYNC) $(SRCROOT)/tools/projector-dis.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/swfdink.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/posix/avm2_tramp.cpp $(SDK)/usr/share/
-	$(RSYNC) $(SRCROOT)/posix/vgl.c $(SDK)/usr/share/
+	$(RSYNC) $(SRCROOT)/posix/vgl:.c $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/Console.as $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/DefaultPreloader.as $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/vfs/HTTPBackingStore.as $(SDK)/usr/share/
@@ -446,6 +447,12 @@ gdb:
 	cp -f $(SRCROOT)/tools/flascc.gdb $(SDK)/usr/share/
 	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
 	cp -f $(SRCROOT)/tools/flascc-init.gdb $(SDK)/usr/share/
+
+llvmdev:
+	cd $(BUILD)/llvm-debug && $(MAKE) -j$(THREADS) && $(MAKE) install
+	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
+	$(MAKE) llvm-install
+
 
 llvm:
 	rm -rf $(BUILD)/llvm-debug
@@ -475,7 +482,7 @@ llvm-install:
 	$(CP_CLANG)
 	cp $(LLVMINSTALLPREFIX)/llvm-install/lib/LLVMgold.* $(SDK)/usr/lib/LLVMgold$(SOEXT)
 	cp -f $(BUILD)/llvm-debug/bin/fpcmp$(EXEEXT) $(BUILDROOT)/extra/fpcmp$(EXEEXT)
-
+	cp $(LLVMINSTALLPREFIX)/llvm-install/lib/libprofile_rt.a $(SDK)/usr/lib/
 
 llvmtests:
 	rm -rf $(BUILD)/llvm-tests
@@ -742,6 +749,29 @@ libthr:
 	cd $(BUILD)/libthr/libthr && rm -f libthr.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libthr.a
 	cp -f $(BUILD)/libthr/libthr/libthr.a $(SDK)/usr/lib/.
 
+.PHONY: libcxxrt
+libcxxrt:
+	rm -rf $(BUILD)/libcxxrt
+	ditto $(SRCROOT)/libcxxrt $(BUILD)/libcxxrt
+	cd $(BUILD)/libcxxrt/src && CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -I $(SRCROOT)/posix -fPIC -emit-llvm" AR="$(AR)" $(MAKE) -f Makefile
+	
+.PHONY: libcxx
+libcxx:
+	rm -rf $(BUILD)/libcxx
+	ditto $(SRCROOT)/libcxx $(BUILD)/libcxx
+	cd $(BUILD)/libcxx/lib &&  CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm" CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm" \
+		CFLAGS="-I$(SRCROOT)/avm2_env/usr/include" CXXFLAGS="-I$(SRCROOT)/avm2_env/usr/include" ./buildit
+	cd $(BUILD)/libcxx/lib &&  $(AR) libc++.a *.o
+	#cd $(BUILD)/libcxx && CC="$(SDK)/usr/bin/$(FLASCC_CC) -fPIC " CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -fPIC " cmake -G "Unix Makefiles" \
+	cd $(BUILD)/libcxx && PATH=$(SDK)/usr/bin CC="clang" CXX="clang++" CFLAGS="-fPIC -emit-llvm" CXXFLAGS="-fPIC -emit-llvm" \
+		cmake -G "Unix Makefiles" -DLIBCXX_CXX_ABI=libcxxrt -DLIBCXX_LIBCXXRT_INCLUDE_PATHS="$(SRCROOT)/libcxxrt/src"  \
+
+	#cd $(BUILD)/libcxx && PATH=$(SDK)/usr/bin  CFLAGS="-nostdlib -fPIC -emit-llvm" CXXFLAGS="-nostdlib -fPIC -emit-llvm" \
+		$(CMAKE) -G "Unix Makefiles" -DLIBCXX_CXX_ABI=libcxxrt  \
+		-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+		-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(BUILD)/libcxx/install $(SRCROOT)/libcxx
+	#cd $(BUILD)/libcxx && make -j $(THREADS) && make install
+
 libobjc_configure:
 	cd $(BUILD)/llvm-gcc-42 \
 		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' TARGET-target-libobjc="all OBJC_THREAD_FILE=thr-posix" all-target-libobjc > $(SRCROOT)/cached_build/libobjc/compile.log
@@ -766,7 +796,7 @@ gcclibs:
 	$(SDK)/usr/bin/ranlib $(SDK)/usr/lib/libstdc++.a
 	$(SDK)/usr/bin/ranlib $(SDK)/usr/lib/libsupc++.a
 	rm -rf $(SDK)/usr/lib/gcc
-	
+
 	$(MAKE) libobjc
 
 	mkdir -p $(SDK)/usr/lib/stdlibs_abc
@@ -1079,7 +1109,7 @@ swigtests:
 	cp $(SRCROOT)/swig-2.0.4/Lib/*.i $(BUILD)/swig/Lib
 	cp $(SRCROOT)/swig-2.0.4/Lib/*.swg $(BUILD)/swig/Lib
 	cd $(BUILD)/swig && $(MAKE) check-as3-examples
-	
+
 swigtestsautomation:
 	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/swig-2.0.4
 
@@ -1163,7 +1193,7 @@ sync_gls3d:
 	rm -rf $(BUILD)/github/GLS3D
 	mkdir -p $(BUILD)/github/GLS3D
 	cd $(BUILD)/github && git clone --depth 1 https://github.com/adobe/GLS3D.git GLS3D
-	
+
 alcexamples: sync_alcextra sync_alcexamples sync_gls3d
 	mkdir -p $(BUILDROOT)/extra
 	$(MAKE) alcexample_neverball
@@ -1358,7 +1388,7 @@ avm2_ui_thunk_test:
 	cd $(BUILD)/avm2_ui_thunk_test && $(SDK)/usr/bin/$(FLASCC_CC) -pthread $(SRCROOT)/test/avm2_ui_thunk.c -symbol-abc=ConsoleBackground.abc -emit-swf -o avm2_ui_thunk_background.swf
 	cd $(BUILD)/avm2_ui_thunk_test && $(SDK)/usr/bin/$(FLASCC_CC) -pthread $(SRCROOT)/test/avm2_ui_thunk.c -symbol-abc=ConsoleAsync.abc -emit-swf -o avm2_ui_thunk_async.swf
 	cp -f $(BUILD)/avm2_ui_thunk_test/*.swf $(BUILDROOT)/extra/
-	
+
 
 scimark_asc:
 	@mkdir -p $(BUILD)/scimark_asc
