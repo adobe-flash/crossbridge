@@ -10,7 +10,7 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
 	$?THREADS=3
-	$?nativepath=$(shell cygpath -at mixed "$(1)")
+	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?CC=gcc-4
 	$?CXX=g++-4
@@ -69,7 +69,7 @@ endif
 ESCAPED_SRCROOT=$(shell echo $(SRCROOT) | sed -e 's/[\/&]/\\&/g')
 $?BUILD_FOLDER="builds"
 $?FTP_HOST=
-$?JAVA=$(call nativepath,$(shell which java))
+$?JAVA=$(call nativepath,'$(shell which java)')
 $?JAVAFLAGS=
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?LN=ln -sfn
@@ -100,7 +100,7 @@ else
 	FLASCC_CXX=clang++
 	CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-install/bin/clang$(EXEEXT) \
 		$(SDK)/usr/bin/clang$(EXEEXT) && \
-		cp $(LLVMINSTALLPREFIX)/llvm-install/bin/clang++$(EXEEXT) \
+		cp $(LLVMINSTALLPREFIX)/llvm-install/bin/clang++ \
 		$(SDK)/usr/bin/clang++$(EXEEXT)
 endif
 
@@ -597,37 +597,37 @@ abcstdlibs_more:
 
 	mkdir -p $(BUILD)/libc_abc
 	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc.a
-	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
+	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
 
 	mkdir -p $(BUILD)/libthr_abc
 	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
-	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
+	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
-
+ifneq (,$(findstring 2.9,$(LLVMVERSION)))
 	mkdir -p $(BUILD)/libgcc_abc
 	cd $(BUILD)/libgcc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libgcc.a
-	cd $(BUILD)/libgcc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
+	cd $(BUILD)/libgcc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libgcc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libgcc.a
 
 	mkdir -p $(BUILD)/libstdcpp_abc
 	cd $(BUILD)/libstdcpp_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libstdc++.a
-	cd $(BUILD)/libstdcpp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
+	cd $(BUILD)/libstdcpp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libstdcpp_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libstdc++.a
 
 	mkdir -p $(BUILD)/libsupcpp_abc
 	cd $(BUILD)/libsupcpp_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libsupc++.a
-	cd $(BUILD)/libsupcpp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
+	cd $(BUILD)/libsupcpp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libsupcpp_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libsupc++.a
 
 	mkdir -p $(BUILD)/libobjc_abc
 	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
-	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
+	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
-
+endif
 	mkdir -p $(BUILD)/libBlocksRuntime_abc
 	cd $(BUILD)/libBlocksRuntime_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libBlocksRuntime.a
-	cd $(BUILD)/libBlocksRuntime_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
+	cd $(BUILD)/libBlocksRuntime_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libBlocksRuntime_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libBlocksRuntime.a
 
 extralibs:
