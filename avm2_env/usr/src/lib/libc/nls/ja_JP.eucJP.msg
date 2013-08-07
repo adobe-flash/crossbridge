@@ -1,4 +1,4 @@
-$ $FreeBSD: src/lib/libc/nls/ja_JP.eucJP.msg,v 1.4.2.3.4.1 2010/12/21 17:09:25 kensmith Exp $
+$ $FreeBSD$
 $
 $ Message catalog for ja_JP.eucJP locale
 $
@@ -181,6 +181,16 @@ $ ENOATTR
 87 そのような属性はありません
 $ EDOOFUS
 88 プログラミングエラーです
+$ EBADMSG
+89 無効なメッセージです
+$ EMULTIHOP
+90 マルチホップが試みられました
+$ ENOLINK
+91 リンクが切断されています
+$ EPROTO
+92 プロトコルエラーです
+$ ENOTCAPABLE
+93 ケーパビリティが不足です
 $
 $ strsignal() support catalog
 $

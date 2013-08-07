@@ -1,4 +1,4 @@
-$ $FreeBSD: src/lib/libc/nls/C.msg,v 1.1.22.2.4.1 2010/12/21 17:09:25 kensmith Exp $
+$ $FreeBSD$
 $
 $ Message catalog for C locale (template)
 $
@@ -181,6 +181,16 @@ $ ENOATTR
 87 Attribute not found
 $ EDOOFUS
 88 Programming error
+$ EBADMSG
+89 Bad message
+$ EMULTIHOP
+90 Multihop attempted
+$ ENOLINK
+91 Link has been severed
+$ EPROTO
+92 Protocol error
+$ ENOTCAPABLE
+93 Capabilities insufficient
 $
 $ strsignal() support catalog
 $

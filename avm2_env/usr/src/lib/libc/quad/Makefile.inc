@@ -1,10 +1,10 @@
 #	from @(#)Makefile.inc	8.1 (Berkeley) 6/4/93
-# $FreeBSD: src/lib/libc/quad/Makefile.inc,v 1.11.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+# $FreeBSD$
 
 # Quad support, if needed
-.PATH: ${.CURDIR}/${MACHINE_ARCH}/quad ${.CURDIR}/quad
+.PATH: ${.CURDIR}/${LIBC_ARCH}/quad ${.CURDIR}/quad
 
-.if ${MACHINE_ARCH} == "i386"
+.if ${LIBC_ARCH} == "i386"
 
 SRCS+=	cmpdi2.c divdi3.c moddi3.c qdivrem.c ucmpdi2.c udivdi3.c umoddi3.c
 

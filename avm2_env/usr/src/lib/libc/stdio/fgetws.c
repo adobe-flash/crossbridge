@@ -2,6 +2,11 @@
  * Copyright (c) 2002-2004 Tim J. Robbins.
  * All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -25,7 +30,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/stdio/fgetws.c,v 1.7.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <errno.h>
@@ -38,12 +43,14 @@ __FBSDID("$FreeBSD: src/lib/libc/stdio/fgetws.c,v 1.7.2.2.4.1 2010/12/21 17:09:2
 #include "mblocal.h"
 
 wchar_t *
-fgetws(wchar_t * __restrict ws, int n, FILE * __restrict fp)
+fgetws_l(wchar_t * __restrict ws, int n, FILE * __restrict fp, locale_t locale)
 {
 	wchar_t *wsp;
 	size_t nconv;
 	const char *src;
 	unsigned char *nl;
+	FIX_LOCALE(locale);
+	struct xlocale_ctype *l = XLOCALE_CTYPE(locale);
 
 	FLOCKFILE(fp);
 	ORIENT(fp, 1);
@@ -60,7 +67,7 @@ fgetws(wchar_t * __restrict ws, int n, FILE * __restrict fp)
 	do {
 		src = fp->_p;
 		nl = memchr(fp->_p, '\n', fp->_r);
-		nconv = __mbsnrtowcs(wsp, &src,
+		nconv = l->__mbsnrtowcs(wsp, &src,
 		    nl != NULL ? (nl - fp->_p + 1) : fp->_r,
 		    n - 1, &fp->_mbstate);
 		if (nconv == (size_t)-1)
@@ -86,7 +93,7 @@ fgetws(wchar_t * __restrict ws, int n, FILE * __restrict fp)
 	if (wsp == ws)
 		/* EOF */
 		goto error;
-	if (!__mbsinit(&fp->_mbstate))
+	if (!l->__mbsinit(&fp->_mbstate))
 		/* Incomplete character */
 		goto error;
 	*wsp = L'\0';
@@ -97,4 +104,9 @@ fgetws(wchar_t * __restrict ws, int n, FILE * __restrict fp)
 error:
 	FUNLOCKFILE(fp);
 	return (NULL);
+}
+wchar_t *
+fgetws(wchar_t * __restrict ws, int n, FILE * __restrict fp)
+{
+	return fgetws_l(ws, n, fp, __get_locale());
 }

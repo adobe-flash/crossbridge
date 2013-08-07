@@ -31,7 +31,7 @@
 static char sccsid[] = "@(#)wait.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/wait.c,v 1.7.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <sys/types.h>
@@ -47,4 +47,4 @@ __wait(int *istat)
 }
 
 __weak_reference2(__wait, wait);
-__weak_reference3(__wait, _wait);
+__weak_reference(__wait, _wait);

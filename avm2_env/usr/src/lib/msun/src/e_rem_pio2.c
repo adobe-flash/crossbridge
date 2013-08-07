@@ -14,7 +14,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/msun/src/e_rem_pio2.c,v 1.21.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /* __ieee754_rem_pio2(x,y)
  * 
@@ -171,9 +171,8 @@ medium:
 	}
     /* set z = scalbn(|x|,ilogb(x)-23) */
 	GET_LOW_WORD(low,x);
-	SET_LOW_WORD(z,low);
 	e0 	= (ix>>20)-1046;	/* e0 = ilogb(z)-23; */
-	SET_HIGH_WORD(z, ix - ((int32_t)(e0<<20)));
+	INSERT_WORDS(z, ix - ((int32_t)(e0<<20)), low);
 	for(i=0;i<2;i++) {
 		tx[i] = (double)((int32_t)(z));
 		z     = (z-tx[i])*two24;

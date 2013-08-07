@@ -34,13 +34,14 @@
 static char sccsid[] = "@(#)fclose.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/stdio/fclose.c,v 1.12.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "un-namespace.h"
+#include <spinlock.h>
 #include "libc_private.h"
 #include "local.h"
 
@@ -65,7 +66,20 @@ fclose(FILE *fp)
 		FREELB(fp);
 	fp->_file = -1;
 	fp->_r = fp->_w = 0;	/* Mess up if reaccessed. */
+
+	/*
+	 * Lock the spinlock used to protect __sglue list walk in
+	 * __sfp().  The __sfp() uses fp->_flags == 0 test as an
+	 * indication of the unused FILE.
+	 *
+	 * Taking the lock prevents possible compiler or processor
+	 * reordering of the writes performed before the final _flags
+	 * cleanup, making sure that we are done with the FILE before
+	 * it is considered available.
+	 */
+	STDIO_THREAD_LOCK();
 	fp->_flags = 0;		/* Release this FILE for reuse. */
+	STDIO_THREAD_UNLOCK();
 	FUNLOCKFILE(fp);
 	return (r);
 }

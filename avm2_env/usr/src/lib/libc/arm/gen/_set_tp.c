@@ -23,13 +23,17 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	$FreeBSD: src/lib/libc/arm/gen/_set_tp.c,v 1.1.22.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ *	$FreeBSD$
  */
 
 #include <string.h>
-#include <stdint.h>
+#include <sys/types.h>
+
+#include <machine/sysarch.h>
 
 void
 _set_tp(void *tp)
 {
+
+	*((struct tcb **)ARM_TP_ADDRESS) = tp;
 }

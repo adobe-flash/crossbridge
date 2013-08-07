@@ -14,7 +14,7 @@
  */
 
 #ifndef lint
-static char rcsid[] = "$FreeBSD: src/lib/msun/src/s_scalbnf.c,v 1.8.22.1.6.1 2010/12/21 17:09:25 kensmith Exp $";
+static char rcsid[] = "$FreeBSD$";
 #endif
 
 #include <sys/cdefs.h>
@@ -55,10 +55,4 @@ scalbnf (float x, int n)
         return x*twom25;
 }
 
-//__strong_reference(scalbnf, ldexpf);
-//AVM2: remove when strong refs work properly
-float
-ldexpf (float x, int n)
-{
-    return scalbnf(x,n);
-}
+__strong_reference(scalbnf, ldexpf);

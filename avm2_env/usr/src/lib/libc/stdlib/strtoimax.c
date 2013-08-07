@@ -2,6 +2,11 @@
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -31,12 +36,13 @@
 static char sccsid[] = "from @(#)strtol.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/stdlib/strtoimax.c,v 1.12.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include "xlocale_private.h"
 
 /*
  * Convert a string to an intmax_t integer.
@@ -45,13 +51,15 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/strtoimax.c,v 1.12.10.1.6.1 2010/12/21 1
  * alphabets and digits are each contiguous.
  */
 intmax_t
-strtoimax(const char * __restrict nptr, char ** __restrict endptr, int base)
+strtoimax_l(const char * __restrict nptr, char ** __restrict endptr, int base,
+		locale_t locale)
 {
 	const char *s;
 	uintmax_t acc;
 	char c;
 	uintmax_t cutoff;
 	int neg, any, cutlim;
+	FIX_LOCALE(locale);
 
 	/*
 	 * Skip white space and pick up leading +/- sign if any.
@@ -61,7 +69,7 @@ strtoimax(const char * __restrict nptr, char ** __restrict endptr, int base)
 	s = nptr;
 	do {
 		c = *s++;
-	} while (isspace((unsigned char)c));
+	} while (isspace_l((unsigned char)c, locale));
 	if (c == '-') {
 		neg = 1;
 		c = *s++;
@@ -137,4 +145,9 @@ noconv:
 	if (endptr != NULL)
 		*endptr = (char *)(any ? s - 1 : nptr);
 	return (acc);
+}
+intmax_t
+strtoimax(const char * __restrict nptr, char ** __restrict endptr, int base)
+{
+	return strtoimax_l(nptr, endptr, base, __get_locale());
 }

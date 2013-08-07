@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libc/include/compat.h,v 1.1.4.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 /*
@@ -39,7 +39,7 @@
 #define __sym_compat(x,y,z) /* nothing */
 #else
 #define	__sym_compat(sym,impl,verid)	\
-.symver impl , sym @ verid
+	.symver impl, sym@verid
 #endif
 
 __sym_compat(__semctl, freebsd7___semctl, FBSD_1.0);

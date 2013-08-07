@@ -26,7 +26,7 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     @(#)fcntl.2	8.2 (Berkeley) 1/12/94
-.\" $FreeBSD: src/lib/libc/sys/fcntl.2,v 1.47.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
 .Dd September 28, 2009
 .Dt FCNTL 2
@@ -539,8 +539,6 @@ The argument
 .Fa cmd
 is
 .Dv F_DUPFD
-or
-.Dv F_DUP2FD
 and the maximum number of file descriptors permitted for the
 process are already in use,
 or no file descriptors greater than or equal to
@@ -618,7 +616,7 @@ for the reasons as stated in
 .Xr flock 2 ,
 .Xr getdtablesize 2 ,
 .Xr open 2 ,
-.Xr sigvec 2 ,
+.Xr sigaction 2 ,
 .Xr lockf 3 ,
 .Xr tcgetpgrp 3 ,
 .Xr tcsetpgrp 3

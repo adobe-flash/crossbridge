@@ -34,8 +34,7 @@
  */
 
 #include <machine/asm.h>
-
-RCSID("$FreeBSD: src/lib/msun/i387/e_exp.S,v 1.12.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $")
+__FBSDID("$FreeBSD$")
 
 /* e^x = 2^(x * log2(e)) */
 ENTRY(exp)
@@ -97,3 +96,5 @@ x_not_minus_Inf:
 	fldl	4(%esp)
 	ret
 END(exp)
+
+	.section .note.GNU-stack,"",%progbits

@@ -26,9 +26,9 @@
 .\" SUCH DAMAGE.
 .\"
 .\"	@(#)mmap.2	8.4 (Berkeley) 5/11/95
-.\" $FreeBSD: src/lib/libc/sys/mmap.2,v 1.59.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
-.Dd July 26, 2009
+.Dd March 18, 2012
 .Dt MMAP 2
 .Os
 .Sh NAME
@@ -108,6 +108,10 @@ The
 argument must be 0.
 .\".It Dv MAP_FILE
 .\"Mapped from a regular file or character-special device memory.
+.It Dv MAP_ANONYMOUS
+This flag is identical to
+.Dv MAP_ANON
+and is provided for compatibility.
 .It Dv MAP_FIXED
 Do not permit the system to select a different address than the one
 specified.
@@ -201,12 +205,25 @@ command and
 system call generally do not flush dirty NOSYNC VM data.
 The
 .Xr msync 2
-system call is obsolete since
+system call is usually not needed since
 .Bx
 implements a coherent file system buffer cache.
 However, it may be
 used to associate dirty VM pages with file system buffers and thus cause
 them to be flushed to physical media sooner rather than later.
+.It Dv MAP_PREFAULT_READ
+Immediately update the calling process's lowest-level virtual address
+translation structures, such as its page table, so that every memory
+resident page within the region is mapped for read access.
+Ordinarily these structures are updated lazily.
+The effect of this option is to eliminate any soft faults that would
+otherwise occur on the initial read accesses to the region.
+Although this option does not preclude
+.Fa prot
+from including
+.Dv PROT_WRITE ,
+it does not eliminate soft faults on the initial write accesses to the
+region.
 .It Dv MAP_PRIVATE
 Modifications are private.
 .It Dv MAP_SHARED
@@ -329,9 +346,6 @@ was specified and the
 argument was not available.
 .Dv MAP_ANON
 was specified and insufficient memory was available.
-The system has reached the per-process mmap limit specified in the
-.Va vm.max_proc_mmap
-sysctl.
 .El
 .Sh SEE ALSO
 .Xr madvise 2 ,
@@ -342,8 +356,7 @@ sysctl.
 .Xr msync 2 ,
 .Xr munlock 2 ,
 .Xr munmap 2 ,
-.Xr getpagesize 3 ,
-.Xr make.conf 5
+.Xr getpagesize 3
 .Sh BUGS
 The
 .Fa len

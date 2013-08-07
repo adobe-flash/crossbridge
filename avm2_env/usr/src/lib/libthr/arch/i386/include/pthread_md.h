@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libthr/arch/i386/include/pthread_md.h,v 1.9.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 /*
@@ -70,7 +70,7 @@ struct tcb {
 	u_int __i;						\
 	__asm __volatile("movl %%gs:%1, %0"			\
 	    : "=r" (__i)					\
-	    : "m" (*(u_int *)(__tcb_offset(name))));		\
+	    : "m" (*(volatile u_int *)(__tcb_offset(name))));	\
 	__result = (__tcb_type(name))__i;			\
 								\
 	__result;						\

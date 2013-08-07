@@ -25,10 +25,16 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/__getosreldate.c,v 1.1.12.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/sysctl.h>
+#include <errno.h>
+#include <link.h>
+#include <elf.h>
+#include "libc_private.h"
+
+int __getosreldate(void);
 
 /*
  * This is private to libc.  It is intended for wrapping syscall stubs in order
@@ -49,7 +55,11 @@ __getosreldate(void)
 
 	if (osreldate != 0)
 		return (osreldate);
-	
+
+	error = _elf_aux_info(AT_OSRELDATE, &osreldate, sizeof(osreldate));
+	if (error == 0 && osreldate != 0)
+		return (osreldate);
+
 	oid[0] = CTL_KERN;
 	oid[1] = KERN_OSRELDATE;
 	osrel = 0;

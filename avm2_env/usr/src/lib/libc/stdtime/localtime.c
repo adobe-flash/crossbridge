@@ -6,10 +6,10 @@
 #include <sys/cdefs.h>
 #ifndef lint
 #ifndef NOID
-static char	elsieid[] __unused = "@(#)localtime.c	8.9";
+static char	elsieid[] __unused = "@(#)localtime.c	8.14";
 #endif /* !defined NOID */
 #endif /* !defined lint */
-__FBSDID("$FreeBSD: src/lib/libc/stdtime/localtime.c,v 1.45.2.3.4.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
 ** Leap second handling from Bradley White.
@@ -315,32 +315,24 @@ settzname(void)
 		return;
 	}
 #endif /* defined ALL_STATE */
+	/*
+	** And to get the latest zone names into tzname. . .
+	*/
 	for (i = 0; i < sp->typecnt; ++i) {
-		const struct ttinfo * const	ttisp = &sp->ttis[i];
+		const struct ttinfo * const ttisp = &sp->ttis[sp->types[i]];
 
 		tzname[ttisp->tt_isdst] =
 			&sp->chars[ttisp->tt_abbrind];
 #ifdef USG_COMPAT
 		if (ttisp->tt_isdst)
 			daylight = 1;
-		if (i == 0 || !ttisp->tt_isdst)
+		if (!ttisp->tt_isdst)
 			timezone = -(ttisp->tt_gmtoff);
 #endif /* defined USG_COMPAT */
 #ifdef ALTZONE
-		if (i == 0 || ttisp->tt_isdst)
+		if (ttisp->tt_isdst)
 			altzone = -(ttisp->tt_gmtoff);
 #endif /* defined ALTZONE */
-	}
-	/*
-	** And to get the latest zone names into tzname. . .
-	*/
-	for (i = 0; i < sp->timecnt; ++i) {
-		const struct ttinfo * const	ttisp =
-							&sp->ttis[
-								sp->types[i]];
-
-		tzname[ttisp->tt_isdst] =
-			&sp->chars[ttisp->tt_abbrind];
 	}
 	/*
 	** Finally, scrub the abbreviations.
@@ -388,12 +380,17 @@ register const int	doextend;
 	int		fid;
 	int		stored;
 	int		nread;
+	int		res;
 	union {
 		struct tzhead	tzhead;
 		char		buf[2 * sizeof(struct tzhead) +
 					2 * sizeof *sp +
 					4 * TZ_MAX_TIMES];
-	} u;
+	} *u;
+
+	u = NULL;
+	res = -1;
+	sp->goback = sp->goahead = FALSE;
 
 	/* XXX The following is from OpenBSD, and I'm not sure it is correct */
 	if (name != NULL && issetugid() != 0)
@@ -412,16 +409,24 @@ register const int	doextend;
 		** to hold the longest file name string that the implementation
 		** guarantees can be opened."
 		*/
-		char		fullname[FILENAME_MAX + 1];
+		char		*fullname;
+
+		fullname = malloc(FILENAME_MAX + 1);
+		if (fullname == NULL)
+			goto out;
 
 		if (name[0] == ':')
 			++name;
 		doaccess = name[0] == '/';
 		if (!doaccess) {
-			if ((p = TZDIR) == NULL)
+			if ((p = TZDIR) == NULL) {
+				free(fullname);
 				return -1;
-			if ((strlen(p) + 1 + strlen(name) + 1) >= sizeof fullname)
+			}
+			if (strlen(p) + 1 + strlen(name) >= FILENAME_MAX) {
+				free(fullname);
 				return -1;
+			}
 			(void) strcpy(fullname, p);
 			(void) strcat(fullname, "/");
 			(void) strcat(fullname, name);
@@ -432,37 +437,46 @@ register const int	doextend;
 				doaccess = TRUE;
 			name = fullname;
 		}
-		if (doaccess && access(name, R_OK) != 0)
+		if (doaccess && access(name, R_OK) != 0) {
+			free(fullname);
 		     	return -1;
-		if ((fid = _open(name, OPEN_MODE)) == -1)
+		}
+		if ((fid = _open(name, OPEN_MODE)) == -1) {
+			free(fullname);
 			return -1;
+		}
 		if ((_fstat(fid, &stab) < 0) || !S_ISREG(stab.st_mode)) {
+			free(fullname);
 			_close(fid);
 			return -1;
 		}
+		free(fullname);
 	}
-	nread = _read(fid, u.buf, sizeof u.buf);
+	u = malloc(sizeof(*u));
+	if (u == NULL)
+		goto out;
+	nread = _read(fid, u->buf, sizeof u->buf);
 	if (_close(fid) < 0 || nread <= 0)
-		return -1;
+		goto out;
 	for (stored = 4; stored <= 8; stored *= 2) {
 		int		ttisstdcnt;
 		int		ttisgmtcnt;
 
-		ttisstdcnt = (int) detzcode(u.tzhead.tzh_ttisstdcnt);
-		ttisgmtcnt = (int) detzcode(u.tzhead.tzh_ttisgmtcnt);
-		sp->leapcnt = (int) detzcode(u.tzhead.tzh_leapcnt);
-		sp->timecnt = (int) detzcode(u.tzhead.tzh_timecnt);
-		sp->typecnt = (int) detzcode(u.tzhead.tzh_typecnt);
-		sp->charcnt = (int) detzcode(u.tzhead.tzh_charcnt);
-		p = u.tzhead.tzh_charcnt + sizeof u.tzhead.tzh_charcnt;
+		ttisstdcnt = (int) detzcode(u->tzhead.tzh_ttisstdcnt);
+		ttisgmtcnt = (int) detzcode(u->tzhead.tzh_ttisgmtcnt);
+		sp->leapcnt = (int) detzcode(u->tzhead.tzh_leapcnt);
+		sp->timecnt = (int) detzcode(u->tzhead.tzh_timecnt);
+		sp->typecnt = (int) detzcode(u->tzhead.tzh_typecnt);
+		sp->charcnt = (int) detzcode(u->tzhead.tzh_charcnt);
+		p = u->tzhead.tzh_charcnt + sizeof u->tzhead.tzh_charcnt;
 		if (sp->leapcnt < 0 || sp->leapcnt > TZ_MAX_LEAPS ||
 			sp->typecnt <= 0 || sp->typecnt > TZ_MAX_TYPES ||
 			sp->timecnt < 0 || sp->timecnt > TZ_MAX_TIMES ||
 			sp->charcnt < 0 || sp->charcnt > TZ_MAX_CHARS ||
 			(ttisstdcnt != sp->typecnt && ttisstdcnt != 0) ||
 			(ttisgmtcnt != sp->typecnt && ttisgmtcnt != 0))
-				return -1;
-		if (nread - (p - u.buf) <
+				goto out;
+		if (nread - (p - u->buf) <
 			sp->timecnt * stored +		/* ats */
 			sp->timecnt +			/* types */
 			sp->typecnt * 6 +		/* ttinfos */
@@ -470,7 +484,7 @@ register const int	doextend;
 			sp->leapcnt * (stored + 4) +	/* lsinfos */
 			ttisstdcnt +			/* ttisstds */
 			ttisgmtcnt)			/* ttisgmts */
-				return -1;
+				goto out;
 		for (i = 0; i < sp->timecnt; ++i) {
 			sp->ats[i] = (stored == 4) ?
 				detzcode(p) : detzcode64(p);
@@ -479,7 +493,7 @@ register const int	doextend;
 		for (i = 0; i < sp->timecnt; ++i) {
 			sp->types[i] = (unsigned char) *p++;
 			if (sp->types[i] >= sp->typecnt)
-				return -1;
+				goto out;
 		}
 		for (i = 0; i < sp->typecnt; ++i) {
 			struct ttinfo *	ttisp;
@@ -489,11 +503,11 @@ register const int	doextend;
 			p += 4;
 			ttisp->tt_isdst = (unsigned char) *p++;
 			if (ttisp->tt_isdst != 0 && ttisp->tt_isdst != 1)
-				return -1;
+				goto out;
 			ttisp->tt_abbrind = (unsigned char) *p++;
 			if (ttisp->tt_abbrind < 0 ||
 				ttisp->tt_abbrind > sp->charcnt)
-					return -1;
+					goto out;
 		}
 		for (i = 0; i < sp->charcnt; ++i)
 			sp->chars[i] = *p++;
@@ -518,7 +532,7 @@ register const int	doextend;
 				ttisp->tt_ttisstd = *p++;
 				if (ttisp->tt_ttisstd != TRUE &&
 					ttisp->tt_ttisstd != FALSE)
-						return -1;
+						goto out;
 			}
 		}
 		for (i = 0; i < sp->typecnt; ++i) {
@@ -531,7 +545,7 @@ register const int	doextend;
 				ttisp->tt_ttisgmt = *p++;
 				if (ttisp->tt_ttisgmt != TRUE &&
 					ttisp->tt_ttisgmt != FALSE)
-						return -1;
+						goto out;
 			}
 		}
 		/*
@@ -564,11 +578,11 @@ register const int	doextend;
 		/*
 		** If this is an old file, we're done.
 		*/
-		if (u.tzhead.tzh_version[0] == '\0')
+		if (u->tzhead.tzh_version[0] == '\0')
 			break;
-		nread -= p - u.buf;
+		nread -= p - u->buf;
 		for (i = 0; i < nread; ++i)
-			u.buf[i] = p[i];
+			u->buf[i] = p[i];
 		/*
 		** If this is a narrow integer time_t system, we're done.
 		*/
@@ -576,41 +590,44 @@ register const int	doextend;
 			break;
 	}
 	if (doextend && nread > 2 &&
-		u.buf[0] == '\n' && u.buf[nread - 1] == '\n' &&
+		u->buf[0] == '\n' && u->buf[nread - 1] == '\n' &&
 		sp->typecnt + 2 <= TZ_MAX_TYPES) {
-			struct state	ts;
+			struct state	*ts;
 			register int	result;
 
-			u.buf[nread - 1] = '\0';
-			result = tzparse(&u.buf[1], &ts, FALSE);
-			if (result == 0 && ts.typecnt == 2 &&
-				sp->charcnt + ts.charcnt <= TZ_MAX_CHARS) {
+			ts = malloc(sizeof(*ts));
+			if (ts == NULL)
+				goto out;
+			u->buf[nread - 1] = '\0';
+			result = tzparse(&u->buf[1], ts, FALSE);
+			if (result == 0 && ts->typecnt == 2 &&
+				sp->charcnt + ts->charcnt <= TZ_MAX_CHARS) {
 					for (i = 0; i < 2; ++i)
-						ts.ttis[i].tt_abbrind +=
+						ts->ttis[i].tt_abbrind +=
 							sp->charcnt;
-					for (i = 0; i < ts.charcnt; ++i)
+					for (i = 0; i < ts->charcnt; ++i)
 						sp->chars[sp->charcnt++] =
-							ts.chars[i];
+							ts->chars[i];
 					i = 0;
-					while (i < ts.timecnt &&
-						ts.ats[i] <=
+					while (i < ts->timecnt &&
+						ts->ats[i] <=
 						sp->ats[sp->timecnt - 1])
 							++i;
-					while (i < ts.timecnt &&
+					while (i < ts->timecnt &&
 					    sp->timecnt < TZ_MAX_TIMES) {
 						sp->ats[sp->timecnt] =
-							ts.ats[i];
+							ts->ats[i];
 						sp->types[sp->timecnt] =
 							sp->typecnt +
-							ts.types[i];
+							ts->types[i];
 						++sp->timecnt;
 						++i;
 					}
-					sp->ttis[sp->typecnt++] = ts.ttis[0];
-					sp->ttis[sp->typecnt++] = ts.ttis[1];
+					sp->ttis[sp->typecnt++] = ts->ttis[0];
+					sp->ttis[sp->typecnt++] = ts->ttis[1];
 			}
+			free(ts);
 	}
-	sp->goback = sp->goahead = FALSE;
 	if (sp->timecnt > 1) {
 		for (i = 1; i < sp->timecnt; ++i)
 			if (typesequiv(sp, sp->types[i], sp->types[0]) &&
@@ -627,7 +644,10 @@ register const int	doextend;
 					break;
 		}
 	}
-	return 0;
+	res = 0;
+out:
+	free(u);
+	return (res);
 }
 
 static int
@@ -1221,7 +1241,7 @@ tzsetwall_basic(int rdlocked)
 
 #ifdef ALL_STATE
 	if (lclptr == NULL) {
-		lclptr = (struct state *) malloc(sizeof *lclptr);
+		lclptr = (struct state *) calloc(1, sizeof *lclptr);
 		if (lclptr == NULL) {
 			settzname();	/* all we can do */
 			_RWLOCK_UNLOCK(&lcl_rwlock);
@@ -1273,7 +1293,7 @@ tzset_basic(int rdlocked)
 
 #ifdef ALL_STATE
 	if (lclptr == NULL) {
-		lclptr = (struct state *) malloc(sizeof *lclptr);
+		lclptr = (struct state *) calloc(1, sizeof *lclptr);
 		if (lclptr == NULL) {
 			settzname();	/* all we can do */
 			_RWLOCK_UNLOCK(&lcl_rwlock);
@@ -1471,7 +1491,7 @@ gmt_init(void)
 {
 
 #ifdef ALL_STATE
-	gmtptr = (struct state *) malloc(sizeof *gmtptr);
+	gmtptr = (struct state *) calloc(1, sizeof *gmtptr);
 	if (gmtptr != NULL)
 #endif /* defined ALL_STATE */
 		gmtload(gmtptr);
@@ -2054,6 +2074,11 @@ const long		offset;
 	int				types[TZ_MAX_TYPES];
 	int				okay;
 
+	if (tmp == NULL) {
+		errno = EINVAL;
+		return WRONG;
+	}
+
 	if (tmp->tm_isdst > 1)
 		tmp->tm_isdst = 1;
 	t = time2(tmp, funcp, offset, &okay);
@@ -2129,7 +2154,8 @@ time_t
 timelocal(tmp)
 struct tm * const	tmp;
 {
-	tmp->tm_isdst = -1;	/* in case it wasn't initialized */
+	if (tmp != NULL)
+		tmp->tm_isdst = -1;	/* in case it wasn't initialized */
 	return mktime(tmp);
 }
 
@@ -2137,7 +2163,8 @@ time_t
 timegm(tmp)
 struct tm * const	tmp;
 {
-	tmp->tm_isdst = 0;
+	if (tmp != NULL)
+		tmp->tm_isdst = 0;
 	return time1(tmp, gmtsub, 0L);
 }
 
@@ -2146,7 +2173,8 @@ timeoff(tmp, offset)
 struct tm * const	tmp;
 const long		offset;
 {
-	tmp->tm_isdst = 0;
+	if (tmp != NULL)
+		tmp->tm_isdst = 0;
 	return time1(tmp, gmtsub, offset);
 }
 

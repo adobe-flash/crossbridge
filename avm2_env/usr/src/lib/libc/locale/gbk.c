@@ -6,6 +6,11 @@
  * This code is derived from software contributed to Berkeley by
  * Paul Borman at Krystal Technologies.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -32,7 +37,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/locale/gbk.c,v 1.14.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/types.h>
 #include <errno.h>
@@ -55,15 +60,15 @@ typedef struct {
 } _GBKState;
 
 int
-_GBK_init(_RuneLocale *rl)
+_GBK_init(struct xlocale_ctype *l, _RuneLocale *rl)
 {
 
-	__mbrtowc = _GBK_mbrtowc;
-	__wcrtomb = _GBK_wcrtomb;
-	__mbsinit = _GBK_mbsinit;
-	_CurrentRuneLocale = rl;
-	__mb_cur_max = 2;
-	__mb_sb_limit = 128;
+	l->__mbrtowc = _GBK_mbrtowc;
+	l->__wcrtomb = _GBK_wcrtomb;
+	l->__mbsinit = _GBK_mbsinit;
+	l->runes = rl;
+	l->__mb_cur_max = 2;
+	l->__mb_sb_limit = 128;
 	return (0);
 }
 

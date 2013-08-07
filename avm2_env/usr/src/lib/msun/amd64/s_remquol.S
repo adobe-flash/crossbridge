@@ -29,7 +29,7 @@
  */
 
 #include <machine/asm.h>
-__FBSDID("$FreeBSD: src/lib/msun/amd64/s_remquol.S,v 1.1.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $"); 
+__FBSDID("$FreeBSD$"); 
 	
 ENTRY(remquol)
 	fldt    24(%rsp)
@@ -60,3 +60,5 @@ ENTRY(remquol)
 /* Store the quotient and return. */
 	movl	%eax,(%rdi)
 	ret
+
+	.section .note.GNU-stack,"",%progbits

@@ -4415,8 +4415,11 @@ namespace {
       IntPtrType = SignedInt;
       RegParmMax = 3;
 
-      DescriptionString = "e-p:32:32-f64:32:64-i64:32:64-i32:32:32-n32";
-      
+      //DescriptionString = "e-p:32:32-f64:32:64-i64:32:64-i32:32:32-n32";
+      DescriptionString = "e-p:32:32:32-i1:8:8-i8:8:8-i16:16:16-i32:32:32-"
+      "i64:32:64-f32:32:32-f64:32:64-v64:64:64-v128:128:128-"
+      "a0:0:64-n8:16:32-S128";
+
      // x86-32 has atomics up to 8 bytes
       // FIXME: Check that we actually have cmpxchg8b before setting
       // MaxAtomicInlineWidth. (cmpxchg8b is an i586 instruction.)
@@ -4431,26 +4434,15 @@ namespace {
     
     virtual void getTargetBuiltins(const Builtin::Info *&Records,
                                    unsigned &NumRecords) const {
-#if 0
-      const Builtin::Info BuiltinInfo[] = {
-#define BUILTIN(ID, TYPE, ATTRS) { #ID, TYPE, ATTRS, 0, ALL_LANGUAGES },
-#define LIBBUILTIN(ID, TYPE, ATTRS, HEADER) { #ID, TYPE, ATTRS, HEADER,\
-ALL_LANGUAGES },
-#include "clang/Basic/BuiltinsAVM.def"
-      };
-      Records = BuiltinInfo;
-      NumRecords = clang::AVM::LastTSBuiltin-Builtin::FirstTSBuiltin;
-#endif
       Records = NULL;
       NumRecords = 0;
     }
     
-    /// \brief Don't support machine asm inline other than actionscript's
-    /// , so here just keep it zero.
+    /// \brief False code for passing x86 headers
     virtual void getGCCRegNames(const char * const *&Names,
                                 unsigned &NumNames) const {
-      Names = 0;
-      NumNames = 0;
+      Names = GCCRegNames;
+      NumNames = llvm::array_lengthof(GCCRegNames);
     }
     
     virtual void getGCCRegAliases(const GCCRegAlias *&Aliases,
@@ -4461,15 +4453,40 @@ ALL_LANGUAGES },
     
     virtual void getGCCAddlRegNames(const AddlRegName *&Names,
                                     unsigned &NumNames) const {
-      Names = 0;
-      NumNames = 0;
+      Names = AddlRegNames;
+      NumNames = llvm::array_lengthof(AddlRegNames);
     }
     
-    /// \brief No Machine Constraint Support
+    /// \brief False code for passing x86 headers
     virtual bool validateAsmConstraint(const char *&Name,
                                        TargetInfo::ConstraintInfo &info) const
     {
-      return false;
+      switch (*Name) {
+        default: return false;
+        case 'a': // eax.
+        case 'b': // ebx.
+        case 'c': // ecx.
+        case 'd': // edx.
+        case 'S': // esi.
+        case 'D': // edi.
+        case 'A': // edx:eax.
+                  //case 'f': // any x87 floating point stack register.
+        case 't': // top of floating point stack.
+        case 'u': // second from top of floating point stack.
+        case 'q': // Any register accessible as [r]l: a, b, c, and d.
+        case 'Q': // Any register accessible as [r]h: a, b, c, and d.
+        case 'R': // "Legacy" registers: ax, bx, cx, dx, di, si, sp, bp.
+        case 'l': // "Index" registers: any general register that can be used as an
+                  // index in a base+index memory access.
+          return true;
+        case 'C': // SSE floating point constant.
+        case 'G': // x87 floating point constant.
+        case 'e': // 32-bit signed integer constant for use with zero-extending
+                  // x86_64 instructions.
+        case 'Z': // 32-bit unsigned integer constant for use with zero-extending
+                  // x86_64 instructions.
+          return true;
+      }
     }
     
     virtual const char *getClobbers() const {

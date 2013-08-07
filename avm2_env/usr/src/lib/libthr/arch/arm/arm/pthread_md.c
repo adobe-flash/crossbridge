@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libthr/arch/arm/arm/pthread_md.c,v 1.2.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #include <stdlib.h>
@@ -37,14 +37,17 @@ _tcb_ctor(struct pthread *thread, int initial)
 {
 	struct tcb *tcb;
 
-	tcb = malloc(sizeof(struct tcb));
+	tcb = _rtld_allocate_tls((initial) ? _tcb_get() :  NULL,
+	    sizeof(struct tcb), 16);
 	if (tcb)
 		tcb->tcb_thread = thread;
+
 	return (tcb);
 }
 
 void
 _tcb_dtor(struct tcb *tcb)
 {
-	free(tcb);
+
+	_rtld_free_tls(tcb, sizeof(struct tcb), 16);
 }

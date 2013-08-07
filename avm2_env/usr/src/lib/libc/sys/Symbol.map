@@ -1,5 +1,5 @@
 /*
- * $FreeBSD: src/lib/libc/sys/Symbol.map,v 1.28.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 /*
@@ -358,6 +358,28 @@ FBSD_1.1 {
 	shmctl;
 	symlinkat;
 	unlinkat;
+};
+
+FBSD_1.2 {
+	cap_enter;
+	cap_getmode;
+	cap_new;
+	cap_getrights;
+	getloginclass;
+	pdfork;
+	pdgetpid;
+	pdkill;
+	posix_fallocate;
+	rctl_get_racct;
+	rctl_get_rules;
+	rctl_get_limits;
+	rctl_add_rule;
+	rctl_remove_rule;
+	setloginclass;
+};
+
+FBSD_1.3 {
+	posix_fadvise;
 };
 
 FBSDprivate_1.0 {
@@ -770,6 +792,8 @@ FBSDprivate_1.0 {
 	__sys_olio_listio;
 	_open;
 	__sys_open;
+	_openat;
+	__sys_openat;
 	_pathconf;
 	__sys_pathconf;
 	_pipe;
@@ -917,6 +941,7 @@ FBSDprivate_1.0 {
 	_sigtimedwait;
 	__sys_sigtimedwait;
 	_sigwait;
+	__sigwait;
 	__sys_sigwait;
 	_sigwaitinfo;
 	__sys_sigwaitinfo;

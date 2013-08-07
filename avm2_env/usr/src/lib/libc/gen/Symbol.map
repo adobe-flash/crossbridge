@@ -1,5 +1,5 @@
 /*
- * $FreeBSD: src/lib/libc/gen/Symbol.map,v 1.21.2.5.2.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 FBSD_1.0 {
@@ -236,16 +236,6 @@ FBSD_1.0 {
 	seekdir;
 	user_from_uid;
 	group_from_gid;
-	sem_init;
-	sem_destroy;
-	sem_open;
-	sem_close;
-	sem_unlink;
-	sem_wait;
-	sem_trywait;
-	sem_timedwait;
-	sem_post;
-	sem_getvalue;
 	setdomainname;
 	sethostname;
 	longjmperror;
@@ -282,7 +272,6 @@ FBSD_1.0 {
 	openlog;
 	closelog;
 	setlogmask;
-	ttyslot;
 	ttyname_r;
 	ttyname;
 	timezone;
@@ -363,10 +352,38 @@ FBSD_1.1 {
 	semctl;
 	tcgetsid;
 	tcsetsid;
+	__pthread_cleanup_pop_imp;
+	__pthread_cleanup_push_imp;
 };
 
 FBSD_1.2 {
+	basename_r;
+	cfmakesane;
+	endutxent;
 	getpagesizes;
+	getutxent;
+	getutxid;
+	getutxline;
+	getutxuser;
+	pututxline;
+	sem_close;
+	sem_destroy;
+	sem_getvalue;
+	sem_init;
+	sem_open;
+	sem_post;
+	sem_timedwait;
+	sem_trywait;
+	sem_unlink;
+	sem_wait;
+	setutxdb;
+	setutxent;
+};
+
+FBSD_1.3 {
+	 fdlopen;
+	__FreeBSD_libc_enter_restricted_mode;
+	getcontextx;
 };
 
 FBSDprivate_1.0 {
@@ -393,6 +410,8 @@ FBSDprivate_1.0 {
 	_pthread_attr_setstackaddr;
 	_pthread_attr_setstacksize;
 	_pthread_cancel;
+	_pthread_cancel_enter;
+	_pthread_cancel_leave;
 	_pthread_cleanup_pop;
 	_pthread_cleanup_push;
 	_pthread_cond_broadcast;
@@ -436,10 +455,13 @@ FBSDprivate_1.0 {
 	_spinlock;
 	_spinlock_debug;
 	_spinunlock;
+	_rtld_addr_phdr;
 	_rtld_atfork_pre;
 	_rtld_atfork_post;
 	_rtld_error;		/* for private use */
+	_rtld_get_stack_prot;
 	_rtld_thread_init;	/* for private use */
+	__elf_phdr_match_addr;
 	_err;
 	_warn;
 	__fmtcheck;
@@ -455,16 +477,6 @@ FBSDprivate_1.0 {
 	__pw_scan;	/* Used by (at least) libutil */
 	__raise;
 	_raise;
-	__sem_init;
-	__sem_destroy;
-	__sem_open;
-	__sem_close;
-	__sem_unlink;
-	__sem_wait;
-	__sem_trywait;
-	__sem_timedwait;
-	__sem_post;
-	__sem_getvalue;
 	__sleep;
 	_sleep;
 	_rtld_allocate_tls;
@@ -481,4 +493,20 @@ FBSDprivate_1.0 {
 	_wait;
 	__waitpid;
 	_waitpid;
+
+	_libc_sem_init_compat;
+	_libc_sem_destroy_compat;
+	_libc_sem_open_compat;
+	_libc_sem_close_compat;
+	_libc_sem_unlink_compat;
+	_libc_sem_wait_compat;
+	_libc_sem_trywait_compat;
+	_libc_sem_timedwait_compat;
+	_libc_sem_post_compat;
+	_libc_sem_getvalue_compat;
+
+	__elf_aux_vector;
+	__pthread_map_stacks_exec;
+	__fillcontextx;
+	__getcontextx_size;
 };

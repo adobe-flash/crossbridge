@@ -35,7 +35,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/stdio/_flock_stub.c,v 1.16.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <stdio.h>
@@ -127,6 +127,8 @@ _funlockfile(FILE *fp)
 	}
 }
 
+
+
 /*
  * Weak symbols for externally visible functions in this file:
  */
@@ -134,4 +136,3 @@ __weak_reference(_flockfile, flockfile);
 //__weak_reference(_flockfile_debug_stub, _flockfile_debug);
 __weak_reference(_ftrylockfile, ftrylockfile);
 __weak_reference(_funlockfile, funlockfile);
-

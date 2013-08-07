@@ -11,7 +11,7 @@
  */
 
 #ifndef lint
-static char rcsid[] = "$FreeBSD: src/lib/msun/src/s_scalbnl.c,v 1.1.22.1.6.1 2010/12/21 17:09:25 kensmith Exp $";
+static char rcsid[] = "$FreeBSD$";
 #endif
 
 /*
@@ -68,10 +68,4 @@ scalbnl (long double x, int n)
         return u.e*0x1p-128;
 }
 
-//__strong_reference(scalbnl, ldexpl);
-//AVM2: remove when strong refs work properly
-long double
-ldexpl (long double x, int n)
-{
-    return scalbnl(x,n);
-}
+__strong_reference(scalbnl, ldexpl);

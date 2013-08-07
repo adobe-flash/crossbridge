@@ -1,5 +1,5 @@
 #	from $NetBSD: Makefile.inc,v 1.7 1995/02/27 13:06:20 cgd Exp $
-# $FreeBSD: src/lib/libc/nls/Makefile.inc,v 1.17.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $
+# $FreeBSD$
 
 .PATH: ${.CURDIR}/nls
 
@@ -20,6 +20,7 @@ NLS+=	el_GR.ISO8859-7
 NLS+=	es_ES.ISO8859-1
 NLS+=	fi_FI.ISO8859-1
 NLS+=	fr_FR.ISO8859-1
+NLS+=	gl_ES.ISO8859-1
 NLS+=	hu_HU.ISO8859-2
 NLS+=	it_IT.ISO8859-15
 NLS+=	ja_JP.UTF-8

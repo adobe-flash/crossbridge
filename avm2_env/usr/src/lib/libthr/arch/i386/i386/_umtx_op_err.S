@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libthr/arch/i386/i386/_umtx_op_err.S,v 1.1.4.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #include <machine/asm.h>
@@ -34,3 +34,5 @@
 			mov __CONCAT($SYS_,x),%eax; int $0x80; ret
 
 SYSCALL_ERR(_umtx_op)
+
+	.section .note.GNU-stack,"",%progbits

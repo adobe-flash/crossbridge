@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/msun/src/s_isnan.c,v 1.8.30.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #include <math.h>
@@ -40,16 +40,16 @@ isnan(double d)
 	u.d = d;
 	return (u.bits.exp == 2047 && (u.bits.manl != 0 || u.bits.manh != 0));
 }
-#endif
 
 int
-isnanf(float f)
+__isnanf(float f)
 {
 	union IEEEf2bits u;
 
 	u.f = f;
 	return (u.bits.exp == 255 && u.bits.man != 0);
 }
+#endif
 
 int
 __isnanl(long double e)
@@ -60,3 +60,5 @@ __isnanl(long double e)
 	mask_nbit_l(u);
 	return (u.bits.exp == 32767 && (u.bits.manl != 0 || u.bits.manh != 0));
 }
+
+__weak_reference2(__isnanf, isnanf);

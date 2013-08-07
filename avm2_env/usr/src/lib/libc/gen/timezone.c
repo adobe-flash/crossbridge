@@ -31,7 +31,7 @@
 static char sccsid[] = "@(#)timezone.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/timezone.c,v 1.6.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/types.h>
 #include <sys/time.h>
@@ -40,7 +40,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/timezone.c,v 1.6.10.1.6.1 2010/12/21 17:09:
 #include <string.h>
 #define TZ_MAX_CHARS 255
 
-char *_tztab();
+char *_tztab(int, int);
 
 /*
  * timezone --
@@ -53,9 +53,7 @@ char *_tztab();
 static char	czone[TZ_MAX_CHARS];		/* space for zone name */
 
 char *
-timezone(zone, dst)
-	int	zone,
-		dst;
+timezone(int zone, int dst)
 {
 	char	*beg,
 			*end;
@@ -106,9 +104,7 @@ static struct zone {
  *	STANDARD LIBRARY.
  */
 char *
-_tztab(zone,dst)
-	int	zone;
-	int	dst;
+_tztab(int zone, int dst)
 {
 	struct zone	*zp;
 	char	sign;

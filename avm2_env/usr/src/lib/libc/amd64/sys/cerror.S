@@ -34,7 +34,7 @@
 	.asciz "@(#)cerror.s	5.1 (Berkeley) 4/23/90"
 #endif /* SYSLIBC_SCCS and not lint */
 #include <machine/asm.h>
-__FBSDID("$FreeBSD: src/lib/libc/amd64/sys/cerror.S,v 1.15.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "SYS.h"
 
@@ -56,3 +56,4 @@ HIDENAME(cerror):
 	movq	$-1,%rdx
 	ret
 
+	.section .note.GNU-stack,"",%progbits

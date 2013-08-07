@@ -10,11 +10,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -31,7 +27,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)signal.h	8.3 (Berkeley) 3/30/94
- * $FreeBSD: src/include/signal.h,v 1.30.2.2.4.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #ifndef _SIGNAL_H_
@@ -73,7 +69,8 @@ int	raise(int);
 #if __POSIX_VISIBLE || __XSI_VISIBLE
 int	kill(__pid_t, int);
 int	pthread_kill(__pthread_t, int);
-int	pthread_sigmask(int, const __sigset_t *, __sigset_t *);
+int	pthread_sigmask(int, const __sigset_t * __restrict,
+	    __sigset_t * __restrict);
 int	sigaction(int, const struct sigaction * __restrict,
 	    struct sigaction * __restrict);
 int	sigaddset(sigset_t *, int);

@@ -30,9 +30,9 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     From: @(#)send.2	8.2 (Berkeley) 2/21/94
-.\" $FreeBSD: src/lib/libc/net/sctp_opt_info.3,v 1.4.10.3.4.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
-.Dd December 15, 2006
+.Dd June 18, 2011
 .Dt SCTP_OPT_INFO 3
 .Os
 .Sh NAME
@@ -50,7 +50,7 @@
 The
 .Fn sctp_opt_info
 call provides a multi-os compatible method for getting
-specific 
+specific
 .Fn getsockopt
 data where an association identification needs to be passed
 into the operating system.
@@ -70,19 +70,35 @@ who wish to write portable code amongst multiple operating systems
 this call should be used for the following SCTP
 socket options.
 .Pp
-.Dv SCTP_RTOINFO 
+.Dv SCTP_RTOINFO
 .Pp
 .Dv SCTP_ASSOCINFO
 .Pp
 .Dv SCTP_PRIMARY_ADDR
 .Pp
-.Dv SCTP_SET_PEER_PRIMARY_ADDR
+.Dv SCTP_PEER_ADDR_PARAMS
+.Pp
+.Dv SCTP_DEFAULT_SEND_PARAM
+.Pp
+.Dv SCTP_MAX_SEG
+.Pp
+.Dv SCTP_AUTH_ACTIVE_KEY
+.Pp
+.Dv SCTP_DELAYED_SACK
+.Pp
+.Dv SCTP_MAX_BURST
+.Pp
+.Dv SCTP_CONTEXT
+.Pp
+.Dv SCTP_EVENT
+.Pp
+.Dv SCTP_DEFAULT_SNDINFO
+.Pp
+.Dv SCTP_DEFAULT_PRINFO
 .Pp
 .Dv SCTP_STATUS
 .Pp
 .Dv SCTP_GET_PEER_ADDR_INFO
-.Pp
-.Dv SCTP_AUTH_ACTIVE_KEY
 .Pp
 .Dv SCTP_PEER_AUTH_CHUNKS
 .Pp
@@ -115,3 +131,14 @@ is not a socket.
 .Sh SEE ALSO
 .Xr getsockopt 2 ,
 .Xr sctp 4
+.Sh BUGS
+Because the structure used for
+.Fa arg
+of the
+.Dv SCTP_MAX_BURST
+socket option has changed in FreeBSD 9.0 and higher,
+using
+.Dv SCTP_MAX_BURST
+as
+.Fa opt
+is only supported in FreeBSD 9.0 and higher.

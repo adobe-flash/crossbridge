@@ -35,7 +35,7 @@
 
 #include <machine/asm.h>
 
-__FBSDID("$FreeBSD: src/lib/msun/i387/e_remainderl.S,v 1.1.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $")
+__FBSDID("$FreeBSD$")
 
 ENTRY(remainderl)
 	fldt	16(%esp)
@@ -46,3 +46,5 @@ ENTRY(remainderl)
 	jp	1b
 	fstp	%st(1)
 	ret
+
+	.section .note.GNU-stack,"",%progbits

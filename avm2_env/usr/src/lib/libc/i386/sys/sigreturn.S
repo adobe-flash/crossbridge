@@ -34,7 +34,7 @@
 	.asciz "@(#)sigreturn.s	5.2 (Berkeley) 12/17/90"
 #endif /* SYSLIBC_SCCS and not lint */
 #include <machine/asm.h>
-__FBSDID("$FreeBSD: src/lib/libc/i386/sys/sigreturn.S,v 1.13.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "SYS.h"
 
@@ -44,3 +44,5 @@ __FBSDID("$FreeBSD: src/lib/libc/i386/sys/sigreturn.S,v 1.13.10.1.6.1 2010/12/21
  */
 
 RSYSCALL(sigreturn)
+
+	.section .note.GNU-stack,"",%progbits

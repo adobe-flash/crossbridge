@@ -28,7 +28,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/arm/gen/modf.c,v 1.1.22.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/types.h>
 #include <errno.h>
@@ -86,7 +86,7 @@ modf(val, iptr)
 	 * If you look at the math involved for a few seconds, it's
 	 * plain to see that the integral part is the input, with the
 	 * low (DBL_FRACBITS - (exponent - DBL_EXP_BIAS)) bits zeroed,
-	 * the the fractional part is the part with the rest of the
+	 * the fractional part is the part with the rest of the
 	 * bits zeroed.  Just zeroing the high bits to get the
 	 * fractional part would yield a fraction in need of
 	 * normalization.  Therefore, we take the easy way out, and

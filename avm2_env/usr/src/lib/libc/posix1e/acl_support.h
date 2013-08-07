@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libc/posix1e/acl_support.h,v 1.7.2.2.2.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 /*
  * Support functionality for the POSIX.1e ACL interface
@@ -50,7 +50,7 @@ int	_nfs4_format_access_mask(char *str, size_t size, acl_perm_t var, int verbose
 int	_nfs4_parse_flags(const char *str, acl_flag_t *var);
 int	_nfs4_parse_access_mask(const char *str, acl_perm_t *var);
 int	_posix1e_acl_check(acl_t acl);
-int	_posix1e_acl_sort(acl_t acl);
+void	_posix1e_acl_sort(acl_t acl);
 int	_posix1e_acl(acl_t acl, acl_type_t type);
 int	_posix1e_acl_id_to_name(acl_tag_t tag, uid_t id, ssize_t buf_len,
 	    char *buf, int flags);

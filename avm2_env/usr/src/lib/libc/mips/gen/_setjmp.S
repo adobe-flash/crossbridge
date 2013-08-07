@@ -33,7 +33,7 @@
  */
 
 #include <machine/asm.h>
-__FBSDID("$FreeBSD: src/lib/libc/mips/gen/_setjmp.S,v 1.3.2.2.2.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 #include <machine/regnum.h>
 
 #include "SYS.h"

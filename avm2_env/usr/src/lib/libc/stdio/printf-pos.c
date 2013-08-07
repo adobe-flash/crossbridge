@@ -34,7 +34,7 @@
 static char sccsid[] = "@(#)vfprintf.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/stdio/printf-pos.c,v 1.6.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
  * This is the code responsible for handling positional arguments
@@ -248,7 +248,6 @@ __find_arguments (const char *fmt0, va_list ap, union arg **argtable)
 	int n;			/* handy integer (short term usage) */
 	int error;
 	int flags;		/* flags as above */
-	int width;		/* width from format (%8d), or 0 */
 	struct typetable types;	/* table of types */
 
 	fmt = (char *)fmt0;
@@ -266,7 +265,6 @@ __find_arguments (const char *fmt0, va_list ap, union arg **argtable)
 		fmt++;		/* skip over '%' */
 
 		flags = 0;
-		width = 0;
 
 rflag:		ch = *fmt++;
 reswitch:	switch (ch) {
@@ -304,7 +302,6 @@ reswitch:	switch (ch) {
 				types.nextarg = n;
 				goto rflag;
 			}
-			width = n;
 			goto reswitch;
 #ifndef NO_FLOATING_POINT
 		case 'L':
@@ -439,7 +436,6 @@ __find_warguments (const wchar_t *fmt0, va_list ap, union arg **argtable)
 	int n;			/* handy integer (short term usage) */
 	int error;
 	int flags;		/* flags as above */
-	int width;		/* width from format (%8d), or 0 */
 	struct typetable types;	/* table of types */
 
 	fmt = (wchar_t *)fmt0;
@@ -457,7 +453,6 @@ __find_warguments (const wchar_t *fmt0, va_list ap, union arg **argtable)
 		fmt++;		/* skip over '%' */
 
 		flags = 0;
-		width = 0;
 
 rflag:		ch = *fmt++;
 reswitch:	switch (ch) {
@@ -495,7 +490,6 @@ reswitch:	switch (ch) {
 				types.nextarg = n;
 				goto rflag;
 			}
-			width = n;
 			goto reswitch;
 #ifndef NO_FLOATING_POINT
 		case 'L':

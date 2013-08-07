@@ -26,7 +26,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/sys/fcntl.c,v 1.3.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <fcntl.h>
 #include <stdarg.h>
@@ -86,4 +86,5 @@ __fcntl_compat(int fd, int cmd, ...)
 	}
 }
 
-__weak_reference3(__fcntl_compat, _fcntl);
+__weak_reference3(__fcntl_compat, fcntl);
+

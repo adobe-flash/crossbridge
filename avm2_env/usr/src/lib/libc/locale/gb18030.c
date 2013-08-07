@@ -2,6 +2,11 @@
  * Copyright (c) 2002-2004 Tim J. Robbins
  * All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -30,7 +35,7 @@
  */
 
 #include <sys/param.h>
-__FBSDID("$FreeBSD: src/lib/libc/locale/gb18030.c,v 1.8.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <errno.h>
 #include <runetype.h>
@@ -38,8 +43,6 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/gb18030.c,v 1.8.2.1.6.1 2010/12/21 17:09
 #include <string.h>
 #include <wchar.h>
 #include "mblocal.h"
-
-extern int __mb_sb_limit;
 
 static size_t	_GB18030_mbrtowc(wchar_t * __restrict, const char * __restrict,
 		    size_t, mbstate_t * __restrict);
@@ -53,15 +56,15 @@ typedef struct {
 } _GB18030State;
 
 int
-_GB18030_init(_RuneLocale *rl)
+_GB18030_init(struct xlocale_ctype *l, _RuneLocale *rl)
 {
 
-	__mbrtowc = _GB18030_mbrtowc;
-	__wcrtomb = _GB18030_wcrtomb;
-	__mbsinit = _GB18030_mbsinit;
-	_CurrentRuneLocale = rl;
-	__mb_cur_max = 4;
-	__mb_sb_limit = 128;
+	l->__mbrtowc = _GB18030_mbrtowc;
+	l->__wcrtomb = _GB18030_wcrtomb;
+	l->__mbsinit = _GB18030_mbsinit;
+	l->runes = rl;
+	l->__mb_cur_max = 4;
+	l->__mb_sb_limit = 128;
 
 	return (0);
 }

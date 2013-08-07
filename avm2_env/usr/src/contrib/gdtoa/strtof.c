@@ -29,15 +29,15 @@ THIS SOFTWARE.
 /* Please send bug reports to David M. Gay (dmg at acm dot org,
  * with " at " changed at "@" and " dot " changed to ".").	*/
 
-/* $FreeBSD: src/contrib/gdtoa/strtof.c,v 1.4.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $ */
+/* $FreeBSD$ */
 
 #include "gdtoaimp.h"
 
  float
 #ifdef KR_headers
-strtof(s, sp) CONST char *s; char **sp;
+strtof_l(s, sp, loc) CONST char *s; char **sp; locale_t loc;
 #else
-strtof(CONST char *s, char **sp)
+strtof_l(CONST char *s, char **sp, locale_t loc)
 #endif
 {
 	static FPI fpi0 = { 24, 1-127-24+1,  254-127-24+1, 1, SI };
@@ -51,7 +51,7 @@ strtof(CONST char *s, char **sp)
 #define fpi &fpi0
 #endif
 
-	k = strtodg(s, sp, fpi, &exp, bits);
+	k = strtodg_l(s, sp, fpi, &exp, bits, loc);
 	switch(k & STRTOG_Retmask) {
 	  case STRTOG_NoNumber:
 	  case STRTOG_Zero:
@@ -59,7 +59,7 @@ strtof(CONST char *s, char **sp)
 		break;
 
 	  case STRTOG_Normal:
-		u.L[0] = bits[0] & 0x7fffff | exp + 0x7f + 23 << 23;
+		u.L[0] = (bits[0] & 0x7fffff) | ((exp + 0x7f + 23) << 23);
 		break;
 
 	  case STRTOG_NaNbits:
@@ -82,3 +82,13 @@ strtof(CONST char *s, char **sp)
 		u.L[0] |= 0x80000000L;
 	return u.f;
 	}
+ float
+#ifdef KR_headers
+strtof(s, sp) CONST char *s; char **sp;
+#else
+strtof(CONST char *s, char **sp)
+#endif
+{
+	return strtof_l(s, sp, __get_locale());
+}
+

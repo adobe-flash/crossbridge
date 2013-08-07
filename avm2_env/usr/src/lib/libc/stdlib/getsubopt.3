@@ -26,9 +26,9 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     @(#)getsubopt.3	8.1 (Berkeley) 6/9/93
-.\" $FreeBSD: src/lib/libc/stdlib/getsubopt.3,v 1.11.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
-.Dd June 9, 1993
+.Dd December 25, 2011
 .Dt GETSUBOPT 3
 .Os
 .Sh NAME
@@ -131,9 +131,11 @@ while ((ch = getopt(argc, argv, "ab:")) != \-1) {
 				else
 					error("missing sub option");
 				break;
+			}
 		}
 		break;
 	}
+}
 .Ed
 .Sh SEE ALSO
 .Xr getopt 3 ,

@@ -2,6 +2,11 @@
  * Copyright (c) 2002-2004 Tim J. Robbins.
  * All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -25,7 +30,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/locale/mbstowcs.c,v 1.12.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <limits.h>
 #include <stdlib.h>
@@ -33,13 +38,19 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/mbstowcs.c,v 1.12.2.1.6.1 2010/12/21 17:
 #include "mblocal.h"
 
 size_t
-mbstowcs(wchar_t * __restrict pwcs, const char * __restrict s, size_t n)
+mbstowcs_l(wchar_t * __restrict pwcs, const char * __restrict s, size_t n, locale_t locale)
 {
 	static const mbstate_t initial;
 	mbstate_t mbs;
 	const char *sp;
+	FIX_LOCALE(locale);
 
 	mbs = initial;
 	sp = s;
-	return (__mbsnrtowcs(pwcs, &sp, SIZE_T_MAX, n, &mbs));
+	return (XLOCALE_CTYPE(locale)->__mbsnrtowcs(pwcs, &sp, SIZE_T_MAX, n, &mbs));
+}
+size_t
+mbstowcs(wchar_t * __restrict pwcs, const char * __restrict s, size_t n)
+{
+	return mbstowcs_l(pwcs, s, n, __get_locale());
 }

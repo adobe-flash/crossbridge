@@ -2,6 +2,11 @@
  * Copyright (c) 2002 Tim J. Robbins
  * All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -25,13 +30,14 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/locale/wcsftime.c,v 1.6.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <time.h>
 #include <wchar.h>
+#include "xlocale_private.h"
 
 /*
  * Convert date and time to a wide-character string.
@@ -47,8 +53,9 @@ __FBSDID("$FreeBSD: src/lib/libc/locale/wcsftime.c,v 1.6.2.1.6.1 2010/12/21 17:0
  * format specifications in the format string.
  */
 size_t
-wcsftime(wchar_t * __restrict wcs, size_t maxsize,
-    const wchar_t * __restrict format, const struct tm * __restrict timeptr)
+wcsftime_l(wchar_t * __restrict wcs, size_t maxsize,
+	const wchar_t * __restrict format, const struct tm * __restrict timeptr,
+	locale_t locale)
 {
 	static const mbstate_t initial;
 	mbstate_t mbs;
@@ -57,6 +64,7 @@ wcsftime(wchar_t * __restrict wcs, size_t maxsize,
 	const wchar_t *formatp;
 	size_t n, sflen;
 	int sverrno;
+	FIX_LOCALE(locale);
 
 	sformat = dst = NULL;
 
@@ -66,13 +74,13 @@ wcsftime(wchar_t * __restrict wcs, size_t maxsize,
 	 */
 	mbs = initial;
 	formatp = format;
-	sflen = wcsrtombs(NULL, &formatp, 0, &mbs);
+	sflen = wcsrtombs_l(NULL, &formatp, 0, &mbs, locale);
 	if (sflen == (size_t)-1)
 		goto error;
 	if ((sformat = malloc(sflen + 1)) == NULL)
 		goto error;
 	mbs = initial;
-	wcsrtombs(sformat, &formatp, sflen + 1, &mbs);
+	wcsrtombs_l(sformat, &formatp, sflen + 1, &mbs, locale);
 
 	/*
 	 * Allocate memory for longest multibyte sequence that will fit
@@ -87,11 +95,11 @@ wcsftime(wchar_t * __restrict wcs, size_t maxsize,
 	}
 	if ((dst = malloc(maxsize * MB_CUR_MAX)) == NULL)
 		goto error;
-	if (strftime(dst, maxsize, sformat, timeptr) == 0)
+	if (strftime_l(dst, maxsize, sformat, timeptr, locale) == 0)
 		goto error;
 	dstp = dst;
 	mbs = initial;
-	n = mbsrtowcs(wcs, &dstp, maxsize, &mbs);
+	n = mbsrtowcs_l(wcs, &dstp, maxsize, &mbs, locale);
 	if (n == (size_t)-2 || n == (size_t)-1 || dstp != NULL)
 		goto error;
 
@@ -105,4 +113,10 @@ error:
 	free(dst);
 	errno = sverrno;
 	return (0);
+}
+size_t
+wcsftime(wchar_t * __restrict wcs, size_t maxsize,
+	const wchar_t * __restrict format, const struct tm * __restrict timeptr)
+{
+	return wcsftime_l(wcs, maxsize, format, timeptr, __get_locale());
 }

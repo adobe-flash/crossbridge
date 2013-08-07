@@ -6,6 +6,11 @@
  * This code is derived from software contributed to Berkeley by
  * Paul Borman at Krystal Technologies.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -32,7 +37,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/locale/ascii.c,v 1.1.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <errno.h>
 #include <limits.h>
@@ -56,17 +61,17 @@ static size_t	_ascii_wcsnrtombs(char * __restrict, const wchar_t ** __restrict,
 		    size_t, size_t, mbstate_t * __restrict);
 
 int
-_ascii_init(_RuneLocale *rl)
+_ascii_init(struct xlocale_ctype *l,_RuneLocale *rl)
 {
 
-	__mbrtowc = _ascii_mbrtowc;
-	__mbsinit = _ascii_mbsinit;
-	__mbsnrtowcs = _ascii_mbsnrtowcs;
-	__wcrtomb = _ascii_wcrtomb;
-	__wcsnrtombs = _ascii_wcsnrtombs;
-	_CurrentRuneLocale = rl;
-	__mb_cur_max = 1;
-	__mb_sb_limit = 128;
+	l->__mbrtowc = _ascii_mbrtowc;
+	l->__mbsinit = _ascii_mbsinit;
+	l->__mbsnrtowcs = _ascii_mbsnrtowcs;
+	l->__wcrtomb = _ascii_wcrtomb;
+	l->__wcsnrtombs = _ascii_wcsnrtombs;
+	l->runes = rl;
+	l->__mb_cur_max = 1;
+	l->__mb_sb_limit = 128;
 	return(0);
 }
 

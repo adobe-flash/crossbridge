@@ -34,7 +34,7 @@
 	.asciz "@(#)pipe.s	5.1 (Berkeley) 4/23/90"
 #endif /* SYSLIBC_SCCS and not lint */
 #include <machine/asm.h>
-__FBSDID("$FreeBSD: src/lib/libc/amd64/sys/pipe.S,v 1.15.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "SYS.h"
 
@@ -58,3 +58,5 @@ ENTRY(__sys_pipe)
 	jmp	HIDENAME(cerror)
 #endif
 END(__sys_pipe)
+
+	.section .note.GNU-stack,"",%progbits

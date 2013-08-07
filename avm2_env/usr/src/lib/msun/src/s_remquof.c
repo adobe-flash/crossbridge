@@ -11,7 +11,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/msun/src/s_remquof.c,v 1.1.22.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "math.h"
 #include "math_private.h"
@@ -46,7 +46,7 @@ remquof(float x, float y, int *quo)
 	    q = 0;
 	    goto fixup;	/* |x|<|y| return x or x-y */
 	} else if(hx==hy) {
-	    *quo = 1;
+	    *quo = (sxy ? -1 : 1);
 	    return Zero[(u_int32_t)sx>>31];	/* |x|=|y| return x*0*/
 	}
 
@@ -88,6 +88,7 @@ remquof(float x, float y, int *quo)
 
     /* convert back to floating value and restore the sign */
 	if(hx==0) {				/* return sign(x)*0 */
+	    q &= 0x7fffffff;
 	    *quo = (sxy ? -q : q);
 	    return Zero[(u_int32_t)sx>>31];
 	}
