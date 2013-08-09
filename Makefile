@@ -74,7 +74,7 @@ $?JAVAFLAGS=
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?LN=ln -sfn
 $?COPY_DOCS=false
-$?ASSERTIONS=ON
+$?ASSERTIONS=OFF
 $?LLVMCMAKEOPTS= 
 $?LLVMLDFLAGS=
 $?LLVMINSTALLPREFIX=$(BUILD)
@@ -483,7 +483,6 @@ llvm-install:
 	$(CP_CLANG)
 	cp $(LLVMINSTALLPREFIX)/llvm-install/lib/LLVMgold.* $(SDK)/usr/lib/LLVMgold$(SOEXT)
 	cp -f $(BUILD)/llvm-debug/bin/fpcmp$(EXEEXT) $(BUILDROOT)/extra/fpcmp$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-install/lib/libprofile_rt.a $(SDK)/usr/lib/
 
 llvmtests:
 	rm -rf $(BUILD)/llvm-tests
@@ -999,7 +998,7 @@ base:
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
 	cp -f avmplus/generated/*.abc $(SDK)/usr/lib/
 
-	$(RSYNC) --exclude '*iconv.h' avm2_env/usr/include/ $(SDK)/usr/include
+	$(RSYNC) --exclude '*iconv.h' avm2_env/usr/src/include/ $(SDK)/usr/include
 	#$(RSYNC) avm2_env/usr/lib/ $(SDK)/usr/lib
 
 	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/swfmake.as) -outdir . -out swfmake
