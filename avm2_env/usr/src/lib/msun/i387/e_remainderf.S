@@ -5,7 +5,7 @@
 
 #include <machine/asm.h>
 
-__FBSDID("$FreeBSD: src/lib/msun/i387/e_remainderf.S,v 1.3.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 /* RCSID("$NetBSD: e_remainderf.S,v 1.2 1995/05/08 23:49:47 jtc Exp $") */
 
 ENTRY(remainderf)
@@ -18,3 +18,5 @@ ENTRY(remainderf)
 	fstp	%st(1)
 	ret
 END(remainderf)
+
+	.section .note.GNU-stack,"",%progbits

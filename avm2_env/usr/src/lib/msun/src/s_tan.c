@@ -11,7 +11,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/msun/src/s_tan.c,v 1.12.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /* tan(x)
  * Return tangent function of x.
@@ -62,7 +62,7 @@ tan(double x)
     /* |x| ~< pi/4 */
 	ix &= 0x7fffffff;
 	if(ix <= 0x3fe921fb) {
-	    if(ix<0x3e300000)			/* x < 2**-28 */
+	    if(ix<0x3e400000)			/* x < 2**-27 */
 		if((int)x==0) return x;		/* generate inexact */
 	    return __kernel_tan(x,z,1);
 	}

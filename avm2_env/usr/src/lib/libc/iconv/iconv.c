@@ -1,4 +1,4 @@
-/* $FreeBSD: release/9.1.0/lib/libc/iconv/iconv.c 223296 2011-06-19 13:35:46Z kan $ */
+/* $FreeBSD$ */
 /* $NetBSD: iconv.c,v 1.11 2009/03/03 16:22:33 explorer Exp $ */
 
 /*-

@@ -2,6 +2,11 @@
  * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -31,12 +36,13 @@
 static char sccsid[] = "@(#)strtouq.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/stdlib/strtoull.c,v 1.21.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <limits.h>
 #include <errno.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include "xlocale_private.h"
 
 /*
  * Convert a string to an unsigned long long integer.
@@ -45,13 +51,15 @@ __FBSDID("$FreeBSD: src/lib/libc/stdlib/strtoull.c,v 1.21.10.1.6.1 2010/12/21 17
  * alphabets and digits are each contiguous.
  */
 unsigned long long
-strtoull(const char * __restrict nptr, char ** __restrict endptr, int base)
+strtoull_l(const char * __restrict nptr, char ** __restrict endptr, int base,
+		locale_t locale)
 {
 	const char *s;
 	unsigned long long acc;
 	char c;
 	unsigned long long cutoff;
 	int neg, any, cutlim;
+	FIX_LOCALE(locale);
 
 	/*
 	 * See strtoq for comments as to the logic used.
@@ -59,7 +67,7 @@ strtoull(const char * __restrict nptr, char ** __restrict endptr, int base)
 	s = nptr;
 	do {
 		c = *s++;
-	} while (isspace((unsigned char)c));
+	} while (isspace_l((unsigned char)c, locale));
 	if (c == '-') {
 		neg = 1;
 		c = *s++;
@@ -115,4 +123,9 @@ noconv:
 	if (endptr != NULL)
 		*endptr = (char *)(any ? s - 1 : nptr);
 	return (acc);
+}
+unsigned long long
+strtoull(const char * __restrict nptr, char ** __restrict endptr, int base)
+{
+	return strtoull_l(nptr, endptr, base, __get_locale());
 }

@@ -30,9 +30,9 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     @(#)strerror.3	8.1 (Berkeley) 6/9/93
-.\" $FreeBSD: src/lib/libc/string/strerror.3,v 1.24.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
-.Dd October 12, 2004
+.Dd April 5, 2011
 .Dt STRERROR 3
 .Os
 .Sh NAME
@@ -114,6 +114,9 @@ the range 0 <
 .Fa errnum
 <
 .Fa sys_nerr .
+The number 0 is also recognized, although applications that take advantage of
+this are likely to use unspecified values of
+.Va errno .
 .Pp
 If insufficient storage is provided in
 .Fa strerrbuf
@@ -144,6 +147,7 @@ or
 should be used instead.
 .Sh SEE ALSO
 .Xr intro 2 ,
+.Xr err 3 ,
 .Xr psignal 3
 .Sh STANDARDS
 The

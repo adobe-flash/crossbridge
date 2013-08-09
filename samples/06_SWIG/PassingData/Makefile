@@ -10,7 +10,7 @@ all: check
 	mv MyLib.as MyLib.as3
 
 	@echo "-> Compile the library into a SWC"
-	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) MyLib.abc MyLib_wrapper.c mylibmain.c mylib.c -emit-swc=sample.MyLib -o MyLib.swc
+	"$(FLASCC)/usr/bin/clang" $(BASE_CFLAGS) MyLib.abc MyLib_wrapper.c mylibmain.c mylib.c -emit-swc=sample.MyLib -o MyLib.swc
 
 	@echo "-> Compile an example SWF that uses that SWC"
 	"$(FLEX)/bin/mxmlc" -static-link-runtime-shared-libraries -compiler.omit-trace-statements=false -library-path+=MyLib.swc PassData.as -debug=true -o PassData.swf

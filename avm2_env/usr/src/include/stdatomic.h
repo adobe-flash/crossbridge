@@ -24,7 +24,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: release/9.1.0/include/stdatomic.h 236326 2012-05-30 19:21:54Z theraven $
+ * $FreeBSD$
  */
 
 #ifndef _STDATOMIC_H_

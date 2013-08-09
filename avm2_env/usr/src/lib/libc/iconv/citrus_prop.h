@@ -1,4 +1,4 @@
-/* $FreeBSD: release/9.1.0/lib/libc/iconv/citrus_prop.h 219019 2011-02-25 00:04:39Z gabor $ */
+/* $FreeBSD$ */
 /* $NetBSD: citrus_prop.h,v 1.3 2006/11/23 13:59:03 tnozaki Exp $ */
 
 /*-

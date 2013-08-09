@@ -1,4 +1,4 @@
-# $FreeBSD: src/lib/libc/posix1e/Makefile.inc,v 1.22.2.2.6.1 2010/12/21 17:09:25 kensmith Exp $
+# $FreeBSD$
 
 .PATH: ${.CURDIR}/posix1e
 
@@ -20,6 +20,7 @@ SRCS+=	acl_branding.c			\
 	acl_from_text.c			\
 	acl_from_text_nfs4.c		\
 	acl_get.c			\
+	acl_id_to_name.c		\
 	acl_init.c			\
 	acl_perm.c			\
 	acl_set.c			\
@@ -119,3 +120,5 @@ MLINKS+=acl_create_entry.3 acl_create_entry_np.3\
 	mac_set.3 mac_set_proc.3		\
 	mac_text.3 mac_from_text.3		\
 	mac_text.3 mac_to_text.3
+
+CLEANFILES+=	subr_acl_nfs4.c

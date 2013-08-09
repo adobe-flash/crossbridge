@@ -1,4 +1,4 @@
-/* $FreeBSD: release/9.1.0/lib/libc/iconv/citrus_memstream.c 219019 2011-02-25 00:04:39Z gabor $ */
+/* $FreeBSD$ */
 /* $NetBSD: citrus_memstream.c,v 1.4 2009/02/03 05:02:12 lukem Exp $ */
 
 /*-

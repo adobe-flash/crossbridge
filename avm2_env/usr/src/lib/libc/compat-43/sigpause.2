@@ -26,7 +26,7 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     @(#)sigpause.2	8.1 (Berkeley) 6/2/93
-.\" $FreeBSD: src/lib/libc/compat-43/sigpause.2,v 1.14.10.3.4.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
 .\" Part of the content of the man page was derived from
 .\" The Open Group Base Specifications Issue 7
@@ -62,7 +62,7 @@
 .Sy This interface is made obsolete by
 .Xr sigsuspend 2
 .Sy and
-.Xr sigaction 2
+.Xr sigaction 2 .
 .Pp
 The
 .Fn sigset
@@ -172,7 +172,8 @@ returns
 if the signal had been blocked and the signal's previous disposition if
 it had not been blocked.
 Otherwise,
-.Dv SIG_ERR is returned and
+.Dv SIG_ERR
+is returned and
 .Va errno
 set to indicate the error.
 .Pp
@@ -195,6 +196,7 @@ functions, an attempt was made to catch or ignore
 .Dv SIGKILL
 or
 .Dv SIGSTOP .
+.El
 .Sh SEE ALSO
 .Xr kill 2 ,
 .Xr sigaction 2 ,

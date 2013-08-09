@@ -154,7 +154,7 @@ def fllvm_opt_opt_EQ : Joined<["-"], "fllvm-opt-opt=">, Group<avm2_features_Grou
   HelpText<"Pass an argument through to the final invocation of opt (LLVM-IR->LLVM-IR optimisation).">;
 def flto_api_EQ : Joined<["-"], "flto-api=">, Group<avm2_features_Group>, Flags<[DriverOption]>,
   HelpText<"Specifies a file containing the public API LLVM should preserve (implies that the optimiser is free to strip any symbols not mentioned in this file that aren't referenced by the symbols mentioned in this file).">;
-def jvmopt_EQ : Joined<["-"], "jvmopt_EQ">, Group<avm2_features_Group>, Flags<[HelpHidden]>,
+def jvmopt_EQ : Joined<["-"], "jvmopt=">, Group<avm2_features_Group>, Flags<[HelpHidden]>,
   HelpText<"Use legacy AS compiler.">;
 def muse_legacy_asc : Flag<["-"], "muse_legacy_asc">, Group<avm2_features_Group>, Flags<[HelpHidden]>,
   HelpText<"Use legacy AS compiler.">;

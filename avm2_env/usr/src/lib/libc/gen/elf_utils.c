@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: release/9.1.0/lib/libc/gen/elf_utils.c 217154 2011-01-08 17:13:43Z kib $
+ * $FreeBSD$
  */
 
 #include <sys/types.h>
@@ -51,7 +51,6 @@ __elf_phdr_match_addr(struct dl_phdr_info *phdr_info, void *addr)
 	return (i != phdr_info->dlpi_phnum);
 }
 
-#ifndef __AVM2__
 #pragma weak __pthread_map_stacks_exec
 void
 __pthread_map_stacks_exec(void)
@@ -72,4 +71,4 @@ __pthread_map_stacks_exec(void)
 	mprotect((void *)(uintptr_t)(usrstack - rlim.rlim_cur),
 	    rlim.rlim_cur, _rtld_get_stack_prot());
 }
-#endif
+

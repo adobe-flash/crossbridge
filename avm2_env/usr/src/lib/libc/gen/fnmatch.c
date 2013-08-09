@@ -5,6 +5,11 @@
  * This code is derived from software contributed to Berkeley by
  * Guido van Rossum.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -34,7 +39,7 @@
 static char sccsid[] = "@(#)fnmatch.c	8.2 (Berkeley) 4/16/94";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/fnmatch.c,v 1.18.10.2.4.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 /*
  * Function fnmatch() as specified in POSIX 1003.2-1992, section B.6.
@@ -222,6 +227,8 @@ rangematch(pattern, test, flags, newp, patmbs)
 	wchar_t c, c2;
 	size_t pclen;
 	const char *origpat;
+	struct xlocale_collate *table =
+		(struct xlocale_collate*)__get_locale()->components[XLC_COLLATE];
 
 	/*
 	 * A bracket expression starting with an unquoted circumflex
@@ -276,10 +283,10 @@ rangematch(pattern, test, flags, newp, patmbs)
 			if (flags & FNM_CASEFOLD)
 				c2 = towlower(c2);
 
-			if (__collate_load_error ?
+			if (table->__collate_load_error ?
 			    c <= test && test <= c2 :
-			       __collate_range_cmp(c, test) <= 0
-			    && __collate_range_cmp(test, c2) <= 0
+			       __collate_range_cmp(table, c, test) <= 0
+			    && __collate_range_cmp(table, test, c2) <= 0
 			   )
 				ok = 1;
 		} else if (c == test)

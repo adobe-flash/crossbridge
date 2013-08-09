@@ -1,4 +1,4 @@
-/* $FreeBSD: release/9.1.0/lib/libc/iconv/_strtoul.h 219019 2011-02-25 00:04:39Z gabor $ */
+/* $FreeBSD$ */
 /* $NetBSD: _strtoul.h,v 1.1 2008/08/20 12:42:26 joerg Exp $ */
 
 /*-

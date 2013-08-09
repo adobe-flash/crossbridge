@@ -28,7 +28,7 @@ T07: check
 				-import VFS.abc \
 				Console.as -outdir . -out Console
 
-	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) -O3 vfstest.cpp VFS.abc $(FLASCC)/usr/lib/AlcVFSZip.abc -symbol-abc=Console.abc -emit-swf -swf-version=17 -swf-size=800x600 -o vfstest.swf
+	"$(FLASCC)/usr/bin/clang++" $(BASE_CFLAGS) -O3 vfstest.cpp VFS.abc $(FLASCC)/usr/lib/AlcVFSZip.abc -symbol-abc=Console.abc -emit-swf -swf-version=17 -swf-size=800x600 -o vfstest.swf
 
 include ../Makefile.common
 

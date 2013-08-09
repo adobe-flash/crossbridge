@@ -29,7 +29,7 @@
  */
 
 #include <machine/asm.h>
-__FBSDID("$FreeBSD: src/lib/msun/i387/s_remquof.S,v 1.2.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $"); 
+__FBSDID("$FreeBSD$"); 
 	
 ENTRY(remquof)
 	flds	8(%esp)
@@ -61,3 +61,5 @@ ENTRY(remquof)
 	movl	%eax,(%ecx)
 	ret
 END(remquof)
+
+	.section .note.GNU-stack,"",%progbits

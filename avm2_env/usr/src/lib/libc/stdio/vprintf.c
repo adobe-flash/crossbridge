@@ -5,6 +5,11 @@
  * This code is derived from software contributed to Berkeley by
  * Chris Torek.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -34,13 +39,18 @@
 static char sccsid[] = "@(#)vprintf.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/stdio/vprintf.c,v 1.11.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <stdio.h>
+#include <xlocale.h>
 
 int
 vprintf(const char * __restrict fmt, __va_list ap)
 {
-
 	return (vfprintf(stdout, fmt, ap));
+}
+int
+vprintf_l(locale_t locale, const char * __restrict fmt, __va_list ap)
+{
+	return (vfprintf_l(stdout, locale, fmt, ap));
 }

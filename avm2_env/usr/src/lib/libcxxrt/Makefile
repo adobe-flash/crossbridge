@@ -1,4 +1,4 @@
-# $FreeBSD: release/9.1.0/lib/libcxxrt/Makefile 236600 2012-06-05 06:41:47Z dim $
+# $FreeBSD$
 
 SRCDIR=		${.CURDIR}/../../contrib/libcxxrt
 
@@ -20,7 +20,7 @@ SRCS+=		libelftc_dem_gnu3.c\
 		guard.cc
 
 WARNS=		0
-CFLAGS+=	-I${SRCDIR}
+CFLAGS+=	-I${SRCDIR} -fPIC
 VERSION_MAP=	${.CURDIR}/Version.map
 
 .include <bsd.lib.mk>

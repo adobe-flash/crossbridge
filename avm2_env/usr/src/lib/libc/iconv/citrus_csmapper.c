@@ -1,4 +1,4 @@
-/* $FreeBSD: release/9.1.0/lib/libc/iconv/citrus_csmapper.c 219019 2011-02-25 00:04:39Z gabor $ */
+/* $FreeBSD$ */
 /* $NetBSD: citrus_csmapper.c,v 1.10 2009/01/11 02:46:24 christos Exp $ */
 
 /*-

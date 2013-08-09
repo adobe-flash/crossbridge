@@ -34,8 +34,7 @@
  */
 
 #include <machine/asm.h>
-
-RCSID("$FreeBSD: src/lib/msun/i387/e_log.S,v 1.8.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $")
+__FBSDID("$FreeBSD$")
 
 ENTRY(log)
 	fldln2
@@ -43,3 +42,5 @@ ENTRY(log)
 	fyl2x
 	ret
 END(log)
+
+	.section .note.GNU-stack,"",%progbits

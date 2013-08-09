@@ -31,7 +31,7 @@
 static char sccsid[] = "@(#)daemon.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/daemon.c,v 1.8.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <errno.h>
@@ -64,6 +64,10 @@ daemon(nochdir, noclose)
 	case 0:
 		break;
 	default:
+		/*
+		 * A fine point:  _exit(0), not exit(0), to avoid triggering
+		 * atexit(3) processing
+		 */
 		_exit(0);
 	}
 

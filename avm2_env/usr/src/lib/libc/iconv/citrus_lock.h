@@ -1,4 +1,4 @@
-/* $FreeBSD: release/9.1.0/lib/libc/iconv/citrus_lock.h 219019 2011-02-25 00:04:39Z gabor $ */
+/* $FreeBSD$ */
 /*-
  * Copyright (C) 2010 Gabor Kovesdan <gabor@FreeBSD.org>
  * All rights reserved.

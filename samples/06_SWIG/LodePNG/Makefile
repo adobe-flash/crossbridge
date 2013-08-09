@@ -10,7 +10,7 @@ all: check
 	mv LodePNGLib.as LodePNGLib.as3
 
 	@echo "-> Compile the library into a SWC"
-	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) LodePNGLib.abc LodePNGLib_wrapper.c lodepngmain.c lodepng.c -emit-swc=sample.LodePNG -o LodePNGLib.swc
+	"$(FLASCC)/usr/bin/clang" $(BASE_CFLAGS) LodePNGLib.abc LodePNGLib_wrapper.c lodepngmain.c lodepng.c -emit-swc=sample.LodePNG -o LodePNGLib.swc
 
 	@echo "-> Compile an example SWF that uses that SWC"
 	"$(FLEX)/bin/mxmlc" -static-link-runtime-shared-libraries -library-path+=LodePNGLib.swc LodePNGExample.as -debug=true -o LodePNG.swf

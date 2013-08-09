@@ -33,7 +33,7 @@
 #define	QL_H_
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: release/9.1.0/lib/libc/stdlib/ql.h 203329 2010-01-31 23:16:10Z jasone $");
+__FBSDID("$FreeBSD$");
 
 /*
  * List definitions.

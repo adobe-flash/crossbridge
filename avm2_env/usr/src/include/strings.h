@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/include/strings.h,v 1.8.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #ifndef _STRINGS_H_
@@ -46,7 +46,7 @@ void	 bzero(void *, size_t);					/* LEGACY */
 #if __XSI_VISIBLE
 int	 ffs(int) __pure2;
 #endif
-#ifdef __BSD_VISIBLE
+#if __BSD_VISIBLE
 int	 ffsl(long) __pure2;
 int	 ffsll(long long) __pure2;
 int	 fls(int) __pure2;

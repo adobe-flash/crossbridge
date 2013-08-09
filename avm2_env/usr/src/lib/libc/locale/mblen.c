@@ -2,6 +2,11 @@
  * Copyright (c) 2002-2004 Tim J. Robbins.
  * All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -25,26 +30,32 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/locale/mblen.c,v 1.9.30.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <stdlib.h>
 #include <wchar.h>
 #include "mblocal.h"
 
 int
-mblen(const char *s, size_t n)
+mblen_l(const char *s, size_t n, locale_t locale)
 {
 	static const mbstate_t initial;
-	static mbstate_t mbs;
 	size_t rval;
+	FIX_LOCALE(locale);
 
 	if (s == NULL) {
 		/* No support for state dependent encodings. */
-		mbs = initial;
+		locale->mblen = initial;
 		return (0);
 	}
-	rval = __mbrtowc(NULL, s, n, &mbs);
+	rval = XLOCALE_CTYPE(locale)->__mbrtowc(NULL, s, n, &locale->mblen);
 	if (rval == (size_t)-1 || rval == (size_t)-2)
 		return (-1);
 	return ((int)rval);
+}
+
+int
+mblen(const char *s, size_t n)
+{
+	return mblen_l(s, n, __get_locale());
 }

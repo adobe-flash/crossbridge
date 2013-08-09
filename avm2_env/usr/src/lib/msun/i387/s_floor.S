@@ -34,8 +34,7 @@
  */
 
 #include <machine/asm.h>
-
-RCSID("$FreeBSD: src/lib/msun/i387/s_floor.S,v 1.8.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $")
+__FBSDID("$FreeBSD$")
 
 ENTRY(floor)
 	pushl	%ebp
@@ -57,3 +56,5 @@ ENTRY(floor)
 	leave
 	ret
 END(floor)
+
+	.section .note.GNU-stack,"",%progbits

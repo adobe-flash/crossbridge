@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: release/9.1.0/include/rpcsvc/ypclnt.h 121577 2003-10-26 16:35:11Z peter $
+ * $FreeBSD$
  */
 
 #ifndef _RPCSVC_YPCLNT_H_

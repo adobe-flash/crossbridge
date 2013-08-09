@@ -1,16 +1,16 @@
 #	@(#)Makefile.inc	8.6 (Berkeley) 5/4/95
-# $FreeBSD: src/lib/libc/gen/Makefile.inc,v 1.144.2.6.2.1 2010/12/21 17:09:25 kensmith Exp $
+# $FreeBSD$
 
 # machine-independent gen sources
-.PATH: ${.CURDIR}/${MACHINE_ARCH}/gen ${.CURDIR}/gen
+.PATH: ${.CURDIR}/${LIBC_ARCH}/gen ${.CURDIR}/gen
 
 SRCS+=  __getosreldate.c __xuname.c \
 	_once_stub.c _pthread_stubs.c _rand48.c _spinlock_stub.c \
 	_thread_init.c \
-	alarm.c arc4random.c assert.c basename.c check_utility_compat.c \
+	alarm.c arc4random.c assert.c aux.c basename.c check_utility_compat.c \
 	clock.c closedir.c confstr.c \
-	ctermid.c daemon.c devname.c dirname.c disklabel.c \
-	dlfcn.c drand48.c erand48.c err.c errlst.c errno.c \
+	crypt.c ctermid.c daemon.c devname.c dirname.c disklabel.c \
+	dlfcn.c drand48.c elf_utils.c erand48.c err.c errlst.c errno.c \
 	exec.c fdevname.c feature_present.c fmtcheck.c fmtmsg.c fnmatch.c \
 	fpclassify.c frexp.c fstab.c ftok.c fts.c fts-compat.c ftw.c \
 	getbootfile.c getbsize.c \
@@ -18,34 +18,41 @@ SRCS+=  __getosreldate.c __xuname.c \
 	gethostname.c getloadavg.c getlogin.c getmntinfo.c getnetgrent.c \
 	getosreldate.c getpagesize.c getpagesizes.c \
 	getpeereid.c getprogname.c getpwent.c getttyent.c \
-	getusershell.c getvfsbyname.c glob.c \
+	getusershell.c getutxent.c getvfsbyname.c glob.c \
 	initgroups.c isatty.c isinf.c isnan.c jrand48.c lcong48.c \
+	libc_dlopen.c \
 	lockf.c lrand48.c mrand48.c nftw.c nice.c \
 	nlist.c nrand48.c opendir.c \
 	pause.c pmadvise.c popen.c posix_spawn.c \
-	psignal.c pw_scan.c pwcache.c \
+	psignal.c pututxline.c pw_scan.c pwcache.c \
 	raise.c readdir.c readpassphrase.c rewinddir.c \
-	scandir.c seed48.c seekdir.c sem.c semctl.c \
+	scandir.c seed48.c seekdir.c semctl.c \
 	setdomainname.c sethostname.c setjmperr.c setmode.c \
 	setproctitle.c setprogname.c siginterrupt.c siglist.c signal.c \
 	sigsetops.c sleep.c srand48.c statvfs.c stringlist.c strtofflags.c \
 	sysconf.c sysctl.c sysctlbyname.c sysctlnametomib.c \
 	syslog.c telldir.c termios.c time.c times.c timezone.c tls.c \
 	ttyname.c ttyslot.c ualarm.c ulimit.c uname.c unvis.c \
-	usleep.c utime.c valloc.c vis.c wait.c wait3.c waitpid.c \
+	usleep.c utime.c utxdb.c valloc.c vis.c wait.c wait3.c waitpid.c \
 	wordexp.c
+
+CANCELPOINTS_SRCS=sem.c sem_new.c
+.for src in ${CANCELPOINTS_SRCS}
+SRCS+=cancelpoints_${src}
+CLEANFILES+=cancelpoints_${src}
+cancelpoints_${src}:
+	ln -sf ${.CURDIR}/gen/${src} ${.TARGET}
+.endfor
 
 SYM_MAPS+=${.CURDIR}/gen/Symbol.map
 
 # machine-dependent gen sources
-.if exists(${.CURDIR}/${MACHINE_ARCH}/gen/Makefile.inc)
-.include "${.CURDIR}/${MACHINE_ARCH}/gen/Makefile.inc"
-.endif
+.sinclude "${.CURDIR}/${LIBC_ARCH}/gen/Makefile.inc"
 
 MAN+=	alarm.3 arc4random.3 \
 	basename.3 check_utility_compat.3 clock.3 \
 	confstr.3 ctermid.3 daemon.3 devname.3 directory.3 dirname.3 \
-	dladdr.3 dlinfo.3 dllockinit.3 dlopen.3 \
+	dl_iterate_phdr.3 dladdr.3 dlinfo.3 dllockinit.3 dlopen.3 \
 	err.3 exec.3 \
 	feature_present.3 fmtcheck.3 fmtmsg.3 fnmatch.3 fpclassify.3 frexp.3 \
 	ftok.3 fts.3 ftw.3 \
@@ -54,7 +61,7 @@ MAN+=	alarm.3 arc4random.3 \
 	getgrent.3 getgrouplist.3 gethostname.3 getloadavg.3 \
 	getmntinfo.3 getnetgrent.3 getosreldate.3 getpagesize.3 \
 	getpagesizes.3 getpass.3 getpeereid.3 getprogname.3 getpwent.3 \
-	getttyent.3 getusershell.3 getvfsbyname.3 \
+	getttyent.3 getusershell.3 getutxent.3 getvfsbyname.3 \
 	glob.3 initgroups.3 isgreater.3 ldexp.3 lockf.3 makecontext.3 \
 	modf.3 \
 	nice.3 nlist.3 pause.3 popen.3 \
@@ -77,6 +84,7 @@ MAN+=	alarm.3 arc4random.3 \
 
 MLINKS+=arc4random.3 arc4random_addrandom.3 arc4random.3 arc4random_stir.3 \
 	arc4random.3 arc4random_buf.3 arc4random.3 arc4random_uniform.3
+MLINKS+=basename.3 basename_r.3
 MLINKS+=ctermid.3 ctermid_r.3
 MLINKS+=devname.3 devname_r.3
 MLINKS+=devname.3 fdevname.3
@@ -85,8 +93,8 @@ MLINKS+=directory.3 closedir.3 directory.3 dirfd.3 directory.3 opendir.3 \
 	directory.3 fdopendir.3 \
 	directory.3 readdir.3 directory.3 readdir_r.3 directory.3 rewinddir.3 \
 	directory.3 seekdir.3 directory.3 telldir.3
-MLINKS+=dlopen.3 dlclose.3 dlopen.3 dlerror.3 dlopen.3 dlfunc.3 \
-	dlopen.3 dlsym.3
+MLINKS+=dlopen.3 fdlopen.3 dlopen.3 dlclose.3 dlopen.3 dlerror.3 \
+	dlopen.3 dlfunc.3 dlopen.3 dlsym.3
 MLINKS+=err.3 err_set_exit.3 err.3 err_set_file.3 err.3 errc.3 err.3 errx.3 \
 	err.3 verr.3 err.3 verrc.3 err.3 verrx.3 err.3 vwarn.3 err.3 vwarnc.3 \
 	err.3 vwarnx.3 err.3 warnc.3 err.3 warn.3 err.3 warnx.3
@@ -125,6 +133,10 @@ MLINKS+=getttyent.3 endttyent.3 getttyent.3 getttynam.3 \
 	getttyent.3 isdialuptty.3 getttyent.3 isnettty.3 \
 	getttyent.3 setttyent.3
 MLINKS+=getusershell.3 endusershell.3 getusershell.3 setusershell.3
+MLINKS+=getutxent.3 endutxent.3 getutxent.3 getutxid.3 \
+	getutxent.3 getutxline.3 getutxent.3 getutxuser.3 \
+	getutxent.3 pututxline.3 getutxent.3 setutxdb.3 \
+	getutxent.3 setutxent.3 getutxent.3 utmpx.3
 MLINKS+=glob.3 globfree.3
 MLINKS+=isgreater.3 isgreaterequal.3 isgreater.3 isless.3 \
 	isgreater.3 islessequal.3 isgreater.3 islessgreater.3 \
@@ -169,10 +181,10 @@ MLINKS+=syslog.3 closelog.3 syslog.3 openlog.3 syslog.3 setlogmask.3 \
 	syslog.3 vsyslog.3
 MLINKS+=tcsendbreak.3 tcdrain.3 tcsendbreak.3 tcflow.3 tcsendbreak.3 tcflush.3
 MLINKS+=tcsetattr.3 cfgetispeed.3 tcsetattr.3 cfgetospeed.3 \
-	tcsetattr.3 cfmakeraw.3 tcsetattr.3 cfsetispeed.3 \
-	tcsetattr.3 cfsetospeed.3 tcsetattr.3 cfsetspeed.3 \
-	tcsetattr.3 tcgetattr.3
-MLINKS+=ttyname.3 isatty.3 ttyname.3 ttyname_r.3 ttyname.3 ttyslot.3
+	tcsetattr.3 cfmakeraw.3 tcsetattr.3 cfmakesane.3 \
+	tcsetattr.3 cfsetispeed.3 tcsetattr.3 cfsetospeed.3 \
+	tcsetattr.3 cfsetspeed.3 tcsetattr.3 tcgetattr.3
+MLINKS+=ttyname.3 isatty.3 ttyname.3 ttyname_r.3
 MLINKS+=tzset.3 tzsetwall.3
 MLINKS+=unvis.3 strunvis.3 unvis.3 strunvisx.3
 MLINKS+=vis.3 strvis.3 vis.3 strvisx.3

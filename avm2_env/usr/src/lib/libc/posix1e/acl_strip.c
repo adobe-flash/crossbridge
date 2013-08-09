@@ -14,18 +14,18 @@
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR THE VOICES IN HIS HEAD BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_strip.c,v 1.2.2.4.2.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <errno.h>
 #include <stdio.h>
@@ -36,13 +36,12 @@ __FBSDID("$FreeBSD: src/lib/libc/posix1e/acl_strip.c,v 1.2.2.4.2.1 2010/12/21 17
 #include "acl_support.h"
 
 /*
- * These three routines from sys/kern/subr_acl_nfs4.c are used by both kernel
+ * These routines from sys/kern/subr_acl_nfs4.c are used by both kernel
  * and libc.
  */
-void	acl_nfs4_trivial_from_mode(struct acl *aclp, mode_t mode);
-void	acl_nfs4_sync_acl_from_mode(struct acl *aclp, mode_t mode,
-	    int file_owner_id);
 void	acl_nfs4_sync_mode_from_acl(mode_t *_mode, const struct acl *aclp);
+void	acl_nfs4_trivial_from_mode_libc(struct acl *aclp, int file_owner_id,
+	    int canonical_six);
 
 static acl_t
 _nfs4_acl_strip_np(const acl_t aclp, int canonical_six)
@@ -59,10 +58,7 @@ _nfs4_acl_strip_np(const acl_t aclp, int canonical_six)
 	_acl_brand_as(newacl, ACL_BRAND_NFS4);
 
 	acl_nfs4_sync_mode_from_acl(&mode, &(aclp->ats_acl));
-	if (canonical_six)
-		acl_nfs4_sync_acl_from_mode(&(newacl->ats_acl), mode, -1);
-	else
-		acl_nfs4_trivial_from_mode(&(newacl->ats_acl), mode);
+	acl_nfs4_trivial_from_mode_libc(&(newacl->ats_acl), mode, canonical_six);
 
 	return (newacl);
 }
@@ -141,7 +137,7 @@ acl_strip_np(const acl_t aclp, int recalculate_mask)
 {
 	switch (_acl_brand(aclp)) {
 	case ACL_BRAND_NFS4:
-		return (_nfs4_acl_strip_np(aclp, 1));
+		return (_nfs4_acl_strip_np(aclp, 0));
 
 	case ACL_BRAND_POSIX:
 		return (_posix1e_acl_strip_np(aclp, recalculate_mask));

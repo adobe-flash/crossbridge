@@ -1,4 +1,4 @@
-/* $FreeBSD: release/9.1.0/lib/libc/iconv/citrus_pivot_factory.h 219019 2011-02-25 00:04:39Z gabor $ */
+/* $FreeBSD$ */
 /* $NetBSD: citrus_pivot_factory.h,v 1.1 2003/06/25 09:51:39 tshiozak Exp $ */
 
 /*-

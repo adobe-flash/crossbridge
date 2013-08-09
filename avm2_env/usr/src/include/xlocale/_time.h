@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: release/9.1.0/include/xlocale/_time.h 231673 2012-02-14 12:03:23Z theraven $
+ * $FreeBSD$
  */
 
 #ifndef _LOCALE_T_DEFINED
@@ -39,6 +39,8 @@ typedef struct	_xlocale *locale_t;
  * the declarations unconditionally if we are included from xlocale.h, but only
  * if we are in POSIX2008 mode if included from locale.h.
  */
+
+#include <sys/cdefs.h>
 #ifndef _XLOCALE_LOCALE1_H
 #define _XLOCALE_LOCALE1_H
 

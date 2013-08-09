@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: release/9.1.0/include/xlocale/_wchar.h 231673 2012-02-14 12:03:23Z theraven $
+ * $FreeBSD$
  */
 
 #ifndef _LOCALE_T_DEFINED

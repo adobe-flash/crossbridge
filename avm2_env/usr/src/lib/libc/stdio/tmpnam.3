@@ -30,7 +30,7 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     @(#)tmpnam.3	8.2 (Berkeley) 11/17/93
-.\" $FreeBSD: src/lib/libc/stdio/tmpnam.3,v 1.20.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
 .Dd March 18, 2007
 .Dt TMPFILE 3
@@ -217,6 +217,17 @@ for any of the errors specified for the library functions
 .Xr malloc 3
 or
 .Xr mktemp 3 .
+.Sh SEE ALSO
+.Xr mkstemp 3 ,
+.Xr mktemp 3
+.Sh STANDARDS
+The
+.Fn tmpfile
+and
+.Fn tmpnam
+functions
+conform to
+.St -isoC .
 .Sh SECURITY CONSIDERATIONS
 The
 .Fn tmpnam
@@ -235,14 +246,3 @@ It is strongly suggested that
 be used in place of these functions.
 (See
 the FSA.)
-.Sh SEE ALSO
-.Xr mkstemp 3 ,
-.Xr mktemp 3
-.Sh STANDARDS
-The
-.Fn tmpfile
-and
-.Fn tmpnam
-functions
-conform to
-.St -isoC .

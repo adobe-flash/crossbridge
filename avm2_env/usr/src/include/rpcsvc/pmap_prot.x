@@ -36,7 +36,7 @@
 %
 %#pragma ident	"@(#)pmap_prot.x	1.6	94/04/29 SMI"
 %#include <sys/cdefs.h>
-%__FBSDID("$FreeBSD: release/9.1.0/include/rpcsvc/pmap_prot.x 114629 2003-05-04 02:51:42Z obrien $");
+%__FBSDID("$FreeBSD$");
 %
 %#ifndef _KERNEL
 %

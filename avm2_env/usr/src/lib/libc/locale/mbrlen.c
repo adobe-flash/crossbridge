@@ -2,6 +2,11 @@
  * Copyright (c) 2002-2004 Tim J. Robbins.
  * All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -25,17 +30,22 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/locale/mbrlen.c,v 1.4.30.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <wchar.h>
 #include "mblocal.h"
 
 size_t
+mbrlen_l(const char * __restrict s, size_t n, mbstate_t * __restrict ps, locale_t locale)
+{
+	FIX_LOCALE(locale);
+	if (ps == NULL)
+		ps = &locale->mbrlen;
+	return (XLOCALE_CTYPE(locale)->__mbrtowc(NULL, s, n, ps));
+}
+
+size_t
 mbrlen(const char * __restrict s, size_t n, mbstate_t * __restrict ps)
 {
-	static mbstate_t mbs;
-
-	if (ps == NULL)
-		ps = &mbs;
-	return (__mbrtowc(NULL, s, n, ps));
+	return mbrlen_l(s, n, ps, __get_locale());
 }

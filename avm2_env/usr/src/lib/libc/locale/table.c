@@ -5,6 +5,11 @@
  * This code is derived from software contributed to Berkeley by
  * Paul Borman at Krystal Technologies.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -34,14 +39,14 @@
 static char sccsid[] = "@(#)table.c	8.1 (Berkeley) 6/27/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/locale/table.c,v 1.28.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <ctype.h>
 #include <runetype.h>
 #include <wchar.h>
 #include "mblocal.h"
 
-_RuneLocale _DefaultRuneLocale = {
+const _RuneLocale _DefaultRuneLocale = {
     _RUNE_MAGIC_1,
     "NONE",
     NULL,
@@ -245,5 +250,14 @@ _RuneLocale _DefaultRuneLocale = {
     },
 };
 
-_RuneLocale *_CurrentRuneLocale = &_DefaultRuneLocale;
+#undef _CurrentRuneLocale
+const _RuneLocale *_CurrentRuneLocale = &_DefaultRuneLocale;
 
+_RuneLocale *
+__runes_for_locale(locale_t locale, int *mb_sb_limit)
+{
+	FIX_LOCALE(locale);
+	struct xlocale_ctype *c = XLOCALE_CTYPE(locale);
+	*mb_sb_limit = c->__mb_sb_limit;
+	return c->runes;
+}

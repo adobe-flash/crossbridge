@@ -31,43 +31,43 @@
 static char sccsid[] = "@(#)siglist.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/siglist.c,v 1.6.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <signal.h>
 
 const char *const sys_signame[NSIG] = {
 	"Signal 0",
-	"hup",				/* SIGHUP */
-	"int",				/* SIGINT */
-	"quit",				/* SIGQUIT */
-	"ill",				/* SIGILL */
-	"trap",				/* SIGTRAP */
-	"abrt",				/* SIGABRT */
-	"emt",				/* SIGEMT */
-	"fpe",				/* SIGFPE */
-	"kill",				/* SIGKILL */
-	"bus",				/* SIGBUS */
-	"segv",				/* SIGSEGV */
-	"sys",				/* SIGSYS */
-	"pipe",				/* SIGPIPE */
-	"alrm",				/* SIGALRM */
-	"term",				/* SIGTERM */
-	"urg",				/* SIGURG */
-	"stop",				/* SIGSTOP */
-	"tstp",				/* SIGTSTP */
-	"cont",				/* SIGCONT */
-	"chld",				/* SIGCHLD */
-	"ttin",				/* SIGTTIN */
-	"ttou",				/* SIGTTOU */
-	"io",				/* SIGIO */
-	"xcpu",				/* SIGXCPU */
-	"xfsz",				/* SIGXFSZ */
-	"vtalrm",			/* SIGVTALRM */
-	"prof",				/* SIGPROF */
-	"winch",			/* SIGWINCH */
-	"info",				/* SIGINFO */
-	"usr1",				/* SIGUSR1 */
-	"usr2"				/* SIGUSR2 */
+	"HUP",				/* SIGHUP */
+	"INT",				/* SIGINT */
+	"QUIT",				/* SIGQUIT */
+	"ILL",				/* SIGILL */
+	"TRAP",				/* SIGTRAP */
+	"ABRT",				/* SIGABRT */
+	"EMT",				/* SIGEMT */
+	"FPE",				/* SIGFPE */
+	"KILL",				/* SIGKILL */
+	"BUS",				/* SIGBUS */
+	"SEGV",				/* SIGSEGV */
+	"SYS",				/* SIGSYS */
+	"PIPE",				/* SIGPIPE */
+	"ALRM",				/* SIGALRM */
+	"TERM",				/* SIGTERM */
+	"URG",				/* SIGURG */
+	"STOP",				/* SIGSTOP */
+	"TSTP",				/* SIGTSTP */
+	"CONT",				/* SIGCONT */
+	"CHLD",				/* SIGCHLD */
+	"TTIN",				/* SIGTTIN */
+	"TTOU",				/* SIGTTOU */
+	"IO",				/* SIGIO */
+	"XCPU",				/* SIGXCPU */
+	"XFSZ",				/* SIGXFSZ */
+	"VTALRM",			/* SIGVTALRM */
+	"PROF",				/* SIGPROF */
+	"WINCH",			/* SIGWINCH */
+	"INFO",				/* SIGINFO */
+	"USR1",				/* SIGUSR1 */
+	"USR2"				/* SIGUSR2 */
 };
 
 const char *const sys_siglist[NSIG] = {

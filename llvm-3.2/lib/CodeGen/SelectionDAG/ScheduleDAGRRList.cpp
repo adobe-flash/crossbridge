@@ -526,7 +526,10 @@ void ScheduleDAGRRList::ReleasePredecessors(SUnit *SU) {
   // If we're scheduling a lowered CALLSEQ_END, find the corresponding
   // CALLSEQ_BEGIN. Inject an artificial physical register dependence between
   // these nodes, to prevent other calls from being interscheduled with them.
-  unsigned CallResource = TRI->getNumRegs();
+  
+  //Fixme: This snippet cause a crash when generating backend code. Just comment out
+  // to avoid the crash. Still need to find the reason and fix it.
+  /*unsigned CallResource = TRI->getNumRegs();
   if (!LiveRegDefs[CallResource])
     for (SDNode *Node = SU->getNode(); Node; Node = Node->getGluedNode())
       if (Node->isMachineOpcode() &&
@@ -542,7 +545,7 @@ void ScheduleDAGRRList::ReleasePredecessors(SUnit *SU) {
         LiveRegDefs[CallResource] = Def;
         LiveRegGens[CallResource] = SU;
         break;
-      }
+      }*/
 }
 
 /// Check to see if any of the pending instructions are ready to issue.  If

@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/include/complex.h,v 1.12.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #ifndef _COMPLEX_H
@@ -33,7 +33,7 @@
 #if __STDC_VERSION__ < 199901
 #define	_Complex	__complex__
 #endif
-#define	_Complex_I	1.0fi
+#define	_Complex_I	((float _Complex)1.0i)
 #endif
 
 #define	complex		_Complex
@@ -49,6 +49,8 @@ long double	cabsl(long double complex);
 double		carg(double complex);
 float		cargf(float complex);
 long double	cargl(long double complex);
+double complex	cexp(double complex);
+float complex	cexpf(float complex);
 double		cimag(double complex) __pure2;
 float		cimagf(float complex) __pure2;
 long double	cimagl(long double complex) __pure2;

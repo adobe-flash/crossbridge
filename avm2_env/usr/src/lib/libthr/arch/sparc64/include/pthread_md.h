@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libthr/arch/sparc64/include/pthread_md.h,v 1.3.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 /*
@@ -50,10 +50,6 @@ struct tcb {
 	void			*tcb_spare[1];
 };
 
-register struct tcb *_tp __asm("%g7");
-
-#define _tcb	(_tp)
-
 /*
  * The tcb constructors.
  */
@@ -64,26 +60,25 @@ void		_tcb_dtor(struct tcb *);
 static __inline void
 _tcb_set(struct tcb *tcb)
 {
-	_tp = tcb;
+
+	__asm __volatile("mov %0, %%g7" : : "r" (tcb));
 }
 
-/*
- * Get the current tcb.
- */
 static __inline struct tcb *
 _tcb_get(void)
 {
-	return (_tcb);
-}
+	register struct tcb *tp __asm("%g7");
 
-extern struct pthread *_thr_initial;
+	return (tp);
+}
 
 static __inline struct pthread *
 _get_curthread(void)
 {
-	if (_thr_initial)
-		return (_tcb->tcb_thread);
-	return (NULL);
+
+	return (_tcb_get()->tcb_thread);
 }
+
+#define HAS__UMTX_OP_ERR	1
 
 #endif /* _PTHREAD_MD_H_ */

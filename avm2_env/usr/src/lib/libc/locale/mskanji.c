@@ -6,6 +6,11 @@
  *    (C) Sin'ichiro MIYATANI / Phase One, Inc
  *    May 12, 1995
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -37,7 +42,7 @@
 static char sccsid[] = "@(#)mskanji.c	1.0 (Phase One) 5/5/95";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/locale/mskanji.c,v 1.18.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/types.h>
 #include <errno.h>
@@ -60,15 +65,15 @@ typedef struct {
 } _MSKanjiState;
 
 int
-_MSKanji_init(_RuneLocale *rl)
+_MSKanji_init(struct xlocale_ctype *l, _RuneLocale *rl)
 {
 
-	__mbrtowc = _MSKanji_mbrtowc;
-	__wcrtomb = _MSKanji_wcrtomb;
-	__mbsinit = _MSKanji_mbsinit;
-	_CurrentRuneLocale = rl;
-	__mb_cur_max = 2;
-	__mb_sb_limit = 256;
+	l->__mbrtowc = _MSKanji_mbrtowc;
+	l->__wcrtomb = _MSKanji_wcrtomb;
+	l->__mbsinit = _MSKanji_mbsinit;
+	l->runes = rl;
+	l->__mb_cur_max = 2;
+	l->__mb_sb_limit = 256;
 	return (0);
 }
 

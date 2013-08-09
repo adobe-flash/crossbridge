@@ -26,9 +26,9 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     @(#)lseek.2	8.3 (Berkeley) 4/19/94
-.\" $FreeBSD: src/lib/libc/sys/lseek.2,v 1.25.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
-.Dd April 5, 2007
+.Dd May 26, 2012
 .Dt LSEEK 2
 .Os
 .Sh NAME
@@ -92,9 +92,9 @@ If
 .Fa whence
 is
 .Dv SEEK_HOLE ,
-the offset of the start of the next hole greater than or equal to the supplied
-.Fa offset
-is returned.
+the offset is set to the start of the next hole greater than or equal
+to the supplied
+.Fa offset .
 The definition of a hole is provided below.
 .It
 If

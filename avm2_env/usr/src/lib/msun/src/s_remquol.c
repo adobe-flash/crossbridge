@@ -11,7 +11,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/msun/src/s_remquol.c,v 1.2.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <float.h>
 #include <stdint.h>
@@ -96,7 +96,7 @@ remquol(long double x, long double y, int *quo)
 		goto fixup;	/* |x|<|y| return x or x-y */
 	    }
 	    if(ux.bits.manh==uy.bits.manh && ux.bits.manl==uy.bits.manl) {
-		*quo = 1;
+		*quo = (sxy ? -1 : 1);
 		return Zero[sx];	/* |x|=|y| return x*0*/
 	    }
 	}
@@ -138,6 +138,7 @@ remquol(long double x, long double y, int *quo)
 
     /* convert back to floating value and restore the sign */
 	if((hx|lx)==0) {			/* return sign(x)*0 */
+	    q &= 0x7fffffff;
 	    *quo = (sxy ? -q : q);
 	    return Zero[sx];
 	}

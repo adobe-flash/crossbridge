@@ -6,7 +6,7 @@
  */
 
 #include <machine/asm.h>
-__FBSDID("$FreeBSD: src/lib/libc/amd64/stdlib/div.S,v 1.2.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 ENTRY(div)
 	movl	%edi,%eax
@@ -16,3 +16,5 @@ ENTRY(div)
 	orq	%rdx,%rax
 	ret
 END(div)
+
+	.section .note.GNU-stack,"",%progbits

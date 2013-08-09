@@ -3,6 +3,11 @@
  *		at Electronni Visti IA, Kiev, Ukraine.
  *			All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -29,7 +34,7 @@
 #if 0
 __FBSDID("FreeBSD: src/lib/libc/string/strxfrm.c,v 1.15 2002/09/06 11:24:06 tjr Exp ");
 #endif
-__FBSDID("$FreeBSD: src/lib/libc/string/wcsxfrm.c,v 1.3.30.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <stdlib.h>
 #include <string.h>
@@ -43,11 +48,14 @@ static char *__mbsdup(const wchar_t *);
  * the logic used.
  */
 size_t
-wcsxfrm(wchar_t * __restrict dest, const wchar_t * __restrict src, size_t len)
+wcsxfrm_l(wchar_t * __restrict dest, const wchar_t * __restrict src, size_t len, locale_t locale)
 {
 	int prim, sec, l;
 	size_t slen;
 	char *mbsrc, *s, *ss;
+	FIX_LOCALE(locale);
+	struct xlocale_collate *table =
+		(struct xlocale_collate*)locale->components[XLC_COLLATE];
 
 	if (*src == L'\0') {
 		if (len != 0)
@@ -55,7 +63,7 @@ wcsxfrm(wchar_t * __restrict dest, const wchar_t * __restrict src, size_t len)
 		return (0);
 	}
 
-	if (__collate_load_error || MB_CUR_MAX > 1) {
+	if (table->__collate_load_error || MB_CUR_MAX > 1) {
 		slen = wcslen(src);
 		if (len > 0) {
 			if (slen < len)
@@ -71,10 +79,10 @@ wcsxfrm(wchar_t * __restrict dest, const wchar_t * __restrict src, size_t len)
 	mbsrc = __mbsdup(src);
 	slen = 0;
 	prim = sec = 0;
-	ss = s = __collate_substitute(mbsrc);
+	ss = s = __collate_substitute(table, mbsrc);
 	while (*s != '\0') {
 		while (*s != '\0' && prim == 0) {
-			__collate_lookup(s, &l, &prim, &sec);
+			__collate_lookup(table, s, &l, &prim, &sec);
 			s += l;
 		}
 		if (prim != 0) {
@@ -92,6 +100,11 @@ wcsxfrm(wchar_t * __restrict dest, const wchar_t * __restrict src, size_t len)
 		*dest = L'\0';
 
 	return (slen);
+}
+size_t
+wcsxfrm(wchar_t * __restrict dest, const wchar_t * __restrict src, size_t len)
+{
+	return wcsxfrm_l(dest, src, len, __get_locale());
 }
 
 static char *

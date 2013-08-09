@@ -1,4 +1,4 @@
-# $FreeBSD: src/lib/libthr/thread/Makefile.inc,v 1.18.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+# $FreeBSD$
 
 # thr sources
 .PATH: ${.CURDIR}/thread
@@ -18,9 +18,11 @@ SRCS+= \
 	thr_equal.c \
 	thr_event.c \
 	thr_exit.c \
+	thr_fork.c \
 	thr_getprio.c \
 	thr_getcpuclockid.c \
 	thr_getschedparam.c \
+	thr_getthreadid_np.c \
 	thr_info.c \
 	thr_init.c \
 	thr_join.c \
@@ -35,6 +37,7 @@ SRCS+= \
 	thr_printf.c \
 	thr_pspinlock.c \
 	thr_resume_np.c \
+	thr_rtld.c \
 	thr_rwlock.c \
 	thr_rwlockattr.c \
 	thr_self.c \
@@ -43,6 +46,7 @@ SRCS+= \
 	thr_setschedparam.c \
 	thr_sig.c \
 	thr_single_np.c \
+	thr_sleepq.c \
 	thr_spec.c \
 	thr_spinlock.c \
 	thr_stack.c \

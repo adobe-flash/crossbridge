@@ -847,11 +847,6 @@ void _init()
     inline_as3("CModule.runCtors()");
 }
 
-long double strtold(const char *nptr, char **endptr)
-{
-  return strtod(nptr, endptr);
-}
-
 //TODO: replace me with something efficient
 double ldexp(double x, int n)
 {
@@ -946,6 +941,17 @@ bool __sync_bool_compare_and_swap_4(unsigned int *ptr, unsigned int oldval, unsi
 {
   return __sync_val_compare_and_swap_4(ptr, oldval, newval) == oldval;
 }
+
+bool __sync_bool_compare_and_swap(unsigned int *ptr, unsigned int oldval, unsigned int newval)
+{
+  return __sync_bool_compare_and_swap_4(ptr, oldval, newval);
+}
+
+unsigned int __sync_val_compare_and_swap(unsigned int *ptr, unsigned int oldval, unsigned int newval)
+{
+  return __sync_val_compare_and_swap_4(ptr,oldval,newval);
+}
+
 
 // TODO: CAS on non 32bit values is broken right now, we should disable it properly in the frontend at some point
 bool __sync_bool_compare_and_swap_2(unsigned short *ptr, unsigned short oldval, unsigned short newval)
@@ -1064,10 +1070,27 @@ T __sync_##N##_##W(T *ptr, T n) \
   return result; \
 }
 
+#define GEN_SYNC_0(T, N, OP) \
+T __sync_##N(T *ptr, T n) \
+{ \
+  T result; \
+  T cur = *(volatile T *)ptr; \
+  for(;;) \
+  { \
+    T val, cur1; \
+    OP; \
+    if(cur == (cur1 = __sync_val_compare_and_swap(ptr, cur, val))) \
+      break; \
+    cur = cur1; \
+  } \
+  return result; \
+}
+
 #define GEN_SYNC(N, OP) \
   GEN_SYNC_1(1, unsigned char, N, OP) \
   GEN_SYNC_1(2, unsigned short, N, OP) \
-  GEN_SYNC_1(4, unsigned int , N, OP)
+  GEN_SYNC_1(4, unsigned int , N, OP) \
+  GEN_SYNC_0(unsigned int , N, OP)
 
 GEN_SYNC(fetch_and_add, val = (result = cur) + n)
 GEN_SYNC(fetch_and_sub, val = (result = cur) - n)

@@ -30,7 +30,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/string/strndup.c,v 1.1.4.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <stddef.h>
 #include <stdlib.h>
@@ -42,9 +42,7 @@ strndup(const char *str, size_t n)
 	size_t len;
 	char *copy;
 
-	for (len = 0; len < n && str[len]; len++)
-		continue;
-
+	len = strnlen(str, n);
 	if ((copy = malloc(len + 1)) == NULL)
 		return (NULL);
 	memcpy(copy, str, len);

@@ -1,4 +1,4 @@
-/* $FreeBSD: release/9.1.0/lib/libc/iconv/citrus_db_factory.h 219019 2011-02-25 00:04:39Z gabor $ */
+/* $FreeBSD$ */
 /* $NetBSD: citrus_db_factory.h,v 1.3 2008/02/09 14:56:20 junyoung Exp $ */
 
 /*-

@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libthr/thread/thr_suspend_np.c,v 1.10.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #include "namespace.h"
@@ -76,7 +76,7 @@ _pthread_suspend_all_np(void)
 	struct pthread *thread;
 	int ret;
 
-	THREAD_LIST_LOCK(curthread);
+	THREAD_LIST_RDLOCK(curthread);
 
 	TAILQ_FOREACH(thread, &_thread_list, tle) {
 		if (thread != curthread) {
@@ -98,13 +98,15 @@ restart:
 			THR_THREAD_LOCK(curthread, thread);
 			ret = suspend_common(curthread, thread, 0);
 			if (ret == 0) {
-				/* Can not suspend, try to wait */
-				thread->refcount++;
 				THREAD_LIST_UNLOCK(curthread);
+				/* Can not suspend, try to wait */
+				THR_REF_ADD(curthread, thread);
 				suspend_common(curthread, thread, 1);
-				THR_THREAD_UNLOCK(curthread, thread);
-				THREAD_LIST_LOCK(curthread);
-				_thr_ref_delete_unlocked(curthread, thread);
+				THR_REF_DEL(curthread, thread);
+				_thr_try_gc(curthread, thread);
+				/* thread lock released */
+
+				THREAD_LIST_RDLOCK(curthread);
 				/*
 				 * Because we were blocked, things may have
 				 * been changed, we have to restart the
@@ -129,10 +131,10 @@ suspend_common(struct pthread *curthread, struct pthread *thread,
 	      !(thread->flags & THR_FLAGS_SUSPENDED)) {
 		thread->flags |= THR_FLAGS_NEED_SUSPEND;
 		tmp = thread->cycle;
-		THR_THREAD_UNLOCK(curthread, thread);
 #ifndef __AVM2__
 		_thr_send_sig(thread, SIGCANCEL);
 #endif
+		THR_THREAD_UNLOCK(curthread, thread);
 		if (waitok) {
 			_thr_umtx_wait_uint(&thread->cycle, tmp, NULL, 0);
 			THR_THREAD_LOCK(curthread, thread);

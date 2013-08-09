@@ -1,4 +1,4 @@
-# $FreeBSD: release/9.1.0/lib/libc++/Makefile 236601 2012-06-05 06:43:45Z dim $
+# $FreeBSD$
 
 LIBCXXRTDIR=	${.CURDIR}/../../contrib/libcxxrt
 HDRDIR=		${.CURDIR}/../../contrib/libc++/include
@@ -36,7 +36,7 @@ SRCS+=		algorithm.cpp\
 		valarray.cpp
 
 WARNS=		0
-CXXFLAGS+=	-I${HDRDIR} -I${LIBCXXRTDIR} -std=c++0x -nostdlib -DLIBCXXRT
+CXXFLAGS+=	-I${HDRDIR} -I${LIBCXXRTDIR} -std=c++0x -nostdlib -DLIBCXXRT -fPIC
 
 DPADD=		${LIBCXXRT}
 LDADD=		-lcxxrt

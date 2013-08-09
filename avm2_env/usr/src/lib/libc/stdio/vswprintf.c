@@ -4,6 +4,11 @@
  * Copyright (c) 1997 Todd C. Miller <Todd.Miller@courtesan.com>
  * All rights reserved.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -31,17 +36,18 @@
 #if 0
 __FBSDID("FreeBSD: src/lib/libc/stdio/vasprintf.c,v 1.16 2002/08/21 16:19:57 mike Exp ");
 #endif
-__FBSDID("$FreeBSD: src/lib/libc/stdio/vswprintf.c,v 1.7.2.2.2.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include "local.h"
+#include "xlocale_private.h"
 
 int
-vswprintf(wchar_t * __restrict s, size_t n, const wchar_t * __restrict fmt,
-    __va_list ap)
+vswprintf_l(wchar_t * __restrict s, size_t n, locale_t locale,
+		const wchar_t * __restrict fmt, __va_list ap)
 {
 	static const mbstate_t initial;
 	mbstate_t mbs;
@@ -49,6 +55,7 @@ vswprintf(wchar_t * __restrict s, size_t n, const wchar_t * __restrict fmt,
 	char *mbp;
 	int ret, sverrno;
 	size_t nwc;
+	FIX_LOCALE(locale);
 
 	if (n == 0) {
 		errno = EINVAL;
@@ -59,14 +66,16 @@ vswprintf(wchar_t * __restrict s, size_t n, const wchar_t * __restrict fmt,
 	f._bf._base = f._p = (unsigned char *)malloc(128);
 	if (f._bf._base == NULL) {
 		errno = ENOMEM;
+		*s = L'\0';
 		return (-1);
 	}
 	f._bf._size = f._w = 127;		/* Leave room for the NUL */
-	ret = __vfwprintf(&f, fmt, ap);
+	ret = __vfwprintf(&f, locale, fmt, ap);
 	if (ret < 0) {
 		sverrno = errno;
 		free(f._bf._base);
 		errno = sverrno;
+		*s = L'\0';
 		return (-1);
 	}
 	*f._p = '\0';
@@ -76,10 +85,11 @@ vswprintf(wchar_t * __restrict s, size_t n, const wchar_t * __restrict fmt,
 	 * fputwc() did in __vfwprintf().
 	 */
 	mbs = initial;
-	nwc = mbsrtowcs(s, (const char **)&mbp, n, &mbs);
+	nwc = mbsrtowcs_l(s, (const char **)&mbp, n, &mbs, locale);
 	free(f._bf._base);
 	if (nwc == (size_t)-1) {
 		errno = EILSEQ;
+		*s = L'\0';
 		return (-1);
 	}
 	if (nwc == n) {
@@ -89,4 +99,10 @@ vswprintf(wchar_t * __restrict s, size_t n, const wchar_t * __restrict fmt,
 	}
 
 	return (ret);
+}
+int
+vswprintf(wchar_t * __restrict s, size_t n, const wchar_t * __restrict fmt,
+    __va_list ap)
+{
+	return vswprintf_l(s, n, __get_locale(), fmt, ap);
 }

@@ -4,7 +4,7 @@
  */
 
 #include <machine/asm.h>
-__FBSDID("$FreeBSD: src/lib/msun/i387/s_copysignl.S,v 1.2.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $")
+__FBSDID("$FreeBSD$")
 
 ENTRY(copysignl)
 	movl	24(%esp),%edx
@@ -16,3 +16,5 @@ ENTRY(copysignl)
 	fldt	4(%esp)
 	ret
 END(copysignl)
+
+	.section .note.GNU-stack,"",%progbits

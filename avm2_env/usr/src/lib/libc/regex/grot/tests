@@ -1,5 +1,5 @@
 # regular expression test set
-# $FreeBSD: src/lib/libc/regex/grot/tests,v 1.3.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+# $FreeBSD$
 # Lines are at least three fields, separated by one or more tabs.  "" stands
 # for an empty field.  First field is an RE.  Second field is flags.  If
 # C flag given, regcomp() is expected to fail, and the third field is the
@@ -472,3 +472,6 @@ abcdefghijklmnop	i	abcdefghijklmnop	abcdefghijklmnop
 abcdefghijklmnopqrstuv	i	abcdefghijklmnopqrstuv	abcdefghijklmnopqrstuv
 (ALAK)|(ALT[AB])|(CC[123]1)|(CM[123]1)|(GAMC)|(LC[23][EO ])|(SEM[1234])|(SL[ES][12])|(SLWW)|(SLF )|(SLDT)|(VWH[12])|(WH[34][EW])|(WP1[ESN])	-	CC11	CC11
 CC[13]1|a{21}[23][EO][123][Es][12]a{15}aa[34][EW]aaaaaaa[X]a	-	CC11	CC11
+# PR 130504
+(.|())(b)	-	ab	ab
+(()|.)(b)	-	ab	ab

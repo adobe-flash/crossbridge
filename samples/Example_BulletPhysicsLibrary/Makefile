@@ -33,7 +33,7 @@ swc:
 	java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) build/Bullet.as
 
 	# Compile the SWIG C++ wrappers
-	cd build && PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" g++ $(EXTRA_OPTS) $(BASE_CFLAGS) -DBT_USE_DOUBLE_PRECISION -I../$(BULLETDIR)/src \
+	cd build && PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" clang++ $(EXTRA_OPTS) $(BASE_CFLAGS) -DBT_USE_DOUBLE_PRECISION -I../$(BULLETDIR)/src \
 	-Lsrc/BulletCollision -Lsrc/BulletDynamics -Lsrc/LinearMath -Lsrc/BulletMultiThreaded \
 	bullet_wrap.cxx -O4 -c
 
@@ -43,7 +43,7 @@ swc:
 	PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" nm build/bullet_wrap.o | grep " T " | awk '{print $$3}' | sed 's/__/_/' >> build/exports.txt
 
 	# Link the final library
-	cd build && PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" g++ $(EXTRA_OPTS) $(BASE_CFLAGS) -DBT_USE_DOUBLE_PRECISION -I../$(BULLETDIR)/src ../main.cpp \
+	cd build && PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" clang++ $(EXTRA_OPTS) $(BASE_CFLAGS) -DBT_USE_DOUBLE_PRECISION -I../$(BULLETDIR)/src ../main.cpp \
 	-Lsrc/BulletCollision -Lsrc/BulletDynamics -Lsrc/LinearMath -Lsrc/BulletMultiThreaded \
 	bullet_wrap.o Bullet.abc \
 	-Wl,--start-group \

@@ -34,7 +34,7 @@
 static char sccsid[] = "@(#)sysconf.c	8.2 (Berkeley) 3/20/94";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/sysconf.c,v 1.26.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/param.h>
 #include <sys/time.h>
@@ -42,6 +42,7 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/sysconf.c,v 1.26.2.1.6.1 2010/12/21 17:09:2
 #include <sys/resource.h>
 #include <sys/socket.h>
 
+#include <elf.h>
 #include <errno.h>
 #include <limits.h>
 #include <paths.h>
@@ -50,7 +51,8 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/sysconf.c,v 1.26.2.1.6.1 2010/12/21 17:09:2
 #include <unistd.h>
 
 #include "../stdlib/atexit.h"
-#include "../stdtime/tzfile.h"
+#include "tzfile.h"		/* from ../../../contrib/tzcode/stdtime */
+#include "libc_private.h"
 
 #define	_PATH_ZONEINFO	TZDIR	/* from tzfile.h */
 
@@ -585,6 +587,8 @@ yesno:
 
 	case _SC_NPROCESSORS_CONF:
 	case _SC_NPROCESSORS_ONLN:
+		if (_elf_aux_info(AT_NCPUS, &value, sizeof(value)) == 0)
+			return ((long)value);
 		mib[0] = CTL_HW;
 		mib[1] = HW_NCPU;
 		break;
@@ -595,6 +599,15 @@ yesno:
 		if (sysctlbyname("hw.availpages", &lvalue, &len, NULL, 0) == -1)
 			return (-1);
 		return (lvalue);
+#endif
+
+#ifdef _SC_CPUSET_SIZE
+	case _SC_CPUSET_SIZE:
+		len = sizeof(value);
+		if (sysctlbyname("kern.sched.cpusetsize", &value, &len, NULL,
+		    0) == -1)
+			return (-1);
+		return ((long)value);
 #endif
 
 	default:

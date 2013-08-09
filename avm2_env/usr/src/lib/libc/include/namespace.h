@@ -23,7 +23,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libc/include/namespace.h,v 1.24.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #ifndef _NAMESPACE_H_
@@ -80,6 +80,7 @@
 #define		listen				_listen
 #define		nanosleep			_nanosleep
 #define		open				_open
+#define		openat				_openat
 #define		poll				_poll
 #define		pthread_atfork			_pthread_atfork
 #define		pthread_attr_destroy		_pthread_attr_destroy
@@ -136,6 +137,7 @@
 #define		pthread_getprio			_pthread_getprio
 #define		pthread_getschedparam		_pthread_getschedparam
 #define		pthread_getspecific		_pthread_getspecific
+#define		pthread_getthreadid_np		_pthread_getthreadid_np
 #define		pthread_join			_pthread_join
 #define		pthread_key_create		_pthread_key_create
 #define		pthread_key_delete		_pthread_key_delete

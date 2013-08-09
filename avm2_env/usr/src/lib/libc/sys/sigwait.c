@@ -24,14 +24,12 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: release/9.1.0/lib/libc/sys/sigwait.c 212405 2010-09-10 01:47:37Z davidxu $");
+__FBSDID("$FreeBSD$");
 
 #include <errno.h>
 #include <signal.h>
 
 int __sys_sigwait(const sigset_t * restrict, int * restrict);
-
-__weak_reference(__sigwait, sigwait);
 
 int
 __sigwait(const sigset_t * restrict set, int * restrict sig)
@@ -44,3 +42,5 @@ __sigwait(const sigset_t * restrict set, int * restrict sig)
 	} while (ret == EINTR);
 	return (ret);
 }
+__weak_reference3(__sigwait, sigwait);
+

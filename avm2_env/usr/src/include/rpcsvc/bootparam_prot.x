@@ -49,7 +49,7 @@
 %/*static char sccsid[] = "from: @(#)bootparam_prot.x	2.1 88/08/01 4.0 RPCSRC";*/
 %#endif /* not lint */
 %#include <sys/cdefs.h>
-%__FBSDID("$FreeBSD: release/9.1.0/include/rpcsvc/bootparam_prot.x 114629 2003-05-04 02:51:42Z obrien $");
+%__FBSDID("$FreeBSD$");
 #endif
 
 const MAX_MACHINE_NAME  = 255;

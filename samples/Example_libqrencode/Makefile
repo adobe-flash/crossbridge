@@ -7,7 +7,7 @@ T10: check
 	cd libqrencode && "$(FLASCC)/usr/bin/swig" -as3  -I. -module QREncode -outdir . -includeall -ignoremissing as3api.h
 	cd libqrencode && java -jar $(call nativepath,$(FLASCC)/usr/lib/$(AS3COMPILER)) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) QREncode.as
 
-	cd libqrencode && "$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) $(OPT_CFLAGS) -DHAVE_CONFIG_H as3api_wrap.c bitstream.c mask.c mmask.c mqrspec.c qrencode.c qrinput.c qrspec.c rscode.c split.c QREncode.abc -emit-swc=sample.qrencode -o ../qrencode.swc $(EXTRACFLAGS)
+	cd libqrencode && "$(FLASCC)/usr/bin/clang" $(BASE_CFLAGS) $(OPT_CFLAGS) -DHAVE_CONFIG_H as3api_wrap.c bitstream.c mask.c mmask.c mqrspec.c qrencode.c qrinput.c qrspec.c rscode.c split.c QREncode.abc -emit-swc=sample.qrencode -o ../qrencode.swc $(EXTRACFLAGS)
 
 	@echo && echo "Compiling test app using SWC:"
 	"$(FLEX)/bin/mxmlc" -static-link-runtime-shared-libraries -library-path+=qrencode.swc qrencoder.mxml -debug=$(MXMLC_DEBUG) -o qrencoder.swf

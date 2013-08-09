@@ -43,7 +43,7 @@
 
 // Always include <clocale> first to avoid conflicts with the macros
 // used when ENABLE_NLS is not defined.
-#include <clocale>
+//#include <clocale>
 
 #ifdef ENABLE_NLS
 # include <libintl.h>

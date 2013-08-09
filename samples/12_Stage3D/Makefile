@@ -17,9 +17,9 @@ T12: check
 		Console.as -outdir . -out Console
 
 	java -jar $(call nativepath, $(FLASCC)/usr/lib/as3wig.jar) -i AGAL.abc -o AGAL
-	"$(FLASCC)/usr/bin/g++" AGAL.cpp -c -emit-llvm &> AGAL.txt
+	"$(FLASCC)/usr/bin/clang++" AGAL.cpp -c -emit-llvm &> AGAL.txt
 
-	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) -fllvm-llc-opt=-ascopt=-import -fllvm-llc-opt=-ascopt=$(call nativepath,AGAL.abc) -I. AGAL.o stage3d.cpp AGAL.abc -lAS3++ -lFlash++ \
+	"$(FLASCC)/usr/bin/clang++" $(BASE_CFLAGS) -fllvm-llc-opt=-ascopt=-import -fllvm-llc-opt=-ascopt=$(call nativepath,AGAL.abc) -I. AGAL.o stage3d.cpp AGAL.abc -lAS3++ -lFlash++ \
 		-O4 -flto-api=exports.txt -symbol-abc=Console.abc -swf-size=320x480 -emit-swf -o stage3d.swf
 
 	make SpaceTriangle
@@ -33,7 +33,7 @@ SpaceTriangle: check
 		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 		SpaceTriangle/Console.as -outdir SpaceTriangle -out Console
 
-	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) \
+	"$(FLASCC)/usr/bin/clang++" $(BASE_CFLAGS) \
 		-fllvm-llc-opt=-ascopt=-import \
 		-fllvm-llc-opt=-ascopt=$(call nativepath,AGAL.abc) \
 		-I. -ISpaceTriangle SpaceTriangle/*.cpp \

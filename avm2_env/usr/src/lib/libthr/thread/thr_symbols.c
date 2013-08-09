@@ -26,13 +26,13 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: src/lib/libthr/thread/thr_symbols.c,v 1.4.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+ * $FreeBSD$
  */
 
 #include <sys/types.h>
 #include <stddef.h>
 #include <pthread.h>
-// #include <rtld.h>
+#include <rtld.h>
 
 #include "thr_private.h"
 
@@ -43,8 +43,8 @@ int _thread_off_tcb = offsetof(struct pthread, tcb);
 int _thread_off_tid = offsetof(struct pthread, tid);
 int _thread_off_next = offsetof(struct pthread, tle.tqe_next);
 int _thread_off_attr_flags = offsetof(struct pthread, attr.flags);
-int _thread_off_linkmap = -1; // offsetof(Obj_Entry, linkmap);
-int _thread_off_tlsindex = -1; // offsetof(Obj_Entry, tlsindex);
+int _thread_off_linkmap = offsetof(Obj_Entry, linkmap);
+int _thread_off_tlsindex = offsetof(Obj_Entry, tlsindex);
 int _thread_off_report_events = offsetof(struct pthread, report_events);
 int _thread_off_event_mask = offsetof(struct pthread, event_mask);
 int _thread_off_event_buf = offsetof(struct pthread, event_buf);

@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: release/9.1.0/include/xlocale/_stdio.h 231673 2012-02-14 12:03:23Z theraven $
+ * $FreeBSD$
  */
 
 int	 asprintf_l(char **, locale_t, const char *, ...) __printflike(3, 4);

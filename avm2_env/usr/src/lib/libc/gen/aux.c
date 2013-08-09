@@ -25,7 +25,7 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: release/9.1.0/lib/libc/gen/aux.c 232388 2012-03-02 11:47:34Z kib $");
+__FBSDID("$FreeBSD$");
 
 #include "namespace.h"
 #include <elf.h>

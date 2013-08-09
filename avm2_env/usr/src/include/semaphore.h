@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: release/9.1.0/include/semaphore.h 201546 2010-01-05 02:37:59Z davidxu $
+ * $FreeBSD$
  */
 
 /* semaphore.h: POSIX 1003.1b semaphores */

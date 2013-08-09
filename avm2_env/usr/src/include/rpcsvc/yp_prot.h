@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: release/9.1.0/include/rpcsvc/yp_prot.h 153149 2005-12-06 02:01:06Z peter $
+ * $FreeBSD$
  */
 
 #ifndef _RPCSVC_YP_PROT_H_

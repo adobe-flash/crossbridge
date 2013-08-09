@@ -26,7 +26,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * $FreeBSD: release/9.1.0/lib/libc/locale/xlocale_private.h 235785 2012-05-22 14:40:39Z theraven $
+ * $FreeBSD$
  */
 
 #ifndef _XLOCALE_PRIVATE__H_
@@ -39,6 +39,8 @@
 #include <sys/types.h>
 #include <machine/atomic.h>
 #include "setlocale.h"
+
+#define __NO_TLS
 
 enum {
 	XLC_COLLATE = 0,

@@ -26,7 +26,7 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     @(#)setpgid.2	8.1 (Berkeley) 6/4/93
-.\" $FreeBSD: src/lib/libc/sys/setpgid.2,v 1.16.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
 .Dd February 8, 2004
 .Dt SETPGID 2
@@ -54,6 +54,11 @@ to the specified
 If
 .Fa pid
 is zero, then the call applies to the current process.
+If
+.Fa pgrp
+is zero, then the process id of the process specified by
+.Fa pid
+is used instead.
 .Pp
 If the affected process is not the invoking process, then it must be a
 child of the invoking process, it must not have performed an

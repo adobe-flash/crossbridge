@@ -25,20 +25,20 @@
  */
 
 #include <sys/cdefs.h>
-__FBSDID("$FreeBSD: src/lib/libc/gen/_thread_init.c,v 1.5.36.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <sys/types.h>
 
-
+void _thread_init_stub(void);
 
 int	_thread_autoinit_dummy_decl_stub = 0;
+
+__weak_reference3(_thread_init_stub, _thread_init);
+__weak_reference3(_thread_autoinit_dummy_decl_stub,
+    _thread_autoinit_dummy_decl);
 
 void
 _thread_init_stub(void)
 {
 	/* This is just a stub; there is nothing to do. */
 }
-
-__weak_reference3(_thread_init_stub, _thread_init);
-__weak_reference3(_thread_autoinit_dummy_decl_stub, _thread_autoinit_dummy_decl);
-

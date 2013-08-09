@@ -816,7 +816,7 @@ RValue CodeGenFunction::EmitBuiltinExpr(const FunctionDecl *FD,
 
     return RValue::get(0);
   }
-  /*case Builtin::BI__sync_fetch_and_add:
+  case Builtin::BI__sync_fetch_and_add:
   case Builtin::BI__sync_fetch_and_sub:
   case Builtin::BI__sync_fetch_and_or:
   case Builtin::BI__sync_fetch_and_and:
@@ -829,10 +829,10 @@ RValue CodeGenFunction::EmitBuiltinExpr(const FunctionDecl *FD,
   case Builtin::BI__sync_val_compare_and_swap:
   case Builtin::BI__sync_bool_compare_and_swap:
   case Builtin::BI__sync_lock_test_and_set:
-  case Builtin::BI__sync_lock_release:*/
+  case Builtin::BI__sync_lock_release:
   case Builtin::BI__sync_swap:
     llvm_unreachable("Shouldn't make it through sema");
-  /*case Builtin::BI__sync_fetch_and_add_1:
+  case Builtin::BI__sync_fetch_and_add_1:
   case Builtin::BI__sync_fetch_and_add_2:
   case Builtin::BI__sync_fetch_and_add_4:
   case Builtin::BI__sync_fetch_and_add_8:
@@ -861,7 +861,7 @@ RValue CodeGenFunction::EmitBuiltinExpr(const FunctionDecl *FD,
   case Builtin::BI__sync_fetch_and_xor_4:
   case Builtin::BI__sync_fetch_and_xor_8:
   case Builtin::BI__sync_fetch_and_xor_16:
-    return EmitBinaryAtomic(*this, llvm::AtomicRMWInst::Xor, E);*/
+    return EmitBinaryAtomic(*this, llvm::AtomicRMWInst::Xor, E);
 
   // Clang extensions: not overloaded yet.
   case Builtin::BI__sync_fetch_and_min:
@@ -873,7 +873,7 @@ RValue CodeGenFunction::EmitBuiltinExpr(const FunctionDecl *FD,
   case Builtin::BI__sync_fetch_and_umax:
     return EmitBinaryAtomic(*this, llvm::AtomicRMWInst::UMax, E);
 
-  /*case Builtin::BI__sync_add_and_fetch_1:
+  case Builtin::BI__sync_add_and_fetch_1:
   case Builtin::BI__sync_add_and_fetch_2:
   case Builtin::BI__sync_add_and_fetch_4:
   case Builtin::BI__sync_add_and_fetch_8:
@@ -962,7 +962,7 @@ RValue CodeGenFunction::EmitBuiltinExpr(const FunctionDecl *FD,
     // zext bool to int.
     Result = Builder.CreateZExt(Result, ConvertType(E->getType()));
     return RValue::get(Result);
-  }*/
+  }
 
   case Builtin::BI__sync_swap_1:
   case Builtin::BI__sync_swap_2:
@@ -971,14 +971,14 @@ RValue CodeGenFunction::EmitBuiltinExpr(const FunctionDecl *FD,
   case Builtin::BI__sync_swap_16:
     return EmitBinaryAtomic(*this, llvm::AtomicRMWInst::Xchg, E);
 
-  /*case Builtin::BI__sync_lock_test_and_set_1:
+  case Builtin::BI__sync_lock_test_and_set_1:
   case Builtin::BI__sync_lock_test_and_set_2:
   case Builtin::BI__sync_lock_test_and_set_4:
   case Builtin::BI__sync_lock_test_and_set_8:
   case Builtin::BI__sync_lock_test_and_set_16:
-    return EmitBinaryAtomic(*this, llvm::AtomicRMWInst::Xchg, E);*/
+    return EmitBinaryAtomic(*this, llvm::AtomicRMWInst::Xchg, E);
 
-  /*case Builtin::BI__sync_lock_release_1:
+  case Builtin::BI__sync_lock_release_1:
   case Builtin::BI__sync_lock_release_2:
   case Builtin::BI__sync_lock_release_4:
   case Builtin::BI__sync_lock_release_8:
@@ -1006,7 +1006,7 @@ RValue CodeGenFunction::EmitBuiltinExpr(const FunctionDecl *FD,
     // semantics.
     Builder.CreateFence(llvm::SequentiallyConsistent);
     return RValue::get(0);
-  }*/
+  }
 
   case Builtin::BI__c11_atomic_is_lock_free:
   case Builtin::BI__atomic_is_lock_free: {

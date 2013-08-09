@@ -30,7 +30,7 @@
 .\" SUCH DAMAGE.
 .\"
 .\"     @(#)getenv.3	8.2 (Berkeley) 12/11/93
-.\" $FreeBSD: src/lib/libc/stdlib/getenv.3,v 1.27.10.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+.\" $FreeBSD$
 .\"
 .Dd June 20, 2007
 .Dt GETENV 3
@@ -107,6 +107,15 @@ function
 deletes all instances of the variable name pointed to by
 .Fa name
 from the list.
+.Pp
+If corruption (e.g., a name without a value) is detected while making a copy of
+environ for internal usage, then
+.Fn setenv ,
+.Fn unsetenv
+and
+.Fn putenv
+will output a warning to stderr about the issue, drop the corrupt entry and
+complete the task without error.
 .Sh RETURN VALUES
 The
 .Fn getenv
@@ -143,7 +152,8 @@ failed because
 is a
 .Dv NULL
 pointer,
-.Fa string is without an
+.Fa string
+is without an
 .Dq Li \&=
 character or
 .Dq Li \&=
@@ -159,15 +169,6 @@ The function
 or
 .Fn putenv
 failed because they were unable to allocate memory for the environment.
-.It Bq Er EFAULT
-The functions
-.Fn setenv ,
-.Fn unsetenv
-or
-.Fn putenv
-failed to make a valid copy of the environment due to the environment being
-corrupt (i.e., a name without a value).  A warning will be output to stderr with
-information about the issue.
 .El
 .Sh SEE ALSO
 .Xr csh 1 ,
@@ -201,7 +202,7 @@ function appeared in
 Until
 .Fx 7.0 ,
 .Fn putenv
-would make a copy of 
+would make a copy of
 .Fa string
 and insert it into the environment using
 .Fn setenv .

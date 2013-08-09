@@ -1,4 +1,4 @@
-$ $FreeBSD: src/lib/libc/nls/uk_UA.UTF-8.msg,v 1.1.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $
+$ $FreeBSD$
 $
 $ Message catalog for uk_UA.UTF-8 locale
 $
@@ -181,6 +181,16 @@ $ ENOATTR
 87 Атрибут не знайдено
 $ EDOOFUS
 88 Помилка програмування
+$ EBADMSG
+89 Поганий формат повідомлення
+$ EMULTIHOP XXX
+90 Спроба мултіхопу
+$ ENOLINK
+91 Мережовий канал розірвано
+$ EPROTO
+92 Помилка протоколу
+$ ENOTCAPABLE
+93 Можливості недостатні
 $
 $ strsignal() support catalog
 $

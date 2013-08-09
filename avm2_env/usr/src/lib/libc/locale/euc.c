@@ -6,6 +6,11 @@
  * This code is derived from software contributed to Berkeley by
  * Paul Borman at Krystal Technologies.
  *
+ * Copyright (c) 2011 The FreeBSD Foundation
+ * All rights reserved.
+ * Portions of this software were developed by David Chisnall
+ * under sponsorship from the FreeBSD Foundation.
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -39,7 +44,7 @@
 static char sccsid[] = "@(#)euc.c	8.1 (Berkeley) 6/4/93";
 #endif /* LIBC_SCCS and not lint */
 #include <sys/param.h>
-__FBSDID("$FreeBSD: src/lib/libc/locale/euc.c,v 1.22.2.1.6.1 2010/12/21 17:09:25 kensmith Exp $");
+__FBSDID("$FreeBSD$");
 
 #include <errno.h>
 #include <limits.h>
@@ -70,7 +75,7 @@ typedef struct {
 } _EucState;
 
 int
-_EUC_init(_RuneLocale *rl)
+_EUC_init(struct xlocale_ctype *l, _RuneLocale *rl)
 {
 	_EucInfo *ei;
 	int x, new__mb_cur_max;
@@ -113,12 +118,12 @@ _EUC_init(_RuneLocale *rl)
 	}
 	rl->__variable = ei;
 	rl->__variable_len = sizeof(_EucInfo);
-	_CurrentRuneLocale = rl;
-	__mb_cur_max = new__mb_cur_max;
-	__mbrtowc = _EUC_mbrtowc;
-	__wcrtomb = _EUC_wcrtomb;
-	__mbsinit = _EUC_mbsinit;
-	__mb_sb_limit = 256;
+	l->runes = rl;
+	l->__mb_cur_max = new__mb_cur_max;
+	l->__mbrtowc = _EUC_mbrtowc;
+	l->__wcrtomb = _EUC_wcrtomb;
+	l->__mbsinit = _EUC_mbsinit;
+	l->__mb_sb_limit = 256;
 	return (0);
 }
 

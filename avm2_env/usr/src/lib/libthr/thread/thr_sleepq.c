@@ -23,7 +23,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: release/9.1.0/lib/libthr/thread/thr_sleepq.c 216642 2010-12-22 05:03:24Z davidxu $
+ * $FreeBSD$
  */
 
 #include <stdlib.h>
