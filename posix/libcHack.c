@@ -1136,6 +1136,11 @@ void atomic_add_int(volatile unsigned *p, unsigned v)
   __sync_fetch_and_add((unsigned *)p, v);
 }
 
+void atomic_add_long(volatile long *p, long v)
+{
+  __sync_fetch_and_add_4((unsigned *)p, v);
+}
+
 void atomic_store_rel_int(volatile unsigned *p, unsigned v)
 {
 //TODO is this right?
@@ -2645,4 +2650,7 @@ int	getpeername(int a, struct sockaddr * __restrict b , socklen_t * __restrict c
   return -1;
 }
 
-
+int __flt_rounds(void)
+{
+  return 1;
+}
