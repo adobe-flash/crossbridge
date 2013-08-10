@@ -63,7 +63,7 @@ struct region_descriptor;
 #define writew(va, d)	(*(volatile uint16_t *) (va) = (d))
 #define writel(va, d)	(*(volatile uint32_t *) (va) = (d))
 
-#if defined(__GNUCLIKE_ASM) && defined(__CC_SUPPORTS___INLINE)
+#if defined(__GNUCLIKE_ASM) && defined(__CC_SUPPORTS___INLINE) && !defined(__AVM2__)
 
 static __inline void
 breakpoint(void)

@@ -108,6 +108,7 @@ public:
     /// getFunctionAlignment - Return the Log2 alignment of this function.
     virtual unsigned int getFunctionAlignment(const llvm::Function*) const;
     virtual bool allowsUnalignedMemoryAccesses(EVT VT) const;
+    virtual bool ExpandInlineAsm(CallInst *CI) const;
 };
 } // end namespace llvm
 

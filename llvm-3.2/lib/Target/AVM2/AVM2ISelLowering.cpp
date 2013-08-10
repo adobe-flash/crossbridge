@@ -36,6 +36,7 @@ static const char AdobeInternalCode[] __attribute__((used)) = "This File contain
 #include "llvm/Function.h"
 #include "llvm/Intrinsics.h"
 #include "llvm/CodeGen/CallingConvLower.h"
+#include "llvm/CodeGen/IntrinsicLowering.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
 #include "llvm/CodeGen/MachineFunction.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
@@ -44,6 +45,8 @@ static const char AdobeInternalCode[] __attribute__((used)) = "This File contain
 #include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
 #include "llvm/MC/MCAsmInfo.h"
 #include "llvm/ADT/SmallString.h"
+#include "llvm/ADT/StringExtras.h"
+#include "llvm/ADT/VariadicFunction.h"
 
 #include <stdio.h>
 
@@ -216,7 +219,18 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
     setOperationAction(ISD::FMA, MVT::i32, Expand);
     setOperationAction(ISD::FMA, MVT::i64, Expand);
     setOperationAction(ISD::ATOMIC_FENCE, MVT::Other, Expand);
-
+    setOperationAction(ISD::ATOMIC_SWAP, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_CMP_SWAP, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_LOAD_ADD, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_LOAD_AND, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_LOAD_MAX, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_LOAD_MIN, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_LOAD_NAND, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_LOAD_OR, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_LOAD_SUB, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_LOAD_UMAX, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_LOAD_UMIN, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_LOAD_XOR, MVT::i32, Expand);
     /*
      http://llvm.org/viewvc/llvm-project?view=rev&revision=78142
      Major calling convention code refactoring.
@@ -280,7 +294,8 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
     // Add an extra underscore to the libcall names
     for(unsigned int i=0; i<RTLIB::UNKNOWN_LIBCALL; i++) {
         const char *nm = getLibcallName((RTLIB::Libcall)i);
-        if(!nm || strncmp(nm, "mem", 3) == 0)
+        if(!nm || strncmp(nm, "mem", 3) == 0
+           || strncmp(nm, "sync", 4) == 0)
             continue;
         int sz = strlen(nm);
         char *newstr = new char[sz+2];
@@ -1291,5 +1306,112 @@ const TargetSubtargetInfo* AVM2TargetLowering::getSubtarget()
 bool AVM2TargetLowering::allowsUnalignedMemoryAccesses(EVT VT) const
 {
     return true;
+}
+
+namespace {
+  // Helper to match a string separated by whitespace.
+  bool matchAsmImpl(StringRef s, ArrayRef<const StringRef *> args) {
+    s = s.substr(s.find_first_not_of(" \t")); // Skip leading whitespace.
+    
+    for (unsigned i = 0, e = args.size(); i != e; ++i) {
+      StringRef piece(*args[i]);
+      if (!s.startswith(piece)) // Check if the piece matches.
+        return false;
+      
+      s = s.substr(piece.size());
+      StringRef::size_type pos = s.find_first_not_of(" \t");
+      if (pos == 0) // We matched a prefix.
+        return false;
+      
+      s = s.substr(pos);
+    }
+    
+    return s.empty();
+  }
+  const VariadicFunction1<bool, StringRef, StringRef, matchAsmImpl> matchAsm={};
+}
+
+bool AVM2TargetLowering::ExpandInlineAsm(CallInst *CI) const {
+  InlineAsm *IA = cast<InlineAsm>(CI->getCalledValue());
+  
+  std::string AsmStr = IA->getAsmString();
+  
+  IntegerType *Ty = dyn_cast<IntegerType>(CI->getType());
+  if (!Ty || Ty->getBitWidth() % 16 != 0)
+    return false;
+  
+  // TODO: should remove alternatives from the asmstring: "foo {a|b}" -> "foo a"
+  SmallVector<StringRef, 4> AsmPieces;
+  SplitString(AsmStr, AsmPieces, ";\n");
+  
+  switch (AsmPieces.size()) {
+    default: return false;
+    case 1:
+      // FIXME: this should verify that we are targeting a 486 or better.  If not,
+      // we will turn this bswap into something that will be lowered to logical
+      // ops instead of emitting the bswap asm.  For now, we don't support 486 or
+      // lower so don't worry about this.
+      // bswap $0
+      if (matchAsm(AsmPieces[0], "bswap", "$0") ||
+          matchAsm(AsmPieces[0], "bswapl", "$0") ||
+          matchAsm(AsmPieces[0], "bswapq", "$0") ||
+          matchAsm(AsmPieces[0], "bswap", "${0:q}") ||
+          matchAsm(AsmPieces[0], "bswapl", "${0:q}") ||
+          matchAsm(AsmPieces[0], "bswapq", "${0:q}")) {
+        // No need to check constraints, nothing other than the equivalent of
+        // "=r,0" would be valid here.
+        return IntrinsicLowering::LowerToByteSwap(CI);
+      }
+      
+      // rorw $$8, ${0:w}  -->  llvm.bswap.i16
+      if (CI->getType()->isIntegerTy(16) &&
+          IA->getConstraintString().compare(0, 5, "=r,0,") == 0 &&
+          (matchAsm(AsmPieces[0], "rorw", "$$8,", "${0:w}") ||
+           matchAsm(AsmPieces[0], "rolw", "$$8,", "${0:w}"))) {
+            AsmPieces.clear();
+            const std::string &ConstraintsStr = IA->getConstraintString();
+            SplitString(StringRef(ConstraintsStr).substr(5), AsmPieces, ",");
+            std::sort(AsmPieces.begin(), AsmPieces.end());
+            if (AsmPieces.size() == 4 &&
+                AsmPieces[0] == "~{cc}" &&
+                AsmPieces[1] == "~{dirflag}" &&
+                AsmPieces[2] == "~{flags}" &&
+                AsmPieces[3] == "~{fpsr}")
+              return IntrinsicLowering::LowerToByteSwap(CI);
+          }
+      break;
+    case 3:
+      if (CI->getType()->isIntegerTy(32) &&
+          IA->getConstraintString().compare(0, 5, "=r,0,") == 0 &&
+          matchAsm(AsmPieces[0], "rorw", "$$8,", "${0:w}") &&
+          matchAsm(AsmPieces[1], "rorl", "$$16,", "$0") &&
+          matchAsm(AsmPieces[2], "rorw", "$$8,", "${0:w}")) {
+        AsmPieces.clear();
+        const std::string &ConstraintsStr = IA->getConstraintString();
+        SplitString(StringRef(ConstraintsStr).substr(5), AsmPieces, ",");
+        std::sort(AsmPieces.begin(), AsmPieces.end());
+        if (AsmPieces.size() == 4 &&
+            AsmPieces[0] == "~{cc}" &&
+            AsmPieces[1] == "~{dirflag}" &&
+            AsmPieces[2] == "~{flags}" &&
+            AsmPieces[3] == "~{fpsr}")
+          return IntrinsicLowering::LowerToByteSwap(CI);
+      }
+      
+      if (CI->getType()->isIntegerTy(64)) {
+        InlineAsm::ConstraintInfoVector Constraints = IA->ParseConstraints();
+        if (Constraints.size() >= 2 &&
+            Constraints[0].Codes.size() == 1 && Constraints[0].Codes[0] == "A" &&
+            Constraints[1].Codes.size() == 1 && Constraints[1].Codes[0] == "0") {
+          // bswap %eax / bswap %edx / xchgl %eax, %edx  -> llvm.bswap.i64
+          if (matchAsm(AsmPieces[0], "bswap", "%eax") &&
+              matchAsm(AsmPieces[1], "bswap", "%edx") &&
+              matchAsm(AsmPieces[2], "xchgl", "%eax,", "%edx"))
+            return IntrinsicLowering::LowerToByteSwap(CI);
+        }
+      }
+      break;
+  }
+  return false;
 }
 

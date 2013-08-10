@@ -228,7 +228,11 @@
 #if defined(__cplusplus) && __cplusplus >= 201103L
 #define	_Alignas(e)		alignas(e)
 #define	_Alignof(e)		alignof(e)
+#ifdef __AVM2__
+#define	_Noreturn
+#else
 #define	_Noreturn		[[noreturn]]
+#endif
 #define	_Static_assert(e, s)	static_assert(e, s)
 /* FIXME: change this to thread_local when clang in base supports it */
 #define	_Thread_local		__thread
@@ -238,7 +242,11 @@
 /* Not supported.  Implement them using our versions. */
 #define	_Alignas(x)		__aligned(x)
 #define	_Alignof(x)		__alignof(x)
+#ifdef __AVM2__
+#define	_Noreturn
+#else
 #define	_Noreturn		__dead2
+#endif
 #define	_Thread_local		__thread
 #ifdef __COUNTER__
 #define	_Static_assert(x, y)	__Static_assert(x, __COUNTER__)
@@ -530,7 +538,11 @@
 #endif /* __AVM2__ */
 #endif	/* __GNUC__ || __INTEL_COMPILER */
 
+#ifdef __AVM2__
+#define	__GLOBL1(sym)
+#else
 #define	__GLOBL1(sym)	__asm__(".globl " #sym)
+#endif
 #define	__GLOBL(sym)	__GLOBL1(sym)
 
 #if defined(__GNUC__) || defined(__INTEL_COMPILER)
@@ -730,7 +742,7 @@
 #define	__has_builtin(x) 0
 #endif
 
-#if defined(__mips) || defined(__powerpc64__) || defined(__arm__)
+#if defined(__mips) || defined(__powerpc64__) || defined(__arm__) || defined(__AVM2__)
 #define __NO_TLS 1
 #endif
 
