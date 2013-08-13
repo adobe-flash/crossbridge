@@ -36,6 +36,9 @@ CANCELPOINTS_CFLAGS=-fexceptions
 CFLAGS+=${CANCELPOINTS_CFLAGS}
 .endif
 
+.if ${LIBC_ARCH} == "avm2"
+CFLAGS+=-x c
+.endif
 #
 # Only link with static libgcc.a (no libgcc_eh.a).
 #

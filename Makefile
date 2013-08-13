@@ -53,6 +53,7 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?BUILD=$(WIN_BUILD)
 	$?PLATFORM_NAME=win
 	$?HOST_TRIPLE=i686-pc-cygwin
+	$?JAVA=$(call nativepath,'$(shell which java)')
 else
 	$?EXEEXT=
 	$?SOEXT=.dylib
@@ -63,13 +64,13 @@ else
 	$?BUILD=$(MAC_BUILD)
 	$?PLATFORM_NAME=mac
 	$?HOST_TRIPLE=x86_64-apple-darwin10
+	$?JAVA=$(call nativepath,$(shell which java))
 	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
 
 ESCAPED_SRCROOT=$(shell echo $(SRCROOT) | sed -e 's/[\/&]/\\&/g')
 $?BUILD_FOLDER="builds"
 $?FTP_HOST=
-$?JAVA=$(call nativepath,'$(shell which java)')
 $?JAVAFLAGS=
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?LN=ln -sfn
