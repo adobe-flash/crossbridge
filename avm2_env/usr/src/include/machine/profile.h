@@ -110,7 +110,7 @@ void user(void);
 
 #define	_MCOUNT_DECL static __inline void _mcount
 
-#ifdef __GNUCLIKE_ASM
+#if defined(__GNUCLIKE_ASM) && !defined(__AVM2__)
 #define	MCOUNT								\
 void									\
 mcount()								\
