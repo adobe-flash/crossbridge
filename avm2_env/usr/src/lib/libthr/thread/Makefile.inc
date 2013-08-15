@@ -18,7 +18,6 @@ SRCS+= \
 	thr_equal.c \
 	thr_event.c \
 	thr_exit.c \
-	thr_fork.c \
 	thr_getprio.c \
 	thr_getcpuclockid.c \
 	thr_getschedparam.c \
@@ -37,7 +36,6 @@ SRCS+= \
 	thr_printf.c \
 	thr_pspinlock.c \
 	thr_resume_np.c \
-	thr_rtld.c \
 	thr_rwlock.c \
 	thr_rwlockattr.c \
 	thr_self.c \

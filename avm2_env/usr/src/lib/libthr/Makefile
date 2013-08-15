@@ -29,6 +29,9 @@ CFLAGS+=-Winline
 .ifndef NO_THREAD_UNWIND_STACK
 CFLAGS+=-fexceptions
 CFLAGS+=-D_PTHREAD_FORCED_UNWIND
+.if ${MACHINE_ARCH} == "avm2"
+CFLAGS+=-DPIC
+.endif
 .endif
 
 LDFLAGS+=-Wl,-znodelete

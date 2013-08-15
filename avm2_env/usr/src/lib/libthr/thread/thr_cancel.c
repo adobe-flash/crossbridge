@@ -152,7 +152,7 @@ _thr_cancel_enter(struct pthread *curthread)
         if (__predict_false((curthread->flags &
             (THR_FLAGS_NEED_SUSPEND | THR_FLAGS_SUSPENDED))
                 == THR_FLAGS_NEED_SUSPEND))
-                _thr_suspend_check(curthread);
+                check_suspend(curthread);
 #endif
 }
 
