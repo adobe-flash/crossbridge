@@ -6041,6 +6041,10 @@ void avm2::Link::ConstructJob(Compilation &C, const JobAction &JA,
         (postfix + "libcHack.o").c_str())));
     CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath(
         (postfix + "libm.o").c_str())));
+    if (Args.hasArg(options::OPT_pthread)) {
+      CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath(
+          (postfix + "libthr.a").c_str())));
+    }
     CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath(
         (postfix + "libc.a").c_str())));
   }

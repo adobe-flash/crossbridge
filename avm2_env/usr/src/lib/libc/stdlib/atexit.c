@@ -149,7 +149,7 @@ __cxa_atexit(void (*func)(void *), void *arg, void *dso)
 }
 
 #pragma weak __pthread_cxa_finalize
-void __pthread_cxa_finalize(const struct dl_phdr_info *);
+void __pthread_cxa_finalize(const struct dl_phdr_info * i){}
 
 /*
  * Call all handlers registered with __cxa_atexit for the shared

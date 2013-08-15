@@ -291,19 +291,6 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
 
     setOperationAction(ISD::MEMBARRIER,        MVT::Other,   Expand);
 
-    // Add an extra underscore to the libcall names
-    for(unsigned int i=0; i<RTLIB::UNKNOWN_LIBCALL; i++) {
-        const char *nm = getLibcallName((RTLIB::Libcall)i);
-        if(!nm || strncmp(nm, "mem", 3) == 0
-           || strncmp(nm, "sync", 4) == 0)
-            continue;
-        int sz = strlen(nm);
-        char *newstr = new char[sz+2];
-        newstr[0] = '_';
-        strcpy(&newstr[1], nm);
-        setLibcallName((RTLIB::Libcall)i, newstr);
-    }
-
     setLibcallName(RTLIB::UNWIND_RESUME, "_Unwind_SjLj_Resume");
     computeRegisterProperties();
 }

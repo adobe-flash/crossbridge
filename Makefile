@@ -141,7 +141,7 @@ export CCACHE_DIR=$(SRCROOT)/ccache
 BMAKE+= AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true 
 BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-builtin -DSTRIP_FBSDID " 
 BMAKE+= CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm -fno-builtin -DSTRIP_FBSDID "
-BMAKE+= MAKEFLAGS="" MFLAGS="" MK_ICONV=
+BMAKE+= MAKEFLAGS="" MFLAGS="" MK_ICONV= WITHOUT_PROFILE=
 BMAKE+= MACHINE_ARCH=avm2 MACHINE_CPUARCH=AVM2 NO_WERROR=true SSP_CFLAGS=
 BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 
@@ -597,6 +597,24 @@ abcflashpp:
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvmopt=-Xmx4G -jvm="$(JAVA)" -falcon-parallel -target-player -filetype=obj $(BUILD)/as3wig/Flash++.o -o $(BUILD)/as3wig/Flash++.abc
 	$(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libFlash++.a $(BUILD)/as3wig/Flash++.abc
 
+libthr.abc:
+	mkdir -p $(BUILD)/libthr_abc
+	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
+	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
+
+libc.abc:
+	mkdir -p $(BUILD)/libc_abc
+	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc.a
+	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
+
+single.abc:
+	mkdir -p $(SDK)/usr/lib/stdlibs_abc
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libm.o -o $(SDK)/usr/lib/stdlibs_abc/libm.o
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
+
 abcstdlibs_more:
 	mkdir -p $(SDK)/usr/lib/stdlibs_abc
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
@@ -618,6 +636,7 @@ ifneq (,$(findstring 2.9,$(LLVMVERSION)))
 	cd $(BUILD)/libgcc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libgcc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libgcc.a
 
+
 	mkdir -p $(BUILD)/libstdcpp_abc
 	cd $(BUILD)/libstdcpp_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libstdc++.a
 	cd $(BUILD)/libstdcpp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
@@ -637,6 +656,12 @@ endif
 	cd $(BUILD)/libBlocksRuntime_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libBlocksRuntime.a
 	cd $(BUILD)/libBlocksRuntime_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libBlocksRuntime_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libBlocksRuntime.a
+
+libcxx.abc:
+	mkdir -p $(BUILD)/libcxx_abc
+	cd $(BUILD)/libcxx_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc++.a
+	cd $(BUILD)/libcxx_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libcxx_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc++.a
 
 extralibs:
 	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng libsdl dmalloc libffi
@@ -750,28 +775,12 @@ libthr:
 	cd $(BUILD)/libthr/libthr && rm -f libthr.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libthr.a
 	cp -f $(BUILD)/libthr/libthr/libthr.a $(SDK)/usr/lib/.
 
-.PHONY: libcxxrt
-libcxxrt:
-	rm -rf $(BUILD)/libcxxrt
-	ditto $(SRCROOT)/libcxxrt $(BUILD)/libcxxrt
-	cd $(BUILD)/libcxxrt/src && CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -I $(SRCROOT)/posix -fPIC -emit-llvm" AR="$(AR)" $(MAKE) -f Makefile
-	
 .PHONY: libcxx
 libcxx:
-	rm -rf $(BUILD)/libcxx
-	ditto $(SRCROOT)/libcxx $(BUILD)/libcxx
-	cd $(BUILD)/libcxx/lib &&  CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm" CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm" \
-		CFLAGS="-I$(SRCROOT)/avm2_env/usr/include" CXXFLAGS="-I$(SRCROOT)/avm2_env/usr/include" ./buildit
-	cd $(BUILD)/libcxx/lib &&  $(AR) libc++.a *.o
-	#cd $(BUILD)/libcxx && CC="$(SDK)/usr/bin/$(FLASCC_CC) -fPIC " CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -fPIC " cmake -G "Unix Makefiles" \
-	cd $(BUILD)/libcxx && PATH=$(SDK)/usr/bin CC="clang" CXX="clang++" CFLAGS="-fPIC -emit-llvm" CXXFLAGS="-fPIC -emit-llvm" \
-		cmake -G "Unix Makefiles" -DLIBCXX_CXX_ABI=libcxxrt -DLIBCXX_LIBCXXRT_INCLUDE_PATHS="$(SRCROOT)/libcxxrt/src"  \
-
-	#cd $(BUILD)/libcxx && PATH=$(SDK)/usr/bin  CFLAGS="-nostdlib -fPIC -emit-llvm" CXXFLAGS="-nostdlib -fPIC -emit-llvm" \
-		$(CMAKE) -G "Unix Makefiles" -DLIBCXX_CXX_ABI=libcxxrt  \
-		-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
-		-DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(BUILD)/libcxx/install $(SRCROOT)/libcxx
-	#cd $(BUILD)/libcxx && make -j $(THREADS) && make install
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(BMAKE) clean && $(BMAKE) libcxxrt.a && cp *.o ../libc++
+	cd $(BUILD)/lib/src/lib/libc++ && $(BMAKE) clean && $(BMAKE) libc++.a 
+	cd $(BUILD)/lib/src/lib/libc++ && $(AR) libc++.a *.o && cp libc++.a $(SDK)/usr/lib/.
 
 libobjc_configure:
 	cd $(BUILD)/llvm-gcc-42 \

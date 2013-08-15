@@ -50,6 +50,60 @@ extern void avm2_mfence();
 
 #define MIN_TID 8 // minimum viable bsd thread id
 
+// FIXME Look stupid. Refactor in future.
+#ifdef __clang__
+#define __sync_synchronize _sync_synchronize
+#define __sync_val_compare_and_swap_4 _sync_val_compare_and_swap_4
+#define __sync_val_compare_and_swap_2 _sync_val_compare_and_swap_2
+#define __sync_val_compare_and_swap_1 _sync_val_compare_and_swap_1
+#define __sync_bool_compare_and_swap_1 _sync_bool_compare_and_swap_1
+#define __sync_bool_compare_and_swap_2 _sync_bool_compare_and_swap_2
+#define __sync_bool_compare_and_swap_4 _sync_bool_compare_and_swap_4
+#define __sync_lock_test_and_set_4 _sync_lock_test_and_set_4
+#define __sync_lock_test_and_set_2 _sync_lock_test_and_set_2
+#define __sync_lock_test_and_set_1 _sync_lock_test_and_set_1
+#define __sync_lock_release_4 _sync_lock_release_4
+#define __sync_lock_release_2 _sync_lock_release_2
+#define __sync_lock_release_1 _sync_lock_release_1
+#define __sync_fetch_and_add_1 _sync_fetch_and_add_1
+#define __sync_fetch_and_add_2 _sync_fetch_and_add_2
+#define __sync_fetch_and_add_4 _sync_fetch_and_add_4
+#define __sync_add_and_fetch_1 _sync_add_and_fetch_1
+#define __sync_add_and_fetch_2 _sync_add_and_fetch_2
+#define __sync_add_and_fetch_4 _sync_add_and_fetch_4
+#define __sync_fetch_and_sub_1 _sync_fetch_and_sub_1
+#define __sync_fetch_and_sub_2 _sync_fetch_and_sub_2
+#define __sync_fetch_and_sub_4 _sync_fetch_and_sub_4
+#define __sync_sub_and_fetch_1 _sync_sub_and_fetch_1
+#define __sync_sub_and_fetch_2 _sync_sub_and_fetch_2
+#define __sync_sub_and_fetch_4 _sync_sub_and_fetch_4
+#define __sync_fetch_and_or_1 _sync_fetch_and_or_1
+#define __sync_fetch_and_or_2 _sync_fetch_and_or_2
+#define __sync_fetch_and_or_4 _sync_fetch_and_or_4
+#define __sync_or_and_fetch_1 _sync_or_and_fetch_1
+#define __sync_or_and_fetch_2 _sync_or_and_fetch_2
+#define __sync_or_and_fetch_4 _sync_or_and_fetch_4
+#define __sync_fetch_and_xor_1 _sync_fetch_and_xor_1
+#define __sync_fetch_and_xor_2 _sync_fetch_and_xor_2
+#define __sync_fetch_and_xor_4 _sync_fetch_and_xor_4
+#define __sync_xor_and_fetch_1 _sync_xor_and_fetch_1
+#define __sync_xor_and_fetch_2 _sync_xor_and_fetch_2
+#define __sync_xor_and_fetch_4 _sync_xor_and_fetch_4
+#define __sync_fetch_and_and_1 _sync_fetch_and_and_1
+#define __sync_fetch_and_and_2 _sync_fetch_and_and_2
+#define __sync_fetch_and_and_4 _sync_fetch_and_and_4
+#define __sync_and_and_fetch_1 _sync_and_and_fetch_1
+#define __sync_and_and_fetch_2 _sync_and_and_fetch_2
+#define __sync_and_and_fetch_4 _sync_and_and_fetch_4
+#define __sync_fetch_and_nand_1 _sync_fetch_and_nand_1
+#define __sync_fetch_and_nand_2 _sync_fetch_and_nand_2
+#define __sync_fetch_and_nand_4 _sync_fetch_and_nand_4
+#define __sync_nand_and_fetch_1 _sync_nand_and_fetch_1
+#define __sync_nand_and_fetch_2 _sync_nand_and_fetch_2
+#define __sync_nand_and_fetch_4 _sync_nand_and_fetch_4
+#endif
+
+
 // have we created any threads? not exactly the same as __isthreaded (which is for pthreads)
 static bool sIsThreaded = false;
 
@@ -722,8 +776,8 @@ int sigaction(int x, const void *y, void *z) __attribute__((weak, alias("__sys_s
 int _sigaction(int x, const void *y, void *z) __attribute__((weak, alias("__sys_sigaction")));
 
 static char __avm2_ostype[] = "FreeBSD";
-static char __avm2_osrelease[] = "8.1-RELEASE";
-static char __avm2_version[] = "FreeBSD 8.1-RELEASE";
+static char __avm2_osrelease[] = "9.1-RELEASE";
+static char __avm2_version[] = "FreeBSD 9.1-RELEASE";
 static char __avm2_hostname[] = "flascc.example.com";
 static char __avm2_machine[] = "avm2";
 
@@ -942,16 +996,6 @@ bool __sync_bool_compare_and_swap_4(unsigned int *ptr, unsigned int oldval, unsi
   return __sync_val_compare_and_swap_4(ptr, oldval, newval) == oldval;
 }
 
-bool __sync_bool_compare_and_swap(unsigned int *ptr, unsigned int oldval, unsigned int newval)
-{
-  return __sync_bool_compare_and_swap_4(ptr, oldval, newval);
-}
-
-unsigned int __sync_val_compare_and_swap(unsigned int *ptr, unsigned int oldval, unsigned int newval)
-{
-  return __sync_val_compare_and_swap_4(ptr,oldval,newval);
-}
-
 
 // TODO: CAS on non 32bit values is broken right now, we should disable it properly in the frontend at some point
 bool __sync_bool_compare_and_swap_2(unsigned short *ptr, unsigned short oldval, unsigned short newval)
@@ -994,11 +1038,12 @@ void __sync_synchronize()
 
 /* TODO -- better way to do this? LLVM generates a symbol to "__sync_synchronize" directly, bypassing "libcalls" (where we add an underscore to these
 kind of calls... so, add another with one less underscore...
-*/
+
 void _sync_synchronize()
 {
   mfence();
 }
+*/
 
 unsigned int __sync_lock_test_and_set_4(unsigned int *ptr, unsigned int newval)
 {
@@ -1054,6 +1099,23 @@ void __sync_lock_release_1(unsigned char *ptr)
   sfence();
 }
 
+#ifdef __clang__
+#define GEN_SYNC_1(W, T, N, OP) \
+T _sync_##N##_##W(T *ptr, T n) \
+{ \
+  T result; \
+  T cur = *(volatile T *)ptr; \
+  for(;;) \
+  { \
+    T val, cur1; \
+    OP; \
+    if(cur == (cur1 = __sync_val_compare_and_swap_##W(ptr, cur, val))) \
+      break; \
+    cur = cur1; \
+  } \
+  return result; \
+}
+#else
 #define GEN_SYNC_1(W, T, N, OP) \
 T __sync_##N##_##W(T *ptr, T n) \
 { \
@@ -1069,28 +1131,13 @@ T __sync_##N##_##W(T *ptr, T n) \
   } \
   return result; \
 }
+#endif
 
-#define GEN_SYNC_0(T, N, OP) \
-T __sync_##N(T *ptr, T n) \
-{ \
-  T result; \
-  T cur = *(volatile T *)ptr; \
-  for(;;) \
-  { \
-    T val, cur1; \
-    OP; \
-    if(cur == (cur1 = __sync_val_compare_and_swap(ptr, cur, val))) \
-      break; \
-    cur = cur1; \
-  } \
-  return result; \
-}
 
 #define GEN_SYNC(N, OP) \
   GEN_SYNC_1(1, unsigned char, N, OP) \
   GEN_SYNC_1(2, unsigned short, N, OP) \
-  GEN_SYNC_1(4, unsigned int , N, OP) \
-  GEN_SYNC_0(unsigned int , N, OP)
+  GEN_SYNC_1(4, unsigned int , N, OP) 
 
 GEN_SYNC(fetch_and_add, val = (result = cur) + n)
 GEN_SYNC(fetch_and_sub, val = (result = cur) - n)

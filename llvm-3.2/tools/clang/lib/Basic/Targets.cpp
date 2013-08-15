@@ -4528,6 +4528,15 @@ namespace {
     virtual bool setCPU(const std::string &Name) {
       return Name == "avm2";
     }
+    
+    virtual CallingConvCheckResult checkCallingConvention(CallingConv CC) const {
+      return (CC == CC_X86ThisCall ||
+              CC == CC_C) ? CCCR_OK : CCCR_Warning;
+    }
+    
+    virtual CallingConv getDefaultCallingConv() const {
+      return CC_C;
+    }
   };
 } // end anonymous namespace
 
