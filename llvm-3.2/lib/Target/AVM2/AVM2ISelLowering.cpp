@@ -291,6 +291,11 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
 
     setOperationAction(ISD::MEMBARRIER,        MVT::Other,   Expand);
 
+    for(unsigned int i=0; i<RTLIB::UNKNOWN_LIBCALL; i++) {
+      const char *nm = getLibcallName((RTLIB::Libcall)i);
+      if(nm && !strncmp(nm, "__sync", 6))
+        setLibcallName((RTLIB::Libcall)i, nm+1);
+    }
     setLibcallName(RTLIB::UNWIND_RESUME, "_Unwind_SjLj_Resume");
     computeRegisterProperties();
 }

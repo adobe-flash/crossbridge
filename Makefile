@@ -87,7 +87,7 @@ ifneq (,$(findstring 2.9,$(LLVMVERSION)))
 	$?LLVMCMAKEFLAGS=-DLLVM_BUILD_CLANG=$(CLANG) \
 		-DLLVM_BUILD_GOLDPLUGIN=ON \
 		-DBINUTILS_INCDIR=$(SRCROOT)/binutils/include 
-	$?LLVMLDCP=cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llvm-ld$(EXEEXT) $(SDK)/usr/bin/llvm-ld$(EXEEXT)
+	$?LLVMLDCP=cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-ld$(EXEEXT) $(SDK)/usr/bin/llvm-ld$(EXEEXT)
 	$?LLVMBUILDTYPE=MinSizeRel
 	$?FLASCC_CC=gcc
 	$?FLASCC_CXX=g++
@@ -101,7 +101,7 @@ else
 	FLASCC_CXX=clang++
 	CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-install/bin/clang$(EXEEXT) \
 		$(SDK)/usr/bin/clang$(EXEEXT) && \
-		cp $(LLVMINSTALLPREFIX)/llvm-install/bin/clang++ \
+		cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang++ \
 		$(SDK)/usr/bin/clang++$(EXEEXT)
 endif
 
@@ -463,26 +463,25 @@ llvm:
 		$(LLVMCMAKEOPTS) -DCMAKE_INSTALL_PREFIX=$(LLVMINSTALLPREFIX)/llvm-install -DCMAKE_BUILD_TYPE=$(LLVMBUILDTYPE) $(LLVMCMAKEFLAGS) \
 		-DLLVM_ENABLE_ASSERTIONS=$(ASSERTIONS) \
 		-DLLVM_TARGETS_TO_BUILD="$(LLVMTARGETS)" -DLLVM_NATIVE_ARCH="avm2" -DLLVM_INCLUDE_TESTS=$(BUILD_LLVM_TESTS) -DLLVM_INCLUDE_EXAMPLES=OFF \
-		$(SRCROOT)/llvm-$(LLVMVERSION) && $(MAKE) -j$(THREADS) && \
-		$(MAKE) install
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
+		$(SRCROOT)/llvm-$(LLVMVERSION) && $(MAKE) -j$(THREADS) 
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
 ifeq ($(LLVM_ONLYLLC), false)
 	$(MAKE) llvm-install
 endif
 
 llvm-install:
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llvm-ar$(EXEEXT) $(SDK)/usr/bin/llvm-ar$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llvm-as$(EXEEXT) $(SDK)/usr/bin/llvm-as$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llvm-diff$(EXEEXT) $(SDK)/usr/bin/llvm-diff$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llvm-dis$(EXEEXT) $(SDK)/usr/bin/llvm-dis$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llvm-extract$(EXEEXT) $(SDK)/usr/bin/llvm-extract$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-ar$(EXEEXT) $(SDK)/usr/bin/llvm-ar$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-as$(EXEEXT) $(SDK)/usr/bin/llvm-as$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-diff$(EXEEXT) $(SDK)/usr/bin/llvm-diff$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-dis$(EXEEXT) $(SDK)/usr/bin/llvm-dis$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-extract$(EXEEXT) $(SDK)/usr/bin/llvm-extract$(EXEEXT)
 	$(LLVMLDCP)
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llvm-link$(EXEEXT) $(SDK)/usr/bin/llvm-link$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llvm-nm$(EXEEXT) $(SDK)/usr/bin/llvm-nm$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llvm-ranlib$(EXEEXT) $(SDK)/usr/bin/llvm-ranlib$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/opt$(EXEEXT) $(SDK)/usr/bin/opt$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-link$(EXEEXT) $(SDK)/usr/bin/llvm-link$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-nm$(EXEEXT) $(SDK)/usr/bin/llvm-nm$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-ranlib$(EXEEXT) $(SDK)/usr/bin/llvm-ranlib$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/opt$(EXEEXT) $(SDK)/usr/bin/opt$(EXEEXT)
 	$(CP_CLANG)
-	cp $(LLVMINSTALLPREFIX)/llvm-install/lib/LLVMgold.* $(SDK)/usr/lib/LLVMgold$(SOEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/lib/LLVMgold.* $(SDK)/usr/lib/LLVMgold$(SOEXT)
 	cp -f $(BUILD)/llvm-debug/bin/fpcmp$(EXEEXT) $(BUILDROOT)/extra/fpcmp$(EXEEXT)
 
 llvmtests:
@@ -573,11 +572,11 @@ libc:
 	cp $(BUILD)/posix/ShellPosixGlue.cpp $(SRCROOT)/avmplus/shell
 	cp $(BUILD)/posix/ShellPosixGlue.h $(SRCROOT)/avmplus/shell
 	cd $(SRCROOT)/avmplus/shell && python ./shell_toplevel.py -config CONFIG::VMCFG_ALCHEMY_POSIX=true
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector -D__AVM2__ $(LIBHELPEROPTFLAGS) -c posix.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector -D__AVM2__ $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/vgl.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector -D__AVM2__ $(LIBHELPEROPTFLAGS) -D_KERNEL -c $(SRCROOT)/avm2_env/usr/src/kern/kern_umtx.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector -D__AVM2__ $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -c $(SRCROOT)/posix/thrStubs.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector -D__AVM2__ $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/kpmalloc.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c posix.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/vgl.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -D_KERNEL -c $(SRCROOT)/avm2_env/usr/src/kern/kern_umtx.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -c $(SRCROOT)/posix/thrStubs.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/kpmalloc.c
 	cd $(BUILD)/posix && cp *.o $(BUILD)/lib/src/lib/libc/
 	cd $(BUILD)/lib/src/lib/libc && $(BMAKE) -j$(THREADS)   libc.a
 	# find bitcode (and ignore non-bitcode genned from .s files) and put
@@ -614,6 +613,12 @@ single.abc:
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libm.o -o $(SDK)/usr/lib/stdlibs_abc/libm.o
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
+
+libm.abc:
+	mkdir -p $(BUILD)/libm_abc
+	cp $(BUILD)/msun/msun/*.o $(BUILD)/libm_abc
+	cd $(BUILD)/libm_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+
 
 abcstdlibs_more:
 	mkdir -p $(SDK)/usr/lib/stdlibs_abc

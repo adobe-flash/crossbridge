@@ -8,9 +8,9 @@
 
 SRCS+=	cmpdi2.c divdi3.c moddi3.c qdivrem.c ucmpdi2.c udivdi3.c umoddi3.c
 
-.elif ${MACHINE_ARCH} == "avm2"
+#.elif ${MACHINE_ARCH} == "avm2"
 
-SRCS+=  adddi3.c anddi3.c cmpdi2.c floatunsdidf.c iordi3.c lshldi3.c qdivrem.c \
+#SRCS+=  adddi3.c anddi3.c cmpdi2.c floatunsdidf.c iordi3.c lshldi3.c qdivrem.c \
         subdi3.c xordi3.c
 
 .else
