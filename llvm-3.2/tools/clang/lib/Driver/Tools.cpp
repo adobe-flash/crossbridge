@@ -5821,18 +5821,20 @@ void avm2::Link::ConstructJob(Compilation &C, const JobAction &JA,
         "IBackingStore.abc")));
     CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath(
         "IVFS.abc")));
-    
-    CmdArgs.push_back("--plugin-opt");
-    CmdArgs.push_back("appendabc");
-    CmdArgs.push_back("--plugin-opt");
-    CmdArgs.push_back(
-      Args.MakeArgString(ToolChain.GetFilePath("startHack.abc")));
-    
-    CmdArgs.push_back("--plugin-opt");
-    CmdArgs.push_back("appendabc");
-    CmdArgs.push_back("--plugin-opt");
-    CmdArgs.push_back(
-      Args.MakeArgString(ToolChain.GetFilePath("ShellCreateWorker.abc")));
+    if(!has_emit_swf && !has_emit_swc)
+    {
+      CmdArgs.push_back("--plugin-opt");
+      CmdArgs.push_back("appendabc");
+      CmdArgs.push_back("--plugin-opt");
+      CmdArgs.push_back(
+        Args.MakeArgString(ToolChain.GetFilePath("startHack.abc")));
+      
+      CmdArgs.push_back("--plugin-opt");
+      CmdArgs.push_back("appendabc");
+      CmdArgs.push_back("--plugin-opt");
+      CmdArgs.push_back(
+        Args.MakeArgString(ToolChain.GetFilePath("ShellCreateWorker.abc")));
+      }
   }
  
   // Set java memory.
