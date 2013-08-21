@@ -783,9 +783,10 @@ libthr:
 .PHONY: libcxx
 libcxx:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(BMAKE) clean && $(BMAKE) libcxxrt.a && cp *.o ../libc++
-	cd $(BUILD)/lib/src/lib/libc++ && $(BMAKE) clean && $(BMAKE) libc++.a 
-	cd $(BUILD)/lib/src/lib/libc++ && $(AR) libc++.a *.o && cp libc++.a $(SDK)/usr/lib/.
+	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(BMAKE) clean && $(BMAKE) libcxxrt.a
+	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(SDK)/usr/bin/llvm-link -o libcxxrt.o *.o && mv libcxxrt.o ../libc++
+	cd $(BUILD)/lib/src/lib/libc++ && $(BMAKE) clean && $(BMAKE) libc++.a
+	cd $(BUILD)/lib/src/lib/libc++ && $(AR) libc++.a *.o && mv libc++.a $(SDK)/usr/lib/.
 
 libobjc_configure:
 	cd $(BUILD)/llvm-gcc-42 \
