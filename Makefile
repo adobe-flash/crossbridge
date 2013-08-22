@@ -99,9 +99,9 @@ else
 	LLVMBUILDTYPE=Debug
 	FLASCC_CC=clang
 	FLASCC_CXX=clang++
-	CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-install/bin/clang$(EXEEXT) \
+	CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang$(EXEEXT) \
 		$(SDK)/usr/bin/clang$(EXEEXT) && \
-		cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang++ \
+		cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang$(EXEEXT) \
 		$(SDK)/usr/bin/clang++$(EXEEXT)
 endif
 
