@@ -192,11 +192,6 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
     setOperationAction(ISD::ROTL , MVT::i32, Expand);
     setOperationAction(ISD::ROTR , MVT::i32, Expand);
     setOperationAction(ISD::BSWAP, MVT::i32, Expand); //YYY
-
-    setOperationAction(ISD::CTTZ_ZERO_UNDEF, MVT::i32, Expand);
-    setOperationAction(ISD::CTLZ_ZERO_UNDEF, MVT::i32, Expand);
-    setOperationAction(ISD::CTTZ_ZERO_UNDEF, MVT::i64, Expand);
-    setOperationAction(ISD::CTLZ_ZERO_UNDEF, MVT::i64, Expand);
  
     setOperationAction(ISD::CTPOP, MVT::i64, Expand);
     setOperationAction(ISD::CTTZ , MVT::i64, Expand);
@@ -205,6 +200,12 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
     setOperationAction(ISD::ROTR , MVT::i64, Expand);
     setOperationAction(ISD::BSWAP, MVT::i64, Expand); //YYY
 
+  
+    setOperationAction(ISD::CTTZ_ZERO_UNDEF, MVT::i32, Expand);
+    setOperationAction(ISD::CTLZ_ZERO_UNDEF, MVT::i32, Expand);
+    setOperationAction(ISD::CTTZ_ZERO_UNDEF, MVT::i64, Expand);
+    setOperationAction(ISD::CTLZ_ZERO_UNDEF, MVT::i64, Expand);
+  
     setOperationAction(ISD::FCOPYSIGN, MVT::f64, Expand);
     setOperationAction(ISD::FCOPYSIGN, MVT::f32, Expand);
 
@@ -219,6 +220,8 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
     setOperationAction(ISD::FMA, MVT::i32, Expand);
     setOperationAction(ISD::FMA, MVT::i64, Expand);
     setOperationAction(ISD::ATOMIC_FENCE, MVT::Other, Expand);
+    setOperationAction(ISD::ATOMIC_LOAD, MVT::i32, Expand);
+    setOperationAction(ISD::ATOMIC_STORE, MVT::i32, Expand);
     setOperationAction(ISD::ATOMIC_SWAP, MVT::i32, Expand);
     setOperationAction(ISD::ATOMIC_CMP_SWAP, MVT::i32, Expand);
     setOperationAction(ISD::ATOMIC_LOAD_ADD, MVT::i32, Expand);
