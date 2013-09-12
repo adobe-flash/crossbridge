@@ -22,7 +22,7 @@
 #define AVM2REGISTERINFO_H
 
 #include "llvm/Target/TargetRegisterInfo.h"
-#include "llvm/Codegen/MachineRegisterInfo.h"
+#include "llvm/CodeGen/MachineRegisterInfo.h"
 #include "AVM2GenRegisterInfo.h.inc"
 
 namespace llvm

@@ -18,7 +18,10 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp.exe
 	$?NOPIE=
-else
+	$?BIN_TRUE=/usr/bin/true
+endif
+
+ifneq (,$(findstring Darwin,$(UNAME)))
 	$?PLATFORM="darwin"
 	$?RAWPLAT=darwin
 	$?THREADS=$(shell sysctl -n hw.ncpu)
@@ -30,6 +33,20 @@ else
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp
 	$?NOPIE=-no_pie
+	$?BIN_TRUE=/usr/bin/true
+else
+	$?PLATFORM="linux"
+	$?RAWPLAT=linux
+	$?THREADS=1
+	$?nativepath=$(1)
+	$?BUILD_TRIPLE=x86_64-unknown-linux-gnu
+	$?CC=gcc
+	$?CXX=g++
+	$?NATIVE_AR=ar
+	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
+	$?FPCMP=$(BUILDROOT)/extra/fpcmp
+	$?NOPIE=
+	$?BIN_TRUE=/bin/true
 endif
 
 export CC:=$(CC)
@@ -38,6 +55,7 @@ $?DBGOPTS=
 $?BUILDROOT=$(PWD)/build
 $?WIN_BUILD=$(BUILDROOT)/win
 $?MAC_BUILD=$(BUILDROOT)/mac
+$?LINUX_BUILD=$(BUILDROOT)/linux
 $?CYGWINMAC=$(SRCROOT)/cygwinmac/sdk/usr/bin
 $?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
 $?LIBHELPEROPTFLAGS=-O3
@@ -54,7 +72,9 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?PLATFORM_NAME=win
 	$?HOST_TRIPLE=i686-pc-cygwin
 	$?JAVA=$(call nativepath,'$(shell which java)')
-else
+endif
+
+ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?EXEEXT=
 	$?SOEXT=.dylib
 	$?SDLFLAGS=--build=i686-apple-darwin9
@@ -64,6 +84,20 @@ else
 	$?BUILD=$(MAC_BUILD)
 	$?PLATFORM_NAME=mac
 	$?HOST_TRIPLE=x86_64-apple-darwin10
+	$?JAVA=$(call nativepath,$(shell which java))
+	export PATH:=$(BUILD)/ccachebin:$(PATH)
+endif
+
+ifneq (,$(findstring linux,$(PLATFORM)))
+	$?EXEEXT=
+	$?SOEXT=.so
+	$?SDLFLAGS=--build=i686-unknown-linux
+	$?TAMARIN_CONFIG_FLAGS=
+	$?TAMARINLDFLAGS=" -m32 -arch=i686"
+	$?SDKEXT=.dmg
+	$?BUILD=$(LINUX_BUILD)
+	$?PLATFORM_NAME=linux
+	$?HOST_TRIPLE=x86_64-unknown-linux
 	$?JAVA=$(call nativepath,$(shell which java))
 	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
@@ -138,7 +172,7 @@ export CCACHE_DIR=$(SRCROOT)/ccache
 #TODO are we done sweeping for asm?
 #BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm"' -DSTRIP_FBSDID -D__asm__\(X...\)="\error" -D__asm\(X...\)="\error"' MAKEFLAGS="" MFLAGS="" NO_WERROR=true $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 
-BMAKE+= AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true 
+BMAKE+= AR="$(BIN_TRUE) ||" GENCAT=$(BIN_TRUE) RANLIB=$(BIN_TRUE)
 BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-builtin -DSTRIP_FBSDID " 
 BMAKE+= CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm -fno-builtin -DSTRIP_FBSDID "
 BMAKE+= MAKEFLAGS="" MFLAGS="" MK_ICONV= WITHOUT_PROFILE=
@@ -160,15 +194,15 @@ all:
 	@echo "~~~ Crossbridge $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
 	@mkdir -p $(BUILD)/logs
 	@echo "-  base"
-	@$(MAKE) base &> $(BUILD)/logs/base.txt
+	@$(MAKE) base > $(BUILD)/logs/base.txt 2>&1
 	@echo "-  make"
-	@$(MAKE) make &> $(BUILD)/logs/make.txt
+	@$(MAKE) make > $(BUILD)/logs/make.txt 2>&1
 	@$(SDK)/usr/bin/make -s all_with_local_make
 
 all_with_local_make:
 	@for target in $(BUILDORDER) ; do \
 		echo "-  $$target" ; \
-		$(MAKE) $$target &> $(BUILD)/logs/$$target.txt ; \
+		$(MAKE) $$target > $(BUILD)/logs/$$target.txt 2>&1; \
 		mret=$$? ; \
 		logs="$$logs $(BUILD)/logs/$$target.txt" ; \
 		grep -q "Resource temporarily unavailable" $(BUILD)/logs/$$target.txt ; \
@@ -176,7 +210,7 @@ all_with_local_make:
 		rcount=1 ; \
 		while [ $$gret == 0 ] && [ $$rcount -lt 6 ] ; do \
 			echo "-  $$target (retry $$rcount)" ; \
-			$(MAKE) $$target &> $(BUILD)/logs/$$target.txt ; \
+			$(MAKE) $$target > $(BUILD)/logs/$$target.txt 2>&1; \
 			mret=$$? ; \
 			grep -q "Resource temporarily unavailable" $(BUILD)/logs/$$target.txt ; \
 			gret=$$? ; \
@@ -223,7 +257,7 @@ abclibs_asdocs:
 				-window-title "Crossbridge API Reference" \
 				-output apidocs &> $(BUILD)/logs/asdoc.txt
 	if [ -d $(BUILDROOT)/tempdita ]; then rm -rf $(BUILDROOT)/tempdita; fi
-	mv $(BUILDROOT)/apidocs/tempdita $(BUILDROOT)/
+	#mv $(BUILDROOT)/apidocs/tempdita $(BUILDROOT)/
 
 CROSS=PATH="$(BUILD)/ccachebin:$(CYGWINMAC):$(PATH):$(SDK)/usr/bin" $(MAKE) SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin LLVMINSTALLPREFIX=$(WIN_BUILD) NATIVE_AR=$(CYGTRIPLE)-ar CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ RANLIB=$(CYGTRIPLE)-ranlib
 
@@ -459,7 +493,7 @@ llvmdev:
 llvm:
 	rm -rf $(BUILD)/llvm-debug
 	mkdir -p $(BUILD)/llvm-debug
-	cd $(BUILD)/llvm-debug && LDFLAGS="$(LLVMLDFLAGS)" CFLAGS="$(LLVMCFLAGS)" CXXFLAGS="$(LLVMCXXFLAGS)" cmake -G "Unix Makefiles" \
+	cd $(BUILD)/llvm-debug && LDFLAGS="$(LLVMLDFLAGS)" CFLAGS="$(LLVMCFLAGS)" CXXFLAGS="$(LLVMCXXFLAGS)" $(SDK)/usr/bin/cmake -G "Unix Makefiles" \
 		$(LLVMCMAKEOPTS) -DCMAKE_INSTALL_PREFIX=$(LLVMINSTALLPREFIX)/llvm-install -DCMAKE_BUILD_TYPE=$(LLVMBUILDTYPE) $(LLVMCMAKEFLAGS) \
 		-DLLVM_ENABLE_ASSERTIONS=$(ASSERTIONS) \
 		-DLLVM_TARGETS_TO_BUILD="$(LLVMTARGETS)" -DLLVM_NATIVE_ARCH="avm2" -DLLVM_INCLUDE_TESTS=$(BUILD_LLVM_TESTS) -DLLVM_INCLUDE_EXAMPLES=OFF \
@@ -905,9 +939,9 @@ trd:
 plugins:
 	rm -rf $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
 	mkdir -p $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
-	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ -DHAVE_ABCNM -DDEFTMPDIR=\"$(call nativepath,/tmp)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -DHAVE_STDINT_H -I$(SRCROOT)/zlib-1.2.5/ -I$(SRCROOT)/binutils/include -c $(SRCROOT)/gold-plugins/makeswf.cpp
+	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ -DHAVE_ABCNM -DDEFTMPDIR=\"$(call nativepath,/tmp)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -DHAVE_STDINT_H -I$(SRCROOT)/zlib-1.2.5/ -I$(SRCROOT)/binutils/include -fPIC -c $(SRCROOT)/gold-plugins/makeswf.cpp
 	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -shared -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup -o makeswf$(SOEXT) makeswf.o
-	cd $(BUILD)/multiplug && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/  -DHAVE_STDINT_H -DSOEXT=\"$(SOEXT)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -I$(SRCROOT)/binutils/include -c $(SRCROOT)/gold-plugins/multiplug.cpp
+	cd $(BUILD)/multiplug && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/  -DHAVE_STDINT_H -DSOEXT=\"$(SOEXT)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -I$(SRCROOT)/binutils/include -fPIC -c $(SRCROOT)/gold-plugins/multiplug.cpp
 	cd $(BUILD)/multiplug && $(CXX) $(DBGOPTS) -shared -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup -o multiplug$(SOEXT) multiplug.o
 	cp -f $(BUILD)/makeswf/makeswf$(SOEXT) $(SDK)/usr/lib/makeswf$(SOEXT)
 	cp -f $(BUILD)/multiplug/multiplug$(SOEXT) $(SDK)/usr/lib/multiplug$(SOEXT)
