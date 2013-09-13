@@ -577,7 +577,7 @@ _GLIBCXX_END_NAMESPACE
 /* #undef _GLIBCXX_HAVE_TANL */
 
 /* Define to 1 if the target supports thread-local storage. */
-#if !defined(__sparc64__) && !defined(__arm__) && !defined(__mips__)
+#if !defined(__sparc64__) && !defined(__arm__) && !defined(__mips__) && !defined(__AVM2Clang__)
 #define _GLIBCXX_HAVE_TLS 1
 #endif
 
@@ -888,7 +888,9 @@ _GLIBCXX_END_NAMESPACE
 /* #undef _GLIBCXX_FULLY_DYNAMIC_STRING */
 
 /* Define to 1 if a full hosted library is built, or 0 if freestanding. */
+#ifndef __AVM2Clang__
 #define _GLIBCXX_HOSTED 1
+#endif
 
 /* Define if compatibility should be provided for -mlong-double-64. */
 /* #undef _GLIBCXX_LONG_DOUBLE_COMPAT */

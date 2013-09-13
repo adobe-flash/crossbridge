@@ -4503,6 +4503,7 @@ namespace {
       //defineCPUMacros(Builder, "i486");
       
       DefineStd(Builder, StringRef("AVM2"), Opts);
+      DefineStd(Builder, StringRef("AVM2Clang"), Opts);
       DefineStd(Builder, StringRef("FLASHPLAYER"), Opts);
       
       // Target properties.

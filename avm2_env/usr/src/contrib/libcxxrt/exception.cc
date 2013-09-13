@@ -1039,7 +1039,11 @@ static void pushCleanupException(_Unwind_Exception *exceptionObject,
  * containing catch or cleanup code.
  */
 extern "C"
+#ifdef __AVM2__
+BEGIN_PERSONALITY_FUNCTION(__gxx_personality_sj0)
+#else
 BEGIN_PERSONALITY_FUNCTION(__gxx_personality_v0)
+#endif
 	// This personality function is for version 1 of the ABI.  If you use it
 	// with a future version of the ABI, it won't know what to do, so it
 	// reports a fatal error and give up before it breaks anything.

@@ -1161,7 +1161,7 @@ static void emitGlobalDtorWithCXAAtExit(CodeGenFunction &CGF,
     handle
   };
 #else
-  llvm::Constant *Zero = llvm::Constant::getNullValue(CGF.Int8Ty);
+  llvm::Constant *Zero = llvm::Constant::getNullValue(CGF.Int8PtrTy);
   llvm::Value *args[] = {
     llvm::ConstantExpr::getBitCast(dtor, dtorTy),
     llvm::ConstantExpr::getBitCast(addr, CGF.Int8PtrTy),

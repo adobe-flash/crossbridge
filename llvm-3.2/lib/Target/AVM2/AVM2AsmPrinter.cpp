@@ -1583,19 +1583,26 @@ void AVM2AsmPrinter::printOperand(const MachineInstr *MI, const MachineOperand &
       }
     case MachineOperand::MO_ExternalSymbol: {
       const char *Sym = MO.getSymbolName();
-
+      //printf("\t%s:", Sym);
       if(MI->getDesc().isCall())
         O << "F"; // function prefix
-      SmallString<256> MN;
-      Twine TMN;
-      if(Sym[0] == '\2') {
-        TMN = (Sym + 1);
+      if(Sym[0] == 'L') {
+        // Internal global.
+        O << Sym;
+        TE.insert(Sym);
       } else {
-        TMN = Sym;
+        SmallString<256> MN;
+        Twine TMN;
+        if(Sym[0] == '\2') {
+          TMN = (Sym + 1);
+        } else {
+          TMN = Sym;
+        }
+        Mang->getNameWithPrefix(MN, TMN);
+        O << MN;
+        TE.insert(MN.str());
+        //printf("%s", MN.str().data());
       }
-      Mang->getNameWithPrefix(MN, TMN);
-      O << MN;
-      TE.insert(MN.str());
     }
     break;
     case MachineOperand::MO_BlockAddress: {

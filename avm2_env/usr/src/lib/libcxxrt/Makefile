@@ -20,7 +20,7 @@ SRCS+=		libelftc_dem_gnu3.c\
 		guard.cc
 
 WARNS=		0
-CFLAGS+=	-I${SRCDIR} -fPIC
+CFLAGS+=	-I${SRCDIR} -fPIC -m32
 VERSION_MAP=	${.CURDIR}/Version.map
 
 .include <bsd.lib.mk>

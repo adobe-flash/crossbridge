@@ -1,6 +1,8 @@
 # $FreeBSD$
 
-LIBCXXRTDIR=	${.CURDIR}/../../contrib/libcxxrt
+#LIBCXXRTDIR=	${.CURDIR}/../../contrib/libstdc++/libsupc++
+LIBCXXRTDIR=	${.CURDIR}/../../../../../../llvm-gcc-4.2-2.9/libstdc++-v3/libsupc++
+#LIBCXXRTDIR=	${.CURDIR}/../../contrib/libcxxrt
 HDRDIR=		${.CURDIR}/../../contrib/libc++/include
 SRCDIR=		${.CURDIR}/../../contrib/libc++/src
 CXXINCLUDEDIR=	${INCLUDEDIR}/c++/v${SHLIB_MAJOR}
@@ -36,7 +38,8 @@ SRCS+=		algorithm.cpp\
 		valarray.cpp
 
 WARNS=		0
-CXXFLAGS+=	-I${HDRDIR} -I${LIBCXXRTDIR} -std=c++0x -nostdlib -DLIBCXXRT -fPIC
+CXXFLAGS+=	-I${HDRDIR} -I${LIBCXXRTDIR} -std=c++0x -nostdlib -D__GLIBCXX__ -fPIC -m32
+#CXXFLAGS+=	-I${HDRDIR} -I${LIBCXXRTDIR} -std=c++0x -nostdlib -DLIBCXXRT -fPIC -m32
 
 DPADD=		${LIBCXXRT}
 LDADD=		-lcxxrt

@@ -2701,3 +2701,24 @@ int __flt_rounds(void)
 {
   return 1;
 }
+
+int __sys_sigreturn(const ucontext_t *scp)
+{
+  return -1;
+}
+
+int sigreturn(const ucontext_t*) __attribute__((weak, alias("__sys_sigreturn")));
+
+int __sys_getcontext(ucontext_t *ucp)
+{
+  return -1;
+}
+
+int __sys_setcontext(const ucontext_t *ucp)
+{
+  return -1;
+}
+
+int getcontext(ucontext_t *ucp) __attribute__((weak, alias("__sys_getcontext")));
+int _Ux86_getcontext(ucontext_t *ucp) __attribute__((weak, alias("__sys_getcontext")));
+int setcontext(const ucontext_t *ucp) __attribute__((weak, alias("__sys_setcontext")));

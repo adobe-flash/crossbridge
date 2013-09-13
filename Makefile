@@ -593,7 +593,7 @@ csu:
 	mv -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
 
 stdlibs:
-	$(MAKE) -j$(THREADS) csu libc libthr libm libBlocksRuntime
+	$(MAKE) -j$(THREADS) csu libc libthr libm libBlocksRuntime libcxx
 
 libc:
 	mkdir -p $(BUILD)/posix/
@@ -629,30 +629,6 @@ abcstdlibs:
 abcflashpp:
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvmopt=-Xmx4G -jvm="$(JAVA)" -falcon-parallel -target-player -filetype=obj $(BUILD)/as3wig/Flash++.o -o $(BUILD)/as3wig/Flash++.abc
 	$(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libFlash++.a $(BUILD)/as3wig/Flash++.abc
-
-libthr.abc:
-	mkdir -p $(BUILD)/libthr_abc
-	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
-	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
-
-libc.abc:
-	mkdir -p $(BUILD)/libc_abc
-	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc.a
-	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
-
-single.abc:
-	mkdir -p $(SDK)/usr/lib/stdlibs_abc
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libm.o -o $(SDK)/usr/lib/stdlibs_abc/libm.o
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
-
-libm.abc:
-	mkdir -p $(BUILD)/libm_abc
-	cp $(BUILD)/msun/msun/*.o $(BUILD)/libm_abc
-	cd $(BUILD)/libm_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-
 
 abcstdlibs_more:
 	mkdir -p $(SDK)/usr/lib/stdlibs_abc
@@ -695,6 +671,29 @@ endif
 	cd $(BUILD)/libBlocksRuntime_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libBlocksRuntime.a
 	cd $(BUILD)/libBlocksRuntime_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libBlocksRuntime_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libBlocksRuntime.a
+
+libthr.abc:
+	mkdir -p $(BUILD)/libthr_abc
+	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
+	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
+
+libc.abc:
+	mkdir -p $(BUILD)/libc_abc
+	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc.a
+	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
+
+single.abc:
+	mkdir -p $(SDK)/usr/lib/stdlibs_abc
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libm.o -o $(SDK)/usr/lib/stdlibs_abc/libm.o
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
+
+libm.abc:
+	mkdir -p $(BUILD)/libm_abc
+	cp $(BUILD)/msun/msun/*.o $(BUILD)/libm_abc
+	cd $(BUILD)/libm_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 
 libcxx.abc:
 	mkdir -p $(BUILD)/libcxx_abc
@@ -814,12 +813,35 @@ libthr:
 	cd $(BUILD)/libthr/libthr && rm -f libthr.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libthr.a
 	cp -f $(BUILD)/libthr/libthr/libthr.a $(SDK)/usr/lib/.
 
-.PHONY: libcxx
-libcxx:
+.PHONY: libcxx libcxxrt libxxabi libunwind libgcceh
+libgcceh:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(BMAKE) clean && $(BMAKE) libcxxrt.a
+	cd $(BUILD)/lib/src/lib/libgcceh/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libgcceh.a
+	cd $(BUILD)/lib/src/lib/libgcceh/ && $(SDK)/usr/bin/llvm-link -o libgcceh.o *.o && mv libgcceh.o ../libc++
+
+libsupcxx:
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+	cd $(BUILD)/lib/src/lib/libsupc++/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libsupc++.a
+	cd $(BUILD)/lib/src/lib/libsupc++/ && $(SDK)/usr/bin/llvm-link -o libsupc++.o *.o && mv libsupc++.o ../libc++
+
+libcxxabi:
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+	cd $(BUILD)/lib/src/lib/libc++abi/ && $(BMAKE) clean && $(BMAKE) libc++abi.a
+	cd $(BUILD)/lib/src/lib/libc++abi/ && $(SDK)/usr/bin/llvm-link -o libc++abi.o *.o && mv libc++abi.o ../libc++
+
+libunwind:
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+	cd $(BUILD)/lib/src/lib/libunwind/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libunwind.a
+	cd $(BUILD)/lib/src/lib/libunwind/ && $(SDK)/usr/bin/llvm-link -o libunwind.o *.o && mv libunwind.o ../libc++
+
+libcxxrt:
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libcxxrt.a
 	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(SDK)/usr/bin/llvm-link -o libcxxrt.o *.o && mv libcxxrt.o ../libc++
-	cd $(BUILD)/lib/src/lib/libc++ && $(BMAKE) clean && $(BMAKE) libc++.a
+
+libcxx: libsupcxx libgcceh
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+	cd $(BUILD)/lib/src/lib/libc++ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libc++.a
 	cd $(BUILD)/lib/src/lib/libc++ && $(AR) libc++.a *.o && mv libc++.a $(SDK)/usr/lib/.
 
 libobjc_configure:
