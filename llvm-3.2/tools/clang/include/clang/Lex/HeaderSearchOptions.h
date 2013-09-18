@@ -124,7 +124,7 @@ public:
   HeaderSearchOptions(StringRef _Sysroot = "/")
     : Sysroot(_Sysroot), DisableModuleHash(0), UseBuiltinIncludes(true),
       UseStandardSystemIncludes(true), UseStandardCXXIncludes(true),
-      UseLibcxx(false), Verbose(false) {}
+      UseLibcxx(true), Verbose(false) {}
 
   /// AddPath - Add the \p Path path to the specified \p Group list.
   void AddPath(StringRef Path, frontend::IncludeDirGroup Group,

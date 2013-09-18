@@ -672,6 +672,11 @@ endif
 	cd $(BUILD)/libBlocksRuntime_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libBlocksRuntime_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libBlocksRuntime.a
 
+	mkdir -p $(BUILD)/libcxx_abc
+	cd $(BUILD)/libcxx_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc++.a
+	cd $(BUILD)/libcxx_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libcxx_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc++.a
+
 libthr.abc:
 	mkdir -p $(BUILD)/libthr_abc
 	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a

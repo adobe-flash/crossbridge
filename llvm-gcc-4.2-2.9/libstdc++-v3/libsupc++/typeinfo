@@ -140,7 +140,8 @@ namespace std
   class bad_cast : public exception 
   {
   public:
-    bad_cast() throw() { }
+    // Clang bug? bad_cast() is not gen'ed at all.
+    bad_cast() throw();// { }
     // This declaration is not useless:
     // http://gcc.gnu.org/onlinedocs/gcc-3.0.2/gcc_6.html#SEC118
     virtual ~bad_cast() throw();

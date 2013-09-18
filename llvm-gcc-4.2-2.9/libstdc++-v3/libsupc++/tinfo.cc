@@ -42,6 +42,7 @@ std::type_info::
 ~type_info ()
 { }
 
+std::bad_cast::bad_cast() throw() { }
 std::bad_cast::~bad_cast() throw() { }
 std::bad_typeid::~bad_typeid() throw() { }
 

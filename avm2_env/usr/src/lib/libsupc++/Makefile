@@ -41,6 +41,7 @@ SRCS+=		del_op.cc\
 
 WARNS=		0
 CXXFLAGS+=	-I${HDRDIR} -m32 -std=c++0x -nostdlib -fPIC -D_GLIBCXX_SJLJ_EXCEPTIONS
+CXXFLAGS+=	-stdlib=libstdc++
 
 LDFLAGS+=	--verbose
 

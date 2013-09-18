@@ -39,7 +39,7 @@ SRCS+=		algorithm.cpp\
 
 WARNS=		0
 CXXFLAGS+=	-I${HDRDIR} -I${LIBCXXRTDIR} -std=c++0x -nostdlib
-CXXFLAGS+=	-D__GLIBCXX__ -DLIBSUPCXX -fPIC -m32
+CXXFLAGS+=	-D__GLIBCXX__ -DLIBSUPCXX -fPIC -m32 -stdlib=libstdc++
 #CXXFLAGS+=	-I${HDRDIR} -I${LIBCXXRTDIR} -std=c++0x -nostdlib -DLIBCXXRT -fPIC -m32
 
 DPADD=		${LIBCXXRT}
