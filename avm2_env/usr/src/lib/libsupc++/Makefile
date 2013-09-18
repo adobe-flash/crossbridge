@@ -28,7 +28,6 @@ SRCS+=		del_op.cc\
 		eh_type.cc\
 		eh_unex_handler.cc\
 		guard.cc\
-		new_handler.cc\
 		new_op.cc\
 		new_opnt.cc\
 		new_opv.cc\
@@ -37,6 +36,7 @@ SRCS+=		del_op.cc\
 		tinfo.cc\
 		tinfo2.cc\
 		vec.cc
+		#new_handler.cc\
 		#vterminate.cc
 
 WARNS=		0

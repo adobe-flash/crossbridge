@@ -302,6 +302,10 @@ public:
     return isMacOSX() || getOS() == Triple::IOS;
   }
 
+  /// IsAVM2 - Is this a "Flash VM targeted" Env
+  bool isAVM2() const {
+    return Arch == avm2;
+  }
   /// \brief Tests for either Cygwin or MinGW OS
   bool isOSCygMing() const {
     return getOS() == Triple::Cygwin || getOS() == Triple::MinGW32;

@@ -38,7 +38,8 @@ SRCS+=		algorithm.cpp\
 		valarray.cpp
 
 WARNS=		0
-CXXFLAGS+=	-I${HDRDIR} -I${LIBCXXRTDIR} -std=c++0x -nostdlib -D__GLIBCXX__ -fPIC -m32
+CXXFLAGS+=	-I${HDRDIR} -I${LIBCXXRTDIR} -std=c++0x -nostdlib
+CXXFLAGS+=	-D__GLIBCXX__ -DLIBSUPCXX -fPIC -m32
 #CXXFLAGS+=	-I${HDRDIR} -I${LIBCXXRTDIR} -std=c++0x -nostdlib -DLIBCXXRT -fPIC -m32
 
 DPADD=		${LIBCXXRT}

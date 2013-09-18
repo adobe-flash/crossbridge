@@ -29,7 +29,10 @@
         #include <cxxabi.h>
     #endif  // __has_include(<cxxabi.h>)
     #ifndef _LIBCPPABI_VERSION
-        static std::new_handler __new_handler;
+      #ifndef LIBSUPCXX
+      static
+      #endif
+        std::new_handler __new_handler;
     #endif  // _LIBCPPABI_VERSION
 #endif
 

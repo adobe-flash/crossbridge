@@ -20,7 +20,7 @@
 
 #include "typeinfo"
 
-#if !(defined(_LIBCPPABI_VERSION) || defined(LIBCXXRT))
+#if !(defined(_LIBCPPABI_VERSION) || defined(LIBCXXRT) || defined(LIBSUPCXX))
 
 std::bad_cast::bad_cast() _NOEXCEPT
 {
