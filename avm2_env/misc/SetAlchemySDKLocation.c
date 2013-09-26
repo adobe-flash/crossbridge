@@ -34,9 +34,9 @@
 #define specialmalloc malloc
 #endif
 
-char* getResultFromCmd(const char* cmd);
+static char* getResultFromCmd(const char* cmd);
 
-char* getResultFromCmd(const char* cmd)
+static char* getResultFromCmd(const char* cmd)
 {
 	char buffer[PATH_MAX];
 	FILE* pipe = popen(cmd, "r");
@@ -67,9 +67,9 @@ char* getResultFromCmd(const char* cmd)
 	return result;
 }
 
-char* nativepath(const char *path);
+static char* nativepath(const char *path);
 
-char* nativepath(const char *path)
+static char* nativepath(const char *path)
 {
 	char buffer[PATH_MAX+32];
 	char *result = NULL;
@@ -78,9 +78,9 @@ char* nativepath(const char *path)
 	return result;
 }
 
-char* javapath(const char *path);
+static char* javapath(const char *path);
 
-char* javapath(const char *path)
+static char* javapath(const char *path)
 {
 	char buffer[PATH_MAX+32];
 	char *result = NULL;
@@ -99,9 +99,15 @@ extern "C" {
 extern int _NSGetExecutablePath(char* buf, unsigned int* bufsize);
 #endif
 
-void GetAppPath(char *dest, unsigned int *sz);
+#ifdef __IN_FILE_USE__
+#define INFILEUSE static
+#else
+#define INFILEUSE
+#endif
 
-void GetAppPath(char *dest, unsigned int *sz) {
+INFILEUSE void GetAppPath(char *dest, unsigned int *sz);
+ 
+INFILEUSE void GetAppPath(char *dest, unsigned int *sz) {
   #if defined(__CYGWIN__) || defined(__MINGW32__)
     char *winpath = NULL;
     /* This should work for normal exes, but will most likely fail
@@ -122,9 +128,9 @@ void GetAppPath(char *dest, unsigned int *sz) {
   *sz = strlen(dest);
 }
 
-char *SetFlasccSDKLocation(const char *suffix);
+INFILEUSE char *SetFlasccSDKLocation(const char *suffix);
 
-char *SetFlasccSDKLocation(const char *suffix) {
+INFILEUSE char *SetFlasccSDKLocation(const char *suffix) {
   static char FlasccSDKLocation[PATH_MAX] = "";
   char *dest = &FlasccSDKLocation[0];
   int slen;

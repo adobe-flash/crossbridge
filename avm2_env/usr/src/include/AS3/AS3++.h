@@ -14,6 +14,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <string>
+#include <stdlib.h>
 
 namespace AS3
 {

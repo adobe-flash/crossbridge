@@ -13,7 +13,9 @@
 
 char cvsroot_main_cxx[] = "$Id: main.cxx 12536 2011-03-14 07:22:08Z wsfulton $";
 
+#define __IN_FILE_USE__
 #include "SetAlchemySDKLocation.c"  // for setting swiglib directory
+#undef __IN_FILE_USE__
 
 #include "swigconfig.h"
 

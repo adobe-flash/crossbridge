@@ -56,7 +56,9 @@ static const char AdobeInternalCode[] __attribute__((used)) = "This File contain
 #include <sys/wait.h>
 #endif
 
+#define __IN_FILE_USE__
 #include "SetAlchemySDKLocation.c"
+#undef __IN_FILE_USE__
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 #include <direct.h>
