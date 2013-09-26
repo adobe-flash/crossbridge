@@ -186,7 +186,7 @@ BUILDORDER+= bmake stdlibs
 ifneq (,$(findstring 2.9,$(LLVMVERSION)))
 BUILDORDER+= gcclibs
 endif
-BUILDORDER+= as3wig abcstdlibs sdkcleanup tr trd extralibs 
+BUILDORDER+= as3xx as3wig abcstdlibs sdkcleanup tr trd extralibs 
 BUILDORDER+= extratools finalcleanup submittests
 
 all:

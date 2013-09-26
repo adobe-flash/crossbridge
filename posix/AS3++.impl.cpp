@@ -152,8 +152,8 @@ extern "C" void (*flascc_uiTickProc)();
     return *this;
   }
 
-  var internal::new_int(int n) MAYBEDELEGATEATTR;
-  var internal::new_int(int n)
+//  var internal::new_int(int n) MAYBEDELEGATEATTR;
+  var internal::new_int(int n) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&new_int);
     unsigned id;
@@ -161,8 +161,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::new_uint(unsigned n) MAYBEDELEGATEATTR;
-  var internal::new_uint(unsigned n)
+//  var internal::new_uint(unsigned n) MAYBEDELEGATEATTR;
+  var internal::new_uint(unsigned n) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&new_uint);
     unsigned id;
@@ -170,8 +170,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
   
-  var internal::new_Number(double n) MAYBEDELEGATEATTR;
-  var internal::new_Number(double n)
+//  var internal::new_Number(double n) MAYBEDELEGATEATTR;
+  var internal::new_Number(double n) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&new_Number);
     unsigned id;
@@ -184,8 +184,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(b ? var::internal::kTrue : var::internal::kFalse);
   }
   
-  var internal::new_String(const char *s, int len) MAYBEDELEGATEATTR;
-  var internal::new_String(const char *s, int len)
+//  var internal::new_String(const char *s, int len) MAYBEDELEGATEATTR;
+  var internal::new_String(const char *s, int len) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&new_String);
     if(len < 0)
@@ -195,8 +195,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::new_Namespace(const char *s, int len) MAYBEDELEGATEATTR;
-  var internal::new_Namespace(const char *s, int len)
+//  var internal::new_Namespace(const char *s, int len) MAYBEDELEGATEATTR;
+  var internal::new_Namespace(const char *s, int len) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&new_String);
     if(len < 0)
@@ -206,8 +206,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::new_Vector(var cc) MAYBEDELEGATEATTR;
-  var internal::new_Vector(var cc)
+//  var internal::new_Vector(var cc) MAYBEDELEGATEATTR;
+  var internal::new_Vector(var cc) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&new_Vector);
     unsigned id;
@@ -224,8 +224,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::new_Vector_int() MAYBEDELEGATEATTR;
-  var internal::new_Vector_int()
+//  var internal::new_Vector_int() MAYBEDELEGATEATTR;
+  var internal::new_Vector_int() MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&new_Vector_int);
     unsigned id;
@@ -233,8 +233,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::new_Vector_uint() MAYBEDELEGATEATTR;
-  var internal::new_Vector_uint()
+//  var internal::new_Vector_uint() MAYBEDELEGATEATTR;
+  var internal::new_Vector_uint() MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&new_Vector_uint);
     unsigned id;
@@ -242,8 +242,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::new_Vector_Boolean() MAYBEDELEGATEATTR;
-  var internal::new_Vector_Boolean()
+//  var internal::new_Vector_Boolean() MAYBEDELEGATEATTR;
+  var internal::new_Vector_Boolean() MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&new_Vector_Boolean);
     unsigned id;
@@ -251,8 +251,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::new_Vector_String() MAYBEDELEGATEATTR;
-  var internal::new_Vector_String()
+//  var internal::new_Vector_String() MAYBEDELEGATEATTR;
+  var internal::new_Vector_String() MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&new_Vector_String);
     unsigned id;
@@ -260,8 +260,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::new_Vector_Number() MAYBEDELEGATEATTR;
-  var internal::new_Vector_Number()
+//  var internal::new_Vector_Number() MAYBEDELEGATEATTR;
+  var internal::new_Vector_Number() MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&new_Vector_Number);
     unsigned id;
@@ -279,8 +279,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(var::internal::kNull);
   }
 
-  var internal::get_ram() MAYBEDELEGATEATTR;
-  var internal::get_ram()
+//  var internal::get_ram() MAYBEDELEGATEATTR;
+  var internal::get_ram() MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&get_ram);
     unsigned id;
@@ -289,8 +289,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
   
-  var internal::_typeof(var val) MAYBEDELEGATEATTR;
-  var internal::_typeof(var val)
+//  var internal::_typeof(var val) MAYBEDELEGATEATTR;
+  var internal::_typeof(var val) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&_typeof);
     unsigned id;
@@ -303,8 +303,8 @@ extern "C" void (*flascc_uiTickProc)();
     return a._id == b._id;
   }
 
-  bool internal::equals(var a, var b) MAYBEDELEGATEATTR;
-  bool internal::equals(var a, var b)
+//  bool internal::equals(var a, var b) MAYBEDELEGATEATTR;
+  bool internal::equals(var a, var b) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&equals);
     int r;
@@ -312,8 +312,8 @@ extern "C" void (*flascc_uiTickProc)();
     return r != 0;
   }
 
-  bool internal::lessthan(var a, var b) MAYBEDELEGATEATTR;
-  bool internal::lessthan(var a, var b)
+//  bool internal::lessthan(var a, var b) MAYBEDELEGATEATTR;
+  bool internal::lessthan(var a, var b) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&lessthan);
     int r;
@@ -321,8 +321,8 @@ extern "C" void (*flascc_uiTickProc)();
     return r != 0;
   }
 
-  bool internal::lessequals(var a, var b) MAYBEDELEGATEATTR;
-  bool internal::lessequals(var a, var b)
+//  bool internal::lessequals(var a, var b) MAYBEDELEGATEATTR;
+  bool internal::lessequals(var a, var b) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&lessequals);
     int r;
@@ -330,8 +330,8 @@ extern "C" void (*flascc_uiTickProc)();
     return r != 0;
   }
 
-  bool internal::greaterthan(var a, var b) MAYBEDELEGATEATTR;
-  bool internal::greaterthan(var a, var b)
+//  bool internal::greaterthan(var a, var b) MAYBEDELEGATEATTR;
+  bool internal::greaterthan(var a, var b) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&greaterthan);
     int r;
@@ -339,8 +339,8 @@ extern "C" void (*flascc_uiTickProc)();
     return r != 0;
   }
 
-  bool internal::greaterequals(var a, var b) MAYBEDELEGATEATTR;
-  bool internal::greaterequals(var a, var b)
+//  bool internal::greaterequals(var a, var b) MAYBEDELEGATEATTR;
+  bool internal::greaterequals(var a, var b) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(&greaterequals);
     int r;
@@ -359,8 +359,8 @@ extern "C" void (*flascc_uiTickProc)();
   const var _true = internal::new_Boolean(true);
   const var _false = internal::new_Boolean(false);
 
-  var internal::get_Worker(long tid) __attribute__((noinline));
-  var internal::get_Worker(long tid)
+//  var internal::get_Worker(long tid) __attribute__((noinline));
+  var internal::get_Worker(long tid) __attribute__((noinline))
   {
     MAYBEDELEGATE(&get_Worker);
     unsigned id;
@@ -383,8 +383,8 @@ extern "C" void (*flascc_uiTickProc)();
   }
 
 #if AS3_UI
-  var internal::get_Stage() __attribute__((noinline));
-  var internal::get_Stage()
+//  var internal::get_Stage() __attribute__((noinline));
+  var internal::get_Stage() __attribute__((noinline))
   {
     MAYBEDELEGATE(&get_Stage);
     unsigned id;
@@ -401,8 +401,9 @@ extern "C" void (*flascc_uiTickProc)();
   }
 #endif
 
-  var internal::call_v(var fun, var rcv, var vargs, void *ramPos) __attribute__((noinline));
+//  var internal::call_v(var fun, var rcv, var vargs, void *ramPos) __attribute__((noinline));
   var internal::call_v(var fun, var rcv, var vargs, void *ramPos)
+      __attribute__((noinline))
   {
     MAYBEDELEGATE(&call_v);
     unsigned id;
@@ -426,8 +427,8 @@ extern "C" void (*flascc_uiTickProc)();
     return internal::call_v(fun, rcv, vargs, ramPos);
   }
 
-  var internal::getproperty(var obj, var name) __attribute__((noinline));
-  var internal::getproperty(var obj, var name)
+//  var internal::getproperty(var obj, var name) __attribute__((noinline));
+  var internal::getproperty(var obj, var name) __attribute__((noinline))
   {
     MAYBEDELEGATE((var (*)(var, var))getproperty);
     unsigned id;
@@ -444,8 +445,9 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::getproperty(var obj, var ns, var name) __attribute__((noinline));
+//  var internal::getproperty(var obj, var ns, var name) __attribute__((noinline));
   var internal::getproperty(var obj, var ns, var name)
+    __attribute__((noinline))
   {
     MAYBEDELEGATE((var (*)(var, var, var))getproperty);
     unsigned id;
@@ -463,8 +465,9 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  void internal::setproperty(var obj, var name, var val) __attribute__((noinline));
+//  void internal::setproperty(var obj, var name, var val) __attribute__((noinline));
   void internal::setproperty(var obj, var name, var val)
+    __attribute__((noinline))
   {
     MAYBEDELEGATE((void (*)(var, var, var))setproperty);
     unsigned eid;
@@ -479,8 +482,9 @@ extern "C" void (*flascc_uiTickProc)();
       throw var(eid);
   }
 
-  void internal::setproperty(var obj, var ns, var name, var val) __attribute__((noinline));
+//  void internal::setproperty(var obj, var ns, var name, var val) __attribute__((noinline));
   void internal::setproperty(var obj, var ns, var name, var val)
+    __attribute__((noinline))
   {
     MAYBEDELEGATE((void (*)(var, var, var, var))setproperty);
     unsigned eid;
@@ -496,8 +500,8 @@ extern "C" void (*flascc_uiTickProc)();
       throw var(eid);
   }
 
-  var internal::getlex(var name) __attribute__((noinline));
-  var internal::getlex(var name)
+//  var internal::getlex(var name) __attribute__((noinline));
+  var internal::getlex(var name) __attribute__((noinline))
   {
     MAYBEDELEGATE((var (*)(var))getlex);
     unsigned id;
@@ -514,8 +518,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::getlex(var ns, var name) __attribute__((noinline));
-  var internal::getlex(var ns, var name)
+//  var internal::getlex(var ns, var name) __attribute__((noinline));
+  var internal::getlex(var ns, var name) __attribute__((noinline))
   {
     MAYBEDELEGATE((var (*)(var, var))getlex);
     unsigned id;
@@ -532,8 +536,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  void internal::setlex(var name, var val) __attribute__((noinline));
-  void internal::setlex(var name, var val)
+//  void internal::setlex(var name, var val) __attribute__((noinline));
+  void internal::setlex(var name, var val) __attribute__((noinline))
   {
     MAYBEDELEGATE((void (*)(var, var))setlex);
     unsigned eid;
@@ -548,8 +552,8 @@ extern "C" void (*flascc_uiTickProc)();
       throw var(eid);
   }
 
-  void internal::setlex(var ns, var name, var val) __attribute__((noinline));
-  void internal::setlex(var ns, var name, var val)
+//  void internal::setlex(var ns, var name, var val) __attribute__((noinline));
+  void internal::setlex(var ns, var name, var val) __attribute__((noinline))
   {
     MAYBEDELEGATE((void (*)(var, var, var))setlex);
     unsigned eid;
@@ -564,8 +568,8 @@ extern "C" void (*flascc_uiTickProc)();
       throw var(eid);
   }
 
-  var internal::construct(var cc) __attribute__((noinline));
-  var internal::construct(var cc)
+//  var internal::construct(var cc) __attribute__((noinline));
+  var internal::construct(var cc) __attribute__((noinline))
   {
     MAYBEDELEGATE((var (*)(var))construct);
     unsigned id;
@@ -581,8 +585,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::construct(var cc, var a1) __attribute__((noinline));
-  var internal::construct(var cc, var a1)
+//  var internal::construct(var cc, var a1) __attribute__((noinline));
+  var internal::construct(var cc, var a1) __attribute__((noinline))
   {
     MAYBEDELEGATE((var (*)(var, var))construct);
     unsigned id;
@@ -598,8 +602,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::construct(var cc, var a1, var a2) __attribute__((noinline));
-  var internal::construct(var cc, var a1, var a2)
+//  var internal::construct(var cc, var a1, var a2) __attribute__((noinline));
+  var internal::construct(var cc, var a1, var a2) __attribute__((noinline))
   {
     MAYBEDELEGATE((var (*)(var, var, var))construct);
     unsigned id;
@@ -615,8 +619,9 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::construct(var cc, var a1, var a2, var a3) __attribute__((noinline));
+//  var internal::construct(var cc, var a1, var a2, var a3) __attribute__((noinline));
   var internal::construct(var cc, var a1, var a2, var a3)
+    __attribute__((noinline))
   {
     MAYBEDELEGATE((var (*)(var, var, var, var))construct);
     unsigned id;
@@ -632,8 +637,9 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::construct(var cc, var a1, var a2, var a3, var a4) __attribute__((noinline));
+//  var internal::construct(var cc, var a1, var a2, var a3, var a4) __attribute__((noinline));
   var internal::construct(var cc, var a1, var a2, var a3, var a4)
+    __attribute__((noinline))
   {
     MAYBEDELEGATE((var (*)(var, var, var, var, var))construct);
     unsigned id;
@@ -649,8 +655,9 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::construct(var cc, var a1, var a2, var a3, var a4, var a5) __attribute__((noinline));
+//  var internal::construct(var cc, var a1, var a2, var a3, var a4, var a5) __attribute__((noinline));
   var internal::construct(var cc, var a1, var a2, var a3, var a4, var a5)
+    __attribute__((noinline))
   {
     MAYBEDELEGATE((var (*)(var, var, var, var, var, var))construct);
     unsigned id;
@@ -666,8 +673,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  var internal::new_Array(int count, var *elems) __attribute__((noinline));
-  var internal::new_Array(int count, var *elems)
+//  var internal::new_Array(int count, var *elems) __attribute__((noinline));
+  var internal::new_Array(int count, var *elems) __attribute__((noinline))
   {
     MAYBEDELEGATE(&new_Array);
     unsigned id;
@@ -717,8 +724,9 @@ extern "C" void (*flascc_uiTickProc)();
     return var::internal::detach(&res);
   }
 
-  var internal::new_Function(var (*fun)(void *data, var args), void *data) __attribute__((noinline));
+//  var internal::new_Function(var (*fun)(void *data, var args), void *data) __attribute__((noinline));
   var internal::new_Function(var (*fun)(void *data, var args), void *data)
+    __attribute__((noinline))
   {
     MAYBEDELEGATE(&new_Function);
     unsigned id;
@@ -739,8 +747,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  char *internal::utf8_toString(var val) __attribute__((noinline));
-  char *internal::utf8_toString(var val)
+//  char *internal::utf8_toString(var val) __attribute__((noinline));
+  char *internal::utf8_toString(var val) __attribute__((noinline))
   {
     MAYBEDELEGATE(&utf8_toString);
     char *result;
@@ -756,8 +764,8 @@ extern "C" void (*flascc_uiTickProc)();
     return result;
   }
 
-  bool internal::bool_valueOf(var val) __attribute__((noinline));
-  bool internal::bool_valueOf(var val)
+//  bool internal::bool_valueOf(var val) __attribute__((noinline));
+  bool internal::bool_valueOf(var val) __attribute__((noinline))
   {
     MAYBEDELEGATE(&bool_valueOf);
     int result;
@@ -773,8 +781,8 @@ extern "C" void (*flascc_uiTickProc)();
     return result ? true : false;
   }
 
-  int internal::int_valueOf(var val) __attribute__((noinline));
-  int internal::int_valueOf(var val)
+//  int internal::int_valueOf(var val) __attribute__((noinline));
+  int internal::int_valueOf(var val) __attribute__((noinline))
   {
     MAYBEDELEGATE(&int_valueOf);
     int result;
@@ -790,8 +798,8 @@ extern "C" void (*flascc_uiTickProc)();
     return result;
   }
 
-  unsigned internal::uns_valueOf(var val) __attribute__((noinline));
-  unsigned internal::uns_valueOf(var val)
+//  unsigned internal::uns_valueOf(var val) __attribute__((noinline));
+  unsigned internal::uns_valueOf(var val) __attribute__((noinline))
   {
     MAYBEDELEGATE(&uns_valueOf);
     unsigned result;
@@ -807,8 +815,8 @@ extern "C" void (*flascc_uiTickProc)();
     return result;
   }
 
-  double internal::double_valueOf(var val) __attribute__((noinline));
-  double internal::double_valueOf(var val)
+//  double internal::double_valueOf(var val) __attribute__((noinline));
+  double internal::double_valueOf(var val) __attribute__((noinline))
   {
     MAYBEDELEGATE(&double_valueOf);
     double result;
@@ -824,8 +832,8 @@ extern "C" void (*flascc_uiTickProc)();
     return result;
   }
 
-  var internal::coerce(var cc, var v) __attribute__((noinline));
-  var internal::coerce(var cc, var v)
+//  var internal::coerce(var cc, var v) __attribute__((noinline));
+  var internal::coerce(var cc, var v) __attribute__((noinline))
   {
     MAYBEDELEGATE(&coerce);
     unsigned id;
@@ -842,8 +850,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  bool internal::_delete(var val, var prop) __attribute__((noinline));
-  bool internal::_delete(var val, var prop)
+//  bool internal::_delete(var val, var prop) __attribute__((noinline));
+  bool internal::_delete(var val, var prop) __attribute__((noinline))
   {
     MAYBEDELEGATE(&_delete);
     int result;
@@ -859,22 +867,22 @@ extern "C" void (*flascc_uiTickProc)();
     return result ? true : false;
   }
 
-  void internal::_throw(var val) __attribute__((noinline));
-  void internal::_throw(var val)
+//  void internal::_throw(var val) __attribute__((noinline));
+  void internal::_throw(var val) __attribute__((noinline))
   {
     MAYBEDELEGATE(&_throw);
     inline_as3 ("throw(as3_id2rcv[%0].val)" : : "r"(val._id));
   }
 
-  void internal::trace(var val) __attribute__((noinline));
-  void internal::trace(var val)
+//  void internal::trace(var val) __attribute__((noinline));
+  void internal::trace(var val) __attribute__((noinline))
   {
     MAYBEDELEGATE(&trace);
     inline_as3 ("trace(as3_id2rcv[%0].val)" : : "r"(val._id));
   }
 
-  bool internal::is(var a, var b) MAYBEDELEGATEATTR;
-  bool internal::is(var a, var b)
+//  bool internal::is(var a, var b) MAYBEDELEGATEATTR;
+  bool internal::is(var a, var b) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(is);
     int result;
@@ -890,8 +898,8 @@ extern "C" void (*flascc_uiTickProc)();
     return result ? true : false;
   }
 
-  var internal::as(var a, var b) MAYBEDELEGATEATTR;
-  var internal::as(var a, var b)
+//  var internal::as(var a, var b) MAYBEDELEGATEATTR;
+  var internal::as(var a, var b) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(as);
     unsigned id;
@@ -907,8 +915,8 @@ extern "C" void (*flascc_uiTickProc)();
     return var(id);
   }
 
-  bool internal::instanceof(var a, var b) MAYBEDELEGATEATTR;
-  bool internal::instanceof(var a, var b)
+//  bool internal::instanceof(var a, var b) MAYBEDELEGATEATTR;
+  bool internal::instanceof(var a, var b) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(instanceof);
     int result;
@@ -924,8 +932,8 @@ extern "C" void (*flascc_uiTickProc)();
     return result ? true : false;
   }
 
-  bool internal::in(var a, var b) MAYBEDELEGATEATTR;
-  bool internal::in(var a, var b)
+//  bool internal::in(var a, var b) MAYBEDELEGATEATTR;
+  bool internal::in(var a, var b) MAYBEDELEGATEATTR
   {
     MAYBEDELEGATE(in);
     int result;
