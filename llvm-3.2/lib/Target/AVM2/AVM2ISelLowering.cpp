@@ -179,6 +179,8 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
     setOperationAction(ISD::FPOW, MVT::f32, Custom);
     setOperationAction(ISD::FSQRT, MVT::f32, Custom);
 
+    setOperationAction(ISD::FMA, MVT::f32, Expand);
+    setOperationAction(ISD::FMA, MVT::f64, Expand);
     // TODO more?
     setOperationAction(ISD::FSIN, MVT::f64, Legal);
     setOperationAction(ISD::FCOS, MVT::f64, Legal);
@@ -216,24 +218,15 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
     setOperationAction(ISD::SRA_PARTS, MVT::i64, Expand);
     setOperationAction(ISD::SRL_PARTS, MVT::i64, Expand);
 
-    
-    setOperationAction(ISD::FMA, MVT::i32, Expand);
-    setOperationAction(ISD::FMA, MVT::i64, Expand);
+    for(int i=ISD::ATOMIC_LOAD; i <= ISD::ATOMIC_LOAD_UMAX; i++) {
+      setOperationAction(i, MVT::i32, Expand);
+      setOperationAction(i, MVT::i8, Promote);
+      setOperationAction(i, MVT::i16, Promote);
+      AddPromotedToType(i, MVT::i8, MVT::i32);
+      AddPromotedToType(i, MVT::i16, MVT::i32);
+    }
     setOperationAction(ISD::ATOMIC_FENCE, MVT::Other, Expand);
-    setOperationAction(ISD::ATOMIC_LOAD, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_STORE, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_SWAP, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_CMP_SWAP, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_LOAD_ADD, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_LOAD_AND, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_LOAD_MAX, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_LOAD_MIN, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_LOAD_NAND, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_LOAD_OR, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_LOAD_SUB, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_LOAD_UMAX, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_LOAD_UMIN, MVT::i32, Expand);
-    setOperationAction(ISD::ATOMIC_LOAD_XOR, MVT::i32, Expand);
+
     /*
      http://llvm.org/viewvc/llvm-project?view=rev&revision=78142
      Major calling convention code refactoring.
