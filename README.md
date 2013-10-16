@@ -1,4 +1,4 @@
-# [Crossbridge][http://www.crossbridge.io] 
+# [Crossbridge](http://www.crossbridge.io) 
 
 Crossbridge is the open-source version of Adobe FlasCC (formerly the Alchemy project). It provides a complete C/C++ development environment for targetting the Adobe Flash Runtime.  
 For more information about this project, please visit http://adobe-flash.github.io/crossbridge/.  
@@ -29,3 +29,5 @@ Comparing to master, it will mainly has
 Download a copy of SDK for your OS at http://sourceforge.net/projects/crossbridge/files/
 Open README.html to get a basic idea of crossbridge usage.
 
+### License
+The code written by adobe is all MIT licensed, but crossbridge contains many different open source projects which have different licenses, check the source files before making any assumptions.
