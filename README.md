@@ -17,7 +17,7 @@ The failure cases fall into 5 categories:
 * Object-C lib not suport (Does anyone use it?) 
 * Debug doesn't work well.
 
-Since github has a file size limit, [A precompiled SDK] with the version hash code in name is put [HERE](http://sourceforge.net/projects/crossbridge/files/) in sourceforge. 
+[A precompiled SDK](https://github.com/adobe-flash/crossbridge/blob/futures/Crossbridge_1.1.0.devbuild.dmg) for current code base is under the top dir if you would like to give a try.   
 Please note that it could be removed in future.  
 Any issue/suggestion/feedback/... please go to issue list.
 
@@ -29,7 +29,7 @@ If not, please take a look at the document README.html at first to get a basic i
 
 
 ### Get involved in development
---Build system  
+###### Build system  
 The build system only supports Mac OS officially.  
 (Well, building in Cygwin is possible, but please pay more patience.)  
 So assume you have a machine like what I have 
@@ -40,13 +40,13 @@ So assume you have a machine like what I have
 * Macport/Homebrew
 
 
---Tools and libs required for building  
+###### Tools and libs required for building  
 Use macport/homebrew to install autoconf, automake, ccache, cmake, gettext,  
  glib, gmp, libmpc, mpfr, pkg-config, readline
 
-For homebrew users, unzip [libmpc.tgz](http://sourceforge.net/projects/crossbridge/files/) to /opt/local/lib
+For homebrew users, unzip [libmpc.tgz](https://github.com/adobe-flash/crossbridge/blob/futures/libmpc.tgz) to /opt/local/lib
 
---Start Building it  
+###### Start Building it  
 Once you've downloaded the code base, say:  
 > $ git clone https://github.com/adobe-flash/crossbridge.git -b futures  
 > $ cd crossbridge && make
@@ -54,9 +54,7 @@ Once you've downloaded the code base, say:
 Build log will be placed in ./build/mac/log. 
 SDK will be placed in ./sdk.  
 
-
-
---Get in developing  
+###### Get in developing  
 Since the learning curve is not low, what I had were  
 1 Read README.html and try examples to learn basic usage.  
 2 Setup env and try to build it.
@@ -64,8 +62,8 @@ Since the learning curve is not low, what I had were
 4 Get a big picture on how Crossbridge compiler works, especially on generating AS/ABC.  
 5 Walk through specific code path and verify your idea via debugging.  
 
---Extra learning materials  
-These parts will be put alone with code base.
+###### Extra ref materials  
+[Overview of compiler stages](https://github.com/adobe-flash/crossbridge/blob/master/overview_of_compiler_stages.md)
 
 
 ### License
