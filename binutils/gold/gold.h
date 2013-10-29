@@ -65,8 +65,9 @@
 
 // Figure out how to get a hash set and a hash map.
 
-#if defined(HAVE_TR1_UNORDERED_SET) && defined(HAVE_TR1_UNORDERED_MAP) \
-    && defined(HAVE_TR1_UNORDERED_MAP_REHASH)
+#if 1
+// #if defined(HAVE_TR1_UNORDERED_SET) && defined(HAVE_TR1_UNORDERED_MAP) \
+//     && defined(HAVE_TR1_UNORDERED_MAP_REHASH)
 
 #include <tr1/unordered_set>
 #include <tr1/unordered_map>

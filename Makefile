@@ -914,7 +914,7 @@ binutils:
 	rm -rf $(BUILD)/binutils
 	mkdir -p $(BUILD)/binutils
 	mkdir -p $(SDK)/usr
-	cd $(BUILD)/binutils && CC=$(CC) CXX=$(CXX) CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " CXXFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " $(SRCROOT)/binutils/configure \
+	cd $(BUILD)/binutils && CC=$(CC) CXX=$(CXX) CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " CXXFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -stdlib=libstdc++" $(SRCROOT)/binutils/configure \
 		--disable-doc --enable-gold --disable-ld --enable-plugins \
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --with-sysroot=$(SDK)/usr \
 		--program-prefix="" --prefix=$(SDK)/usr --disable-werror \

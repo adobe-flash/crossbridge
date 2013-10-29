@@ -2506,12 +2506,8 @@ Version_script_info::print_expression_list(
     fprintf(f, "      }\n");
 }
 
-} // End namespace gold.
-
 // The remaining functions are extern "C", so it's clearer to not put
 // them in namespace gold.
-
-using namespace gold;
 
 // This function is called by the bison parser to return the next
 // token.
@@ -3363,3 +3359,5 @@ script_exp_function_length(void* closurev, const char* name, size_t namelen)
 
   return length;
 }
+
+} // End namespace gold.
