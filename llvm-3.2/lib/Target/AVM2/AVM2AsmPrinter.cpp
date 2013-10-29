@@ -475,12 +475,15 @@ public:
     }
 
     void printFloatImm(const MachineInstr *MI, int opNum, raw_ostream &OS) {
+        struct dword {
+            uint32_t hi, lo;
+        };
+
         union {
             double d;
-            struct dword {
-                uint32_t hi, lo;
-            } dw;
+            dword dw;
         };
+        
         dw.hi = MI->getOperand(opNum).getImm();
         dw.lo = MI->getOperand(opNum+1).getImm();
         char buf[512];
