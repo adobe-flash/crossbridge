@@ -549,7 +549,7 @@ cmake:
 	mkdir -p $(SDK)/usr/bin
 	mkdir -p $(BUILD)/cmake
 	mkdir -p $(SDK)/usr/cmake_junk
-	$(RSYNC) $(SRCROOT)/cmake-2.8.10.1/ $(BUILD)/cmake/
+	$(RSYNC) $(SRCROOT)/cmake-2.8.12/ $(BUILD)/cmake/
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --docdir=cmake_junk --mandir=cmake_junk
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) install
