@@ -117,35 +117,22 @@ $?LLVM_ONLYLLC=false
 $?LLVMVERSION=3.2
 
 $?GCCLANGFLAG=
-ifneq (,$(findstring 3.3svn,$(`g++ -v`)))
+ifneq (,$(findstring 3.3svn,$(shell g++ --version)))
 	$?GCCLANGFLAG+=-stdlib=libstdc++
 endif
 $?LLVMCXXFLAGS+=$(GCCLANGFLAG)
 
-
-
-ifneq (,$(findstring 2.9,$(LLVMVERSION)))
-	$?LLVMTARGETS=AVM2;AVM2Shim;X86;CBackend
-	$?LLVMCMAKEFLAGS=-DLLVM_BUILD_CLANG=$(CLANG) \
-		-DLLVM_BUILD_GOLDPLUGIN=ON \
-		-DBINUTILS_INCDIR=$(SRCROOT)/binutils/include 
-	$?LLVMLDCP=cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-ld$(EXEEXT) $(SDK)/usr/bin/llvm-ld$(EXEEXT)
-	$?LLVMBUILDTYPE=MinSizeRel
-	$?FLASCC_CC=gcc
-	$?FLASCC_CXX=g++
-else
-	LLVMTARGETS=AVM2;X86
-	LLVMCMAKEFLAGS=-DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8 \
-		-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
-		-DLLVM_BUILD_RUNTIME=OFF
-	LLVMBUILDTYPE=Debug
-	FLASCC_CC=clang
-	FLASCC_CXX=clang++
-	CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang$(EXEEXT) \
-		$(SDK)/usr/bin/clang$(EXEEXT) && \
-		cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang$(EXEEXT) \
-		$(SDK)/usr/bin/clang++$(EXEEXT)
-endif
+LLVMTARGETS=AVM2;X86
+LLVMCMAKEFLAGS=-DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8 \
+	-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
+	-DLLVM_BUILD_RUNTIME=OFF
+LLVMBUILDTYPE=Debug
+FLASCC_CC=clang
+FLASCC_CXX=clang++
+CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang$(EXEEXT) \
+	$(SDK)/usr/bin/clang$(EXEEXT) && \
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang$(EXEEXT) \
+	$(SDK)/usr/bin/clang++$(EXEEXT)
 
 $?FLEX=$(SRCROOT)/tools/flex/
 $?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX -l
@@ -188,13 +175,7 @@ BMAKE+= MACHINE_ARCH=avm2 MACHINE_CPUARCH=AVM2 NO_WERROR=true SSP_CFLAGS=
 BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 
 BUILDORDER= cmake abclibs basictools llvm binutils plugins 
-ifneq (,$(findstring 2.9,$(LLVMVERSION)))
-BUILDORDER+= gcc
-endif
 BUILDORDER+= bmake stdlibs 
-ifneq (,$(findstring 2.9,$(LLVMVERSION)))
-BUILDORDER+= gcclibs
-endif
 BUILDORDER+= as3xx as3wig abcstdlibs sdkcleanup tr trd extralibs 
 BUILDORDER+= extratools finalcleanup submittests
 
@@ -486,7 +467,7 @@ finalcleanup:
 gdb:
 	rm -rf $(BUILD)/gdb-7.3
 	mkdir -p $(BUILD)/gdb-7.3
-	cd $(BUILD)/gdb-7.3 && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/gdb-7.3/configure --build=$(BUILD_TRIPLE)  --host=$(HOST_TRIPLE) --target=avm2-elf && $(MAKE) -j$(THREADS)
+	cd $(BUILD)/gdb-7.3 && CFLAGS="-I$(SRCROOT)/avm2_env/misc -Qunused-arguments -Wno-error" $(SRCROOT)/gdb-7.3/configure --build=$(BUILD_TRIPLE)  --host=$(HOST_TRIPLE) --target=avm2-elf && $(MAKE) -j$(THREADS)
 	cp -f $(BUILD)/gdb-7.3/gdb/gdb$(EXEEXT) $(SDK)/usr/bin/
 	cp -f $(SRCROOT)/tools/flascc.gdb $(SDK)/usr/share/
 	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
@@ -1170,9 +1151,8 @@ libtool:
 	cd $(BUILD)/libtool && $(MAKE) -j$(THREADS) && $(MAKE) install-exec
 
 SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
-SWIG_LIBS=-lLLVMAVM2Info -lLLVMAVM2CodeGen -lLLVMAVM2AsmParser -lLLVMAsmPrinter -lLLVMMCParser -lclangEdit -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport 
-#SWIG_LIBS=-lLLVMAVM2ShimInfo -lLLVMAVM2ShimCodeGen -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport 
-SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/llvm-$(LLVMVERSION)/include -I$(BUILD)/llvm-debug/include -I$(SRCROOT)/llvm-$(LLVMVERSION)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include -I$(SRCROOT)/llvm-$(LLVMVERSION)/tools/clang/lib -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long
+SWIG_LIBS=-lLLVMAVM2Info -lLLVMAVM2CodeGen -lLLVMAVM2AsmParser -lLLVMAsmPrinter -lLLVMMCParser -lclangEdit -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport -stdlib=libstdc++
+SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/llvm-$(LLVMVERSION)/include -I$(BUILD)/llvm-debug/include -I$(SRCROOT)/llvm-$(LLVMVERSION)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include -I$(SRCROOT)/llvm-$(LLVMVERSION)/tools/clang/lib -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long 
 SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
 
 swig:
@@ -1540,7 +1520,7 @@ genfs:
 	$(RSYNC) $(SRCROOT)/zlib-1.2.5/ $(BUILD)/zlib-native
 	cd $(BUILD)/zlib-native && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) ./configure --static && $(MAKE) 
 	cd $(BUILD)/zlib-native/contrib/minizip/ && $(MAKE) 
-	$$CC -Wall -Werror -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
+	$$CC -Wall -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
 
 checkasm:
 	rm -rf $(BUILD)/libtoabc

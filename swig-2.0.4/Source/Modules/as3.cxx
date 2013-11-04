@@ -528,7 +528,7 @@ namespace {
       diagEng->setClient(pTextDiagnosticPrinter);
       
       clang::LangOptions langopt;
-      if (lang = CXX) {
+      if (lang == CXX) {
         clang::CompilerInvocation::setLangDefaults(langopt, clang::IK_CXX);
       }
       
