@@ -11,7 +11,7 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?RAWPLAT=cygwin
 	$?THREADS=3
 	$?nativepath=$(shell cygpath -at mixed $(1))
-	$?BUILD_TRIPLE=x86_64-pc-cygwin
+	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?CC=gcc
 	$?CXX=g++
 	$?NATIVE_AR=ar
@@ -52,7 +52,7 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?SDKEXT=.zip
 	$?BUILD=$(WIN_BUILD)
 	$?PLATFORM_NAME=win
-	$?HOST_TRIPLE=x86_64-pc-cygwin
+	$?HOST_TRIPLE=i686-pc-cygwin
 else
 	$?EXEEXT=
 	$?SOEXT=.dylib
@@ -88,7 +88,7 @@ $?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2
 $?BUILDTYPE=MinSizeRel
 $?CLANG=ON
 ?BUILD_LLVM_TESTS=ON
-$?CYGTRIPLE=x86_64-pc-cygwin
+$?CYGTRIPLE=i686-pc-cygwin
 $?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
@@ -465,7 +465,7 @@ cmake:
 	mkdir -p $(SDK)/usr/bin
 	mkdir -p $(BUILD)/cmake
 	mkdir -p $(SDK)/usr/cmake_junk
-	cp -r $(SRCROOT)/cmake-2.8.10.1/* $(BUILD)/cmake/
+	cp -r $(SRCROOT)/cmake-2.8.12.2/* $(BUILD)/cmake/
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --docdir=cmake_junk --mandir=cmake_junk
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) install
