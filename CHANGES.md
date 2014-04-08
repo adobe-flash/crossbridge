@@ -9,5 +9,6 @@ Changes
 * Fixed compiler error (multi-line rows)
   * \posix\syscalls.changed
   * \posix\syscalls.master
-* Fixed compiler error (missing header)
-  * tools\as\as.cpp
+* Fixed compiler error (missing header: unistd.h)
+  * \tools\as\as.cpp
+  * \llvm-2.9\lib\Target\AVM2\AVM2MCAsmStreamer.cpp

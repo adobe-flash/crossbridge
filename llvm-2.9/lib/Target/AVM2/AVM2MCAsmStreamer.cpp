@@ -46,6 +46,7 @@
 #include <vector>
 #include <map>
 #include <stdio.h>
+#include <unistd.h>
 
 #if !defined(__MINGW32__) 
 #include <sys/wait.h>
