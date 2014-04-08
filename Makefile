@@ -101,11 +101,11 @@ $?FLASCC_VERSION_BUILD:=devbuild
 $?SDKNAME=Crossbridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH).$(FLASCC_VERSION_BUILD)
 BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_MINOR=$(FLASCC_VERSION_MINOR) -DFLASCC_VERSION_PATCH=$(FLASCC_VERSION_PATCH) -DFLASCC_VERSION_BUILD=$(FLASCC_VERSION_BUILD)"
 
-ifneq (,$(PRINT_LOGS_ON_ERROR))
+#ifneq (,$(PRINT_LOGS_ON_ERROR))
 	$?PRINT_LOGS_CMD=tail +1
-else
-	$?PRINT_LOGS_CMD=true
-endif
+#else
+#	$?PRINT_LOGS_CMD=true
+#endif
 
 export CCACHE_DIR=$(SRCROOT)/ccache
 
@@ -476,7 +476,7 @@ make:
 	mkdir -p $(BUILD)/make
 	cp -r $(SRCROOT)/make-3.82/* $(BUILD)/make/
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --program-prefix="" \
-                --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --disable-nls MAKEINFO=missing
+                --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) MAKEINFO=missing
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) install
 
