@@ -31,3 +31,22 @@ Open README.html to get a basic idea of crossbridge usage.
 
 ### License
 The code written by adobe is all MIT licensed, but crossbridge contains many different open source projects which have different licenses, check the source files before making any assumptions.
+
+### Building from source
+
+#### Windows (Cygwin x86-64bit)
+
+##### Prerequisites
+
+* Install Cygwin
+* Install Packages according to "\cygwinmac\packages\"
+* Edit "$CYGWIN_HOME\etc\fstab" with "noacl" resulting "none /cygdrive cygdrive binary,noacl,posix=0,user 0 0"
+* Run Cygwin with pre-set variables
+    * "set FLASCC_ROOT=\CROSSBRIDGE_SOURCE_ROOT"
+    * "set SHELLOPTS=braceexpand:emacs:hashall:histexpand:history:igncr:interactive-comments:monitor"
+* Run "cd $FLASCC_ROOT"
+* Run "make -i" for ignoring errors
+        
+#### Mac
+
+TBD

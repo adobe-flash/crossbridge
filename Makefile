@@ -11,9 +11,9 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?RAWPLAT=cygwin
 	$?THREADS=3
 	$?nativepath=$(shell cygpath -at mixed $(1))
-	$?BUILD_TRIPLE=i686-pc-cygwin
-	$?CC=gcc-4
-	$?CXX=g++-4
+	$?BUILD_TRIPLE=x86_64-pc-cygwin
+	$?CC=gcc
+	$?CXX=g++
 	$?NATIVE_AR=ar
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp.exe
@@ -52,7 +52,7 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?SDKEXT=.zip
 	$?BUILD=$(WIN_BUILD)
 	$?PLATFORM_NAME=win
-	$?HOST_TRIPLE=i686-pc-cygwin
+	$?HOST_TRIPLE=x86_64-pc-cygwin
 else
 	$?EXEEXT=
 	$?SOEXT=.dylib
@@ -88,7 +88,7 @@ $?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2
 $?BUILDTYPE=MinSizeRel
 $?CLANG=ON
 ?BUILD_LLVM_TESTS=ON
-$?CYGTRIPLE=i686-pc-cygwin
+$?CYGTRIPLE=x86_64-pc-cygwin
 $?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
