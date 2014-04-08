@@ -41,12 +41,16 @@ The code written by adobe is all MIT licensed, but crossbridge contains many dif
 ##### Prerequisites
 
 * Install Cygwin with packages:
-    * gcc-core
-    * gcc-g++
-    * make
-    * cmake
     * autoconf
     * automake
+    * cmake
+    * gcc-core
+    * gcc-g++
+    * glib
+    * libuuid
+    * make
+    * pkg-config
+    * python
     * rsync
 * Edit "$CYGWIN_HOME\etc\fstab" with "noacl" resulting "none /cygdrive cygdrive binary,noacl,posix=0,user 0 0"
 * Run Cygwin with pre-set variables
