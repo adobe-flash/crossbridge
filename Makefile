@@ -101,12 +101,6 @@ $?FLASCC_VERSION_BUILD:=devbuild
 $?SDKNAME=Crossbridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH).$(FLASCC_VERSION_BUILD)
 BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_MINOR=$(FLASCC_VERSION_MINOR) -DFLASCC_VERSION_PATCH=$(FLASCC_VERSION_PATCH) -DFLASCC_VERSION_BUILD=$(FLASCC_VERSION_BUILD)"
 
-#ifneq (,$(PRINT_LOGS_ON_ERROR))
-	$?PRINT_LOGS_CMD=tail +1
-#else
-#	$?PRINT_LOGS_CMD=true
-#endif
-
 export CCACHE_DIR=$(SRCROOT)/ccache
 
 #TODO are we done sweeping for asm?
@@ -122,7 +116,7 @@ all:
 	@echo "-  base"
 	@$(MAKE) base &> $(BUILD)/logs/base.txt
 	@echo "-  make"
-	@$(MAKE) make &> $(BUILD)/logs/make.txt
+	@$(MAKE) -i make &> $(BUILD)/logs/make.txt
 	@$(SDK)/usr/bin/make -s all_with_local_make
 
 all_with_local_make:
@@ -144,7 +138,8 @@ all_with_local_make:
 		done ; \
 		if [ $$mret -ne 0 ] ; then \
 			echo "Failed to build: $$target" ;\
-			$(PRINT_LOGS_CMD) $$logs ;\
+			echo "$(BUILD)/logs/$$target.txt" ;\
+			tail $(BUILD)/logs/$$target.txt ;\
 			exit 1 ; \
 		fi ; \
 	done
