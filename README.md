@@ -68,5 +68,5 @@ The code written by adobe is all MIT licensed, but crossbridge contains many dif
          
 #### Mac
 
-TBD
+* Take a look at .travis.yml
 

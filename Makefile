@@ -4,9 +4,6 @@ $?UNAME=$(shell uname -s)
 $?EMITSWF=
 $?SWFDIR=
 $?SWFEXT=
-$?CC=gcc
-$?CXX=g++
-$?NATIVE_AR=ar
 
 # This section is for Host platform options
 ifneq (,$(findstring CYGWIN,$(UNAME)))
@@ -18,7 +15,6 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp.exe
 	$?NOPIE=
-	$?DEP_CMAKE_VERSION=2.8.12.2   
 else
 	$?PLATFORM="darwin"
 	$?RAWPLAT=darwin
@@ -28,8 +24,11 @@ else
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp
 	$?NOPIE=-no_pie
-	$?DEP_CMAKE_VERSION=2.8.10.1
 endif
+
+$?CC=gcc
+$?CXX=g++
+$?NATIVE_AR=ar
 
 export CC:=$(CC)
 export CXX:=$(CXX)
@@ -459,8 +458,7 @@ cmake:
 	mkdir -p $(SDK)/usr/bin
 	mkdir -p $(BUILD)/cmake
 	mkdir -p $(SDK)/usr/cmake_junk
-	cp -r $(SRCROOT)/cmake-$(DEP_CMAKE_VERSION)/* $(BUILD)/cmake/
-	echo "Building CMake ${DEP_CMAKE_VERSION} ..."
+	cp -r $(SRCROOT)/cmake-2.8.12.2/* $(BUILD)/cmake/
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --docdir=cmake_junk --mandir=cmake_junk
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) install
