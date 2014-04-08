@@ -1,4 +1,17 @@
+notifications:
+    email: false
+
 language: objective-c
+
 compiler:
     - gcc
-script: make PRINT_LOGS_ON_ERROR=1 VERBOSE=1 V=1
+
+before_install:
+    - brew update
+    - brew install mercurial
+    
+before_script:
+    - chmod -R +x .
+
+script: 
+    - make -i

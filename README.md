@@ -1,5 +1,7 @@
 # [Crossbridge](http://www.crossbridge.io) 
 
+[![Build Status](https://travis-ci.org/vpmedia/crossbridge.png?branch=master)](https://travis-ci.org/vpmedia/crossbridge)
+
 Crossbridge is the open-source version of Adobe FlasCC (formerly the Alchemy project). It provides a complete C/C++ development environment for targetting the Adobe Flash Runtime.  
 For more information about this project, please visit http://adobe-flash.github.io/crossbridge/.  
 To get the latest release version, please visit the http://sourceforge.net/projects/crossbridge/files/.
@@ -44,6 +46,8 @@ The code written by adobe is all MIT licensed, but crossbridge contains many dif
     * make
     * cmake
     * autoconf
+    * automake
+    * rsync
 * Edit "$CYGWIN_HOME\etc\fstab" with "noacl" resulting "none /cygdrive cygdrive binary,noacl,posix=0,user 0 0"
 * Run Cygwin with pre-set variables
     * "set FLASCC_ROOT=\CROSSBRIDGE_SOURCE_ROOT"
