@@ -113,6 +113,7 @@ BUILDORDER=cmake abclibs basictools llvm binutils plugins gcc bmake \
 all:
 	@echo "~~~ Crossbridge ~~~"
 	@echo "Using Platform: $(PLATFORM)"
+	@echo "Using CMake: $(DEPENDENCY_CMAKE)"
 	@mkdir -p $(BUILD)/logs
 	@echo "-  base"
 	@$(MAKE) base &> $(BUILD)/logs/base.txt
