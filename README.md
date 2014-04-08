@@ -70,3 +70,15 @@ The code written by adobe is all MIT licensed, but crossbridge contains many dif
 
 * Take a look at .travis.yml
 
+### Changes
+
+#### 08/04/14 
+
+* Updated CMake to 2.8.12.2
+
+* Fixed compiler error (argument type)
+  \tools\noenv\noenv.c
+
+* Formatted multi-line delimited files for windows compatibility
+  \posix\syscalls.changed
+  \posix\syscalls.master
