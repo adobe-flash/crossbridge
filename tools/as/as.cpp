@@ -30,6 +30,7 @@
 #include <sys/utsname.h>
 #include <string>
 #include <vector>
+#include <unistd.h>
 
 #define CHUNK (256 * 1024)
 

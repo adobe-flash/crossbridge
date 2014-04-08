@@ -75,10 +75,10 @@ The code written by adobe is all MIT licensed, but crossbridge contains many dif
 #### 08/04/14 
 
 * Updated CMake to 2.8.12.2
-
 * Fixed compiler error (argument type)
-  \tools\noenv\noenv.c
-
-* Formatted multi-line delimited files for windows compatibility
-  \posix\syscalls.changed
-  \posix\syscalls.master
+  * \tools\noenv\noenv.c
+* Fixed compiler error (multi-line rows)
+  * \posix\syscalls.changed
+  * \posix\syscalls.master
+* Fixed compiler error (missing header)
+  * tools\as\as.cpp
