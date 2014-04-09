@@ -27,7 +27,8 @@ else
 endif
 
 $?DEPENDENCY_MAKE=make-3.82
-$?DEPENDENCY_CMAKE=cmake-2.8.12.2
+#$?DEPENDENCY_CMAKE=cmake-2.8.12.2
+$?DEPENDENCY_CMAKE=cmake-3.0.20140409
 $?DEPENDENCY_BMAKE=bmake-20140214
 $?DEPENDENCY_LLVM=llvm-2.9
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
@@ -476,6 +477,7 @@ cmake:
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --docdir=cmake_junk --mandir=cmake_junk
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) install
+	cp -r $(SDK)/usr/share/$(DEPENDENCY_CMAKE) $(SDK)/usr/platform/$(PLATFORM)/share/
 
 make:
 	rm -rf $(BUILD)/make
