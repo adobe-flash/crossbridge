@@ -15,7 +15,6 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp.exe
 	$?NOPIE=
-	$?DEPENDENCY_CMAKE=cmake-2.8.12.2
 else
 	$?PLATFORM="darwin"
 	$?RAWPLAT=darwin
@@ -25,8 +24,9 @@ else
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp
 	$?NOPIE=-no_pie
-	$?DEPENDENCY_CMAKE=cmake-2.8.10.1
 endif
+
+$?DEPENDENCY_CMAKE=cmake-2.8.12.2
 
 $?CC=gcc
 $?CXX=g++
