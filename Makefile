@@ -515,7 +515,6 @@ csu:
 # Cygwin compatibility
 ifneq (,$(findstring cygwin,$(PLATFORM)))
 	find $(BUILD)/lib/share/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/csu/avm2/ -name 'makefile' -exec dos2unix {} +
 endif
 	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE) SSP_CFLAGS="" MACHINE_ARCH=avm2 crt1_c.o
 	cp -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
