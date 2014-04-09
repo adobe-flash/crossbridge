@@ -9,7 +9,7 @@ $?SWFEXT=
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
-	$?THREADS=3
+	$?THREADS=2
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
@@ -512,6 +512,11 @@ gcc:
 
 csu:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/share/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/csu/avm2/ -name 'makefile' -exec dos2unix {} +
+endif
 	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE) SSP_CFLAGS="" MACHINE_ARCH=avm2 crt1_c.o
 	cp -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
 
@@ -523,6 +528,12 @@ libc:
 	rm -f $(BUILD)/posix/*.o
 	mkdir -p $(BUILD)/lib/src/lib/libc/
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/lib/ -name 'Makefile.inc' -exec dos2unix {} +
+	find $(BUILD)/lib/ -name 'makefile' -exec dos2unix {} +
+endif
 	cd $(BUILD)/posix && python $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
 	cp $(BUILD)/posix/IKernel.as $(SRCROOT)/avmplus/shell
 	cp $(BUILD)/posix/ShellPosix.as $(SRCROOT)/avmplus/shell
@@ -703,6 +714,12 @@ libthr:
 	rm -rf $(BUILD)/libthr
 	mkdir -p $(BUILD)/libthr
 	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/libthr/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/libthr/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/libthr/ -name 'Makefile.inc' -exec dos2unix {} +
+	find $(BUILD)/libthr/ -name 'makefile' -exec dos2unix {} +
+endif
 	cd $(BUILD)/libthr/libthr && $(SDK)/usr/bin/gcc -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/thrHelpers.c
 	# CWARNFLAGS= because thr_exit() can return and pthread_exit() is marked noreturn (where?)...
 	cd $(BUILD)/libthr/libthr && $(BMAKE) -j$(THREADS) SSP_CFLAGS="" MACHINE_ARCH=avm2 CWARNFLAGS= libthr.a
