@@ -34,6 +34,7 @@
 #include <sys/wait.h>
 #include <arpa/inet.h> // htonl
 #include <pthread.h>
+#include <unistd.h>
 
 #include "SetAlchemySDKLocation.c"
 

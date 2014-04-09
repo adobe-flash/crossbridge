@@ -22,3 +22,5 @@ Changes
 
 * Disabled dependency documentation generation
   * \Makefile
+* Fixed compiler error (missing header: unistd.h)
+  * \gold-plugins\makeswf.cpp
