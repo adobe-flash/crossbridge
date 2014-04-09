@@ -25,7 +25,7 @@ else
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp
 	$?NOPIE=-no_pie
-	$?DEPENDENCY_CMAKE=cmake-2.8.12.2
+	$?DEPENDENCY_CMAKE=cmake-2.8.10.1
 endif
 
 $?CC=gcc
