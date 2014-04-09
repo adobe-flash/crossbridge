@@ -7,9 +7,12 @@ The code written by adobe is all MIT licensed, but crossbridge contains many dif
 * CMake: http://www.cmake.org/
 * Cygwin: http://www.cygwin.com/
 * DejaGnu: https://www.gnu.org/software/dejagnu/
-* GNUStep: https://www.gnu.org/software/gnustep/
 * DMalloc: http://dmalloc.com/
+* GNUStep: https://www.gnu.org/software/gnustep/
+* GCC: https://www.gnu.org/software/gcc/
+* GDB: https://www.gnu.org/software/gdb/
 * LLVM: http://llvm.org/
+* LLVM Gold Plug-In: http://llvm.org/docs/GoldPlugin.html
 * LibIconv: https://www.gnu.org/software/libiconv/
 * LibFFI: http://sourceware.org/libffi/
 * LibJPEG: http://libjpeg.sourceforge.net/
