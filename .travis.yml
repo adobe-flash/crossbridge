@@ -14,7 +14,7 @@ before_script:
     - chmod -R +x .
 
 script: 
-    - make
+    - make -i
 
 after_failure:
     - cat /Users/travis/build/vpmedia/crossbridge/build/mac/logs/base.txt
@@ -22,3 +22,8 @@ after_failure:
     - cat /Users/travis/build/vpmedia/crossbridge/build/mac/logs/cmake.txt
     - cat /Users/travis/build/vpmedia/crossbridge/build/mac/cmake/CMakeFiles/CMakeError.log
     - cat /Users/travis/build/vpmedia/crossbridge/build/mac/cmake/CMakeFiles/CMakeOutput.log
+    
+after_success:
+    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/logs/base.txt
+    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/logs/make.txt
+    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/logs/cmake.txt
