@@ -473,7 +473,7 @@ make:
 	mkdir -p $(BUILD)/make
 	cp -r $(SRCROOT)/make-3.82/* $(BUILD)/make/
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --program-prefix="" \
-                --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --disable-doc --disable-nls MAKEINFO=missing
+                --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --disable-nls MAKEINFO=missing
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) install
 
