@@ -1,0 +1,40 @@
+
+LIST= one two three
+LIST+= four five six
+
+FU_mod-ts = a / b / cool
+
+AAA= a a a
+B.aaa= Baaa
+
+all:   mod-ts
+
+# At least one bright spark decided to "improve" their shell,
+# so use printf if it is a builtin
+.if ${type printf:L:sh:Mbuiltin} != ""
+ECHO= printf '%s\n'
+.else
+ECHO= echo
+.endif
+
+mod-ts:
+	@${ECHO} 'LIST="${LIST}"'
+	@${ECHO} 'LIST:ts,="${LIST:ts,}"'
+	@${ECHO} 'LIST:ts/:tu="${LIST:ts/:tu}"'
+	@${ECHO} 'LIST:ts::tu="${LIST:ts::tu}"'
+	@${ECHO} 'LIST:ts:tu="${LIST:ts:tu}"'
+	@${ECHO} 'LIST:tu:ts/="${LIST:tu:ts/}"'
+	@${ECHO} 'LIST:ts:="${LIST:ts:}"'
+	@${ECHO} 'LIST:ts="${LIST:ts}"'
+	@${ECHO} 'LIST:ts:S/two/2/="${LIST:ts:S/two/2/}"'
+	@${ECHO} 'LIST:S/two/2/:ts="${LIST:S/two/2/:ts}"'
+	@${ECHO} 'LIST:ts/:S/two/2/="${LIST:ts/:S/two/2/}"'
+	@${ECHO} "Pretend the '/' in '/n' etc. below are back-slashes."
+	@${ECHO} 'LIST:ts/n="${LIST:ts\n}"'
+	@${ECHO} 'LIST:ts/t="${LIST:ts\t}"'
+	@${ECHO} 'LIST:ts/012:tu="${LIST:ts\012:tu}"'
+	@${ECHO} 'LIST:tx="${LIST:tx}"'
+	@${ECHO} 'LIST:ts/x:tu="${LIST:ts\x:tu}"'
+	@${ECHO} 'FU_$@="${FU_${@:ts}:ts}"'
+	@${ECHO} 'FU_$@:ts:T="${FU_${@:ts}:ts:T}" == cool?'
+	@${ECHO} 'B.$${AAA:ts}="${B.${AAA:ts}}" == Baaa?'

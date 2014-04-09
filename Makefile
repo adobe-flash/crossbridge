@@ -26,7 +26,16 @@ else
 	$?NOPIE=-no_pie
 endif
 
+$?DEPENDENCY_MAKE=make-3.82
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
+$?DEPENDENCY_BMAKE=bmake-20140214
+$?DEPENDENCY_LLVM=llvm-2.9
+$?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
+$?DEPENDENCY_DMALLOC=dmalloc-5.5.2
+$?DEPENDENCY_PKG_CFG=pkg-config-0.26
+$?DEPENDENCY_SWIG=swig-2.0.4
+$?DEPENDENCY_ICONV=libiconv-1.13.1
+$?DEPENDENCY_FFI=libffi-3.0.11
 
 $?CC=gcc
 $?CXX=g++
@@ -114,6 +123,7 @@ all:
 	@echo "~~~ Crossbridge ~~~"
 	@echo "Using Platform: $(PLATFORM)"
 	@echo "Using CMake: $(DEPENDENCY_CMAKE)"
+	@echo "Using BMake: $(DEPENDENCY_BMAKE)"
 	@mkdir -p $(BUILD)/logs
 	@echo "-  base"
 	@$(MAKE) base &> $(BUILD)/logs/base.txt
@@ -471,7 +481,7 @@ make:
 	rm -rf $(BUILD)/make
 	mkdir -p $(SDK)/usr/bin
 	mkdir -p $(BUILD)/make
-	cp -r $(SRCROOT)/make-3.82/* $(BUILD)/make/
+	cp -r $(SRCROOT)/$(DEPENDENCY_MAKE)/* $(BUILD)/make/
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --program-prefix="" \
                 --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --disable-nls MAKEINFO=missing
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
@@ -598,12 +608,12 @@ extratools:
 
 libiconv:
 	mkdir -p $(BUILD)/libiconv
-	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/libiconv-1.13.1/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_ICONV)/configure --prefix=$(SDK)/usr
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 libffi:
 	mkdir -p $(BUILD)/libffi
-	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/libffi-3.0.11/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure --prefix=$(SDK)/usr
 	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 libfficheck:
@@ -739,7 +749,7 @@ gcclibs:
 dmalloc_configure:
 	rm -rf $(SRCROOT)/cached_build/dmalloc
 	mkdir -p $(SRCROOT)/cached_build/dmalloc
-	cd $(SRCROOT)/cached_build/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=gcc CXX=g++ $(SRCROOT)/dmalloc-5.5.2/configure \
+	cd $(SRCROOT)/cached_build/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=gcc CXX=g++ $(SRCROOT)/$(DEPENDENCY_DMALLOC)/configure \
 		--prefix=$(SDK)/usr --disable-shared --enable-static --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
 	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/dmalloc`
 
@@ -761,7 +771,7 @@ abclibobjc:
 bmake:
 	rm -rf $(BUILD)/bmake
 	mkdir -p $(BUILD)/bmake
-	cd $(BUILD)/bmake && $(SRCROOT)/bmake/configure && bash make-bootstrap.sh
+	cd $(BUILD)/bmake && $(SRCROOT)/$(DEPENDENCY_BMAKE)/configure && bash make-bootstrap.sh
 
 binutils:
 	rm -rf $(BUILD)/binutils
@@ -996,7 +1006,7 @@ libsdl-install:
 pkgconfig:
 	rm -rf $(BUILD)/pkgconfig
 	mkdir -p $(BUILD)/pkgconfig
-	cd $(BUILD)/pkgconfig && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/pkg-config-0.26/configure --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --prefix=$(SDK)/usr --disable-shared --disable-dependency-tracking
+	cd $(BUILD)/pkgconfig && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/$(DEPENDENCY_PKG_CFG)/configure --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --prefix=$(SDK)/usr --disable-shared --disable-dependency-tracking
 	cd $(BUILD)/pkgconfig && $(MAKE) -j$(THREADS) && $(MAKE) install
 
 zlib:
@@ -1022,27 +1032,27 @@ SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modul
 swig:
 	rm -rf $(BUILD)/swig
 	mkdir -p $(BUILD)/swig
-	cp -f $(SRCROOT)/swig-2.0.4/pcre-8.20.tar.gz $(BUILD)/swig
-	cd $(BUILD)/swig && $(SRCROOT)/swig-2.0.4/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/swig-2.0.4/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	cp -f $(SRCROOT)/$(DEPENDENCY_SWIG)/pcre-8.20.tar.gz $(BUILD)/swig
+	cd $(BUILD)/swig && $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
 	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
 	$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/2.0.4/$(var);)
 
 swigtests:
 	# reconfigure so that makefile is up to date (in case Makefile.in changed)
 	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" \
-		CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/swig-2.0.4/configure --prefix=$(SDK)/usr --disable-ccache
+		CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache
 	rm -rf $(BUILD)/swig/Examples/as3
-	cp -R $(SRCROOT)/swig-2.0.4/Examples/as3 $(BUILD)/swig/Examples
+	cp -R $(SRCROOT)/$(DEPENDENCY_SWIG)/Examples/as3 $(BUILD)/swig/Examples
 	rm -rf $(BUILD)/swig/Lib/
 	mkdir -p $(BUILD)/swig/Lib/as3
-	cp -R $(SRCROOT)/swig-2.0.4/Lib/as3/* $(BUILD)/swig/Lib/as3
-	cp $(SRCROOT)/swig-2.0.4/Lib/*.i $(BUILD)/swig/Lib
-	cp $(SRCROOT)/swig-2.0.4/Lib/*.swg $(BUILD)/swig/Lib
+	cp -R $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/as3/* $(BUILD)/swig/Lib/as3
+	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.i $(BUILD)/swig/Lib
+	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.swg $(BUILD)/swig/Lib
 	cd $(BUILD)/swig && $(MAKE) check-as3-examples
 	
 swigtestsautomation:
-	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/swig-2.0.4
+	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/$(DEPENDENCY_SWIG)
 
 dejagnu:
 	mkdir -p $(BUILD)/dejagnu
