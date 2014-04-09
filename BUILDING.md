@@ -17,7 +17,9 @@ Doing a "make" in the root directory should be sufficient to build just the mac 
 * Install Cygwin Packages:
     * autoconf
     * automake
+    * bison
     * cmake
+    * flex
     * gcc-core
     * gcc-g++
     * gettext
