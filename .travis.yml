@@ -23,10 +23,10 @@ script:
     - make
 
 after_failure:
-    - tail /Users/travis/build/vpmedia/crossbridge/build/mac/cmake/CMakeFiles/CMakeError.log
-    - tail /Users/travis/build/vpmedia/crossbridge/build/mac/cmake/CMakeFiles/CMakeOutput.log
+    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/cmake/CMakeFiles/CMakeError.log
+    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/cmake/CMakeFiles/CMakeOutput.log
 
 after_script:
-    - tail /Users/travis/build/vpmedia/crossbridge/build/mac/logs/base.txt
-    - tail /Users/travis/build/vpmedia/crossbridge/build/mac/logs/make.txt
-    - tail /Users/travis/build/vpmedia/crossbridge/build/mac/logs/cmake.txt
+    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/logs/base.txt
+    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/logs/make.txt
+    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/logs/cmake.txt
