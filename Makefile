@@ -141,7 +141,7 @@ all_with_local_make:
 		if [ $$mret -ne 0 ] ; then \
 			echo "Failed to build: $$target" ;\
 			echo "$(BUILD)/logs/$$target.txt" ;\
-			tail $(BUILD)/logs/$$target.txt ;\
+			cat $(BUILD)/logs/$$target.txt ;\
 			exit 1 ; \
 		fi ; \
 	done
