@@ -473,7 +473,7 @@ make:
 	mkdir -p $(BUILD)/make
 	cp -r $(SRCROOT)/make-3.82/* $(BUILD)/make/
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --program-prefix="" \
-                --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --disable-docs MAKEINFO=missing
+                --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --disable-doc --disable-nls MAKEINFO=missing
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) install
 
@@ -484,7 +484,7 @@ gcc:
 	mkdir -p $(BUILD)/llvm-gcc-42
 	cd $(BUILD)/llvm-gcc-42 && CFLAGS='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ ' \
 		CC=$(CC) CXX=$(CXX) $(SRCROOT)/llvm-gcc-4.2-2.9/configure --enable-languages=c,c++,objc,obj-c++ \
-		--enable-llvm=$(LLVMINSTALLPREFIX)/llvm-install/ --disable-bootstrap --disable-multilib --disable-libada --disable-docs \
+		--enable-llvm=$(LLVMINSTALLPREFIX)/llvm-install/ --disable-bootstrap --disable-multilib --disable-libada --disable-doc --disable-nls \
 		--enable-sjlj-exceptions --disable-shared --program-prefix="" \
 		--prefix=$(SDK)/usr --with-sysroot="" --with-build-sysroot=$(SDK)/ \
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE)
@@ -768,7 +768,7 @@ binutils:
 	mkdir -p $(BUILD)/binutils
 	mkdir -p $(SDK)/usr
 	cd $(BUILD)/binutils && CC=$(CC) CXX=$(CXX) CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " CXXFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " $(SRCROOT)/binutils/configure \
-		--disable-docs --enable-gold --disable-ld --enable-plugins \
+		--disable-doc --disable-nls --enable-gold --disable-ld --enable-plugins \
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --with-sysroot=$(SDK)/usr \
 		--program-prefix="" --prefix=$(SDK)/usr --disable-werror \
 		--enable-targets=$(TRIPLE)
@@ -784,7 +784,7 @@ cxxfiltmingw:
 		AR=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-ar  CXX=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-g++ \
 		CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " \
 		CXXFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " $(SRCROOT)/binutils/configure \
-		--disable-docs --disable-gold --disable-ld --disable-plugins \
+		--disable-doc --disable-nls --disable-gold --disable-ld --disable-plugins \
 		--build=$(BUILD_TRIPLE) --host=$(MINGWTRIPLE) --target=$(MINGWTRIPLE) \
 		--program-prefix="" --disable-werror \
 		--enable-targets=$(TRIPLE)

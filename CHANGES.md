@@ -20,5 +20,5 @@ Changes
   
 ## 09/04/14
 
-* Fixed GNU ToolChain param ("--disable-doc =>" "--disable-docs")
+* Disabled dependency documentation generation
   * \Makefile
