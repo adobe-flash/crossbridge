@@ -7,14 +7,9 @@ compiler:
     - gcc
 
 before_install:
-    - brew list 
     - brew update 
-    - brew install pbzip2
     - brew install curl
-    - brew install libarchive
-    - brew install expat
-    - brew install glib
-    - brew update 
+    - brew list 
     
 before_script:
     - chmod -R +x .
@@ -23,10 +18,8 @@ script:
     - make
 
 after_failure:
-    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/cmake/CMakeFiles/CMakeError.log
-    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/cmake/CMakeFiles/CMakeOutput.log
-
-after_script:
     - cat /Users/travis/build/vpmedia/crossbridge/build/mac/logs/base.txt
     - cat /Users/travis/build/vpmedia/crossbridge/build/mac/logs/make.txt
     - cat /Users/travis/build/vpmedia/crossbridge/build/mac/logs/cmake.txt
+    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/cmake/CMakeFiles/CMakeError.log
+    - cat /Users/travis/build/vpmedia/crossbridge/build/mac/cmake/CMakeFiles/CMakeOutput.log
