@@ -47,18 +47,21 @@ endif
 # ====================================================================================
 # DEPENDENCIES
 # ====================================================================================
-$?DEPENDENCY_MAKE=make-3.82
-#$?DEPENDENCY_BINUTILS=binutils-2.24
 $?DEPENDENCY_BINUTILS=binutils
-$?DEPENDENCY_CMAKE=cmake-3.0.20140409
 $?DEPENDENCY_BMAKE=bmake-20140214
+$?DEPENDENCY_CMAKE=cmake-3.0.20140409
+$?DEPENDENCY_DMALLOC=dmalloc-5.5.2
+$?DEPENDENCY_FFI=libffi-3.0.11
+$?DEPENDENCY_ICONV=libiconv-1.13.1
+#$?DEPENDENCY_LIBOGG=libogg-1.3.0
+$?DEPENDENCY_LIBPNG=libpng-1.5.7
+$?DEPENDENCY_LIBTOOL=libtool-2.4.2
+#$?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
 $?DEPENDENCY_LLVM=llvm-2.9
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
-$?DEPENDENCY_DMALLOC=dmalloc-5.5.2
+$?DEPENDENCY_MAKE=make-3.82
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SWIG=swig-2.0.4
-$?DEPENDENCY_ICONV=libiconv-1.13.1
-$?DEPENDENCY_FFI=libffi-3.0.11
 $?DEPENDENCY_ZLIB=zlib-1.2.5
 
 # ====================================================================================
@@ -848,7 +851,7 @@ libjpeg:
 libpng_configure:
 	rm -rf $(SRCROOT)/cached_build/libpng
 	mkdir -p $(SRCROOT)/cached_build/libpng
-	cd $(SRCROOT)/cached_build/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=gcc CXX=g++ CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/libpng-1.5.7/configure \
+	cd $(SRCROOT)/cached_build/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=gcc CXX=g++ CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/$(DEPENDENCY_LIBPNG)/configure \
 		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-dependency-tracking
 	perl -p -i -e 's~$(SRCROOT)/cached_build/libpng~FLASCC_BUILD_DIR~g' `grep -ril $(SRCROOT) cached_build/`
 	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
@@ -977,7 +980,7 @@ pkgconfig:
 libtool:
 	rm -rf $(BUILD)/libtool
 	mkdir -p $(BUILD)/libtool
-	cd $(BUILD)/libtool && CC=gcc CXX=g++ $(SRCROOT)/libtool-2.4.2/configure \
+	cd $(BUILD)/libtool && CC=gcc CXX=g++ $(SRCROOT)/$(DEPENDENCY_LIBTOOL)/configure \
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) \
 		--prefix=$(SDK)/usr --enable-static --disable-shared --disable-ltdl-install
 	cd $(BUILD)/libtool && $(MAKE) -j$(THREADS) && $(MAKE) install-exec
