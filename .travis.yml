@@ -7,19 +7,14 @@ compiler:
     - gcc
 
 before_install:
-    - brew update 
-    - brew list 
-    
+    - brew update
+    - brew install curl
+
 before_script:
     - chmod -R +x .
 
 script: 
-    - make
-    - make clean
-    - make base
-    - make make
-    - make cmake
-    - make
+    - sudo make
     
 after_script:
     - cat ./build/mac/logs/base.txt
