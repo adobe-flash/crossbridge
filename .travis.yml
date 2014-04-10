@@ -3,18 +3,15 @@ notifications:
 
 language: objective-c
 
-compiler:
-    - gcc
+compiler: gcc
 
 before_install:
     - brew update
-    - brew install curl
 
 before_script:
     - chmod -R +x .
 
-script: 
-    - sudo make
+script: make
     
 after_script:
     - cat ./build/mac/logs/base.txt

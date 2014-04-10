@@ -35,4 +35,5 @@ Changes
   
 ## 10/04/14
 
-* TBD
+* Changed typos due gettex>5 errors ( @colophon => @@colophon)
+  * \binutils\bfd\doc\bfd.texinfo
