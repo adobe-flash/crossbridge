@@ -157,7 +157,7 @@ BUILDORDER=cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gccl
 # We are ignoring some target errors because of issues with documentation generation
 all:
 	@echo "~~~ Initializing ~~~"
-	#tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
+	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	#tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	@echo "~~~ Crossbridge ~~~"
 	@echo "Using Platform: $(PLATFORM)"
