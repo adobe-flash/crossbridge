@@ -14,7 +14,12 @@ before_script:
     - chmod -R +x .
 
 script: 
-    - make -i
+    - make
+    - make clean
+    - make base
+    - make make
+    - make cmake
+    - make
     
 after_script:
     - cat ./build/mac/logs/base.txt

@@ -20,7 +20,19 @@ Changes
   
 ## 09/04/14
 
-* Disabled dependency documentation generation
-  * \Makefile
 * Fixed compiler error (missing header: unistd.h)
   * \gold-plugins\makeswf.cpp
+* Fixed Cygwin FreeBSD issues with CR/LF using dos2unix
+  * \Makefile
+* Disabled documentation and i18n generation
+  * \Makefile
+* Upgraded CMake
+  * \cmake-3.0.20140409
+  * \Makefile
+* Upgraded BMake
+  * \bmake-20140214
+  * \Makefile
+  
+## 10/04/14
+
+* TBD
