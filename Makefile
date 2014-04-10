@@ -27,7 +27,7 @@ $?SWFEXT=
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
-	$?THREADS=1
+	$?THREADS=2
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
@@ -159,6 +159,8 @@ all:
 	@echo "~~~ Initializing ~~~"
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
+	tar xf packages/$(DEPENDENCY_ICONV).tar.gz
+	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
 	@echo "~~~ Crossbridge ~~~"
 	@echo "Using Platform: $(PLATFORM)"
 	@mkdir -p $(BUILD)/logs
@@ -616,6 +618,12 @@ libm:
 	rm -rf $(BUILD)/msun/ $(BUILD)/libmbc $(SDK)/usr/lib/libm.a $(SDK)/usr/lib/libm.o
 	mkdir -p $(BUILD)/msun
 	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/msun/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/msun/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/msun/ -name 'Makefile.inc' -exec dos2unix {} +
+	dos2unix $(BUILD)/msun/msun/Makefile
+endif
 	cd $(BUILD)/msun/msun && $(BMAKE) -j$(THREADS) SSP_CFLAGS="" MACHINE_ARCH=avm2 libm.a
 	# find bitcode (and ignore non-bitcode genned from .s files) and put
 	# it in our lib
