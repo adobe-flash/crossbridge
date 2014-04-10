@@ -41,3 +41,9 @@ Doing a "make" in the root directory should be sufficient to build just the mac 
 ### Mac
 
 * Take a look at .travis.yml
+
+## Debugging build failures
+
+### Binutils
+  * http://www.linuxquestions.org/questions/linux-from-scratch-13/make-error-in-compiling-binutils-4175476855/
+  * http://www.linuxfromscratch.org/lfs/view/development/chapter05/binutils-pass1.html
