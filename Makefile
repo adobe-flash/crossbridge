@@ -158,7 +158,7 @@ BUILDORDER=cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gccl
 all:
 	@echo "~~~ Initializing ~~~"
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
-	#tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
+	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	@echo "~~~ Crossbridge ~~~"
 	@echo "Using Platform: $(PLATFORM)"
 	@mkdir -p $(BUILD)/logs
