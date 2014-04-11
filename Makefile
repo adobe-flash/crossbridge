@@ -25,6 +25,7 @@ $?DEPENDENCY_MAKE=make-3.82
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SWIG=swig-2.0.4
 $?DEPENDENCY_ZLIB=zlib-1.2.5
+$?DEPENDENCY_DEJAGNU=dejagnu-1.5
 
 # ====================================================================================
 # HOST PLATFORM OPTIONS
@@ -1277,7 +1278,7 @@ swigtestsautomation:
 
 dejagnu:
 	mkdir -p $(BUILD)/dejagnu
-	cd $(BUILD)/dejagnu && $(SRCROOT)/dejagnu-1.5/configure --prefix=$(BUILD)/dejagnu && $(MAKE) install
+	cd $(BUILD)/dejagnu && $(SRCROOT)/$(DEPENDENCY_DEJAGNU)/configure --prefix=$(BUILD)/dejagnu && $(MAKE) install
 
 RUNGCCTESTS=mkdir -p $(BUILD)/gcctests/$@ && cd $(BUILD)/gcctests/$@ && LD_LIBRARY_PATH="/" PATH="$(SDK)/usr/bin:$(PATH)" $(BUILD)/dejagnu/bin/runtest --all --srcdir $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite --target_board=$(TRIPLE)
 
