@@ -27,7 +27,7 @@ $?SWFEXT=
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
-	$?THREADS=2
+	$?THREADS=1
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
@@ -123,7 +123,7 @@ $?SCOMP=java $(JAVAFLAGS) -classpath $(ASC) macromedia.asc.embedding.ScriptCompi
 $?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
 $?BUILDTYPE=MinSizeRel
 $?CLANG=ON
-?BUILD_LLVM_TESTS=ON
+?BUILD_LLVM_TESTS=OFF
 $?CYGTRIPLE=i686-pc-cygwin
 $?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
@@ -501,7 +501,7 @@ binutils:
 plugins:
 	rm -rf $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
 	mkdir -p $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
-	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ -DHAVE_ABCNM -DDEFTMPDIR=\"$(call nativepath,/tmp)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -DHAVE_STDINT_H -I$(SRCROOT)/zlib-1.2.5/ -I$(SRCROOT)/$(DEPENDENCY_BINUTILS)/include -c $(SRCROOT)/gold-plugins/makeswf.cpp
+	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ -DHAVE_ABCNM -DDEFTMPDIR=\"$(call nativepath,/tmp)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -DHAVE_STDINT_H -I$(SRCROOT)/$(DEPENDENCY_ZLIB)/ -I$(SRCROOT)/$(DEPENDENCY_BINUTILS)/include -c $(SRCROOT)/gold-plugins/makeswf.cpp
 	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -shared -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup -o makeswf$(SOEXT) makeswf.o
 	cd $(BUILD)/multiplug && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/  -DHAVE_STDINT_H -DSOEXT=\"$(SOEXT)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -I$(SRCROOT)/$(DEPENDENCY_BINUTILS)/include -c $(SRCROOT)/gold-plugins/multiplug.cpp
 	cd $(BUILD)/multiplug && $(CXX) $(DBGOPTS) -shared -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup -o multiplug$(SOEXT) multiplug.o
@@ -814,7 +814,7 @@ extralibs:
 
 zlib:
 	rm -rf $(BUILD)/zlib
-	cp -r $(SRCROOT)/zlib-1.2.5 $(BUILD)/zlib
+	cp -r $(SRCROOT)/$(DEPENDENCY_ZLIB) $(BUILD)/zlib
 	cd $(BUILD)/zlib && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libz.a CFLAGS=-O4 CXXFLAGS=-O4 SFLAGS=-O4
 	$(RSYNC) $(BUILD)/zlib/zlib.h $(SDK)/usr/include/
 	$(RSYNC) $(BUILD)/zlib/libz.a $(SDK)/usr/lib/
@@ -927,7 +927,7 @@ extratools:
 genfs:
 	rm -rf $(BUILD)/zlib-native
 	mkdir -p $(BUILD)/zlib-native
-	$(RSYNC) $(SRCROOT)/zlib-1.2.5/ $(BUILD)/zlib-native
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_ZLIB)/ $(BUILD)/zlib-native
 	cd $(BUILD)/zlib-native && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) ./configure --static && $(MAKE) 
 	cd $(BUILD)/zlib-native/contrib/minizip/ && $(MAKE) 
 	$$CC -Wall -Werror -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
@@ -1054,7 +1054,7 @@ cross_llvm_mingw:
 		LLVMCFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" \
 		LLVMCXXFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" LLVMLDFLAGS="-lrpcrt4 -Wl,--stack,16000000" \
 		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
-		llvm BUILD_LLVM_TESTS=OFF LLVM_ONLYLLC=true CLANG=OFF
+		llvm BUILD_LLVM_TESTS=ON LLVM_ONLYLLC=true CLANG=OFF
 
 cross_llvm_cygwin:
 	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
