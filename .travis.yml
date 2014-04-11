@@ -1,0 +1,37 @@
+notifications:
+    email: false
+
+language: objective-c
+
+compiler: gcc
+
+before_install:
+    - brew update
+
+before_script:
+    - chmod -R +x .
+
+script: make
+    
+after_script:
+    - cat ./build/mac/logs/base.txt
+    - cat ./build/mac/logs/make.txt
+    - cat ./build/mac/logs/cmake.txt
+    - cat ./build/mac/logs/asdoc.txt
+    - cat ./build/mac/logs/abclibs.txt
+    - cat ./build/mac/logs/basictools.txt
+    - cat ./build/mac/logs/llvm.txt
+    - cat ./build/mac/logs/binutils.txt
+    - cat ./build/mac/logs/plugins.txt
+    - cat ./build/mac/logs/gcc.txt
+    - cat ./build/mac/logs/bmake.txt
+    - cat ./build/mac/logs/stdlibs.txt
+    - cat ./build/mac/logs/gcclibs.txt
+    - cat ./build/mac/logs/abcstdlibs.txt
+    - cat ./build/mac/logs/sdkcleanup.txt
+    - cat ./build/mac/logs/tr.txt
+    - cat ./build/mac/logs/trd.txt
+    - cat ./build/mac/logs/extralibs.txt
+    - cat ./build/mac/logs/extratools.txt
+    - cat ./build/mac/logs/finalcleanup.txt
+    - cat ./build/mac/logs/submittests.txt
