@@ -27,7 +27,7 @@ $?SWFEXT=
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
-	$?THREADS=4
+	$?THREADS=1
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
