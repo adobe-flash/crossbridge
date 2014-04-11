@@ -13,17 +13,23 @@ Changes
   
 ## Code
 
-* Fixed compiler error (argument type)
+* Change argument type
   * \tools\noenv\noenv.c
+
+> from: const **argv
+>
+> to: char*argv[]
 
 * Fixed compiler error (multi-line rows) [new version of python tool should solve this change set]
   * \posix\syscalls.changed
   * \posix\syscalls.master
   
-* Fixed compiler error (missing header: unistd.h)
+* Added missing header
   * \tools\as\as.cpp
   * \llvm-2.9\lib\Target\AVM2\AVM2MCAsmStreamer.cpp
   * \gold-plugins\makeswf.cpp
+  
+> include <unistd.h>
   
 * Changed typos due gettex>5 errors
   * \binutils\bfd\doc\bfd.texinfo
