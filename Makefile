@@ -333,13 +333,6 @@ cmake:
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) install
 	cp -r $(SDK)/usr/share/$(DEPENDENCY_CMAKE) $(SDK)/usr/platform/$(PLATFORM)/share/
 
-# Cygwin/Travis-CI compatibility (Travis-CI installs CMake without minor version 2.8.12.2 or 2.8)
-#ifneq (,$(findstring cygwin,$(PLATFORM)))
-#	cp -r $(SDK)/usr/share/$(DEPENDENCY_CMAKE) $(SDK)/usr/platform/$(PLATFORM)/share/
-#endif
-#	cp -r $(SDK)/usr/share/cmake-2.8 $(SDK)/usr/platform/$(PLATFORM)/share/
-# Solution to test configuration: --datadir=share/$(DEPENDENCY_CMAKE) 
-
 # ====================================================================================
 # ABCLIBS
 # ====================================================================================
@@ -780,10 +773,10 @@ abcstdlibs_more:
 # CLEANUP
 # ====================================================================================
 sdkcleanup:
-	mv $(SDK)/usr/share/cmake-2.8 $(SDK)/usr/share_cmake
+	mv $(SDK)/usr/share/$(DEPENDENCY_CMAKE) $(SDK)/usr/share_cmake
 	rm -rf $(SDK)/usr/share $(SDK)/usr/info $(SDK)/usr/man $(SDK)/usr/lib/x86_64 $(SDK)/usr/cmake_junk $(SDK)/usr/make_junk
 	mkdir -p $(SDK)/usr/share
-	mv $(SDK)/usr/share_cmake $(SDK)/usr/share/cmake-2.8
+	mv $(SDK)/usr/share_cmake $(SDK)/usr/share/$(DEPENDENCY_CMAKE)
 	rm -f $(SDK)/usr/lib/*.la
 	rm -f $(SDK)/usr/lib/crt1.o $(SDK)/usr/lib/crtbegin.o $(SDK)/usr/lib/crtbeginS.o $(SDK)/usr/lib/crtbeginT.o $(SDK)/usr/lib/crtend.o $(SDK)/usr/lib/crtendS.o $(SDK)/usr/lib/crti.o $(SDK)/usr/lib/crtn.o
 
@@ -1172,7 +1165,7 @@ winstaging:
 	$(RSYNC) $(SRCROOT)/cygwin $(BUILDROOT)/staging/
 	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
 	rm -rf $(BUILDROOT)/staging/sdk/usr/libexec
-	rm -rf $(BUILDROOT)/staging/sdk/usr/share/cmake-2.8
+	rm -rf $(BUILDROOT)/staging/sdk/usr/share/$(DEPENDENCY_CMAKE)
 	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/platform/cygwin $(BUILDROOT)/staging/sdk/usr/platform/
 	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/*.dll $(BUILDROOT)/staging/sdk/usr/lib/
 	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/bfd-plugins/*.dll $(BUILDROOT)/staging/sdk/usr/lib/bfd-plugins/
