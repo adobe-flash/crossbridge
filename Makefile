@@ -651,6 +651,10 @@ gcc:
 
 csu:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/share/ -name '*.mk' -exec dos2unix {} +
+endif
 	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE)   crt1_c.o
 	mv -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
 
@@ -662,6 +666,12 @@ libc:
 	rm -f $(BUILD)/posix/*.o
 	mkdir -p $(BUILD)/lib/src/lib/libc/
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/lib/ -name 'Makefile.inc' -exec dos2unix {} +
+	find $(BUILD)/lib/ -name 'makefile' -exec dos2unix {} +
+endif
 	cd $(BUILD)/posix && python $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
 	cp $(BUILD)/posix/IKernel.as $(SRCROOT)/avmplus/shell
 	cp $(BUILD)/posix/ShellPosix.as $(SRCROOT)/avmplus/shell
@@ -854,6 +864,12 @@ libm:
 	rm -rf $(BUILD)/msun/ $(BUILD)/libmbc $(SDK)/usr/lib/libm.a $(SDK)/usr/lib/libm.o
 	mkdir -p $(BUILD)/msun
 	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/msun/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/msun/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/msun/ -name 'Makefile.inc' -exec dos2unix {} +
+	dos2unix $(BUILD)/msun/msun/Makefile
+endif
 	cd $(BUILD)/msun/msun && $(BMAKE) -j$(THREADS)   libm.a
 	# find bitcode (and ignore non-bitcode genned from .s files) and put
 	# it in our lib
@@ -872,6 +888,12 @@ libthr:
 	rm -rf $(BUILD)/libthr
 	mkdir -p $(BUILD)/libthr
 	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/libthr/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/libthr/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/libthr/ -name 'Makefile.inc' -exec dos2unix {} +
+	find $(BUILD)/libthr/ -name 'makefile' -exec dos2unix {} +
+endif
 	cd $(BUILD)/libthr/libthr && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/thrHelpers.c
 	# CWARNFLAGS= because thr_exit() can return and pthread_exit() is marked noreturn (where?)...
 	cd $(BUILD)/libthr/libthr && $(BMAKE) -j$(THREADS)   CWARNFLAGS= libthr.a
