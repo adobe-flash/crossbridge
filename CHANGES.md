@@ -27,13 +27,17 @@ Changes
   
 * Changed typos due gettex>5 errors ( @colophon => @@colophon, @cyrus => @@cyrus)
   * \binutils\bfd\doc\bfd.texinfo
+    
+    Patch:
+    -% I think something like @colophon should be in texinfo. In the
+    +% I think something like @@colophon should be in texinfo. In the
+    ..
+    -% Blame: doc@cygnus.com, 28mar91.
+    +% Blame: doc@@cygnus.com, 28mar91.
   
 * Removed default argument definition: %{!jvmopt=*:-jvmopt=-Xmx1500M}
   * \llvm-gcc-4.2-2.9\gcc\config\avm2.hu
-  
-* Changed from "cygpath -at unix" to "cygpath -at mixed"
-  * \avm2_env\misc\SeAlchemySDKLocation.c
-  
+    
 * Changed from "cygpath -m" to "cygpath -at mixed"
   * \tools\as\as.cpp
   
