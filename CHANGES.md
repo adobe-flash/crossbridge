@@ -10,8 +10,6 @@ Changes
 * Fixed Cygwin FreeBSD issues with CR/LF (dos2unix)
 
 * Disabled documentation and i18n generation (disable-doc and disable-nls)
-
-* Introduced tar-d untouched packages
   
 ## Code
 
@@ -45,11 +43,14 @@ Changes
 
 ## Dependency
 
-* Upgraded CMake
-  * \cmake-3.0.20140409
+* Introduced tar-d untouched packages
+  * \packages\..
   
 * Upgraded BMake
   * \bmake-20140214
+  
+* Upgraded CMake
+  * \cmake-2.8.12.2
   
 ## Other
 
