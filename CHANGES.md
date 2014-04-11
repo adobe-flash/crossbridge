@@ -50,3 +50,11 @@ Changes
   
 * Upgraded BMake
   * \bmake-20140214
+  
+## Other
+
+* Fixed gitignore, CMake has a 'build' folder with sources!!!
+./ccache/
+./build/
+./sdk/
+
