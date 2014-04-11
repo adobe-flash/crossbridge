@@ -5,15 +5,36 @@ $?EMITSWF=
 $?SWFDIR=
 $?SWFEXT=
 
-# This section is for Host platform options
+# ====================================================================================
+# DEPENDENCIES
+# ====================================================================================
+$?DEPENDENCY_BINUTILS=binutils
+$?DEPENDENCY_BMAKE=bmake-20140214
+#$?DEPENDENCY_CMAKE=cmake-3.0.20140409
+$?DEPENDENCY_CMAKE=cmake-2.8.12.2
+$?DEPENDENCY_DMALLOC=dmalloc-5.5.2
+$?DEPENDENCY_FFI=libffi-3.0.11
+$?DEPENDENCY_ICONV=libiconv-1.13.1
+#$?DEPENDENCY_LIBOGG=libogg-1.3.0
+$?DEPENDENCY_LIBPNG=libpng-1.5.7
+$?DEPENDENCY_LIBTOOL=libtool-2.4.2
+#$?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
+$?DEPENDENCY_LLVM=llvm-2.9
+$?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
+$?DEPENDENCY_MAKE=make-3.82
+$?DEPENDENCY_PKG_CFG=pkg-config-0.26
+$?DEPENDENCY_SWIG=swig-2.0.4
+$?DEPENDENCY_ZLIB=zlib-1.2.5
+
+# ====================================================================================
+# HOST PLATFORM OPTIONS
+# ====================================================================================
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
-	$?THREADS=3
+	$?THREADS=1
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
-	$?CC=gcc-4
-	$?CXX=g++-4
 	$?NATIVE_AR=ar
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp.exe
@@ -26,8 +47,6 @@ else ifneq (,$(findstring Darwin,$(UNAME)))
 	$?THREADS=$(shell sysctl -n hw.ncpu)
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-apple-darwin10
-	$?CC=gcc
-	$?CXX=g++
 	$?NATIVE_AR=ar
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp
@@ -39,8 +58,6 @@ else
 	$?THREADS=1
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-unknown-linux-gnu
-	$?CC=gcc
-	$?CXX=g++
 	$?NATIVE_AR=ar
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp
@@ -48,6 +65,8 @@ else
 	$?BIN_TRUE=/bin/true
 endif
 
+$?CC=gcc
+$?CXX=g++
 export CC:=$(CC)
 export CXX:=$(CXX)
 $?DBGOPTS=
@@ -59,7 +78,9 @@ $?CYGWINMAC=$(SRCROOT)/cygwinmac/sdk/usr/bin
 $?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
 $?LIBHELPEROPTFLAGS=-O3
 
-# This section is for Target platform options
+# ====================================================================================
+# TARGET PLATFORM OPTIONS
+# ====================================================================================
 ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?EXEEXT=.exe
 	$?SOEXT=.dll
@@ -181,6 +202,11 @@ BUILDORDER+= extratools finalcleanup submittests
 
 all:
 	@echo "~~~ Crossbridge $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
+	@echo "User: $(UNAME)"
+	@echo "Platform: $(PLATFORM)"
+	@echo "Build: $(BUILD)"
+	@echo "-  libs"
+	@$(MAKE) install_libs
 	@mkdir -p $(BUILD)/logs
 	@echo "-  base"
 	@$(MAKE) base > $(BUILD)/logs/base.txt 2>&1
@@ -212,6 +238,9 @@ all_with_local_make:
 		fi ; \
 	done
 
+# ====================================================================================
+# CORE
+# ====================================================================================
 clean:
 	rm -rf $(BUILDROOT)
 	rm -rf $(SDK)
@@ -221,6 +250,23 @@ clean:
 docs:
 	$(MAKE) base
 	$(MAKE) abclibs_asdocs
+
+# ====================================================================================
+# DEPENDENCY LIBS
+# ====================================================================================
+install_libs:
+	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
+	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
+	tar xf packages/$(DEPENDENCY_ICONV).tar.gz
+	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
+	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
+
+clean_libs:
+	rm -rf $(DEPENDENCY_CMAKE)
+	rm -rf $(DEPENDENCY_DMALLOC)
+	rm -rf $(DEPENDENCY_ICONV)
+	rm -rf $(DEPENDENCY_MAKE)
+	rm -rf $(DEPENDENCY_PKG_CFG)
 
 abclibs:
 	$(MAKE) -j$(THREADS) abclibs_compile abclibs_asdocs
@@ -423,7 +469,7 @@ winstaging:
 	$(RSYNC) $(SRCROOT)/cygwin $(BUILDROOT)/staging/
 	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
 	rm -rf $(BUILDROOT)/staging/sdk/usr/libexec
-	rm -rf $(BUILDROOT)/staging/sdk/usr/share/cmake-2.8
+	rm -rf $(BUILDROOT)/staging/sdk/usr/share/$(DEPENDENCY_CMAKE)
 	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/platform/cygwin $(BUILDROOT)/staging/sdk/usr/platform/
 	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/*.dll $(BUILDROOT)/staging/sdk/usr/lib/
 	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/bfd-plugins/*.dll $(BUILDROOT)/staging/sdk/usr/lib/bfd-plugins/
@@ -437,10 +483,10 @@ winstaging:
 	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
 
 sdkcleanup:
-	mv $(SDK)/usr/share/cmake-2.8 $(SDK)/usr/share_cmake
+	mv $(SDK)/usr/share/$(DEPENDENCY_CMAKE) $(SDK)/usr/share_cmake
 	rm -rf $(SDK)/usr/share $(SDK)/usr/info $(SDK)/usr/man $(SDK)/usr/lib/x86_64 $(SDK)/usr/cmake_junk $(SDK)/usr/make_junk
 	mkdir -p $(SDK)/usr/share
-	mv $(SDK)/usr/share_cmake $(SDK)/usr/share/cmake-2.8
+	mv $(SDK)/usr/share_cmake $(SDK)/usr/share/$(DEPENDENCY_CMAKE)
 	rm -f $(SDK)/usr/lib/*.la
 	rm -f $(SDK)/usr/lib/crt1.o $(SDK)/usr/lib/crtbegin.o $(SDK)/usr/lib/crtbeginS.o $(SDK)/usr/lib/crtbeginT.o $(SDK)/usr/lib/crtend.o $(SDK)/usr/lib/crtendS.o $(SDK)/usr/lib/crti.o $(SDK)/usr/lib/crtn.o
 
@@ -538,8 +584,8 @@ cmake:
 	mkdir -p $(SDK)/usr/bin
 	mkdir -p $(BUILD)/cmake
 	mkdir -p $(SDK)/usr/cmake_junk
-	$(RSYNC) $(SRCROOT)/cmake-2.8.12/ $(BUILD)/cmake/
-	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --docdir=cmake_junk --mandir=cmake_junk
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_CMAKE)/ $(BUILD)/cmake/
+	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --datadir=share/$(DEPENDENCY_CMAKE) --docdir=cmake_junk --mandir=cmake_junk
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) install
 
@@ -547,7 +593,7 @@ make:
 	rm -rf $(BUILD)/make
 	mkdir -p $(SDK)/usr/bin
 	mkdir -p $(BUILD)/make
-	$(RSYNC) $(SRCROOT)/make-3.82/ $(BUILD)/make/
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_MAKE)/ $(BUILD)/make/
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --program-prefix="" \
                 --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE)
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
@@ -703,12 +749,12 @@ extratools:
 
 libiconv:
 	mkdir -p $(BUILD)/libiconv
-	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/libiconv-1.13.1/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_ICONV)/configure --prefix=$(SDK)/usr
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 libffi:
 	mkdir -p $(BUILD)/libffi
-	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/libffi-3.0.11/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure --prefix=$(SDK)/usr
 	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 libfficheck:
@@ -1132,7 +1178,7 @@ libsdl-install:
 pkgconfig:
 	rm -rf $(BUILD)/pkgconfig
 	mkdir -p $(BUILD)/pkgconfig
-	cd $(BUILD)/pkgconfig && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/pkg-config-0.26/configure --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --prefix=$(SDK)/usr --disable-shared --disable-dependency-tracking
+	cd $(BUILD)/pkgconfig && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/$(DEPENDENCY_PKG_CFG)/configure --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --prefix=$(SDK)/usr --disable-shared --disable-dependency-tracking
 	cd $(BUILD)/pkgconfig && $(MAKE) -j$(THREADS) && $(MAKE) install
 
 zlib:

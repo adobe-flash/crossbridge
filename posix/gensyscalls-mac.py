@@ -18,11 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-# System call collector and generator script
-# Version: 1.1
-# Changes: 
-# 09.04.14.: Fixed multi-line handling (Windows compat.)
-
 import re
 import sys
 import contextlib
@@ -256,12 +251,9 @@ def read_syscalls(filename):
     with open(filename) as master_file:
         logical_line = ''
         for line in master_file:
-            tmp = line.strip()
-            if len(tmp) == 0: continue
-            fc = tmp[0]
-            if fc == ';' or fc == '#':
+            if line[0] == ';' or line[0] == '#' or len(line.strip()) == 0:
                 continue
-            elif tmp[-1] == '\\':
+            elif line[-2] == '\\':
                 logical_line += line
             else:
                 call = SysCall()
