@@ -238,6 +238,33 @@ all_with_local_make:
 		fi ; \
 	done
 
+all_with_travis:
+	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
+	@echo "User: $(UNAME)"
+	@echo "Platform: $(PLATFORM)"
+	@echo "Build: $(BUILD)"
+	@$(MAKE) install_libs
+	@$(MAKE) base
+	@$(MAKE) make
+	@$(SDK)/usr/bin/make cmake
+	@$(SDK)/usr/bin/make abclibs
+	@$(SDK)/usr/bin/make basictools
+	@$(SDK)/usr/bin/make llvm
+	@$(SDK)/usr/bin/make binutils
+	@$(SDK)/usr/bin/make plugins
+	@$(SDK)/usr/bin/make bmake
+	@$(SDK)/usr/bin/make stdlibs
+	@$(SDK)/usr/bin/make as3xx
+	@$(SDK)/usr/bin/make as3wig
+	@$(SDK)/usr/bin/make abcstdlibs
+	@$(SDK)/usr/bin/make sdkcleanup
+	@$(SDK)/usr/bin/make tr
+	@$(SDK)/usr/bin/make trd
+	@$(SDK)/usr/bin/make extralibs
+	@$(SDK)/usr/bin/make extratools
+	@$(SDK)/usr/bin/make finalcleanup
+	@$(SDK)/usr/bin/make submittests
+
 # ====================================================================================
 # CORE
 # ====================================================================================
