@@ -9,6 +9,8 @@ Changes
 
 * Fixed Cygwin FreeBSD issues with CR/LF (dos2unix)
 
+* Fixed AS3Wig step using nativepath on Windows
+
 * Disabled documentation and i18n generation (disable-doc and disable-nls)
   
 ## Code

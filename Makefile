@@ -328,10 +328,17 @@ cmake:
 	mkdir -p $(SDK)/usr/cmake_junk
 	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/share/$(DEPENDENCY_CMAKE)/
 	cp -r $(SRCROOT)/$(DEPENDENCY_CMAKE)/* $(BUILD)/cmake/
-	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --docdir=cmake_junk --mandir=cmake_junk
+	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --datadir=share/$(DEPENDENCY_CMAKE) --docdir=cmake_junk --mandir=cmake_junk
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) install
 	cp -r $(SDK)/usr/share/$(DEPENDENCY_CMAKE) $(SDK)/usr/platform/$(PLATFORM)/share/
+
+# Cygwin/Travis-CI compatibility (Travis-CI installs CMake without minor version 2.8.12.2 or 2.8)
+#ifneq (,$(findstring cygwin,$(PLATFORM)))
+#	cp -r $(SDK)/usr/share/$(DEPENDENCY_CMAKE) $(SDK)/usr/platform/$(PLATFORM)/share/
+#endif
+#	cp -r $(SDK)/usr/share/cmake-2.8 $(SDK)/usr/platform/$(PLATFORM)/share/
+# Solution to test configuration: --datadir=share/$(DEPENDENCY_CMAKE) 
 
 # ====================================================================================
 # ABCLIBS
