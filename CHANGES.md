@@ -1,39 +1,52 @@
 Changes
 =======
 
-## 08/04/14 
+## Makefile
 
-* Updated CMake to 2.8.12.2
-  \cmake-2.8.12.2
 * Changed Cygwin compiler names ("gcc-4" => "gcc")
-  * \Makefile
+
 * Fixed ASDoc generation on windows ("$(SRCROOT)/posix/vfs" => "$(call nativepath,$(SRCROOT)/posix/vfs)")
-  * \Makefile
+
+* Fixed Cygwin FreeBSD issues with CR/LF (dos2unix)
+
+* Disabled documentation and i18n generation (disable-doc and disable-nls)
+
+* Introduced tar-d untouched packages
+  
+## Code
+
 * Fixed compiler error (argument type)
   * \tools\noenv\noenv.c
-* Fixed compiler error (multi-line rows)
+
+* Fixed compiler error (multi-line rows) [new version of python tool should solve this change set]
   * \posix\syscalls.changed
   * \posix\syscalls.master
+  
 * Fixed compiler error (missing header: unistd.h)
   * \tools\as\as.cpp
   * \llvm-2.9\lib\Target\AVM2\AVM2MCAsmStreamer.cpp
-  
-## 09/04/14
-
-* Fixed compiler error (missing header: unistd.h)
   * \gold-plugins\makeswf.cpp
-* Fixed Cygwin FreeBSD issues with CR/LF using dos2unix
-  * \Makefile
-* Disabled documentation and i18n generation
-  * \Makefile
+  
+* Changed typos due gettex>5 errors ( @colophon => @@colophon, @cyrus => @@cyrus)
+  * \binutils\bfd\doc\bfd.texinfo
+  
+* Removed default argument definition: %{!jvmopt=*:-jvmopt=-Xmx1500M}
+  * \llvm-gcc-4.2-2.9\gcc\config\avm2.hu
+  
+* Changed from "cygpath -at unix" to "cygpath -at mixed"
+  * \avm2_env\misc\SeAlchemySDKLocation.c
+  
+* Changed from "cygpath -m" to "cygpath -at mixed"
+  * \tools\as\as.cpp
+  
+* Changed from "cygpath -at windows" to "cygpath -at mixed"
+  * \llvm-2.9\tools\gold\gold-plugin.cpp
+  * \llvm-gcc-4.2-2.9\gcc\llvm-backend.cpp
+
+## Dependency
+
 * Upgraded CMake
   * \cmake-3.0.20140409
-  * \Makefile
+  
 * Upgraded BMake
   * \bmake-20140214
-  * \Makefile
-  
-## 10/04/14
-
-* Changed typos due gettex>5 errors ( @colophon => @@colophon)
-  * \binutils\bfd\doc\bfd.texinfo

@@ -685,8 +685,10 @@ as3wig:
 	cp $(BUILD)/as3wig/as3wig.jar $(SDK)/usr/lib/.
 	mkdir -p $(SDK)/usr/include/AS3++/
 	cp -f $(SRCROOT)/tools/aet/AS3Wig.h $(SDK)/usr/include/AS3++/AS3Wig.h
-	java -jar $(SDK)/usr/lib/as3wig.jar -builtins -i $(SDK)/usr/lib/builtin.abc -o $(SDK)/usr/include/AS3++/builtin
-	java -jar $(SDK)/usr/lib/as3wig.jar -builtins -i $(SDK)/usr/lib/playerglobal.abc -o $(SDK)/usr/include/AS3++/playerglobal
+	#java -jar $(SDK)/usr/lib/as3wig.jar -builtins -i $(SDK)/usr/lib/builtin.abc -o $(SDK)/usr/include/AS3++/builtin
+	#java -jar $(SDK)/usr/lib/as3wig.jar -builtins -i $(SDK)/usr/lib/playerglobal.abc -o $(SDK)/usr/include/AS3++/playerglobal
+	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/builtin.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/builtin)
+	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/playerglobal)
 	cp -f $(SRCROOT)/tools/aet/AS3Wig.cpp $(BUILD)/as3wig/
 	echo "#include <AS3++/builtin.h>\n" > $(BUILD)/as3wig/AS3WigIncludes.h
 	echo "#include <AS3++/playerglobal.h>\n" >> $(BUILD)/as3wig/AS3WigIncludes.h

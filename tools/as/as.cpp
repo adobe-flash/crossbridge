@@ -132,7 +132,8 @@ static std::string unipath(const std::string path)
   std::string result;
 
   args.push_back("cygpath");
-  args.push_back("-m");
+  args.push_back("-at");
+  args.push_back("mixed");
   args.push_back(path);
   runCmd(&result, args);
 
