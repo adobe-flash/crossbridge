@@ -22,3 +22,27 @@ The code written by adobe is all MIT licensed, but crossbridge contains many dif
 * PKG-Config: http://www.freedesktop.org/wiki/Software/pkg-config/
 * SWIG: http://www.swig.org/
 * ZLib: http://www.zlib.net/
+
+Credits
+=======
+
+## Original Developers
+
+Alexander Macdonald <alexmac@adobe.com>
+https://github.com/alexmac
+
+Alexey
+https://github.com/stopiccot
+
+Cheng Liao <liaocheng210@126.com>
+https://github.com/liaocheng
+
+Ye Liu <yeli@adobe.com>
+https://github.com/cbakgly
+
+## Contributors
+
+Andras Csizmadia <andras@vpmedia.hu>
+https://github.com/vpmedia
+
+.. Add Your Details Here! ..
