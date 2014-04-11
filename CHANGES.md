@@ -25,15 +25,18 @@ Changes
   * \llvm-2.9\lib\Target\AVM2\AVM2MCAsmStreamer.cpp
   * \gold-plugins\makeswf.cpp
   
-* Changed typos due gettex>5 errors ( @colophon => @@colophon, @cyrus => @@cyrus)
+* Changed typos due gettex>5 errors
   * \binutils\bfd\doc\bfd.texinfo
-    
-    Patch:
-    -% I think something like @colophon should be in texinfo. In the
-    +% I think something like @@colophon should be in texinfo. In the
-    ..
-    -% Blame: doc@cygnus.com, 28mar91.
-    +% Blame: doc@@cygnus.com, 28mar91.
+ 
+> -% I think something like @colophon should be in texinfo. In the
+> 
+> +% I think something like @@colophon should be in texinfo. In the
+> 
+> ..
+> 
+> -% Blame: doc@cygnus.com, 28mar91.
+> 
+> +% Blame: doc@@cygnus.com, 28mar91.
   
 * Removed default argument definition: %{!jvmopt=*:-jvmopt=-Xmx1500M}
   * \llvm-gcc-4.2-2.9\gcc\config\avm2.hu
