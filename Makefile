@@ -285,16 +285,17 @@ docs:
 install_libs:
 	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
+	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
 	tar xf packages/$(DEPENDENCY_ICONV).tar.gz
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
-	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
     
 clean_libs:
 	rm -rf $(DEPENDENCY_CMAKE)
 	rm -rf $(DEPENDENCY_DMALLOC)
+	rm -rf $(DEPENDENCY_DEJAGNU)
 	rm -rf $(DEPENDENCY_ICONV)
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_PKG_CFG)
