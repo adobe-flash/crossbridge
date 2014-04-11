@@ -49,7 +49,8 @@ endif
 # ====================================================================================
 $?DEPENDENCY_BINUTILS=binutils
 $?DEPENDENCY_BMAKE=bmake-20140214
-$?DEPENDENCY_CMAKE=cmake-3.0.20140409
+#$?DEPENDENCY_CMAKE=cmake-3.0.20140409
+$?DEPENDENCY_CMAKE=cmake-2.8.12.2
 $?DEPENDENCY_DMALLOC=dmalloc-5.5.2
 $?DEPENDENCY_FFI=libffi-3.0.11
 $?DEPENDENCY_ICONV=libiconv-1.13.1
@@ -159,14 +160,13 @@ BUILDORDER=cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gccl
 
 # We are ignoring some target errors because of issues with documentation generation
 all:
-	@echo "~~~ Initializing ~~~"
-	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
-	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
-	tar xf packages/$(DEPENDENCY_ICONV).tar.gz
-	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
-	@echo "~~~ Crossbridge ~~~"
-	@echo "Using Platform: $(PLATFORM)"
+	@echo "~~~ Building Crossbridge ~~~"
+	@echo "User: $(UNAME)"
+	@echo "Platform: $(PLATFORM)"
+	@echo "Build: $(BUILD)"
 	@mkdir -p $(BUILD)/logs
+	@echo "-  libs"
+	@$(MAKE) install_libs
 	@echo "-  base"
 	@$(MAKE) base &> $(BUILD)/logs/base.txt
 	@echo "-  $(DEPENDENCY_MAKE)"
@@ -219,6 +219,23 @@ clean:
 docs:
 	$(MAKE) base
 	$(MAKE) abclibs_asdocs
+
+# ====================================================================================
+# DEPENDENCY LIBS
+# ====================================================================================
+install_libs:
+	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
+	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
+	tar xf packages/$(DEPENDENCY_ICONV).tar.gz
+	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
+	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
+
+clean_libs:
+	rm -rf $(DEPENDENCY_CMAKE)
+	rm -rf $(DEPENDENCY_DMALLOC)
+	rm -rf $(DEPENDENCY_ICONV)
+	rm -rf $(DEPENDENCY_MAKE)
+	rm -rf $(DEPENDENCY_PKG_CFG)
 
 # ====================================================================================
 # CI
