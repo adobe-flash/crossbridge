@@ -252,7 +252,7 @@ proc remote_exec { hostname program args } {
     if { [llength $args] > 3 } {
 	set timeout "[lindex $args 3]"
     } else {
-	set timeout 120
+	set timeout 300
     }
 
     verbose -log "Executing on $hostname: $program $pargs $inp $outp (timeout = $timeout)" 2
