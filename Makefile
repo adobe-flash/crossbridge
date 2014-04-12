@@ -148,7 +148,7 @@ LLVMCMAKEFLAGS=-DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8 \
 	-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
 	-DLLVM_BUILD_RUNTIME=OFF
 #Possible values: Release, Debug, RelWithDebInfo and MinSizeRel
-LLVMBUILDTYPE=Release
+LLVMBUILDTYPE=Debug
 FLASCC_CC=clang
 FLASCC_CXX=clang++
 CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang$(EXEEXT) \
@@ -266,33 +266,6 @@ all_with_travis:
 	@$(SDK)/usr/bin/make finalcleanup
 	@$(SDK)/usr/bin/make submittests
 
-cbdebug:
-	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
-	@echo "User: $(UNAME)"
-	@echo "Platform: $(PLATFORM)"
-	@echo "Build: $(BUILD)"
-	#@$(MAKE) install_libs
-	#@$(MAKE) base
-	#@$(MAKE) make
-	#@$(SDK)/usr/bin/make cmake
-	#@$(SDK)/usr/bin/make abclibs
-	#@$(SDK)/usr/bin/make basictools
-	#@$(SDK)/usr/bin/make llvm
-	#@$(SDK)/usr/bin/make -i binutils
-	#@$(SDK)/usr/bin/make plugins
-	#@$(SDK)/usr/bin/make bmake
-	@$(SDK)/usr/bin/make stdlibs
-	@$(SDK)/usr/bin/make as3xx
-	@$(SDK)/usr/bin/make as3wig
-	@$(SDK)/usr/bin/make abcstdlibs
-	@$(SDK)/usr/bin/make sdkcleanup
-	@$(SDK)/usr/bin/make tr
-	@$(SDK)/usr/bin/make trd
-	@$(SDK)/usr/bin/make extralibs
-	@$(SDK)/usr/bin/make extratools
-	@$(SDK)/usr/bin/make finalcleanup
-	@$(SDK)/usr/bin/make submittests
-
 # ====================================================================================
 # CORE
 # ====================================================================================
@@ -329,11 +302,73 @@ clean_libs:
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 
+# ====================================================================================
+# MAKE
+# ====================================================================================
+make:
+	rm -rf $(BUILD)/make
+	mkdir -p $(SDK)/usr/bin
+	mkdir -p $(BUILD)/make
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_MAKE)/ $(BUILD)/make/
+	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --program-prefix="" \
+                --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE)
+	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
+	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) install
+
+# ====================================================================================
+# CMAKE
+# ====================================================================================
+cmake:
+	rm -rf $(BUILD)/cmake
+	rm -rf $(SDK)/usr/cmake_junk
+	mkdir -p $(SDK)/usr/bin
+	mkdir -p $(BUILD)/cmake
+	mkdir -p $(SDK)/usr/cmake_junk
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_CMAKE)/ $(BUILD)/cmake/
+	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --datadir=share/$(DEPENDENCY_CMAKE) --docdir=cmake_junk --mandir=cmake_junk
+	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
+	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) install
+
+# ====================================================================================
+# ABC LIBS
+# ====================================================================================
 abclibs:
 	$(MAKE) -j$(THREADS) abclibs_compile abclibs_asdocs
 ifeq ($(COPY_DOCS), true)
 	$(MAKE) copy_docs
 endif
+
+abclibs_compile:
+	mkdir -p $(BUILD)/abclibs
+	mkdir -p $(BUILD)/abclibsposix
+	mkdir -p $(SDK)/usr/lib/abcs
+
+	# Just use this to get the Posix interface
+	cd $(BUILD)/abclibsposix && python $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
+	cat $(BUILD)/abclibsposix/IKernel.as | sed '1,1d' | sed '$$d' > $(SRCROOT)/posix/IKernel.as
+
+	cd $(BUILD)/abclibs && $(SCOMP) $(ABCLIBOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/DefaultPreloader.as) -swf com.adobe.flascc.preloader.DefaultPreloader,1024,768,60 -outdir . -out DefaultPreloader
+
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/ELF.as) -outdir . -out ELF
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/Exit.as) -outdir . -out Exit
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/LongJmp.as) -outdir . -out LongJmp
+	cd $(BUILD)/abclibs && $(SCOMP) $(ABCLIBOPTS)         -import Exit.abc $(call nativepath,$(SRCROOT)/posix/C_Run.as) -outdir . -out C_Run
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/vfs/ISpecialFile.as) -outdir . -out ISpecialFile
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/vfs/IBackingStore.as) -outdir . -out IBackingStore
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import IBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/InMemoryBackingStore.as) -outdir . -out InMemoryBackingStore
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import IBackingStore.abc -import ISpecialFile.abc $(call nativepath,$(SRCROOT)/posix/vfs/IVFS.as) -outdir . -out IVFS
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import ISpecialFile.abc -import IBackingStore.abc -import IVFS.abc -import InMemoryBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/DefaultVFS.as) -outdir . -out DefaultVFS
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath, `find $(SRCROOT)/posix/vfs/nochump -name "*.as"`) -outdir . -out AlcVFSZip
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS)         -import Exit.abc -import C_Run.abc -import IBackingStore.abc -import ISpecialFile.abc -import IVFS.abc -import LongJmp.abc $(call nativepath,$(SRCROOT)/posix/CModule.as) -outdir . -out CModule
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import ELF.abc $(call nativepath,$(SRCROOT)/posix/AlcDbgHelper.as) -d -outdir . -out AlcDbgHelper
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/BinaryData.as) -outdir . -out BinaryData
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/Console.as) -outdir . -out Console
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import ELF.abc $(call nativepath,$(SRCROOT)/posix/startHack.as) -outdir . -out startHack
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc $(call nativepath,$(SRCROOT)/posix/ShellCreateWorker.as) -outdir . -out ShellCreateWorker
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/PlayerCreateWorker.as) -outdir . -out PlayerCreateWorker
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import CModule.abc -import C_Run.abc -import Exit.abc -import IBackingStore.abc -import ISpecialFile.abc -import IVFS.abc -import DefaultVFS.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/PlayerKernel.as) -outdir . -out PlayerKernel
+	cp $(BUILD)/abclibs/*.abc $(SDK)/usr/lib
+	cp $(BUILD)/abclibs/*.swf $(SDK)/usr/lib
 
 abclibs_asdocs:
 	mkdir -p $(BUILDROOT)
@@ -355,6 +390,53 @@ abclibs_asdocs:
 	if [ -d $(BUILDROOT)/tempdita ]; then rm -rf $(BUILDROOT)/tempdita; fi
 	mv $(BUILDROOT)/apidocs/tempdita $(BUILDROOT)/
 
+# ====================================================================================
+# BASIC TOOLS
+# ====================================================================================
+
+basictools:
+	$(MAKE) -j$(THREADS) uname noenv avm2-as alctool alcdb
+
+uname:
+	mkdir -p $(SDK)/usr/bin
+	$(CC) $(SRCROOT)/tools/uname/uname.c -o $(SDK)/usr/bin/uname$(EXEEXT)
+
+noenv:
+	mkdir -p $(SDK)/usr/bin
+	$(CC) $(SRCROOT)/tools/noenv/noenv.c -o $(SDK)/usr/bin/noenv$(EXEEXT)
+
+avm2-as:
+	mkdir -p $(SDK)/usr/bin
+	$(CXX) $(SRCROOT)/avm2_env/misc/SetAlchemySDKLocation.c $(SRCROOT)/tools/as/as.cpp -o $(SDK)/usr/bin/avm2-as$(EXEEXT)
+
+alctool:
+	rm -rf $(BUILD)/alctool
+	mkdir -p $(BUILD)/alctool/flascc
+	cp -f $(SRCROOT)/tools/lib/*.jar $(SDK)/usr/lib/
+	cp -f $(SRCROOT)/tools/lib/falcon.txt $(SDK)/usr/lib/.
+	rm -f $(SDK)/usr/lib/mxmlc.jar
+	cp -f $(SRCROOT)/tools/aet/*.java $(BUILD)/alctool/flascc/.
+	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/alctool/flascc/.
+	cd $(BUILD)/alctool && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib/aet.jar)
+	cd $(BUILD)/alctool && echo "Main-Class: flascc.AlcTool" > MANIFEST.MF
+	cd $(BUILD)/alctool && echo "Class-Path: aet.jar" >> MANIFEST.MF
+	cd $(BUILD)/alctool && jar cmf MANIFEST.MF alctool.jar flascc/*.class
+	cp $(BUILD)/alctool/alctool.jar $(SDK)/usr/lib/.
+
+alcdb:
+	rm -rf $(BUILD)/alcdb
+	mkdir -p $(BUILD)/alcdb/flascc
+	cp -f $(SRCROOT)/tools/alcdb/*.java $(BUILD)/alcdb/flascc/.
+	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/alcdb/flascc/.
+	cd $(BUILD)/alcdb && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib/fdb.jar)
+	cd $(BUILD)/alcdb && echo "Main-Class: flascc.AlcDB" > MANIFEST.MF
+	cd $(BUILD)/alcdb && echo "Class-Path: fdb.jar" >> MANIFEST.MF
+	cd $(BUILD)/alcdb && jar cmf MANIFEST.MF alcdb.jar flascc/*.class 
+	cp $(BUILD)/alcdb/alcdb.jar $(SDK)/usr/lib/.
+
+# ====================================================================================
+# CROSS COMPILE UNDER MAC
+# ====================================================================================
 CROSS=PATH="$(BUILD)/ccachebin:$(CYGWINMAC):$(PATH):$(SDK)/usr/bin" $(MAKE) SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin LLVMINSTALLPREFIX=$(WIN_BUILD) NATIVE_AR=$(CYGTRIPLE)-ar CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ RANLIB=$(CYGTRIPLE)-ranlib
 
 win:
@@ -436,6 +518,9 @@ cross_llvm_cygwin:
 		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
 		llvm BUILD_LLVM_TESTS=OFF
 
+# ====================================================================================
+# CONTINUOUS INTEGRATION TARGETS
+# ====================================================================================
 continuous:
 	$(MAKE) all COPY_DOCS=true
 	$(MAKE) examples neverball
@@ -571,6 +656,9 @@ finalcleanup:
 	$(RSYNC) $(SRCROOT)/posix/vfs/LSOBackingStore.as $(SDK)/usr/share/
 	$(RSYNC) --exclude "*.xslt" --exclude "*.html" --exclude ASDoc_Config.xml --exclude overviews.xml $(BUILDROOT)/tempdita/ $(SDK)/usr/share/asdocs
 
+# ====================================================================================
+# CORE TARGETS
+# ====================================================================================
 gdb:
 	rm -rf $(BUILD)/gdb-7.3
 	mkdir -p $(BUILD)/gdb-7.3
@@ -638,27 +726,6 @@ llvmtests-speccpu2006: # works only on mac!
 	python $(SRCROOT)/tools/llvmtestcheck.py --fpcmp $(FPCMP) --srcdir $(SRCROOT)/llvm-2.9/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ > $(BUILD)/llvm-tests/passfail.txt
 	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_spec.txt
 	cp -r $(BUILD)/llvm-tests/projects $(BUILD)/llvm-spec-tests
-
-cmake:
-	rm -rf $(BUILD)/cmake
-	rm -rf $(SDK)/usr/cmake_junk
-	mkdir -p $(SDK)/usr/bin
-	mkdir -p $(BUILD)/cmake
-	mkdir -p $(SDK)/usr/cmake_junk
-	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_CMAKE)/ $(BUILD)/cmake/
-	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --datadir=share/$(DEPENDENCY_CMAKE) --docdir=cmake_junk --mandir=cmake_junk
-	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
-	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) install
-
-make:
-	rm -rf $(BUILD)/make
-	mkdir -p $(SDK)/usr/bin
-	mkdir -p $(BUILD)/make
-	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_MAKE)/ $(BUILD)/make/
-	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --program-prefix="" \
-                --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE)
-	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
-	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) install
 
 gcc:
 	rm -rf $(BUILD)/llvm-gcc-42
@@ -1112,28 +1179,13 @@ trd:
 plugins:
 	rm -rf $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
 	mkdir -p $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
-	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ -DHAVE_ABCNM -DDEFTMPDIR=\"$(call nativepath,/tmp)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -DHAVE_STDINT_H -I$(SRCROOT)/zlib-1.2.5/ -I$(SRCROOT)/binutils/include -fPIC -c $(SRCROOT)/gold-plugins/makeswf.cpp
+	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ -DHAVE_ABCNM -DDEFTMPDIR=\"$(call nativepath,/tmp)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -DHAVE_STDINT_H -I$(SRCROOT)/$(DEPENDENCY_ZLIB)/ -I$(SRCROOT)/binutils/include -fPIC -c $(SRCROOT)/gold-plugins/makeswf.cpp
 	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -shared -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup -o makeswf$(SOEXT) makeswf.o
 	cd $(BUILD)/multiplug && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/  -DHAVE_STDINT_H -DSOEXT=\"$(SOEXT)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -I$(SRCROOT)/binutils/include -fPIC -c $(SRCROOT)/gold-plugins/multiplug.cpp
 	cd $(BUILD)/multiplug && $(CXX) $(DBGOPTS) -shared -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup -o multiplug$(SOEXT) multiplug.o
 	cp -f $(BUILD)/makeswf/makeswf$(SOEXT) $(SDK)/usr/lib/makeswf$(SOEXT)
 	cp -f $(BUILD)/multiplug/multiplug$(SOEXT) $(SDK)/usr/lib/multiplug$(SOEXT)
 	cp -f $(BUILD)/multiplug/multiplug$(SOEXT) $(SDK)/usr/lib/bfd-plugins/multiplug$(SOEXT)
-
-basictools:
-	$(MAKE) -j$(THREADS) uname noenv avm2-as alctool alcdb
-
-uname:
-	mkdir -p $(SDK)/usr/bin
-	$(CC) $(SRCROOT)/tools/uname/uname.c -o $(SDK)/usr/bin/uname$(EXEEXT)
-
-noenv:
-	mkdir -p $(SDK)/usr/bin
-	$(CC) $(SRCROOT)/tools/noenv/noenv.c -o $(SDK)/usr/bin/noenv$(EXEEXT)
-
-avm2-as:
-	mkdir -p $(SDK)/usr/bin
-	$(CXX) $(SRCROOT)/avm2_env/misc/SetAlchemySDKLocation.c $(SRCROOT)/tools/as/as.cpp -o $(SDK)/usr/bin/avm2-as$(EXEEXT)
 
 as3wig:
 	rm -rf $(BUILD)/as3wig
@@ -1154,31 +1206,6 @@ as3wig:
 	echo "#include <AS3++/playerglobal.h>\n" >> $(BUILD)/as3wig/AS3WigIncludes.h
 	cd $(BUILD)/as3wig && $(SDK)/usr/bin/$(FLASCC_CXX) -c -emit-llvm -I. AS3Wig.cpp -o Flash++.o
 	cd $(BUILD)/as3wig && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libFlash++.a Flash++.o
-
-alctool:
-	rm -rf $(BUILD)/alctool
-	mkdir -p $(BUILD)/alctool/flascc
-	cp -f $(SRCROOT)/tools/lib/*.jar $(SDK)/usr/lib/
-	cp -f $(SRCROOT)/tools/lib/falcon.txt $(SDK)/usr/lib/.
-	rm -f $(SDK)/usr/lib/mxmlc.jar
-	cp -f $(SRCROOT)/tools/aet/*.java $(BUILD)/alctool/flascc/.
-	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/alctool/flascc/.
-	cd $(BUILD)/alctool && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib/aet.jar)
-	cd $(BUILD)/alctool && echo "Main-Class: flascc.AlcTool" > MANIFEST.MF
-	cd $(BUILD)/alctool && echo "Class-Path: aet.jar" >> MANIFEST.MF
-	cd $(BUILD)/alctool && jar cmf MANIFEST.MF alctool.jar flascc/*.class
-	cp $(BUILD)/alctool/alctool.jar $(SDK)/usr/lib/.
-
-alcdb:
-	rm -rf $(BUILD)/alcdb
-	mkdir -p $(BUILD)/alcdb/flascc
-	cp -f $(SRCROOT)/tools/alcdb/*.java $(BUILD)/alcdb/flascc/.
-	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/alcdb/flascc/.
-	cd $(BUILD)/alcdb && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib/fdb.jar)
-	cd $(BUILD)/alcdb && echo "Main-Class: flascc.AlcDB" > MANIFEST.MF
-	cd $(BUILD)/alcdb && echo "Class-Path: fdb.jar" >> MANIFEST.MF
-	cd $(BUILD)/alcdb && jar cmf MANIFEST.MF alcdb.jar flascc/*.class 
-	cp $(BUILD)/alcdb/alcdb.jar $(SDK)/usr/lib/.
 
 builtinabcs:
 	cd $(SRCROOT)/avmplus/core && ./builtin.py
@@ -1227,38 +1254,6 @@ base:
 	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/swfmake.as) -outdir . -out swfmake
 	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/projectormake.as) -outdir . -out projectormake
 
-abclibs_compile:
-	mkdir -p $(BUILD)/abclibs
-	mkdir -p $(BUILD)/abclibsposix
-	mkdir -p $(SDK)/usr/lib/abcs
-
-	# Just use this to get the Posix interface
-	cd $(BUILD)/abclibsposix && python $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
-	cat $(BUILD)/abclibsposix/IKernel.as | sed '1,1d' | sed '$$d' > $(SRCROOT)/posix/IKernel.as
-
-	cd $(BUILD)/abclibs && $(SCOMP) $(ABCLIBOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/DefaultPreloader.as) -swf com.adobe.flascc.preloader.DefaultPreloader,1024,768,60 -outdir . -out DefaultPreloader
-
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/ELF.as) -outdir . -out ELF
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/Exit.as) -outdir . -out Exit
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/LongJmp.as) -outdir . -out LongJmp
-	cd $(BUILD)/abclibs && $(SCOMP) $(ABCLIBOPTS)         -import Exit.abc $(call nativepath,$(SRCROOT)/posix/C_Run.as) -outdir . -out C_Run
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/vfs/ISpecialFile.as) -outdir . -out ISpecialFile
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/vfs/IBackingStore.as) -outdir . -out IBackingStore
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import IBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/InMemoryBackingStore.as) -outdir . -out InMemoryBackingStore
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import IBackingStore.abc -import ISpecialFile.abc $(call nativepath,$(SRCROOT)/posix/vfs/IVFS.as) -outdir . -out IVFS
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import ISpecialFile.abc -import IBackingStore.abc -import IVFS.abc -import InMemoryBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/DefaultVFS.as) -outdir . -out DefaultVFS
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath, `find $(SRCROOT)/posix/vfs/nochump -name "*.as"`) -outdir . -out AlcVFSZip
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS)         -import Exit.abc -import C_Run.abc -import IBackingStore.abc -import ISpecialFile.abc -import IVFS.abc -import LongJmp.abc $(call nativepath,$(SRCROOT)/posix/CModule.as) -outdir . -out CModule
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import ELF.abc $(call nativepath,$(SRCROOT)/posix/AlcDbgHelper.as) -d -outdir . -out AlcDbgHelper
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/BinaryData.as) -outdir . -out BinaryData
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/Console.as) -outdir . -out Console
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import ELF.abc $(call nativepath,$(SRCROOT)/posix/startHack.as) -outdir . -out startHack
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc $(call nativepath,$(SRCROOT)/posix/ShellCreateWorker.as) -outdir . -out ShellCreateWorker
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/PlayerCreateWorker.as) -outdir . -out PlayerCreateWorker
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import CModule.abc -import C_Run.abc -import Exit.abc -import IBackingStore.abc -import ISpecialFile.abc -import IVFS.abc -import DefaultVFS.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/PlayerKernel.as) -outdir . -out PlayerKernel
-	cp $(BUILD)/abclibs/*.abc $(SDK)/usr/lib
-	cp $(BUILD)/abclibs/*.swf $(SDK)/usr/lib
-
 libsdl_configure:
 	rm -rf $(SRCROOT)/cached_build/libsdl
 	mkdir -p $(SRCROOT)/cached_build/libsdl
@@ -1293,7 +1288,7 @@ pkgconfig:
 
 zlib:
 	rm -rf $(BUILD)/zlib
-	cp -r $(SRCROOT)/zlib-1.2.5 $(BUILD)/zlib
+	cp -r $(SRCROOT)/$(DEPENDENCY_ZLIB) $(BUILD)/zlib
 	cd $(BUILD)/zlib && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libz.a CFLAGS=-O4 CXXFLAGS=-O4 SFLAGS=-O4
 	$(RSYNC) $(BUILD)/zlib/zlib.h $(SDK)/usr/include/
 	$(RSYNC) $(BUILD)/zlib/libz.a $(SDK)/usr/lib/
@@ -1673,7 +1668,7 @@ parse_scimark_log:
 genfs:
 	rm -rf $(BUILD)/zlib-native
 	mkdir -p $(BUILD)/zlib-native
-	$(RSYNC) $(SRCROOT)/zlib-1.2.5/ $(BUILD)/zlib-native
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_ZLIB)/ $(BUILD)/zlib-native
 	cd $(BUILD)/zlib-native && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) ./configure --static && $(MAKE) 
 	cd $(BUILD)/zlib-native/contrib/minizip/ && $(MAKE) 
 	$$CC -Wall -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
