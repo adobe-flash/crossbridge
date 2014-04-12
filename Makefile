@@ -282,6 +282,7 @@ docs:
 # DEPENDENCY LIBS
 # ====================================================================================
 install_libs:
+	tar xf packages/$(DEPENDENCY_BMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
@@ -292,6 +293,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
     
 clean_libs:
+	rm -rf $(DEPENDENCY_BMAKE)
 	rm -rf $(DEPENDENCY_CMAKE)
 	rm -rf $(DEPENDENCY_DMALLOC)
 	rm -rf $(DEPENDENCY_DEJAGNU)
