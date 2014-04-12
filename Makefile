@@ -147,7 +147,8 @@ LLVMTARGETS=AVM2;X86
 LLVMCMAKEFLAGS=-DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8 \
 	-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
 	-DLLVM_BUILD_RUNTIME=OFF
-LLVMBUILDTYPE=Debug
+#Possible values: Release, Debug, RelWithDebInfo and MinSizeRel
+LLVMBUILDTYPE=RelWithDebInfo
 FLASCC_CC=clang
 FLASCC_CXX=clang++
 CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang$(EXEEXT) \
@@ -162,7 +163,7 @@ $?ASC=$(call nativepath,$(SRCROOT)/avmplus/utils/asc.jar)
 $?SCOMP=java $(JAVAFLAGS) -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
 $?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
 $?CLANG=ON
-?BUILD_LLVM_TESTS=OFF
+?BUILD_LLVM_TESTS=ON
 $?CYGTRIPLE=i686-pc-cygwin
 $?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
