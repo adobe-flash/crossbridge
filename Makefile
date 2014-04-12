@@ -9,16 +9,15 @@ $?SWFEXT=
 # DEPENDENCIES
 # ====================================================================================
 $?DEPENDENCY_BINUTILS=binutils
-$?DEPENDENCY_BMAKE=bmake-20140214
-#$?DEPENDENCY_CMAKE=cmake-3.0.20140409
+$?DEPENDENCY_BMAKE=bmake
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
 $?DEPENDENCY_DMALLOC=dmalloc-5.5.2
 $?DEPENDENCY_FFI=libffi-3.0.11
 $?DEPENDENCY_ICONV=libiconv-1.13.1
-#$?DEPENDENCY_LIBOGG=libogg-1.3.0
+$?DEPENDENCY_LIBOGG=libogg-1.3.0
 $?DEPENDENCY_LIBPNG=libpng-1.5.7
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
-#$?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
+$?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
 $?DEPENDENCY_LLVM=llvm-2.9
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-3.82
@@ -163,7 +162,7 @@ $?ASC=$(call nativepath,$(SRCROOT)/avmplus/utils/asc.jar)
 $?SCOMP=java $(JAVAFLAGS) -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
 $?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
 $?CLANG=ON
-?BUILD_LLVM_TESTS=ON
+?BUILD_LLVM_TESTS=OFF
 $?CYGTRIPLE=i686-pc-cygwin
 $?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
@@ -910,31 +909,67 @@ endif
 .PHONY: libcxx libcxxrt libxxabi libunwind libgcceh
 libgcceh:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/src/lib/libgcceh/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libgcceh/ -name 'Makefile.inc' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libgcceh/ -name 'makefile' -exec dos2unix {} +
+endif
 	cd $(BUILD)/lib/src/lib/libgcceh/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libgcceh.a
 	cd $(BUILD)/lib/src/lib/libgcceh/ && $(SDK)/usr/bin/llvm-link -o libgcceh.o *.o && mv libgcceh.o ../libc++
 
 libsupcxx:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/src/lib/libsupc++/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libsupc++/ -name 'Makefile.inc' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libsupc++/ -name 'makefile' -exec dos2unix {} +
+endif
 	cd $(BUILD)/lib/src/lib/libsupc++/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libsupc++.a
 	cd $(BUILD)/lib/src/lib/libsupc++/ && $(SDK)/usr/bin/llvm-link -o libsupc++.o *.o && mv libsupc++.o ../libc++
 
 libcxxabi:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/src/lib/libc++abi/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libc++abi/ -name 'Makefile.inc' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libc++abi/ -name 'makefile' -exec dos2unix {} +
+endif
 	cd $(BUILD)/lib/src/lib/libc++abi/ && $(BMAKE) clean && $(BMAKE) libc++abi.a
 	cd $(BUILD)/lib/src/lib/libc++abi/ && $(SDK)/usr/bin/llvm-link -o libc++abi.o *.o && mv libc++abi.o ../libc++
 
 libunwind:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/src/lib/libunwind/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libunwind/ -name 'Makefile.inc' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libunwind/ -name 'makefile' -exec dos2unix {} +
+endif
 	cd $(BUILD)/lib/src/lib/libunwind/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libunwind.a
 	cd $(BUILD)/lib/src/lib/libunwind/ && $(SDK)/usr/bin/llvm-link -o libunwind.o *.o && mv libunwind.o ../libc++
 
 libcxxrt:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/src/lib/libcxxrt/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libcxxrt/ -name 'Makefile.inc' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libcxxrt/ -name 'makefile' -exec dos2unix {} +
+endif
 	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libcxxrt.a
 	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(SDK)/usr/bin/llvm-link -o libcxxrt.o *.o && mv libcxxrt.o ../libc++
 
 libcxx: libsupcxx libgcceh
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/src/lib/libc++/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libc++/ -name 'Makefile.inc' -exec dos2unix {} +
+	find $(BUILD)/lib/src/lib/libc++/ -name 'makefile' -exec dos2unix {} +
+endif
 	cd $(BUILD)/lib/src/lib/libc++ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libc++.a
 	cd $(BUILD)/lib/src/lib/libc++ && $(AR) libc++.a *.o && mv libc++.a $(SDK)/usr/lib/.
 

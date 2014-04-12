@@ -17,8 +17,7 @@ LIB=thr
 SHLIB_MAJOR= 3
 WARNS?=	3
 CFLAGS+=-DPTHREAD_KERNEL
-CFLAGS+=-I${.CURDIR}/../libc/include -I${.CURDIR}/thread \
-	-I${.CURDIR}/../../include
+CFLAGS+=-I${.CURDIR}/../libc/include -I${.CURDIR}/thread -I${.CURDIR}/../../include
 CFLAGS+=-I${.CURDIR}/arch/${MACHINE_CPUARCH}/include
 CFLAGS+=-I${.CURDIR}/sys
 CFLAGS+=-I${.CURDIR}/../../libexec/rtld-elf
