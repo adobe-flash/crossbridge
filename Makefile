@@ -266,6 +266,33 @@ all_with_travis:
 	@$(SDK)/usr/bin/make finalcleanup
 	@$(SDK)/usr/bin/make submittests
 
+cbdebug:
+	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
+	@echo "User: $(UNAME)"
+	@echo "Platform: $(PLATFORM)"
+	@echo "Build: $(BUILD)"
+	#@$(MAKE) install_libs
+	#@$(MAKE) base
+	#@$(MAKE) make
+	#@$(SDK)/usr/bin/make cmake
+	#@$(SDK)/usr/bin/make abclibs
+	#@$(SDK)/usr/bin/make basictools
+	#@$(SDK)/usr/bin/make llvm
+	#@$(SDK)/usr/bin/make -i binutils
+	#@$(SDK)/usr/bin/make plugins
+	#@$(SDK)/usr/bin/make bmake
+	@$(SDK)/usr/bin/make stdlibs
+	@$(SDK)/usr/bin/make as3xx
+	@$(SDK)/usr/bin/make as3wig
+	@$(SDK)/usr/bin/make abcstdlibs
+	@$(SDK)/usr/bin/make sdkcleanup
+	@$(SDK)/usr/bin/make tr
+	@$(SDK)/usr/bin/make trd
+	@$(SDK)/usr/bin/make extralibs
+	@$(SDK)/usr/bin/make extratools
+	@$(SDK)/usr/bin/make finalcleanup
+	@$(SDK)/usr/bin/make submittests
+
 # ====================================================================================
 # CORE
 # ====================================================================================
@@ -677,7 +704,6 @@ libc:
 ifneq (,$(findstring cygwin,$(PLATFORM)))
 	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
 	find $(BUILD)/lib/ -name 'Makefile.inc' -exec dos2unix {} +
-	find $(BUILD)/lib/ -name 'makefile' -exec dos2unix {} +
 endif
 	cd $(BUILD)/posix && python $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
 	cp $(BUILD)/posix/IKernel.as $(SRCROOT)/avmplus/shell
@@ -874,7 +900,6 @@ libm:
 # Cygwin compatibility
 ifneq (,$(findstring cygwin,$(PLATFORM)))
 	find $(BUILD)/msun/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/msun/ -name 'Makefile.inc' -exec dos2unix {} +
 	dos2unix $(BUILD)/msun/msun/Makefile
 endif
 	cd $(BUILD)/msun/msun && $(BMAKE) -j$(THREADS)   libm.a
@@ -899,7 +924,6 @@ libthr:
 ifneq (,$(findstring cygwin,$(PLATFORM)))
 	find $(BUILD)/libthr/ -name '*.mk' -exec dos2unix {} +
 	find $(BUILD)/libthr/ -name 'Makefile.inc' -exec dos2unix {} +
-	find $(BUILD)/libthr/ -name 'makefile' -exec dos2unix {} +
 endif
 	cd $(BUILD)/libthr/libthr && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/thrHelpers.c
 	# CWARNFLAGS= because thr_exit() can return and pthread_exit() is marked noreturn (where?)...
@@ -914,9 +938,8 @@ libgcceh:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 # Cygwin compatibility
 ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/src/lib/libgcceh/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libgcceh/ -name 'Makefile.inc' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libgcceh/ -name 'makefile' -exec dos2unix {} +
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libgcceh/Makefile
 endif
 	cd $(BUILD)/lib/src/lib/libgcceh/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libgcceh.a
 	cd $(BUILD)/lib/src/lib/libgcceh/ && $(SDK)/usr/bin/llvm-link -o libgcceh.o *.o && mv libgcceh.o ../libc++
@@ -925,9 +948,8 @@ libsupcxx:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 # Cygwin compatibility
 ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/src/lib/libsupc++/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libsupc++/ -name 'Makefile.inc' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libsupc++/ -name 'makefile' -exec dos2unix {} +
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libsupc++/Makefile
 endif
 	cd $(BUILD)/lib/src/lib/libsupc++/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libsupc++.a
 	cd $(BUILD)/lib/src/lib/libsupc++/ && $(SDK)/usr/bin/llvm-link -o libsupc++.o *.o && mv libsupc++.o ../libc++
@@ -936,9 +958,8 @@ libcxxabi:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 # Cygwin compatibility
 ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/src/lib/libc++abi/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libc++abi/ -name 'Makefile.inc' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libc++abi/ -name 'makefile' -exec dos2unix {} +
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libc++abi/Makefile
 endif
 	cd $(BUILD)/lib/src/lib/libc++abi/ && $(BMAKE) clean && $(BMAKE) libc++abi.a
 	cd $(BUILD)/lib/src/lib/libc++abi/ && $(SDK)/usr/bin/llvm-link -o libc++abi.o *.o && mv libc++abi.o ../libc++
@@ -947,9 +968,8 @@ libunwind:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 # Cygwin compatibility
 ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/src/lib/libunwind/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libunwind/ -name 'Makefile.inc' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libunwind/ -name 'makefile' -exec dos2unix {} +
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libunwind/Makefile
 endif
 	cd $(BUILD)/lib/src/lib/libunwind/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libunwind.a
 	cd $(BUILD)/lib/src/lib/libunwind/ && $(SDK)/usr/bin/llvm-link -o libunwind.o *.o && mv libunwind.o ../libc++
@@ -958,9 +978,8 @@ libcxxrt:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 # Cygwin compatibility
 ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/src/lib/libcxxrt/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libcxxrt/ -name 'Makefile.inc' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libcxxrt/ -name 'makefile' -exec dos2unix {} +
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libcxxrt/Makefile
 endif
 	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libcxxrt.a
 	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(SDK)/usr/bin/llvm-link -o libcxxrt.o *.o && mv libcxxrt.o ../libc++
@@ -969,9 +988,8 @@ libcxx: libsupcxx libgcceh
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 # Cygwin compatibility
 ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/src/lib/libc++/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libc++/ -name 'Makefile.inc' -exec dos2unix {} +
-	find $(BUILD)/lib/src/lib/libc++/ -name 'makefile' -exec dos2unix {} +
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libc++/Makefile
 endif
 	cd $(BUILD)/lib/src/lib/libc++ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libc++.a
 	cd $(BUILD)/lib/src/lib/libc++ && $(AR) libc++.a *.o && mv libc++.a $(SDK)/usr/lib/.
