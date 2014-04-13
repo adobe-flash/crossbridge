@@ -19,7 +19,6 @@ $?DEPENDENCY_LIBPNG=libpng-1.5.7
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
 $?DEPENDENCY_LLVM=llvm-3.2
-$?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-3.82
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SWIG=swig-2.0.4
@@ -652,6 +651,23 @@ endif
 	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -fexceptions -c $(SRCROOT)/posix/libcHack.c
 	cp -f $(BUILD)/lib/src/lib/libc/libc.a $(BUILD)/posix/libcHack.o $(SDK)/usr/lib/.
 
+libthr:
+	rm -rf $(BUILD)/libthr
+	mkdir -p $(BUILD)/libthr
+	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/libthr/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/libthr/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/libthr/ -name 'Makefile.inc' -exec dos2unix {} +
+endif
+	cd $(BUILD)/libthr/libthr && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/thrHelpers.c
+	# CWARNFLAGS= because thr_exit() can return and pthread_exit() is marked noreturn (where?)...
+	cd $(BUILD)/libthr/libthr && $(BMAKE) -j$(THREADS)   CWARNFLAGS= libthr.a
+	# find bitcode (and ignore non-bitcode genned from .s files) and put
+	# it in our lib
+	cd $(BUILD)/libthr/libthr && rm -f libthr.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libthr.a
+	cp -f $(BUILD)/libthr/libthr/libthr.a $(SDK)/usr/lib/.
+
 libthr.abc:
 	mkdir -p $(BUILD)/libthr_abc
 	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
@@ -664,22 +680,89 @@ libc.abc:
 	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
 
-single.abc:
-	mkdir -p $(SDK)/usr/lib/stdlibs_abc
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libm.o -o $(SDK)/usr/lib/stdlibs_abc/libm.o
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
+libm:
+	cd compiler_rt && $(MAKE) clean && $(MAKE) avm2 CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm" RANLIB=$(SDK)/usr/bin/ranlib AR=$(SDK)/usr/bin/ar VERBOSE=1
+	$(SDK)/usr/bin/llvm-link -o $(BUILD)/libcompiler_rt.o compiler_rt/avm2/avm2/avm2/SubDir.lib/*.o
+	$(SDK)/usr/bin/nm $(BUILD)/libcompiler_rt.o  | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/compiler_rt.txt
+	cat $(BUILD)/compiler_rt.txt >> $(SDK)/public-api.txt
+	cat $(SRCROOT)/llvm-$(LLVMVERSION)/lib/CodeGen/SelectionDAG/TargetLowering.cpp | grep "Names\[RTLIB::" | awk '{print $$3}' | sed 's/"//g' | sed 's/;//' | sort | uniq > $(BUILD)/rtlib.txt
+	cat avm2_env/rtlib-extras.txt >> $(BUILD)/rtlib.txt
+
+	rm -rf $(BUILD)/msun/ $(BUILD)/libmbc $(SDK)/usr/lib/libm.a $(SDK)/usr/lib/libm.o
+	mkdir -p $(BUILD)/msun
+	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/msun/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/msun/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/msun/msun/Makefile
+endif
+	cd $(BUILD)/msun/msun && $(BMAKE) -j$(THREADS)   libm.a
+	# find bitcode (and ignore non-bitcode genned from .s files) and put
+	# it in our lib
+	cd $(BUILD)/msun/msun && rm -f libm.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libm.a
+	# remove symbols for sin, cos, other things we support as intrinsics
+	cd $(BUILD)/msun/msun && $(SDK)/usr/bin/ar sd libm.a s_cos.o s_sin.o e_pow.o e_sqrt.o
+	$(SDK)/usr/bin/ar r $(SDK)/usr/lib/libm.a
+	mkdir -p $(BUILD)/libmbc
+	cd $(BUILD)/libmbc && $(SDK)/usr/bin/ar x $(BUILD)/msun/msun/libm.a
+	cd $(BUILD)/libmbc && $(SDK)/usr/bin/llvm-link -o $(BUILD)/libmbc/libm.o $(BUILD)/libcompiler_rt.o *.o
+	cp -f $(BUILD)/libmbc/libm.o $(SDK)/usr/lib/libm.o
+	$(SDK)/usr/bin/opt -O3 -o $(SDK)/usr/lib/libm.o $(BUILD)/libmbc/libm.o
+	$(SDK)/usr/bin/nm $(SDK)/usr/lib/libm.o | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/libm.bc.txt
 
 libm.abc:
 	mkdir -p $(BUILD)/libm_abc
 	cp $(BUILD)/msun/msun/*.o $(BUILD)/libm_abc
 	cd $(BUILD)/libm_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 
+libBlocksRuntime:
+	cd compiler_rt/BlocksRuntime && echo '#define HAVE_SYNC_BOOL_COMPARE_AND_SWAP_INT' > config.h && echo '#define HAVE_SYNC_BOOL_COMPARE_AND_SWAP_LONG' >> config.h
+	cd compiler_rt/BlocksRuntime && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -c data.c -o data.o
+	cd compiler_rt/BlocksRuntime && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -c runtime.c -o runtime.o
+	cd compiler_rt/BlocksRuntime && $(AR) $(SDK)/usr/lib/libBlocksRuntime.a data.o runtime.o
+	cp compiler_rt/BlocksRuntime/Block*.h $(SDK)/usr/include/
+
+libcxx: libsupcxx libgcceh
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libc++/Makefile
+endif
+	cd $(BUILD)/lib/src/lib/libc++ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libc++.a
+	cd $(BUILD)/lib/src/lib/libc++ && $(AR) libc++.a *.o && mv libc++.a $(SDK)/usr/lib/.
+
+libsupcxx:
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libsupc++/Makefile
+endif
+	cd $(BUILD)/lib/src/lib/libsupc++/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libsupc++.a
+	cd $(BUILD)/lib/src/lib/libsupc++/ && $(SDK)/usr/bin/llvm-link -o libsupc++.o *.o && mv libsupc++.o ../libc++
+
+libgcceh:
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libgcceh/Makefile
+endif
+	cd $(BUILD)/lib/src/lib/libgcceh/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libgcceh.a
+	cd $(BUILD)/lib/src/lib/libgcceh/ && $(SDK)/usr/bin/llvm-link -o libgcceh.o *.o && mv libgcceh.o ../libc++
+
 libcxx.abc:
 	mkdir -p $(BUILD)/libcxx_abc
 	cd $(BUILD)/libcxx_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc++.a
 	cd $(BUILD)/libcxx_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libcxx_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc++.a
+
+single.abc:
+	mkdir -p $(SDK)/usr/lib/stdlibs_abc
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libm.o -o $(SDK)/usr/lib/stdlibs_abc/libm.o
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
 
 # ====================================================================================
 # AS3XX
@@ -805,6 +888,117 @@ trd:
 extralibs:
 	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng #TODO libsdl dmalloc libffi
 
+zlib:
+	rm -rf $(BUILD)/zlib
+	cp -r $(SRCROOT)/$(DEPENDENCY_ZLIB) $(BUILD)/zlib
+	cd $(BUILD)/zlib && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libz.a CFLAGS=-O4 CXXFLAGS=-O4 SFLAGS=-O4
+	$(RSYNC) $(BUILD)/zlib/zlib.h $(SDK)/usr/include/
+	$(RSYNC) $(BUILD)/zlib/libz.a $(SDK)/usr/lib/
+
+libvgl:
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libvgl/Makefile
+endif
+	cd $(BUILD)/lib/src/lib/libvgl && $(BMAKE) -j$(THREADS)   libvgl.a
+	rm -f $(SDK)/usr/lib/libvgl.a
+	$(AR) $(SDK)/usr/lib/libvgl.a $(BUILD)/lib/src/lib/libvgl/*.o
+
+libjpeg_configure:
+	rm -rf $(SRCROOT)/cached_build/libjpeg
+	mkdir -p $(SRCROOT)/cached_build/libjpeg
+	cd $(SRCROOT)/cached_build/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/jpeg-8c/configure \
+		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
+	perl -p -i -e 's~$(SRCROOT)/cached_build/libjpeg~FLASCC_BUILD_DIR~g' `grep -ril $(SRCROOT) cached_build/`
+	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
+
+libjpeg:
+	rm -rf $(BUILD)/libjpeg
+	mkdir -p $(BUILD)/libjpeg
+	cp -r $(SRCROOT)/cached_build/libjpeg $(BUILD)/
+	perl -p -i -e 's~FLASCC_BUILD_DIR~$(BUILD)/libjpeg~g' `grep -ril FLASCC_BUILD_DIR $(BUILD)/libjpeg/`
+	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libjpeg/`
+	cd $(BUILD)/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libjpeg.la && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) install-libLTLIBRARIES install-includeHEADERS
+	cp -f $(SRCROOT)/cached_build/libjpeg/jconfig.h $(SDK)/usr/include/
+	rm -f $(SDK)/usr/lib/libjpeg.so
+	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-jpegtran
+	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-rdjpgcom
+	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-wrjpgcom
+	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-cjpeg
+	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-djpeg
+
+libpng_configure:
+	rm -rf $(SRCROOT)/cached_build/libpng
+	mkdir -p $(SRCROOT)/cached_build/libpng
+	cd $(SRCROOT)/cached_build/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/libpng-1.5.7/configure \
+		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-dependency-tracking
+	perl -p -i -e 's~$(SRCROOT)/cached_build/libpng~FLASCC_BUILD_DIR~g' `grep -ril $(SRCROOT) cached_build/`
+	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
+
+libpng:
+	rm -rf $(BUILD)/libpng
+	mkdir -p $(BUILD)/libpng
+	cp -r $(SRCROOT)/cached_build/libpng $(BUILD)/
+	perl -p -i -e 's~FLASCC_BUILD_DIR~$(BUILD)/libpng~g' `grep -ril FLASCC_BUILD_DIR $(BUILD)/libpng/`
+	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libpng/`
+	cd $(BUILD)/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j$(THREADS) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+	rm -f $(SDK)/usr/bin/libpng-config
+	cp -f $(SDK)/usr/bin/libpng15-config $(SDK)/usr/bin/libpng-config
+	rm -f $(SDK)/usr/lib/libpng.a
+	cp -f $(SDK)/usr/lib/libpng15.a $(SDK)/usr/lib/libpng.a
+
+libsdl_configure:
+	rm -rf $(SRCROOT)/cached_build/libsdl
+	mkdir -p $(SRCROOT)/cached_build/libsdl
+	cd $(SRCROOT)/cached_build/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/SDL-1.2.14/configure \
+		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
+		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
+		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
+		--disable-directx --enable-joystick --enable-video-vgl --enable-static --disable-shared
+	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
+	rm $(SRCROOT)/cached_build/libsdl/config.status
+
+libsdl:
+	rm -rf $(BUILD)/libsdl
+	mkdir -p $(BUILD)/libsdl
+	cp -r $(SRCROOT)/cached_build/libsdl $(BUILD)/
+	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libsdl/`
+
+	cd $(BUILD)/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' $(MAKE) -j$(THREADS)
+	cd $(BUILD)/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' $(MAKE) install
+	$(MAKE) libsdl-install
+	rm $(SDK)/usr/include/SDL/SDL_opengl.h
+
+libsdl-install:
+	cp $(SRCROOT)/tools/sdl-config $(SDK)/usr/bin/. # install our custom sdl-config
+	chmod a+x $(SDK)/usr/bin/sdl-config
+
+dmalloc_configure:
+	rm -rf $(SRCROOT)/cached_build/dmalloc
+	mkdir -p $(SRCROOT)/cached_build/dmalloc
+	cd $(SRCROOT)/cached_build/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/dmalloc-5.5.2/configure \
+		--prefix=$(SDK)/usr --disable-shared --enable-static --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
+	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/dmalloc`
+
+dmalloc:
+	rm -rf $(BUILD)/dmalloc
+	mkdir -p $(BUILD)/dmalloc
+	cp -r $(SRCROOT)/cached_build/dmalloc $(BUILD)/
+	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/dmalloc/`
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 threads cxx
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 installcxx installth
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 heavy
+
+libffi:
+	mkdir -p $(BUILD)/libffi
+	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+libfficheck:
+	cd $(BUILD)/libffi/testsuite && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) check
+
 # ====================================================================================
 # EXTRA TOOLS
 # ====================================================================================
@@ -863,6 +1057,14 @@ pkgconfig:
 	mkdir -p $(BUILD)/pkgconfig
 	cd $(BUILD)/pkgconfig && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/$(DEPENDENCY_PKG_CFG)/configure --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --prefix=$(SDK)/usr --disable-shared --disable-dependency-tracking
 	cd $(BUILD)/pkgconfig && $(MAKE) -j$(THREADS) && $(MAKE) install
+
+libtool:
+	rm -rf $(BUILD)/libtool
+	mkdir -p $(BUILD)/libtool
+	cd $(BUILD)/libtool && CC=gcc CXX=g++ $(SRCROOT)/libtool-2.4.2/configure \
+		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) \
+		--prefix=$(SDK)/usr --enable-static --disable-shared --disable-ltdl-install
+	cd $(BUILD)/libtool && $(MAKE) -j$(THREADS) && $(MAKE) install-exec
 
 # ====================================================================================
 # CROSS COMPILE UNDER MAC
@@ -968,8 +1170,6 @@ nightly:
 weekly:
 	$(MAKE) nightly
 	$(MAKE) gcctests
-
-.PHONY: bmake posix binutils docs gcc samples
 
 deliverables:
 	$(MAKE) staging
@@ -1095,143 +1295,6 @@ libiconv:
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_ICONV)/configure --prefix=$(SDK)/usr
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-libffi:
-	mkdir -p $(BUILD)/libffi
-	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure --prefix=$(SDK)/usr
-	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-libfficheck:
-	cd $(BUILD)/libffi/testsuite && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) check
-
-libBlocksRuntime:
-	cd compiler_rt/BlocksRuntime && echo '#define HAVE_SYNC_BOOL_COMPARE_AND_SWAP_INT' > config.h && echo '#define HAVE_SYNC_BOOL_COMPARE_AND_SWAP_LONG' >> config.h
-	cd compiler_rt/BlocksRuntime && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -c data.c -o data.o
-	cd compiler_rt/BlocksRuntime && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -c runtime.c -o runtime.o
-	cd compiler_rt/BlocksRuntime && $(AR) $(SDK)/usr/lib/libBlocksRuntime.a data.o runtime.o
-	cp compiler_rt/BlocksRuntime/Block*.h $(SDK)/usr/include/
-
-libvgl:
-	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libvgl/Makefile
-endif
-	cd $(BUILD)/lib/src/lib/libvgl && $(BMAKE) -j$(THREADS)   libvgl.a
-	rm -f $(SDK)/usr/lib/libvgl.a
-	$(AR) $(SDK)/usr/lib/libvgl.a $(BUILD)/lib/src/lib/libvgl/*.o
-
-libjpeg_configure:
-	rm -rf $(SRCROOT)/cached_build/libjpeg
-	mkdir -p $(SRCROOT)/cached_build/libjpeg
-	cd $(SRCROOT)/cached_build/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/jpeg-8c/configure \
-		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
-	perl -p -i -e 's~$(SRCROOT)/cached_build/libjpeg~FLASCC_BUILD_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-
-libjpeg:
-	rm -rf $(BUILD)/libjpeg
-	mkdir -p $(BUILD)/libjpeg
-	cp -r $(SRCROOT)/cached_build/libjpeg $(BUILD)/
-	perl -p -i -e 's~FLASCC_BUILD_DIR~$(BUILD)/libjpeg~g' `grep -ril FLASCC_BUILD_DIR $(BUILD)/libjpeg/`
-	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libjpeg/`
-	cd $(BUILD)/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libjpeg.la && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) install-libLTLIBRARIES install-includeHEADERS
-	cp -f $(SRCROOT)/cached_build/libjpeg/jconfig.h $(SDK)/usr/include/
-	rm -f $(SDK)/usr/lib/libjpeg.so
-	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-jpegtran
-	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-rdjpgcom
-	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-wrjpgcom
-	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-cjpeg
-	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-djpeg
-
-libpng_configure:
-	rm -rf $(SRCROOT)/cached_build/libpng
-	mkdir -p $(SRCROOT)/cached_build/libpng
-	cd $(SRCROOT)/cached_build/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/libpng-1.5.7/configure \
-		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-dependency-tracking
-	perl -p -i -e 's~$(SRCROOT)/cached_build/libpng~FLASCC_BUILD_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-
-libpng:
-	rm -rf $(BUILD)/libpng
-	mkdir -p $(BUILD)/libpng
-	cp -r $(SRCROOT)/cached_build/libpng $(BUILD)/
-	perl -p -i -e 's~FLASCC_BUILD_DIR~$(BUILD)/libpng~g' `grep -ril FLASCC_BUILD_DIR $(BUILD)/libpng/`
-	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libpng/`
-	cd $(BUILD)/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j$(THREADS) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-	rm -f $(SDK)/usr/bin/libpng-config
-	cp -f $(SDK)/usr/bin/libpng15-config $(SDK)/usr/bin/libpng-config
-	rm -f $(SDK)/usr/lib/libpng.a
-	cp -f $(SDK)/usr/lib/libpng15.a $(SDK)/usr/lib/libpng.a
-
-libm:
-	cd compiler_rt && $(MAKE) clean && $(MAKE) avm2 CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm" RANLIB=$(SDK)/usr/bin/ranlib AR=$(SDK)/usr/bin/ar VERBOSE=1
-	$(SDK)/usr/bin/llvm-link -o $(BUILD)/libcompiler_rt.o compiler_rt/avm2/avm2/avm2/SubDir.lib/*.o
-	$(SDK)/usr/bin/nm $(BUILD)/libcompiler_rt.o  | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/compiler_rt.txt
-	cat $(BUILD)/compiler_rt.txt >> $(SDK)/public-api.txt
-	cat $(SRCROOT)/llvm-$(LLVMVERSION)/lib/CodeGen/SelectionDAG/TargetLowering.cpp | grep "Names\[RTLIB::" | awk '{print $$3}' | sed 's/"//g' | sed 's/;//' | sort | uniq > $(BUILD)/rtlib.txt
-	cat avm2_env/rtlib-extras.txt >> $(BUILD)/rtlib.txt
-
-	rm -rf $(BUILD)/msun/ $(BUILD)/libmbc $(SDK)/usr/lib/libm.a $(SDK)/usr/lib/libm.o
-	mkdir -p $(BUILD)/msun
-	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/msun/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/msun/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/msun/msun/Makefile
-endif
-	cd $(BUILD)/msun/msun && $(BMAKE) -j$(THREADS)   libm.a
-	# find bitcode (and ignore non-bitcode genned from .s files) and put
-	# it in our lib
-	cd $(BUILD)/msun/msun && rm -f libm.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libm.a
-	# remove symbols for sin, cos, other things we support as intrinsics
-	cd $(BUILD)/msun/msun && $(SDK)/usr/bin/ar sd libm.a s_cos.o s_sin.o e_pow.o e_sqrt.o
-	$(SDK)/usr/bin/ar r $(SDK)/usr/lib/libm.a
-	mkdir -p $(BUILD)/libmbc
-	cd $(BUILD)/libmbc && $(SDK)/usr/bin/ar x $(BUILD)/msun/msun/libm.a
-	cd $(BUILD)/libmbc && $(SDK)/usr/bin/llvm-link -o $(BUILD)/libmbc/libm.o $(BUILD)/libcompiler_rt.o *.o
-	cp -f $(BUILD)/libmbc/libm.o $(SDK)/usr/lib/libm.o
-	$(SDK)/usr/bin/opt -O3 -o $(SDK)/usr/lib/libm.o $(BUILD)/libmbc/libm.o
-	$(SDK)/usr/bin/nm $(SDK)/usr/lib/libm.o | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/libm.bc.txt
-
-libthr:
-	rm -rf $(BUILD)/libthr
-	mkdir -p $(BUILD)/libthr
-	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/libthr/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/libthr/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/libthr/ -name 'Makefile.inc' -exec dos2unix {} +
-endif
-	cd $(BUILD)/libthr/libthr && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/thrHelpers.c
-	# CWARNFLAGS= because thr_exit() can return and pthread_exit() is marked noreturn (where?)...
-	cd $(BUILD)/libthr/libthr && $(BMAKE) -j$(THREADS)   CWARNFLAGS= libthr.a
-	# find bitcode (and ignore non-bitcode genned from .s files) and put
-	# it in our lib
-	cd $(BUILD)/libthr/libthr && rm -f libthr.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libthr.a
-	cp -f $(BUILD)/libthr/libthr/libthr.a $(SDK)/usr/lib/.
-
-.PHONY: libcxx libcxxrt libxxabi libunwind libgcceh
-libgcceh:
-	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libgcceh/Makefile
-endif
-	cd $(BUILD)/lib/src/lib/libgcceh/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libgcceh.a
-	cd $(BUILD)/lib/src/lib/libgcceh/ && $(SDK)/usr/bin/llvm-link -o libgcceh.o *.o && mv libgcceh.o ../libc++
-
-libsupcxx:
-	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libsupc++/Makefile
-endif
-	cd $(BUILD)/lib/src/lib/libsupc++/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libsupc++.a
-	cd $(BUILD)/lib/src/lib/libsupc++/ && $(SDK)/usr/bin/llvm-link -o libsupc++.o *.o && mv libsupc++.o ../libc++
-
 libcxxabi:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 # Cygwin compatibility
@@ -1262,16 +1325,6 @@ endif
 	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libcxxrt.a
 	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(SDK)/usr/bin/llvm-link -o libcxxrt.o *.o && mv libcxxrt.o ../libc++
 
-libcxx: libsupcxx libgcceh
-	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libc++/Makefile
-endif
-	cd $(BUILD)/lib/src/lib/libc++ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libc++.a
-	cd $(BUILD)/lib/src/lib/libc++ && $(AR) libc++.a *.o && mv libc++.a $(SDK)/usr/lib/.
-
 libobjc_configure:
 	cd $(BUILD)/llvm-gcc-42 \
 		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' TARGET-target-libobjc="all OBJC_THREAD_FILE=thr-posix" all-target-libobjc > $(SRCROOT)/cached_build/libobjc/compile.log
@@ -1298,22 +1351,6 @@ gcclibs:
 	rm -rf $(SDK)/usr/lib/gcc
 
 	$(MAKE) libobjc
-
-dmalloc_configure:
-	rm -rf $(SRCROOT)/cached_build/dmalloc
-	mkdir -p $(SRCROOT)/cached_build/dmalloc
-	cd $(SRCROOT)/cached_build/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/dmalloc-5.5.2/configure \
-		--prefix=$(SDK)/usr --disable-shared --enable-static --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/dmalloc`
-
-dmalloc:
-	rm -rf $(BUILD)/dmalloc
-	mkdir -p $(BUILD)/dmalloc
-	cp -r $(SRCROOT)/cached_build/dmalloc $(BUILD)/
-	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/dmalloc/`
-	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 threads cxx
-	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 installcxx installth
-	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 heavy
 
 abclibobjc:
 	mkdir -p $(BUILD)/libobjc_abc
@@ -1343,47 +1380,6 @@ cxxfiltmingw:
 builtinabcs:
 	cd $(SRCROOT)/avmplus/core && ./builtin.py
 	cd $(SRCROOT)/avmplus/shell && ./shell_toplevel.py
-
-libsdl_configure:
-	rm -rf $(SRCROOT)/cached_build/libsdl
-	mkdir -p $(SRCROOT)/cached_build/libsdl
-	cd $(SRCROOT)/cached_build/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/SDL-1.2.14/configure \
-		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
-		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
-		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
-		--disable-directx --enable-joystick --enable-video-vgl --enable-static --disable-shared
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-	rm $(SRCROOT)/cached_build/libsdl/config.status
-
-libsdl:
-	rm -rf $(BUILD)/libsdl
-	mkdir -p $(BUILD)/libsdl
-	cp -r $(SRCROOT)/cached_build/libsdl $(BUILD)/
-	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libsdl/`
-
-	cd $(BUILD)/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' $(MAKE) -j$(THREADS)
-	cd $(BUILD)/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' $(MAKE) install
-	$(MAKE) libsdl-install
-	rm $(SDK)/usr/include/SDL/SDL_opengl.h
-
-libsdl-install:
-	cp $(SRCROOT)/tools/sdl-config $(SDK)/usr/bin/. # install our custom sdl-config
-	chmod a+x $(SDK)/usr/bin/sdl-config
-
-zlib:
-	rm -rf $(BUILD)/zlib
-	cp -r $(SRCROOT)/$(DEPENDENCY_ZLIB) $(BUILD)/zlib
-	cd $(BUILD)/zlib && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libz.a CFLAGS=-O4 CXXFLAGS=-O4 SFLAGS=-O4
-	$(RSYNC) $(BUILD)/zlib/zlib.h $(SDK)/usr/include/
-	$(RSYNC) $(BUILD)/zlib/libz.a $(SDK)/usr/lib/
-
-libtool:
-	rm -rf $(BUILD)/libtool
-	mkdir -p $(BUILD)/libtool
-	cd $(BUILD)/libtool && CC=gcc CXX=g++ $(SRCROOT)/libtool-2.4.2/configure \
-		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) \
-		--prefix=$(SDK)/usr --enable-static --disable-shared --disable-ltdl-install
-	cd $(BUILD)/libtool && $(MAKE) -j$(THREADS) && $(MAKE) install-exec
 
 dejagnu:
 	mkdir -p $(BUILD)/dejagnu
@@ -1749,3 +1745,5 @@ libtoabc:
 	if [$$numos -gt 0 ] ; then \
 	cd $(BUILD)/libtoabc/`basename $(LIB)` && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS) ; \
 	fi 
+
+.PHONY: bmake posix binutils docs gcc samples libcxx libcxxrt libxxabi libunwind libgcceh
