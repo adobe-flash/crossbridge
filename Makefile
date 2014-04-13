@@ -148,7 +148,7 @@ LLVMCMAKEFLAGS=-DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8 \
 	-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
 	-DLLVM_BUILD_RUNTIME=OFF
 #Possible values: Release, Debug, RelWithDebInfo and MinSizeRel
-LLVMBUILDTYPE=Debug
+LLVMBUILDTYPE=Release
 FLASCC_CC=clang
 FLASCC_CXX=clang++
 CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang$(EXEEXT) \
@@ -266,6 +266,9 @@ all_with_travis:
 	@$(SDK)/usr/bin/make finalcleanup
 	@$(SDK)/usr/bin/make submittests
 
+cbdebug:
+	@$(SDK)/usr/bin/make extratools
+
 # ====================================================================================
 # CORE
 # ====================================================================================
@@ -301,6 +304,52 @@ clean_libs:
 	rm -rf $(DEPENDENCY_ICONV)
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_PKG_CFG)
+
+# ====================================================================================
+# BASE
+# ====================================================================================
+base:
+	mkdir -p $(BUILDROOT)/extra
+	mkdir -p $(BUILD)/abclibs
+	mkdir -p $(SDK)/usr/lib/bfd-plugins
+	mkdir -p $(SDK)/usr/share
+	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/bin
+	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/libexec/gcc/$(TRIPLE)
+
+	$(LN) ../usr $(SDK)/usr/$(TRIPLE)
+	$(LN) $(PLATFORM) $(SDK)/usr/platform/current
+	$(LN) platform/current/bin $(SDK)/usr/bin
+	$(LN) ../ $(SDK)/usr/platform/usr 
+	$(LN) ../../lib $(SDK)/usr/platform/current/lib 
+	$(LN) platform/current/libexec $(SDK)/usr/libexec
+	$(LN) ../../../../../lib $(SDK)/usr/platform/current/libexec/gcc/$(TRIPLE)/lib
+
+	cd $(SDK)/usr/platform/current/bin && $(LN) ar$(EXEEXT) avm2-unknown-freebsd8-ar$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) nm$(EXEEXT) avm2-unknown-freebsd8-nm$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) strip$(EXEEXT) avm2-unknown-freebsd8-strip$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) ranlib$(EXEEXT) avm2-unknown-freebsd8-ranlib$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) avm2-unknown-freebsd8-gcc$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) avm2-unknown-freebsd8-g++$(EXEEXT)
+
+	mkdir -p $(BUILD)/ccachebin
+	mkdir -p ccache
+	$(LN) `which ccache` $(BUILD)/ccachebin/$(CC)
+	$(LN) `which ccache` $(BUILD)/ccachebin/$(CXX)
+	$(LN) `which ccache` $(BUILD)/ccachebin/$(CYGTRIPLE)-gcc
+	$(LN) `which ccache` $(BUILD)/ccachebin/$(CYGTRIPLE)-g++
+	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-gcc
+	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-g++
+
+	$(RSYNC) asc/abc/playerglobal.abc $(SDK)/usr/lib/
+	$(RSYNC) asc/abc/playerglobal.swc $(SDK)/usr/lib/
+	$(RSYNC) avm2_env/public-api.txt $(SDK)/
+	cp -f avmplus/generated/*.abc $(SDK)/usr/lib/
+
+	$(RSYNC) --exclude '*iconv.h' avm2_env/usr/src/include/ $(SDK)/usr/include
+	#$(RSYNC) avm2_env/usr/lib/ $(SDK)/usr/lib
+
+	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/swfmake.as) -outdir . -out swfmake
+	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/projectormake.as) -outdir . -out projectormake
 
 # ====================================================================================
 # MAKE
@@ -393,7 +442,6 @@ abclibs_asdocs:
 # ====================================================================================
 # BASIC TOOLS
 # ====================================================================================
-
 basictools:
 	$(MAKE) -j$(THREADS) uname noenv avm2-as alctool alcdb
 
@@ -433,6 +481,388 @@ alcdb:
 	cd $(BUILD)/alcdb && echo "Class-Path: fdb.jar" >> MANIFEST.MF
 	cd $(BUILD)/alcdb && jar cmf MANIFEST.MF alcdb.jar flascc/*.class 
 	cp $(BUILD)/alcdb/alcdb.jar $(SDK)/usr/lib/.
+
+# ====================================================================================
+# LLVM
+# ====================================================================================
+llvmdev:
+	cd $(BUILD)/llvm-debug && $(MAKE) -j$(THREADS) && $(MAKE) install
+	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
+	$(MAKE) llvm-install
+
+llvm:
+	rm -rf $(BUILD)/llvm-debug
+	mkdir -p $(BUILD)/llvm-debug
+	cd $(BUILD)/llvm-debug && LDFLAGS="$(LLVMLDFLAGS)" CFLAGS="$(LLVMCFLAGS)" CXXFLAGS="$(LLVMCXXFLAGS)" $(SDK)/usr/bin/cmake -G "Unix Makefiles" \
+		$(LLVMCMAKEOPTS) -DCMAKE_INSTALL_PREFIX=$(LLVMINSTALLPREFIX)/llvm-install -DCMAKE_BUILD_TYPE=$(LLVMBUILDTYPE) $(LLVMCMAKEFLAGS) \
+		-DLLVM_ENABLE_ASSERTIONS=$(ASSERTIONS) \
+		-DLLVM_TARGETS_TO_BUILD="$(LLVMTARGETS)" -DLLVM_NATIVE_ARCH="avm2" -DLLVM_INCLUDE_TESTS=$(BUILD_LLVM_TESTS) -DLLVM_INCLUDE_EXAMPLES=OFF \
+		$(SRCROOT)/llvm-$(LLVMVERSION) && $(MAKE) -j$(THREADS) 
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
+ifeq ($(LLVM_ONLYLLC), false)
+	$(MAKE) llvm-install
+endif
+
+llvm-install:
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-ar$(EXEEXT) $(SDK)/usr/bin/llvm-ar$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-as$(EXEEXT) $(SDK)/usr/bin/llvm-as$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-diff$(EXEEXT) $(SDK)/usr/bin/llvm-diff$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-dis$(EXEEXT) $(SDK)/usr/bin/llvm-dis$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-extract$(EXEEXT) $(SDK)/usr/bin/llvm-extract$(EXEEXT)
+	$(LLVMLDCP)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-link$(EXEEXT) $(SDK)/usr/bin/llvm-link$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-nm$(EXEEXT) $(SDK)/usr/bin/llvm-nm$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-ranlib$(EXEEXT) $(SDK)/usr/bin/llvm-ranlib$(EXEEXT)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/opt$(EXEEXT) $(SDK)/usr/bin/opt$(EXEEXT)
+	$(CP_CLANG)
+	cp $(LLVMINSTALLPREFIX)/llvm-debug/lib/LLVMgold.* $(SDK)/usr/lib/LLVMgold$(SOEXT)
+	cp -f $(BUILD)/llvm-debug/bin/fpcmp$(EXEEXT) $(BUILDROOT)/extra/fpcmp$(EXEEXT)
+
+llvmtests:
+	rm -rf $(BUILD)/llvm-tests
+	mkdir -p $(BUILD)/llvm-tests
+	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
+	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-$(LLVMVERSION)/configure --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --without-f2c --without-f95 --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
+	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
+	cd $(BUILD)/llvm-tests/projects/test-suite/MultiSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
+	cd $(BUILD)/llvm-tests/projects/test-suite/SingleSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
+	python $(SRCROOT)/tools/llvmtestcheck.py --srcdir $(SRCROOT)/llvm-2.9/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ --fpcmp $(FPCMP)> $(BUILD)/llvm-tests/passfail.txt
+	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_llvm.txt
+
+llvmtests-speccpu2006: # works only on mac!
+	rm -rf $(BUILD)/llvm-tests
+	rm -rf $(BUILD)/llvm-spec-tests
+	mkdir -p $(BUILD)/llvm-tests
+	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
+	mkdir -p $(BUILD)/llvm-externals && cd $(BUILD)/llvm-externals && curl http://alchemy.corp.adobe.com/speccpu2006.tar.bz2 | tar xvjf -
+	#mkdir -p $(BUILD)/llvm-externals && cd $(BUILD)/llvm-externals && cat $(SRCROOT)/speccpu2006.tar.bz2 | tar xvjf -
+	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-$(LLVMVERSION)/configure --without-f2c --without-f95 --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --with-externals=$(BUILD)/llvm-externals --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
+	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
+	cd $(BUILD)/llvm-tests/projects/test-suite/External && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1 CXXFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP' CFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP')
+	python $(SRCROOT)/tools/llvmtestcheck.py --fpcmp $(FPCMP) --srcdir $(SRCROOT)/llvm-2.9/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ > $(BUILD)/llvm-tests/passfail.txt
+	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_spec.txt
+	cp -r $(BUILD)/llvm-tests/projects $(BUILD)/llvm-spec-tests
+
+gcc:
+	rm -rf $(BUILD)/llvm-gcc-42
+	mkdir -p $(SDK)/usr/bin
+	mkdir -p $(SDK)/usr/lib
+	mkdir -p $(BUILD)/llvm-gcc-42
+	cd $(BUILD)/llvm-gcc-42 && CFLAGS='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ ' \
+		CC=$(CC) CXX=$(CXX) $(SRCROOT)/llvm-gcc-4.2-2.9/configure --enable-languages=c,c++,objc,obj-c++ \
+		--enable-llvm=$(LLVMINSTALLPREFIX)/llvm-install/ --disable-bootstrap --disable-multilib --disable-libada \
+		--enable-sjlj-exceptions --disable-shared --program-prefix="" \
+		--prefix=$(SDK)/usr --with-sysroot="" --with-build-sysroot=$(SDK)/ \
+		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE)
+	cd $(BUILD)/llvm-gcc-42 && CC=$(CC) CXX=$(CXX)  $(MAKE) -j$(THREADS) all-gcc \
+		CFLAGS_FOR_TARGET='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os -emit-llvm -I$(SRCROOT)/avm2_env/misc/ ' \
+		CXXFLAGS_FOR_TARGET='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os -emit-llvm -I$(SRCROOT)/avm2_env/misc/ ' && $(MAKE) install-gcc
+	rm -f $(SDK)/usr/bin/gccbug*
+	rm -f $(BUILD)/llvm-gcc-42/gcc/gccbug*
+	rm -rf $(SDK)/usr/lib/avm2-unknown-freebsd8
+	mv $(SDK)/usr/lib/gcc/* $(SDK)/usr/lib/
+	mv $(SDK)/usr/lib/avm2-unknown-freebsd8/4.2.1/*.a $(SDK)/usr/lib/
+	rmdir $(SDK)/usr/lib/gcc
+	$(RSYNC) $(SDK)/usr/libexec/gcc/avm2-unknown-freebsd8/4.2.1/ $(SDK)/usr/bin/
+	rm -rf $(SDK)/usr/libexec
+
+# ====================================================================================
+# BINUTILS
+# ====================================================================================
+binutils:
+	rm -rf $(BUILD)/binutils
+	mkdir -p $(BUILD)/binutils
+	mkdir -p $(SDK)/usr
+	cd $(BUILD)/binutils && CC=$(CC) CXX=$(CXX) CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " CXXFLAGS="$(GCCLANGFLAG) -I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " $(SRCROOT)/binutils/configure \
+		--disable-doc --enable-gold --disable-ld --enable-plugins \
+		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --with-sysroot=$(SDK)/usr \
+		--program-prefix="" --prefix=$(SDK)/usr --disable-werror \
+		--enable-targets=$(TRIPLE)
+	cd $(BUILD)/binutils && $(MAKE) -j$(THREADS) && $(MAKE) install
+	mv $(SDK)/usr/bin/ld.gold$(EXEEXT) $(SDK)/usr/bin/ld$(EXEEXT)
+	rm -rf $(SDK)/usr/bin/readelf$(EXEEXT) $(SDK)/usr/bin/elfedit$(EXEEXT) $(SDK)/usr/bin/ld.bfd$(EXEEXT) $(SDK)/usr/bin/objdump$(EXEEXT) $(SDK)/usr/bin/objcopy$(EXEEXT) $(SDK)/usr/share/info $(SDK)/usr/share/man
+
+# ====================================================================================
+# PLUGINS
+# ====================================================================================
+plugins:
+	rm -rf $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
+	mkdir -p $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
+	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ -DHAVE_ABCNM -DDEFTMPDIR=\"$(call nativepath,/tmp)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -DHAVE_STDINT_H -I$(SRCROOT)/$(DEPENDENCY_ZLIB)/ -I$(SRCROOT)/binutils/include -fPIC -c $(SRCROOT)/gold-plugins/makeswf.cpp
+	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -shared -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup -o makeswf$(SOEXT) makeswf.o
+	cd $(BUILD)/multiplug && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/  -DHAVE_STDINT_H -DSOEXT=\"$(SOEXT)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -I$(SRCROOT)/binutils/include -fPIC -c $(SRCROOT)/gold-plugins/multiplug.cpp
+	cd $(BUILD)/multiplug && $(CXX) $(DBGOPTS) -shared -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup -o multiplug$(SOEXT) multiplug.o
+	cp -f $(BUILD)/makeswf/makeswf$(SOEXT) $(SDK)/usr/lib/makeswf$(SOEXT)
+	cp -f $(BUILD)/multiplug/multiplug$(SOEXT) $(SDK)/usr/lib/multiplug$(SOEXT)
+	cp -f $(BUILD)/multiplug/multiplug$(SOEXT) $(SDK)/usr/lib/bfd-plugins/multiplug$(SOEXT)
+
+# ====================================================================================
+# BMAKE
+# ====================================================================================
+bmake:
+	rm -rf $(BUILD)/bmake
+	mkdir -p $(BUILD)/bmake
+	cd $(BUILD)/bmake && $(SRCROOT)/bmake/configure && bash make-bootstrap.sh
+
+# ====================================================================================
+# STD LIBS
+# ====================================================================================
+stdlibs:
+	$(MAKE) -j$(THREADS) csu libc libthr libm libBlocksRuntime libcxx
+
+csu:
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/share/ -name '*.mk' -exec dos2unix {} +
+endif
+	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE)   crt1_c.o
+	mv -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
+
+libc:
+	mkdir -p $(BUILD)/posix/
+	rm -f $(BUILD)/posix/*.o
+	mkdir -p $(BUILD)/lib/src/lib/libc/
+	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	find $(BUILD)/lib/ -name 'Makefile.inc' -exec dos2unix {} +
+endif
+	cd $(BUILD)/posix && python $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
+	cp $(BUILD)/posix/IKernel.as $(SRCROOT)/avmplus/shell
+	cp $(BUILD)/posix/ShellPosix.as $(SRCROOT)/avmplus/shell
+	cp $(BUILD)/posix/ShellPosixGlue.cpp $(SRCROOT)/avmplus/shell
+	cp $(BUILD)/posix/ShellPosixGlue.h $(SRCROOT)/avmplus/shell
+	cd $(SRCROOT)/avmplus/shell && python ./shell_toplevel.py -config CONFIG::VMCFG_ALCHEMY_POSIX=true
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c posix.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/vgl.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -D_KERNEL -c $(SRCROOT)/avm2_env/usr/src/kern/kern_umtx.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -c $(SRCROOT)/posix/thrStubs.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/kpmalloc.c
+	cd $(BUILD)/posix && cp *.o $(BUILD)/lib/src/lib/libc/
+	cd $(BUILD)/lib/src/lib/libc && $(BMAKE) -j$(THREADS)   libc.a
+	# find bitcode (and ignore non-bitcode genned from .s files) and put
+	# it in our lib
+	rm -f $(BUILD)/lib/src/lib/libc/tmp/*
+	$(AR) $(SDK)/usr/lib/libssp.a $(BUILD)/lib/src/lib/libc/stack_protector.o && cp $(SDK)/usr/lib/libssp.a $(SDK)/usr/lib/libssp_nonshared.a
+	# we override these in thrStubs.c but leave them weak
+	cd $(BUILD)/lib/src/lib/libc && $(SDK)/usr/bin/llvm-dis -o=_pthread_stubs.ll _pthread_stubs.o && sed -E 's/@pthread_(key_create|key_delete|getspecific|setspecific|once) =/@_d_u_m_m_y_\1 =/g' _pthread_stubs.ll | $(SDK)/usr/bin/llvm-as -o _pthread_stubs.o
+	cd $(BUILD)/lib/src/lib/libc && rm -f libc.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libc.a
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -fexceptions -c $(SRCROOT)/posix/libcHack.c
+	cp -f $(BUILD)/lib/src/lib/libc/libc.a $(BUILD)/posix/libcHack.o $(SDK)/usr/lib/.
+
+libthr.abc:
+	mkdir -p $(BUILD)/libthr_abc
+	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
+	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
+
+libc.abc:
+	mkdir -p $(BUILD)/libc_abc
+	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc.a
+	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
+
+single.abc:
+	mkdir -p $(SDK)/usr/lib/stdlibs_abc
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libm.o -o $(SDK)/usr/lib/stdlibs_abc/libm.o
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
+
+libm.abc:
+	mkdir -p $(BUILD)/libm_abc
+	cp $(BUILD)/msun/msun/*.o $(BUILD)/libm_abc
+	cd $(BUILD)/libm_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+
+libcxx.abc:
+	mkdir -p $(BUILD)/libcxx_abc
+	cd $(BUILD)/libcxx_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc++.a
+	cd $(BUILD)/libcxx_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libcxx_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc++.a
+
+# ====================================================================================
+# AS3XX
+# ====================================================================================
+as3xx:
+	mkdir -p $(SDK)/usr/lib/stdlibs_abc
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/AS3++.cpp
+	cd $(BUILD)/posix && $(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj AS3++.o -o AS3++.abc
+	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libAS3++.a AS3++.o
+	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libAS3++.a AS3++.abc
+
+# ====================================================================================
+# AS3WIG
+# ====================================================================================
+as3wig:
+	rm -rf $(BUILD)/as3wig
+	mkdir -p $(BUILD)/as3wig/flascc
+	cp -f $(SRCROOT)/tools/aet/AS3Wig.java $(BUILD)/as3wig/flascc/.
+	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/as3wig/flascc/.
+	cd $(BUILD)/as3wig && javac flascc/*.java -cp $(call nativepath,$(SDK)/usr/lib/aet.jar)
+	cd $(BUILD)/as3wig && echo "Main-Class: flascc.AS3Wig" > MANIFEST.MF
+	cd $(BUILD)/as3wig && echo "Class-Path: aet.jar" >> MANIFEST.MF
+	cd $(BUILD)/as3wig && jar cmf MANIFEST.MF as3wig.jar flascc/*.class
+	cp $(BUILD)/as3wig/as3wig.jar $(SDK)/usr/lib/.
+	mkdir -p $(SDK)/usr/include/AS3++/
+	cp -f $(SRCROOT)/tools/aet/AS3Wig.h $(SDK)/usr/include/AS3++/AS3Wig.h
+	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/builtin.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/builtin)
+	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/playerglobal)
+	cp -f $(SRCROOT)/tools/aet/AS3Wig.cpp $(BUILD)/as3wig/
+	echo "#include <AS3++/builtin.h>\n" > $(BUILD)/as3wig/AS3WigIncludes.h
+	echo "#include <AS3++/playerglobal.h>\n" >> $(BUILD)/as3wig/AS3WigIncludes.h
+	cd $(BUILD)/as3wig && $(SDK)/usr/bin/$(FLASCC_CXX) -c -emit-llvm -I. AS3Wig.cpp -o Flash++.o
+	cd $(BUILD)/as3wig && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libFlash++.a Flash++.o
+
+# ====================================================================================
+# ABCSTDLIBS
+# ====================================================================================
+abcstdlibs:
+	$(MAKE) -j$(THREADS) abcflashpp abcstdlibs_more
+
+abcflashpp:
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvmopt=-Xmx4G -jvm="$(JAVA)" -falcon-parallel -target-player -filetype=obj $(BUILD)/as3wig/Flash++.o -o $(BUILD)/as3wig/Flash++.abc
+	$(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libFlash++.a $(BUILD)/as3wig/Flash++.abc
+
+abcstdlibs_more:
+	mkdir -p $(SDK)/usr/lib/stdlibs_abc
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libm.o -o $(SDK)/usr/lib/stdlibs_abc/libm.o
+	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
+
+	mkdir -p $(BUILD)/libc_abc
+	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc.a
+	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
+
+	mkdir -p $(BUILD)/libthr_abc
+	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
+	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
+ifneq (,$(findstring 2.9,$(LLVMVERSION)))
+	mkdir -p $(BUILD)/libgcc_abc
+	cd $(BUILD)/libgcc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libgcc.a
+	cd $(BUILD)/libgcc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libgcc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libgcc.a
+
+
+	mkdir -p $(BUILD)/libstdcpp_abc
+	cd $(BUILD)/libstdcpp_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libstdc++.a
+	cd $(BUILD)/libstdcpp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libstdcpp_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libstdc++.a
+
+	mkdir -p $(BUILD)/libsupcpp_abc
+	cd $(BUILD)/libsupcpp_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libsupc++.a
+	cd $(BUILD)/libsupcpp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libsupcpp_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libsupc++.a
+
+	mkdir -p $(BUILD)/libobjc_abc
+	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
+	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
+endif
+	mkdir -p $(BUILD)/libBlocksRuntime_abc
+	cd $(BUILD)/libBlocksRuntime_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libBlocksRuntime.a
+	cd $(BUILD)/libBlocksRuntime_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libBlocksRuntime_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libBlocksRuntime.a
+
+	mkdir -p $(BUILD)/libcxx_abc
+	cd $(BUILD)/libcxx_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc++.a
+	cd $(BUILD)/libcxx_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
+	mv $(BUILD)/libcxx_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc++.a
+
+# ====================================================================================
+# TR
+# ====================================================================================
+tr:
+	rm -rf $(BUILD)/tr
+	mkdir -p $(BUILD)/tr
+	mkdir -p $(SDK)/usr/bin
+	cd $(BUILD)/tr && rm -f Makefile && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(TAMARINCONFIG) --disable-debugger
+	cd $(BUILD)/tr && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
+	cp -f $(BUILD)/tr/shell/avmshell $(SDK)/usr/bin/avmshell
+	cd $(SRCROOT)/avmplus/utils && curdir=$(SRCROOT)/avmplus/utils ASC=$(ASC) $(MAKE) -f manifest.mk utils
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/projectormake.as) -outdir . -out projectormake
+#ifeq (,$(findstring cygwin,$(PLATFORM)))
+#	$(SDK)/usr/bin/avmshell $(BUILD)/abclibs/projectormake.abc -- -o $(SDK)/usr/bin/abcdump$(EXEEXT) $(SDK)/usr/bin/avmshell $(SRCROOT)/avmplus/utils/abcdump.abc -- -Djitordie
+#	chmod a+x $(SDK)/usr/bin/abcdump$(EXEEXT)
+#endif
+
+# ====================================================================================
+# TRD
+# ====================================================================================
+trd:
+	rm -rf $(BUILD)/trd
+	mkdir -p $(BUILD)/trd
+	mkdir -p $(SDK)/usr/bin
+	cd $(BUILD)/trd && rm -f Makefile && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(TAMARINCONFIG) --enable-debugger
+	cd $(BUILD)/trd && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
+	cp -f $(BUILD)/trd/shell/avmshell $(SDK)/usr/bin/avmshell-release-debugger
+
+# ====================================================================================
+# EXTRA LIBS
+# ====================================================================================
+extralibs:
+	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng #TODO libsdl dmalloc libffi
+
+# ====================================================================================
+# EXTRA TOOLS
+# ====================================================================================
+extratools:
+	$(MAKE) -j$(THREADS) genfs gdb swig pkgconfig libtool
+
+genfs:
+	rm -rf $(BUILD)/zlib-native
+	mkdir -p $(BUILD)/zlib-native
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_ZLIB)/ $(BUILD)/zlib-native
+	cd $(BUILD)/zlib-native && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) ./configure --static && $(MAKE) 
+	cd $(BUILD)/zlib-native/contrib/minizip/ && $(MAKE) 
+	$$CC -Wall -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
+
+gdb:
+	rm -rf $(BUILD)/gdb-7.3
+	mkdir -p $(BUILD)/gdb-7.3
+	cd $(BUILD)/gdb-7.3 && CFLAGS="-I$(SRCROOT)/avm2_env/misc -Qunused-arguments -Wno-error" $(SRCROOT)/gdb-7.3/configure --build=$(BUILD_TRIPLE)  --host=$(HOST_TRIPLE) --target=avm2-elf && $(MAKE) -j$(THREADS)
+	cp -f $(BUILD)/gdb-7.3/gdb/gdb$(EXEEXT) $(SDK)/usr/bin/
+	cp -f $(SRCROOT)/tools/flascc.gdb $(SDK)/usr/share/
+	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
+	cp -f $(SRCROOT)/tools/flascc-init.gdb $(SDK)/usr/share/
+
+SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
+SWIG_LIBS=-lLLVMAVM2Info -lLLVMAVM2CodeGen -lLLVMAVM2AsmParser -lLLVMAsmPrinter -lLLVMMCParser -lclangEdit -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport -stdlib=libstdc++
+SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/llvm-$(LLVMVERSION)/include -I$(BUILD)/llvm-debug/include -I$(SRCROOT)/llvm-$(LLVMVERSION)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include -I$(SRCROOT)/llvm-$(LLVMVERSION)/tools/clang/lib -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long 
+SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
+
+swig:
+	rm -rf $(BUILD)/swig
+	mkdir -p $(BUILD)/swig
+	cp -f $(SRCROOT)/swig-2.0.4/pcre-8.20.tar.gz $(BUILD)/swig
+	cd $(BUILD)/swig && $(SRCROOT)/swig-2.0.4/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/swig-2.0.4/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
+	$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/2.0.4/$(var);)
+
+swigtests:
+	# reconfigure so that makefile is up to date (in case Makefile.in changed)
+	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" \
+		CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/swig-2.0.4/configure --prefix=$(SDK)/usr --disable-ccache
+	rm -rf $(BUILD)/swig/Examples/as3
+	cp -R $(SRCROOT)/swig-2.0.4/Examples/as3 $(BUILD)/swig/Examples
+	rm -rf $(BUILD)/swig/Lib/
+	mkdir -p $(BUILD)/swig/Lib/as3
+	cp -R $(SRCROOT)/swig-2.0.4/Lib/as3/* $(BUILD)/swig/Lib/as3
+	cp $(SRCROOT)/swig-2.0.4/Lib/*.i $(BUILD)/swig/Lib
+	cp $(SRCROOT)/swig-2.0.4/Lib/*.swg $(BUILD)/swig/Lib
+	cd $(BUILD)/swig && $(MAKE) check-as3-examples
+
+swigtestsautomation:
+	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/swig-2.0.4
+
+pkgconfig:
+	rm -rf $(BUILD)/pkgconfig
+	mkdir -p $(BUILD)/pkgconfig
+	cd $(BUILD)/pkgconfig && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/$(DEPENDENCY_PKG_CFG)/configure --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --prefix=$(SDK)/usr --disable-shared --disable-dependency-tracking
+	cd $(BUILD)/pkgconfig && $(MAKE) -j$(THREADS) && $(MAKE) install
 
 # ====================================================================================
 # CROSS COMPILE UNDER MAC
@@ -657,232 +1087,8 @@ finalcleanup:
 	$(RSYNC) --exclude "*.xslt" --exclude "*.html" --exclude ASDoc_Config.xml --exclude overviews.xml $(BUILDROOT)/tempdita/ $(SDK)/usr/share/asdocs
 
 # ====================================================================================
-# CORE TARGETS
+# EXTRA
 # ====================================================================================
-gdb:
-	rm -rf $(BUILD)/gdb-7.3
-	mkdir -p $(BUILD)/gdb-7.3
-	cd $(BUILD)/gdb-7.3 && CFLAGS="-I$(SRCROOT)/avm2_env/misc -Qunused-arguments -Wno-error" $(SRCROOT)/gdb-7.3/configure --build=$(BUILD_TRIPLE)  --host=$(HOST_TRIPLE) --target=avm2-elf && $(MAKE) -j$(THREADS)
-	cp -f $(BUILD)/gdb-7.3/gdb/gdb$(EXEEXT) $(SDK)/usr/bin/
-	cp -f $(SRCROOT)/tools/flascc.gdb $(SDK)/usr/share/
-	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
-	cp -f $(SRCROOT)/tools/flascc-init.gdb $(SDK)/usr/share/
-
-llvmdev:
-	cd $(BUILD)/llvm-debug && $(MAKE) -j$(THREADS) && $(MAKE) install
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
-	$(MAKE) llvm-install
-
-
-llvm:
-	rm -rf $(BUILD)/llvm-debug
-	mkdir -p $(BUILD)/llvm-debug
-	cd $(BUILD)/llvm-debug && LDFLAGS="$(LLVMLDFLAGS)" CFLAGS="$(LLVMCFLAGS)" CXXFLAGS="$(LLVMCXXFLAGS)" $(SDK)/usr/bin/cmake -G "Unix Makefiles" \
-		$(LLVMCMAKEOPTS) -DCMAKE_INSTALL_PREFIX=$(LLVMINSTALLPREFIX)/llvm-install -DCMAKE_BUILD_TYPE=$(LLVMBUILDTYPE) $(LLVMCMAKEFLAGS) \
-		-DLLVM_ENABLE_ASSERTIONS=$(ASSERTIONS) \
-		-DLLVM_TARGETS_TO_BUILD="$(LLVMTARGETS)" -DLLVM_NATIVE_ARCH="avm2" -DLLVM_INCLUDE_TESTS=$(BUILD_LLVM_TESTS) -DLLVM_INCLUDE_EXAMPLES=OFF \
-		$(SRCROOT)/llvm-$(LLVMVERSION) && $(MAKE) -j$(THREADS) 
-	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
-ifeq ($(LLVM_ONLYLLC), false)
-	$(MAKE) llvm-install
-endif
-
-llvm-install:
-	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-ar$(EXEEXT) $(SDK)/usr/bin/llvm-ar$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-as$(EXEEXT) $(SDK)/usr/bin/llvm-as$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-diff$(EXEEXT) $(SDK)/usr/bin/llvm-diff$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-dis$(EXEEXT) $(SDK)/usr/bin/llvm-dis$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-extract$(EXEEXT) $(SDK)/usr/bin/llvm-extract$(EXEEXT)
-	$(LLVMLDCP)
-	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-link$(EXEEXT) $(SDK)/usr/bin/llvm-link$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-nm$(EXEEXT) $(SDK)/usr/bin/llvm-nm$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-ranlib$(EXEEXT) $(SDK)/usr/bin/llvm-ranlib$(EXEEXT)
-	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/opt$(EXEEXT) $(SDK)/usr/bin/opt$(EXEEXT)
-	$(CP_CLANG)
-	cp $(LLVMINSTALLPREFIX)/llvm-debug/lib/LLVMgold.* $(SDK)/usr/lib/LLVMgold$(SOEXT)
-	cp -f $(BUILD)/llvm-debug/bin/fpcmp$(EXEEXT) $(BUILDROOT)/extra/fpcmp$(EXEEXT)
-
-llvmtests:
-	rm -rf $(BUILD)/llvm-tests
-	mkdir -p $(BUILD)/llvm-tests
-	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
-	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-$(LLVMVERSION)/configure --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --without-f2c --without-f95 --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
-	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
-	cd $(BUILD)/llvm-tests/projects/test-suite/MultiSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
-	cd $(BUILD)/llvm-tests/projects/test-suite/SingleSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
-	python $(SRCROOT)/tools/llvmtestcheck.py --srcdir $(SRCROOT)/llvm-2.9/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ --fpcmp $(FPCMP)> $(BUILD)/llvm-tests/passfail.txt
-	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_llvm.txt
-
-llvmtests-speccpu2006: # works only on mac!
-	rm -rf $(BUILD)/llvm-tests
-	rm -rf $(BUILD)/llvm-spec-tests
-	mkdir -p $(BUILD)/llvm-tests
-	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
-	mkdir -p $(BUILD)/llvm-externals && cd $(BUILD)/llvm-externals && curl http://alchemy.corp.adobe.com/speccpu2006.tar.bz2 | tar xvjf -
-	#mkdir -p $(BUILD)/llvm-externals && cd $(BUILD)/llvm-externals && cat $(SRCROOT)/speccpu2006.tar.bz2 | tar xvjf -
-	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-$(LLVMVERSION)/configure --without-f2c --without-f95 --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --with-externals=$(BUILD)/llvm-externals --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
-	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
-	cd $(BUILD)/llvm-tests/projects/test-suite/External && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1 CXXFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP' CFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP')
-	python $(SRCROOT)/tools/llvmtestcheck.py --fpcmp $(FPCMP) --srcdir $(SRCROOT)/llvm-2.9/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ > $(BUILD)/llvm-tests/passfail.txt
-	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_spec.txt
-	cp -r $(BUILD)/llvm-tests/projects $(BUILD)/llvm-spec-tests
-
-gcc:
-	rm -rf $(BUILD)/llvm-gcc-42
-	mkdir -p $(SDK)/usr/bin
-	mkdir -p $(SDK)/usr/lib
-	mkdir -p $(BUILD)/llvm-gcc-42
-	cd $(BUILD)/llvm-gcc-42 && CFLAGS='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ ' \
-		CC=$(CC) CXX=$(CXX) $(SRCROOT)/llvm-gcc-4.2-2.9/configure --enable-languages=c,c++,objc,obj-c++ \
-		--enable-llvm=$(LLVMINSTALLPREFIX)/llvm-install/ --disable-bootstrap --disable-multilib --disable-libada \
-		--enable-sjlj-exceptions --disable-shared --program-prefix="" \
-		--prefix=$(SDK)/usr --with-sysroot="" --with-build-sysroot=$(SDK)/ \
-		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE)
-	cd $(BUILD)/llvm-gcc-42 && CC=$(CC) CXX=$(CXX)  $(MAKE) -j$(THREADS) all-gcc \
-		CFLAGS_FOR_TARGET='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os -emit-llvm -I$(SRCROOT)/avm2_env/misc/ ' \
-		CXXFLAGS_FOR_TARGET='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os -emit-llvm -I$(SRCROOT)/avm2_env/misc/ ' && $(MAKE) install-gcc
-	rm -f $(SDK)/usr/bin/gccbug*
-	rm -f $(BUILD)/llvm-gcc-42/gcc/gccbug*
-	rm -rf $(SDK)/usr/lib/avm2-unknown-freebsd8
-	mv $(SDK)/usr/lib/gcc/* $(SDK)/usr/lib/
-	mv $(SDK)/usr/lib/avm2-unknown-freebsd8/4.2.1/*.a $(SDK)/usr/lib/
-	rmdir $(SDK)/usr/lib/gcc
-	$(RSYNC) $(SDK)/usr/libexec/gcc/avm2-unknown-freebsd8/4.2.1/ $(SDK)/usr/bin/
-	rm -rf $(SDK)/usr/libexec
-
-csu:
-	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/share/ -name '*.mk' -exec dos2unix {} +
-endif
-	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE)   crt1_c.o
-	mv -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
-
-stdlibs:
-	$(MAKE) -j$(THREADS) csu libc libthr libm libBlocksRuntime libcxx
-
-libc:
-	mkdir -p $(BUILD)/posix/
-	rm -f $(BUILD)/posix/*.o
-	mkdir -p $(BUILD)/lib/src/lib/libc/
-	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/lib/ -name 'Makefile.inc' -exec dos2unix {} +
-endif
-	cd $(BUILD)/posix && python $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
-	cp $(BUILD)/posix/IKernel.as $(SRCROOT)/avmplus/shell
-	cp $(BUILD)/posix/ShellPosix.as $(SRCROOT)/avmplus/shell
-	cp $(BUILD)/posix/ShellPosixGlue.cpp $(SRCROOT)/avmplus/shell
-	cp $(BUILD)/posix/ShellPosixGlue.h $(SRCROOT)/avmplus/shell
-	cd $(SRCROOT)/avmplus/shell && python ./shell_toplevel.py -config CONFIG::VMCFG_ALCHEMY_POSIX=true
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c posix.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/vgl.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -D_KERNEL -c $(SRCROOT)/avm2_env/usr/src/kern/kern_umtx.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -c $(SRCROOT)/posix/thrStubs.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/kpmalloc.c
-	cd $(BUILD)/posix && cp *.o $(BUILD)/lib/src/lib/libc/
-	cd $(BUILD)/lib/src/lib/libc && $(BMAKE) -j$(THREADS)   libc.a
-	# find bitcode (and ignore non-bitcode genned from .s files) and put
-	# it in our lib
-	rm -f $(BUILD)/lib/src/lib/libc/tmp/*
-	$(AR) $(SDK)/usr/lib/libssp.a $(BUILD)/lib/src/lib/libc/stack_protector.o && cp $(SDK)/usr/lib/libssp.a $(SDK)/usr/lib/libssp_nonshared.a
-	# we override these in thrStubs.c but leave them weak
-	cd $(BUILD)/lib/src/lib/libc && $(SDK)/usr/bin/llvm-dis -o=_pthread_stubs.ll _pthread_stubs.o && sed -E 's/@pthread_(key_create|key_delete|getspecific|setspecific|once) =/@_d_u_m_m_y_\1 =/g' _pthread_stubs.ll | $(SDK)/usr/bin/llvm-as -o _pthread_stubs.o
-	cd $(BUILD)/lib/src/lib/libc && rm -f libc.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libc.a
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -fexceptions -c $(SRCROOT)/posix/libcHack.c
-	cp -f $(BUILD)/lib/src/lib/libc/libc.a $(BUILD)/posix/libcHack.o $(SDK)/usr/lib/.
-
-abcstdlibs:
-	$(MAKE) -j$(THREADS) abcflashpp abcstdlibs_more
-
-abcflashpp:
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvmopt=-Xmx4G -jvm="$(JAVA)" -falcon-parallel -target-player -filetype=obj $(BUILD)/as3wig/Flash++.o -o $(BUILD)/as3wig/Flash++.abc
-	$(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libFlash++.a $(BUILD)/as3wig/Flash++.abc
-
-abcstdlibs_more:
-	mkdir -p $(SDK)/usr/lib/stdlibs_abc
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libm.o -o $(SDK)/usr/lib/stdlibs_abc/libm.o
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
-
-	mkdir -p $(BUILD)/libc_abc
-	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc.a
-	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
-
-	mkdir -p $(BUILD)/libthr_abc
-	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
-	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
-ifneq (,$(findstring 2.9,$(LLVMVERSION)))
-	mkdir -p $(BUILD)/libgcc_abc
-	cd $(BUILD)/libgcc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libgcc.a
-	cd $(BUILD)/libgcc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libgcc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libgcc.a
-
-
-	mkdir -p $(BUILD)/libstdcpp_abc
-	cd $(BUILD)/libstdcpp_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libstdc++.a
-	cd $(BUILD)/libstdcpp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libstdcpp_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libstdc++.a
-
-	mkdir -p $(BUILD)/libsupcpp_abc
-	cd $(BUILD)/libsupcpp_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libsupc++.a
-	cd $(BUILD)/libsupcpp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libsupcpp_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libsupc++.a
-
-	mkdir -p $(BUILD)/libobjc_abc
-	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
-	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
-endif
-	mkdir -p $(BUILD)/libBlocksRuntime_abc
-	cd $(BUILD)/libBlocksRuntime_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libBlocksRuntime.a
-	cd $(BUILD)/libBlocksRuntime_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libBlocksRuntime_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libBlocksRuntime.a
-
-	mkdir -p $(BUILD)/libcxx_abc
-	cd $(BUILD)/libcxx_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc++.a
-	cd $(BUILD)/libcxx_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libcxx_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc++.a
-
-libthr.abc:
-	mkdir -p $(BUILD)/libthr_abc
-	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
-	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
-
-libc.abc:
-	mkdir -p $(BUILD)/libc_abc
-	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc.a
-	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
-
-single.abc:
-	mkdir -p $(SDK)/usr/lib/stdlibs_abc
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libm.o -o $(SDK)/usr/lib/stdlibs_abc/libm.o
-	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
-
-libm.abc:
-	mkdir -p $(BUILD)/libm_abc
-	cp $(BUILD)/msun/msun/*.o $(BUILD)/libm_abc
-	cd $(BUILD)/libm_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-
-libcxx.abc:
-	mkdir -p $(BUILD)/libcxx_abc
-	cd $(BUILD)/libcxx_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc++.a
-	cd $(BUILD)/libcxx_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
-	mv $(BUILD)/libcxx_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc++.a
-
-extralibs:
-	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng #TODO libsdl dmalloc libffi
-
-extratools:
-	$(MAKE) -j$(THREADS) genfs gdb swig pkgconfig libtool
 
 libiconv:
 	mkdir -p $(BUILD)/libiconv
@@ -906,6 +1112,11 @@ libBlocksRuntime:
 
 libvgl:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libvgl/Makefile
+endif
 	cd $(BUILD)/lib/src/lib/libvgl && $(BMAKE) -j$(THREADS)   libvgl.a
 	rm -f $(SDK)/usr/lib/libvgl.a
 	$(AR) $(SDK)/usr/lib/libvgl.a $(BUILD)/lib/src/lib/libvgl/*.o
@@ -1088,13 +1299,6 @@ gcclibs:
 
 	$(MAKE) libobjc
 
-as3xx:
-	mkdir -p $(SDK)/usr/lib/stdlibs_abc
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/AS3++.cpp
-	cd $(BUILD)/posix && $(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj AS3++.o -o AS3++.abc
-	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libAS3++.a AS3++.o
-	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libAS3++.a AS3++.abc
-
 dmalloc_configure:
 	rm -rf $(SRCROOT)/cached_build/dmalloc
 	mkdir -p $(SRCROOT)/cached_build/dmalloc
@@ -1117,24 +1321,6 @@ abclibobjc:
 	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
 	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
 
-bmake:
-	rm -rf $(BUILD)/bmake
-	mkdir -p $(BUILD)/bmake
-	cd $(BUILD)/bmake && $(SRCROOT)/bmake/configure && bash make-bootstrap.sh
-
-binutils:
-	rm -rf $(BUILD)/binutils
-	mkdir -p $(BUILD)/binutils
-	mkdir -p $(SDK)/usr
-	cd $(BUILD)/binutils && CC=$(CC) CXX=$(CXX) CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " CXXFLAGS="$(GCCLANGFLAG) -I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " $(SRCROOT)/binutils/configure \
-		--disable-doc --enable-gold --disable-ld --enable-plugins \
-		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --with-sysroot=$(SDK)/usr \
-		--program-prefix="" --prefix=$(SDK)/usr --disable-werror \
-		--enable-targets=$(TRIPLE)
-	cd $(BUILD)/binutils && $(MAKE) -j$(THREADS) && $(MAKE) install
-	mv $(SDK)/usr/bin/ld.gold$(EXEEXT) $(SDK)/usr/bin/ld$(EXEEXT)
-	rm -rf $(SDK)/usr/bin/readelf$(EXEEXT) $(SDK)/usr/bin/elfedit$(EXEEXT) $(SDK)/usr/bin/ld.bfd$(EXEEXT) $(SDK)/usr/bin/objdump$(EXEEXT) $(SDK)/usr/bin/objcopy$(EXEEXT) $(SDK)/usr/share/info $(SDK)/usr/share/man
-
 cxxfiltmingw:
 	# install the version of mingw for osx from ere: http://crossgcc.rts-software.org/doku.php
 	rm -rf $(BUILD)/cxxfiltmingw
@@ -1154,105 +1340,9 @@ cxxfiltmingw:
 		$(BUILD)/cxxfiltmingw/libiberty/*.o $(BUILD)/cxxfiltmingw/intl/*.o $(BUILD)/cxxfiltmingw/binutils/version.o \
 		$(BUILD)/cxxfiltmingw/binutils/bucomm.o  $(BUILD)/cxxfiltmingw/bfd/*.o -o c++filt.exe
 
-tr:
-	rm -rf $(BUILD)/tr
-	mkdir -p $(BUILD)/tr
-	mkdir -p $(SDK)/usr/bin
-	cd $(BUILD)/tr && rm -f Makefile && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(TAMARINCONFIG) --disable-debugger
-	cd $(BUILD)/tr && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
-	cp -f $(BUILD)/tr/shell/avmshell $(SDK)/usr/bin/avmshell
-	cd $(SRCROOT)/avmplus/utils && curdir=$(SRCROOT)/avmplus/utils ASC=$(ASC) $(MAKE) -f manifest.mk utils
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/projectormake.as) -outdir . -out projectormake
-#ifeq (,$(findstring cygwin,$(PLATFORM)))
-#	$(SDK)/usr/bin/avmshell $(BUILD)/abclibs/projectormake.abc -- -o $(SDK)/usr/bin/abcdump$(EXEEXT) $(SDK)/usr/bin/avmshell $(SRCROOT)/avmplus/utils/abcdump.abc -- -Djitordie
-#	chmod a+x $(SDK)/usr/bin/abcdump$(EXEEXT)
-#endif
-
-trd:
-	rm -rf $(BUILD)/trd
-	mkdir -p $(BUILD)/trd
-	mkdir -p $(SDK)/usr/bin
-	cd $(BUILD)/trd && rm -f Makefile && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(TAMARINCONFIG) --enable-debugger
-	cd $(BUILD)/trd && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
-	cp -f $(BUILD)/trd/shell/avmshell $(SDK)/usr/bin/avmshell-release-debugger
-
-plugins:
-	rm -rf $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
-	mkdir -p $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
-	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ -DHAVE_ABCNM -DDEFTMPDIR=\"$(call nativepath,/tmp)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -DHAVE_STDINT_H -I$(SRCROOT)/$(DEPENDENCY_ZLIB)/ -I$(SRCROOT)/binutils/include -fPIC -c $(SRCROOT)/gold-plugins/makeswf.cpp
-	cd $(BUILD)/makeswf && $(CXX) $(DBGOPTS) -shared -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup -o makeswf$(SOEXT) makeswf.o
-	cd $(BUILD)/multiplug && $(CXX) $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/  -DHAVE_STDINT_H -DSOEXT=\"$(SOEXT)\" -DDEFSYSROOT=\"$(call nativepath,$(SDK))\" -I$(SRCROOT)/binutils/include -fPIC -c $(SRCROOT)/gold-plugins/multiplug.cpp
-	cd $(BUILD)/multiplug && $(CXX) $(DBGOPTS) -shared -Wl,-headerpad_max_install_names,-undefined,dynamic_lookup -o multiplug$(SOEXT) multiplug.o
-	cp -f $(BUILD)/makeswf/makeswf$(SOEXT) $(SDK)/usr/lib/makeswf$(SOEXT)
-	cp -f $(BUILD)/multiplug/multiplug$(SOEXT) $(SDK)/usr/lib/multiplug$(SOEXT)
-	cp -f $(BUILD)/multiplug/multiplug$(SOEXT) $(SDK)/usr/lib/bfd-plugins/multiplug$(SOEXT)
-
-as3wig:
-	rm -rf $(BUILD)/as3wig
-	mkdir -p $(BUILD)/as3wig/flascc
-	cp -f $(SRCROOT)/tools/aet/AS3Wig.java $(BUILD)/as3wig/flascc/.
-	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/as3wig/flascc/.
-	cd $(BUILD)/as3wig && javac flascc/*.java -cp $(call nativepath,$(SDK)/usr/lib/aet.jar)
-	cd $(BUILD)/as3wig && echo "Main-Class: flascc.AS3Wig" > MANIFEST.MF
-	cd $(BUILD)/as3wig && echo "Class-Path: aet.jar" >> MANIFEST.MF
-	cd $(BUILD)/as3wig && jar cmf MANIFEST.MF as3wig.jar flascc/*.class
-	cp $(BUILD)/as3wig/as3wig.jar $(SDK)/usr/lib/.
-	mkdir -p $(SDK)/usr/include/AS3++/
-	cp -f $(SRCROOT)/tools/aet/AS3Wig.h $(SDK)/usr/include/AS3++/AS3Wig.h
-	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/builtin.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/builtin)
-	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/playerglobal)
-	cp -f $(SRCROOT)/tools/aet/AS3Wig.cpp $(BUILD)/as3wig/
-	echo "#include <AS3++/builtin.h>\n" > $(BUILD)/as3wig/AS3WigIncludes.h
-	echo "#include <AS3++/playerglobal.h>\n" >> $(BUILD)/as3wig/AS3WigIncludes.h
-	cd $(BUILD)/as3wig && $(SDK)/usr/bin/$(FLASCC_CXX) -c -emit-llvm -I. AS3Wig.cpp -o Flash++.o
-	cd $(BUILD)/as3wig && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libFlash++.a Flash++.o
-
 builtinabcs:
 	cd $(SRCROOT)/avmplus/core && ./builtin.py
 	cd $(SRCROOT)/avmplus/shell && ./shell_toplevel.py
-
-base:
-	mkdir -p $(BUILDROOT)/extra
-	mkdir -p $(BUILD)/abclibs
-	mkdir -p $(SDK)/usr/lib/bfd-plugins
-	mkdir -p $(SDK)/usr/share
-	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/bin
-	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/libexec/gcc/$(TRIPLE)
-
-	$(LN) ../usr $(SDK)/usr/$(TRIPLE)
-	$(LN) $(PLATFORM) $(SDK)/usr/platform/current
-	$(LN) platform/current/bin $(SDK)/usr/bin
-	$(LN) ../ $(SDK)/usr/platform/usr 
-	$(LN) ../../lib $(SDK)/usr/platform/current/lib 
-	$(LN) platform/current/libexec $(SDK)/usr/libexec
-	$(LN) ../../../../../lib $(SDK)/usr/platform/current/libexec/gcc/$(TRIPLE)/lib
-
-	cd $(SDK)/usr/platform/current/bin && $(LN) ar$(EXEEXT) avm2-unknown-freebsd8-ar$(EXEEXT)
-	cd $(SDK)/usr/platform/current/bin && $(LN) nm$(EXEEXT) avm2-unknown-freebsd8-nm$(EXEEXT)
-	cd $(SDK)/usr/platform/current/bin && $(LN) strip$(EXEEXT) avm2-unknown-freebsd8-strip$(EXEEXT)
-	cd $(SDK)/usr/platform/current/bin && $(LN) ranlib$(EXEEXT) avm2-unknown-freebsd8-ranlib$(EXEEXT)
-	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) avm2-unknown-freebsd8-gcc$(EXEEXT)
-	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) avm2-unknown-freebsd8-g++$(EXEEXT)
-
-	mkdir -p $(BUILD)/ccachebin
-	mkdir -p ccache
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CC)
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CXX)
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CYGTRIPLE)-gcc
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CYGTRIPLE)-g++
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-gcc
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-g++
-
-	$(RSYNC) asc/abc/playerglobal.abc $(SDK)/usr/lib/
-	$(RSYNC) asc/abc/playerglobal.swc $(SDK)/usr/lib/
-	$(RSYNC) avm2_env/public-api.txt $(SDK)/
-	cp -f avmplus/generated/*.abc $(SDK)/usr/lib/
-
-	$(RSYNC) --exclude '*iconv.h' avm2_env/usr/src/include/ $(SDK)/usr/include
-	#$(RSYNC) avm2_env/usr/lib/ $(SDK)/usr/lib
-
-	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/swfmake.as) -outdir . -out swfmake
-	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/projectormake.as) -outdir . -out projectormake
 
 libsdl_configure:
 	rm -rf $(SRCROOT)/cached_build/libsdl
@@ -1280,12 +1370,6 @@ libsdl-install:
 	cp $(SRCROOT)/tools/sdl-config $(SDK)/usr/bin/. # install our custom sdl-config
 	chmod a+x $(SDK)/usr/bin/sdl-config
 
-pkgconfig:
-	rm -rf $(BUILD)/pkgconfig
-	mkdir -p $(BUILD)/pkgconfig
-	cd $(BUILD)/pkgconfig && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/$(DEPENDENCY_PKG_CFG)/configure --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --prefix=$(SDK)/usr --disable-shared --disable-dependency-tracking
-	cd $(BUILD)/pkgconfig && $(MAKE) -j$(THREADS) && $(MAKE) install
-
 zlib:
 	rm -rf $(BUILD)/zlib
 	cp -r $(SRCROOT)/$(DEPENDENCY_ZLIB) $(BUILD)/zlib
@@ -1300,36 +1384,6 @@ libtool:
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) \
 		--prefix=$(SDK)/usr --enable-static --disable-shared --disable-ltdl-install
 	cd $(BUILD)/libtool && $(MAKE) -j$(THREADS) && $(MAKE) install-exec
-
-SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
-SWIG_LIBS=-lLLVMAVM2Info -lLLVMAVM2CodeGen -lLLVMAVM2AsmParser -lLLVMAsmPrinter -lLLVMMCParser -lclangEdit -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport -stdlib=libstdc++
-SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/llvm-$(LLVMVERSION)/include -I$(BUILD)/llvm-debug/include -I$(SRCROOT)/llvm-$(LLVMVERSION)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include -I$(SRCROOT)/llvm-$(LLVMVERSION)/tools/clang/lib -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long 
-SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
-
-swig:
-	rm -rf $(BUILD)/swig
-	mkdir -p $(BUILD)/swig
-	cp -f $(SRCROOT)/swig-2.0.4/pcre-8.20.tar.gz $(BUILD)/swig
-	cd $(BUILD)/swig && $(SRCROOT)/swig-2.0.4/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/swig-2.0.4/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
-	$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/2.0.4/$(var);)
-
-swigtests:
-	# reconfigure so that makefile is up to date (in case Makefile.in changed)
-	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" \
-		CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/swig-2.0.4/configure --prefix=$(SDK)/usr --disable-ccache
-	rm -rf $(BUILD)/swig/Examples/as3
-	cp -R $(SRCROOT)/swig-2.0.4/Examples/as3 $(BUILD)/swig/Examples
-	rm -rf $(BUILD)/swig/Lib/
-	mkdir -p $(BUILD)/swig/Lib/as3
-	cp -R $(SRCROOT)/swig-2.0.4/Lib/as3/* $(BUILD)/swig/Lib/as3
-	cp $(SRCROOT)/swig-2.0.4/Lib/*.i $(BUILD)/swig/Lib
-	cp $(SRCROOT)/swig-2.0.4/Lib/*.swg $(BUILD)/swig/Lib
-	cd $(BUILD)/swig && $(MAKE) check-as3-examples
-
-swigtestsautomation:
-	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/swig-2.0.4
 
 dejagnu:
 	mkdir -p $(BUILD)/dejagnu
@@ -1664,14 +1718,6 @@ parse_scimark_log:
 	$(MAKE) scimark
 	ant -f qa/performance/build.xml -Dbuild=$(FLASCC_VERSION_BUILD) \
 		-DsendResults=true -Dbranch=mainline -DresultsFile=$(BUILD)/scimark/result.txt -DresultsFileFalcon=$(BUILD)/scimark/result.txt
-
-genfs:
-	rm -rf $(BUILD)/zlib-native
-	mkdir -p $(BUILD)/zlib-native
-	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_ZLIB)/ $(BUILD)/zlib-native
-	cd $(BUILD)/zlib-native && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) ./configure --static && $(MAKE) 
-	cd $(BUILD)/zlib-native/contrib/minizip/ && $(MAKE) 
-	$$CC -Wall -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
 
 checkasm:
 	rm -rf $(BUILD)/libtoabc
