@@ -24,7 +24,7 @@ Please note that it could be removed in future.
 Any issue/suggestion/feedback/... please go to issue list.
 
 ### Get started in using Crossbridge
-Clang is designed to be a drop-in of gcc. And the one in this SDK also keeps the same.  
+Clang is designed to be a drop-in of GCC. And the one in this SDK also keeps the same.  
 If you are familiar with Crossbridge SDK 1.0, just get and use.  
 If not, please take a look at the document README.html at first to get a basic idea.
 
@@ -63,8 +63,7 @@ Since the learning curve is not low, what I had were
 5 Walk through specific code path and verify your idea via debugging.  
 
 ###### Extra ref materials  
-[Overview of compiler stages](https://github.com/adobe-flash/crossbridge/blob/futures/devguides/COMPILER.md)
-[Overview of source folders](https://github.com/adobe-flash/crossbridge/blob/futures/devguides/DEVGUIDE.md)
 
-### License
-The code written by adobe is all MIT licensed, but crossbridge contains many different open source projects which have different licenses, check the source files before making any assumptions.
+[Overview of compiler stages](https://github.com/adobe-flash/crossbridge/blob/futures/devguides/COMPILER.md)
+
+[Overview of source folders](https://github.com/adobe-flash/crossbridge/blob/futures/devguides/DEVGUIDE.md)
