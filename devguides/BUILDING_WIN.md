@@ -15,12 +15,13 @@ Building from sources
     * gettext
     * gettext-devel
     * glib
+    * help2man
     * libuuid
     * make
     * pkg-config
     * python
     * rsync
-* Downgrade Cygwin Package - TexInfo 4.X (>=5.0 Not supported!)
+* Downgrade Cygwin Package: TexInfo to 4.X (>=5.0 Not supported!)
 * Edit "$CYGWIN_HOME\etc\fstab" with "noacl" resulting "none /cygdrive cygdrive binary,noacl,posix=0,user 0 0"
 * Run Cygwin with pre-set variables
     * "set FLASCC_ROOT=\CROSSBRIDGE_SOURCE_ROOT"
