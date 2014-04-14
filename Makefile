@@ -64,6 +64,7 @@ $?DEPENDENCY_MAKE=make-3.82
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SWIG=swig-2.0.4
 $?DEPENDENCY_ZLIB=zlib-1.2.5
+$?DEPENDENCY_DEJAGNU=dejagnu-1.5
 
 # ====================================================================================
 # TOOLCHAIN
