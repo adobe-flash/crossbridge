@@ -49,15 +49,12 @@ endif
 # ====================================================================================
 $?DEPENDENCY_BINUTILS=binutils
 $?DEPENDENCY_BMAKE=bmake-20140214
-#$?DEPENDENCY_CMAKE=cmake-3.0.20140409
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
 $?DEPENDENCY_DMALLOC=dmalloc-5.5.2
 $?DEPENDENCY_FFI=libffi-3.0.11
 $?DEPENDENCY_ICONV=libiconv-1.13.1
-#$?DEPENDENCY_LIBOGG=libogg-1.3.0
 $?DEPENDENCY_LIBPNG=libpng-1.5.7
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
-#$?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
 $?DEPENDENCY_LLVM=llvm-2.9
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-3.82
@@ -226,8 +223,8 @@ docs:
 # ====================================================================================
 install_libs:
 	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
-	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
+	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
 	tar xf packages/$(DEPENDENCY_ICONV).tar.gz
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
@@ -236,8 +233,8 @@ install_libs:
 
 clean_libs:
 	rm -rf $(DEPENDENCY_CMAKE)
-	rm -rf $(DEPENDENCY_DMALLOC)
 	rm -rf $(DEPENDENCY_DEJAGNU)
+	rm -rf $(DEPENDENCY_DMALLOC)
 	rm -rf $(DEPENDENCY_ICONV)
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_PKG_CFG)
