@@ -1,7 +1,5 @@
 # [Crossbridge](www.crossbridge.io) (future branch)
 
-[![Build Status](https://travis-ci.org/vpmedia/crossbridge.png?branch=futures)](https://travis-ci.org/vpmedia/crossbridge)
-
 ### Goals 
 At present we have quite straight goal:
 
