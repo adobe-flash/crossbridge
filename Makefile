@@ -106,7 +106,7 @@ $?BUILD_FOLDER="builds"
 $?FTP_HOST=
 $?JAVA=$(call nativepath,$(shell which java))
 $?JAVAFLAGS=
-$?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
+$?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-local-typedefs -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?LN=ln -sfn
 $?COPY_DOCS=false
 $?ASSERTIONS=OFF
@@ -207,6 +207,9 @@ all:
 	@$(SDK)/usr/bin/make finalcleanup &> $(BUILD)/logs/finalcleanup.txt
 	@echo "-  submittests"
 	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt
+
+dev:
+	@$(SDK)/usr/bin/make tr
 
 clean:
 	rm -rf $(BUILDROOT)
