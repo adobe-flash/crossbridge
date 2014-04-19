@@ -209,7 +209,14 @@ all:
 	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt
 
 dev:
-	@$(SDK)/usr/bin/make tr
+	@echo "-  extralibs"
+	@$(SDK)/usr/bin/make extralibs &> $(BUILD)/logs/extralibs.txt
+	@echo "-  extratools"
+	@$(SDK)/usr/bin/make extratools &> $(BUILD)/logs/extratools.txt
+	@echo "-  finalcleanup"
+	@$(SDK)/usr/bin/make finalcleanup &> $(BUILD)/logs/finalcleanup.txt
+	@echo "-  submittests"
+	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt
 
 clean:
 	rm -rf $(BUILDROOT)
@@ -845,6 +852,10 @@ zlib:
 
 libvgl:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+endif
 	cd $(BUILD)/lib/src/lib/libvgl && $(BMAKE) -j$(THREADS) SSP_CFLAGS="" MACHINE_ARCH=avm2 libvgl.a
 	rm -f $(SDK)/usr/lib/libvgl.a
 	$(AR) $(SDK)/usr/lib/libvgl.a $(BUILD)/lib/src/lib/libvgl/*.o
