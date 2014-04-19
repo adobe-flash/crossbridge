@@ -53,6 +53,7 @@ $?DEPENDENCY_CMAKE=cmake-2.8.12.2
 $?DEPENDENCY_DMALLOC=dmalloc-5.5.2
 $?DEPENDENCY_FFI=libffi-3.0.11
 $?DEPENDENCY_ICONV=libiconv-1.13.1
+$?DEPENDENCY_JPEG=jpeg-8c
 $?DEPENDENCY_LIBPNG=libpng-1.5.7
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LLVM=llvm-2.9
@@ -236,6 +237,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
 	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
 	tar xf packages/$(DEPENDENCY_ICONV).tar.gz
+	tar xf packages/$(DEPENDENCY_JPEG).tar.gz
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
@@ -246,6 +248,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_DEJAGNU)
 	rm -rf $(DEPENDENCY_DMALLOC)
 	rm -rf $(DEPENDENCY_ICONV)
+	rm -rf $(DEPENDENCY_JPEG)
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 
@@ -863,7 +866,7 @@ endif
 libjpeg_configure:
 	rm -rf $(SRCROOT)/cached_build/libjpeg
 	mkdir -p $(SRCROOT)/cached_build/libjpeg
-	cd $(SRCROOT)/cached_build/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) CC=gcc CXX=g++ CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/jpeg-8c/configure \
+	cd $(SRCROOT)/cached_build/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) CC=gcc CXX=g++ CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/$(DEPENDENCY_JPEG)/configure \
 		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
 	perl -p -i -e 's~$(SRCROOT)/cached_build/libjpeg~FLASCC_BUILD_DIR~g' `grep -ril $(SRCROOT) cached_build/`
 	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
