@@ -210,8 +210,6 @@ all:
 	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt
 
 dev:
-	@echo "-  extralibs"
-	@$(SDK)/usr/bin/make extralibs &> $(BUILD)/logs/extralibs.txt
 	@echo "-  extratools"
 	@$(SDK)/usr/bin/make extratools &> $(BUILD)/logs/extratools.txt
 	@echo "-  finalcleanup"
@@ -858,6 +856,7 @@ libvgl:
 # Cygwin compatibility
 ifneq (,$(findstring cygwin,$(PLATFORM)))
 	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libvgl/Makefile
 endif
 	cd $(BUILD)/lib/src/lib/libvgl && $(BMAKE) -j$(THREADS) SSP_CFLAGS="" MACHINE_ARCH=avm2 libvgl.a
 	rm -f $(SDK)/usr/lib/libvgl.a
