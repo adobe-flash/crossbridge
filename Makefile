@@ -395,7 +395,7 @@ abclibs_compile:
 	mkdir -p $(SDK)/usr/lib/abcs
 
 	# Just use this to get the Posix interface
-	cd $(BUILD)/abclibsposix && python $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
+	cd $(BUILD)/abclibsposix && python2 $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
 	cat $(BUILD)/abclibsposix/IKernel.as | sed '1,1d' | sed '$$d' > $(SRCROOT)/posix/IKernel.as
 
 	cd $(BUILD)/abclibs && $(SCOMP) $(ABCLIBOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/DefaultPreloader.as) -swf com.adobe.flascc.preloader.DefaultPreloader,1024,768,60 -outdir . -out DefaultPreloader
@@ -528,7 +528,7 @@ llvmtests:
 	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
 	cd $(BUILD)/llvm-tests/projects/test-suite/MultiSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
 	cd $(BUILD)/llvm-tests/projects/test-suite/SingleSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
-	python $(SRCROOT)/tools/llvmtestcheck.py --srcdir $(SRCROOT)/llvm-2.9/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ --fpcmp $(FPCMP)> $(BUILD)/llvm-tests/passfail.txt
+	python2 $(SRCROOT)/tools/llvmtestcheck.py --srcdir $(SRCROOT)/llvm-2.9/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ --fpcmp $(FPCMP)> $(BUILD)/llvm-tests/passfail.txt
 	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_llvm.txt
 
 llvmtests-speccpu2006: # works only on mac!
@@ -541,7 +541,7 @@ llvmtests-speccpu2006: # works only on mac!
 	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-$(LLVMVERSION)/configure --without-f2c --without-f95 --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --with-externals=$(BUILD)/llvm-externals --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
 	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
 	cd $(BUILD)/llvm-tests/projects/test-suite/External && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1 CXXFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP' CFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP')
-	python $(SRCROOT)/tools/llvmtestcheck.py --fpcmp $(FPCMP) --srcdir $(SRCROOT)/llvm-2.9/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ > $(BUILD)/llvm-tests/passfail.txt
+	python2 $(SRCROOT)/tools/llvmtestcheck.py --fpcmp $(FPCMP) --srcdir $(SRCROOT)/llvm-2.9/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ > $(BUILD)/llvm-tests/passfail.txt
 	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_spec.txt
 	cp -r $(BUILD)/llvm-tests/projects $(BUILD)/llvm-spec-tests
 
@@ -631,12 +631,12 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
 	find $(BUILD)/lib/ -name 'Makefile.inc' -exec dos2unix {} +
 endif
-	cd $(BUILD)/posix && python $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
+	cd $(BUILD)/posix && python2 $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
 	cp $(BUILD)/posix/IKernel.as $(SRCROOT)/avmplus/shell
 	cp $(BUILD)/posix/ShellPosix.as $(SRCROOT)/avmplus/shell
 	cp $(BUILD)/posix/ShellPosixGlue.cpp $(SRCROOT)/avmplus/shell
 	cp $(BUILD)/posix/ShellPosixGlue.h $(SRCROOT)/avmplus/shell
-	cd $(SRCROOT)/avmplus/shell && python ./shell_toplevel.py -config CONFIG::VMCFG_ALCHEMY_POSIX=true
+	cd $(SRCROOT)/avmplus/shell && python2 ./shell_toplevel.py -config CONFIG::VMCFG_ALCHEMY_POSIX=true
 	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c posix.c
 	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/vgl.c
 	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -D_KERNEL -c $(SRCROOT)/avm2_env/usr/src/kern/kern_umtx.c
@@ -1338,7 +1338,7 @@ libobjc_configure:
 libobjc:
 	rm -rf $(BUILD)/libobjc
 	mkdir -p $(BUILD)/libobjc
-	python $(SRCROOT)/tools/build-objc.py $(SRCROOT)/cached_build/libobjc/compile.log $(SRCROOT)/cached_build/libobjc/install.log $(SRCROOT) > $(BUILD)/libobjc/build.sh
+	python2 $(SRCROOT)/tools/build-objc.py $(SRCROOT)/cached_build/libobjc/compile.log $(SRCROOT)/cached_build/libobjc/install.log $(SRCROOT) > $(BUILD)/libobjc/build.sh
 	cd $(BUILD)/libobjc && PATH=$(SDK)/usr/bin:$(PATH) bash -x build.sh
 	# link bitcode
 	cd $(BUILD)/libobjc && rm -f libobjc.a && mkdir NXConstStr && mv NXConstStr.o NXConstStr/. && $(SDK)/usr/bin/llvm-link -o libobjc.o *.o && $(AR) libobjc.a libobjc.o NXConstStr/*.o && cp libobjc.a $(SDK)/usr/lib/.
@@ -1738,7 +1738,7 @@ checkasm:
 		fi ; \
 	done
 	@echo "Checking headers for asm"
-	python $(SRCROOT)/tools/search_headers.py $(SDK) $(BUILD)/header-search
+	python2 $(SRCROOT)/tools/search_headers.py $(SDK) $(BUILD)/header-search
 
 libtoabc:
 	mkdir -p $(BUILD)/libtoabc/`basename $(LIB)`
