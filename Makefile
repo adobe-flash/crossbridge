@@ -12,6 +12,7 @@ $?SDK=$(PWD)/sdk
 $?BUILDROOT=$(PWD)/build
 $?WIN_BUILD=$(BUILDROOT)/win
 $?MAC_BUILD=$(BUILDROOT)/mac
+$?LINUX_BUILD=$(BUILDROOT)/linux
 $?CYGWINMAC=$(SRCROOT)/cygwinmac/sdk/usr/bin
 
 # ====================================================================================
@@ -20,29 +21,6 @@ $?CYGWINMAC=$(SRCROOT)/cygwinmac/sdk/usr/bin
 $?EMITSWF=
 $?SWFDIR=
 $?SWFEXT=
-
-# ====================================================================================
-# HOST PLATFORM OPTIONS
-# ====================================================================================
-ifneq (,$(findstring CYGWIN,$(UNAME)))
-	$?PLATFORM="cygwin"
-	$?RAWPLAT=cygwin
-	$?THREADS=1
-	$?nativepath=$(shell cygpath -at mixed $(1))
-	$?BUILD_TRIPLE=i686-pc-cygwin
-	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
-	$?FPCMP=$(BUILDROOT)/extra/fpcmp.exe
-	$?NOPIE=
-else
-	$?PLATFORM="darwin"
-	$?RAWPLAT=darwin
-	$?THREADS=$(shell sysctl -n hw.ncpu)
-	$?nativepath=$(1)
-	$?BUILD_TRIPLE=x86_64-apple-darwin10
-	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
-	$?FPCMP=$(BUILDROOT)/extra/fpcmp
-	$?NOPIE=-no_pie
-endif
 
 # ====================================================================================
 # DEPENDENCIES
@@ -63,6 +41,41 @@ $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SWIG=swig-2.0.4
 $?DEPENDENCY_ZLIB=zlib-1.2.5
 $?DEPENDENCY_DEJAGNU=dejagnu-1.5
+
+# ====================================================================================
+# HOST PLATFORM OPTIONS
+# ====================================================================================
+ifneq (,$(findstring CYGWIN,$(UNAME)))
+	$?PLATFORM="cygwin"
+	$?RAWPLAT=cygwin
+	$?THREADS=1
+	$?nativepath=$(shell cygpath -at mixed $(1))
+	$?BUILD_TRIPLE=i686-pc-cygwin
+	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
+	$?FPCMP=$(BUILDROOT)/extra/fpcmp.exe
+	$?NOPIE=
+	$?BIN_TRUE=/usr/bin/true
+else ifneq (,$(findstring Darwin,$(UNAME)))
+	$?PLATFORM="darwin"
+	$?RAWPLAT=darwin
+	$?THREADS=$(shell sysctl -n hw.ncpu)
+	$?nativepath=$(1)
+	$?BUILD_TRIPLE=x86_64-apple-darwin10
+	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
+	$?FPCMP=$(BUILDROOT)/extra/fpcmp
+	$?NOPIE=-no_pie
+	$?BIN_TRUE=/usr/bin/true
+else
+	$?PLATFORM="linux"
+	$?RAWPLAT=linux
+	$?THREADS=1
+	$?nativepath=$(1)
+	$?BUILD_TRIPLE=x86_64-unknown-linux-gnu
+	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
+	$?FPCMP=$(BUILDROOT)/extra/fpcmp
+	$?NOPIE=
+	$?BIN_TRUE=/bin/true
+endif
 
 # ====================================================================================
 # TOOLCHAIN
@@ -89,7 +102,9 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?BUILD=$(WIN_BUILD)
 	$?PLATFORM_NAME=win
 	$?HOST_TRIPLE=i686-pc-cygwin
-else
+endif
+
+ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?EXEEXT=
 	$?SOEXT=.dylib
 	$?SDLFLAGS=--build=i686-apple-darwin9
@@ -99,6 +114,19 @@ else
 	$?BUILD=$(MAC_BUILD)
 	$?PLATFORM_NAME=mac
 	$?HOST_TRIPLE=x86_64-apple-darwin10
+	export PATH:=$(BUILD)/ccachebin:$(PATH)
+endif
+
+ifneq (,$(findstring linux,$(PLATFORM)))
+	$?EXEEXT=
+	$?SOEXT=.so
+	$?SDLFLAGS=--build=i686-unknown-linux
+	$?TAMARIN_CONFIG_FLAGS=
+	$?TAMARINLDFLAGS=" -m32 -arch=i686"
+	$?SDKEXT=.dmg
+	$?BUILD=$(LINUX_BUILD)
+	$?PLATFORM_NAME=linux
+	$?HOST_TRIPLE=x86_64-unknown-linux
 	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
 
@@ -141,6 +169,15 @@ $?SDKNAME=Crossbridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_V
 BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_MINOR=$(FLASCC_VERSION_MINOR) -DFLASCC_VERSION_PATCH=$(FLASCC_VERSION_PATCH) -DFLASCC_VERSION_BUILD=$(FLASCC_VERSION_BUILD)"
 
 # ====================================================================================
+# LOGGING
+# ====================================================================================
+ifneq (,$(PRINT_LOGS_ON_ERROR))
+	$?PRINT_LOGS_CMD=tail +1
+else
+	$?PRINT_LOGS_CMD=true
+endif
+
+# ====================================================================================
 # CACHING
 # ====================================================================================
 export CCACHE_DIR=$(SRCROOT)/ccache
@@ -157,66 +194,75 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 # ====================================================================================
 BUILDORDER=cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs sdkcleanup tr trd extralibs extratools finalcleanup submittests
 
-# We are ignoring some target errors because of issues with documentation generation
 all:
-	@echo "~~~ Building Crossbridge ~~~"
+	@echo "~~~ Crossbridge $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
 	@mkdir -p $(BUILD)/logs
-	@echo "-  libs"
-	@$(MAKE) install_libs
 	@echo "-  base"
 	@$(MAKE) base &> $(BUILD)/logs/base.txt
-	@echo "-  $(DEPENDENCY_MAKE)"
-	@$(MAKE) -i make &> $(BUILD)/logs/make.txt
-	@echo "-  $(DEPENDENCY_CMAKE)"
-	@$(SDK)/usr/bin/make cmake &> $(BUILD)/logs/cmake.txt
-	@echo "-  abclibs"
-	@$(SDK)/usr/bin/make abclibs &> $(BUILD)/logs/abclibs.txt
-	@echo "-  basictools"
-	@$(SDK)/usr/bin/make basictools &> $(BUILD)/logs/basictools.txt
-	@echo "-  llvm"
-	@$(SDK)/usr/bin/make llvm &> $(BUILD)/logs/llvm.txt
-	@echo "-  $(DEPENDENCY_BINUTILS)"
-	@$(SDK)/usr/bin/make -i binutils &> $(BUILD)/logs/binutils.txt
-	@echo "-  plugins"
-	@$(SDK)/usr/bin/make plugins &> $(BUILD)/logs/plugins.txt
-	@echo "-  gcc"
-	@$(SDK)/usr/bin/make gcc &> $(BUILD)/logs/gcc.txt
-	@echo "-  $(DEPENDENCY_BMAKE)"
-	@$(SDK)/usr/bin/make bmake &> $(BUILD)/logs/bmake.txt
-	@echo "-  stdlibs"
-	@$(SDK)/usr/bin/make stdlibs &> $(BUILD)/logs/stdlibs.txt
-	@echo "-  gcclibs"
-	@$(SDK)/usr/bin/make gcclibs &> $(BUILD)/logs/gcclibs.txt
-	@echo "-  as3wig"
-	@$(SDK)/usr/bin/make as3wig &> $(BUILD)/logs/as3wig.txt
-	@echo "-  abcstdlibs"
-	@$(SDK)/usr/bin/make abcstdlibs &> $(BUILD)/logs/abcstdlibs.txt
-	@echo "-  sdkcleanup"
-	@$(SDK)/usr/bin/make sdkcleanup &> $(BUILD)/logs/sdkcleanup.txt
-	@echo "-  tr"
-	@$(SDK)/usr/bin/make tr &> $(BUILD)/logs/tr.txt
-	@echo "-  trd"
-	@$(SDK)/usr/bin/make trd &> $(BUILD)/logs/trd.txt
-	@echo "-  extralibs"
-	@$(SDK)/usr/bin/make extralibs &> $(BUILD)/logs/extralibs.txt
-	@echo "-  extratools"
-	@$(SDK)/usr/bin/make extratools &> $(BUILD)/logs/extratools.txt
-	@echo "-  finalcleanup"
-	@$(SDK)/usr/bin/make finalcleanup &> $(BUILD)/logs/finalcleanup.txt
-	@echo "-  submittests"
-	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt
+	@echo "-  make"
+	@$(MAKE) make &> $(BUILD)/logs/make.txt
+	@$(SDK)/usr/bin/make -s all_with_local_make
 
-dev:
-	@echo "-  extratools"
-	@$(SDK)/usr/bin/make extratools &> $(BUILD)/logs/extratools.txt
-	@echo "-  finalcleanup"
-	@$(SDK)/usr/bin/make finalcleanup &> $(BUILD)/logs/finalcleanup.txt
-	@echo "-  submittests"
-	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt
+all_with_local_make:
+	@for target in $(BUILDORDER) ; do \
+		echo "-  $$target" ; \
+		$(MAKE) $$target &> $(BUILD)/logs/$$target.txt ; \
+		mret=$$? ; \
+		logs="$$logs $(BUILD)/logs/$$target.txt" ; \
+		grep -q "Resource temporarily unavailable" $(BUILD)/logs/$$target.txt ; \
+		gret=$$? ; \
+		rcount=1 ; \
+		while [ $$gret == 0 ] && [ $$rcount -lt 6 ] ; do \
+			echo "-  $$target (retry $$rcount)" ; \
+			$(MAKE) $$target &> $(BUILD)/logs/$$target.txt ; \
+			mret=$$? ; \
+			grep -q "Resource temporarily unavailable" $(BUILD)/logs/$$target.txt ; \
+			gret=$$? ; \
+			let rcount=rcount+1 ; \
+		done ; \
+		if [ $$mret -ne 0 ] ; then \
+			echo "Failed to build: $$target" ;\
+			$(PRINT_LOGS_CMD) $$logs ;\
+			exit 1 ; \
+		fi ; \
+	done 
 
+# We are ignoring some target errors because of issues with documentation generation
+all_ci:
+	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
+	@echo "User: $(UNAME)"
+	@echo "Platform: $(PLATFORM)"
+	@echo "Build: $(BUILD)"
+	@mkdir -p $(BUILD)/logs
+	@$(MAKE) install_libs
+	@$(MAKE) base
+	@$(MAKE) -i make
+	@$(SDK)/usr/bin/make cmake
+	@$(SDK)/usr/bin/make abclibs
+	@$(SDK)/usr/bin/make basictools
+	@$(SDK)/usr/bin/make llvm
+	@$(SDK)/usr/bin/make binutils
+	@$(SDK)/usr/bin/make plugins
+	@$(SDK)/usr/bin/make gcc
+	@$(SDK)/usr/bin/make bmake
+	@$(SDK)/usr/bin/make stdlibs
+	@$(SDK)/usr/bin/make gcclibs
+	@$(SDK)/usr/bin/make as3wig
+	@$(SDK)/usr/bin/make abcstdlibs
+	@$(SDK)/usr/bin/make sdkcleanup
+	@$(SDK)/usr/bin/make tr
+	@$(SDK)/usr/bin/make trd
+	@$(SDK)/usr/bin/make extralibs
+	@$(SDK)/usr/bin/make extratools
+	@$(SDK)/usr/bin/make finalcleanup
+	@$(SDK)/usr/bin/make submittests
+
+# ====================================================================================
+# CORE
+# ====================================================================================
 clean:
 	rm -rf $(BUILDROOT)
 	rm -rf $(SDK)
