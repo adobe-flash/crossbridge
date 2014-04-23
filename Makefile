@@ -144,9 +144,10 @@ endif
 $?LLVMCXXFLAGS+=$(GCCLANGFLAG)
 
 LLVMTARGETS=AVM2;X86
-LLVMCMAKEFLAGS=-DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8 \
-	-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
-	-DLLVM_BUILD_RUNTIME=OFF
+LLVMCMAKEFLAGS=-DPYTHON_EXECUTABLE=/usr/bin/python2 \
+               -DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8 \
+	           -DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
+	           -DLLVM_BUILD_RUNTIME=OFF
 #Possible values: Release, Debug, RelWithDebInfo and MinSizeRel
 LLVMBUILDTYPE=Debug
 FLASCC_CC=clang
