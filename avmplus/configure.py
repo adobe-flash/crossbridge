@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- Mode: Python; indent-tabs-mode: nil -*-
 # vi: set ts=4 sw=4 expandtab:
 # This Source Code Form is subject to the terms of the Mozilla Public
