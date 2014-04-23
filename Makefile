@@ -1,6 +1,23 @@
+# ====================================================================================
+# CrossBridge Makefile
+# ====================================================================================
+
+$?UNAME=$(shell uname -s)
+
+# ====================================================================================
+# DIRECTORIES
+# ====================================================================================
 $?SRCROOT=$(PWD)
 $?SDK=$(PWD)/sdk
-$?UNAME=$(shell uname -s)
+$?BUILDROOT=$(PWD)/build
+$?WIN_BUILD=$(BUILDROOT)/win
+$?MAC_BUILD=$(BUILDROOT)/mac
+$?LINUX_BUILD=$(BUILDROOT)/linux
+$?CYGWINMAC=$(SRCROOT)/cygwinmac/sdk/usr/bin
+
+# ====================================================================================
+# THREAD TEST CONFIG
+# ====================================================================================
 $?EMITSWF=
 $?SWFDIR=
 $?SWFEXT=
@@ -35,19 +52,16 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?THREADS=1
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
-	$?NATIVE_AR=ar
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp.exe
 	$?NOPIE=
 	$?BIN_TRUE=/usr/bin/true
-
 else ifneq (,$(findstring Darwin,$(UNAME)))
 	$?PLATFORM="darwin"
 	$?RAWPLAT=darwin
 	$?THREADS=$(shell sysctl -n hw.ncpu)
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-apple-darwin10
-	$?NATIVE_AR=ar
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp
 	$?NOPIE=-no_pie
@@ -58,23 +72,21 @@ else
 	$?THREADS=1
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-unknown-linux-gnu
-	$?NATIVE_AR=ar
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
 	$?FPCMP=$(BUILDROOT)/extra/fpcmp
 	$?NOPIE=
 	$?BIN_TRUE=/bin/true
 endif
 
+# ====================================================================================
+# TOOLCHAIN
+# ====================================================================================
 $?CC=gcc
 $?CXX=g++
+$?NATIVE_AR=ar
 export CC:=$(CC)
 export CXX:=$(CXX)
 $?DBGOPTS=
-$?BUILDROOT=$(PWD)/build
-$?WIN_BUILD=$(BUILDROOT)/win
-$?MAC_BUILD=$(BUILDROOT)/mac
-$?LINUX_BUILD=$(BUILDROOT)/linux
-$?CYGWINMAC=$(SRCROOT)/cygwinmac/sdk/usr/bin
 $?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
 $?LIBHELPEROPTFLAGS=-O3
 
@@ -91,7 +103,6 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?BUILD=$(WIN_BUILD)
 	$?PLATFORM_NAME=win
 	$?HOST_TRIPLE=i686-pc-cygwin
-	$?JAVA=$(call nativepath,'$(shell which java)')
 endif
 
 ifneq (,$(findstring darwin,$(PLATFORM)))
@@ -104,7 +115,6 @@ ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?BUILD=$(MAC_BUILD)
 	$?PLATFORM_NAME=mac
 	$?HOST_TRIPLE=x86_64-apple-darwin10
-	$?JAVA=$(call nativepath,$(shell which java))
 	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
 
@@ -118,13 +128,13 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 	$?BUILD=$(LINUX_BUILD)
 	$?PLATFORM_NAME=linux
 	$?HOST_TRIPLE=x86_64-unknown-linux
-	$?JAVA=$(call nativepath,$(shell which java))
 	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
 
 ESCAPED_SRCROOT=$(shell echo $(SRCROOT) | sed -e 's/[\/&]/\\&/g')
 $?BUILD_FOLDER="builds"
 $?FTP_HOST=
+$?JAVA=$(call nativepath,$(shell which java))
 $?JAVAFLAGS=
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?LN=ln -sfn
@@ -171,6 +181,9 @@ $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
 $?AR=$(SDK)/usr/bin/ar scru -v
 $?CMAKE=$(SDK)/usr/bin/cmake
 
+# ====================================================================================
+# VERSIONING
+# ====================================================================================
 $?FLASCC_VERSION_MAJOR:=1
 $?FLASCC_VERSION_MINOR:=1
 $?FLASCC_VERSION_PATCH:=0
@@ -178,12 +191,18 @@ $?FLASCC_VERSION_BUILD:=devbuild
 $?SDKNAME=Crossbridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH).$(FLASCC_VERSION_BUILD)
 BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_MINOR=$(FLASCC_VERSION_MINOR) -DFLASCC_VERSION_PATCH=$(FLASCC_VERSION_PATCH) -DFLASCC_VERSION_BUILD=$(FLASCC_VERSION_BUILD)"
 
+# ====================================================================================
+# LOGGING
+# ====================================================================================
 ifneq (,$(PRINT_LOGS_ON_ERROR))
 	$?PRINT_LOGS_CMD=tail +1
 else
 	$?PRINT_LOGS_CMD=true
 endif
 
+# ====================================================================================
+# CACHING
+# ====================================================================================
 export CCACHE_DIR=$(SRCROOT)/ccache
 
 #TODO are we done sweeping for asm?
@@ -239,7 +258,7 @@ all_with_local_make:
 		fi ; \
 	done
 
-all_with_travis:
+all_ci:
 	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
@@ -265,9 +284,6 @@ all_with_travis:
 	@$(SDK)/usr/bin/make extratools
 	@$(SDK)/usr/bin/make finalcleanup
 	@$(SDK)/usr/bin/make submittests
-
-cbdebug:
-	@$(SDK)/usr/bin/make extratools
 
 # ====================================================================================
 # CORE
