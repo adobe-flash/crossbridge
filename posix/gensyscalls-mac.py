@@ -18,11 +18,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-# System call collector and generator script
-# Version: 1.1
-# Changes: 
-# 09.04.14.: Fixed multi-line handling (Windows compat.)
-
 import re
 import sys
 import contextlib
@@ -256,12 +251,9 @@ def read_syscalls(filename):
     with open(filename) as master_file:
         logical_line = ''
         for line in master_file:
-            tmp = line.strip()
-            if len(tmp) == 0: continue
-            fc = tmp[0]
-            if fc == ';' or fc == '#':
+            if line[0] == ';' or line[0] == '#' or len(line.strip()) == 0:
                 continue
-            elif tmp[-1] == '\\':
+            elif line[-2] == '\\':
                 logical_line += line
             else:
                 call = SysCall()
@@ -518,8 +510,7 @@ def gen_vm_glue(syscall_list, header_file, impl_file):
     impl_file.write('#include <sys/ioctl.h>\n')
     impl_file.write('#include <sys/wait.h>\n')
     impl_file.write('#include <sys/sem.h>\n')
-    # <sys/dirent.h> is probably included in <dirent.h> anyway
-    #impl_file.write('#include <sys/dirent.h>\n')
+    impl_file.write('#include <sys/dirent.h>\n')
     impl_file.write('#include <sys/uio.h>\n')
     impl_file.write('#include <dirent.h>\n')
     impl_file.write('#include <sys/msg.h>\n')
@@ -534,12 +525,12 @@ def gen_vm_glue(syscall_list, header_file, impl_file):
     impl_file.write('#include "SetAlchemySDKLocation.c"\n\n')
     impl_file.write('#endif\n')
     
-    # These members of struct stat have different names on Cygwin or Linux
-    impl_file.write('#if defined(__CYGWIN__) || defined(__linux__)\n')
+    # These members of struct stat have different names on Cygwin
+    impl_file.write('#ifdef __CYGWIN__\n')
     impl_file.write('#define st_atimespec st_atim\n')
     impl_file.write('#define st_mtimespec st_mtim\n')
     impl_file.write('#define st_ctimespec st_ctim\n')
-    impl_file.write('#endif /* __CYGWIN__ || __linux__ */\n\n')
+    impl_file.write('#endif /* __CYGWIN__ */\n\n')
 
     impl_file.write('namespace avmplus {\n')
     impl_file.write('\tstatic void *domainMemoryPtr(ScriptObject *obj, ' + 
