@@ -8,8 +8,8 @@ This page describes the status of the effort to upgrade Crossbridge's compiler i
 
 |Description|Estimate|Status|
 |---------------------------|
-| *Total* | *28 days* | |
-|Refactor code generator to accommodate changes since LLVM 2.9 | N/A | Complete |
+| *Total* | *28 days* |     |
+| Refactor code generator to accommodate changes since LLVM 2.9 | N/A | Complete |
 | Move FlasCC-specific gcc options into the clang driver. Hook up plumbing so that clang can create SWFs and shell projectors from C code without the  user needing to explicitly invoke llc, asc, etc. | 2 days | In progress |
 | Enhance the AVM2 clang target as necessary. Currently we have a very simple AVM2 clang target, based off of X86, and used by swig. This may be sufficient, but we might also need to improve it to support actual code generation. | 0 - 2 days | *tick* Complete |
 | Get the LLVM gold plugin building and ensure that LTO works. | 1 day | In progress |

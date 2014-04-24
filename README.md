@@ -65,3 +65,5 @@ Since the learning curve is not low, what I had were
 [Overview of compiler stages](COMPILER.md)
 
 [Overview of source folders](DEVGUIDE.md)
+
+[Overview of LLVM TODOs](LLVM_UPGRADE.md)
