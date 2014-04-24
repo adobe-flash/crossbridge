@@ -209,6 +209,9 @@ export CCACHE_DIR=$(SRCROOT)/ccache
 #TODO are we done sweeping for asm?
 #BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm"' -DSTRIP_FBSDID -D__asm__\(X...\)="\error" -D__asm\(X...\)="\error"' MAKEFLAGS="" MFLAGS="" NO_WERROR=true $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 
+# ====================================================================================
+# BMAKE
+# ====================================================================================
 BMAKE= AR="$(BIN_TRUE) ||" GENCAT=$(BIN_TRUE) RANLIB=$(BIN_TRUE)
 BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-builtin -DSTRIP_FBSDID " 
 BMAKE+= CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm -fno-builtin -DSTRIP_FBSDID "
@@ -216,10 +219,11 @@ BMAKE+= MAKEFLAGS="" MFLAGS="" MK_ICONV= WITHOUT_PROFILE=
 BMAKE+= MACHINE_ARCH=avm2 MACHINE_CPUARCH=AVM2 NO_WERROR=true SSP_CFLAGS=
 BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 
-BUILDORDER= cmake abclibs basictools llvm binutils plugins 
-BUILDORDER+= bmake stdlibs 
-BUILDORDER+= as3xx as3wig abcstdlibs sdkcleanup tr trd extralibs 
-BUILDORDER+= extratools finalcleanup submittests
+# ====================================================================================
+# ALL TARGET
+# ====================================================================================
+BUILDORDER= cmake abclibs basictools llvm binutils plugins bmake stdlibs as3xx as3wig abcstdlibs
+BUILDORDER+= sdkcleanup tr trd extralibs extratools finalcleanup submittests
 
 all:
 	@echo "~~~ Crossbridge $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
@@ -259,6 +263,7 @@ all_with_local_make:
 		fi ; \
 	done
 
+# We are ignoring some target errors because of issues with documentation generation
 all_ci:
 	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
 	@echo "User: $(UNAME)"
@@ -282,11 +287,6 @@ all_ci:
 	@$(SDK)/usr/bin/make tr
 	@$(SDK)/usr/bin/make trd
 	@$(SDK)/usr/bin/make extralibs
-	@$(SDK)/usr/bin/make extratools
-	@$(SDK)/usr/bin/make finalcleanup
-	@$(SDK)/usr/bin/make submittests
-
-all_dev:
 	@$(SDK)/usr/bin/make extratools
 	@$(SDK)/usr/bin/make finalcleanup
 	@$(SDK)/usr/bin/make submittests
@@ -553,43 +553,6 @@ llvmtests:
 	$(PYTHON) $(SRCROOT)/tools/llvmtestcheck.py --srcdir $(SRCROOT)/llvm-$(LLVMVERSION)/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ --fpcmp $(FPCMP)> $(BUILD)/llvm-tests/passfail.txt
 	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_llvm.txt
 
-llvmtests-speccpu2006: # works only on mac!
-	rm -rf $(BUILD)/llvm-tests
-	rm -rf $(BUILD)/llvm-spec-tests
-	mkdir -p $(BUILD)/llvm-tests
-	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
-	mkdir -p $(BUILD)/llvm-externals && cd $(BUILD)/llvm-externals && curl http://alchemy.corp.adobe.com/speccpu2006.tar.bz2 | tar xvjf -
-	#mkdir -p $(BUILD)/llvm-externals && cd $(BUILD)/llvm-externals && cat $(SRCROOT)/speccpu2006.tar.bz2 | tar xvjf -
-	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-$(LLVMVERSION)/configure --without-f2c --without-f95 --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --with-externals=$(BUILD)/llvm-externals --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
-	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
-	cd $(BUILD)/llvm-tests/projects/test-suite/External && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1 CXXFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP' CFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP')
-	$(PYTHON) $(SRCROOT)/tools/llvmtestcheck.py --fpcmp $(FPCMP) --srcdir $(SRCROOT)/llvm-$(LLVMVERSION)/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ > $(BUILD)/llvm-tests/passfail.txt
-	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_spec.txt
-	cp -r $(BUILD)/llvm-tests/projects $(BUILD)/llvm-spec-tests
-
-gcc:
-	rm -rf $(BUILD)/llvm-gcc-42
-	mkdir -p $(SDK)/usr/bin
-	mkdir -p $(SDK)/usr/lib
-	mkdir -p $(BUILD)/llvm-gcc-42
-	cd $(BUILD)/llvm-gcc-42 && CFLAGS='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ ' \
-		CC=$(CC) CXX=$(CXX) $(SRCROOT)/llvm-gcc-4.2-2.9/configure --enable-languages=c,c++,objc,obj-c++ \
-		--enable-llvm=$(LLVMINSTALLPREFIX)/llvm-install/ --disable-bootstrap --disable-multilib --disable-libada \
-		--enable-sjlj-exceptions --disable-shared --program-prefix="" \
-		--prefix=$(SDK)/usr --with-sysroot="" --with-build-sysroot=$(SDK)/ \
-		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE)
-	cd $(BUILD)/llvm-gcc-42 && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS) all-gcc \
-		CFLAGS_FOR_TARGET='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os -emit-llvm -I$(SRCROOT)/avm2_env/misc/ ' \
-		CXXFLAGS_FOR_TARGET='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os -emit-llvm -I$(SRCROOT)/avm2_env/misc/ ' && $(MAKE) install-gcc
-	rm -f $(SDK)/usr/bin/gccbug*
-	rm -f $(BUILD)/llvm-gcc-42/gcc/gccbug*
-	rm -rf $(SDK)/usr/lib/avm2-unknown-freebsd8
-	mv $(SDK)/usr/lib/gcc/* $(SDK)/usr/lib/
-	mv $(SDK)/usr/lib/avm2-unknown-freebsd8/4.2.1/*.a $(SDK)/usr/lib/
-	rmdir $(SDK)/usr/lib/gcc
-	$(RSYNC) $(SDK)/usr/libexec/gcc/avm2-unknown-freebsd8/4.2.1/ $(SDK)/usr/bin/
-	rm -rf $(SDK)/usr/libexec
-
 # ====================================================================================
 # BINUTILS
 # ====================================================================================
@@ -852,7 +815,6 @@ ifneq (,$(findstring 2.9,$(LLVMVERSION)))
 	cd $(BUILD)/libgcc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libgcc.a
 	cd $(BUILD)/libgcc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libgcc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libgcc.a
-
 
 	mkdir -p $(BUILD)/libstdcpp_abc
 	cd $(BUILD)/libstdcpp_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libstdc++.a
@@ -1119,8 +1081,8 @@ win:
 	@$(CROSS) binutils &> $(WIN_BUILD)/logs/binutils_win.txt
 	@echo "-  plugins (win)"
 	@$(CROSS) plugins &> $(WIN_BUILD)/logs/plugins_win.txt
-	@echo "-  gcc (win)"
-	@$(CROSS) gcc &> $(WIN_BUILD)/logs/gcc_win.txt
+	#@echo "-  gcc (win)"
+	#@$(CROSS) gcc &> $(WIN_BUILD)/logs/gcc_win.txt
 	@echo "-  swig (win)"
 	@$(CROSS) swig &> $(WIN_BUILD)/logs/swig_win.txt
 	@echo "-  llvm (win/mingw)"
@@ -1177,7 +1139,7 @@ nightly:
 
 weekly:
 	$(MAKE) nightly
-	$(MAKE) gcctests
+	#$(MAKE) gcctests
 
 deliverables:
 	$(MAKE) staging
@@ -1348,18 +1310,6 @@ libobjc:
 	# link bitcode
 	cd $(BUILD)/libobjc && rm -f libobjc.a && mkdir NXConstStr && mv NXConstStr.o NXConstStr/. && $(SDK)/usr/bin/llvm-link -o libobjc.o *.o && $(AR) libobjc.a libobjc.o NXConstStr/*.o && cp libobjc.a $(SDK)/usr/lib/.
 
-gcclibs:
-	rm -rf $(BUILD)/llvm-gcc-42/$(TRIPLE)
-	cd $(BUILD)/llvm-gcc-42 \
-		&& $(MAKE) -j$(THREADS) FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm ' all-target-libstdc++-v3 \
-		&& $(MAKE) -j$(THREADS) FLASCC_INTERNAL_SDK_ROOT=$(SDK) install-target-libstdc++-v3 \
-		&& find $(SDK) -name '*.gch' -type d | xargs rm -rf
-	$(SDK)/usr/bin/ranlib $(SDK)/usr/lib/libstdc++.a
-	$(SDK)/usr/bin/ranlib $(SDK)/usr/lib/libsupc++.a
-	rm -rf $(SDK)/usr/lib/gcc
-
-	$(MAKE) libobjc
-
 abclibobjc:
 	mkdir -p $(BUILD)/libobjc_abc
 	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
@@ -1388,55 +1338,6 @@ cxxfiltmingw:
 builtinabcs:
 	cd $(SRCROOT)/avmplus/core && ./builtin.py
 	cd $(SRCROOT)/avmplus/shell && ./shell_toplevel.py
-
-dejagnu:
-	mkdir -p $(BUILD)/dejagnu
-	cd $(BUILD)/dejagnu && $(SRCROOT)/$(DEPENDENCY_DEJAGNU)/configure --prefix=$(BUILD)/dejagnu && $(MAKE) install
-
-RUNGCCTESTS=mkdir -p $(BUILD)/gcctests/$@ && cd $(BUILD)/gcctests/$@ && LD_LIBRARY_PATH="/" PATH="$(SDK)/usr/bin:$(PATH)" $(BUILD)/dejagnu/bin/runtest --all --srcdir $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite --target_board=$(TRIPLE)
-
-CTORTUREDIRS= \
-compat \
-compile \
-execute \
-unsorted
-
-GCCTESTDIRS= \
-g++.apple \
-g++.dg \
-g++.old-deja \
-gcc.apple \
-gcc.dg \
-gcc.misc-tests \
-gcc.target \
-gcc.test-framework \
-llvm.obj-c++ \
-llvm.objc \
-obj-c++.dg \
-objc \
-objc.dg
-
-gcctorture/%:
-	-$(RUNGCCTESTS) --tool gcc --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/gcc.c-torture $(@:gcctorture/%=%).exp
-
-gxxtorture/%:
-	-$(RUNGCCTESTS) --tool g++ --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/gcc.c-torture $(@:gxxtorture/%=%).exp
-
-gccrun/%:
-	-$(RUNGCCTESTS) --tool gcc --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/$(@:gccrun/%=%)
-
-gxxrun/%:
-	-$(RUNGCCTESTS) --tool g++ --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/$(@:gxxrun/%=%)
-
-gcctests:
-	$(MAKE) dejagnu
-	cp -f $(SRCROOT)/tools/$(TRIPLE).exp $(BUILD)/dejagnu/share/dejagnu/baseboards/
-	chmod u+rw $(BUILD)/dejagnu/share/dejagnu/baseboards/*
-	$(MAKE) -j$(THREADS) allgcctests
-
-allgcctests: $(CTORTUREDIRS:%=gcctorture/%) $(CTORTUREDIRS:%=gxxtorture/%) $(GCCTESTDIRS:%=gccrun/%) $(GCCTESTDIRS:%=gxxrun/%)
-	cat $(BUILD)/gcctests/*/*/gcc.log  > $(BUILD)/gcctests/gcc.log
-	cat $(BUILD)/gcctests/*/*/g++.log  > $(BUILD)/gcctests/g++.log
 
 ieeetests_conversion:
 	rm -rf $(BUILD)/ieeetests_conversion
@@ -1618,18 +1519,6 @@ posixtest:
 		$(call nativepath, $(BUILD)/posixtest/alcfsBackingStore.as) -outdir . -out alcfs
 	cd $(BUILD)/posixtest && $(SDK)/usr/bin/$(FLASCC_CC) -emit-swf -O0 -swf-version=15 $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) alcfs.abc $(SRCROOT)/test/fileio.c -o posixtest.swf
 
-speccpu2006: # works on mac only! (and probably requires local tweaks to alchemy.cfg and mac32.cfg)
-	@rm -rf $(BUILD)/speccpu2006
-	@mkdir -p $(BUILD)/speccpu2006
-	cd $(BUILD)/speccpu2006 && curl http://alchemy.corp.adobe.com/speccpu2006.tar.bz2 | tar xvf -
-	cd $(BUILD)/speccpu2006/speccpu2006 && cat $(SRCROOT)/test/speccpu2006/install.sh.ed | ed install.sh # build install2.sh w/ hardcoded arch=mac32-x86
-	cd $(BUILD)/speccpu2006/speccpu2006 && chmod +x install2.sh && chmod +x tools/bin/macosx-x86/spec* && chmod +w MANIFEST && echo y | SPEC= ./install2.sh
-	cd $(BUILD)/speccpu2006/speccpu2006 && cp $(SRCROOT)/test/speccpu2006/*.cfg config/. && chmod +w config/*.cfg
-	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=alchemy.cfg --tune=base --loose --action build int fp | tee alchemy.build.log)
-	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action build int fp | tee mac32.build.log)
-	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=alchemy.cfg --tune=base --loose --action validate int fp | tee -a alchemy.run.log)
-	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action validate int fp | tee -a mac32.run.log)
-
 scimark:
 	@mkdir -p $(BUILD)/scimark
 	cd $(BUILD)/scimark && $(SDK)/usr/bin/$(FLASCC_CC) -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
@@ -1755,3 +1644,121 @@ libtoabc:
 	fi 
 
 .PHONY: bmake posix binutils docs gcc samples libcxx libcxxrt libxxabi libunwind libgcceh
+
+# ====================================================================================
+# Deprecated (Should be deleted at whole?)
+# ====================================================================================
+
+# Futures uses Clang, not?
+gcc:
+	rm -rf $(BUILD)/llvm-gcc-42
+	mkdir -p $(SDK)/usr/bin
+	mkdir -p $(SDK)/usr/lib
+	mkdir -p $(BUILD)/llvm-gcc-42
+	cd $(BUILD)/llvm-gcc-42 && CFLAGS='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ ' \
+		CC=$(CC) CXX=$(CXX) $(SRCROOT)/llvm-gcc-4.2-2.9/configure --enable-languages=c,c++,objc,obj-c++ \
+		--enable-llvm=$(LLVMINSTALLPREFIX)/llvm-install/ --disable-bootstrap --disable-multilib --disable-libada \
+		--enable-sjlj-exceptions --disable-shared --program-prefix="" \
+		--prefix=$(SDK)/usr --with-sysroot="" --with-build-sysroot=$(SDK)/ \
+		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE)
+	cd $(BUILD)/llvm-gcc-42 && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS) all-gcc \
+		CFLAGS_FOR_TARGET='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os -emit-llvm -I$(SRCROOT)/avm2_env/misc/ ' \
+		CXXFLAGS_FOR_TARGET='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os -emit-llvm -I$(SRCROOT)/avm2_env/misc/ ' && $(MAKE) install-gcc
+	rm -f $(SDK)/usr/bin/gccbug*
+	rm -f $(BUILD)/llvm-gcc-42/gcc/gccbug*
+	rm -rf $(SDK)/usr/lib/avm2-unknown-freebsd8
+	mv $(SDK)/usr/lib/gcc/* $(SDK)/usr/lib/
+	mv $(SDK)/usr/lib/avm2-unknown-freebsd8/4.2.1/*.a $(SDK)/usr/lib/
+	rmdir $(SDK)/usr/lib/gcc
+	$(RSYNC) $(SDK)/usr/libexec/gcc/avm2-unknown-freebsd8/4.2.1/ $(SDK)/usr/bin/
+	rm -rf $(SDK)/usr/libexec
+
+# Source not available and mac only
+# works on mac only! (and probably requires local tweaks to alchemy.cfg and mac32.cfg)
+speccpu2006: 
+	@rm -rf $(BUILD)/speccpu2006
+	@mkdir -p $(BUILD)/speccpu2006
+	cd $(BUILD)/speccpu2006 && curl http://alchemy.corp.adobe.com/speccpu2006.tar.bz2 | tar xvf -
+	cd $(BUILD)/speccpu2006/speccpu2006 && cat $(SRCROOT)/test/speccpu2006/install.sh.ed | ed install.sh # build install2.sh w/ hardcoded arch=mac32-x86
+	cd $(BUILD)/speccpu2006/speccpu2006 && chmod +x install2.sh && chmod +x tools/bin/macosx-x86/spec* && chmod +w MANIFEST && echo y | SPEC= ./install2.sh
+	cd $(BUILD)/speccpu2006/speccpu2006 && cp $(SRCROOT)/test/speccpu2006/*.cfg config/. && chmod +w config/*.cfg
+	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=alchemy.cfg --tune=base --loose --action build int fp | tee alchemy.build.log)
+	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action build int fp | tee mac32.build.log)
+	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=alchemy.cfg --tune=base --loose --action validate int fp | tee -a alchemy.run.log)
+	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action validate int fp | tee -a mac32.run.log)
+
+# Like above
+llvmtests-speccpu2006: # works only on mac!
+	rm -rf $(BUILD)/llvm-tests
+	rm -rf $(BUILD)/llvm-spec-tests
+	mkdir -p $(BUILD)/llvm-tests
+	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
+	mkdir -p $(BUILD)/llvm-externals && cd $(BUILD)/llvm-externals && curl http://alchemy.corp.adobe.com/speccpu2006.tar.bz2 | tar xvjf -
+	#mkdir -p $(BUILD)/llvm-externals && cd $(BUILD)/llvm-externals && cat $(SRCROOT)/speccpu2006.tar.bz2 | tar xvjf -
+	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-$(LLVMVERSION)/configure --without-f2c --without-f95 --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --with-externals=$(BUILD)/llvm-externals --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
+	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
+	cd $(BUILD)/llvm-tests/projects/test-suite/External && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1 CXXFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP' CFLAGS+='-DSPEC_CPU_MACOSX -DSPEC_CPU_NO_HAS_SIGSETJMP')
+	$(PYTHON) $(SRCROOT)/tools/llvmtestcheck.py --fpcmp $(FPCMP) --srcdir $(SRCROOT)/llvm-$(LLVMVERSION)/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ > $(BUILD)/llvm-tests/passfail.txt
+	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_spec.txt
+	cp -r $(BUILD)/llvm-tests/projects $(BUILD)/llvm-spec-tests
+
+# Used by gcctests only
+dejagnu:
+	mkdir -p $(BUILD)/dejagnu
+	cd $(BUILD)/dejagnu && $(SRCROOT)/$(DEPENDENCY_DEJAGNU)/configure --prefix=$(BUILD)/dejagnu && $(MAKE) install
+
+RUNGCCTESTS=mkdir -p $(BUILD)/gcctests/$@ && cd $(BUILD)/gcctests/$@ && LD_LIBRARY_PATH="/" PATH="$(SDK)/usr/bin:$(PATH)" $(BUILD)/dejagnu/bin/runtest --all --srcdir $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite --target_board=$(TRIPLE)
+
+CTORTUREDIRS= \
+compat \
+compile \
+execute \
+unsorted
+
+GCCTESTDIRS= \
+g++.apple \
+g++.dg \
+g++.old-deja \
+gcc.apple \
+gcc.dg \
+gcc.misc-tests \
+gcc.target \
+gcc.test-framework \
+llvm.obj-c++ \
+llvm.objc \
+obj-c++.dg \
+objc \
+objc.dg
+
+gcctorture/%:
+	-$(RUNGCCTESTS) --tool gcc --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/gcc.c-torture $(@:gcctorture/%=%).exp
+
+gxxtorture/%:
+	-$(RUNGCCTESTS) --tool g++ --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/gcc.c-torture $(@:gxxtorture/%=%).exp
+
+gccrun/%:
+	-$(RUNGCCTESTS) --tool gcc --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/$(@:gccrun/%=%)
+
+gxxrun/%:
+	-$(RUNGCCTESTS) --tool g++ --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/$(@:gxxrun/%=%)
+
+gcctests:
+	$(MAKE) dejagnu
+	cp -f $(SRCROOT)/tools/$(TRIPLE).exp $(BUILD)/dejagnu/share/dejagnu/baseboards/
+	chmod u+rw $(BUILD)/dejagnu/share/dejagnu/baseboards/*
+	$(MAKE) -j$(THREADS) allgcctests
+
+allgcctests: $(CTORTUREDIRS:%=gcctorture/%) $(CTORTUREDIRS:%=gxxtorture/%) $(GCCTESTDIRS:%=gccrun/%) $(GCCTESTDIRS:%=gxxrun/%)
+	cat $(BUILD)/gcctests/*/*/gcc.log  > $(BUILD)/gcctests/gcc.log
+	cat $(BUILD)/gcctests/*/*/g++.log  > $(BUILD)/gcctests/g++.log
+
+gcclibs:
+	rm -rf $(BUILD)/llvm-gcc-42/$(TRIPLE)
+	cd $(BUILD)/llvm-gcc-42 \
+		&& $(MAKE) -j$(THREADS) FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm ' all-target-libstdc++-v3 \
+		&& $(MAKE) -j$(THREADS) FLASCC_INTERNAL_SDK_ROOT=$(SDK) install-target-libstdc++-v3 \
+		&& find $(SDK) -name '*.gch' -type d | xargs rm -rf
+	$(SDK)/usr/bin/ranlib $(SDK)/usr/lib/libstdc++.a
+	$(SDK)/usr/bin/ranlib $(SDK)/usr/lib/libsupc++.a
+	rm -rf $(SDK)/usr/lib/gcc
+	$(MAKE) libobjc
