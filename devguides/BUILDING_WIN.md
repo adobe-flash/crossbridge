@@ -10,6 +10,7 @@ Building from sources
     * bison
     * ccache
     * cmake
+    * expat
     * flex
     * gcc-core
     * gcc-g++
