@@ -9,6 +9,7 @@ Building from sources
     * automake
     * bison
     * ccache
+    * cmbzip2
     * cmake
     * expat
     * flex
