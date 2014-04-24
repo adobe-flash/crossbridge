@@ -14,4 +14,4 @@ before_install:
 before_script:
     - chmod -R +x .
 
-script: make -i all_ci
+script: make THREADS=1 -j1 -i all_ci
