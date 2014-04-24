@@ -1,0 +1,47 @@
+mSUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+
+all: scimark2 scimark2.phi2mem scimark2.reg2mem
+
+CC = gcc
+CFLAGS = -m32 -O3 -flto
+LDFLAGS = 
+CPU = i686
+
+OBJS = FFT.o kernel.o Stopwatch.o Random.o SOR.o SparseCompRow.o \
+	array.o MonteCarlo.o LU.o 
+
+scimark2.linked.o : scimark2.o $(OBJS)
+	$(LLVMPATH)/llvm-link -o=scimark2.linked.o scimark2.o $(OBJS)
+
+scimark2.lto.o : scimark2.linked.o
+	$(LLVMPATH)/opt -O3 scimark2.linked.o -o scimark2.lto.o
+
+scimark2.s : scimark2.lto.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o scimark2.s scimark2.lto.o
+
+scimark2 : scimark2.s
+	$(CC) $(CFLAGS) $(LDFLAGS) scimark2.s -o scimark2
+
+scimark2.phi2mem.o : scimark2.lto.o
+	$(LLVMPATH)/opt -phi2mem scimark2.lto.o -o scimark2.phi2mem.o
+	
+scimark2.phi2mem.s : scimark2.phi2mem.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o scimark2.phi2mem.s scimark2.phi2mem.o
+
+scimark2.phi2mem : scimark2.phi2mem.s
+	$(CC) $(CFLAGS) $(LDFLAGS) scimark2.phi2mem.s -o scimark2.phi2mem
+
+scimark2.reg2mem.o : scimark2.lto.o
+	$(LLVMPATH)/opt -reg2mem scimark2.lto.o -o scimark2.reg2mem.o
+	
+scimark2.reg2mem.s : scimark2.reg2mem.o
+	$(LLVMPATH)/llc -mcpu=$(CPU) -o scimark2.reg2mem.s scimark2.reg2mem.o
+
+scimark2.reg2mem : scimark2.reg2mem.s
+	$(CC) $(CFLAGS) $(LDFLAGS) scimark2.reg2mem.s -o scimark2.reg2mem
+
+clean:
+	rm *.o *.s scimark2 scimark2.phi2mem scimark2.reg2mem
