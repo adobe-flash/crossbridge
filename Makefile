@@ -159,7 +159,7 @@ LLVMCMAKEFLAGS=-DLLVM_DEFAULT_TARGET_TRIPLE=avm2-unknown-freebsd8 \
 	-DLLVM_BINUTILS_INCDIR=$(SRCROOT)/binutils/include \
 	-DLLVM_BUILD_RUNTIME=OFF
 #Possible values: Release, Debug, RelWithDebInfo and MinSizeRel
-LLVMBUILDTYPE=Debug
+LLVMBUILDTYPE=MinSizeRel
 FLASCC_CC=clang
 FLASCC_CXX=clang++
 CP_CLANG= cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/clang$(EXEEXT) \
@@ -271,7 +271,7 @@ all_ci:
 	@$(SDK)/usr/bin/make abclibs
 	@$(SDK)/usr/bin/make basictools
 	@$(SDK)/usr/bin/make llvm
-	@$(SDK)/usr/bin/make binutils
+	@$(SDK)/usr/bin/make -i binutils
 	@$(SDK)/usr/bin/make plugins
 	@$(SDK)/usr/bin/make bmake
 	@$(SDK)/usr/bin/make stdlibs
