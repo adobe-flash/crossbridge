@@ -37,9 +37,11 @@ $?DEPENDENCY_LIBPNG=libpng-1.5.7
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
 $?DEPENDENCY_LLVM=llvm-3.2
+$?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-3.82
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SWIG=swig-2.0.4
+$?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_ZLIB=zlib-1.2.5
 $?DEPENDENCY_DEJAGNU=dejagnu-1.5
 
@@ -313,10 +315,13 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
 	tar xf packages/$(DEPENDENCY_ICONV).tar.gz
 	tar xf packages/$(DEPENDENCY_JPEG).tar.gz
+	unzip -q packages/$(DEPENDENCY_LLVM_GCC).zip
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
+	unzip -q packages/$(DEPENDENCY_SCIMARK).zip
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
+	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
 
 clean_libs:
 	rm -rf $(DEPENDENCY_BMAKE)
@@ -325,8 +330,10 @@ clean_libs:
 	rm -rf $(DEPENDENCY_DEJAGNU)
 	rm -rf $(DEPENDENCY_ICONV)
 	rm -rf $(DEPENDENCY_JPEG)
+	rm -rf $(DEPENDENCY_LLVM_GCC)
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_PKG_CFG)
+	rm -rf $(DEPENDENCY_SCIMARK)
 
 # ====================================================================================
 # BASE
