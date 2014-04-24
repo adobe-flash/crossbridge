@@ -8,6 +8,7 @@ Building from sources
     * autoconf
     * automake
     * bison
+    * ccache
     * cmake
     * flex
     * gcc-core
