@@ -193,8 +193,8 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 # ====================================================================================
 # ALL TARGET
 # ====================================================================================
-BUILDORDER=cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
-BUILDORDER+=sdkcleanup tr trd extralibs extratools finalcleanup submittests
+BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
+BUILDORDER+= sdkcleanup tr trd extralibs extratools finalcleanup submittests
 
 all:
 	@echo "~~~ Crossbridge $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
