@@ -318,7 +318,8 @@ install_libs:
 	unzip -q packages/$(DEPENDENCY_LLVM_GCC).zip
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
-	unzip -q packages/$(DEPENDENCY_SCIMARK).zip
+	mkdir -p $(DEPENDENCY_SCIMARK)
+	cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
