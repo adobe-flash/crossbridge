@@ -546,7 +546,7 @@ llvmtests:
 	rm -rf $(BUILD)/llvm-tests
 	mkdir -p $(BUILD)/llvm-tests
 	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
-	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-$(LLVMVERSION)/configure --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --without-f2c --without-f95 --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
+	cd $(BUILD)/llvm-tests && $(SRCROOT)/llvm-$(LLVMVERSION)/configure --with-llvmgcc=$(SDK)/usr/bin/$(FLASCC_CC) --with-llvmgxx=$(SDK)/usr/bin/$(FLASCC_CXX) --without-f2c --without-f95 --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
 	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
 	cd $(BUILD)/llvm-tests/projects/test-suite/MultiSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
 	cd $(BUILD)/llvm-tests/projects/test-suite/SingleSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
