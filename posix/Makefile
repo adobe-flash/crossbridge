@@ -9,8 +9,8 @@ stat: $(TARGET).c
 	../sdk/usr/bin/llvm-ld -internalize-public-api-file=../sdk/public-api.txt \
 	$(TARGET).o ../sdk/usr/lib/crt1_c.o ../sdk/usr/lib/libgcc.a \
 	../sdk/usr/lib/libc.a ../sdk/usr/lib/libm.a -o $(TARGET)-linked
-	perl ../llvm-2.9/lib/Target/AVM2/build.pl ../sdk/usr $(TARGET)-linked.bc \
-	../tamarin-redux/utils/asc.jar ../llvm-2.9/lib/Target/AVM2 $(TARGET)
+	perl ../llvm-3.2/lib/Target/AVM2/build.pl ../sdk/usr $(TARGET)-linked.bc \
+	../tamarin-redux/utils/asc.jar ../llvm-3.2/lib/Target/AVM2 $(TARGET)
 	$(AVMSHELL) ../build/swfmake.abc -- -o $(TARGET).swf \
 	../sdk/usr/lib/C_Run.abc \
 	../sdk/usr/lib/Exit.abc ../sdk/usr/lib/LongJmp.abc \
