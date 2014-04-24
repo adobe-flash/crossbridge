@@ -62,6 +62,6 @@ Since the learning curve is not low, what I had were
 
 ###### Extra ref materials  
 
-[Overview of compiler stages](https://github.com/adobe-flash/crossbridge/blob/futures/devguides/COMPILER.md)
+[Overview of compiler stages](https://github.com/adobe-flash/crossbridge/blob/futures/COMPILER.md)
 
-[Overview of source folders](https://github.com/adobe-flash/crossbridge/blob/futures/devguides/DEVGUIDE.md)
+[Overview of source folders](https://github.com/adobe-flash/crossbridge/blob/futures/DEVGUIDE.md)
