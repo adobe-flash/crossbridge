@@ -200,17 +200,19 @@ all:
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
+	@echo "-  libs"
+	@$(MAKE) install_libs
 	@mkdir -p $(BUILD)/logs
 	@echo "-  base"
-	@$(MAKE) base &> $(BUILD)/logs/base.txt
+	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
 	@echo "-  make"
-	@$(MAKE) make &> $(BUILD)/logs/make.txt
+	@$(MAKE) make &> $(BUILD)/logs/make.txt 2>&1
 	@$(SDK)/usr/bin/make -s all_with_local_make
 
 all_with_local_make:
 	@for target in $(BUILDORDER) ; do \
 		echo "-  $$target" ; \
-		$(MAKE) $$target &> $(BUILD)/logs/$$target.txt ; \
+		$(MAKE) $$target &> $(BUILD)/logs/$$target.txt 2>&1; \
 		mret=$$? ; \
 		logs="$$logs $(BUILD)/logs/$$target.txt" ; \
 		grep -q "Resource temporarily unavailable" $(BUILD)/logs/$$target.txt ; \
@@ -218,7 +220,7 @@ all_with_local_make:
 		rcount=1 ; \
 		while [ $$gret == 0 ] && [ $$rcount -lt 6 ] ; do \
 			echo "-  $$target (retry $$rcount)" ; \
-			$(MAKE) $$target &> $(BUILD)/logs/$$target.txt ; \
+			$(MAKE) $$target &> $(BUILD)/logs/$$target.txt 2>&1; \
 			mret=$$? ; \
 			grep -q "Resource temporarily unavailable" $(BUILD)/logs/$$target.txt ; \
 			gret=$$? ; \
