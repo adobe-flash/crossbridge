@@ -346,6 +346,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
 	tar xf packages/$(DEPENDENCY_ICONV).tar.gz
 	tar xf packages/$(DEPENDENCY_JPEG).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBPNG).tar.gz
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	tar xf packages/$(DEPENDENCY_SDL).tar.gz
@@ -356,6 +357,7 @@ install_libs:
 	cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
+	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
 	cp -r ./patches/$(DEPENDENCY_SDL) .
@@ -368,6 +370,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_DEJAGNU)
 	rm -rf $(DEPENDENCY_ICONV)
 	rm -rf $(DEPENDENCY_JPEG)
+	rm -rf $(DEPENDENCY_LIBPNG)
 	rm -rf $(DEPENDENCY_LLVM_GCC)
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_PKG_CFG)
