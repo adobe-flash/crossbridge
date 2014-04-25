@@ -41,8 +41,9 @@ $?DEPENDENCY_LLVM=llvm-3.2
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-3.82
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
-$?DEPENDENCY_SWIG=swig-2.0.4
 $?DEPENDENCY_SCIMARK=scimark2_1c
+$?DEPENDENCY_SDL=SDL-1.2.14
+$?DEPENDENCY_SWIG=swig-2.0.4
 $?DEPENDENCY_ZLIB=zlib-1.2.5
 $?DEPENDENCY_DEJAGNU=dejagnu-1.5
 
@@ -338,20 +339,25 @@ docs:
 # DEPENDENCY LIBS
 # ====================================================================================
 install_libs:
+	# untar packages
 	tar xf packages/$(DEPENDENCY_BMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
 	tar xf packages/$(DEPENDENCY_ICONV).tar.gz
 	tar xf packages/$(DEPENDENCY_JPEG).tar.gz
-	unzip -q packages/$(DEPENDENCY_LLVM_GCC).zip
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
+	tar xf packages/$(DEPENDENCY_SDL).tar.gz
+	# unzip packages
+	unzip -q packages/$(DEPENDENCY_LLVM_GCC).zip
 	mkdir -p $(DEPENDENCY_SCIMARK)
 	cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
+	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
+	cp -r ./patches/$(DEPENDENCY_SDL) .
 
 clean_libs:
 	rm -rf $(DEPENDENCY_BMAKE)
@@ -364,6 +370,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
+	rm -rf $(DEPENDENCY_SDL)
 
 # ====================================================================================
 # BASE
@@ -985,7 +992,7 @@ libpng:
 libsdl_configure:
 	rm -rf $(SRCROOT)/cached_build/libsdl
 	mkdir -p $(SRCROOT)/cached_build/libsdl
-	cd $(SRCROOT)/cached_build/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/SDL-1.2.14/configure \
+	cd $(SRCROOT)/cached_build/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/$(DEPENDENCY_SDL)/configure \
 		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
 		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
 		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
