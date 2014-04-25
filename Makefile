@@ -28,6 +28,7 @@ $?SWFEXT=
 $?DEPENDENCY_BINUTILS=binutils
 $?DEPENDENCY_BMAKE=bmake
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
+$?DEPENDENCY_DEJAGNU=dejagnu-1.5
 $?DEPENDENCY_DMALLOC=dmalloc-5.5.2
 $?DEPENDENCY_FFI=libffi-3.0.11
 $?DEPENDENCY_GDB=gdb-7.3
@@ -45,7 +46,6 @@ $?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_SDL=SDL-1.2.14
 $?DEPENDENCY_SWIG=swig-2.0.4
 $?DEPENDENCY_ZLIB=zlib-1.2.5
-$?DEPENDENCY_DEJAGNU=dejagnu-1.5
 
 # ====================================================================================
 # HOST PLATFORM OPTIONS
@@ -349,6 +349,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	tar xf packages/$(DEPENDENCY_SDL).tar.gz
+	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# unzip packages
 	unzip -q packages/$(DEPENDENCY_LLVM_GCC).zip
 	mkdir -p $(DEPENDENCY_SCIMARK)
@@ -358,6 +359,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
 	cp -r ./patches/$(DEPENDENCY_SDL) .
+	cp -r ./patches/$(DEPENDENCY_ZLIB) .
 
 clean_libs:
 	rm -rf $(DEPENDENCY_BMAKE)
@@ -371,6 +373,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
 	rm -rf $(DEPENDENCY_SDL)
+	rm -rf $(DEPENDENCY_ZLIB)
 
 # ====================================================================================
 # BASE
@@ -1049,9 +1052,9 @@ genfs:
 	rm -rf $(BUILD)/zlib-native
 	mkdir -p $(BUILD)/zlib-native
 	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_ZLIB)/ $(BUILD)/zlib-native
-	cd $(BUILD)/zlib-native && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) ./configure --static && $(MAKE) 
-	cd $(BUILD)/zlib-native/contrib/minizip/ && $(MAKE) 
-	$$CC -Wall -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
+	cd $(BUILD)/zlib-native && PATH=$(SDK)/usr/bin:$(PATH) AR=$(NATIVE_AR) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) ./configure --static && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) 
+	cd $(BUILD)/zlib-native/contrib/minizip/ && PATH=$(SDK)/usr/bin:$(PATH) AR=$(NATIVE_AR) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) 
+	PATH=$(SDK)/usr/bin:$(PATH) $(FLASCC_CC) -Wall -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
 
 gdb:
 	rm -rf $(BUILD)/$(DEPENDENCY_GDB)

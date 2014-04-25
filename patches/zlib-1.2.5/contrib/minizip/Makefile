@@ -1,4 +1,4 @@
-CC=gcc
+CC=clang
 CFLAGS=-O -I../..
 
 UNZ_OBJS = miniunz.o unzip.o ioapi.o ../../libz.a
