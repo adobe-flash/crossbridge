@@ -925,7 +925,7 @@ int SWIG_main(int argc, char *argv[], Language *l) {
       SwigLibWinUnix = NewString(SWIG_LIB_WIN_UNIX); // Unix installation path using a drive letter (for msys/mingw)
 #else
     String *alcSDK = NewString(flasccSDKLocation);
-    Append(alcSDK, "/usr/share/swig/2.0.4/");
+    Append(alcSDK, "/usr/share/swig/3.0.0/");
     SwigLib = Swig_copy_string(Char(alcSDK));
     Delete(alcSDK);
 #endif
