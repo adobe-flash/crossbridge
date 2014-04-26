@@ -234,7 +234,10 @@ SWIG_LIBS=-lLLVMAVM2Info -lLLVMAVM2CodeGen -lLLVMAVM2AsmParser -lLLVMAsmPrinter 
 SWIG_LIBS+= -lclangEdit -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lclangSerialization
 SWIG_LIBS+= $(GCCLANGFLAG)
 # C++ Flags
-SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/$(DEPENDENCY_LLVM)/include -I$(BUILD)/llvm-debug/include -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/lib
+SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/
+SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/include -I$(BUILD)/llvm-debug/include 
+SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include
+SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/lib
 SWIG_CXXFLAGS+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long -v
 # Post Process
 SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
@@ -679,9 +682,11 @@ bmake:
 # ====================================================================================
 # STD LIBS
 # ====================================================================================
+# TBD
 stdlibs:
 	$(MAKE) -j$(THREADS) csu libc libthr libm libBlocksRuntime libcxx libunwind libcxxrt
 
+# TBD
 csu:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 # Cygwin compatibility
@@ -691,6 +696,7 @@ endif
 	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE) crt1_c.o
 	mv -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
 
+# C
 libc:
 	mkdir -p $(BUILD)/posix/
 	rm -f $(BUILD)/posix/*.o
@@ -730,6 +736,7 @@ libc.abc:
 	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
 
+# Threads
 libthr:
 	rm -rf $(BUILD)/libthr
 	mkdir -p $(BUILD)/libthr
@@ -747,12 +754,14 @@ endif
 	cd $(BUILD)/libthr/libthr && rm -f libthr.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libthr.a
 	cp -f $(BUILD)/libthr/libthr/libthr.a $(SDK)/usr/lib/.
 
+# Threads
 libthr.abc:
 	mkdir -p $(BUILD)/libthr_abc
 	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
 	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
 
+# Math
 libm:
 	cd compiler_rt && $(MAKE) clean && $(MAKE) avm2 CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm" RANLIB=$(SDK)/usr/bin/ranlib AR=$(SDK)/usr/bin/ar VERBOSE=1
 	$(SDK)/usr/bin/llvm-link -o $(BUILD)/libcompiler_rt.o compiler_rt/avm2/avm2/avm2/SubDir.lib/*.o
@@ -783,6 +792,7 @@ endif
 	$(SDK)/usr/bin/opt -O3 -o $(SDK)/usr/lib/libm.o $(BUILD)/libmbc/libm.o
 	$(SDK)/usr/bin/nm $(SDK)/usr/lib/libm.o | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/libm.bc.txt
 
+# Math
 libm.abc:
 	mkdir -p $(BUILD)/libm_abc
 	cp $(BUILD)/msun/msun/*.o $(BUILD)/libm_abc
@@ -1238,7 +1248,7 @@ pkgconfig:
 libtool:
 	rm -rf $(BUILD)/libtool
 	mkdir -p $(BUILD)/libtool
-	cd $(BUILD)/libtool && CC=gcc CXX=g++ $(SRCROOT)/libtool-2.4.2/configure \
+	cd $(BUILD)/libtool && CC=gcc CXX=g++ $(SRCROOT)/$(DEPENDENCY_LIBTOOL)/configure \
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) \
 		--prefix=$(SDK)/usr --enable-static --disable-shared --disable-ltdl-install
 	cd $(BUILD)/libtool && $(MAKE) -j$(THREADS) && $(MAKE) install-exec

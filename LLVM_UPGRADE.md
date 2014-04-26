@@ -231,7 +231,7 @@ This work is unfinished and mostly unstable. Some changes are questionable and w
 
 * Description: Refactor swig, as necessary, to build against the new version of clang. Ensure swig tests are passing.
 * Estimate: 1 day
-* Status: Not started
+* Status: In progress
 
 ## CB-0011
 
@@ -243,13 +243,13 @@ This work is unfinished and mostly unstable. Some changes are questionable and w
 
 * Description: Find bugs, fix bugs, and address any unforeseen problems.
 * Estimate: 10 days
-* Status: Not started
+* Status: In progress
 
 ## CB-0013
 
 * Description: Remove references to 'llvm-gcc-4.2-2.9' should be removed ?!
 * Estimate: ? days
-* Status: Not started
+* Status: In progress
 * Relates to CB-0011
 
     \avm2_env\usr\src\contrib\libc++\Makefile
