@@ -190,6 +190,8 @@ TBD
 * http://llvm.org/docs/GoldPlugin.html
 * http://llvm.org/docs/WritingAnLLVMBackend.html
 * http://llvm.org/docs/TableGen/index.html
+* https://github.com/maidsafe/MaidSafe/wiki/Hacking-with-Clang-llvm-abi-and-llvm-libc
+* http://libcxx.llvm.org/
 
 ## SWIG
 
