@@ -1,0 +1,178 @@
+# APPLE LOCAL file testsuite
+###
+### List of failing tests with Radar bug numbers
+### <radarNum>: <test name>
+### test name should be exactly as it appears html summary reports
+### including any trailing #<number>
+###
+### When the bug is fixed and the test passes, it will be an
+### analyzed non-fail. You should then comment out the test in this
+### file and make sure the Radar is closed.
+###
+###------------------------------------------------------------------
+5066141: gcc.dg/pr30643.c scan-assembler-not undefined
+5951276: gcc.target/i386/20020616-1.c execution test
+6497723: gcc.apple/block-5988451.c (test for excess errors)
+6497723: gcc.apple/block-ivar.c (test for excess errors)
+# temporary failures due to new linker messages
+6312070: gcc.dg/compat/scalar-by-value-1 c_compat_x_tst.o-c_compat_y_tst.o link
+6312070: gcc.dg/compat/scalar-by-value-3 c_compat_x_tst.o-c_compat_y_tst.o link
+6312070: gcc.dg/darwin-ld-1.c (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-float80-timode.c  -O0  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-float80-timode.c  -O1  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-float80-timode.c  -O2  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-float80-timode.c  -O3 -fomit-frame-pointer  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-float80-timode.c  -O3 -g  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-float80-timode.c  -Os  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-float80-timode.c  -fast  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-timode.c  -O0  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-timode.c  -O1  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-timode.c  -O2  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-timode.c  -O3 -fomit-frame-pointer  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-timode.c  -O3 -g  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-timode.c  -Os  (test for excess errors)
+6312070: gcc.dg/torture/fp-int-convert-timode.c  -fast  (test for excess errors)
+#
+# ppc only
+3906375: gcc.dg/debug/debug-1.c -gstabs -fast scan-assembler xyzzy
+3906375: gcc.dg/debug/debug-1.c -gstabs3 -fast scan-assembler xyzzy
+3906375: gcc.dg/debug/debug-1.c -gstabs+ -fast scan-assembler xyzzy
+3906375: gcc.dg/debug/debug-1.c -gstabs+3 -fast scan-assembler xyzzy
+3906375: gcc.dg/debug/debug-2.c -gstabs -fast scan-assembler xyzzy
+3906375: gcc.dg/debug/debug-2.c -gstabs3 -fast scan-assembler xyzzy
+3906375: gcc.dg/debug/debug-2.c -gstabs+ -fast scan-assembler xyzzy
+3906375: gcc.dg/debug/debug-2.c -gstabs+3 -fast scan-assembler xyzzy
+4874933: gcc.dg/vect/vect-ifcvt-8.c scan-tree-dump-times vectorized 1 loops 1
+4875164: gcc.dg/vect/section-anchors-pr27770.c (test for excess errors)
+4875164: gcc.dg/vect/section-anchors-vect-69.c (test for excess errors)
+4875164: gcc.dg/vect/section-anchors-vect-69.c scan-tree-dump-times Alignment of access forced using peeling 4
+4875176: gcc.target/powerpc/stabs-attrib-vect-darwin.c scan-assembler .stabs.*vi:\\(0,[0-9]+\\)=@V
+6186620: gcc.dg/builtins-18.c (test for excess errors)
+6186620: gcc.dg/builtins-20.c (test for excess errors)
+6186620: gcc.dg/builtins-55.c (test for excess errors)
+6186620: gcc.dg/darwin-minversion-2.c (test for excess errors)
+6186620: gcc.dg/darwin64-abi.c (test for excess errors)
+6186620: gcc.dg/single-precision-constant.c (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-1.c  -O0  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-1.c  -O1  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-1.c  -O2  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-1.c  -O3 -g  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-1.c  -Os  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-1.c  -fast  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-2.c  -O0  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-2.c  -O1  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-2.c  -O2  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-2.c  -O3 -fomit-frame-pointer  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-2.c  -O3 -g  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-2.c  -Os  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-2.c  -fast  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-3.c  -O0  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-3.c  -O1  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-3.c  -O2  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-3.c  -O3 -fomit-frame-pointer  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-3.c  -O3 -g  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-3.c  -Os  (test for excess errors)
+6186620: gcc.dg/torture/builtin-convert-3.c  -fast  (test for excess errors)
+6186620: gcc.dg/torture/builtin-power-1.c  -O0  (test for excess errors)
+6186620: gcc.dg/torture/builtin-power-1.c  -O1  (test for excess errors)
+6186620: gcc.dg/torture/builtin-power-1.c  -O2  (test for excess errors)
+6186620: gcc.dg/torture/builtin-power-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
+6186620: gcc.dg/torture/builtin-power-1.c  -O3 -g  (test for excess errors)
+6186620: gcc.dg/torture/builtin-power-1.c  -Os  (test for excess errors)
+6186620: gcc.dg/torture/builtin-power-1.c  -fast  (test for excess errors)
+#
+# x86 only
+4874504: gcc.dg/tree-ssa/gen-vect-11b.c scan-tree-dump-times vectorized 0 loops 1
+4874504: gcc.dg/tree-ssa/gen-vect-11c.c scan-tree-dump-times vectorized 0 loops 1
+4875094: gcc.target/i386/cmov4.c scan-assembler cmov
+4874970: gcc.target/i386/pr21291.c (test for excess errors)
+5066234: gcc.c-torture/execute/builtin-return-address-1.c execution,  -fast
+#
+# -m64 only
+#
+# ppc -m64 only
+3966342: gcc.apple/apple-altivec-13.c (test for excess errors)
+4876409: gcc.target/powerpc/ppc-negeq0-1.c scan-assembler-not cntlzw
+4876481: gcc.target/powerpc/ppc64-abi-1.c (test for excess errors)
+4085231: gcc.dg/transparent-union-1.c (test for excess errors)
+4085231: gcc.dg/transparent-union-2.c (test for excess errors)
+4085231: gcc.dg/transparent-union-4.c  (test for warnings, line 9)
+4085231: gcc.dg/transparent-union-4.c (test for excess errors)
+4085231: gcc.dg/transparent-union-5.c (test for excess errors)
+#
+# x86 -m64 only
+4874947: gcc.dg/tree-ssa/loop-3.c scan-tree-dump-times step: 1
+#
+# when running through ObjC only
+4079037: gcc.dg/cpp/direct2.c (test for excess errors)
+4079037: gcc.dg/cpp/direct2s.c (test for excess errors)
+3904213: gcc.dg/20040813-1.c scan-assembler .stabs.*100,0,2
+3904213: gcc.apple/objc-negtest.c  (test for errors, line 3)
+3904216: gcc.dg/cast-function-1.c  (test for warnings, line 25)
+3904216: gcc.dg/cast-function-1.c  (test for warnings, line 26)
+3904216: gcc.dg/cast-function-1.c  (test for warnings, line 27)
+3904216: gcc.dg/cast-function-1.c  (test for warnings, line 28)
+3904216: gcc.dg/cast-function-1.c  (test for warnings, line 32)
+3904216: gcc.dg/cast-function-1.c  (test for warnings, line 34)
+3904216: gcc.dg/cast-function-1.c  (test for warnings, line 35)
+3904224: gcc.dg/gnu89-init-1.c (test for excess errors)
+3904224: gcc.dg/gnu99-init-1.c (test for excess errors)
+5704830: gcc.dg/init-desig-obs-1.c  (test for errors, line 19)
+5704830: gcc.dg/init-desig-obs-1.c (test for excess errors)
+4881841: gcc.dg/pr28706.c (test for excess errors)
+4881841: gcc.dg/pr28712.c (test for excess errors)
+4881841: gcc.dg/pr30762-1.c (test for excess errors)
+3904228: gcc.dg/uninit-A.c (test for excess errors)
+3904235: gcc.dg/wtr-unary-plus-1.c unary plus operator (test for warnings, line 12)
+3904235: gcc.dg/wtr-unary-plus-1.c unary plus operator (test for warnings, line 13)
+5275911: gcc.dg/invalid-call-1.c non-compatible type (test for warnings, line 18)
+0000000: compiler driver --coverage option(s) (compiler options)
+6348516: gcc.dg/20050607-1.c (test for excess errors)
+6348516: gcc.dg/Wpadded.c (test for excess errors)
+6348517: gcc.dg/darwin-weakimport-1.c scan-assembler-not weak_[a-z \t]*_b
+6348517: gcc.dg/darwin-weakimport-3.c scan-assembler-not coalesced
+6348519: gcc.dg/pch/valid-2.c -O... -g  (test for errors, line 3)  [ 7 tests ]
+6348519: gcc.dg/pch/valid-2.c -O0 -g  (test for errors, line 3) #1  [ 7 duplicate tests ]
+#
+# -fasm-blocks only
+5087183: gcc.dg/cpp/19951227-1.c  (test for errors, line 2)
+5087183: gcc.dg/cpp/direct2.c non-include (test for errors, line 13)
+5087183: gcc.dg/cpp/direct2s.c non-include (test for errors, line 15)
+5087183: gcc.dg/cpp/if-1.c invalid number (test for errors, line 12)
+5087183: gcc.dg/cpp/if-1.c invalid number (test for errors, line 15)
+5087183: gcc.dg/cpp/if-1.c invalid number (test for errors, line 18)
+5087183: gcc.dg/cpp/if-1.c too many suffixes (test for errors, line 28)
+5087183: gcc.dg/cpp/if-1.c too many suffixes (test for errors, line 31)
+5087183: gcc.dg/cpp/if-1.c u between ls (test for errors, line 34)
+5087183: gcc.dg/cpp/multiline-2.c (test for excess errors)
+5087183: gcc.dg/cpp/paste4.c (test for excess errors)
+5087183: gcc.dg/c90-hexfloat-1.c (test for excess errors)
+5087183: gcc.dg/dollar.c  (test for errors, line 9)
+5087183: gcc.dg/dollar.c (test for excess errors)
+5087183: gcc.dg/fold-nonneg-1.c (test for excess errors)
+5087183: gcc.dg/pr27428-1.c (test for excess errors)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O0  error for LUL suffix (test for errors, line 23)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O0  error for Ll suffix (test for errors, line 24)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O0  (test for excess errors)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O1  error for LUL suffix (test for errors, line 23)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O1  error for Ll suffix (test for errors, line 24)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O1  (test for excess errors)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O2  error for LUL suffix (test for errors, line 23)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O2  error for Ll suffix (test for errors, line 24)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O2  (test for excess errors)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O3 -fomit-frame-pointer  error for LUL suffix (test for errors, line 23)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O3 -fomit-frame-pointer  error for Ll suffix (test for errors, line 24)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O3 -g  error for LUL suffix (test for errors, line 23)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O3 -g  error for Ll suffix (test for errors, line 24)
+5087183: gcc.dg/noncompile/const-ll-1.c  -O3 -g  (test for excess errors)
+5087183: gcc.dg/noncompile/const-ll-1.c  -Os  error for LUL suffix (test for errors, line 23)
+5087183: gcc.dg/noncompile/const-ll-1.c  -Os  error for Ll suffix (test for errors, line 24)
+5087183: gcc.dg/noncompile/const-ll-1.c  -Os  (test for excess errors)
+5087183: gcc.dg/noncompile/const-ll-1.c  -fast  error for LUL suffix (test for errors, line 23)
+5087183: gcc.dg/noncompile/const-ll-1.c  -fast  error for Ll suffix (test for errors, line 24)
+5087183: gcc.dg/noncompile/const-ll-1.c  -fast  (test for excess errors)
+#
+# -mcpu=G5 only
+4929147: gcc.target/powerpc/20050603-3.c scan-assembler-not inm

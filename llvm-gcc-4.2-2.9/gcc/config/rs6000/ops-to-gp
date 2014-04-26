@@ -1,0 +1,620 @@
+#!/bin/sh
+# APPLE LOCAL file AltiVec
+# ops-to-gp -gcc vec.ops builtin.ops
+# Creates vec.h used by rs6000.c
+
+arg0=`basename $0`
+err() {
+    echo "$arg0: $*" 1>&2
+    exit 2
+}
+
+if [ $# -eq 0 ] ; then
+    echo "Usage: $arg0 [ -mcc | -gcc ] builtin-ops ..." 1>&2
+    exit 1
+fi
+
+MCC=1
+GCC=0
+suffix="gp"
+if [ "$1" = "-mcc" ] ; then
+    shift;
+elif [ "$1" = "-gcc" ] ; then
+    GCC=1
+    MCC=0
+    suffix="h"
+    shift;
+fi
+
+output=`basename $1 .ops`
+gperf="gperf -G -a -o -k1-15 -p -t -D -T -N Is_Builtin_Function $output.gp";
+
+# Lines in the ops file have the form
+# @ @ betype betype-code type-spelling
+# @ fetype betype [code]
+# @ @ @ instruction type
+# generic op1 op2 ... opn = result specific when configure [addressible
+#    [instruction [const_ptr_ok [volatile_ptr_ok [transform [predicate]]]]]]
+
+# Sort the ops file to put it in a canonical order.
+sort -u $* | \
+
+# Add specific function uid's, make generic functions from specific
+# functions, validate the types used, compute default parameters, and
+# compute parts of the default transform and predicate functions.
+awk 'BEGIN {
+	i = 0
+        EQ = i++
+        RESULT = i++
+        SPECIFIC = i++
+        WHEN = i++
+        CONFIGURED = i++
+        ADDRESSIBLE = i++
+        INSTRUCTION = i++
+        CONST_PTR_OK = i++
+        VOLATILE_PTR_OK = i++
+        TRANSFORM = i++
+        PREDICATE = i++
+        n_lines = 1;
+        tree[3] = "Make_Folded_4tree";
+        tree[2] = "Make_Folded_3tree";
+        tree[1] = "Make_Folded_Btree";
+        tree[0] = "Make_Utree";
+	optimize["vec_sub"] = 1;
+	optimize["vec_subs"] = 1;
+	optimize["vec_xor"] = 1;
+	optimize["vec_andc"] = 1;
+	optimize["vec_avg"] = 2;
+	optimize["vec_or"] = 2;
+	optimize["vec_and"] = 2;
+	optimize["vec_max"] = 2;
+	optimize["vec_min"] = 2;
+	optimize["vec_sld"] = 3;
+	optimize["vec_splat_s8"] = 4;
+	optimize["vec_splat_s16"] = 5;
+	optimize["vec_splat_s32"] = 6;
+	optimize["vec_splat_u8"] = 4;
+	optimize["vec_splat_u16"] = 5;
+	optimize["vec_splat_u32"] = 6;
+	optimize["vec_cmpeq"] = 7;
+	optimize["vec_lvsl"] = 8;
+	optimize["vec_lvsr"] = 9;
+	# These operations need additional transformation.  Key off the
+	# optimize attribute to identify them.
+	optimize["vec_cmplt"] = 10;
+	optimize["vec_cmple"] = 10;
+	optimize["vec_abs"] = 11;
+	optimize["vec_abss"] = 11;
+    }
+    function no_type(t) {
+        printf "%% Error: type %s not declared.\n", t;
+        status = 1;
+        exit;
+    }
+    # Record the type.
+    $1 == "@" {
+        if ($2 == "@") {
+          if ($3 == "@") {
+            # Definition of an instruction.
+            insn_type[$4] = $5; # type
+          } else {
+            # Definition of a betype.
+            becode[$3] = $4; # betype-code
+            bespell[$3] = $5; # type-spelling
+            gsub(/\=/, " ", bespell[$3]);
+          }
+        } else {
+          # Definition of a fetype.
+          print $0;
+          if (!becode[$3]) no_type($3); # Must have defined the betype.
+          betype[$2] = $3; # betype;
+          if (NF == 3)
+            code[$2] = "";      
+          else
+            code[$2] = $4; # code
+        }
+    }
+    function no_equal(i,l) {
+        printf "%% Syntax error %d: %s\n", i, l;
+        status = 1;
+        exit;
+    }
+    function error(f,a) {
+        printf( ("%% error: " f), a);
+        status = 1;
+        exit;
+    }
+    # Ignore comment lines.
+    $1 != "#" && $1 != "@" {
+        # Generate the signature of the specific function, the predicate,
+        # the transform, the arguments to the transform function, the
+        # arguments to the predicate function, and the spelling of the
+        # function type.
+        signature = "";
+        predicate = "";
+        transform = "";
+        insn_code = "";
+        transform_args = "";
+        predicate_args = "";
+        function_type = "";
+        # First, consider the parameter types.
+        for (i = 2; $i != "=" && i < NF; i++) {
+          if ($i != "...") {
+            if (!betype[$i]) no_type($i);
+            signature = (signature " " $i);
+            predicate = (predicate "_" betype[$i]);
+            transform = (transform code[$i]);
+            transform_args = (transform_args ", ND_kid(t," i-1 ")");
+            predicate_args = (predicate_args " " becode[betype[$i]]);
+            if (function_type)
+              function_type = (function_type ", " bespell[betype[$i]]);
+            else
+              function_type = bespell[betype[$i]];
+          }
+        }
+	constraints = (transform "@");
+        # Check the syntax of the ops file.
+        if ($i != "=" || NF > i+PREDICATE || NF < i+CONFIGURE) no_equal(i,$0);
+        if (!betype[$(i+RESULT)]) no_type($(i+RESULT));
+        # Incorporate the result type.
+        if (i == 2) {
+          predicate = "_void";
+          function_type = "void";
+        }
+        signature = ($(i+SPECIFIC) signature);
+        predicate = sprintf("is_%s_func%s", betype[$(i+RESULT)], predicate);
+        predicate_args = (becode[betype[$(i+RESULT)]] predicate_args);
+        function_type = sprintf("(%s (*)(%s))", bespell[betype[$(i+RESULT)]], \
+                                function_type);
+        if (substr(code[$(i+RESULT)], 1, 1) == "j") {
+          # Handle a jump asm.  The code is expedted to be
+          # j={cc-bit-num}={cc-bit-value}[={r|d}].  The operation must have
+          # one operand if the code d is used and two operands otherwise.
+          # The transform function can implement the r code by reversing the
+          # two operands.  In all cases, the first operand is a computed
+          # constant encoding both the bit number and the test.
+          n = split(code[$(i+RESULT)], jmp, "=");
+          if (jmp[n] == "d" && i != 3) error("%d operands", i-2);
+          if (jmp[n] != "d" && i != 4) error("%d operands", i-2);
+          if (jmp[n] == "r")
+            transform_args = ", ND_kid(t,2), ND_kid(t,1)";
+          transform_args = sprintf("%s(OP_VCMP%s%s", tree[i-2], \
+                                   toupper(jmp[3]), transform_args);
+          if (jmp[n] == "r")
+            transform = ("r" transform);
+          insn_code = sprintf("CODE_FOR_j_%d_%s_f%s", jmp[2], jmp[3], \
+                              transform);
+          transform = sprintf("transform_j_%d_%s_f%s", jmp[2], jmp[3], \
+                              transform);
+        } else {
+          transform_args = sprintf("%s(OP_%sASM%s%s", tree[i-2], \
+                                   toupper(code[$(i+RESULT)]), \
+				   toupper(transform), transform_args);
+          insn_code = sprintf("CODE_FOR_%sf%s", code[$(i+RESULT)], transform);
+          transform = sprintf("transform_%sf%s", code[$(i+RESULT)], transform);
+        }       
+        # Give a unique id to the signature
+        if (count[signature] == 0)
+          count[signature] = ++uid[$(i+SPECIFIC)];
+
+        # Compute the default instruction name
+        nf = split($(i+SPECIFIC), part, "_");
+        instruction = ("MOP_" part[nf]);
+
+	# Compute the insn_code, but use the instruction override if given.
+        if (NF >= i+INSTRUCTION)
+          instruction = $(i+INSTRUCTION);
+        if (insn_type[instruction])
+          insn_code = (insn_code "_" insn_type[instruction]);
+
+        # Allow the user to override the addressibility, instruction,
+        # const_ptr_ok, volatile_ptr_ok, transform, and predicate.
+        if (NF >= i+ADDRESSIBLE)
+          addressible = "";
+        else
+          addressible = "FALSE";
+
+        if (NF >= i+INSTRUCTION)
+          instruction = "";
+        else if (substr($1, 1, 4) == "vec_")
+          print "@ @3", instruction;
+
+        if (NF >= i+CONST_PTR_OK)
+          const_ptr_ok = "";
+        else
+          const_ptr_ok = "FALSE";
+
+        if (NF >= i+VOLATILE_PTR_OK)
+          volatile_ptr_ok = "";
+        else
+          volatile_ptr_ok = "FALSE";
+
+        if (NF >= i+TRANSFORM)
+          transform = "";
+        else
+          print "@ @1", transform, transform_args;
+
+        if (NF >= i+PREDICATE)
+          predicate = "";
+        else
+          print "@ @2", i-2, predicate, predicate_args, function_type;
+
+	if (optimize[$1])
+	  optimize_method = optimize[$1];
+	else
+	  optimize_method = "0";
+
+        # Record the line, addressibility, instruction, transform,
+        # predicate, and unique id.
+        line[n_lines++] = ($0 " " addressible " " instruction " " \
+                           const_ptr_ok " " volatile_ptr_ok " " transform " " \
+                           predicate " " insn_code " " constraints " " \
+			   optimize_method " " count[signature]);
+    }
+    END {
+        if (status) exit;
+        # generic op1 op2 ... opn = result specific when configured
+        #         addressable instruction const_ptr_ok volatile_ptr_ok
+        #         transform predicate insn_code constraints optimize uid
+        SPECIFIC = 12
+        for (i = 1; i < n_lines; i++) {
+          nf = split(line[i], part);
+          specific = part[nf-SPECIFIC];
+
+          # Print the generic form.
+          printf "%s", part[1];
+          for (j = 2; j <= nf-SPECIFIC; j++) printf " %s", part[j];
+          if (uid[specific] > 1) printf ":%d", part[nf];
+          while (j < nf) printf " %s", part[j++];
+          printf "\n";
+
+          # Print the specific form.
+          printf "%s", specific;
+          for (j = 2; j <= nf-SPECIFIC; j++) printf " %s", part[j];
+          if (uid[specific] > 1) printf ":%d", part[nf];
+          while (j < nf) printf " %s", part[j++];
+          printf "\n";
+        }
+    }' | \
+
+# Strip out load and store qualifiers.
+sed -e 's/_load_op//g' -e 's/_store_op//g' | \
+
+# Sort the processed file and eliminate duplicates.
+sort -u | \
+
+# Append the count of each generic function to each line.
+awk 'function push() {
+        if (num)
+          for (i = 0; i < num; i++)
+            print line[i], num;
+        num = 0;
+    }
+    $1 == "@" {
+        print $0;
+    }
+    $1 != "@" {
+        if (last != $1)
+          push();
+        last = $1;
+        line[num++] = $0;
+    }
+    END {
+        push();
+    }' | \
+
+# Now compute the gperf input file.
+# Lines now have a fixed format
+# generic op1 ... opn = result specific instruction when configured
+#         addressible const_ptr_ok volatile_ptr_ok transform predicate
+#         insn_code constraints optimize count
+awk 'BEGIN {
+	MCC = '$MCC'
+	GCC = '$GCC'
+        i = 0;
+        COUNT = i++
+	OPTIMIZE = i++
+	CONSTRAINTS = i++
+        INSN_CODE = i++
+        PREDICATE = i++
+        TRANSFORM = i++
+        VOLATILE_PTR_OK = i++
+        CONST_PTR_OK = i++
+        INSTRUCTION = i++
+        ADDRESSIBLE = i++
+        CONFIGURED = i++
+        WHEN = i++
+        SPECIFIC = i++
+        RESULT = i++
+        EQ = i++
+        OPN = i++
+        NARGS = i++
+	if (MCC) {
+          print "%{";
+          print "/* Command-line: '"$gperf"'  */";
+	  MAXARGS = 5
+	}
+	if (GCC)
+	  MAXARGS = 3
+    }
+    function write_test(tree, type, num) {
+        if (type == "PTR") {
+          printf "\n      && TY_kind(%s) == KIND_POINTER", tree;
+        } else if (type == "I5") {
+          printf "\n      && is_integer_type(%s)", tree;
+          printf "\n      && Is_Const(ND_kid0(ND_kid(t,%d)), &tc)", num;
+          printf "\n      && ((UINT32)Targ_To_Host(tc) + 16) < 32";
+        } else if (type == "U5") {
+          printf "\n      && is_integer_type(%s)", tree;
+          printf "\n      && Is_Const(ND_kid0(ND_kid(t,%d)), &tc)", num;
+          printf "\n      && (UINT32)Targ_To_Host(tc) < 32";
+        } else if (type == "U4") {
+          printf "\n      && is_integer_type(%s)", tree;
+          printf "\n      && Is_Const(ND_kid0(ND_kid(t,%d)), &tc)", num;
+          printf "\n      && (UINT32)Targ_To_Host(tc) < 16";
+        } else if (type == "U2") {
+          printf "\n      && is_integer_type(%s)", tree;
+          printf "\n      && Is_Const(ND_kid0(ND_kid(t,%d)), &tc)", num;
+          printf "\n      && (UINT32)Targ_To_Host(tc) < 4";
+        } else if (type == "BETYPE_U4" || type == "BETYPE_I4") {
+          printf "\n      && is_integer_type(%s)", tree;
+        } else {
+          printf "\n      && Similar_Types(%s,", tree;
+          printf "\n\t\t       Be_Type_Tbl(%s), IGNORE_QUALIFIERS)", type;
+        }
+    }
+    $1 == "@" {
+      if (MCC) {
+        if ($2 == "@1") {
+          # Write the predicate function from the given parameters.
+          # The format is:
+          # @ @1 transform_ifii Make_3tree(OP_IASMII, ND_kid(t,1), ND_kid(t,2)
+          print "";
+          print "/*ARGSUSED*/";
+          print "static void";
+          print $3 "(ND *func, ND *parent, ND *t, struct builtin *self)";
+          print "{";
+          printf "  *t = *%s", $4;
+          for (i = 5; i <= NF; i++) printf " %s", $i;
+          print ",";
+          if (split($3,jmp,"_") == 5 && jmp[2] == "j")
+            printf "\t\t   MK_I4CONST_ND((self->data << 5) + %d));\n", \
+                   jmp[3];
+          else
+            print "\t\t   MK_I4CONST_ND(self->data));";
+
+          print "  Is_True(self->data > 0, (\"No implementation for %s\", self->name));";
+          print "}";
+        } else if ($2 == "@2") {
+          # Write the transform function from the given parameters.
+          # The format is:
+          # @ @2 2 is_int_func_int_int BETYPE_I4 BETYPE_I4 BETYPE_I4 
+          #          (int (*)(int, int))
+          print "";
+          print "/*ARGSUSED*/";
+          print "static BOOL";
+          print $4 "(ND *func, ND *parent, ND *t, struct builtin *self)";
+          print "{";
+          print "  TCON tc;";
+          printf "  if (ND_nkids(t) == %d", $3+1;
+          write_test("ST_type(ND_dec(func))", $5, "");
+          for (i = 1; i <= $3; i++) {
+            printf "\n      && ND_name(ND_kid(t,%d)) == TO_VAL", i;
+            write_test(sprintf("The_Tree_Type(ND_kid(t,%d))", i), $(i+5), i);
+          }       
+          print ")";
+          print "    return TRUE;";
+          print "  Error_Prt_Line (ND_linenum(t), ec_builtin_function_type, self->name,";
+          i = $3+6;
+          printf "\t\t  \"%s", $i;
+          while (++i <= NF) printf " %s", $i;
+          print "\");";
+          print "  return FALSE;";
+          print "}";
+        } else if ($2 == "@3") {
+          if (once++ == 0) printf "\n#ifndef HAVE_ALTIVEC\n";
+          printf "#define %s -1\n", $3;
+        } else {
+          if (once && twice++ == 0) printf "#endif /* HAVE_ALTIVEC */\n\n";
+          printf "extern struct a_type *T_%s;\n", $2;
+        }
+      }
+      next;
+    }
+    $1 == "%" {
+        print $0;
+        status = 1;
+        exit;
+    }
+    {
+        # Compute the signature of the generic function.
+        signature=$1;
+        for (i = 2; i <= NF-OPN; i++) {
+          if ($i != "...")
+            signature=(signature " " $i);
+        }
+
+        # Ensure that the signature is unique.
+        if (signature_line[signature]) {
+          print "Ambiguous signatures:";
+          print $0;
+          print line[signature_line[signature]];
+        }
+        signature_line[signature] = n_lines;
+
+        # Require that overloaded functions have the same attributes:
+        # number of arguments, when, configured, and addressible.
+        if (same_arg_count[$1] && same_arg_count[$1] != NF)
+          printf "%% number of arguments for %s varies: %d and %d\n", \
+                 $1, NF-NARGS, same_arg_count[$1]-NARGS;
+        same_arg_count[$1] = NF;
+
+        if (same_when[$1] && same_when[$1] != $(NF-WHEN))
+          printf "%% when for %s varies: %s and %s\n", \
+                 $1, $(NF-WHEN), same_when[$1];
+        same_when[$1] = $(NF-WHEN);
+
+        if (same_configured[$1] && same_configured[$1] != $(NF-CONFIGURED))
+          printf "%% configured for %s varies: %s and %s\n", \
+                 $1, $(NF-CONFIGURED), same_configured[$1];
+        same_configured[$1] = $(NF-CONFIGURED);
+
+        if (same_addressible[$1] && same_addressible[$1] != $(NF-ADDRESSIBLE))
+          printf "%% addressible for %s varies: %s and %s\n", \
+                 $1, $(NF-ADDRESSIBLE), same_addressible[$1];
+        else if (same_addressible[$1] && same_addressible[$1] != "FALSE")
+          printf "%% Overloaded function %s is addressible\n", $1
+        same_addressible[$1] = $(NF-ADDRESSIBLE);
+
+        # Record the line.
+        line[n_lines++] = $0;
+    }
+    function push(fcn, n) {
+        if (last) printf "};\n";
+        # Gcc3: declare as arrays of const pointers
+        if (fcn) printf "static const struct builtin *const O_%s[%d] = {\n", fcn, n;
+        last = fcn;
+    }
+    function mangle(name) {
+        if (split(name, names, ":") == 1)
+          return ("B_" names[1]);
+        return ("B" names[2] "_" names[1]);
+    }
+    END { 
+        if (status) exit;
+        
+        # Gcc3: Mark file as Apple local
+        printf "/* APPLE LOCAL file AltiVec */\n";
+        printf "/* This file is generated by ops-to-gp.  Do not edit.   */\n\n";
+        printf "/* To regenerate execute:\n";
+        printf "     ops-to-gp -gcc vec.ops builtin.ops\n";
+        printf "   with the current directory being gcc/config/rs6000.  */\n\n";
+        
+        # Output the description of each specific function.
+        uid = 0;
+        if (MCC) print "";
+        for (i = 0; i < n_lines; i++) {
+          nf = split(line[i], part);
+          fcn = part[nf-SPECIFIC];
+          if (!done[fcn]) {
+            printf "static const struct builtin %s = {", mangle(fcn);
+	    if (GCC) printf " {";
+            ellipsis = 1;
+            for (j = 2; j <= nf-OPN; j++)
+              if (part[j] != "...") {
+                printf " &T_%s,", part[j];
+              } else {
+                ellipsis = -1;
+                printf " NULL,";
+              }
+            while (j++ <= MAXARGS+1)
+              printf " NULL,";
+            instruction = part[nf-INSTRUCTION];
+            if (substr(instruction, 1, 4) == "MOP_")
+              instruction = substr(instruction, 5);
+            if (substr(instruction, length(instruction)) == "D")
+              instruction = (substr(instruction, 1, length(instruction) - 1) ".");
+	    # Gcc3: Prefix each specific instruction with a "*"
+	    if (match (instruction, "^[a-zA-Z]") > 0)
+	      instruction = "*" instruction;
+	    if (GCC) printf " },";
+	    if (GCC) printf " \"%s\",", substr(part[nf-CONSTRAINTS], 1, length(part[nf-CONSTRAINTS]) - 1);
+            printf " &T_%s,", part[nf-RESULT];
+            if (MCC) printf " \"%s\",", part[nf-SPECIFIC];
+            printf " %d,", ellipsis * (nf - NARGS);
+	    if (MCC) {
+	      printf " %s,", part[nf-WHEN];
+	      printf " %s,", part[nf-ADDRESSIBLE];
+	      printf " %s,", part[nf-CONST_PTR_OK];
+	      printf " %s,", part[nf-VOLATILE_PTR_OK];
+	      printf " %s,", part[nf-CONFIGURED];
+	      printf " %s,", part[nf-INSTRUCTION];
+	      printf " %s,", part[nf-TRANSFORM];
+	      printf " %s", part[nf-PREDICATE];
+            } else if (GCC) {
+	      printf " %s,", part[nf-CONST_PTR_OK];
+	      printf " %s,", part[nf-VOLATILE_PTR_OK];
+	      printf " %s,", part[nf-OPTIMIZE];
+	      printf " \"%s\",", part[nf-SPECIFIC];
+	      printf " \"%s\",", instruction;
+	      printf " %s,", part[nf-INSN_CODE];
+	      printf " B_UID(%d)", uid++;
+            }
+            printf " };\n";
+          }
+          done[fcn] = 1;
+        }
+
+        if (GCC) printf "#define LAST_B_UID B_UID(%d)\n", uid;
+
+	if (GCC) {
+	  # Output the description of each specific function.
+	  print "";
+	  uid = 0;
+	  for (i in done)
+	    done[i] = "";
+	  print "const struct builtin * const Builtin[] = {"
+	  for (i = 0; i < n_lines; i++) {
+	    nf = split(line[i], part);
+	    fcn = part[nf-SPECIFIC];
+	    if (!done[fcn]) {
+	      printf "  &%s,\n", mangle(fcn);
+	    }
+	    done[fcn] = 1;
+	  }
+	  print "};"
+	}
+
+        # Output the overload tables for each generic function.
+        print "";
+        for (i = 0; i < n_lines; i++) {
+          nf = split(line[i], part);
+          fcn = part[1];
+          if (last != fcn) 
+            push(fcn, part[nf]);
+          printf "  &%s,\n", mangle(part[nf-SPECIFIC]);
+        }
+        push("", 0);
+
+        # Output the builtin function structure.
+        print "";
+	if (MCC) {
+	  print "%}";
+	  print "struct overloadx {";
+	  print "  char *name;";
+	  print "  int fcns;";
+	  print "  int args;";
+	  print "  struct builtin **functions;";
+	  print "};";
+	  print "%%";
+	} else if (GCC) {
+	  print "const struct overloadx Overload[] = {";
+	}
+
+        # Output the builtin function list and data.
+        uid = 0;
+        for (i = 0; i < n_lines; i++) {
+          nf = split(line[i], part);
+          fcn = part[1];
+          args = nf - NARGS;
+          if (part[nf-OPN] == "...") args = -args;
+          if (last != fcn) {
+	    if (MCC) printf "%s, %d, %d, O_%s\n", fcn, part[nf], args, fcn;
+            if (GCC) printf "  { \"%s\", %d, %d, O_%s, O_UID(%d) },\n", \
+                            fcn, part[nf], args, fcn, uid++;
+	  }
+          last = fcn;
+        }
+
+	if (GCC) {
+          print "  { NULL, 0, 0, NULL, 0 }"
+          print "};";
+
+          printf "#define LAST_O_UID O_UID(%d)\n", uid;
+	}
+
+    }' > $output.$suffix
+
+if [ "$MCC" = "1" ] ; then
+    $gperf > $output.h
+fi

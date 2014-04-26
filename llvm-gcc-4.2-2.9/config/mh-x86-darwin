@@ -1,0 +1,10 @@
+# APPLE LOCAL file dynamic-no-pic
+# The -mdynamic-no-pic ensures that the compiler executable is built without
+# position-independent-code -- the usual default on Darwin.
+
+BOOT_CFLAGS=-g -O2 -mdynamic-no-pic
+
+# LLVM LOCAL
+# For hosts after darwin10 we want to pass in -no-pie
+BOOT_LDFLAGS=`case ${host} in *-*-darwin[1][1-9]*) echo -Wl,-no_pie ;; esac;`
+LDFLAGS=$(BOOT_LDFLAGS)

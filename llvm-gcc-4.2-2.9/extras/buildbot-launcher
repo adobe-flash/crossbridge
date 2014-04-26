@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -e                     # Terminate script at the first line that fails.
+set -o pipefail            # Return the first non-zero pipe command error.
+set -x                     # Print commands as they are executed
+
+# The fist 4 parameters are consumed by this script and they are:
+BUILD_SCRIPT=$1            # Build script name to launch
+shift
+LLVM_SOURCE=$1             # Directory name where the LLVM source code is.
+shift
+LLVM_GCC_SOURCE=$1         # Directory name where the LLVM-GCC source code is.
+shift
+BUILD_DIR=$1               # Path to the build root directory.
+shift
+# The rest of the parameters will pass through.
+
+# The build script expects to be run from the build root directory.
+cd $BUILD_DIR
+
+# The build script expects source code directories in certain place with
+# certain names. Create link only if target directory or link does not exist.
+if [ ! -d $BUILD_DIR/llvm.src ] ; then
+   ln -sf $LLVM_SOURCE $BUILD_DIR/llvm.src
+fi
+if [ ! -d $BUILD_DIR/llvm-gcc.src ] ; then
+   ln -sf $LLVM_GCC_SOURCE $BUILD_DIR/llvm-gcc.src
+fi
+
+# Launch the build script with all the remaining parameters
+$BUILD_SCRIPT $@

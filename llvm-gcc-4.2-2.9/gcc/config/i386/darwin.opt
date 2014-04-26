@@ -1,0 +1,15 @@
+; APPLE LOCAL begin Macintosh alignment 2002-2-19 --ff
+malign-mac68k
+Target Report Mask(ALIGN_MAC68K) Var(darwin_alignment_flags)
+Align structs and unions according to mac68k rules
+
+malign-natural
+Target Report Mask(ALIGN_NATURAL) Var(darwin_alignment_flags)
+Align structs and unions according to natural rules
+
+; Maybe we don't need this.
+;malign-power
+;; I want this to clear MASK_ALIGN_MAC68K | MASK_ALIGN_NATURAL
+;Target Undocumented InverseMask(ALIGN_MAC68K)
+;Align structs and unions according to PowerPC rules
+; APPLE LOCAL end Macintosh alignment 2002-2-19 --ff

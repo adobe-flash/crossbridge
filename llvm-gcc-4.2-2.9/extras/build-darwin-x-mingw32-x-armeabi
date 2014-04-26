@@ -1,0 +1,510 @@
+#!/bin/bash
+
+set -e                     # Terminate script at the first line that fails.
+set -o pipefail            # Return the first non-zero pipe command error.
+set -x                     # Print commands as they are executed
+
+# This script performs a 3 stages automated build on x86_64-apple-darwin10
+# of LLVM mingw32 cross-toolchain for arm-eabi hardfloat.
+# To do so it builds dependencies for this canadian cross as the first 2 stages
+#
+# Stage 1: Builds x86_64-apple-darwin10 cross for i686-pc-mingw32 as
+# --build=x86_64-apple-darwin10
+# --host=x86_64-apple-darwin10
+# --target=i686-pc-mingw32
+#
+# Stage 2: Builds x86_64-apple-darwin10 cross for arm-eabi hardfloat as
+# --build=x86_64-apple-darwin10
+# --host=x86_64-apple-darwin10
+# --target=arm-eabi
+#
+# Stage 3: Using the cross tool-chains from stages 1 and 2 builds
+#          i686-pc-mingw32 cross for i686-pc-mingw32 as
+# --build=x86_64-apple-darwin10
+# --host=i686-pc-mingw32
+# --target=arm-eabi
+
+# This script assumes the valid native compiler for x86_64-apple-darwin10
+# is in place and available as well as cross tools, libraries and
+# headers for mingw and arm-eabi.
+
+# The usage:
+# Run this build from the build from the build root directory as
+# build-darwin-x-mingw32-x-armeabi [<step>] [<extra args>]
+
+# Expected project tree structure:
+# <build root>
+#    +-- ${LLVM_src}
+#    +-- ${LLVM_GCC_src}
+#    +-- ${LLVM_obj_1}        # llvm build directory (stage 1).
+#    +-- ${LLVM_GCC_obj_1}    # llvm-gcc build directory (stage 1).
+#    +-- ${LLVM_obj_2}        # llvm build directory (stage 2).
+#    +-- ${LLVM_GCC_obj_2}    # llvm-gcc build directory (stage 2).
+#    +-- ${LLVM_obj_3}        # llvm build directory (stage 3).
+#    +-- ${LLVM_GCC_obj_3}    # llvm-gcc build directory (stage 3).
+#    +-- ${INSTALL}           # Install directory.
+
+LLVM_src=llvm.src             # The LLVM source code root directory name.
+LLVM_GCC_src=llvm-gcc.src     # The LLVM-GCC source code root directory name.
+
+LLVM_obj_1=llvm_1.obj         # The LLVM build root directory for stage1.
+LLVM_GCC_obj_1=llvm-gcc_1.obj # The LLVM-GCC build root directory for stage1.
+
+LLVM_obj_2=llvm_2.obj         # The LLVM build root directory for stage2.
+LLVM_GCC_obj_2=llvm-gcc_2.obj # The LLVM-GCC build root directory for stage2.
+
+LLVM_obj_3=llvm_3.obj         # The LLVM build root directory for stage2.
+LLVM_GCC_obj_3=llvm-gcc_3.obj # The LLVM-GCC build root directory for stage2.
+
+INSTALL=install               # Where the result will be installed.
+
+# CFLAGS and CXXFLAGS must not be set during the building of cross-tools.
+unset CFLAGS
+unset CXXFLAGS
+
+BUILD_ROOT=$PWD                           # Where build happens.
+PRIVATE_INSTALL=${BUILD_ROOT}/${INSTALL}  # Where the result will be installed.
+
+export PATH=/opt/local/bin:/opt/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin
+export PATH=$PATH:/mingw_build_tools/install/bin
+export PATH=$PATH:/arm-eabi_build_tools/install/bin
+export PATH=$PATH:${PRIVATE_INSTALL}/bin
+
+#------------------------------------------------------------------------------
+# Define build steps, parse and validate input parameters
+#------------------------------------------------------------------------------
+
+# This script supports the following steps:
+do_clean=no                # Clean up the build directory.
+do_copy_cross_tools=no     # Copy cross-tools and newlib.
+
+do_configure_llvm_1=no     # Configure LLVM stage 1.
+do_make_llvm_1=no          # Make LLVM stage 1.
+do_install_llvm_1=no       # Install LLVM stage 1.
+do_test_llvm_1=no          # Test LLVM stage 1.
+do_configure_llvmgcc_1=no  # Configure LLVM-GCC stage 1.
+do_make_llvmgcc_1=no       # Make LLVM-GCC stage 1.
+do_install_llvmgcc_1=no    # Install LLVM-GCC stage 1.
+
+do_configure_llvm_2=no     # Configure LLVM stage 2.
+do_make_llvm_2=no          # Make LLVM stage 2.
+do_install_llvm_2=no       # Install LLVM stage 2.
+do_test_llvm_2=no          # Test LLVM stage 2.
+do_configure_llvmgcc_2=no  # Configure LLVM-GCC stage 2.
+do_make_llvmgcc_2=no       # Make LLVM-GCC stage 2.
+do_install_llvmgcc_2=no    # Install LLVM-GCC stage 2.
+
+do_configure_llvm_3=no     # Configure LLVM stage 3.
+do_make_llvm_3=no          # Make LLVM stage 3.
+do_install_llvm_3=no       # Install LLVM stage 3.
+do_configure_llvmgcc_3=no  # Configure LLVM-GCC stage 3.
+do_make_llvmgcc_3=no       # Make LLVM-GCC stage 3.
+do_install_llvmgcc_3=no    # Install LLVM-GCC stage 3.
+
+do_all=no                  # Runs all steps at once when requested.
+
+# Set step parameter
+if (( $# == 0 )) ; then
+   do_all=yes
+fi
+# else
+if (( ! $# == 0 )) ; then
+   # First check that the parameter actually defines a step.
+   case $1 in
+      clean               |  \
+	  copy_cross_tools    |  \
+	  configure_llvm_1    |  \
+      make_llvm_1         |  \
+	  install_llvm_1      |  \
+      test_llvm_1         |  \
+      configure_llvmgcc_1 |  \
+      make_llvmgcc_1      |  \
+      install_llvmgcc_1   |  \
+      configure_llvm_2    |  \
+      make_llvm_2         |  \
+	  install_llvm_2      |  \
+      test_llvm_2         |  \
+      configure_llvmgcc_2 |  \
+      make_llvmgcc_2      |  \
+      install_llvmgcc_2   |  \
+      configure_llvm_3    |  \
+      make_llvm_3         |  \
+	  install_llvm_3      |  \
+      configure_llvmgcc_3 |  \
+      make_llvmgcc_3      |  \
+      install_llvmgcc_3   |  \
+      all)
+         eval do_$1=yes    # Set the flag for the requested step .
+         shift             # Remove it since is is ours and already precessed.
+         ;;
+
+      *)
+         # Not our parameter. Pass it as is.
+   esac
+fi
+
+# Set all steps if do_all requested
+if [ "$do_all" == "yes" ] ; then
+   # Set all steps to yes
+   do_clean=yes
+   do_copy_cross_tools=yes
+   do_configure_llvm_1=yes
+   do_make_llvm_1=yes
+   do_install_llvm_1=yes
+   do_test_llvm_1=yes
+   do_configure_llvmgcc_1=yes
+   do_make_llvmgcc_1=yes
+   do_install_llvmgcc_1=yes
+   do_configure_llvm_2=yes
+   do_make_llvm_2=yes
+   do_install_llvm_2=yes
+   do_test_llvm_2=yes
+   do_configure_llvmgcc_2=yes
+   do_make_llvmgcc_2=yes
+   do_install_llvmgcc_2=yes   
+   do_configure_llvm_3=yes
+   do_make_llvm_3=yes
+   do_install_llvm_3=yes
+   do_configure_llvmgcc_3=yes
+   do_make_llvmgcc_3=yes
+   do_install_llvmgcc_3=yes
+fi
+
+#------------------------------------------------------------------------------
+# Step: Clean up.
+#------------------------------------------------------------------------------
+if [ "$do_clean" == "yes" ] ; then
+
+   # Remove everything from where we will be installing the result.
+   rm -rf ${PRIVATE_INSTALL}
+   mkdir -p ${PRIVATE_INSTALL}
+   chmod a+rx ${PRIVATE_INSTALL}
+   
+fi
+
+#------------------------------------------------------------------------------
+# Step: Copy newlib.
+#------------------------------------------------------------------------------
+if [ "$do_copy_cross_tools" == "yes" ] ; then
+
+   cp -RL /mingw_build_tools/install/ ${PRIVATE_INSTALL}
+   cp -RL /arm-eabi_build_tools/install/ ${PRIVATE_INSTALL}
+
+   cp -RL /arm-eabi_build_tools/newlib-src/newlib ${BUILD_ROOT}/${LLVM_GCC_src}
+   cp -RL /arm-eabi_build_tools/newlib-src/libgloss \
+      ${BUILD_ROOT}/${LLVM_GCC_src}
+
+fi
+
+#==============================================================================
+# STAGE 1 builds cross llvm-gcc for mingw32.
+#==============================================================================
+
+#------------------------------------------------------------------------------
+# Step: Stage1. Configure LLVM.
+#------------------------------------------------------------------------------
+if [ "$do_configure_llvm_1" == "yes" ] ; then
+
+   # Remove previously build files if any.
+   rm -rf ${BUILD_ROOT}/${LLVM_obj_1}
+   mkdir -p ${BUILD_ROOT}/${LLVM_obj_1}
+   chmod a+rx ${BUILD_ROOT}/${LLVM_obj_1}
+   cd ${BUILD_ROOT}/${LLVM_obj_1}
+   
+   ../${LLVM_src}/configure --prefix=${PRIVATE_INSTALL}           \
+      --build=x86_64-apple-darwin10 --host=x86_64-apple-darwin10  \
+      --target=i686-pc-mingw32                                    \
+      --enable-optimize                                           \
+      --without-llvmgcc --without-llvmgxx                         \
+      $@  # Extra args if any   
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage1. Make LLVM.
+#------------------------------------------------------------------------------
+if [ "$do_make_llvm_1" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_obj_1}
+   # NOTE: Do not build with ENABLE_OPTIMIZED=1 - some test fail after it.   
+   nice -n 20 make VERBOSE=1 \
+      $@  # Extra args if any, like -j16 for example.
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage1. Install LLVM.
+#------------------------------------------------------------------------------
+if [ "$do_install_llvm_1" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_obj_1}
+   nice -n 20 make install VERBOSE=1 \
+      $@  # Extra args if any, like -j16 for example.
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage1. Test LLVM.
+#------------------------------------------------------------------------------
+if [ "$do_test_llvm_1" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_obj_1}
+   make check-lit VERBOSE=1 \
+      $@  # Extra args if any, like -j16 for example.
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage1. Configure LLVM-GCC.
+#------------------------------------------------------------------------------
+if [ "$do_configure_llvmgcc_1" == "yes" ] ; then
+
+   # Remove previously build files if any.
+   rm -rf ${BUILD_ROOT}/${LLVM_GCC_obj_1}
+   mkdir -p ${BUILD_ROOT}/${LLVM_GCC_obj_1}
+   chmod a+rx ${BUILD_ROOT}/${LLVM_GCC_obj_1}
+   cd ${BUILD_ROOT}/${LLVM_GCC_obj_1}  
+   
+   ../${LLVM_GCC_src}/configure --prefix=${PRIVATE_INSTALL}      \
+      --build=x86_64-apple-darwin10 --host=x86_64-apple-darwin10 \
+      --target=i686-pc-mingw32                                   \
+      --with-local-prefix=/tools                                 \
+      --program-prefix=i686-pc-mingw32-                          \
+      --enable-llvm=${BUILD_ROOT}/${LLVM_obj_1}                  \
+      --enable-languages=c,c++                                   \
+      --disable-multilib --disable-nls --disable-shared          \
+      --disable-sjlj-exceptions --disable-__cxa_atexit           \
+      $@  # Extra args if any
+  
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage1. Make LLVM-GCC.
+#------------------------------------------------------------------------------
+if [ "$do_make_llvmgcc_1" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_GCC_obj_1}
+   nice -n 20 make all \
+      $@  # Extra args if any
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage1. Install LLVM-GCC.
+#------------------------------------------------------------------------------
+if [ "$do_install_llvmgcc_1" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_GCC_obj_1}
+   nice -n 20 make install \
+      $@  # Extra args if any
+
+fi
+
+#==============================================================================
+# STAGE 2 builds cross llvm-gcc for arm-eabi.
+#==============================================================================
+
+#------------------------------------------------------------------------------
+# Step: Stage2. Configure LLVM.
+#------------------------------------------------------------------------------
+if [ "$do_configure_llvm_2" == "yes" ] ; then
+
+   # Remove previously build files if any.
+   rm -rf ${BUILD_ROOT}/${LLVM_obj_2}
+   mkdir -p ${BUILD_ROOT}/${LLVM_obj_2}
+   chmod a+rx ${BUILD_ROOT}/${LLVM_obj_2}
+   cd ${BUILD_ROOT}/${LLVM_obj_2}
+   
+   ../${LLVM_src}/configure --prefix=${PRIVATE_INSTALL} \
+      --build=x86_64-apple-darwin10                     \
+      --host=x86_64-apple-darwin10                      \
+      --target=arm-eabi                                 \
+      --enable-optimized                                \
+      --enable-targets=cbe,arm                          \
+      $@  # Extra args if any
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage2. Make LLVM.
+#------------------------------------------------------------------------------
+if [ "$do_make_llvm_2" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_obj_2}
+   # NOTE: Do not build with ENABLE_OPTIMIZED=1 - some test fail after it.   
+   nice -n 20 make VERBOSE=1 \
+      $@  # Extra args if any, like -j16 for example.
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage2. Install LLVM.
+#------------------------------------------------------------------------------
+if [ "$do_install_llvm_2" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_obj_2}
+   nice -n 20 make install VERBOSE=1 \
+      $@  # Extra args if any, like -j16 for example.
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage2. Test LLVM.
+#------------------------------------------------------------------------------
+if [ "$do_test_llvm_2" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_obj_2}
+   make check-lit VERBOSE=1 \
+      $@  # Extra args if any, like -j16 for example.
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage2. Configure LLVM-GCC.
+#------------------------------------------------------------------------------
+if [ "$do_configure_llvmgcc_2" == "yes" ] ; then
+
+   # Remove previously build files if any.
+   rm -rf ${BUILD_ROOT}/${LLVM_GCC_obj_2}
+   mkdir -p ${BUILD_ROOT}/${LLVM_GCC_obj_2}
+   chmod a+rx ${BUILD_ROOT}/${LLVM_GCC_obj_2}
+   cd ${BUILD_ROOT}/${LLVM_GCC_obj_2}  
+   
+   ../${LLVM_GCC_src}/configure --prefix=${PRIVATE_INSTALL} \
+      --build=x86_64-apple-darwin10                         \
+      --host=x86_64-apple-darwin10                          \
+      --target=arm-eabi                                     \
+      --enable-languages=c,c++                              \
+      --disable-nls                                         \
+      --program-prefix=arm-eabi-                            \
+      --with-newlib                                         \
+      --with-headers=yes                                    \
+      --enable-llvm=${BUILD_ROOT}/${LLVM_obj_2}             \
+      --with-cpu=cortex-a8                                  \
+      --with-fpu=neon                                       \
+      --with-float=hard                                     \
+      --with-abi=aapcs                                      \
+      $@  # Extra args if any
+   
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage2. Make LLVM-GCC.
+#------------------------------------------------------------------------------
+if [ "$do_make_llvmgcc_2" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_GCC_obj_2}
+   nice -n 20 make all \
+      $@  # Extra args if any
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage2. Install LLVM-GCC.
+#------------------------------------------------------------------------------
+if [ "$do_install_llvmgcc_2" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_GCC_obj_2}
+   nice -n 20 make install \
+      $@  # Extra args if any
+
+fi
+
+#==============================================================================
+# STAGE 3 builds mingw-hosted llvm-gcc for arm-eabi.
+#==============================================================================
+
+#------------------------------------------------------------------------------
+# Step: Stage3. Configure LLVM.
+#------------------------------------------------------------------------------
+if [ "$do_configure_llvm_3" == "yes" ] ; then
+
+   # Remove previously build files if any.
+   rm -rf ${BUILD_ROOT}/${LLVM_obj_3}
+   mkdir -p ${BUILD_ROOT}/${LLVM_obj_3}
+   chmod a+rx ${BUILD_ROOT}/${LLVM_obj_3}
+   cd ${BUILD_ROOT}/${LLVM_obj_3}
+   
+   ../${LLVM_src}/configure --prefix=${PRIVATE_INSTALL} \
+      --build=x86_64-apple-darwin10                     \
+      --host=i686-pc-mingw32 --target=arm-eabi          \
+      --enable-optimized                                \
+      --enable-targets=cbe,arm                          \
+      $@  # Extra args if any
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage3. Make LLVM.
+#------------------------------------------------------------------------------
+if [ "$do_make_llvm_3" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_obj_3}
+   # NOTE: Do not build with ENABLE_OPTIMIZED=1 - some test fail after it.   
+   nice -n 20 make VERBOSE=1 \
+      $@  # Extra args if any, like -j16 for example.
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage3. Install LLVM.
+#------------------------------------------------------------------------------
+if [ "$do_install_llvm_3" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_obj_3}
+   nice -n 20 make install VERBOSE=3 \
+      $@  # Extra args if any, like -j16 for example.
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage3. Configure LLVM-GCC.
+#------------------------------------------------------------------------------
+if [ "$do_configure_llvmgcc_3" == "yes" ] ; then
+
+   # Remove previously build files if any.
+   rm -rf ${BUILD_ROOT}/${LLVM_GCC_obj_3}
+   mkdir -p ${BUILD_ROOT}/${LLVM_GCC_obj_3}
+   chmod a+rx ${BUILD_ROOT}/${LLVM_GCC_obj_3}
+   cd ${BUILD_ROOT}/${LLVM_GCC_obj_3}  
+   
+   ../${LLVM_GCC_src}/configure --prefix=${PRIVATE_INSTALL} \
+      --build=x86_64-apple-darwin10                         \
+      --host=i686-pc-mingw32 --target=arm-eabi              \
+      --enable-languages=c,c++                              \
+      --disable-nls                                         \
+      --program-prefix=arm-eabi-                            \
+      --with-newlib                                         \
+      --with-headers=yes                                    \
+      --enable-llvm=${BUILD_ROOT}/${LLVM_obj_3}             \
+      --with-cpu=cortex-a8                                  \
+      --with-fpu=neon                                       \
+      --with-float=hard                                     \
+      --with-abi=aapcs                                      \
+      $@  # Extra args if any
+   
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage3. Make LLVM-GCC.
+#------------------------------------------------------------------------------
+if [ "$do_make_llvmgcc_3" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_GCC_obj_3}
+   nice -n 20 make all \
+      $@  # Extra args if any
+
+fi
+
+#------------------------------------------------------------------------------
+# Step: Stage3. Install LLVM-GCC.
+#------------------------------------------------------------------------------
+if [ "$do_install_llvmgcc_3" == "yes" ] ; then
+
+   cd ${BUILD_ROOT}/${LLVM_GCC_obj_3}
+   nice -n 20 make install \
+      $@  # Extra args if any
+
+fi
+
+

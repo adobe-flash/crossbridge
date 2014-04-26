@@ -375,7 +375,6 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_SDL).tar.gz
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# unzip packages
-	unzip -q packages/$(DEPENDENCY_LLVM_GCC).zip
 	mkdir -p $(DEPENDENCY_SCIMARK)
 	cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
 	# apply patches
@@ -394,7 +393,6 @@ clean_libs:
 	rm -rf $(DEPENDENCY_ICONV)
 	rm -rf $(DEPENDENCY_JPEG)
 	rm -rf $(DEPENDENCY_LIBPNG)
-	rm -rf $(DEPENDENCY_LLVM_GCC)
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)

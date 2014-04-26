@@ -1,0 +1,77 @@
+; Processor-independent options for Darwin.
+
+; Copyright (C) 2005 Free Software Foundation, Inc.
+;
+; This file is part of GCC.
+;
+; GCC is free software; you can redistribute it and/or modify it under
+; the terms of the GNU General Public License as published by the Free
+; Software Foundation; either version 2, or (at your option) any later
+; version.
+;
+; GCC is distributed in the hope that it will be useful, but WITHOUT ANY
+; WARRANTY; without even the implied warranty of MERCHANTABILITY or
+; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+; for more details.
+;
+; You should have received a copy of the GNU General Public License
+; along with GCC; see the file COPYING.  If not, write to the Free
+; Software Foundation, 51 Franklin Street, Fifth Floor, Boston, MA
+; 02110-1301, USA.
+
+mfix-and-continue
+Target Report Var(darwin_fix_and_continue)
+Generate code suitable for fast turn around debugging
+
+; APPLE LOCAL begin ARM 5683689
+mmacosx-version-min=
+Target Joined Report Var(darwin_macosx_version_min) Init(NULL)
+The earliest MacOS X version on which this program will run
+
+miphoneos-version-min=
+Target Joined Report Var(darwin_iphoneos_version_min) Init(NULL)
+The earliest iPhone OS version on which this program will run
+; APPLE LOCAL end ARM 5683689
+
+mone-byte-bool
+Target RejectNegative Report Var(darwin_one_byte_bool)
+Set sizeof(bool) to 1
+
+; APPLE LOCAL begin AT&T-style stub 4164563
+matt-stubs
+Target Report Var(darwin_macho_att_stub) Init(1)
+Generate AT&T-style stubs for Mach-O
+; APPLE LOCAL end AT&T-style stub 4164563
+
+; APPLE LOCAL begin constant cfstrings
+mconstant-cfstrings
+Target Report Var(darwin_constant_cfstrings) Init(-1)
+Generate compile-time CFString objects
+
+mwarn-nonportable-cfstrings
+Target Report Var(darwin_warn_nonportable_cfstrings) Init(1)
+Warn if constant CFString objects contain non-portable characters
+
+mpascal-strings
+Target Report Var(darwin_pascal_strings)
+Allow use of Pascal strings
+; APPLE LOCAL end constant cfstrings
+
+; APPLE LOCAL begin mdynamic-no-pic
+mdynamic-no-pic
+Target Report Mask(MACHO_DYNAMIC_NO_PIC)
+Generate code suitable for executables (NOT shared libs)
+; APPLE LOCAL end mdynamic-no-pic
+
+fapple-kext
+Target Report Var(flag_apple_kext)
+Generate code for darwin loadable kernel extentions
+
+mkernel
+Target Report Var(flag_mkernel)
+Generate code for the kernel or loadable kernel extentions
+
+; APPLE LOCAL begin 5971844
+mdarwin-rtl-pre-ignore-critical-edges
+Target Report Var(flag_darwin_rtl_pre_ignore_critical_edges)
+; APPLE LOCAL end 5971844

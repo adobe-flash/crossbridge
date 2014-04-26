@@ -1,0 +1,8 @@
+# APPLE LOCAL file mainline
+# This file should go away.
+host-x86_64-darwin.o : $(srcdir)/config/i386/host-x86_64-darwin.c \
+  $(CONFIG_H) $(SYSTEM_H) coretypes.h hosthooks.h $(HOSTHOOKS_DEF_H) \
+  config/host-darwin.h
+	$(CC) -c $(ALL_CFLAGS) $(ALL_CPPFLAGS) $(INCLUDES) $<
+
+XCFLAGS = 

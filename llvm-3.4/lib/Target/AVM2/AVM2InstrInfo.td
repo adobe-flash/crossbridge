@@ -658,7 +658,7 @@ def FCOS : InstAVM2<(outs FPRegs:$dst), (ins FPRegs:$src), "$dst = Math.cos($src
 def FSQRT : InstAVM2<(outs FPRegs:$dst), (ins FPRegs:$src), "$dst = Math.sqrt($src)",
   [(set FPRegs:$dst, (fsqrt FPRegs:$src))]>;
 
-def fpow      : SDNode<"ISD::FPOW"      , SDTFPBinOp>;
+//def fpow      : SDNode<"ISD::FPOW"      , SDTFPBinOp>;
 def FPOW : InstAVM2<(outs FPRegs:$dst), (ins FPRegs:$base, FPRegs:$pow), "$dst = Math.pow($base, $pow)",
   [(set FPRegs:$dst, (fpow FPRegs:$base, FPRegs:$pow))]>;
 

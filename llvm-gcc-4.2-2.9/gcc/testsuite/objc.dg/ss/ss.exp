@@ -1,0 +1,230 @@
+# APPLE LOCAL file
+#   Copyright (C) 2005 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  
+
+# GCC testsuite for symbol separation interaction,
+# that uses the `dg.exp' driver.
+
+# Load support procs.
+load_lib objc-dg.exp
+
+# Initialize `dg'.
+dg-init
+
+# Get checksum (first field of BINCL and EXCL stab information 
+proc get_checksum {input_file search_string} {
+    global RESULT nshort
+
+    # Regular expression to extract hexadecimal word
+    set hexexp {[0-9a-fA-F]+}
+
+    # Do nm on input_file and grep for search_string
+    set tmp [remote_exec host "nm -ap $input_file"]
+    set status [lindex $tmp 0];
+    set output [lindex $tmp 1];
+
+    if {$status != 0} {
+	fail "$nshort test checksum"
+    } else {
+	pass "$nshort test checksum"
+    }
+
+    regexp $hexexp $output RESULT;
+
+    # Return check sum
+    return $RESULT
+}
+
+set old_dg_do_what_default "${dg-do-what-default}"
+
+# Main loop.
+foreach test [lsort [glob -nocomplain $srcdir/$subdir/*.m]] {
+    global runtests torture_without_loops dg-do-what-default nshort
+
+    # If we're only testing specific files and this isn't one of them, skip it.
+    if ![runtest_file_p $runtests $test] {
+        continue
+    }
+
+    # [file tail name] returns part of name after last /
+    set nshort "$subdir/[file tail $test]"
+    set short_bname "[file rootname [file tail $test]]"
+    set bname "[file rootname $test]"
+    set ss_exp_debug 0
+
+    # We don't try to use the loop-optimizing options, since they are highly
+    # unlikely to make any difference to CINFO.
+    foreach flags "[list {-gstabs+ -gfull}]" {
+        verbose "Testing $nshort, $flags" 1
+
+        # Clean up
+        catch { file delete "$bname.h" }
+        catch { file delete "$bname.o" }
+        catch { file delete "$bname.h.o" }
+
+        if {$ss_exp_debug == 1} {
+            puts "ss_exp_debug: various names"
+            puts "ss_exp_debug bname:";       puts $bname
+            puts "ss_exp_debug bname.ssh:";   puts $bname.ssh
+            puts "ss_exp_debug test:";        puts $test
+            puts "ss_exp_debug short_bname:"; puts $short_bname
+        }
+
+        # 1) compile foo.h to create foo.h.o
+        if { [ file exists "$bname.ssh" ] } {
+
+            # For the header files, the default is to make repository
+            set dg-do-what-default assemble
+
+            # Header files are supplied using .ssh extension, so that we can
+            # identify candidates for makeing symbol repository. Get header copy
+            # with .h here.
+            file copy -force "$bname.ssh" "$bname.h"
+            file copy -force "$bname.ssh" "$short_bname.h"
+
+            # Make repository
+            # This will create two output files $short_bname.h.o and PCH
+            dg-test -keep-output "$bname.h" $flags "-fsave-repository=$short_bname.h.o -x objective-c-header"
+
+            if { [ file exists "$short_bname.o" ] } {
+                file rename -force "$short_bname.h.o" "$bname.h.o"
+
+                # Do nm on $bname.h.o and grep for "BINCL $bname.h"
+                # Extract dummy-checksum from the grep result and save it in RESULT1
+                set RESULT1 [get_checksum $bname.h.o "BINCL $bname.h"]
+
+                if {$ss_exp_debug == 1} {
+                    puts "ss_exp_debug: RESULT1"; puts $RESULT1
+                }
+
+                pass "$nshort $flags Make Repository"
+            } else {
+                set RESULT1 " "
+                fail "$nshort $flags Make Repository"
+            }
+
+            if { [ file exists "$bname.h.o" ] } {
+
+                # 2) compile foo.c to create foo.o
+                dg-test -keep-output $test $flags "-I. "
+                if { [ file exists "$short_bname.o" ] } {
+
+                    # Do nm on $bname.o and grep for "EXCL $bname.h"
+                    # Extract dummy-checksum from the grep result and save it in RESULT2
+                    set RESULT2 [get_checksum $short_bname.o "EXCL $bname.h"]
+
+                    if {$ss_exp_debug == 1} {
+                        puts "ss_exp_debug: RESULT2"; puts $RESULT2
+                    }
+
+                    pass "$nshort $flags Use symbol repository"
+
+                } else {
+                    set RESULT2 " "
+                    fail "$nshort $flags Use symbol repository"
+                }
+
+            
+                if { [ file exists "$bname.part_2.c" ] } {
+                    
+                    # 3) compile foo_part_2.c to create foo_part_2.o
+                    dg-test -keep-output "$bname_part_2.c" $flags "-I. -grepository"
+                    if { [ file exists "$short_bname_part_2.o" ] } {
+
+                        # Do nm on $bname_part_2.o and grep for "EXCL $bname.h"
+                        # Extract dummy-checksum from the grep result and save it in RESULT3
+                        set RESULT3 [get_checksum $short_bname_part_2.o "EXCL $bname.h"]
+
+                        if {$ss_exp_debug == 1} {
+                            puts "ss_exp_debug: RESULT3"; puts $RESULT3
+                        }
+
+                        pass "$nshort $flags Use symbol repository"
+
+                    } else {
+                        set RESULT3 " "
+                        fail "$nshort $flags Use symbol repository"
+                    }
+
+                    # 4) Link foo.h.o and foo.o to create foo
+                    set dg-do-what-default link
+                    dg-test -keep-output "$bname.h.o" "$bname.o"  "-o $short_bname.out"
+
+                    # 5) do 'nm |grep ' on final assembler and save result in RES4
+                    # Do nm on $bname.out and grep for "EXCL $bname.h"
+                    # Extract dummy-checksum from the grep result and save it in RESULT4
+                    set RESULT4 [get_checksum $short_bname.out "EXCL $bname.h"]
+
+                    # Do nm on $bname.out and grep for "BINCL $bname.h"
+                    # Extract dummy-checksum from the grep result and save it in RESULT5
+                    set RESULT5 [get_checksum $short_bname.out "BINCL $bname.h"]
+
+                    if {$ss_exp_debug == 1} {
+                        puts "ss_exp_debug: RESULT4"; puts $RESULT4
+                        puts "ss_exp_debug: RESULT5"; puts $RESULT5
+                    }
+
+                    pass "$nshort $flags symbol separation: linking"
+
+                } else {
+
+                    # If we are not testing second part then set values so that comparison test succeeds
+                    set RESULT3 $RESULT2
+                    set RESULT4 $RESULT2
+                    set RESULT5 $RESULT2
+                    if {$ss_exp_debug == 1} {
+                        puts "ss_exp_debug: RESULT3"; puts $RESULT3
+                        puts "ss_exp_debug: RESULT4"; puts $RESULT4
+                        puts "ss_exp_debug: RESULT5"; puts $RESULT5
+                    }
+                }
+
+                # 6) Compare RES1 and RES2 and RES3 and RES4
+                if { ( $RESULT1 == $RESULT2 )
+                     && ( $RESULT1 == $RESULT3 ) 
+                     && ( $RESULT1 == $RESULT4 ) } {
+                    pass "$nshort $flags symbol separation valid use test"
+                } else {
+                    fail "$nshort $flags symbol separation valid use test"
+                }
+                if { ( $RESULT1 == $RESULT5 ) } {
+                    pass "$nshort $flags symbol separation link test"
+                } else {
+                    fail "$nshort $flags symbol separation link test"
+                }
+		pass "$nshort $flags Make repository"
+            } else {
+                fail "$nshort $flags Make repository"
+            }
+        } else {
+
+            # Normal test
+            set dg-do-what-default compile
+            dg-test -keep-output $test $flags "-I."
+        }
+
+    }
+
+    # Clean up
+    catch { file delete "$bname.h" }
+    catch { file delete "$bname.o" }
+    catch { file delete "$bname.h.o" }
+}
+
+set dg-do-what-default "$old_dg_do_what_default"
+
+# All done.
+dg-finish

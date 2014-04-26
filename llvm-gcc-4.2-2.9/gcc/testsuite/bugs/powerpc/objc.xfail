@@ -1,0 +1,86 @@
+# APPLE LOCAL file testsuite
+###
+### List of failing tests with Radar bug numbers
+### <radarNum>: <test name>
+### test name should be exactly as it appears html summary reports
+### including any trailing #<number>
+###
+### When the bug is fixed and the test passes, it will be an
+### analyzed non-fail. You should then comment out the test in this
+### file and make sure the Radar is closed.
+###
+###------------------------------------------------------------------
+#
+5405050: objc.dg/encode-7.m (test for excess errors)
+5405050: objc.dg/encode-8.m (test for excess errors)
+5405050: objc.dg/gnu-runtime-3.m (test for excess errors)
+5405050: objc.dg/type-stream-1.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t001_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t002_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t003_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t004_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t005_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t006_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t007_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t008_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t009_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t010_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t011_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t012_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t013_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t014_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t015_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t016_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t017_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t018_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t019_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t020_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t021_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t022_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t023_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t024_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t025_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t026_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t027_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t028_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t029_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t030_main.m (test for excess errors)
+5095016: objc.dg-struct-layout-encoding-1/t031_main.m (test for excess errors)
+#
+# the following fail with -m64 only
+5297256: objc/execute/exceptions/foward-1.m execution,  -O0  -fnext-runtime
+5297256: objc/execute/exceptions/foward-1.m execution,  -O1  -fnext-runtime
+5297256: objc/execute/exceptions/foward-1.m execution,  -O2  -fnext-runtime
+5297256: objc/execute/exceptions/foward-1.m execution,  -O3 -fomit-frame-pointer  -fnext-runtime
+5297256: objc/execute/exceptions/foward-1.m execution,  -O3 -fomit-frame-pointer -funroll-loops  -fnext-runtime
+5297256: objc/execute/exceptions/foward-1.m execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  -fnext-runtime
+5297256: objc/execute/exceptions/foward-1.m execution,  -O3 -g  -fnext-runtime
+5297256: objc/execute/exceptions/foward-1.m execution,  -Os  -fnext-runtime
+5297256: objc/execute/exceptions/foward-1.m execution,  -fast  -fnext-runtime
+#
+# the following fail for ppc only
+5303263: objc.dg/encode-8.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t001_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t005_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t009_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t010_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t013_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t014_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t016_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t017_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t018_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t019_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t020_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t021_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t023_main.m execution test
+5303263: objc.dg-struct-layout-encoding-1/t024_main.m execution test
+#
+# the following fail for ppc 32-bit only
+#
+# the following fail for ppc 64-bit only
+#
+# the following fail for x86
+#
+# the following failures are for x86 -m64 only 
+#
+# the following failures are for -mmacosx-version-min=10.5 only
