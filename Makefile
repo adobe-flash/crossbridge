@@ -343,7 +343,7 @@ all_ci:
 
 # Used to debug specific target
 all_dev:
-	@$(SDK)/usr/bin/make swig
+	@$(SDK)/usr/bin/make llvm
 
 # ====================================================================================
 # CORE
