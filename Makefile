@@ -341,7 +341,7 @@ all_ci:
 
 # Used to debug specific target
 all_dev:
-	@$(SDK)/usr/bin/make swig
+	@$(SDK)/usr/bin/make checkasm
 
 # ====================================================================================
 # CORE
@@ -1282,11 +1282,17 @@ finalcleanup:
 # ====================================================================================
 
 # TBD
-submittests: pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
+submittests: aliastest pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
 			hellocpp_shell hellocpp_swf hellocpp_swf_opt posixtest scimark scimark_swf \
 			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest samples
 	cd samples && $(MAKE) clean
 	cat $(BUILD)/scimark/result.txt
+
+# TBD
+aliastest:
+	mkdir -p $(BUILD)/aliastest
+	cd $(BUILD)/aliastest && $(SDK)/usr/bin/llvm-as $(SRCROOT)/test/aliastest.ll -o aliastest.bc
+	cd $(BUILD)/aliastest && $(SDK)/usr/bin/llc -jvm=$(JAVA) aliastest.bc -filetype=asm -o aliastest.s
 
 # TBD
 pthreadsubmittests_shell: pthreadsubmittests_shell_compile pthreadsubmittests_shell_run
@@ -1521,33 +1527,26 @@ checkasm:
 	$(PYTHON) $(SRCROOT)/tools/search_headers.py $(SDK) $(BUILD)/header-search
 
 # TBD
-# TODO: Not in build
-aliastest:
-	mkdir -p $(BUILD)/aliastest
-	cd $(BUILD)/aliastest && $(SDK)/usr/bin/llvm-as $(SRCROOT)/test/aliastest.ll -o aliastest.bc
-	cd $(BUILD)/aliastest && $(SDK)/usr/bin/llc -jvm=$(JAVA) aliastest.bc -filetype=asm -o aliastest.s
-
-# TBD
-# TODO: Not in build
+# TODO: Undefined references in libthr (___sys_swapcontext, _check_suspend)
 avm2_ui_thunk_test:
 	@mkdir -p $(BUILD)/avm2_ui_thunk_test
-	java -jar $(SDK)/usr/lib/asc2.jar -merge -md -AS3 -strict -optimize \
-		-import $(SDK)/usr/lib/builtin.abc -import $(SDK)/usr/lib/playerglobal.abc \
-		-import $(SDK)/usr/lib/ISpecialFile.abc -import $(SDK)/usr/lib/IBackingStore.abc \
-		-import $(SDK)/usr/lib/IVFS.abc -import $(SDK)/usr/lib/InMemoryBackingStore.abc \
-		-import $(SDK)/usr/lib/AlcVFSZip.abc -import $(SDK)/usr/lib/CModule.abc \
-		-import $(SDK)/usr/lib/C_Run.abc -import $(SDK)/usr/lib/BinaryData.abc \
-		-import $(SDK)/usr/lib/PlayerKernel.abc \
-		test/avm2_ui_thunk.as -config CONFIG::BACKGROUND=false -config CONFIG::ASYNC=true -outdir $(BUILD)/avm2_ui_thunk_test -out ConsoleAsync
+	java -jar $(call nativepath,$(SDK)/usr/lib/asc2.jar) -merge -md -AS3 -strict -optimize \
+		-import $(call nativepath,$(SDK)/usr/lib/builtin.abc) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/ISpecialFile.abc) -import $(call nativepath,$(SDK)/usr/lib/IBackingStore.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/IVFS.abc) -import $(call nativepath,$(SDK)/usr/lib/InMemoryBackingStore.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) -import $(call nativepath,$(SDK)/usr/lib/CModule.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/C_Run.abc) -import $(call nativepath,$(SDK)/usr/lib/BinaryData.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/PlayerKernel.abc) \
+		test/avm2_ui_thunk.as -config CONFIG::BACKGROUND=false -config CONFIG::ASYNC=true -outdir $(call nativepath,$(BUILD)/avm2_ui_thunk_test) -out ConsoleAsync
 
-	java -jar $(SDK)/usr/lib/asc2.jar -merge -md -AS3 -strict -optimize \
-		-import $(SDK)/usr/lib/builtin.abc -import $(SDK)/usr/lib/playerglobal.abc \
-		-import $(SDK)/usr/lib/ISpecialFile.abc -import $(SDK)/usr/lib/IBackingStore.abc \
-		-import $(SDK)/usr/lib/IVFS.abc -import $(SDK)/usr/lib/InMemoryBackingStore.abc \
-		-import $(SDK)/usr/lib/AlcVFSZip.abc -import $(SDK)/usr/lib/CModule.abc \
-		-import $(SDK)/usr/lib/C_Run.abc -import $(SDK)/usr/lib/BinaryData.abc \
-		-import $(SDK)/usr/lib/PlayerKernel.abc \
-		test/avm2_ui_thunk.as -config CONFIG::BACKGROUND=true -config CONFIG::ASYNC=false -outdir $(BUILD)/avm2_ui_thunk_test -out ConsoleBackground
+	java -jar $(call nativepath,$(SDK)/usr/lib/asc2.jar) -merge -md -AS3 -strict -optimize \
+		-import $(call nativepath,$(SDK)/usr/lib/builtin.abc) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/ISpecialFile.abc) -import $(call nativepath,$(SDK)/usr/lib/IBackingStore.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/IVFS.abc) -import $(call nativepath,$(SDK)/usr/lib/InMemoryBackingStore.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) -import $(call nativepath,$(SDK)/usr/lib/CModule.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/C_Run.abc) -import $(call nativepath,$(SDK)/usr/lib/BinaryData.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/PlayerKernel.abc) \
+		test/avm2_ui_thunk.as -config CONFIG::BACKGROUND=true -config CONFIG::ASYNC=false -outdir $(call nativepath,$(BUILD)/avm2_ui_thunk_test) -out ConsoleBackground
 
 	cd $(BUILD)/avm2_ui_thunk_test && $(SDK)/usr/bin/$(FLASCC_CC) -pthread $(SRCROOT)/test/avm2_ui_thunk.c -symbol-abc=ConsoleBackground.abc -emit-swf -o avm2_ui_thunk_background.swf
 	cd $(BUILD)/avm2_ui_thunk_test && $(SDK)/usr/bin/$(FLASCC_CC) -pthread $(SRCROOT)/test/avm2_ui_thunk.c -symbol-abc=ConsoleAsync.abc -emit-swf -o avm2_ui_thunk_async.swf
