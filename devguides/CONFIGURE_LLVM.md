@@ -1,6 +1,6 @@
-`configure' configures llvm 2.9 to adapt to many kinds of systems.
+`configure' configures LLVM 3.2svn to adapt to many kinds of systems.
 
-Usage: ./configure [OPTION]... [VAR=VALUE]...
+Usage: llvm-3.2/configure [OPTION]... [VAR=VALUE]...
 
 To assign environment variables (e.g., CC, CFLAGS...), specify them as
 VAR=VALUE.  See below for descriptions of some of the useful variables.
@@ -46,7 +46,7 @@ Fine tuning of the installation directories:
   --infodir=DIR          info documentation [DATAROOTDIR/info]
   --localedir=DIR        locale-dependent data [DATAROOTDIR/locale]
   --mandir=DIR           man documentation [DATAROOTDIR/man]
-  --docdir=DIR           documentation root [DATAROOTDIR/doc/-llvm-]
+  --docdir=DIR           documentation root [DATAROOTDIR/doc/llvm]
   --htmldir=DIR          html documentation [DOCDIR]
   --dvidir=DIR           dvi documentation [DOCDIR]
   --pdfdir=DIR           pdf documentation [DOCDIR]
@@ -61,9 +61,13 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-polly          Use polly if available (default is YES)
-  --enable-optimized      Compile with optimizations enabled (default is YES)
+  --enable-libcpp         Use libc++ if available (default is NO)
+  --enable-cxx11          Use c++11 if available (default is NO)
+  --enable-optimized      Compile with optimizations enabled (default is NO)
   --enable-profiling      Compile with profiling enabled (default is NO)
-  --enable-assertions     Compile with assertion checks enabled (default is NO)
+  --enable-assertions     Compile with assertion checks enabled (default is
+                          YES)
+  --enable-werror         Compile with -Werror enabled (default is NO)
   --enable-expensive-checks
                           Compile with expensive debug checks enabled (default
                           is NO)
@@ -71,6 +75,7 @@ Optional Features:
                           NO)
   --enable-debug-symbols  Build compiler with debug symbols (default is NO if
                           optimization is on and YES if it's off)
+  --enable-keep-symbols   Do not strip installed executables)
   --enable-jit            Enable Just In Time Compiling (default is YES)
   --enable-docs           Build documents (default is YES)
   --enable-doxygen        Build doxygen documentation (default is NO)
@@ -81,16 +86,18 @@ Optional Features:
   --enable-shared         Build a shared library and link tools against it
                           (default is NO)
   --enable-embed-stdcxx   Build a shared library with embedded libstdc++ for
-                          Win32 DLL (default is YES)
+                          Win32 DLL (default is NO)
   --enable-timestamps     Enable embedding timestamp information in build
                           (default is YES)
+  --enable-backtraces     Enable embedding backtraces on crash (default is
+                          YES)
   --enable-targets        Build specific host targets: all or
                           target1,target2,... Valid targets are: host, x86,
-                          x86_64, sparc, powerpc, alpha, arm, mips, spu,
-                          xcore, msp430, systemz, blackfin, ptx, cbe, and cpp
-                          (default=all)
-  --enable-cbe-printf-a   Enable C Backend output with hex floating point via
-                          %a (default is YES)
+                          x86_64, sparc, powerpc, arm, mips, spu, hexagon,
+                          xcore, msp430, nvptx, and cpp (default=all)
+  --enable-experimental-targets
+                          Build experimental host targets: disable or
+                          target1,target2,... (default=disable)
   --enable-bindings       Build specific language bindings:
                           all,auto,none,{binding-name} (default=auto)
   --enable-libffi         Check for the presence of libffi (default is NO)
@@ -99,40 +106,30 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-llvmgccdir       Specify location of llvm-gcc install dir (default
-                          searches PATH)
-  --with-llvmgcc          Specify location of llvm-gcc driver (default
-                          searches PATH)
-  --with-llvmgxx          Specify location of llvm-g++ driver (default
-                          searches PATH)
-  --with-clang            Specify location of clang compiler (default is
-                          --with-built-clang)
-  --with-built-clang      Use the compiled Clang as the LLVM compiler
-                          (default=check)
   --with-optimize-option  Select the compiler options to use for optimized
                           builds
   --with-extra-options    Specify additional options to compile LLVM with
+  --with-extra-ld-options Specify additional options to link LLVM with
   --with-ocaml-libdir     Specify install location for ocaml bindings (default
                           is stdlib)
+  --with-clang-srcdir     Directory to the out-of-tree Clang source
   --with-clang-resource-dir
                           Relative directory from the Clang binary for
                           resource files
   --with-c-include-dirs   Colon separated list of directories clang will
                           search for headers
-  --with-cxx-include-root Directory with the libstdc++ headers.
-  --with-cxx-include-arch Architecture of the libstdc++ headers.
-  --with-cxx-include-32bit-dir
-                          32 bit multilib dir.
-  --with-cxx-include-64bit-dir
-                          64 bit multilib directory.
+  --with-gcc-toolchain    Directory where gcc is installed.
+  --with-default-sysroot  Add --sysroot=<path> to all compiler invocations.
   --with-binutils-include Specify path to binutils/include/ containing
                           plugin-api.h file for gold plugin.
-  --with-tclinclude       directory where tcl headers are
-  --with-llvmcc=<name>    Choose the LLVM capable compiler to use (llvm-gcc,
-                          clang, or none; default=check)
+  --with-bug-report-url   Specify the URL where bug reports should be
+                          submitted (default=http://llvm.org/bugs/)
+  --with-internal-prefix  Installation directory for internal files
   --with-udis86=<path>    Use udis86 external x86 disassembler library
   --with-oprofile=<prefix>
                           Tell OProfile >= 0.9.4 how to symbolize JIT output
+  --with-intel-jitevents  Notify Intel JIT profiling API of generated code
+
 
 Some influential environment variables:
   CC          C compiler command
@@ -141,11 +138,11 @@ Some influential environment variables:
               nonstandard directory <lib dir>
   CPPFLAGS    C/C++/Objective C preprocessor flags, e.g. -I<include dir> if
               you have headers in a nonstandard directory <include dir>
-  CPP         C preprocessor
   CXX         C++ compiler command
   CXXFLAGS    C++ compiler flags
+  CPP         C preprocessor
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
 
-Report bugs to <llvmbugs@cs.uiuc.edu>.
+Report bugs to <http://llvm.org/bugs/>.

@@ -285,14 +285,19 @@ nightly:
 	rm -rf $(CCACHE_DIR)
 	$(MAKE) all
 	$(MAKE) libsdl_configure
-	$(MAKE) ieeetests_conversion
-	$(MAKE) ieeetests_basicops
-	$(MAKE) swigtests
-	#$(MAKE)checkasm
+	$(MAKE) all_tests
 
 # Weekly tests
 weekly:
 	$(MAKE) nightly
+
+# tests not in submittests target
+all_tests:
+	@$(SDK)/usr/bin/make llvmtests
+	@$(SDK)/usr/bin/make ieeetests_conversion
+	@$(SDK)/usr/bin/make ieeetests_basicops
+	@$(SDK)/usr/bin/make swigtests
+	#$(SDK)/usr/bin/make checkasm
 
 # We are ignoring some target errors because of issues with documentation generation
 all_ci:
@@ -599,10 +604,10 @@ llvmtests:
 	rm -rf $(BUILD)/llvm-tests
 	mkdir -p $(BUILD)/llvm-tests
 	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
-	cd $(BUILD)/llvm-tests && $(SRCROOT)/$(DEPENDENCY_LLVM)/configure --with-llvmgcc=$(SDK)/usr/bin/$(FLASCC_CC) --with-llvmgxx=$(SDK)/usr/bin/$(FLASCC_CXX) --without-f2c --without-f95 --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
+	cd $(BUILD)/llvm-tests && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_LLVM)/configure --disable-polly --without-f2c --without-f95 --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
 	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
-	cd $(BUILD)/llvm-tests/projects/test-suite/MultiSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
-	cd $(BUILD)/llvm-tests/projects/test-suite/SingleSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
+	cd $(BUILD)/llvm-tests/projects/test-suite/MultiSource && (LANG=C && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
+	cd $(BUILD)/llvm-tests/projects/test-suite/SingleSource && (LANG=C && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
 	$(PYTHON) $(SRCROOT)/tools/llvmtestcheck.py --srcdir $(SRCROOT)/$(DEPENDENCY_LLVM)/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ --fpcmp $(FPCMP)> $(BUILD)/llvm-tests/passfail.txt
 	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_llvm.txt
 
