@@ -157,7 +157,7 @@ protected:
   void EmitW64Tables();
 
   virtual void EmitRawTextImpl(StringRef String);
-
+    
 public:
   virtual ~MCStreamer();
 
@@ -667,7 +667,12 @@ public:
   /// the specified string in the output .s file.  This capability is
   /// indicated by the hasRawTextSupport() predicate.  By default this aborts.
   void EmitRawText(const Twine &String);
-
+  
+  // AVM2 Specific
+  virtual void EmitRawTextAsm(StringRef String);
+  void EmitRawTextAsm(const Twine &String);
+  // AVM2 Specific
+  
   /// Flush - Causes any cached state to be written out.
   virtual void Flush() {}
 
