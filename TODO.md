@@ -236,3 +236,12 @@
 > awk: ./confMGZtSm/subs.awk:1: BEGIN {\r
 > awk: ./confMGZtSm/subs.awk:1:        ^ syntax error
 > config.status: error: could not create Makefile
+
+## CB-0022
+* Description: Cannot build lib libcxxabi
+* Estimate: 1 days
+* Status: In progress
+* Relates to CB-0004
+* Exception: 
+
+> TBD
