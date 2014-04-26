@@ -344,6 +344,17 @@ all_ci:
 # Used to debug specific target
 all_dev:
 	@$(SDK)/usr/bin/make llvm
+	@$(SDK)/usr/bin/make stdlibs
+	@$(SDK)/usr/bin/make as3xx
+	@$(SDK)/usr/bin/make as3wig
+	@$(SDK)/usr/bin/make abcstdlibs
+	@$(SDK)/usr/bin/make sdkcleanup
+	@$(SDK)/usr/bin/make tr
+	@$(SDK)/usr/bin/make trd
+	@$(SDK)/usr/bin/make extralibs
+	@$(SDK)/usr/bin/make -i extratools
+	@$(SDK)/usr/bin/make -i finalcleanup
+	@$(SDK)/usr/bin/make submittests
 
 # ====================================================================================
 # CORE

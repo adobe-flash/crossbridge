@@ -13,6 +13,7 @@ The code written by adobe is all MIT licensed, but crossbridge contains many dif
 * GDB: https://www.gnu.org/software/gdb/
 * LLVM: http://llvm.org/
 * LLVM Gold Plug-In: http://llvm.org/docs/GoldPlugin.html
+* LibCXXRT: https://github.com/pathscale/libcxxrt/
 * LibIconv: https://www.gnu.org/software/libiconv/
 * LibFFI: http://sourceware.org/libffi/
 * LibJPEG: http://libjpeg.sourceforge.net/

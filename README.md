@@ -3,7 +3,7 @@
 ### Goals 
 At present we have quite straight goal:
 
-* LLVM-Clang-3.2 toolchain 
+* LLVM-Clang-3.4 toolchain 
 * Freebsd 9.1 Environment
 * Libc++ with support of c++11 std.
 
