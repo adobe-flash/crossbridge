@@ -39,12 +39,14 @@ $?DEPENDENCY_LIBPNG=libpng-1.5.7
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
 $?DEPENDENCY_LLVM=llvm-3.2
+#$?DEPENDENCY_LLVM=llvm-3.4
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-3.82
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_SDL=SDL-1.2.14
 $?DEPENDENCY_SWIG=swig-2.0.4
+#$?DEPENDENCY_SWIG=swig-3.0.0
 $?DEPENDENCY_ZLIB=zlib-1.2.5
 
 # ====================================================================================
@@ -306,7 +308,6 @@ weekly:
 
 # tests not in submittests target
 all_tests:
-	@$(SDK)/usr/bin/make builtinabcs
 	@$(SDK)/usr/bin/make llvmtests
 	@$(SDK)/usr/bin/make swigtests
 	#$(SDK)/usr/bin/make checkasm
