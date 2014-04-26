@@ -330,7 +330,7 @@ all_ci:
 
 # Used to debug specific target
 all_dev:
-	@$(SDK)/usr/bin/make swig
+	@$(SDK)/usr/bin/make libpng
 
 # ====================================================================================
 # CORE
@@ -950,9 +950,11 @@ trd:
 # ====================================================================================
 # EXTRA LIBS
 # ====================================================================================
+# TBD
 extralibs:
 	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng #TODO libsdl dmalloc libffi
 
+# TBD
 zlib:
 	rm -rf $(BUILD)/zlib
 	cp -r $(SRCROOT)/$(DEPENDENCY_ZLIB) $(BUILD)/zlib
@@ -960,6 +962,7 @@ zlib:
 	$(RSYNC) $(BUILD)/zlib/zlib.h $(SDK)/usr/include/
 	$(RSYNC) $(BUILD)/zlib/libz.a $(SDK)/usr/lib/
 
+# TBD
 libvgl:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 # Cygwin compatibility
@@ -971,22 +974,14 @@ endif
 	rm -f $(SDK)/usr/lib/libvgl.a
 	$(AR) $(SDK)/usr/lib/libvgl.a $(BUILD)/lib/src/lib/libvgl/*.o
 
-libjpeg_configure:
-	rm -rf $(SRCROOT)/cached_build/libjpeg
-	mkdir -p $(SRCROOT)/cached_build/libjpeg
-	cd $(SRCROOT)/cached_build/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/$(DEPENDENCY_JPEG)/configure \
-		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
-	perl -p -i -e 's~$(SRCROOT)/cached_build/libjpeg~FLASCC_BUILD_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-
+# TBD
 libjpeg:
 	rm -rf $(BUILD)/libjpeg
 	mkdir -p $(BUILD)/libjpeg
-	cp -r $(SRCROOT)/cached_build/libjpeg $(BUILD)/
-	perl -p -i -e 's~FLASCC_BUILD_DIR~$(BUILD)/libjpeg~g' `grep -ril FLASCC_BUILD_DIR $(BUILD)/libjpeg/`
-	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libjpeg/`
+	cd $(BUILD)/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/$(DEPENDENCY_JPEG)/configure \
+		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
 	cd $(BUILD)/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libjpeg.la && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) install-libLTLIBRARIES install-includeHEADERS
-	cp -f $(SRCROOT)/cached_build/libjpeg/jconfig.h $(SDK)/usr/include/
+	cp -f $(BUILD)/libjpeg/jconfig.h $(SDK)/usr/include/
 	rm -f $(SDK)/usr/lib/libjpeg.so
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-jpegtran
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-rdjpgcom
@@ -994,26 +989,19 @@ libjpeg:
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-cjpeg
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-djpeg
 
-libpng_configure:
-	rm -rf $(SRCROOT)/cached_build/libpng
-	mkdir -p $(SRCROOT)/cached_build/libpng
-	cd $(SRCROOT)/cached_build/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/libpng-1.5.7/configure \
-		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-dependency-tracking
-	perl -p -i -e 's~$(SRCROOT)/cached_build/libpng~FLASCC_BUILD_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-
+# TBD
 libpng:
 	rm -rf $(BUILD)/libpng
 	mkdir -p $(BUILD)/libpng
-	cp -r $(SRCROOT)/cached_build/libpng $(BUILD)/
-	perl -p -i -e 's~FLASCC_BUILD_DIR~$(BUILD)/libpng~g' `grep -ril FLASCC_BUILD_DIR $(BUILD)/libpng/`
-	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libpng/`
+	cd $(BUILD)/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/libpng-1.5.7/configure \
+		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-dependency-tracking
 	cd $(BUILD)/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j$(THREADS) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 	rm -f $(SDK)/usr/bin/libpng-config
 	cp -f $(SDK)/usr/bin/libpng15-config $(SDK)/usr/bin/libpng-config
 	rm -f $(SDK)/usr/lib/libpng.a
 	cp -f $(SDK)/usr/lib/libpng15.a $(SDK)/usr/lib/libpng.a
 
+# TBD
 libsdl_configure:
 	rm -rf $(SRCROOT)/cached_build/libsdl
 	mkdir -p $(SRCROOT)/cached_build/libsdl
