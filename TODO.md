@@ -182,3 +182,24 @@
 > Makefile:599: recipe for target 'llvmtests' failed
 
 > make: *** [llvmtests] Error 2
+
+## CB-0017
+* Description: Cannot build lib DMalloc
+* Estimate: 1 days
+* Status: In progress
+* Relates to CB-0004
+* Exception: Cannot run test program while cross compiling 
+
+## CB-0018
+* Description: Cannot build lib SDL
+* Estimate: 1 days
+* Status: In progress
+* Relates to CB-0004
+* Exception: TBD
+
+## CB-0019
+* Description: Cannot build lib FFI
+* Estimate: 1 days
+* Status: In progress
+* Relates to CB-0004
+* Exception: FFI_TRAMPOLINE_SIZE undeclared here
