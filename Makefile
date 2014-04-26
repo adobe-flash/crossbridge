@@ -335,13 +335,13 @@ all_ci:
 	@$(SDK)/usr/bin/make tr
 	@$(SDK)/usr/bin/make trd
 	@$(SDK)/usr/bin/make extralibs
-	@$(SDK)/usr/bin/make extratools
+	@$(SDK)/usr/bin/make -i extratools
 	@$(SDK)/usr/bin/make -i finalcleanup
 	@$(SDK)/usr/bin/make submittests
 
 # Used to debug specific target
 all_dev:
-	@$(SDK)/usr/bin/make checkasm
+	@$(SDK)/usr/bin/make swig
 
 # ====================================================================================
 # CORE
