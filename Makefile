@@ -47,6 +47,7 @@ $?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_SDL=SDL-1.2.14
 $?DEPENDENCY_SWIG=swig-2.0.4
 #$?DEPENDENCY_SWIG=swig-3.0.0
+$?DEPENDENCY_SWIG_PCRE=pcre-8.20
 $?DEPENDENCY_ZLIB=zlib-1.2.5
 
 # ====================================================================================
@@ -1205,13 +1206,13 @@ genfs:
 swig:
 	rm -rf $(BUILD)/swig
 	mkdir -p $(BUILD)/swig
-	cp -f $(SRCROOT)/$(DEPENDENCY_SWIG)/pcre-8.20.tar.gz $(BUILD)/swig
+	cp -f packages/$(DEPENDENCY_SWIG_PCRE).tar.gz $(BUILD)/swig
 	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh \
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
 	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure \
 		--prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
 	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j$(THREADS) && $(MAKE) install
-	$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/2.0.4/$(var);)
+	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/2.0.4/$(var);)
 
 swigtests:
 	# reconfigure so that makefile is up to date (in case Makefile.in changed)
