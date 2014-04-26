@@ -329,11 +329,7 @@ all_ci:
 
 # Used to debug specific target
 all_dev:
-	@$(SDK)/usr/bin/make libpng
-
-# Used to debug specific target
-all_dev2:
-	@$(SDK)/usr/bin/make libsdl_all
+	@$(SDK)/usr/bin/make libsdl
 
 # ====================================================================================
 # CORE
