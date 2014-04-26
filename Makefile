@@ -293,6 +293,7 @@ weekly:
 
 # tests not in submittests target
 all_tests:
+	@$(SDK)/usr/bin/make llvmcheck
 	@$(SDK)/usr/bin/make llvmtests
 	@$(SDK)/usr/bin/make ieeetests_conversion
 	@$(SDK)/usr/bin/make ieeetests_basicops
@@ -329,6 +330,9 @@ all_ci:
 
 all_dev:
 	@$(SDK)/usr/bin/make swig
+
+all_dev2:
+	@$(SDK)/usr/bin/make zlib
 
 # ====================================================================================
 # CORE
@@ -567,11 +571,7 @@ alcdb:
 # ====================================================================================
 # LLVM
 # ====================================================================================
-llvmdev:
-	cd $(BUILD)/llvm-debug && $(MAKE) -j$(THREADS) && $(MAKE) install
-	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
-	$(MAKE) llvm-install
-
+# This build the tool chain
 llvm:
 	rm -rf $(BUILD)/llvm-debug
 	mkdir -p $(BUILD)/llvm-debug
@@ -585,6 +585,17 @@ ifeq ($(LLVM_ONLYLLC), false)
 	$(MAKE) llvm-install
 endif
 
+# This run the regression tests to ensure everything is in working order
+llvmcheck:
+	cd $(BUILD)/llvm-debug && $(MAKE) check-all
+
+# This re-build the tool chain
+llvmdev:
+	cd $(BUILD)/llvm-debug && $(MAKE) -j$(THREADS) && $(MAKE) install
+	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
+	$(MAKE) llvm-install
+
+# This install the tool chain
 llvm-install:
 	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-ar$(EXEEXT) $(SDK)/usr/bin/llvm-ar$(EXEEXT)
 	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llvm-as$(EXEEXT) $(SDK)/usr/bin/llvm-as$(EXEEXT)
@@ -600,12 +611,14 @@ llvm-install:
 	cp $(LLVMINSTALLPREFIX)/llvm-debug/lib/LLVMgold.* $(SDK)/usr/lib/LLVMgold$(SOEXT)
 	cp -f $(BUILD)/llvm-debug/bin/fpcmp$(EXEEXT) $(BUILDROOT)/extra/fpcmp$(EXEEXT)
 
+# This run the test suite
 llvmtests:
 	rm -rf $(BUILD)/llvm-tests
 	mkdir -p $(BUILD)/llvm-tests
-	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
+	#cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
 	cd $(BUILD)/llvm-tests && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_LLVM)/configure --disable-polly --without-f2c --without-f95 --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-debug
 	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
+	cd $(BUILD)/llvm-tests/projects/test-suite/tools && (LANG=C && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
 	cd $(BUILD)/llvm-tests/projects/test-suite/MultiSource && (LANG=C && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
 	cd $(BUILD)/llvm-tests/projects/test-suite/SingleSource && (LANG=C && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
 	$(PYTHON) $(SRCROOT)/tools/llvmtestcheck.py --srcdir $(SRCROOT)/$(DEPENDENCY_LLVM)/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ --fpcmp $(FPCMP)> $(BUILD)/llvm-tests/passfail.txt
@@ -1014,6 +1027,7 @@ libsdl_configure:
 	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
 	rm $(SRCROOT)/cached_build/libsdl/config.status
 
+# TBD
 libsdl:
 	rm -rf $(BUILD)/libsdl
 	mkdir -p $(BUILD)/libsdl
@@ -1025,10 +1039,12 @@ libsdl:
 	$(MAKE) libsdl-install
 	rm $(SDK)/usr/include/SDL/SDL_opengl.h
 
+# TBD
 libsdl-install:
 	cp $(SRCROOT)/tools/sdl-config $(SDK)/usr/bin/. # install our custom sdl-config
 	chmod a+x $(SDK)/usr/bin/sdl-config
 
+# TBD
 dmalloc_configure:
 	rm -rf $(SRCROOT)/cached_build/dmalloc
 	mkdir -p $(SRCROOT)/cached_build/dmalloc
@@ -1036,6 +1052,7 @@ dmalloc_configure:
 		--prefix=$(SDK)/usr --disable-shared --enable-static --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
 	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/dmalloc`
 
+# TODO: Solve error. pthread mutexattr_default undeclared
 dmalloc:
 	rm -rf $(BUILD)/dmalloc
 	mkdir -p $(BUILD)/dmalloc
@@ -1045,11 +1062,31 @@ dmalloc:
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 installcxx installth
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 heavy
 
-libffi:
+# TODO: Solve error: cannot run test program while cross compiling 
+dmalloc_new:
+	rm -rf $(BUILD)/dmalloc
+	mkdir -p $(BUILD)/dmalloc
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_DMALLOC)/configure \
+		--prefix=$(SDK)/usr --disable-shared --enable-static --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 threads cxx
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 installcxx installth
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 heavy
+
+# TODO: Solve libffi has not been ported to avm2-unknown-freebsd8 error
+libffi_new:
 	mkdir -p $(BUILD)/libffi
-	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) CFLAGS="-I$(SDK)/usr/include" CXXFLAGS="-I$(SDK)/usr/include" $(SRCROOT)/$(DEPENDENCY_FFI)/configure \
+		--prefix=$(SDK)/usr --disable-shared --enable-static --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
 	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
+# TODO: Solve AS3/AVM2.h not found
+libffi:
+	mkdir -p $(BUILD)/libffi
+	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure \
+		--prefix=$(SDK)/usr
+	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# TBD
 libfficheck:
 	cd $(BUILD)/libffi/testsuite && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) check
 
