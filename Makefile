@@ -329,7 +329,7 @@ all_ci:
 
 # Used to debug specific target
 all_dev:
-	@$(SDK)/usr/bin/make libsdl
+	@$(SDK)/usr/bin/make submittests
 
 # ====================================================================================
 # CORE
