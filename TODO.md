@@ -222,3 +222,17 @@
 
 > /cygdrive/f/crossbridge/sdk/usr/bin/../../usr/lib/libthr.a: error: undefined reference to '___sys_swapcontext'
 > /cygdrive/f/crossbridge/sdk/usr/bin/../../usr/lib/libthr.a: error: undefined reference to '_check_suspend'
+
+## CB-0021
+* Description: Cannot build lib Iconv
+* Estimate: 1 days
+* Status: In progress
+* Relates to CB-0004
+* Exception: 
+
+> config.status: creating Makefile
+> awk: ./confMGZtSm/subs.awk:1: BEGIN {\r
+> awk: ./confMGZtSm/subs.awk:1:        ^ backslash not last character on line
+> awk: ./confMGZtSm/subs.awk:1: BEGIN {\r
+> awk: ./confMGZtSm/subs.awk:1:        ^ syntax error
+> config.status: error: could not create Makefile

@@ -293,9 +293,8 @@ weekly:
 
 # tests not in submittests target
 all_tests:
+	@$(SDK)/usr/bin/make builtinabcs
 	@$(SDK)/usr/bin/make llvmtests
-	@$(SDK)/usr/bin/make ieeetests_conversion
-	@$(SDK)/usr/bin/make ieeetests_basicops
 	@$(SDK)/usr/bin/make swigtests
 	#$(SDK)/usr/bin/make checkasm
 
@@ -329,7 +328,7 @@ all_ci:
 
 # Used to debug specific target
 all_dev:
-	@$(SDK)/usr/bin/make submittests
+	@$(SDK)/usr/bin/make swig
 
 # ====================================================================================
 # CORE
@@ -947,7 +946,7 @@ trd:
 # ====================================================================================
 # Extra Libraries
 extralibs:
-	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng #TODO libsdl dmalloc libffi
+	$(MAKE) -j$(THREADS) zlib libvgl libunwind libcxxrt libjpeg libpng dejagnu #TODO libsdl dmalloc libffi libiconv
 
 # Library ZLib
 zlib:
@@ -1037,6 +1036,116 @@ libffi:
 libfficheck:
 	cd $(BUILD)/libffi/testsuite && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) check
 
+# TBD
+libiconv:
+	mkdir -p $(BUILD)/libiconv
+	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_ICONV)/configure \
+		--prefix=$(SDK)/usr
+	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# TBD
+dejagnu:
+	mkdir -p $(BUILD)/dejagnu
+	cd $(BUILD)/dejagnu && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_DEJAGNU)/configure \
+		--prefix=$(BUILD)/dejagnu
+	cd $(BUILD)/dejagnu && $(MAKE) install
+
+# TBD
+# TODO: Solve build error
+libcxxabi:
+	#$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libc++abi/Makefile
+endif
+	cd $(BUILD)/lib/src/lib/libc++abi/ && $(BMAKE) clean && $(BMAKE) libc++abi.a
+	cd $(BUILD)/lib/src/lib/libc++abi/ && $(SDK)/usr/bin/llvm-link -o libc++abi.o *.o && mv libc++abi.o ../libc++
+
+# TBD
+libunwind:
+	#$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libunwind/Makefile
+endif
+	cd $(BUILD)/lib/src/lib/libunwind/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libunwind.a
+	cd $(BUILD)/lib/src/lib/libunwind/ && $(SDK)/usr/bin/llvm-link -o libunwind.o *.o && mv libunwind.o ../libc++
+
+# TBD
+libcxxrt:
+	#$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
+# Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
+	dos2unix $(BUILD)/lib/src/lib/libcxxrt/Makefile
+endif
+	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libcxxrt.a
+	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(SDK)/usr/bin/llvm-link -o libcxxrt.o *.o && mv libcxxrt.o ../libc++
+
+# TBD
+# TODO: Not in build
+libobjc_configure:
+	cd $(BUILD)/llvm-gcc-42 \
+		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' TARGET-target-libobjc="all OBJC_THREAD_FILE=thr-posix" all-target-libobjc > $(SRCROOT)/cached_build/libobjc/compile.log
+	cd $(BUILD)/llvm-gcc-42 \
+		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' install-target-libobjc > $(SRCROOT)/cached_build/libobjc/install.log
+	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/libobjc`
+
+# TBD
+# TODO: Not in build
+libobjc:
+	rm -rf $(BUILD)/libobjc
+	mkdir -p $(BUILD)/libobjc
+	$(PYTHON) $(SRCROOT)/tools/build-objc.py $(SRCROOT)/cached_build/libobjc/compile.log $(SRCROOT)/cached_build/libobjc/install.log $(SRCROOT) > $(BUILD)/libobjc/build.sh
+	cd $(BUILD)/libobjc && PATH=$(SDK)/usr/bin:$(PATH) bash -x build.sh
+	# link bitcode
+	cd $(BUILD)/libobjc && rm -f libobjc.a && mkdir NXConstStr && mv NXConstStr.o NXConstStr/. && $(SDK)/usr/bin/llvm-link -o libobjc.o *.o && $(AR) libobjc.a libobjc.o NXConstStr/*.o && cp libobjc.a $(SDK)/usr/lib/.
+
+# TBD
+# TODO: Not in build
+abclibobjc:
+	mkdir -p $(BUILD)/libobjc_abc
+	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
+	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
+	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
+
+# TBD
+cxxfiltmingw:
+	# install the version of mingw for osx from ere: http://crossgcc.rts-software.org/doku.php
+	rm -rf $(BUILD)/cxxfiltmingw
+	mkdir -p $(BUILD)/cxxfiltmingw
+	cd $(BUILD)/cxxfiltmingw && CC=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-gcc \
+		AR=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-ar  CXX=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-g++ \
+		CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " \
+		CXXFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " $(SRCROOT)/binutils/configure \
+		--disable-doc --disable-gold --disable-ld --disable-plugins \
+		--build=$(BUILD_TRIPLE) --host=$(MINGWTRIPLE) --target=$(MINGWTRIPLE) \
+		--program-prefix="" --disable-werror \
+		--enable-targets=$(TRIPLE)
+	-cd $(BUILD)/cxxfiltmingw && $(MAKE) -j$(THREADS)
+	-cd $(BUILD)/cxxfiltmingw && $(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-gcc -DMINGW_MONOCLE_HACKS  \
+		-I$(BUILD)/cxxfiltmingw/binutils -I$(BUILD)/cxxfiltmingw/bfd -I$(SRCROOT)/binutils/include  \
+		-I$(BUILD)/cxxfiltmingw/intl $(SRCROOT)/binutils/binutils/cxxfilt.c  \
+		$(BUILD)/cxxfiltmingw/libiberty/*.o $(BUILD)/cxxfiltmingw/intl/*.o $(BUILD)/cxxfiltmingw/binutils/version.o \
+		$(BUILD)/cxxfiltmingw/binutils/bucomm.o  $(BUILD)/cxxfiltmingw/bfd/*.o -o c++filt.exe
+
+# TBD
+libtoabc:
+	mkdir -p $(BUILD)/libtoabc/`basename $(LIB)`
+	cd $(BUILD)/libtoabc/`basename $(LIB)` && $(SDK)/usr/bin/ar x $(LIB)
+	@abcdir=$(BUILD)/libtoabc/`basename $(LIB)` ; \
+	numos=`find $$abcdir -maxdepth 1 -name '*.o' | wc -l` ; \
+	if [$$numos -gt 0 ] ; then \
+	cd $(BUILD)/libtoabc/`basename $(LIB)` && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS) ; \
+	fi 
+
+# TODO: Solve Error
+builtinabcs:
+	cd $(SRCROOT)/avmplus/core && ./builtin.py
+	cd $(SRCROOT)/avmplus/shell && ./shell_toplevel.py
+
 # ====================================================================================
 # EXTRA TOOLS
 # ====================================================================================
@@ -1122,218 +1231,6 @@ finalcleanup:
 	$(RSYNC) $(SRCROOT)/posix/vfs/InMemoryBackingStore.as $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/vfs/LSOBackingStore.as $(SDK)/usr/share/
 	$(RSYNC) --exclude "*.xslt" --exclude "*.html" --exclude ASDoc_Config.xml --exclude overviews.xml $(BUILDROOT)/tempdita/ $(SDK)/usr/share/asdocs
-
-# ====================================================================================
-# DEPLOY
-# ====================================================================================
-
-deliverables:
-	$(MAKE) staging
-	$(MAKE) flattensymlinks
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-		$(MAKE) zip
-else
-		$(MAKE) dmg
-		$(MAKE) staging
-		$(MAKE) winstaging
-		$(MAKE) flattensymlinks
-		$(MAKE) zip
-#		$(MAKE) diffdeliverables
-endif
-
-dmg:
-	rm -f $(BUILDROOT)/$(SDKNAME).*.dmg 
-	cp -f $(SRCROOT)/tools/Base.dmg $(BUILDROOT)/$(SDKNAME).tmp.dmg
-	chmod u+rw $(BUILDROOT)/$(SDKNAME).tmp.dmg
-	hdiutil resize -size 2G $(BUILDROOT)/$(SDKNAME).tmp.dmg
-	hdiutil attach $(BUILDROOT)/$(SDKNAME).tmp.dmg -readwrite -mountpoint $(BUILDROOT)/dmgmount
-	rm -f $(BUILDROOT)/staging/.DS_Store
-	$(RSYNC) $(BUILDROOT)/staging/ $(BUILDROOT)/dmgmount/
-	mv $(BUILDROOT)/dmgmount/.fseventsd $(BUILDROOT)/
-	hdiutil detach $(BUILDROOT)/dmgmount
-	hdiutil convert $(BUILDROOT)/$(SDKNAME).tmp.dmg -format UDZO -imagekey zlib-level=9 -o $(BUILDROOT)/$(SDKNAME).dmg
-	rm -f $(BUILDROOT)/$(SDKNAME).tmp.dmg
-	find $(BUILDROOT)/staging > $(BUILDROOT)/dmgcontents.txt
-
-staging:
-	rm -rf $(BUILDROOT)/staging
-	mkdir -p $(BUILDROOT)/staging
-	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
-	$(RSYNC) --exclude '*.PAK' --exclude '*.pak' --exclude 13_ObjectiveC --exclude Example_Sound --exclude 13_Example_Neverball --exclude demobaseq2 --exclude 15_Example_Quake3 --exclude 14_Example_Quake2 $(SRCROOT)/samples $(BUILDROOT)/staging/
-	$(RSYNC) $(SRCROOT)/README.html $(BUILDROOT)/staging/
-	$(RSYNC) $(SRCROOT)/docs $(BUILDROOT)/staging/
-	$(RSYNC) $(BUILDROOT)/apidocs $(BUILDROOT)/staging/docs/
-	rm -f $(BUILDROOT)/staging/sdk/usr/bin/gccbug*
-	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
-	echo $(FLASCC_VERSION_BUILD) > $(BUILDROOT)/staging/sdk/ver.txt
-
-winstaging:
-	$(LN) cygwin $(BUILDROOT)/staging/sdk/usr/platform/current
-	# temporarily $(MAKE) sdk cygwin-ish
-	$(LN) cygwin $(SDK)/usr/platform/current
-	mkdir -p $(SDK)/usr/platform/cygwin/bin
-	$(MAKE) libsdl-install
-	# copy some parts of the mac bin dir which are actually xplatform
-	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libtool* $(SDK)/usr/platform/cygwin/bin/
-	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libpng* $(SDK)/usr/platform/cygwin/bin/
-	# clean-up
-	$(MAKE) sdkcleanup
-	$(MAKE) finalcleanup
-	@rm -rf $(SDK)/usr/platform/darwin/share
-	$(RSYNC) $(SRCROOT)/tools/run.bat $(BUILDROOT)/staging/
-	$(RSYNC) $(SRCROOT)/cygwin $(BUILDROOT)/staging/
-	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
-	rm -rf $(BUILDROOT)/staging/sdk/usr/libexec
-	rm -rf $(BUILDROOT)/staging/sdk/usr/share/$(DEPENDENCY_CMAKE)
-	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/platform/cygwin $(BUILDROOT)/staging/sdk/usr/platform/
-	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/*.dll $(BUILDROOT)/staging/sdk/usr/lib/
-	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/bfd-plugins/*.dll $(BUILDROOT)/staging/sdk/usr/lib/bfd-plugins/
-	rm -rf $(BUILDROOT)/staging/sdk/usr/platform/darwin
-	rm -f $(BUILDROOT)/staging/sdk/usr/lib/*.dylib
-	rm -f $(BUILDROOT)/staging/sdk/usr/lib/*.la
-	rm -f $(BUILDROOT)/staging/sdk/usr/lib/bfd-plugins/*.dylib
-	$(LN) darwin $(SDK)/usr/platform/current
-	# nuke cygwin from sdk
-	rm -rf $(SDK)/usr/platform/cygwin
-	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
-
-flattensymlinks:
-	find $(BUILDROOT)/staging/sdk -type l | xargs rm
-	$(RSYNC) $(BUILDROOT)/staging/sdk/usr/platform/*/ $(BUILDROOT)/staging/sdk/usr
-	rm -rf $(BUILDROOT)/staging/sdk/usr/platform
-
-zip:
-	cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
-	find $(BUILDROOT)/staging > $(BUILDROOT)/zipcontents.txt
-
-diffdeliverables:
-		cat $(BUILDROOT)/zipcontents.txt | grep -v staging/cygwin | grep -v "run.bat" | sed -e 's/\.exe//g' -e 's/\.dll/\.~SO~/g' -e 's/\/cygwin/\/~PLAT~/g' | sort > $(BUILDROOT)/zipcontents_munge.txt
-		cat $(BUILDROOT)/dmgcontents.txt | grep -v "share/cmake" | grep -v "bin/cmake" | grep -v "bin/ctest" | grep -v "bin/cpack" | grep -v "bin/ccmake" | sed -e 's/\.exe//g' -e 's/\.dylib/\.~SO~/g' -e 's/\/darwin/\/~PLAT~/g' | sort > $(BUILDROOT)/dmgcontents_munge.txt	
-		diff $(BUILDROOT)/dmgcontents_munge.txt $(BUILDROOT)/zipcontents_munge.txt
-
-# ====================================================================================
-# EXTRA
-# ====================================================================================
-
-# TBD
-# TODO: Not in build
-libiconv:
-	mkdir -p $(BUILD)/libiconv
-	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_ICONV)/configure --prefix=$(SDK)/usr
-	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-# TBD
-# TODO: Not in build
-libcxxabi:
-	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libc++abi/Makefile
-endif
-	cd $(BUILD)/lib/src/lib/libc++abi/ && $(BMAKE) clean && $(BMAKE) libc++abi.a
-	cd $(BUILD)/lib/src/lib/libc++abi/ && $(SDK)/usr/bin/llvm-link -o libc++abi.o *.o && mv libc++abi.o ../libc++
-
-# TBD
-# TODO: Not in build
-libunwind:
-	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libunwind/Makefile
-endif
-	cd $(BUILD)/lib/src/lib/libunwind/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libunwind.a
-	cd $(BUILD)/lib/src/lib/libunwind/ && $(SDK)/usr/bin/llvm-link -o libunwind.o *.o && mv libunwind.o ../libc++
-
-# TBD
-# TODO: Not in build
-libcxxrt:
-	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libcxxrt/Makefile
-endif
-	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libcxxrt.a
-	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(SDK)/usr/bin/llvm-link -o libcxxrt.o *.o && mv libcxxrt.o ../libc++
-
-# TBD
-# TODO: Not in build
-libobjc_configure:
-	cd $(BUILD)/llvm-gcc-42 \
-		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' TARGET-target-libobjc="all OBJC_THREAD_FILE=thr-posix" all-target-libobjc > $(SRCROOT)/cached_build/libobjc/compile.log
-	cd $(BUILD)/llvm-gcc-42 \
-		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' install-target-libobjc > $(SRCROOT)/cached_build/libobjc/install.log
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/libobjc`
-
-# TBD
-# TODO: Not in build
-libobjc:
-	rm -rf $(BUILD)/libobjc
-	mkdir -p $(BUILD)/libobjc
-	$(PYTHON) $(SRCROOT)/tools/build-objc.py $(SRCROOT)/cached_build/libobjc/compile.log $(SRCROOT)/cached_build/libobjc/install.log $(SRCROOT) > $(BUILD)/libobjc/build.sh
-	cd $(BUILD)/libobjc && PATH=$(SDK)/usr/bin:$(PATH) bash -x build.sh
-	# link bitcode
-	cd $(BUILD)/libobjc && rm -f libobjc.a && mkdir NXConstStr && mv NXConstStr.o NXConstStr/. && $(SDK)/usr/bin/llvm-link -o libobjc.o *.o && $(AR) libobjc.a libobjc.o NXConstStr/*.o && cp libobjc.a $(SDK)/usr/lib/.
-
-# TBD
-# TODO: Not in build
-abclibobjc:
-	mkdir -p $(BUILD)/libobjc_abc
-	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
-	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
-	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
-
-cxxfiltmingw:
-	# install the version of mingw for osx from ere: http://crossgcc.rts-software.org/doku.php
-	rm -rf $(BUILD)/cxxfiltmingw
-	mkdir -p $(BUILD)/cxxfiltmingw
-	cd $(BUILD)/cxxfiltmingw && CC=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-gcc \
-		AR=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-ar  CXX=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-g++ \
-		CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " \
-		CXXFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " $(SRCROOT)/binutils/configure \
-		--disable-doc --disable-gold --disable-ld --disable-plugins \
-		--build=$(BUILD_TRIPLE) --host=$(MINGWTRIPLE) --target=$(MINGWTRIPLE) \
-		--program-prefix="" --disable-werror \
-		--enable-targets=$(TRIPLE)
-	-cd $(BUILD)/cxxfiltmingw && $(MAKE) -j$(THREADS)
-	-cd $(BUILD)/cxxfiltmingw && $(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-gcc -DMINGW_MONOCLE_HACKS  \
-		-I$(BUILD)/cxxfiltmingw/binutils -I$(BUILD)/cxxfiltmingw/bfd -I$(SRCROOT)/binutils/include  \
-		-I$(BUILD)/cxxfiltmingw/intl $(SRCROOT)/binutils/binutils/cxxfilt.c  \
-		$(BUILD)/cxxfiltmingw/libiberty/*.o $(BUILD)/cxxfiltmingw/intl/*.o $(BUILD)/cxxfiltmingw/binutils/version.o \
-		$(BUILD)/cxxfiltmingw/binutils/bucomm.o  $(BUILD)/cxxfiltmingw/bfd/*.o -o c++filt.exe
-
-libtoabc:
-	mkdir -p $(BUILD)/libtoabc/`basename $(LIB)`
-	cd $(BUILD)/libtoabc/`basename $(LIB)` && $(SDK)/usr/bin/ar x $(LIB)
-	@abcdir=$(BUILD)/libtoabc/`basename $(LIB)` ; \
-	numos=`find $$abcdir -maxdepth 1 -name '*.o' | wc -l` ; \
-	if [$$numos -gt 0 ] ; then \
-	cd $(BUILD)/libtoabc/`basename $(LIB)` && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS) ; \
-	fi 
-
-dejagnu:
-	mkdir -p $(BUILD)/dejagnu
-	cd $(BUILD)/dejagnu && $(SRCROOT)/$(DEPENDENCY_DEJAGNU)/configure --prefix=$(BUILD)/dejagnu && $(MAKE) install
-
-builtinabcs:
-	cd $(SRCROOT)/avmplus/core && ./builtin.py
-	cd $(SRCROOT)/avmplus/shell && ./shell_toplevel.py
-
-ieeetests_conversion:
-	rm -rf $(BUILD)/ieeetests_conversion
-	mkdir -p $(BUILD)/ieeetests_conversion
-	$(RSYNC) $(SRCROOT)/test/IeeeCC754/ $(BUILD)/ieeetests_conversion
-	echo "b\nb\na" > $(BUILD)/ieeetests_conversion/answers
-	cd $(BUILD)/ieeetests_conversion && PATH=$(SDK)/usr/bin:$(PATH) ./dotests.sh < answers
-
-ieeetests_basicops:
-	rm -rf $(BUILD)/ieeetests_basicops
-	mkdir -p $(BUILD)/ieeetests_basicops
-	$(RSYNC) $(SRCROOT)/test/IeeeCC754/ $(BUILD)/ieeetests_basicops
-	echo "a\nb\na" > $(BUILD)/ieeetests_basicops/answers
-	cd $(BUILD)/ieeetests_basicops && PATH=$(SDK)/usr/bin:$(PATH) ./dotests.sh < answers
 
 # ====================================================================================
 # Submit tests
@@ -1610,6 +1507,110 @@ avm2_ui_thunk_test:
 	cd $(BUILD)/avm2_ui_thunk_test && $(SDK)/usr/bin/$(FLASCC_CC) -pthread $(SRCROOT)/test/avm2_ui_thunk.c -symbol-abc=ConsoleBackground.abc -emit-swf -o avm2_ui_thunk_background.swf
 	cd $(BUILD)/avm2_ui_thunk_test && $(SDK)/usr/bin/$(FLASCC_CC) -pthread $(SRCROOT)/test/avm2_ui_thunk.c -symbol-abc=ConsoleAsync.abc -emit-swf -o avm2_ui_thunk_async.swf
 	cp -f $(BUILD)/avm2_ui_thunk_test/*.swf $(BUILDROOT)/extra/
+
+# TODO: Source not found
+ieeetests_conversion:
+	rm -rf $(BUILD)/ieeetests_conversion
+	mkdir -p $(BUILD)/ieeetests_conversion
+	$(RSYNC) $(SRCROOT)/test/IeeeCC754/ $(BUILD)/ieeetests_conversion
+	echo "b\nb\na" > $(BUILD)/ieeetests_conversion/answers
+	cd $(BUILD)/ieeetests_conversion && PATH=$(SDK)/usr/bin:$(PATH) ./dotests.sh < answers
+
+# TODO: Source not found
+ieeetests_basicops:
+	rm -rf $(BUILD)/ieeetests_basicops
+	mkdir -p $(BUILD)/ieeetests_basicops
+	$(RSYNC) $(SRCROOT)/test/IeeeCC754/ $(BUILD)/ieeetests_basicops
+	echo "a\nb\na" > $(BUILD)/ieeetests_basicops/answers
+	cd $(BUILD)/ieeetests_basicops && PATH=$(SDK)/usr/bin:$(PATH) ./dotests.sh < answers
+
+# ====================================================================================
+# DEPLOY
+# ====================================================================================
+
+deliverables:
+	$(MAKE) staging
+	$(MAKE) flattensymlinks
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+		$(MAKE) zip
+else
+		$(MAKE) dmg
+		$(MAKE) staging
+		$(MAKE) winstaging
+		$(MAKE) flattensymlinks
+		$(MAKE) zip
+#		$(MAKE) diffdeliverables
+endif
+
+dmg:
+	rm -f $(BUILDROOT)/$(SDKNAME).*.dmg 
+	cp -f $(SRCROOT)/tools/Base.dmg $(BUILDROOT)/$(SDKNAME).tmp.dmg
+	chmod u+rw $(BUILDROOT)/$(SDKNAME).tmp.dmg
+	hdiutil resize -size 2G $(BUILDROOT)/$(SDKNAME).tmp.dmg
+	hdiutil attach $(BUILDROOT)/$(SDKNAME).tmp.dmg -readwrite -mountpoint $(BUILDROOT)/dmgmount
+	rm -f $(BUILDROOT)/staging/.DS_Store
+	$(RSYNC) $(BUILDROOT)/staging/ $(BUILDROOT)/dmgmount/
+	mv $(BUILDROOT)/dmgmount/.fseventsd $(BUILDROOT)/
+	hdiutil detach $(BUILDROOT)/dmgmount
+	hdiutil convert $(BUILDROOT)/$(SDKNAME).tmp.dmg -format UDZO -imagekey zlib-level=9 -o $(BUILDROOT)/$(SDKNAME).dmg
+	rm -f $(BUILDROOT)/$(SDKNAME).tmp.dmg
+	find $(BUILDROOT)/staging > $(BUILDROOT)/dmgcontents.txt
+
+staging:
+	rm -rf $(BUILDROOT)/staging
+	mkdir -p $(BUILDROOT)/staging
+	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
+	$(RSYNC) --exclude '*.PAK' --exclude '*.pak' --exclude 13_ObjectiveC --exclude Example_Sound --exclude 13_Example_Neverball --exclude demobaseq2 --exclude 15_Example_Quake3 --exclude 14_Example_Quake2 $(SRCROOT)/samples $(BUILDROOT)/staging/
+	$(RSYNC) $(SRCROOT)/README.html $(BUILDROOT)/staging/
+	$(RSYNC) $(SRCROOT)/docs $(BUILDROOT)/staging/
+	$(RSYNC) $(BUILDROOT)/apidocs $(BUILDROOT)/staging/docs/
+	rm -f $(BUILDROOT)/staging/sdk/usr/bin/gccbug*
+	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
+	echo $(FLASCC_VERSION_BUILD) > $(BUILDROOT)/staging/sdk/ver.txt
+
+winstaging:
+	$(LN) cygwin $(BUILDROOT)/staging/sdk/usr/platform/current
+	# temporarily $(MAKE) sdk cygwin-ish
+	$(LN) cygwin $(SDK)/usr/platform/current
+	mkdir -p $(SDK)/usr/platform/cygwin/bin
+	$(MAKE) libsdl-install
+	# copy some parts of the mac bin dir which are actually xplatform
+	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libtool* $(SDK)/usr/platform/cygwin/bin/
+	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libpng* $(SDK)/usr/platform/cygwin/bin/
+	# clean-up
+	$(MAKE) sdkcleanup
+	$(MAKE) finalcleanup
+	@rm -rf $(SDK)/usr/platform/darwin/share
+	$(RSYNC) $(SRCROOT)/tools/run.bat $(BUILDROOT)/staging/
+	$(RSYNC) $(SRCROOT)/cygwin $(BUILDROOT)/staging/
+	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
+	rm -rf $(BUILDROOT)/staging/sdk/usr/libexec
+	rm -rf $(BUILDROOT)/staging/sdk/usr/share/$(DEPENDENCY_CMAKE)
+	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/platform/cygwin $(BUILDROOT)/staging/sdk/usr/platform/
+	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/*.dll $(BUILDROOT)/staging/sdk/usr/lib/
+	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/bfd-plugins/*.dll $(BUILDROOT)/staging/sdk/usr/lib/bfd-plugins/
+	rm -rf $(BUILDROOT)/staging/sdk/usr/platform/darwin
+	rm -f $(BUILDROOT)/staging/sdk/usr/lib/*.dylib
+	rm -f $(BUILDROOT)/staging/sdk/usr/lib/*.la
+	rm -f $(BUILDROOT)/staging/sdk/usr/lib/bfd-plugins/*.dylib
+	$(LN) darwin $(SDK)/usr/platform/current
+	# nuke cygwin from sdk
+	rm -rf $(SDK)/usr/platform/cygwin
+	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
+
+flattensymlinks:
+	find $(BUILDROOT)/staging/sdk -type l | xargs rm
+	$(RSYNC) $(BUILDROOT)/staging/sdk/usr/platform/*/ $(BUILDROOT)/staging/sdk/usr
+	rm -rf $(BUILDROOT)/staging/sdk/usr/platform
+
+zip:
+	cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
+	find $(BUILDROOT)/staging > $(BUILDROOT)/zipcontents.txt
+
+diffdeliverables:
+		cat $(BUILDROOT)/zipcontents.txt | grep -v staging/cygwin | grep -v "run.bat" | sed -e 's/\.exe//g' -e 's/\.dll/\.~SO~/g' -e 's/\/cygwin/\/~PLAT~/g' | sort > $(BUILDROOT)/zipcontents_munge.txt
+		cat $(BUILDROOT)/dmgcontents.txt | grep -v "share/cmake" | grep -v "bin/cmake" | grep -v "bin/ctest" | grep -v "bin/cpack" | grep -v "bin/ccmake" | sed -e 's/\.exe//g' -e 's/\.dylib/\.~SO~/g' -e 's/\/darwin/\/~PLAT~/g' | sort > $(BUILDROOT)/dmgcontents_munge.txt	
+		diff $(BUILDROOT)/dmgcontents_munge.txt $(BUILDROOT)/zipcontents_munge.txt
 
 # ====================================================================================
 # Examples
