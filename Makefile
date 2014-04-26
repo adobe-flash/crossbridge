@@ -226,7 +226,7 @@ BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk
 # SWIG
 # ====================================================================================
 SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
-SWIG_LIBS=-lLLVMAVM2Info -lLLVMAVM2CodeGen -lLLVMAVM2AsmParser -lLLVMAsmPrinter -lLLVMMCParser -lclangEdit -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport $(GCCLANGFLAG) -luuid
+SWIG_LIBS=-lLLVMAVM2Info -lLLVMAVM2CodeGen -lLLVMAVM2AsmParser -lLLVMAsmPrinter -lLLVMMCParser -lclangEdit -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport $(GCCLANGFLAG)
 SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/$(DEPENDENCY_LLVM)/include -I$(BUILD)/llvm-debug/include -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/lib -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long 
 SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
 
@@ -321,6 +321,9 @@ all_ci:
 	@$(SDK)/usr/bin/make extratools
 	@$(SDK)/usr/bin/make -i finalcleanup
 	@$(SDK)/usr/bin/make submittests
+
+all_dev:
+	@$(SDK)/usr/bin/make swig
 
 # ====================================================================================
 # CORE
@@ -1049,24 +1052,15 @@ libfficheck:
 # EXTRA TOOLS
 # ====================================================================================
 extratools:
-	$(MAKE) -j$(THREADS) genfs gdb swig pkgconfig libtool
+	$(MAKE) -j$(THREADS) genfs swig gdb pkgconfig libtool
 
 genfs:
 	rm -rf $(BUILD)/zlib-native
 	mkdir -p $(BUILD)/zlib-native
 	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_ZLIB)/ $(BUILD)/zlib-native
-	cd $(BUILD)/zlib-native && PATH=$(SDK)/usr/bin:$(PATH) AR=$(NATIVE_AR) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) ./configure --static && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) 
-	cd $(BUILD)/zlib-native/contrib/minizip/ && PATH=$(SDK)/usr/bin:$(PATH) AR=$(NATIVE_AR) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) 
+	cd $(BUILD)/zlib-native && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) ./configure --static && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) 
+	cd $(BUILD)/zlib-native/contrib/minizip/ && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) 
 	PATH=$(SDK)/usr/bin:$(PATH) $(FLASCC_CC) -Wall -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
-
-gdb:
-	rm -rf $(BUILD)/$(DEPENDENCY_GDB)
-	mkdir -p $(BUILD)/$(DEPENDENCY_GDB)
-	cd $(BUILD)/$(DEPENDENCY_GDB) && CFLAGS="-I$(SRCROOT)/avm2_env/misc -Wno-error" $(SRCROOT)/$(DEPENDENCY_GDB)/configure --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=avm2-elf && $(MAKE) -j$(THREADS)
-	cp -f $(BUILD)/$(DEPENDENCY_GDB)/gdb/gdb$(EXEEXT) $(SDK)/usr/bin/
-	cp -f $(SRCROOT)/tools/flascc.gdb $(SDK)/usr/share/
-	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
-	cp -f $(SRCROOT)/tools/flascc-init.gdb $(SDK)/usr/share/
 
 swig:
 	rm -rf $(BUILD)/swig
@@ -1092,6 +1086,15 @@ swigtests:
 
 swigtestsautomation:
 	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/$(DEPENDENCY_SWIG)
+
+gdb:
+	rm -rf $(BUILD)/$(DEPENDENCY_GDB)
+	mkdir -p $(BUILD)/$(DEPENDENCY_GDB)
+	cd $(BUILD)/$(DEPENDENCY_GDB) && CFLAGS="-I$(SRCROOT)/avm2_env/misc -Wno-error" $(SRCROOT)/$(DEPENDENCY_GDB)/configure --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=avm2-elf && $(MAKE) -j$(THREADS)
+	cp -f $(BUILD)/$(DEPENDENCY_GDB)/gdb/gdb$(EXEEXT) $(SDK)/usr/bin/
+	cp -f $(SRCROOT)/tools/flascc.gdb $(SDK)/usr/share/
+	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
+	cp -f $(SRCROOT)/tools/flascc-init.gdb $(SDK)/usr/share/
 
 pkgconfig:
 	rm -rf $(BUILD)/pkgconfig
