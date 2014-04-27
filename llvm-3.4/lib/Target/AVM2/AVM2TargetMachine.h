@@ -27,7 +27,7 @@
 #define AVM2TARGETMACHINE_H
 
 #include "llvm/Target/TargetMachine.h"
-#include "llvm/DataLayout.h"
+#include "llvm/IR/DataLayout.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
 #include "AVM2InstrInfo.h"
 #include "AVM2Subtarget.h"

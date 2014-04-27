@@ -40,7 +40,7 @@ using namespace llvm;
 namespace {
     class AVM2AsmParser : public MCTargetAsmParser {
     public:
-        AVM2AsmParser(MCSubtargetInfo &sti, MCAsmParser &parser)
+        AVM2AsmParser(MCSubtargetInfo &sti, MCAsmParser &parser, const MCInstrInfo &MII)
             : MCTargetAsmParser()
         {
             //printf("AVM2AsmParser!\n");
@@ -67,7 +67,7 @@ namespace {
             return false; // abort();
         }
 
-        virtual bool mnemonicIsValid(StringRef Mnemonic)
+        virtual bool mnemonicIsValid(StringRef Mnemonic, unsigned VariantID)
         {
             abort();
             return false;
