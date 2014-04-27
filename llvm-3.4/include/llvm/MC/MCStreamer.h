@@ -171,6 +171,11 @@ public:
     assert(TargetStreamer);
     return *TargetStreamer;
   }
+  
+    // AVM2 PATCH START
+    virtual void EmitFnStart();
+    virtual void EmitFnEnd();
+    // AVM2 PATCH END
 
   unsigned getNumFrameInfos() { return FrameInfos.size(); }
 

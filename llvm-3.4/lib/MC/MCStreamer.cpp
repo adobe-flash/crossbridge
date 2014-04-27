@@ -570,6 +570,18 @@ void MCStreamer::EmitCOFFSecRel32(MCSymbol const *Symbol) {
   llvm_unreachable("This file format doesn't support this directive");
 }
 
+// AVM2 PATCH START
+void MCStreamer::EmitFnStart() {
+  errs() << "Not implemented yet\n";
+  abort();
+}
+
+void MCStreamer::EmitFnEnd() {
+  errs() << "Not implemented yet\n";
+  abort();
+}
+// AVM2 PATCH END
+
 /// EmitRawText - If this file is backed by an assembly streamer, this dumps
 /// the specified string in the output .s file.  This capability is
 /// indicated by the hasRawTextSupport() predicate.
