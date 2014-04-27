@@ -30,14 +30,19 @@ $?DEPENDENCY_BMAKE=bmake-20140214
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
 $?DEPENDENCY_DMALLOC=dmalloc-5.5.2
 $?DEPENDENCY_FFI=libffi-3.0.11
-$?DEPENDENCY_ICONV=libiconv-1.13.1
 $?DEPENDENCY_JPEG=jpeg-8c
+$?DEPENDENCY_LIBICONV=libiconv-1.13.1
+$?DEPENDENCY_LIBOGG=libogg-1.3.1
 $?DEPENDENCY_LIBPNG=libpng-1.5.7
+$?DEPENDENCY_LIBSNDFILE=libsndfile-1.0.25
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
+$?DEPENDENCY_LIBVORBIS=libvorbis-1.3.4
 $?DEPENDENCY_LLVM=llvm-2.9
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-3.82
+$?DEPENDENCY_OPENSSL=openssl-1.0.1g
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
+$?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_SWIG=swig-2.0.4
 $?DEPENDENCY_ZLIB=zlib-1.2.5
 $?DEPENDENCY_DEJAGNU=dejagnu-1.5
@@ -234,6 +239,31 @@ all_with_local_make:
 		fi ; \
 	done 
 
+# CI hook
+continuous:
+	rm -rf $(CCACHE_DIR)
+	$(MAKE) clean
+	$(MAKE) clean_libs
+	$(MAKE) all
+	$(MAKE) all_tests
+	cd samples && $(MAKE) clean
+
+# Nightly tests
+nightly:
+	$(MAKE) continuous
+
+# Weekly tests
+weekly:
+	$(MAKE) continuous
+
+# tests not in submittests target
+all_tests:
+	@$(SDK)/usr/bin/make examples
+	@$(SDK)/usr/bin/make alcexamples
+	@$(SDK)/usr/bin/make llvmtests
+	@$(SDK)/usr/bin/make swigtests
+	#$(SDK)/usr/bin/make checkasm
+
 # We are ignoring some target errors because of issues with documentation generation
 all_ci:
 	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
@@ -263,6 +293,11 @@ all_ci:
 	@$(SDK)/usr/bin/make extratools
 	@$(SDK)/usr/bin/make -i finalcleanup
 	@$(SDK)/usr/bin/make submittests
+	@$(SDK)/usr/bin/make all_tests
+
+# Dev debug target
+all_dev:
+	@$(SDK)/usr/bin/make swig
 
 # ====================================================================================
 # CORE
@@ -284,42 +319,38 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
 	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
-	tar xf packages/$(DEPENDENCY_ICONV).tar.gz
 	tar xf packages/$(DEPENDENCY_JPEG).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBICONV).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBOGG).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBPNG).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBSNDFILE).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBVORBIS).tar.gz
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
+	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
+	# unzip packages
+	mkdir -p $(DEPENDENCY_SCIMARK)
+	cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
+	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
+	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
+	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
 
 clean_libs:
 	rm -rf $(DEPENDENCY_CMAKE)
 	rm -rf $(DEPENDENCY_DEJAGNU)
 	rm -rf $(DEPENDENCY_DMALLOC)
-	rm -rf $(DEPENDENCY_ICONV)
 	rm -rf $(DEPENDENCY_JPEG)
+	rm -rf $(DEPENDENCY_LIBICONV)
+	rm -rf $(DEPENDENCY_LIBOGG)
+	rm -rf $(DEPENDENCY_LIBPNG)
+	rm -rf $(DEPENDENCY_LIBSNDFILE)
+	rm -rf $(DEPENDENCY_LIBVORBIS)
 	rm -rf $(DEPENDENCY_MAKE)
+	rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_PKG_CFG)
-
-# ====================================================================================
-# CI
-# ====================================================================================
-continuous:
-	$(MAKE) all COPY_DOCS=true
-	$(MAKE) examples neverball
-	cd samples && $(MAKE) clean
-
-nightly:
-	rm -rf $(CCACHE_DIR)
-	$(MAKE) all
-	$(MAKE) libsdl_configure
-	$(MAKE) ieeetests_conversion
-	$(MAKE) ieeetests_basicops
-	$(MAKE) swigtests
-	#$(MAKE)checkasm
-
-weekly:
-	$(MAKE) nightly
-	$(MAKE) gcctests
+	rm -rf $(DEPENDENCY_SCIMARK)
 
 # ====================================================================================
 # BASE
@@ -892,7 +923,7 @@ trd:
 # EXTRA LIBS
 # ====================================================================================
 extralibs:
-	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng libsdl dmalloc libffi
+	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng libsdl dmalloc libffi libogg libvorbis libsndfile libopenssl
 
 zlib:
 	rm -rf $(BUILD)/zlib
@@ -912,22 +943,13 @@ endif
 	rm -f $(SDK)/usr/lib/libvgl.a
 	$(AR) $(SDK)/usr/lib/libvgl.a $(BUILD)/lib/src/lib/libvgl/*.o
 
-libjpeg_configure:
-	rm -rf $(SRCROOT)/cached_build/libjpeg
-	mkdir -p $(SRCROOT)/cached_build/libjpeg
-	cd $(SRCROOT)/cached_build/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) CC=gcc CXX=g++ CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/$(DEPENDENCY_JPEG)/configure \
-		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
-	perl -p -i -e 's~$(SRCROOT)/cached_build/libjpeg~FLASCC_BUILD_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-
 libjpeg:
 	rm -rf $(BUILD)/libjpeg
 	mkdir -p $(BUILD)/libjpeg
-	cp -r $(SRCROOT)/cached_build/libjpeg $(BUILD)/
-	perl -p -i -e 's~FLASCC_BUILD_DIR~$(BUILD)/libjpeg~g' `grep -ril FLASCC_BUILD_DIR $(BUILD)/libjpeg/`
-	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libjpeg/`
+	cd $(BUILD)/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) CC=gcc CXX=g++ CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/$(DEPENDENCY_JPEG)/configure \
+		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
 	cd $(BUILD)/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libjpeg.la && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install-libLTLIBRARIES install-includeHEADERS
-	cp -f $(SRCROOT)/cached_build/libjpeg/jconfig.h $(SDK)/usr/include/
+	cp -f $(BUILD)/libjpeg/jconfig.h $(SDK)/usr/include/
 	rm -f $(SDK)/usr/lib/libjpeg.so
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-jpegtran
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-rdjpgcom
@@ -935,20 +957,11 @@ libjpeg:
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-cjpeg
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-djpeg
 
-libpng_configure:
-	rm -rf $(SRCROOT)/cached_build/libpng
-	mkdir -p $(SRCROOT)/cached_build/libpng
-	cd $(SRCROOT)/cached_build/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=gcc CXX=g++ CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/$(DEPENDENCY_LIBPNG)/configure \
-		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-dependency-tracking
-	perl -p -i -e 's~$(SRCROOT)/cached_build/libpng~FLASCC_BUILD_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-
 libpng:
 	rm -rf $(BUILD)/libpng
 	mkdir -p $(BUILD)/libpng
-	cp -r $(SRCROOT)/cached_build/libpng $(BUILD)/
-	perl -p -i -e 's~FLASCC_BUILD_DIR~$(BUILD)/libpng~g' `grep -ril FLASCC_BUILD_DIR $(BUILD)/libpng/`
-	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libpng/`
+	cd $(BUILD)/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=gcc CXX=g++ CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/$(DEPENDENCY_LIBPNG)/configure \
+		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-dependency-tracking
 	cd $(BUILD)/libpng && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 	rm -f $(SDK)/usr/bin/libpng-config
 	cp -f $(SDK)/usr/bin/libpng15-config $(SDK)/usr/bin/libpng-config
@@ -1004,6 +1017,31 @@ libffi:
 
 libfficheck:
 	cd $(BUILD)/libffi/testsuite && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) check
+
+libiconv:
+	mkdir -p $(BUILD)/libiconv
+	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBICONV)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+libogg:
+	mkdir -p $(BUILD)/libogg
+	cd $(BUILD)/libogg && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBOGG)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libogg && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+libvorbis:
+	mkdir -p $(BUILD)/libvorbis
+	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBVORBIS)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+libsndfile:
+	mkdir -p $(BUILD)/libsndfile
+	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSNDFILE)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+libopenssl:
+	mkdir -p $(BUILD)/openssl
+	cd $(BUILD)/openssl && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_OPENSSL)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/openssl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # ====================================================================================
 # EXTRA TOOLS
@@ -1073,88 +1111,342 @@ libtool:
 	cd $(BUILD)/libtool && $(MAKE) -j$(THREADS) && $(MAKE) install-exec
 
 # ====================================================================================
-# WIN
+# Submit tests
 # ====================================================================================
-win:
-	@if [ -d $(CYGWINMAC) ] ; then true ; \
-		else echo "Couldn't locate cygwin mac directory, please invoke $(MAKE) with \"$(MAKE) CYGWINMAC=/path/to/cygwinmac/sdk/usr/bin ...\"" ; exit 1; \
-	fi
 
-	@mkdir -p $(WIN_BUILD)/logs
+submittests: pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
+			hellocpp_shell hellocpp_swf hellocpp_swf_opt posixtest scimark scimark_swf \
+			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest samples
+	cat $(BUILD)/scimark/result.txt
 
-	@echo "-  base (win)"
-	@$(CROSS) base  &> $(WIN_BUILD)/logs/base_win.txt
+pthreadsubmittests_shell: pthreadsubmittests_shell_compile pthreadsubmittests_shell_run
 
-	@echo "-  make (win)"
-	@$(CROSS) make &> $(WIN_BUILD)/logs/make_win.txt
-	
-	@echo "-  uname (win)"
-	@$(CROSS) uname  &> $(WIN_BUILD)/logs/uname_win.txt
+pthreadsubmittests_shell_compile:
+	@rm -rf $(BUILD)/pthreadsubmit_shell
+	@mkdir -p $(BUILD)/pthreadsubmit_shell
+	cd $(BUILD)/pthreadsubmit_shell && $(SDK)/usr/bin/gcc -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized
+	cd $(BUILD)/pthreadsubmit_shell && $(SDK)/usr/bin/gcc -O0 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test
 
-	@echo "-  noenv (win)"
-	@$(CROSS) noenv &> $(WIN_BUILD)/logs/noenv_win.txt
+pthreadsubmittests_shell_run:
+	cd $(BUILD)/pthreadsubmit_shell && ./pthread_test_optimized
+	cd $(BUILD)/pthreadsubmit_shell && ./pthread_test
 
-	@echo "-  avm2-as (win)"
-	@$(CROSS) avm2-as &> $(WIN_BUILD)/logs/avm2-as_win.txt
+pthreadsubmittests_swf:
+	@rm -rf $(BUILD)/pthreadsubmit_swf
+	@mkdir -p $(BUILD)/pthreadsubmit_swf
+	cd $(BUILD)/pthreadsubmit_swf && $(SDK)/usr/bin/gcc -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized.swf
+	cd $(BUILD)/pthreadsubmit_swf && $(SDK)/usr/bin/gcc -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -emit-swc=com.adobe.flascc -o pthread_test_optimized.swc
+	cd $(BUILD)/pthreadsubmit_swf && $(SDK)/usr/bin/gcc -O0 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
+	cp -f $(BUILD)/pthreadsubmit_swf/*.swf $(BUILDROOT)/extra/
 
-	@echo "-  pkgconfig (win)"
-	@$(CROSS) GLIB_CFLAGS="-I$(CYGWINMAC)/../include/glib-2.0/ -I$(CYGWINMAC)/../lib/glib-2.0/include/" GLIB_LIBS="$(CYGWINMAC)/../lib/libglib-2.0.a -lintl -liconv" pkgconfig -j1 &> $(WIN_BUILD)/logs/pkgconfig_win.txt
+pthreadtests:
+	@rm -rf $(BUILD)/pthread$(SWFDIR)
+	@mkdir -p $(BUILD)/pthread$(SWFDIR)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_cancel.c -o pthread_cancel$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_async_cancel.c -o pthread_async_cancel$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_create.c -o pthread_create$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_create_test.c -o pthread_create_test$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_mutex_test.c -o pthread_mutex_test$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_mutex_test2.c -o pthread_mutex_test2$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_malloc_test.c -o pthread_malloc_test$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_specific.c -o pthread_specific$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_suspend.c -o pthread_suspend$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/thr_kill.c -o thr_kill$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/peterson.c -o peterson$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps -DORDER_STRENGTH=1 $(SRCROOT)/test/peterson.c -o peterson_nofence$(SWFEXT)
+	$(MAKE) as3++tests
 
-	@echo "-  llvm (win/cygwin)"
-	@$(MAKE) cross_llvm_cygwin &> $(WIN_BUILD)/logs/llvm_win_cygwin.txt
+helloswf:
+	@rm -rf $(BUILD)/helloswf
+	@mkdir -p $(BUILD)/helloswf
+	cd $(BUILD)/helloswf && $(SDK)/usr/bin/gcc -c -g -O0 $(SRCROOT)/test/hello.c -emit-llvm -o hello.bc
+	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.abc -filetype=obj
+	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.as -filetype=asm
+	cd $(BUILD)/helloswf && $(SDK)/usr/bin/gcc -emit-swf -swf-size=200x200 -O0 -g hello.abc -o hello.swf
 
-	@echo "-  binutils (win)"
-	@$(CROSS) binutils &> $(WIN_BUILD)/logs/binutils_win.txt
-	
-	@echo "-  plugins (win)"
-	@$(CROSS) plugins &> $(WIN_BUILD)/logs/plugins_win.txt
-	
-	@echo "-  gcc (win)"
-	@$(CROSS) gcc &> $(WIN_BUILD)/logs/gcc_win.txt
-	
-	@echo "-  swig (win)"
-	@$(CROSS) swig &> $(WIN_BUILD)/logs/swig_win.txt
+helloswf_opt:
+	@rm -rf $(BUILD)/helloswf_opt
+	@mkdir -p $(BUILD)/helloswf_opt
+	cd $(BUILD)/helloswf_opt && $(SDK)/usr/bin/gcc -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
 
-	@echo "-  llvm (win/mingw)"
-	@$(MAKE) cross_llvm_mingw &> $(WIN_BUILD)/logs/llvm_win_mingw.txt
+hellocpp_shell:
+	@rm -rf $(BUILD)/hellocpp_shell
+	@mkdir -p $(BUILD)/hellocpp_shell
+	cd $(BUILD)/hellocpp_shell && $(SDK)/usr/bin/g++ -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
 
-	@echo "-  tr (win)"
-	@$(CROSS) tr &> $(WIN_BUILD)/logs/tr_win.txt
-	
-	@echo "-  trd (win)"
-	@$(CROSS) trd &> $(WIN_BUILD)/logs/trd_win.txt
+hellocpp_swf:
+	@rm -rf $(BUILD)/hellocpp_swf
+	@mkdir -p $(BUILD)/hellocpp_swf
+	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/g++ -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
 
-	@echo "-  gdb (win)"
-	@$(CROSS) gdb &> $(WIN_BUILD)/logs/gdb_win.txt
+hellocpp_swf_opt:
+	@rm -rf $(BUILD)/hellocpp_swf_opt
+	@mkdir -p $(BUILD)/hellocpp_swf_opt
+	cd $(BUILD)/hellocpp_swf_opt && $(SDK)/usr/bin/g++ -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
 
-	@echo "-  genfs (win)"
-	@$(CROSS) genfs &> $(WIN_BUILD)/logs/genfs_win.txt
+as3++tests:
+	@rm -rf $(BUILD)/as3++_swf
+	@mkdir -p $(BUILD)/as3++_swf
+	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt.cpp -lAS3++ -o AS3++mt.swf
+	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt1.cpp -lAS3++ -o AS3++mt1.swf
+	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt2.cpp -lAS3++ -o AS3++mt2.swf
+	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt3.cpp -lAS3++ -o AS3++mt3.swf
 
-cross_llvm_mingw:
-	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_RC_COMPILER $(MINGWTRIPLE)-gcc)" >> $(BUILD)/llvmcross.toolchain
-	
-	PATH="$(BUILD)/ccachebin:$(SRCROOT)/mingwmac/sdk/usr/bin:$(PATH)" $(MAKE) \
-		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(MINGWTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
-		CC=$(MINGWTRIPLE)-gcc CXX=$(MINGWTRIPLE)-g++ \
-		LLVMCFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" \
-		LLVMCXXFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" LLVMLDFLAGS="-lrpcrt4 -Wl,--stack,16000000" \
-		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
-		llvm BUILD_LLVM_TESTS=ON LLVM_ONLYLLC=true CLANG=OFF
+conctests:
+	mkdir -p $(BUILD)/conc$(SWFDIR)
+	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/newThread.c -o newThread$(SWFEXT)
+	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_conc.c -o avm2_conc$(SWFEXT)
+	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex.c -o avm2_mutex$(SWFEXT)
+	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex2.c -o avm2_mutex2$(SWFEXT)
 
-cross_llvm_cygwin:
-	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_RC_COMPILER $(CC))" >> $(BUILD)/llvmcross.toolchain
-	
-	PATH="$(BUILD)/ccachebin:$(CYGWINMAC)/../altbin:$(CYGWINMAC):$(PATH)" $(MAKE) \
-		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(CYGTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
-		CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ LLVMLDFLAGS="-Wl,--stack,16000000" \
-		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
-		llvm BUILD_LLVM_TESTS=OFF
+posixtest:
+	@rm -rf $(BUILD)/posixtest
+	@mkdir -p $(BUILD)/posixtest
+	$(SDK)/usr/bin/genfs --name my.test.BackingStore $(SRCROOT)/test/zipfsroot $(BUILD)/posixtest/alcfs
+	cd $(BUILD)/posixtest && $(SCOMPFALCON) \
+		-import $(call nativepath,$(SDK)/usr/lib/BinaryData.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/ISpecialFile.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/IBackingStore.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/IVFS.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/InMemoryBackingStore.abc) \
+		-import $(call nativepath,$(SDK)/usr/lib/PlayerKernel.abc) \
+		$(call nativepath, $(BUILD)/posixtest/alcfsBackingStore.as) -outdir . -out alcfs
+	cd $(BUILD)/posixtest && $(SDK)/usr/bin/gcc -emit-swf -O0 -swf-version=15 $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) alcfs.abc $(SRCROOT)/test/fileio.c -o posixtest.swf
 
-.PHONY: bmake posix binutils docs gcc samples
+scimark:
+	@mkdir -p $(BUILD)/scimark
+	cd $(BUILD)/scimark && $(SDK)/usr/bin/gcc -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
+	$(BUILD)/scimark/scimark2 &> $(BUILD)/scimark/result.txt
+
+scimark_swf:
+	@mkdir -p $(BUILD)/scimark_swf
+	cd $(BUILD)/scimark_swf && $(SDK)/usr/bin/gcc -O4 -swf-version=17 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
+	cd $(BUILD)/scimark_swf && $(SDK)/usr/bin/gcc -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2v18.swf
+	cp -f $(BUILD)/scimark_swf/*.swf $(BUILDROOT)/extra/
+
+scimark_asc:
+	@mkdir -p $(BUILD)/scimark_asc
+	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/gcc -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
+	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/gcc -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
+	$(BUILD)/scimark_asc/scimark2 &> $(BUILD)/scimark_asc/result.txt
+
+parse_scimark_log:
+	$(MAKE) scimark
+	ant -f qa/performance/build.xml -Dbuild=$(FLASCC_VERSION_BUILD) \
+		-DsendResults=true -Dbranch=mainline -DresultsFile=$(BUILD)/scimark/result.txt -DresultsFileFalcon=$(BUILD)/scimark/result.txt
+
+sjljtest:
+	@mkdir -p $(BUILD)/sjljtest
+	cd $(BUILD)/sjljtest && $(SDK)/usr/bin/g++ -O0 $(SRCROOT)/test/sjljtest.c -v -o sjljtest -save-temps
+	$(BUILD)/sjljtest/sjljtest &> $(BUILD)/sjljtest/result.txt
+	diff --strip-trailing-cr $(BUILD)/sjljtest/result.txt $(SRCROOT)/test/sjljtest.expected.txt
+
+sjljtest_opt:
+	@mkdir -p $(BUILD)/sjljtest_opt
+	cd $(BUILD)/sjljtest_opt && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/sjljtest.c -o sjljtest -save-temps
+	$(BUILD)/sjljtest_opt/sjljtest &> $(BUILD)/sjljtest_opt/result.txt
+	diff --strip-trailing-cr $(BUILD)/sjljtest_opt/result.txt $(SRCROOT)/test/sjljtest.expected.txt
+
+ehtest:
+	@mkdir -p $(BUILD)/ehtest
+	cd $(BUILD)/ehtest && $(SDK)/usr/bin/g++ -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	-$(BUILD)/ehtest/ehtest &> $(BUILD)/ehtest/result.txt
+	diff --strip-trailing-cr $(BUILD)/ehtest/result.txt $(SRCROOT)/test/ehtest.expected.txt
+
+ehtest_opt:
+	@mkdir -p $(BUILD)/ehtest_opt
+	cd $(BUILD)/ehtest_opt && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	-$(BUILD)/ehtest_opt/ehtest &> $(BUILD)/ehtest_opt/result.txt
+	diff --strip-trailing-cr $(BUILD)/ehtest_opt/result.txt $(SRCROOT)/test/ehtest.expected.txt
+
+ehtest_asc:
+	@mkdir -p $(BUILD)/ehtest_asc
+	cd $(BUILD)/ehtest_asc && $(SDK)/usr/bin/g++ -muse-legacy-asc -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	-$(BUILD)/ehtest_asc/ehtest &> $(BUILD)/ehtest_asc/result.txt
+	diff --strip-trailing-cr $(BUILD)/ehtest_asc/result.txt $(SRCROOT)/test/ehtest.expected.txt
+
+	cd $(BUILD)/ehtest_asc && $(SDK)/usr/bin/g++ -muse-legacy-asc -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	-$(BUILD)/ehtest_asc/ehtest &> $(BUILD)/ehtest_asc/result.txt
+	diff --strip-trailing-cr $(BUILD)/ehtest_asc/result.txt $(SRCROOT)/test/ehtest.expected.txt
+
+as3interoptest:
+	@mkdir -p $(BUILD)/as3interoptest
+	cd $(BUILD)/as3interoptest && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/as3interoptest.c -o as3interoptest -save-temps
+	$(BUILD)/as3interoptest/as3interoptest &> $(BUILD)/as3interoptest/result.txt
+
+symboltest:
+	mkdir -p $(BUILD)/symboltest
+	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llvm-as $(SRCROOT)/test/symboltest.ll -o symboltest.bc
+	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=asm -o symboltest.s
+	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=obj -o symboltest.abc
+
+	cd $(BUILD)/symboltest && $(SDK)/usr/bin/nm symboltest.abc | grep symbolTest > syms.abc.txt
+	cd $(BUILD)/symboltest && $(SDK)/usr/bin/nm symboltest.bc | grep symbolTest > syms.bc.txt
+	diff --strip-trailing-cr $(BUILD)/symboltest/*.txt
+
+samples:
+	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS)
+	mkdir -p $(BUILDROOT)/extra
+	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
+
+gdbunit:
+	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
+	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
+
+vfstests:
+	@cd qa/vfs/framework && $(MAKE) FLASCC=$(FLASCC)
+
+checkasm:
+	rm -rf $(BUILD)/libtoabc
+	@mkdir -p $(BUILD)/logs/libtoabc
+	@libs=`find $(SDK) -name "*.a"`; \
+	omittedlibs="libjpeg.a\nlibpng\nlibz.a" ; \
+	omittedlibs=`echo $$omittedlibs` ; \
+	libs=`echo "$$libs" | grep -F -v "$$omittedlibs"` ; \
+	echo "Compiling SDK libraries to ABC" ; \
+	for lib in $$libs ; do \
+		shortlib=`basename $$lib` ; \
+		echo "- checking $$lib" ; \
+		$(MAKE) libtoabc LIB=$$lib &> $(BUILD)/logs/libtoabc/$$shortlib.txt ; \
+		mret=$$? ; \
+		if [ $$mret -ne 0 ] ; then \
+		echo "Failed to build abc: $$lib" ;\
+		cat $(BUILD)/logs/libtoabc/$$shortlib.txt ;\
+		exit 1 ; \
+		fi ; \
+	done
+	@echo "Checking headers for asm"
+	$(PYTHON) $(SRCROOT)/tools/search_headers.py $(SDK) $(BUILD)/header-search
+
+libtoabc:
+	mkdir -p $(BUILD)/libtoabc/`basename $(LIB)`
+	cd $(BUILD)/libtoabc/`basename $(LIB)` && $(SDK)/usr/bin/ar x $(LIB)
+	@abcdir=$(BUILD)/libtoabc/`basename $(LIB)` ; \
+	numos=`find $$abcdir -maxdepth 1 -name '*.o' | wc -l` ; \
+	if [$$numos -gt 0 ] ; then \
+	cd $(BUILD)/libtoabc/`basename $(LIB)` && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS) ; \
+	fi 
+
+speccpu2006: # works on mac only! (and probably requires local tweaks to alchemy.cfg and mac32.cfg)
+	@rm -rf $(BUILD)/speccpu2006
+	@mkdir -p $(BUILD)/speccpu2006
+	cd $(BUILD)/speccpu2006 && curl http://alchemy.corp.adobe.com/speccpu2006.tar.bz2 | tar xvf -
+	cd $(BUILD)/speccpu2006/speccpu2006 && cat $(SRCROOT)/test/speccpu2006/install.sh.ed | ed install.sh # build install2.sh w/ hardcoded arch=mac32-x86
+	cd $(BUILD)/speccpu2006/speccpu2006 && chmod +x install2.sh && chmod +x tools/bin/macosx-x86/spec* && chmod +w MANIFEST && echo y | SPEC= ./install2.sh
+	cd $(BUILD)/speccpu2006/speccpu2006 && cp $(SRCROOT)/test/speccpu2006/*.cfg config/. && chmod +w config/*.cfg
+	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=alchemy.cfg --tune=base --loose --action build int fp | tee alchemy.build.log)
+	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action build int fp | tee mac32.build.log)
+	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=alchemy.cfg --tune=base --loose --action validate int fp | tee -a alchemy.run.log)
+	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action validate int fp | tee -a mac32.run.log)
+
+# ====================================================================================
+# Examples
+# ====================================================================================
+
+examples:
+	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS) PAK0FILE=$(SRCROOT)/samples/Example_Quake1/sdlquake-1.0.9/ID1/PAK0.PAK examples
+	mkdir -p $(BUILDROOT)/extra
+	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
+
+alcexamples: sync_alcextra sync_alcexamples sync_gls3d
+	mkdir -p $(BUILDROOT)/extra
+	$(MAKE) alcexample_neverball
+	$(MAKE) alcexample_dosbox
+
+sync_alcextra:
+	rm -rf $(BUILD)/github/alcextra
+	mkdir -p $(BUILD)/github/alcextra
+	cd $(BUILD)/github && git clone --depth 1 https://github.com/alexmac/alcextra.git alcextra
+
+sync_alcexamples:
+	rm -rf $(BUILD)/github/alcexamples
+	mkdir -p $(BUILD)/github/alcexamples
+	cd $(BUILD)/github && git clone --depth 1 https://github.com/alexmac/alcexamples.git alcexamples
+
+sync_gls3d:
+	rm -rf $(BUILD)/github/GLS3D
+	mkdir -p $(BUILD)/github/GLS3D
+	cd $(BUILD)/github && git clone --depth 1 https://github.com/adobe/GLS3D.git GLS3D
+
+alcexample_neverball:
+	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra neverball
+	mkdir -p $(BUILDROOT)/extra/neverball
+	cp -f $(BUILD)/github/alcexamples/build/neverball/neverball.swf $(BUILDROOT)/extra/neverball/
+	cp -f $(BUILD)/github/alcexamples/build/neverball/neverputt.swf $(BUILDROOT)/extra/neverball/
+	cp -f $(BUILD)/github/alcexamples/build/neverball/*.zip $(BUILDROOT)/extra/neverball/
+
+alcexample_dosbox:
+	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra dosbox
+	mkdir -p $(BUILDROOT)/extra/neverball
+	cp -f $(BUILD)/github/alcexamples/build/dosbox/dosbox.swf $(BUILDROOT)/extra/
+
+# ====================================================================================
+# Extra Tests
+# ====================================================================================
+dejagnu:
+	mkdir -p $(BUILD)/dejagnu
+	cd $(BUILD)/dejagnu && $(SRCROOT)/dejagnu-1.5/configure --prefix=$(BUILD)/dejagnu && $(MAKE) install
+
+RUNGCCTESTS=mkdir -p $(BUILD)/gcctests/$@ && cd $(BUILD)/gcctests/$@ && LD_LIBRARY_PATH="/" PATH="$(SDK)/usr/bin:$(PATH)" $(BUILD)/dejagnu/bin/runtest --all --srcdir $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite --target_board=$(TRIPLE)
+
+CTORTUREDIRS= \
+compat \
+compile \
+execute \
+unsorted
+
+GCCTESTDIRS= \
+g++.apple \
+g++.dg \
+g++.old-deja \
+gcc.apple \
+gcc.dg \
+gcc.misc-tests \
+gcc.target \
+gcc.test-framework \
+llvm.obj-c++ \
+llvm.objc \
+obj-c++.dg \
+objc \
+objc.dg
+
+gcctorture/%:
+	-$(RUNGCCTESTS) --tool gcc --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/gcc.c-torture $(@:gcctorture/%=%).exp
+
+gxxtorture/%:
+	-$(RUNGCCTESTS) --tool g++ --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/gcc.c-torture $(@:gxxtorture/%=%).exp
+
+gccrun/%:
+	-$(RUNGCCTESTS) --tool gcc --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/$(@:gccrun/%=%)
+
+gxxrun/%:
+	-$(RUNGCCTESTS) --tool g++ --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/$(@:gxxrun/%=%)
+
+gcctests:
+	$(MAKE) dejagnu
+	cp -f $(SRCROOT)/tools/$(TRIPLE).exp $(BUILD)/dejagnu/share/dejagnu/baseboards/
+	chmod u+rw $(BUILD)/dejagnu/share/dejagnu/baseboards/*
+	$(MAKE) -j$(THREADS) allgcctests
+
+allgcctests: $(CTORTUREDIRS:%=gcctorture/%) $(CTORTUREDIRS:%=gxxtorture/%) $(GCCTESTDIRS:%=gccrun/%) $(GCCTESTDIRS:%=gxxrun/%)
+	cat $(BUILD)/gcctests/*/*/gcc.log  > $(BUILD)/gcctests/gcc.log
+	cat $(BUILD)/gcctests/*/*/g++.log  > $(BUILD)/gcctests/g++.log
+
+ieeetests_conversion:
+	rm -rf $(BUILD)/ieeetests_conversion
+	mkdir -p $(BUILD)/ieeetests_conversion
+	$(RSYNC) $(SRCROOT)/test/IeeeCC754/ $(BUILD)/ieeetests_conversion
+	echo "b\nb\na" > $(BUILD)/ieeetests_conversion/answers
+	cd $(BUILD)/ieeetests_conversion && PATH=$(SDK)/usr/bin:$(PATH) ./dotests.sh < answers
+
+ieeetests_basicops:
+	rm -rf $(BUILD)/ieeetests_basicops
+	mkdir -p $(BUILD)/ieeetests_basicops
+	$(RSYNC) $(SRCROOT)/test/IeeeCC754/ $(BUILD)/ieeetests_basicops
+	echo "a\nb\na" > $(BUILD)/ieeetests_basicops/answers
+	cd $(BUILD)/ieeetests_basicops && PATH=$(SDK)/usr/bin:$(PATH) ./dotests.sh < answers
 
 # ====================================================================================
 # DEPLOY
@@ -1246,11 +1538,9 @@ winstaging:
 	rm -rf $(SDK)/usr/platform/cygwin
 	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
 
-libiconv:
-	mkdir -p $(BUILD)/libiconv
-	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_ICONV)/configure --prefix=$(SDK)/usr
-	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
+# ====================================================================================
+# CROSS
+# ====================================================================================
 libobjc_configure:
 	cd $(BUILD)/llvm-gcc-42 \
 		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' TARGET-target-libobjc="all OBJC_THREAD_FILE=thr-posix" all-target-libobjc > $(SRCROOT)/cached_build/libobjc/compile.log
@@ -1291,341 +1581,83 @@ cxxfiltmingw:
 		$(BUILD)/cxxfiltmingw/libiberty/*.o $(BUILD)/cxxfiltmingw/intl/*.o $(BUILD)/cxxfiltmingw/binutils/version.o \
 		$(BUILD)/cxxfiltmingw/binutils/bucomm.o  $(BUILD)/cxxfiltmingw/bfd/*.o -o c++filt.exe
 
-dejagnu:
-	mkdir -p $(BUILD)/dejagnu
-	cd $(BUILD)/dejagnu && $(SRCROOT)/dejagnu-1.5/configure --prefix=$(BUILD)/dejagnu && $(MAKE) install
+win:
+	@if [ -d $(CYGWINMAC) ] ; then true ; \
+		else echo "Couldn't locate cygwin mac directory, please invoke $(MAKE) with \"$(MAKE) CYGWINMAC=/path/to/cygwinmac/sdk/usr/bin ...\"" ; exit 1; \
+	fi
 
-RUNGCCTESTS=mkdir -p $(BUILD)/gcctests/$@ && cd $(BUILD)/gcctests/$@ && LD_LIBRARY_PATH="/" PATH="$(SDK)/usr/bin:$(PATH)" $(BUILD)/dejagnu/bin/runtest --all --srcdir $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite --target_board=$(TRIPLE)
+	@mkdir -p $(WIN_BUILD)/logs
 
-CTORTUREDIRS= \
-compat \
-compile \
-execute \
-unsorted
+	@echo "-  base (win)"
+	@$(CROSS) base  &> $(WIN_BUILD)/logs/base_win.txt
 
-GCCTESTDIRS= \
-g++.apple \
-g++.dg \
-g++.old-deja \
-gcc.apple \
-gcc.dg \
-gcc.misc-tests \
-gcc.target \
-gcc.test-framework \
-llvm.obj-c++ \
-llvm.objc \
-obj-c++.dg \
-objc \
-objc.dg
-
-gcctorture/%:
-	-$(RUNGCCTESTS) --tool gcc --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/gcc.c-torture $(@:gcctorture/%=%).exp
-
-gxxtorture/%:
-	-$(RUNGCCTESTS) --tool g++ --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/gcc.c-torture $(@:gxxtorture/%=%).exp
-
-gccrun/%:
-	-$(RUNGCCTESTS) --tool gcc --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/$(@:gccrun/%=%)
-
-gxxrun/%:
-	-$(RUNGCCTESTS) --tool g++ --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/$(@:gxxrun/%=%)
-
-gcctests:
-	$(MAKE) dejagnu
-	cp -f $(SRCROOT)/tools/$(TRIPLE).exp $(BUILD)/dejagnu/share/dejagnu/baseboards/
-	chmod u+rw $(BUILD)/dejagnu/share/dejagnu/baseboards/*
-	$(MAKE) -j$(THREADS) allgcctests
-
-allgcctests: $(CTORTUREDIRS:%=gcctorture/%) $(CTORTUREDIRS:%=gxxtorture/%) $(GCCTESTDIRS:%=gccrun/%) $(GCCTESTDIRS:%=gxxrun/%)
-	cat $(BUILD)/gcctests/*/*/gcc.log  > $(BUILD)/gcctests/gcc.log
-	cat $(BUILD)/gcctests/*/*/g++.log  > $(BUILD)/gcctests/g++.log
-
-ieeetests_conversion:
-	rm -rf $(BUILD)/ieeetests_conversion
-	mkdir -p $(BUILD)/ieeetests_conversion
-	$(RSYNC) $(SRCROOT)/test/IeeeCC754/ $(BUILD)/ieeetests_conversion
-	echo "b\nb\na" > $(BUILD)/ieeetests_conversion/answers
-	cd $(BUILD)/ieeetests_conversion && PATH=$(SDK)/usr/bin:$(PATH) ./dotests.sh < answers
-
-ieeetests_basicops:
-	rm -rf $(BUILD)/ieeetests_basicops
-	mkdir -p $(BUILD)/ieeetests_basicops
-	$(RSYNC) $(SRCROOT)/test/IeeeCC754/ $(BUILD)/ieeetests_basicops
-	echo "a\nb\na" > $(BUILD)/ieeetests_basicops/answers
-	cd $(BUILD)/ieeetests_basicops && PATH=$(SDK)/usr/bin:$(PATH) ./dotests.sh < answers
-
-# ====================================================================================
-# Samples and Examples
-# ====================================================================================
-
-neverball: sync_alcextra sync_alcexamples sync_gls3d
-	$(MAKE) alcexample_neverball 
-
-sync_alcextra:
-	rm -rf $(BUILD)/github/alcextra
-	mkdir -p $(BUILD)/github/alcextra
-	cd $(BUILD)/github && git clone --depth 1 https://github.com/alexmac/alcextra.git alcextra
-
-sync_alcexamples:
-	rm -rf $(BUILD)/github/alcexamples
-	mkdir -p $(BUILD)/github/alcexamples
-	cd $(BUILD)/github && git clone --depth 1 https://github.com/alexmac/alcexamples.git alcexamples
-
-sync_gls3d:
-	rm -rf $(BUILD)/github/GLS3D
-	mkdir -p $(BUILD)/github/GLS3D
-	cd $(BUILD)/github && git clone --depth 1 https://github.com/adobe/GLS3D.git GLS3D
+	@echo "-  make (win)"
+	@$(CROSS) make &> $(WIN_BUILD)/logs/make_win.txt
 	
-alcexamples: sync_alcextra sync_alcexamples sync_gls3d
-	mkdir -p $(BUILDROOT)/extra
-	$(MAKE) alcexample_neverball
-	$(MAKE) alcexample_dosbox
+	@echo "-  uname (win)"
+	@$(CROSS) uname  &> $(WIN_BUILD)/logs/uname_win.txt
 
-alcexample_neverball:
-	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra neverball
-	mkdir -p $(BUILDROOT)/extra/neverball
-	cp -f $(BUILD)/github/alcexamples/build/neverball/neverball.swf $(BUILDROOT)/extra/neverball/
-	cp -f $(BUILD)/github/alcexamples/build/neverball/neverputt.swf $(BUILDROOT)/extra/neverball/
-	cp -f $(BUILD)/github/alcexamples/build/neverball/*.zip $(BUILDROOT)/extra/neverball/
+	@echo "-  noenv (win)"
+	@$(CROSS) noenv &> $(WIN_BUILD)/logs/noenv_win.txt
 
-alcexample_dosbox:
-	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra dosbox
-	mkdir -p $(BUILDROOT)/extra/neverball
-	cp -f $(BUILD)/github/alcexamples/build/dosbox/dosbox.swf $(BUILDROOT)/extra/
+	@echo "-  avm2-as (win)"
+	@$(CROSS) avm2-as &> $(WIN_BUILD)/logs/avm2-as_win.txt
 
-symboltest:
-	mkdir -p $(BUILD)/symboltest
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llvm-as $(SRCROOT)/test/symboltest.ll -o symboltest.bc
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=asm -o symboltest.s
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=obj -o symboltest.abc
+	@echo "-  pkgconfig (win)"
+	@$(CROSS) GLIB_CFLAGS="-I$(CYGWINMAC)/../include/glib-2.0/ -I$(CYGWINMAC)/../lib/glib-2.0/include/" GLIB_LIBS="$(CYGWINMAC)/../lib/libglib-2.0.a -lintl -liconv" pkgconfig -j1 &> $(WIN_BUILD)/logs/pkgconfig_win.txt
 
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/nm symboltest.abc | grep symbolTest > syms.abc.txt
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/nm symboltest.bc | grep symbolTest > syms.bc.txt
-	diff --strip-trailing-cr $(BUILD)/symboltest/*.txt
+	@echo "-  llvm (win/cygwin)"
+	@$(MAKE) cross_llvm_cygwin &> $(WIN_BUILD)/logs/llvm_win_cygwin.txt
 
-samples:
-	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS)
-	mkdir -p $(BUILDROOT)/extra
-	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
+	@echo "-  binutils (win)"
+	@$(CROSS) binutils &> $(WIN_BUILD)/logs/binutils_win.txt
+	
+	@echo "-  plugins (win)"
+	@$(CROSS) plugins &> $(WIN_BUILD)/logs/plugins_win.txt
+	
+	@echo "-  gcc (win)"
+	@$(CROSS) gcc &> $(WIN_BUILD)/logs/gcc_win.txt
+	
+	@echo "-  swig (win)"
+	@$(CROSS) swig &> $(WIN_BUILD)/logs/swig_win.txt
 
-examples:
-	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS) PAK0FILE=$(SRCROOT)/samples/Example_Quake1/sdlquake-1.0.9/ID1/PAK0.PAK examples
-	mkdir -p $(BUILDROOT)/extra
-	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
+	@echo "-  llvm (win/mingw)"
+	@$(MAKE) cross_llvm_mingw &> $(WIN_BUILD)/logs/llvm_win_mingw.txt
 
-# ====================================================================================
-# Submit tests
-# ====================================================================================
+	@echo "-  tr (win)"
+	@$(CROSS) tr &> $(WIN_BUILD)/logs/tr_win.txt
+	
+	@echo "-  trd (win)"
+	@$(CROSS) trd &> $(WIN_BUILD)/logs/trd_win.txt
 
-submittests: pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
-			hellocpp_shell hellocpp_swf hellocpp_swf_opt posixtest scimark scimark_swf \
-			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest samples
-	cd samples && $(MAKE) clean
-	cat $(BUILD)/scimark/result.txt
+	@echo "-  gdb (win)"
+	@$(CROSS) gdb &> $(WIN_BUILD)/logs/gdb_win.txt
 
-helloswf:
-	@rm -rf $(BUILD)/helloswf
-	@mkdir -p $(BUILD)/helloswf
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/gcc -c -g -O0 $(SRCROOT)/test/hello.c -emit-llvm -o hello.bc
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.abc -filetype=obj
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.as -filetype=asm
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/gcc -emit-swf -swf-size=200x200 -O0 -g hello.abc -o hello.swf
+	@echo "-  genfs (win)"
+	@$(CROSS) genfs &> $(WIN_BUILD)/logs/genfs_win.txt
 
-helloswf_opt:
-	@rm -rf $(BUILD)/helloswf_opt
-	@mkdir -p $(BUILD)/helloswf_opt
-	cd $(BUILD)/helloswf_opt && $(SDK)/usr/bin/gcc -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
+cross_llvm_mingw:
+	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
+	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
+	echo  "set(CMAKE_RC_COMPILER $(MINGWTRIPLE)-gcc)" >> $(BUILD)/llvmcross.toolchain
+	
+	PATH="$(BUILD)/ccachebin:$(SRCROOT)/mingwmac/sdk/usr/bin:$(PATH)" $(MAKE) \
+		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(MINGWTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
+		CC=$(MINGWTRIPLE)-gcc CXX=$(MINGWTRIPLE)-g++ \
+		LLVMCFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" \
+		LLVMCXXFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" LLVMLDFLAGS="-lrpcrt4 -Wl,--stack,16000000" \
+		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
+		llvm BUILD_LLVM_TESTS=ON LLVM_ONLYLLC=true CLANG=OFF
 
-hellocpp_shell:
-	@rm -rf $(BUILD)/hellocpp_shell
-	@mkdir -p $(BUILD)/hellocpp_shell
-	cd $(BUILD)/hellocpp_shell && $(SDK)/usr/bin/g++ -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
+cross_llvm_cygwin:
+	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
+	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
+	echo  "set(CMAKE_RC_COMPILER $(CC))" >> $(BUILD)/llvmcross.toolchain
+	
+	PATH="$(BUILD)/ccachebin:$(CYGWINMAC)/../altbin:$(CYGWINMAC):$(PATH)" $(MAKE) \
+		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(CYGTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
+		CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ LLVMLDFLAGS="-Wl,--stack,16000000" \
+		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
+		llvm BUILD_LLVM_TESTS=OFF
 
-hellocpp_swf:
-	@rm -rf $(BUILD)/hellocpp_swf
-	@mkdir -p $(BUILD)/hellocpp_swf
-	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/g++ -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
-
-hellocpp_swf_opt:
-	@rm -rf $(BUILD)/hellocpp_swf_opt
-	@mkdir -p $(BUILD)/hellocpp_swf_opt
-	cd $(BUILD)/hellocpp_swf_opt && $(SDK)/usr/bin/g++ -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
-
-pthreadsubmittests_shell: pthreadsubmittests_shell_compile pthreadsubmittests_shell_run
-
-pthreadsubmittests_shell_compile:
-	@rm -rf $(BUILD)/pthreadsubmit_shell
-	@mkdir -p $(BUILD)/pthreadsubmit_shell
-	cd $(BUILD)/pthreadsubmit_shell && $(SDK)/usr/bin/gcc -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized
-	cd $(BUILD)/pthreadsubmit_shell && $(SDK)/usr/bin/gcc -O0 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test
-
-pthreadsubmittests_shell_run:
-	cd $(BUILD)/pthreadsubmit_shell && ./pthread_test_optimized
-	cd $(BUILD)/pthreadsubmit_shell && ./pthread_test
-
-pthreadsubmittests_swf:
-	@rm -rf $(BUILD)/pthreadsubmit_swf
-	@mkdir -p $(BUILD)/pthreadsubmit_swf
-	cd $(BUILD)/pthreadsubmit_swf && $(SDK)/usr/bin/gcc -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized.swf
-	cd $(BUILD)/pthreadsubmit_swf && $(SDK)/usr/bin/gcc -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -emit-swc=com.adobe.flascc -o pthread_test_optimized.swc
-	cd $(BUILD)/pthreadsubmit_swf && $(SDK)/usr/bin/gcc -O0 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
-	cp -f $(BUILD)/pthreadsubmit_swf/*.swf $(BUILDROOT)/extra/
-
-pthreadtests:
-	@rm -rf $(BUILD)/pthread$(SWFDIR)
-	@mkdir -p $(BUILD)/pthread$(SWFDIR)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_cancel.c -o pthread_cancel$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_async_cancel.c -o pthread_async_cancel$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_create.c -o pthread_create$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_create_test.c -o pthread_create_test$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_mutex_test.c -o pthread_mutex_test$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_mutex_test2.c -o pthread_mutex_test2$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_malloc_test.c -o pthread_malloc_test$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_specific.c -o pthread_specific$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_suspend.c -o pthread_suspend$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/thr_kill.c -o thr_kill$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/peterson.c -o peterson$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps -DORDER_STRENGTH=1 $(SRCROOT)/test/peterson.c -o peterson_nofence$(SWFEXT)
-	$(MAKE) as3++tests
-
-as3++tests:
-	@rm -rf $(BUILD)/as3++_swf
-	@mkdir -p $(BUILD)/as3++_swf
-	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt.cpp -lAS3++ -o AS3++mt.swf
-	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt1.cpp -lAS3++ -o AS3++mt1.swf
-	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt2.cpp -lAS3++ -o AS3++mt2.swf
-	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt3.cpp -lAS3++ -o AS3++mt3.swf
-
-conctests:
-	mkdir -p $(BUILD)/conc$(SWFDIR)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/newThread.c -o newThread$(SWFEXT)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_conc.c -o avm2_conc$(SWFEXT)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex.c -o avm2_mutex$(SWFEXT)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex2.c -o avm2_mutex2$(SWFEXT)
-
-posixtest:
-	@rm -rf $(BUILD)/posixtest
-	@mkdir -p $(BUILD)/posixtest
-	$(SDK)/usr/bin/genfs --name my.test.BackingStore $(SRCROOT)/test/zipfsroot $(BUILD)/posixtest/alcfs
-	cd $(BUILD)/posixtest && $(SCOMPFALCON) \
-		-import $(call nativepath,$(SDK)/usr/lib/BinaryData.abc) \
-		-import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) \
-		-import $(call nativepath,$(SDK)/usr/lib/ISpecialFile.abc) \
-		-import $(call nativepath,$(SDK)/usr/lib/IBackingStore.abc) \
-		-import $(call nativepath,$(SDK)/usr/lib/IVFS.abc) \
-		-import $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) \
-		-import $(call nativepath,$(SDK)/usr/lib/InMemoryBackingStore.abc) \
-		-import $(call nativepath,$(SDK)/usr/lib/PlayerKernel.abc) \
-		$(call nativepath, $(BUILD)/posixtest/alcfsBackingStore.as) -outdir . -out alcfs
-	cd $(BUILD)/posixtest && $(SDK)/usr/bin/gcc -emit-swf -O0 -swf-version=15 $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) alcfs.abc $(SRCROOT)/test/fileio.c -o posixtest.swf
-
-speccpu2006: # works on mac only! (and probably requires local tweaks to alchemy.cfg and mac32.cfg)
-	@rm -rf $(BUILD)/speccpu2006
-	@mkdir -p $(BUILD)/speccpu2006
-	cd $(BUILD)/speccpu2006 && curl http://alchemy.corp.adobe.com/speccpu2006.tar.bz2 | tar xvf -
-	cd $(BUILD)/speccpu2006/speccpu2006 && cat $(SRCROOT)/test/speccpu2006/install.sh.ed | ed install.sh # build install2.sh w/ hardcoded arch=mac32-x86
-	cd $(BUILD)/speccpu2006/speccpu2006 && chmod +x install2.sh && chmod +x tools/bin/macosx-x86/spec* && chmod +w MANIFEST && echo y | SPEC= ./install2.sh
-	cd $(BUILD)/speccpu2006/speccpu2006 && cp $(SRCROOT)/test/speccpu2006/*.cfg config/. && chmod +w config/*.cfg
-	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=alchemy.cfg --tune=base --loose --action build int fp | tee alchemy.build.log)
-	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action build int fp | tee mac32.build.log)
-	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=alchemy.cfg --tune=base --loose --action validate int fp | tee -a alchemy.run.log)
-	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action validate int fp | tee -a mac32.run.log)
-
-scimark:
-	@mkdir -p $(BUILD)/scimark
-	cd $(BUILD)/scimark && $(SDK)/usr/bin/gcc -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
-	$(BUILD)/scimark/scimark2 &> $(BUILD)/scimark/result.txt
-
-scimark_swf:
-	@mkdir -p $(BUILD)/scimark_swf
-	cd $(BUILD)/scimark_swf && $(SDK)/usr/bin/gcc -O4 -swf-version=17 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
-	cd $(BUILD)/scimark_swf && $(SDK)/usr/bin/gcc -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2v18.swf
-	cp -f $(BUILD)/scimark_swf/*.swf $(BUILDROOT)/extra/
-
-scimark_asc:
-	@mkdir -p $(BUILD)/scimark_asc
-	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/gcc -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
-	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/gcc -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
-	$(BUILD)/scimark_asc/scimark2 &> $(BUILD)/scimark_asc/result.txt
-
-as3interoptest:
-	@mkdir -p $(BUILD)/as3interoptest
-	cd $(BUILD)/as3interoptest && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/as3interoptest.c -o as3interoptest -save-temps
-	$(BUILD)/as3interoptest/as3interoptest &> $(BUILD)/as3interoptest/result.txt
-
-sjljtest:
-	@mkdir -p $(BUILD)/sjljtest
-	cd $(BUILD)/sjljtest && $(SDK)/usr/bin/g++ -O0 $(SRCROOT)/test/sjljtest.c -v -o sjljtest -save-temps
-	$(BUILD)/sjljtest/sjljtest &> $(BUILD)/sjljtest/result.txt
-	diff --strip-trailing-cr $(BUILD)/sjljtest/result.txt $(SRCROOT)/test/sjljtest.expected.txt
-
-sjljtest_opt:
-	@mkdir -p $(BUILD)/sjljtest_opt
-	cd $(BUILD)/sjljtest_opt && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/sjljtest.c -o sjljtest -save-temps
-	$(BUILD)/sjljtest_opt/sjljtest &> $(BUILD)/sjljtest_opt/result.txt
-	diff --strip-trailing-cr $(BUILD)/sjljtest_opt/result.txt $(SRCROOT)/test/sjljtest.expected.txt
-
-ehtest:
-	@mkdir -p $(BUILD)/ehtest
-	cd $(BUILD)/ehtest && $(SDK)/usr/bin/g++ -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
-	-$(BUILD)/ehtest/ehtest &> $(BUILD)/ehtest/result.txt
-	diff --strip-trailing-cr $(BUILD)/ehtest/result.txt $(SRCROOT)/test/ehtest.expected.txt
-
-ehtest_opt:
-	@mkdir -p $(BUILD)/ehtest_opt
-	cd $(BUILD)/ehtest_opt && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
-	-$(BUILD)/ehtest_opt/ehtest &> $(BUILD)/ehtest_opt/result.txt
-	diff --strip-trailing-cr $(BUILD)/ehtest_opt/result.txt $(SRCROOT)/test/ehtest.expected.txt
-
-ehtest_asc:
-	@mkdir -p $(BUILD)/ehtest_asc
-	cd $(BUILD)/ehtest_asc && $(SDK)/usr/bin/g++ -muse-legacy-asc -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
-	-$(BUILD)/ehtest_asc/ehtest &> $(BUILD)/ehtest_asc/result.txt
-	diff --strip-trailing-cr $(BUILD)/ehtest_asc/result.txt $(SRCROOT)/test/ehtest.expected.txt
-
-	cd $(BUILD)/ehtest_asc && $(SDK)/usr/bin/g++ -muse-legacy-asc -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
-	-$(BUILD)/ehtest_asc/ehtest &> $(BUILD)/ehtest_asc/result.txt
-	diff --strip-trailing-cr $(BUILD)/ehtest_asc/result.txt $(SRCROOT)/test/ehtest.expected.txt
-
-gdbunit:
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
-
-vfstests:
-	@cd qa/vfs/framework && $(MAKE) FLASCC=$(FLASCC)
-
-parse_scimark_log:
-	$(MAKE) scimark
-	ant -f qa/performance/build.xml -Dbuild=$(FLASCC_VERSION_BUILD) \
-		-DsendResults=true -Dbranch=mainline -DresultsFile=$(BUILD)/scimark/result.txt -DresultsFileFalcon=$(BUILD)/scimark/result.txt
-
-checkasm:
-	rm -rf $(BUILD)/libtoabc
-	@mkdir -p $(BUILD)/logs/libtoabc
-	@libs=`find $(SDK) -name "*.a"`; \
-	omittedlibs="libjpeg.a\nlibpng\nlibz.a" ; \
-	omittedlibs=`echo $$omittedlibs` ; \
-	libs=`echo "$$libs" | grep -F -v "$$omittedlibs"` ; \
-	echo "Compiling SDK libraries to ABC" ; \
-	for lib in $$libs ; do \
-		shortlib=`basename $$lib` ; \
-		echo "- checking $$lib" ; \
-		$(MAKE) libtoabc LIB=$$lib &> $(BUILD)/logs/libtoabc/$$shortlib.txt ; \
-		mret=$$? ; \
-		if [ $$mret -ne 0 ] ; then \
-		echo "Failed to build abc: $$lib" ;\
-		cat $(BUILD)/logs/libtoabc/$$shortlib.txt ;\
-		exit 1 ; \
-		fi ; \
-	done
-	@echo "Checking headers for asm"
-	$(PYTHON) $(SRCROOT)/tools/search_headers.py $(SDK) $(BUILD)/header-search
-
-libtoabc:
-	mkdir -p $(BUILD)/libtoabc/`basename $(LIB)`
-	cd $(BUILD)/libtoabc/`basename $(LIB)` && $(SDK)/usr/bin/ar x $(LIB)
-	@abcdir=$(BUILD)/libtoabc/`basename $(LIB)` ; \
-	numos=`find $$abcdir -maxdepth 1 -name '*.o' | wc -l` ; \
-	if [$$numos -gt 0 ] ; then \
-	cd $(BUILD)/libtoabc/`basename $(LIB)` && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS) ; \
-	fi 
+.PHONY: bmake posix binutils docs gcc samples
