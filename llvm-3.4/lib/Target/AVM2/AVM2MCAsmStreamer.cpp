@@ -119,11 +119,11 @@ std::string runcmd(std::string cmd, std::vector<std::string> &args)
     std::string cmdname = "Run Command " + cmd;
     NamedRegionTimer RunCmdTimer(cmdname.c_str(), "AVM2 Backend");
 
-    std::string appPath = sys::Program::FindProgramByName(cmd).c_str();
-    sys::Path *ioredirects[3] = {NULL, NULL, NULL};
-    ioredirects[0] = new sys::Path();
-    ioredirects[1] = new sys::Path(sys::Path::GetTemporaryDirectory().str() + "alctmp");
-    ioredirects[2] = new sys::Path(sys::Path::GetTemporaryDirectory().str() + "alctmp");
+    std::string appPath = sys::FindProgramByName(cmd).c_str();
+    std::string *ioredirects[3] = {NULL, NULL, NULL};
+    ioredirects[0] = NULL;
+    ioredirects[1] = sys::fs::GetTemporaryDirectory().str() + "alctmp";
+    ioredirects[2] = sys::fs::GetTemporaryDirectory().str() + "alctmp";
 
     // redirect stdout/stderr somewhere
     ioredirects[1]->createTemporaryFileOnDisk();
@@ -136,7 +136,7 @@ std::string runcmd(std::string cmd, std::vector<std::string> &args)
         argptrs[1+i] = (char*)args[i].c_str();
     }
     std::string ErrMsg;
-    int result = sys::Program::ExecuteAndWait(sys::Path(appPath), (const char**)argptrs, NULL, (const llvm::sys::Path**)&ioredirects[0], 0, 0, &ErrMsg);
+    int result = sys::ExecuteAndWait(sys::path::Path(appPath), (const char**)argptrs, NULL, (const llvm::sys::path::Path**)&ioredirects[0], 0, 0, &ErrMsg);
 
     OwningPtr<MemoryBuffer> stdoutbuffer,stderrbuffer;
     MemoryBuffer::getFile(ioredirects[1]->c_str(), stdoutbuffer);
@@ -520,7 +520,7 @@ public:
         delete FOS1;
         delete FOS2;
 
-        sys::Path tdir = sys::Path::GetTemporaryDirectory();
+        sys::path::Path tdir = sys::path::Path::GetTemporaryDirectory();
         std::string sdk = SetFlasccSDKLocation("/../../");
         
         // remember the current dir and cd into the temp dir
@@ -592,18 +592,18 @@ public:
         args.push_back("-out");
         args.push_back("output");
         
-        sys::Path jvmPath(JVMPath);
+        sys::path::Path jvmPath(JVMPath);
 
         if(!jvmPath.canExecute())
         {
-            std::string pathWithSuffix = (JVMPath + "." + sys::Path::GetEXESuffix()).str();
+            std::string pathWithSuffix = (JVMPath + "." + sys::path::Path::GetEXESuffix()).str();
             jvmPath = StringRef(pathWithSuffix);
         }
 
         runcmd(nativepath(jvmPath.str()), args);
 
         OwningPtr<MemoryBuffer> mbuf;
-        sys::Path output(tdir);
+        sys::path::Path output(tdir);
         output.appendComponent("output.abc");
         MemoryBuffer::getFile(output.c_str(), mbuf);
         if(mbuf.get()) {
@@ -613,9 +613,9 @@ public:
         chdir(cwd);
 
         if(deleteTmps) {
-            sys::Path tmpfile1(asout1);
+            sys::path::Path tmpfile1(asout1);
             tmpfile1.eraseFromDisk(true);
-            sys::Path tmpfile2(asout2);
+            sys::path::Path tmpfile2(asout2);
             tmpfile2.eraseFromDisk(true);
         }
 
@@ -1327,9 +1327,9 @@ MCStreamer *createAVM2ABCStreamer(const Target &T, StringRef TT,
     std::string tmp1,tmp2;
 
     bool deleteTmps = false;
-    sys::Path td = sys::Path::GetTemporaryDirectory();
+    sys::path::Path td = sys::path::Path::GetTemporaryDirectory();
     if(AS3TmpFile1 == "" || AS3TmpFile2 == "") {
-        sys::Path tmpfile1(td.str() + "/alctmp"), tmpfile2(td.str() + "/alctmp");
+        sys::path::Path tmpfile1(td.str() + "/alctmp"), tmpfile2(td.str() + "/alctmp");
         tmpfile1.createTemporaryFileOnDisk();
         tmpfile2.createTemporaryFileOnDisk();
         tmp1 = tmpfile1.str() + ".as";
