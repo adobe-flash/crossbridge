@@ -139,15 +139,18 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 endif
 
 ESCAPED_SRCROOT=$(shell echo $(SRCROOT) | sed -e 's/[\/&]/\\&/g')
-$?BUILD_FOLDER="builds"
-$?FTP_HOST=
 $?JAVA=$(call nativepath,$(shell which java))
 $?JAVAFLAGS=
 $?PYTHON=$(call nativepath,$(shell which python))
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?LN=ln -sfn
 $?COPY_DOCS=false
-$?ASSERTIONS=OFF
+
+# ====================================================================================
+# LLVM
+# ====================================================================================
+$?LLVMASSERTIONS=OFF
+$?LLVMTESTS=ON
 $?LLVMCMAKEOPTS= 
 $?LLVMLDFLAGS=
 $?LLVMCXXFLAGS=
@@ -180,7 +183,6 @@ $?ASC=$(call nativepath,$(SRCROOT)/avmplus/utils/asc.jar)
 $?SCOMP=java $(JAVAFLAGS) -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc) -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
 $?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc) -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
 $?CLANG=ON
-?BUILD_LLVM_TESTS=ON
 $?CYGTRIPLE=i686-pc-cygwin
 $?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
@@ -226,24 +228,6 @@ BMAKE+= CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm -fno-builtin -DSTRIP_FBSDID
 BMAKE+= MAKEFLAGS="" MFLAGS="" MK_ICONV= WITHOUT_PROFILE=
 BMAKE+= MACHINE_ARCH=avm2 MACHINE_CPUARCH=AVM2 NO_WERROR=true SSP_CFLAGS=
 BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
-
-# ====================================================================================
-# SWIG
-# ====================================================================================
-# LD Flags
-SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
-# Libs
-SWIG_LIBS=-lLLVMAVM2Info -lLLVMAVM2CodeGen -lLLVMAVM2AsmParser -lLLVMAsmPrinter -lLLVMMCParser -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lLLVMCore -lLLVMSupport
-SWIG_LIBS+= -lclangEdit -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lclangSerialization
-SWIG_LIBS+= $(GCCLANGFLAG)
-# C++ Flags
-SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/
-SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/include -I$(BUILD)/llvm-debug/include 
-SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include
-SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/lib
-SWIG_CXXFLAGS+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long -v
-# Post Process
-SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
 
 # ====================================================================================
 # ALL TARGET
@@ -339,22 +323,11 @@ all_ci:
 	@$(SDK)/usr/bin/make extralibs
 	@$(SDK)/usr/bin/make -i extratools
 	@$(SDK)/usr/bin/make -i finalcleanup
-	@$(SDK)/usr/bin/make submittests
+	@$(SDK)/usr/bin/make -i submittests
 
 # Used to debug specific target
 all_dev:
-	@$(SDK)/usr/bin/make llvm
-	@$(SDK)/usr/bin/make stdlibs
-	@$(SDK)/usr/bin/make as3xx
-	@$(SDK)/usr/bin/make as3wig
-	@$(SDK)/usr/bin/make abcstdlibs
-	@$(SDK)/usr/bin/make sdkcleanup
-	@$(SDK)/usr/bin/make tr
-	@$(SDK)/usr/bin/make trd
-	@$(SDK)/usr/bin/make extralibs
-	@$(SDK)/usr/bin/make -i extratools
-	@$(SDK)/usr/bin/make -i finalcleanup
-	@$(SDK)/usr/bin/make submittests
+	@$(SDK)/usr/bin/make swig
 
 # ====================================================================================
 # CORE
@@ -531,6 +504,9 @@ abclibs_compile:
 #TBD
 abclibs_asdocs:
 	mkdir -p $(BUILDROOT)
+	mkdir -p $(BUILDROOT)/tempdita
+	mkdir -p $(BUILDROOT)/apidocs
+	mkdir -p $(BUILDROOT)/apidocs/tempdita
 	mkdir -p $(BUILD)/logs
 	cd $(BUILDROOT) && $(ASDOC) \
 				-load-config= \
@@ -608,8 +584,8 @@ llvm:
 	mkdir -p $(BUILD)/llvm-debug
 	cd $(BUILD)/llvm-debug && LDFLAGS="$(LLVMLDFLAGS)" CFLAGS="$(LLVMCFLAGS)" CXXFLAGS="$(LLVMCXXFLAGS)" $(SDK)/usr/bin/cmake -G "Unix Makefiles" \
 		$(LLVMCMAKEOPTS) -DCMAKE_INSTALL_PREFIX=$(LLVMINSTALLPREFIX)/llvm-install -DCMAKE_BUILD_TYPE=$(LLVMBUILDTYPE) $(LLVMCMAKEFLAGS) \
-		-DLLVM_ENABLE_ASSERTIONS=$(ASSERTIONS) \
-		-DLLVM_TARGETS_TO_BUILD="$(LLVMTARGETS)" -DLLVM_NATIVE_ARCH="avm2" -DLLVM_INCLUDE_TESTS=$(BUILD_LLVM_TESTS) -DLLVM_INCLUDE_EXAMPLES=OFF \
+		-DLLVM_ENABLE_ASSERTIONS=$(LLVMASSERTIONS) \
+		-DLLVM_TARGETS_TO_BUILD="$(LLVMTARGETS)" -DLLVM_NATIVE_ARCH="avm2" -DLLVM_INCLUDE_TESTS=$(LLVMTESTS) -DLLVM_INCLUDE_EXAMPLES=OFF \
 		$(SRCROOT)/$(DEPENDENCY_LLVM) && $(MAKE) -j$(THREADS) 
 	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
 ifeq ($(LLVM_ONLYLLC), false)
@@ -688,7 +664,8 @@ plugins:
 bmake:
 	rm -rf $(BUILD)/bmake
 	mkdir -p $(BUILD)/bmake
-	cd $(BUILD)/bmake && $(SRCROOT)/bmake/configure && bash make-bootstrap.sh
+	cd $(BUILD)/bmake && $(SRCROOT)/bmake/configure
+	cd $(BUILD)/bmake && bash make-bootstrap.sh
 
 # ====================================================================================
 # STD LIBS
@@ -1200,9 +1177,11 @@ builtinabcs:
 # ====================================================================================
 # EXTRA TOOLS
 # ====================================================================================
+# TBD
 extratools:
 	$(MAKE) -j$(THREADS) genfs swig gdb pkgconfig libtool
 
+# TBD
 genfs:
 	rm -rf $(BUILD)/zlib-native
 	mkdir -p $(BUILD)/zlib-native
@@ -1212,17 +1191,55 @@ genfs:
 	cd $(BUILD)/zlib-native/contrib/minizip/ && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) 
 	PATH=$(SDK)/usr/bin:$(PATH) $(FLASCC_CC) -Wall -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
 
-swig:
+# SWIG Phase 0
+
+# LD Flags
+SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
+# Libs
+SWIG_LIBS=-lLLVMAVM2Info -lLLVMAVM2CodeGen -lLLVMAVM2AsmParser -lLLVMAsmPrinter -lLLVMMCParser -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lLLVMCore -lLLVMSupport
+SWIG_LIBS+= -lclangEdit -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lclangSerialization
+SWIG_LIBS+= $(GCCLANGFLAG)
+# C++ Flags
+SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/
+#SWIG_CXXFLAGS+= -I$(BUILD)/llvm-debug/lib/clang/3.2/include/
+SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/include -I$(BUILD)/llvm-debug/include 
+SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include
+SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/lib
+SWIG_CXXFLAGS+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long -v
+# Post Process
+SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
+
+# SWIG Phase 1
+swig-clean:
 	rm -rf $(BUILD)/swig
 	mkdir -p $(BUILD)/swig
+
+# SWIG Phase 2
+swig-pcre:
 	cp -f packages/$(DEPENDENCY_SWIG_PCRE).tar.gz $(BUILD)/swig
 	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh \
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+
+# SWIG Phase 3
+swig-configure:
 	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure \
 		--prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+
+# SWIG Phase 4
+swig-build:
+	rm -rf $(SDK)/usr/lib/clang
+	cp -R $(BUILD)/llvm-debug/lib/clang $(SDK)/usr/lib/clang
 	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j$(THREADS) && $(MAKE) install
 	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/2.0.4/$(var);)
 
+# SWIG All
+swig:
+	$(MAKE) swig-clean
+	$(MAKE) swig-pcre
+	$(MAKE) swig-configure
+	$(MAKE) swig-build
+
+# SWIG Tests
 swigtests:
 	# reconfigure so that makefile is up to date (in case Makefile.in changed)
 	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" \
@@ -1236,9 +1253,11 @@ swigtests:
 	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.swg $(BUILD)/swig/Lib
 	cd $(BUILD)/swig && $(MAKE) check-as3-examples
 
+# TBD
 swigtestsautomation:
 	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/$(DEPENDENCY_SWIG)
 
+# TBD
 gdb:
 	rm -rf $(BUILD)/$(DEPENDENCY_GDB)
 	mkdir -p $(BUILD)/$(DEPENDENCY_GDB)
@@ -1249,6 +1268,7 @@ gdb:
 	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
 	cp -f $(SRCROOT)/tools/flascc-init.gdb $(SDK)/usr/share/
 
+# TBD
 pkgconfig:
 	rm -rf $(BUILD)/pkgconfig
 	mkdir -p $(BUILD)/pkgconfig
@@ -1256,6 +1276,7 @@ pkgconfig:
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --prefix=$(SDK)/usr --disable-shared --disable-dependency-tracking
 	cd $(BUILD)/pkgconfig && $(MAKE) -j$(THREADS) && $(MAKE) install
 
+# TBD
 libtool:
 	rm -rf $(BUILD)/libtool
 	mkdir -p $(BUILD)/libtool
@@ -1268,6 +1289,7 @@ libtool:
 # FINALCLEANUP
 # ====================================================================================
 
+# TBD
 finalcleanup:
 	rm -f $(SDK)/usr/lib/*.la
 	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/share/info
@@ -1765,7 +1787,7 @@ cross_llvm_mingw:
 		LLVMCFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" \
 		LLVMCXXFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" LLVMLDFLAGS="-lrpcrt4 -Wl,--stack,16000000" \
 		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
-		llvm BUILD_LLVM_TESTS=OFF LLVM_ONLYLLC=true CLANG=OFF
+		llvm LLVMTESTS=OFF LLVM_ONLYLLC=true CLANG=OFF
 
 cross_llvm_cygwin:
 	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
@@ -1776,6 +1798,6 @@ cross_llvm_cygwin:
 		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(CYGTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
 		CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ LLVMLDFLAGS="-Wl,--stack,16000000" \
 		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
-		llvm BUILD_LLVM_TESTS=OFF
+		llvm LLVMTESTS=OFF
 
 .PHONY: bmake posix binutils docs gcc samples libcxx libcxxrt libxxabi libunwind libgcceh

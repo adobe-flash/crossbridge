@@ -316,7 +316,7 @@ This work is unfinished and mostly unstable. Some changes are questionable and w
 > clang++: error: assembler command failed with exit code 255 (use -v to see invocation)
 
 ## CB-0016
-* Description: Cannot build LLVMTests
+* Description: Cannot build LLVM 3.2 Tests
 * Estimate: 1 days
 * Status: In progress
 * Relates to CB-0010
@@ -418,3 +418,11 @@ This work is unfinished and mostly unstable. Some changes are questionable and w
 * Exception: 
 
 > TBD
+
+## CB-0023
+* Description: Cannot build LLVM-3.4
+* Estimate: 7 days
+* Status: In progress
+* Exception: 
+
+> Related mostly due changes in std:sys::Path (removed)
