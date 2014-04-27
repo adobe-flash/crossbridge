@@ -297,7 +297,8 @@ all_ci:
 
 # Dev debug target
 all_dev:
-	@$(SDK)/usr/bin/make swig
+	@$(SDK)/usr/bin/make submittests
+	@$(SDK)/usr/bin/make all_tests
 
 # ====================================================================================
 # CORE
@@ -1047,7 +1048,37 @@ libopenssl:
 # EXTRA TOOLS
 # ====================================================================================
 extratools:
-	$(MAKE) -j$(THREADS) genfs gdb swig pkgconfig libtool
+	$(MAKE) -j$(THREADS) swig genfs gdb pkgconfig libtool
+
+SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
+SWIG_LIBS=-lLLVMAVM2ShimInfo -lLLVMAVM2ShimCodeGen -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport 
+SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/llvm-2.9/include -I$(BUILD)/llvm-debug/include -I$(SRCROOT)/llvm-2.9/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include -I$(SRCROOT)/llvm-2.9/tools/clang/lib -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long
+SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
+
+swig:
+	rm -rf $(BUILD)/swig
+	mkdir -p $(BUILD)/swig
+	cp -f $(SRCROOT)/$(DEPENDENCY_SWIG)/pcre-8.20.tar.gz $(BUILD)/swig
+	cd $(BUILD)/swig && $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
+	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/2.0.4/$(var);)
+
+swigtests:
+	# reconfigure so that makefile is up to date (in case Makefile.in changed)
+	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" \
+		CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache
+	rm -rf $(BUILD)/swig/Examples/as3
+	cp -R $(SRCROOT)/$(DEPENDENCY_SWIG)/Examples/as3 $(BUILD)/swig/Examples
+	rm -rf $(BUILD)/swig/Lib/
+	mkdir -p $(BUILD)/swig/Lib/as3
+	cp -R $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/as3/* $(BUILD)/swig/Lib/as3
+	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.i $(BUILD)/swig/Lib
+	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.swg $(BUILD)/swig/Lib
+	cd $(BUILD)/swig && $(MAKE) check-as3-examples
+	
+swigtestsautomation:
+	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/$(DEPENDENCY_SWIG)
 
 genfs:
 	rm -rf $(BUILD)/zlib-native
@@ -1065,36 +1096,6 @@ gdb:
 	cp -f $(SRCROOT)/tools/flascc.gdb $(SDK)/usr/share/
 	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
 	cp -f $(SRCROOT)/tools/flascc-init.gdb $(SDK)/usr/share/
-
-SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
-SWIG_LIBS=-lLLVMAVM2ShimInfo -lLLVMAVM2ShimCodeGen -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport 
-SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/llvm-2.9/include -I$(BUILD)/llvm-debug/include -I$(SRCROOT)/llvm-2.9/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include -I$(SRCROOT)/llvm-2.9/tools/clang/lib -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long
-SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
-
-swig:
-	rm -rf $(BUILD)/swig
-	mkdir -p $(BUILD)/swig
-	cp -f $(SRCROOT)/$(DEPENDENCY_SWIG)/pcre-8.20.tar.gz $(BUILD)/swig
-	cd $(BUILD)/swig && $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
-	$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/2.0.4/$(var);)
-
-swigtests:
-	# reconfigure so that makefile is up to date (in case Makefile.in changed)
-	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" \
-		CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache
-	rm -rf $(BUILD)/swig/Examples/as3
-	cp -R $(SRCROOT)/$(DEPENDENCY_SWIG)/Examples/as3 $(BUILD)/swig/Examples
-	rm -rf $(BUILD)/swig/Lib/
-	mkdir -p $(BUILD)/swig/Lib/as3
-	cp -R $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/as3/* $(BUILD)/swig/Lib/as3
-	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.i $(BUILD)/swig/Lib
-	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.swg $(BUILD)/swig/Lib
-	cd $(BUILD)/swig && $(MAKE) check-as3-examples
-	
-swigtestsautomation:
-	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/$(DEPENDENCY_SWIG)
 
 pkgconfig:
 	rm -rf $(BUILD)/pkgconfig
