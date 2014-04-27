@@ -75,6 +75,7 @@ struct AVM2RegisterInfo : public AVM2GenRegisterInfo {
 
     virtual void eliminateFrameIndex(MachineBasicBlock::iterator MI,
                                      int AVM2Adj, //int *Value = NULL,
+                                     unsigned FIOperandNum,
                                      RegScavenger *RS=NULL) const;
 
     void processFunctionBeforeFrameFinalized(MachineFunction &MF) const;

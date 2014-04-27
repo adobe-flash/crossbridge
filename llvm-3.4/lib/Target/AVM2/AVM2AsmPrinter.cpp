@@ -933,7 +933,7 @@ GlobalMethodMD, WeakMD, "[Csym(\"W\", \"memset\")]\n",
         OS << "// private data\n";
         for(; GI != GE; GI++)
 	{
-            MCSymbol *Sym = Mang->getSymbol(GI);
+            MCSymbol *Sym = getSymbol(GI);
 
 	    SynthSym2Num.erase(Sym); // remove global vars
 
@@ -960,7 +960,7 @@ GlobalMethodMD, WeakMD, "[Csym(\"W\", \"memset\")]\n",
         {
             Fun2NumMap::const_iterator FVI = Fun2Num.begin(), FVE = Fun2Num.end();
             for(; FVI != FVE; FVI++) {
-                const MCSymbol *Sym = Mang->getSymbol(FVI->first);
+                const MCSymbol *Sym = getSymbol(FVI->first);
 
                 SynthSym2Num.erase(Sym); // remove functions
 
@@ -996,7 +996,7 @@ GlobalMethodMD, WeakMD, "[Csym(\"W\", \"memset\")]\n",
         GI = M.global_begin();
         for(; GI != GE; GI++)
             if(GI->isDeclaration() && GI->hasNUsesOrMore(1)) {
-                MCSymbol &Sym = *(Mang->getSymbol(GI));
+                MCSymbol &Sym = *(getSymbol(GI));
                 if(!isImplicitlyDefined(Sym)) {
                     emitCsymMD(OS, false, StringRef("U"), Sym.getName());
                 }
@@ -1006,7 +1006,7 @@ GlobalMethodMD, WeakMD, "[Csym(\"W\", \"memset\")]\n",
         Module::const_iterator FI = M.begin(), FE = M.end();
         for(; FI != FE; FI++)
             if(FI->isDeclaration() && FI->hasNUsesOrMore(1)) {
-                MCSymbol &Sym = *(Mang->getSymbol(FI));
+                MCSymbol &Sym = *(getSymbol(FI));
                 if(!FI->getName().startswith("llvm.") && !isImplicitlyDefined(Sym)) {
                     emitCsymMD(OS, false, StringRef("U"), Sym.getName());
                 }
@@ -1071,7 +1071,7 @@ GlobalMethodMD, WeakMD, "[Csym(\"W\", \"memset\")]\n",
                     continue;
                 }
 
-                MCSymbol *Sym = Mang->getSymbol(GI);
+                MCSymbol *Sym = getSymbol(GI);
                 Sym2NumMap::const_iterator SI = Sym2Num.find(Sym);
                 if(SI == Sym2Num.end()) {
                     continue;
@@ -1094,7 +1094,7 @@ GlobalMethodMD, WeakMD, "[Csym(\"W\", \"memset\")]\n",
                 if(isPublic(FVI->first)) {
                     const Function *Fun = FVI->first;
 
-                    MCSymbol *Sym = Mang->getSymbol(Fun);
+                    MCSymbol *Sym = getSymbol(Fun);
                     bool IsCommon = Fun->hasCommonLinkage();
                     bool IsWeak = isWeak(Fun);
 
@@ -1150,8 +1150,8 @@ GlobalMethodMD, WeakMD, "[Csym(\"W\", \"memset\")]\n",
                 const Function *Fun = dyn_cast<const Function>(FVI->first);
 
                 if(Fun && Fun2Sig.find(Fun) == Fun2Sig.end()) { // skip funs w/ explicit sigs
-                    OS << "com.adobe.flascc.CModule.regFun(" << *(Mang->getSymbol(FVI->first)) << ", ";
-                    OS << (isPublic(Fun) ? getPackageName(M) : getModulePackageName(M)) << ".F" << *(Mang->getSymbol(FVI->first)) << ")\n";
+                    OS << "com.adobe.flascc.CModule.regFun(" << *(getSymbol(FVI->first)) << ", ";
+                    OS << (isPublic(Fun) ? getPackageName(M) : getModulePackageName(M)) << ".F" << *(getSymbol(FVI->first)) << ")\n";
                 }
             }
         }
@@ -1350,7 +1350,8 @@ GlobalMethodMD, WeakMD, "[Csym(\"W\", \"memset\")]\n",
         if(FunHasAS3Sig) // set up for return value
           OS << "    var _as3ReturnValue:*;\n";
 
-        FunIsNaked = Fun->getFnAttributes().hasAttribute(Attributes::Naked);
+        // Changed 27.04.2014.: was FunIsNaked = Fun->getFnAttributes().hasAttribute(Attributes::Naked);
+        FunIsNaked = Fun->getAttributes().hasAttribute(AttributeSet::FunctionIndex, Attribute::Naked);
 
         if(!TM.getSubtarget<AVM2Subtarget>().DisableDebugLines && TM.getSubtarget<AVM2Subtarget>().useInlineAsm()) {
 	  OS << "__asm(debugfile, str(\"" << getModulePackageName(M) << "\"))\n";
@@ -1581,7 +1582,7 @@ void AVM2AsmPrinter::printOperand(const MachineInstr *MI, const MachineOperand &
         const GlobalValue *GV = MO.getGlobal();
         if(MI->getDesc().isCall())
           O << "F"; // function prefix
-        O << *Mang->getSymbol(GV);
+        O << *getSymbol(GV);
         break;
       }
     case MachineOperand::MO_ExternalSymbol: {
