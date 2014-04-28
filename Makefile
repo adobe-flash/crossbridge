@@ -34,6 +34,7 @@ $?DEPENDENCY_JPEG=jpeg-8c
 $?DEPENDENCY_LIBAA=aalib-1.2
 $?DEPENDENCY_LIBBZIP=bzip2-1.0.6
 $?DEPENDENCY_LIBEIGEN=eigen-3.1.2
+$?DEPENDENCY_LIBFLAC=flac-1.2.1
 $?DEPENDENCY_LIBFREETYPE=freetype-2.5.3
 $?DEPENDENCY_LIBGIF=giflib-5.0.5
 $?DEPENDENCY_LIBGMP=gmp-5.1.3
@@ -309,7 +310,7 @@ all_ci:
 
 # Dev debug target
 all_dev:
-	@$(SDK)/usr/bin/make examples
+	@$(SDK)/usr/bin/make libflac
 
 # ====================================================================================
 # CORE
@@ -335,6 +336,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_JPEG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBAA).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBBZIP).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBFLAC).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBFREETYPE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBGIF).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBICONV).tar.gz
@@ -367,6 +369,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_JPEG)
 	rm -rf $(DEPENDENCY_LIBAA)
 	rm -rf $(DEPENDENCY_LIBBZIP)
+	rm -rf $(DEPENDENCY_LIBFLAC)
 	rm -rf $(DEPENDENCY_LIBFREETYPE)
 	rm -rf $(DEPENDENCY_LIBGIF)
 	rm -rf $(DEPENDENCY_LIBICONV)
@@ -1141,6 +1144,30 @@ libogg:
 		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libogg && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
+# Ogg Vorbis is a completely open, patent-free, professional audio encoding and streaming technology with all the benefits of Open Source.
+libvorbis:
+	rm -rf $(BUILD)/libvorbis
+	mkdir -p $(BUILD)/libvorbis
+	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBVORBIS)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# TBD
+libflac:
+	rm -rf $(BUILD)/libflac
+	mkdir -p $(BUILD)/libflac
+	cd $(BUILD)/libflac && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBFLAC)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+	cd $(BUILD)/libflac && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# Libsndfile is a C library for reading and writing files containing sampled sound.
+libsndfile:
+	rm -rf $(BUILD)/libsndfile
+	mkdir -p $(BUILD)/libsndfile
+	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBSNDFILE)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
 # XZ data compression
 libxz:
 	rm -rf $(BUILD)/libxz
@@ -1157,22 +1184,6 @@ libbzip:
 	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBBZIP)/configure \
 		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libbzip && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-# Ogg Vorbis is a completely open, patent-free, professional audio encoding and streaming technology with all the benefits of Open Source.
-libvorbis:
-	rm -rf $(BUILD)/libvorbis
-	mkdir -p $(BUILD)/libvorbis
-	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBVORBIS)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
-	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-# Libsndfile is a C library for reading and writing files containing sampled sound.
-libsndfile:
-	rm -rf $(BUILD)/libsndfile
-	mkdir -p $(BUILD)/libsndfile
-	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBSNDFILE)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
-	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # AAlib is an portable ascii art GFX library.
 libaa:
