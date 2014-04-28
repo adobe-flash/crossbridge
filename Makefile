@@ -319,7 +319,7 @@ all_ci:
 
 # Dev debug target
 all_dev:
-	@$(SDK)/usr/bin/make libeigen libvgl libjpeg libpng libgif libwebp dmalloc libffi libogg libvorbis libsndfile libsdl
+	@$(SDK)/usr/bin/make examples
 
 # ====================================================================================
 # CORE
@@ -1508,29 +1508,19 @@ samples:
 	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
 examples:
-	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS) PAK0FILE=$(SRCROOT)/samples/Example_Quake1/sdlquake-1.0.9/ID1/PAK0.PAK examples
+	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS) PAK0FILE=$(SRCROOT)/samples/Example_Quake1/sdlquake-1.0.9/ID1/PAK0.PAK examples
 	mkdir -p $(BUILDROOT)/extra
 	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
-alcexamples:
-	mkdir -p $(BUILDROOT)/extra
-	$(MAKE) alcexample_neverball
-	$(MAKE) alcexample_dosbox
-
-sync_alcexamples:
-	rm -rf $(BUILD)/github/alcexamples
-	mkdir -p $(BUILD)/github/alcexamples
-	cd $(BUILD)/github && git clone --depth 1 https://github.com/alexmac/alcexamples.git alcexamples
-
-alcexample_neverball:
-	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra neverball
+example_neverball:
+	cd $(BUILD)/github/alcexamples && $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra neverball
 	mkdir -p $(BUILDROOT)/extra/neverball
 	cp -f $(BUILD)/github/alcexamples/build/neverball/neverball.swf $(BUILDROOT)/extra/neverball/
 	cp -f $(BUILD)/github/alcexamples/build/neverball/neverputt.swf $(BUILDROOT)/extra/neverball/
 	cp -f $(BUILD)/github/alcexamples/build/neverball/*.zip $(BUILDROOT)/extra/neverball/
 
-alcexample_dosbox:
-	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra dosbox
+example_dosbox:
+	cd $(BUILD)/github/alcexamples && $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra dosbox
 	mkdir -p $(BUILDROOT)/extra/neverball
 	cp -f $(BUILD)/github/alcexamples/build/dosbox/dosbox.swf $(BUILDROOT)/extra/
 
