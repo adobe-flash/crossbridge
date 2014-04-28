@@ -45,6 +45,8 @@ $?DEPENDENCY_LIBPROTOBUF=protobuf-2.5.0
 $?DEPENDENCY_LIBNCURSES=ncurses-5.9
 $?DEPENDENCY_LIBREADLINE=readline-6.3
 $?DEPENDENCY_LIBSNDFILE=libsndfile-1.0.25
+$?DEPENDENCY_LIBSDLIMAGE=SDL_image-1.2.12
+$?DEPENDENCY_LIBSDLMIXER=SDL_mixer-1.2.12
 $?DEPENDENCY_LIBTIFF=tiff-4.0.3
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.4
@@ -96,19 +98,6 @@ else
 endif
 
 # ====================================================================================
-# TOOLCHAIN
-# ====================================================================================
-$?CC=gcc
-$?CXX=g++
-$?NATIVE_AR=ar
-export CC:=$(CC)
-export CXX:=$(CXX)
-$?DBGOPTS=
-$?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
-$?LIBHELPEROPTFLAGS=-O3
-$?CFLAGS=-O4
-$?CXXFLAGS=-O4
-# ====================================================================================
 # TARGET PLATFORM OPTIONS
 # ====================================================================================
 ifneq (,$(findstring cygwin,$(PLATFORM)))
@@ -149,15 +138,38 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
 
+# ====================================================================================
+# TOOLCHAIN
+# ====================================================================================
+
 ESCAPED_SRCROOT=$(shell echo $(SRCROOT) | sed -e 's/[\/&]/\\&/g')
-$?BUILD_FOLDER="builds"
-$?FTP_HOST=
+
+$?CYGTRIPLE=i686-pc-cygwin
+$?MINGWTRIPLE=i686-mingw32
+$?TRIPLE=avm2-unknown-freebsd8
+
+#$?CC_FOR_BUILD=gcc
+$?CC=gcc
+$?CXX=g++
+$?NATIVE_AR=ar
+export CC:=$(CC)
+export CXX:=$(CXX)
+$?DBGOPTS=
+$?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
+$?LIBHELPEROPTFLAGS=-O3
+$?CFLAGS=-O4
+$?CXXFLAGS=-O4
+
 $?JAVA=$(call nativepath,$(shell which java))
 $?JAVAFLAGS=
 $?PYTHON=$(call nativepath,$(shell which python))
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
-$?LN=ln -sfn
+
 $?COPY_DOCS=false
+
+$?LN=ln -sfn
+$?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
+
 $?LLVMASSERTIONS=OFF
 $?LLVMCMAKEOPTS= 
 $?LLVMLDFLAGS=
@@ -166,15 +178,12 @@ $?LLVM_ONLYLLC=false
 $?LLVMBUILDTYPE=MinSizeRel
 $?BUILD_LLVM_TESTS=OFF
 $?CLANG=ON
+
 $?FLEX=$(SRCROOT)/tools/flex
-$?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
 $?ASDOC=$(FLEX)/bin/asdoc
 $?ASC=$(call nativepath,$(SRCROOT)/avmplus/utils/asc.jar)
 $?SCOMP=java $(JAVAFLAGS) -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
 $?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
-$?CYGTRIPLE=i686-pc-cygwin
-$?MINGWTRIPLE=i686-mingw32
-$?TRIPLE=avm2-unknown-freebsd8
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
 $?AR=$(SDK)/usr/bin/ar scru -v
 
@@ -306,11 +315,11 @@ all_ci:
 	@$(SDK)/usr/bin/make extralibs
 	@$(SDK)/usr/bin/make extratools
 	@$(SDK)/usr/bin/make -i finalcleanup
-	@$(SDK)/usr/bin/make -i submittests
+	@$(SDK)/usr/bin/make submittests
 
 # Dev debug target
 all_dev:
-	@$(SDK)/usr/bin/make libflac
+	@$(SDK)/usr/bin/make libeigen libvgl libjpeg libpng libgif libwebp dmalloc libffi libogg libvorbis libsndfile libsdl
 
 # ====================================================================================
 # CORE
@@ -336,9 +345,11 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_JPEG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBAA).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBBZIP).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBEIGEN).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBFLAC).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBFREETYPE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBGIF).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBGMP).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBICONV).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBNCURSES).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBPROTOBUF).tar.gz
@@ -346,6 +357,8 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBOGG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBPNG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSNDFILE).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBSDLIMAGE).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBSDLMIXER).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBTIFF).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBVORBIS).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBWEBP).tar.gz
@@ -369,9 +382,11 @@ clean_libs:
 	rm -rf $(DEPENDENCY_JPEG)
 	rm -rf $(DEPENDENCY_LIBAA)
 	rm -rf $(DEPENDENCY_LIBBZIP)
+	rm -rf $(DEPENDENCY_LIBEIGEN)
 	rm -rf $(DEPENDENCY_LIBFLAC)
 	rm -rf $(DEPENDENCY_LIBFREETYPE)
 	rm -rf $(DEPENDENCY_LIBGIF)
+	rm -rf $(DEPENDENCY_LIBGMP)
 	rm -rf $(DEPENDENCY_LIBICONV)
 	rm -rf $(DEPENDENCY_LIBNCURSES)
 	rm -rf $(DEPENDENCY_LIBPROTOBUF)
@@ -379,6 +394,8 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBOGG)
 	rm -rf $(DEPENDENCY_LIBPNG)
 	rm -rf $(DEPENDENCY_LIBSNDFILE)
+	rm -rf $(DEPENDENCY_LIBSDLIMAGE)
+	rm -rf $(DEPENDENCY_LIBSDLMIXER)
 	rm -rf $(DEPENDENCY_LIBTIFF)
 	rm -rf $(DEPENDENCY_LIBVORBIS)
 	rm -rf $(DEPENDENCY_LIBWEBP)
@@ -961,8 +978,8 @@ trd:
 
 # TBD
 extralibs:
-	$(MAKE) -j$(THREADS) zlib libncurses libreadline libvgl libjpeg libpng libgif libwebp \
-		libsdl dmalloc libffi libogg libvorbis libsndfile libxz libfreetype libopenssl
+	$(MAKE) -j$(THREADS) zlib libbzip libxz libeigen libvgl libjpeg libpng libgif libwebp \
+		dmalloc libffi libogg libvorbis libsndfile libsdl
 
 # A Massively Spiffy Yet Delicately Unobtrusive Compression Library
 zlib:
@@ -971,6 +988,39 @@ zlib:
 	cd $(BUILD)/zlib && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libz.a CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) SFLAGS=-O4
 	$(RSYNC) $(BUILD)/zlib/zlib.h $(SDK)/usr/include/
 	$(RSYNC) $(BUILD)/zlib/libz.a $(SDK)/usr/lib/
+
+# XZ data compression
+libxz:
+	rm -rf $(BUILD)/libxz
+	mkdir -p $(BUILD)/libxz
+	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBXZ)/configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared \
+		--enable-encoders=lzma1,lzma2,delta --enable-decoders=lzma1,lzma2,delta 
+	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# BZip data compression
+libbzip:
+	cd $(SRCROOT)/$(DEPENDENCY_LIBBZIP) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) PREFIX=$(SDK)/usr $(MAKE) install
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_LIBBZIP)/bzlib.h $(SDK)/usr/include/
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_LIBBZIP)/libbz2.a $(SDK)/usr/lib/
+
+# The Ncurses (new curses) library is a free software emulation of curses in System V Release 4.0, and more. 
+libncurses:
+	rm -rf $(BUILD)/libncurses
+	mkdir -p $(BUILD)/libncurses
+	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBNCURSES)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
+		--disable-pthread --without-shared --without-debug --without-tests \
+		--without-progs --without-dlsym
+	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# The GNU Readline library provides a set of functions for use by applications that allow users to edit command lines as they are typed in. 
+libreadline:
+	rm -rf $(BUILD)/libreadline
+	mkdir -p $(BUILD)/libreadline
+	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBREADLINE)/configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared --with-curses 
+	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # OpenGL-based programs must link with the libGL library. libGL implements the GLX interface as well as the main OpenGL API entrypoints. 
 # When using indirect rendering, libGL creates GLX protocol messages and sends them to the X server via a socket. 
@@ -986,12 +1036,12 @@ endif
 	rm -f $(SDK)/usr/lib/libvgl.a
 	$(AR) $(SDK)/usr/lib/libvgl.a $(BUILD)/lib/src/lib/libvgl/*.o
 
-# Libjpeg is a widely used C library for reading and writing JPEG image files. 
+# JPEG image format library. 
 libjpeg:
 	rm -rf $(BUILD)/libjpeg
 	mkdir -p $(BUILD)/libjpeg
 	cd $(BUILD)/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_JPEG)/configure \
-		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-shared
 	cd $(BUILD)/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libjpeg.la && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install-libLTLIBRARIES install-includeHEADERS
 	cp -f $(BUILD)/libjpeg/jconfig.h $(SDK)/usr/include/
 	rm -f $(SDK)/usr/lib/libjpeg.so
@@ -1001,33 +1051,40 @@ libjpeg:
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-cjpeg
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-djpeg
 
-# libpng is the official PNG reference library. It supports almost all PNG features, is extensible, and has been extensively tested for over 18 years. 
+# PNG image format library. 
 libpng:
 	rm -rf $(BUILD)/libpng
 	mkdir -p $(BUILD)/libpng
 	cd $(BUILD)/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBPNG)/configure \
-		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-dependency-tracking
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-shared --disable-dependency-tracking
 	cd $(BUILD)/libpng && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 	rm -f $(SDK)/usr/bin/libpng-config
 	cp -f $(SDK)/usr/bin/libpng15-config $(SDK)/usr/bin/libpng-config
 	rm -f $(SDK)/usr/lib/libpng.a
 	cp -f $(SDK)/usr/lib/libpng15.a $(SDK)/usr/lib/libpng.a
 
-# giflib is a library for reading and writing gif images. 
-# It is API and ABI compatible with libungif which was in wide use while the LZW compression algorithm was patented.
+# GIF image format library.
 libgif:
 	rm -rf $(BUILD)/libgif
 	mkdir -p $(BUILD)/libgif
 	cd $(BUILD)/libgif && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBGIF)/configure \
-		--prefix=$(SDK)/usr --build=$(TRIPLE) --enable-static --disable-shared 
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared 
 	cd $(BUILD)/libgif && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# TIFF image format library.
+libtiff:
+	rm -rf $(BUILD)/libtiff
+	mkdir -p $(BUILD)/libtiff
+	cd $(BUILD)/libtiff && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBTIFF)/configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared 
+	cd $(BUILD)/libtiff && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # WebP is an image format that does lossy compression of digital photographic images. 
 libwebp:
 	rm -rf $(BUILD)/libwebp
 	mkdir -p $(BUILD)/libwebp
 	cd $(BUILD)/libwebp && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBWEBP)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libwebp && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # FreeType is a freely available software library to render fonts.
@@ -1035,11 +1092,10 @@ libfreetype:
 	rm -rf $(BUILD)/libfreetype
 	mkdir -p $(BUILD)/libfreetype
 	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBFREETYPE)/configure \
-		--prefix=$(SDK)/usr --build=$(TRIPLE) --without-bzip2 --without-ats --without-old-mac-fonts --disable-mmap --enable-static --disable-shared
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --without-bzip2 --without-ats --without-old-mac-fonts --disable-mmap --enable-static --disable-shared
 	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# Simple DirectMedia Layer is a cross-platform development library designed to provide low level access 
-# to audio, keyboard, mouse, joystick, and graphics hardware via OpenGL and Direct3D. 
+# Simple DirectMedia Layer provide low level access to audio, keyboard, mouse, joystick, and graphics hardware. 
 libsdl_configure:
 	rm -rf $(SRCROOT)/cached_build/libsdl
 	mkdir -p $(SRCROOT)/cached_build/libsdl
@@ -1117,31 +1173,12 @@ libiconv:
 		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# The Ncurses (new curses) library is a free software emulation of curses in System V Release 4.0, and more. 
-libncurses:
-	rm -rf $(BUILD)/libncurses
-	mkdir -p $(BUILD)/libncurses
-	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBNCURSES)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
-		--disable-pthread --without-shared --without-debug --without-tests \
-		--without-progs --without-dlsym
-	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-# The GNU Readline library provides a set of functions for use by applications that allow users to edit command lines as they are typed in. 
-libreadline:
-	rm -rf $(BUILD)/libreadline
-	mkdir -p $(BUILD)/libreadline
-	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBREADLINE)/configure \
-		--prefix=$(SDK)/usr --build=$(TRIPLE) --enable-static --disable-shared \
-		--with-curses --without-shared
-	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
 # Ogg is a multimedia container format, and the native file and stream format for the Xiph.org multimedia codecs. 
 libogg:
 	rm -rf $(BUILD)/libogg
 	mkdir -p $(BUILD)/libogg
 	cd $(BUILD)/libogg && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBOGG)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libogg && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Ogg Vorbis is a completely open, patent-free, professional audio encoding and streaming technology with all the benefits of Open Source.
@@ -1149,7 +1186,7 @@ libvorbis:
 	rm -rf $(BUILD)/libvorbis
 	mkdir -p $(BUILD)/libvorbis
 	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBVORBIS)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # TBD
@@ -1157,7 +1194,7 @@ libflac:
 	rm -rf $(BUILD)/libflac
 	mkdir -p $(BUILD)/libflac
 	cd $(BUILD)/libflac && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBFLAC)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libflac && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Libsndfile is a C library for reading and writing files containing sampled sound.
@@ -1165,32 +1202,15 @@ libsndfile:
 	rm -rf $(BUILD)/libsndfile
 	mkdir -p $(BUILD)/libsndfile
 	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBSNDFILE)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-# XZ data compression
-libxz:
-	rm -rf $(BUILD)/libxz
-	mkdir -p $(BUILD)/libxz
-	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBXZ)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
-		--enable-encoders=lzma1,lzma2,delta --enable-decoders=lzma1,lzma2,delta 
-	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-# BZip data compression
-libbzip:
-	rm -rf $(BUILD)/libbzip
-	mkdir -p $(BUILD)/libbzip
-	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBBZIP)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
-	cd $(BUILD)/libbzip && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # AAlib is an portable ascii art GFX library.
 libaa:
 	rm -rf $(BUILD)/libaa
 	mkdir -p $(BUILD)/libaa
 	cd $(BUILD)/libaa && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBAA)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared \
 		--without-x --with-curses-driver=no
 	cd $(BUILD)/libaa && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
@@ -1199,7 +1219,8 @@ libopenssl:
 	rm -rf $(BUILD)/openssl
 	mkdir -p $(BUILD)/openssl
 	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./configure \
-		BSD-x86 --prefix=$(SDK)/usr -no-hw -no-asm -no-threads -no-shared -no-dso
+		BSD-x86 --prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) \
+		-no-hw -no-asm -no-threads -no-shared -no-dso
 	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Protocol Buffers are a way of encoding structured data in an efficient yet extensible format. 
@@ -1208,22 +1229,23 @@ libprotobuf:
 	rm -rf $(BUILD)/libprotobuf
 	mkdir -p $(BUILD)/libprotobuf
 	cd $(BUILD)/libprotobuf && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBPROTOBUF)/configure \
-		--prefix=$(SDK)/usr --disable-shared
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-shared
 	cd $(BUILD)/libprotobuf && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Eigen is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms.
 libeigen:
 	rm -rf $(BUILD)/libeigen
 	mkdir -p $(BUILD)/libeigen
-	cd $(BUILD)/libeigen && PATH=$(SDK)/usr/bin:$(PATH) cmake "$(SRCROOT)/$(DEPENDENCY_LIBEIGEN)" -DCMAKE_INSTALL_PREFIX="$(SDK)/usr"
+	cd $(BUILD)/libeigen && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/sdk/usr/bin/cmake -G "Unix Makefiles" \
+		$(SRCROOT)/eigen-eigen-5097c01bcdc4 -DCMAKE_INSTALL_PREFIX="$(SDK)/usr"
 	cd $(BUILD)/libeigen && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# TBD
+# GMP is a free library for arbitrary precision arithmetic, operating on signed integers, rational numbers, and floating-point numbers. 
 libgmp:
 	rm -rf $(BUILD)/libgmp
 	mkdir -p $(BUILD)/libgmp
 	cd $(BUILD)/libgmp && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBGMP)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared 
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared 
 	cd $(BUILD)/libgmp && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # ====================================================================================
