@@ -48,22 +48,26 @@ T11:
 T12:
 	cd 12_Stage3D && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 
-Example_Lua:
+E01:
+	@cd Example_GLS3D && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
+E02:
+	@cd Example_freeglut && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
+E03:
 	@cd Example_Lua && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-Example_BulletPhysicsLibrary:
+E04:
 	@cd Example_BulletPhysicsLibrary && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-Example_libqrencode:
+E05:
 	@cd Example_libqrencode && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-Example_Quake1:
-	@cd Example_Quake1 && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-Example_Box2D:
+E06:
 	@cd Example_Box2D && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
+E07:
+	@cd Example_Quake1 && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 
 
 allsamples: T01 T02 T03 T04 T05 T06 T07 T08 T09 T10 T11 T12
 	echo "done!"
 
-examples: Example_Lua Example_BulletPhysicsLibrary Example_libqrencode Example_Quake1 Example_Box2D
+examples: E01 E02 E03 E04 E05 E06 E07
 	echo "done!"
 
 include Makefile.common

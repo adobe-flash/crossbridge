@@ -4,17 +4,17 @@ $?GLS3D:=/path/to/gls3d
 SRC=$(wildcard src/*.c)
 OBJS=$(subst .c,.o,$(SRC))
 
-AS3COMP=java -jar $(FLASCC)/usr/lib/asc2.jar -merge -md -AS3 -optimize \
-	-import $(FLASCC)/usr/lib/builtin.abc \
-	-import $(FLASCC)/usr/lib/playerglobal.abc \
-	-import $(FLASCC)/usr/lib/BinaryData.abc \
-	-import $(FLASCC)/usr/lib/ISpecialFile.abc \
-	-import $(FLASCC)/usr/lib/IBackingStore.abc \
-	-import $(FLASCC)/usr/lib/IVFS.abc \
-	-import $(FLASCC)/usr/lib/InMemoryBackingStore.abc \
-	-import $(FLASCC)/usr/lib/PlayerKernel.abc \
-	-import $(FLASCC)/usr/lib/CModule.abc \
-	-import $(GLS3D)/install/usr/lib/libGL.abc
+AS3COMP=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md -AS3 -optimize \
+	-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
+	-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
+	-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \
+	-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \
+	-import $(call nativepath,$(FLASCC)/usr/lib/IBackingStore.abc) \
+	-import $(call nativepath,$(FLASCC)/usr/lib/IVFS.abc) \
+	-import $(call nativepath,$(FLASCC)/usr/lib/InMemoryBackingStore.abc) \
+	-import $(call nativepath,$(FLASCC)/usr/lib/PlayerKernel.abc) \
+	-import $(call nativepath,$(FLASCC)/usr/lib/CModule.abc) \
+	-import $(call nativepath,$(GLS3D)/install/usr/lib/libGL.abc)
 
 .PHONY: demos
 
@@ -191,3 +191,5 @@ compile: $(OBJS)
 	@echo "Compiling $<"
 	@$(FLASCC)/usr/bin/gcc -DHAVE_GETTIMEOFDAY -DHAVE_ERRNO_H -DHAVE_LIMITS_H -DHAVE_VFPRINTF -DHAVE_UNISTD_H -O4 -c \
 		-I$(GLS3D)/install/usr/include/ -Iinstall/usr/include/ $< -o $@
+
+include ../Makefile.common
