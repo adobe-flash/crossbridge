@@ -1,0 +1,765 @@
+-------------------------------------------------------------------------------
+New in 1.5.4
+
+* Fix inconsistent quoting in error messages
+* Try to work around GCC optimizations breaking switch/body timers
+
+-------------------------------------------------------------------------------
+New in 1.5.3
+
+* Init default most coins times with the level's time
+* When scanning for set files, ignore files not ending with ".txt"
+* Fix attempt to use "joystick" option before config system is set up
+* Add licence info for share/fs_jpg.c, which is based on jdatasrc.c
+  from libjpeg
+* Do not flip left/right when using joystick third-axis rotation
+* Disallow path separators when entering replay name
+* Fix LOCALEDIR ambiguity in Makefile
+* Putt: Move shot/desc from courses.txt to the individual course
+  files, a la sets.txt
+* Putt: Scan for and add courses not listed in courses.txt after those
+  listed
+* Don't clip shadow geometry above ball if "shadow" is set to 3
+* Print last error when VFS init fails
+* Fix user scores not being read if file has CRLF newlines
+* Fix some "glass" materials scheduled as opaque
+* Show inapplicable score (e.g. not enough coins for a Fast Unlock) as
+  unqualified rather than leave an empty row
+* ufo.map: Replaced uses of red-glass and green-glass
+* Removed the now unused green-glass texture
+* Fix filler space allocation in GUI
+* Correctly apply teleport translation to view position
+* maze2.map, runstop.map: replaced pane of glass with a grill
+  (invalidates replays)
+* Update "stereo" option description
+
+-------------------------------------------------------------------------------
+New in 1.5.2
+
+* French translation update
+* Fixed HUD display of selected camera
+* Rip out locale <-> UTF-8 filename conversions (and a direct iconv dep)
+* Allow view rotation using second gamepad stick
+* Remove static replay limit
+* Fixed label corners in help screen
+* Simplified Chinese translation
+* Allow fall back to non-localised font path
+* Make fast view rotation modifier configurable, and support joystick
+* Squash embarrasing out-of-bounds access bug
+* Redo video init when turning on reflections, to fix the
+  long-standing crazy reflections bug
+* Middle mouse button toggles between chase/manual views
+* ufo.map: Tiny texture fix
+* accordian.map: increase time by 5 seconds
+* Fix a buffer overflow when reading player name from replay, and
+  support stored names of arbitrary length
+* Implement a Quake-like virtual file system with ZIP archive support
+* Make sets.txt optional
+* Write and look for replays in a Replays directory
+* Move replays found at the top of the user dir into Replays
+* Keep scores in a Scores directory (migrate old ones, too)
+* Write all screen shots to a Screenshots directory
+* Set GL read buffer to "front" once and for all when setting video mode
+* Actually use the "joystick" config option
+* mapc: report unknown materials
+* Use separate score files in cheat mode
+* Document font requirements
+* Increase default view rotation rates
+* Load entire font to memory at init
+* Add a ball configuration screen
+* Added brass-faceted texture to match chrome-faceted
+* title.map: Aligned stray coin to the 32-unit grid
+* Spanish translation update
+* Add normal green texture
+* Exclude vertical ball velocity from view computations (no more
+  spinning out of control while in air)
+* Added non-reflective texture "blue-wave" for moving water
+* Fix typo in French translation
+* spacetime.map: Small fixes
+* coneskeleton.map: Changed goal_hs times that were based on an
+  outdated goal value
+* Remove "--info" command line option
+* Include initial view data in the first update (in replays)
+* Allow camera switching during ready/set stage
+* Add missing sounds in resolution screen
+* Tweak selector layout in resolution screen
+* Add some space between navigation and set/level selectors
+* Make sure the last viewed set selection page actually exists
+* Correctly register scores for levels with no time limit
+* Remove static level set limit
+* Show 6 sets per page
+* Paint background first, then mirrors (fix for environments with
+  layers very close to origin)
+* Add a Volcano environment (used in levels from Hard 09 to Hard III)
+* Add new BGM track6.ogg for use in Volcano environment
+* Time to the left, coins to the right in the score board
+* Paint score buttons green on a high-score in that score type
+* Preempt many buffer overflows related to strncpy usage
+* Add label truncation, truncate long labels in several screens
+* Clip shadowed geometry above the ball center
+* Remove unused Bitstream Vera font
+* Revert "Request SSE floating-point math from GCC for x86 systems"
+* Updated DejaVu font to v2.29
+* Remove archaic "levelname" attribute from maps
+* Tweak replay compatibility warning message
+* airways.map: split message across two lines
+* Do not step state unless it has been painted at least once (avoids
+  "fast-forwards" after long screen loads)
+* Change "joystick" default to 1
+* Brazilian Portuguese translation
+* Remove several uninteresting or problematic balls
+* Decrease par to 4 on hole 18 of Tricky Golf
+* Change Challenge info area in goal screen to fix breakage using
+  French translation
+
+-------------------------------------------------------------------------------
+New in 1.5.1
+
+* Prevent thread race that was occasionally crashing the game
+* Rename Unlock Goal scores to Fast Unlock
+* Make mouse buttons configurable (full view control)
+* Add bindings to toggle between chase and manual views
+* Actually load/save joystick dpad config
+* Transform default game/locale data paths based on executable name
+* Treat a single unrecognised argument as a replay name
+* turn.map: full rebuild to prevent a bothering camera problem
+  (invalidates replays)
+* bigcone.map: rebuilt bottom part of the cone (invalidates replays)
+* German, French, Catalan translation updates
+* Init the default fast unlock coin values with the level's goal value
+* Display warning on map version mismatch when watching replays.
+* ufo.map: Change to reduce stress on the physics engine (invalidates
+  replays)
+* Make ENABLE_WII=1 compile again
+* adventure.map: Rearranged several coins (invalidates replays)
+
+-------------------------------------------------------------------------------
+New in 1.5.0
+
+* Added dictionary elements to SOL file in order to allow metadata storage.
+* Reverted short usage in SOL to int.  Was bumping up against the limit.
+* Added new textures.
+* Corrected various mapping problems in existing maps.
+* Tweaked maps.
+* Removed 5 set limit.
+* Added internationalization.
+* Added Catalan, Finnish, French, German, Latvian, Norwegian Nynorsk,
+  and Spanish translations.
+* Countless interface tweaks across the board.
+* Added three new Neverball sets.
+* Reshuffled levels to smooth the difficulty curve.
+* Fixed config not being saved sometimes.
+* Fixed a misplaced Set Complete screen.
+* Split off limited lives and set high-scores to a separate
+  "Challenge" game mode.
+* Added bonus levels as a reward in Challenge mode.
+* Added four new Neverputt courses.
+* Fixed goal sound not being played in replays.
+* Removed OSX mouse invert work-around.
+* Reworked player name management.
+* Added keyboard support for typing text.
+* Added an option to launch replays from the command line.
+* Added a dialog with replay info in replay selection screen.
+* Added Unlock Goal high-scores.
+* Made replays use the .nbr filename extension.
+* Added invisible switches.
+* Fixed layout falling apart due to long replay names.
+* Added a new help system.
+* Added a HUD toggle, bound to F6.
+* Removed coin texture config option, it's now based on locale instead.
+* Display current camera type when starting a level.
+* Save screenshots as PNG instead of BMP.
+* Implemented collectible grow/shrink items.
+* Added ability to restart a level mid-game (normal mode only), bound to R.
+* Added SVG icons.
+* Fixed replays not being overwritten on Windows.
+* Increased mapc limits.
+* Fixed a repeated path inaccuracy.
+* Fixed mute sounds after toggling the audio setting in config screen.
+* Added multisample option.
+* Fixed ball texture seem.
+* Fixed GUI font texture coordinates sometimes being off by half a pixel.
+* Made ball bounce more realistically with respect to moving objects.
+* Replaced all TGA files with PNGs.
+* Made several key bindings only available in development mode.
+* Removed MSVC support, only MinGW is supported.
+* Store user config in %APPDATA%\Neverball on Windows.
+* Bound camera rotation keys to S and D by default.
+* Added new pause screen.
+* Changed lights to evenly illuminate entire maps.
+* Fixed not being able to deactivate a timed switch on at start of level.
+* Added platform acceleration toggle.
+* Added Neverputt keyboard navigation.
+* Added decal material flag in order to enable decals coincident with
+  base geometry.
+* Added a tweak to place the GUI into "recently moved" mode upon level
+  end.  This will force the player to recenter the joystick before the
+  GUI with work.  Thus, the default button will not be accidentally
+  deselected if the joystick is not centered when play ends.
+* Changed mover OBJ mechanism.
+* Removed ball shadow in poser mode.
+* Rewrote audio code without SDL_mixer dependency to eliminate
+  annoying crackle on various platforms.
+* Removed audio_rate config variable.
+* Rewrote image handling, eliminating SDL_image.
+* Added mipmap and anisotropic options.
+* Fixed level data not being freed by conf state.  This allowed OpenGL
+  state to leak when the context is bounced on resolution change.
+* Fixed image_white not saturating red channel on RGB and RGBA images.
+* Modified material sorter to draw opaque decals AFTER opaque
+  textures, and transparent decals BEFORE transparent textures.
+* Removed TGA search from mapc.
+* Added lump smoothing to mapc.
+* Added glassy effect to glass materials.
+* Some OpenGL optimization and state-change reduction.
+* Added foreground billboards.
+* Fixed the zero-velocity test in the edge/vert collision detection.
+  Was producing different results with different compilers.
+* Added constant DT.
+* Modified FPS calculation to be more correct.
+* Added stats collection and output.
+* Added application controlled vblank sync.
+* Enhanced specular illumination.
+* Added tilt sensor abstraction.
+* Added Wiimote tilt sensor mode for Linux.
+* Fixed empty buttons possibly being layed out so small that the
+  rounding rectangle overlaps itself.
+* Added joystick digital pad button config symbols.
+* Fixed failure to load ball texture breaks shadow texture.
+* Added new ball rendering mechanism.
+* Added several new balls using the new mechanism.
+* Ignored mouse motion events generated on mouse grab, sometimes
+  causing sudden tilting to bottom right at level start.
+* Texture cleanup.
+* Added uniform sync option.
+* Fixed Neverputt using hard-coded limits for score counts.
+* Added curve tool to distribution.
+* Implemented new shot name generation using a persistent index.
+* Now saving screenshots in user data directory.
+* Added support for decimal fractions in mapc.
+* Rebuilt curves in maps to take advantage of decimal fractions.
+* Allowed spaces in config values.
+* Greatly optimized several mapc operations.
+* Fixed texture rotation in mapc.
+* Used OpenGL memory layout conventions for storing image data,
+  allowing proper texture coordinates to be used in OBJs and
+  elsewhere.
+* Moved goal detection factor from code to Neverputt maps.
+* Set the EWMH _NET_WM_ICON window hint on X11 systems (WM icons with
+  8-bit alpha transparency).
+* Delayed buffer swap in level_snap until after image_snap, following
+  OpenGL standard and fixing off-by-one type error in set shots on
+  some ATI hardware.
+* Eliminated performance penalty on mirror-less maps with reflections
+  enabled.
+* Made default replay name user-configurable.
+* Fixed mapc to avoid overflows when operating on SSE hardware.
+* Fixed logic of BSP back/front tests.
+* Requested SSE floating-point math from GCC for x86 systems
+* Redesigned teleporter visuals.
+* Implemented a server/client-like game/replay architecture.
+
+-------------------------------------------------------------------------------
+New in 1.4.0
+
+* Fixed font renderer to never exceed maximum texture size.
+
+-------------------------------------------------------------------------------
+New in 1.3.11
+
+* Fixed broken Unix build.
+* Added OSX SDL mouse invert workaround.
+* A few texture tweaks.
+* Fixed broken Ball HUD.
+
+-------------------------------------------------------------------------------
+New in 1.3.10
+
+* Tweaks to pars.
+* Added wireframe view to Putt.
+* Fixed view toward hole when the hole is directly above or below the ball.
+
+-------------------------------------------------------------------------------
+New in 1.3.9
+
+* Made a few minor fixes to paxed's holes.
+* Added score and par to HUD.
+* Show score card only after a hole is finished.
+* Added timeouts to all in-game states except Next Player.
+* Fixed texture ID leak in conf state.
+
+-------------------------------------------------------------------------------
+New in 1.3.8
+
+* Modified joystick traversal of GUIs to wrap top/bottom and left/right.
+* Converted Putt to use Ball's GUI API.
+* Merged Putt's and Ball's audio managers into shared.
+* Added "Paused" screen to Putt.
+* Generalized Putt's scoring to allow courses of length other than 18.
+* Enabled switches in Putt.
+* Added paxed's Putt courses.
+* Changed a few textures on paxed's courses.
+* Capped per-hole scores at 12.
+* Modified several Putt backgrounds.
+* Applied a change to Mehdi 25.
+* Added poser mode to Putt.
+* "Fixed" mouse jump on pointer grab.  SDL is unpredictable here.
+* By popular demand, set initial ball view toward hole.
+
+-------------------------------------------------------------------------------
+New in 1.3.7
+
+* Fixed mapc normal optimization bug.  Resolves the Putt 16 invisible wall.
+
+-------------------------------------------------------------------------------
+New in 1.3.6
+
+* Fixed mapc normal optimization bug.  Resolves the "Level 6" crash.
+
+-------------------------------------------------------------------------------
+New in 1.3.5
+
+* Applied fixes to Mehdi's levels
+* Fixed GUI keyboard caps lock bug.
+* Fixed no default GUI state on Done screen (joystick didn't work).
+* Added fast camera rotation bound to Shift keys.
+* Added camera rotation rate to config file.
+* Modified perspective matrix to match gluPerspective.
+
+-------------------------------------------------------------------------------
+New in 1.3.4
+
+* Removed unnecessary autopause when pointer is not grabbed.
+* Fixed GUI not hilighting widget under cursor when mouse isn't moved.
+* Fixed config file written only when changed.
+
+-------------------------------------------------------------------------------
+New in 1.3.3
+
+* Removed few remaining bits of GLU code.
+* Whitened glyph textures manually rather than relying upon pixel bias.
+* Fixed Neverputt shadow
+
+-------------------------------------------------------------------------------
+New in 1.3.2
+
+* Rewrote shadow code to use mulipass rather than multitexture.
+* Removed all multitexture code.
+* Added shadow option to config screen.
+* Fixed music fade-in bug.
+* Fixed badly named static variable "clock".
+* Added level number to replay save screen.
+
+-------------------------------------------------------------------------------
+New in 1.3.1
+
+* Fixed Save Replay not allowing score count to complete.
+* Fixed bad unlock score in Mehdi 25.
+
+-------------------------------------------------------------------------------
+New in 1.3.0
+
+* Fixed replay header nonportable.
+
+-------------------------------------------------------------------------------
+New in 1.2.11
+
+* Rewrote SOL reader/writer to remove byte-order dependance.
+* Rewrote replay handler to remove byte-order dependance
+* Modified replay selector to ignore partial replays.
+* Added camera mode gamepad control.
+* Applied Mehdi's updates to several levels.
+* Generalized config string handling.  Added coin and ball option strings.
+* Added two new background music tracks.
+* Fixed broken set scoring.
+* Added Set Record screen.
+
+-------------------------------------------------------------------------------
+New in 1.2.10
+
+* Added caps lock key to keyboard.
+* Worked around Neverputt overwriting Neverball's camera setting.
+* Added clobber confirmation to replay save.
+* Fixed an audio bug when fading to the currently playing song.
+
+-------------------------------------------------------------------------------
+New in 1.2.9
+
+* Merged set-complete state into goal state, fixing set-complete crash.
+* Fixed a few game state init crashes.
+* Fixed a few pointer grab issues.
+* Added random replay during attract mode.
+* Added scene fade in/out.
+* Fixed a bug causing the texture quality setting to be ignored.
+* Moved shadow handling in with other geometry, where it belongs.
+* Moved particle and shadow init/free out of game init/free and into config.
+
+-------------------------------------------------------------------------------
+New in 1.2.8
+
+* Improved directory handling.  No longer depends on CWD.
+* Moved all config files to ~/.neverball/ directory.
+* Screenshots now go to CWD, which is not changed.
+* Reorganized replay handling.
+* Added replay save / play / delete GUIs.
+* Added auto disabling of stereo and reflection is mode set fails.
+* Changed default pointer state to ungrabbed.
+
+-------------------------------------------------------------------------------
+New in 1.2.7
+
+* Changed policy: Goal opens after a set number of coins are collected.
+* Changed policy: Extra balls are awarded only after a goal.
+* Changed policy: Game is saved after every goal.
+* Changed hud to reflect new scoring policies.
+* Fixed volume set bug.
+* Fixed shadow visible on reflective surfaces in level shots.
+* Fixed music on config screen.
+* Increased ball transparancy to accomodate new view.
+* Added subtle view distance flexibility.
+* Merged Goal and High Score states.
+* Tweaked some levels and scores in line with new scoring policies.
+* Added better fading to make music less repetitious and annoying.
+
+-------------------------------------------------------------------------------
+New in 1.2.6
+
+* Modularized state functions.
+* Changed view to make horizon visible.
+* Added view configuration options for people who whine about the new view.
+* Changed background images to augment horizon.
+* Fixed Neverputt far clip set closer than background.
+* Fixed an audio init bug.
+* Generalized config handling.
+* Heavily modified GUI handling.
+* Replaced all 2D menus with new GUI code.
+* Changed image loading policy to support non-power-of-two images.
+* Replaced Win32 makefile with VS.Net solution.
+* Rewrote HUD to use new GUI handler.
+* Added billboard objects to .SOL file.
+* Policy change: .SOL files now go in same directory as .MAP files.
+* Changed mapc to derive .SOL file name from .MAP file name.
+* Changed pause screen to include the word "Paused".
+* Changed internal clock to use integer deciseconds instead of float seconds.
+  (HIGH SCORE FILE CHANGED)
+* Made some fixes to reflection handling.
+* Added background .SOLs.
+* Added wireframe mode.
+* Added look-around mode.
+* Added keyboard-to-joystick input mapping.
+* Added mipmap generation.
+* Added clamped material type.
+
+-------------------------------------------------------------------------------
+New in 1.2.5
+
+* Fixed refrected background rotation.
+* Added OBJ loading to mapc.
+* Finally fixed material hack in mapc.
+* A few graphical optimizations.
+* Added shadow config option.
+* Added sphere-map material type.
+* Modified many levels to use detail OBJs.
+* Traded doubles/ints for floats/shorts in the .sol file.  This cuts .sol
+  file size in half, but puts a limit on level complexity.
+
+-------------------------------------------------------------------------------
+New in 1.2.4
+
+* Added camera control key binding to config file.
+* Fixed some braindead reflection handling code.
+* Fixed broken config menu.
+* Fixed sound volume adjustment crash when sound is disabled.
+* Fixed very stupid game timing bug that had been around far too long.
+
+-------------------------------------------------------------------------------
+New in 1.2.3
+
+* Added reflection material.
+* Modified several levels to use reflective material.
+* Added option to disable reflection materials.
+* Updated mapping documentation.
+* Changed shadow CLAMP_TO_EDGE to CLAMP to work around some bad drivers.
+* Added arrow key bindings for camera rotation.
+
+-------------------------------------------------------------------------------
+New in 1.2.2
+
+* Fixed a sneaky bug in menu memory that allowed unopened levels to be played.
+* Fixed camera rotation joystick button init bug.
+* Changed options menu to make unavailable modes unselectable.
+* Implemented auto-pause when the game loses focus externally.
+* Simplified ARB extension handling.
+* Made another tweak to the level set screenshot loader.
+* Applied Mehdi's tweak to level 5.
+
+-------------------------------------------------------------------------------
+New in 1.2.1
+
+* Fixed the scoring bug for real this time.
+* Documented global set scoring.
+* Added a ball "ghost" to ensure the ball remains visible when obscured.
+
+-------------------------------------------------------------------------------
+New in 1.2.0
+
+* Fixed the path timing bug for real this time.
+
+-------------------------------------------------------------------------------
+New in 1.1.6
+
+* Updated Mehdi's set to final.
+* Fixed a path timing bug to correct a slight path pause discrepancy.
+* Fixed scoring bug that was adding coins from failed level to global score.
+* Fixed a bug corrupting level set screenshots.
+
+-------------------------------------------------------------------------------
+New in 1.1.5
+
+* Reorganized code, merged Neverputt code.
+* Added friction physics.
+* Fixed goal particle radius.
+
+-------------------------------------------------------------------------------
+New in 1.1.4
+
+* Set all menus to remember their last selection.  Now the frustrated player
+  need only pound angrily on the mouse button to get back to his last save.
+
+-------------------------------------------------------------------------------
+New in 1.1.3
+
+* Fixed pipe.sol dependancy missing from Win32 makefile.
+* Added help screen.
+
+-------------------------------------------------------------------------------
+New in 1.1.2
+
+* Mouse invert and joystick select patches.
+* Minor level tweaks.
+* Fixed no levels open after reading old high score file.
+* Fixed activation of all switches at the same location.
+* Added camera HUD indicator.
+
+-------------------------------------------------------------------------------
+New in 1.1.1
+
+* Added stereo viewing.
+* Fixed Win32 makefile.
+
+-------------------------------------------------------------------------------
+New in 1.1.0
+
+* Minor tweaks and cleanup for an announced release.
+
+-------------------------------------------------------------------------------
+New in 1.0.5
+
+* Changed default scores file format, removing player names.
+* Adjusted level order and default scores.
+* Reimplemented physics lock punt.
+
+-------------------------------------------------------------------------------
+New in 1.0.4
+
+* New levels
+* Fixed texture positioning bug
+* Darkened screen during pause
+* Modified high scores to keep global highs.  (HIGH SCORE FILE CHANGED)
+* Added new automatic level shot grabber.
+* Tweaked BSP optimizer.
+
+-------------------------------------------------------------------------------
+New in 1.0.3
+
+* Modified some textures.
+* Modified some levels.
+* Modified switches to switch entire path chains.
+* Disallowed player from toggling timed switches off manually.
+
+-------------------------------------------------------------------------------
+New in 1.0.2
+
+* Added level set selector.  (HIGH SCORE FILE CHANGED)
+* Modified demo playback to handle level sets.
+* Added BSP optimization to physics.
+* New textures.
+* New levels.
+* Added Mehdi's level set.
+* Modified switches to act on paths rather than bodies.
+* Added timer option to switches.
+
+-------------------------------------------------------------------------------
+New in 1.0.1
+
+* Modified physics to better handle vertical movers.
+* Added mover switch entity.
+* Replaced level 13 with a level using vertical movers and switches.
+
+-------------------------------------------------------------------------------
+New in 1.0.0
+
+* Absolutely nothing
+
+-------------------------------------------------------------------------------
+New in 0.25.12
+
+* FreeBSD support
+* OSX support
+
+-------------------------------------------------------------------------------
+New in 0.25.11
+
+* Changed platforms to accelerate rather than change velocity instantly.
+* Changed timer to display minutes.  Increased max time from 99s to 9m59s.
+* Changed teleport exit to be relative to teleport entry.
+* Fixed time comparison ambiguity.
+
+-------------------------------------------------------------------------------
+New in 0.25.10
+
+* Fix broken load balancer starving the renderer on early level load.
+* Disabled music playback entirely when music volume is zero.
+
+-------------------------------------------------------------------------------
+New in 0.25.9
+
+* Demo record and replay.
+
+-------------------------------------------------------------------------------
+New in 0.25.8
+
+* Padded .sol files to make them portable between Linux and Windows.
+* Added pulsing HUD numbers.
+* Changed Windows config file path.
+* Changed pause mode to continue rendering.
+
+-------------------------------------------------------------------------------
+New in 0.25.7
+
+* Added background music.
+* Changed several sounds.
+* Added sound and music volume control to options screen and config file.
+* Fixed discrepancy between reported time and recorded time.
+* Fixed new coin record not triggering name input state.
+* Fixed ESC during goal state.
+
+-------------------------------------------------------------------------------
+New in 0.25.6
+
+* Level score and high score list added to goal screen.
+* Level score added to record screen.
+* Goal screen requires click-through instead of time-out.
+* Fixed level time bug.  Clock was running during goal screen.
+
+-------------------------------------------------------------------------------
+New in 0.25.5
+
+* Player name stored in config.
+* Keyboard camera selection.
+* Tweaked cameras.
+
+-------------------------------------------------------------------------------
+New in 0.25.4
+
+* Changed save game policy: it must be earned by collecting coins.
+* Added camera tracking configuration option.
+* Added coin sub-sort of time records.
+* Added time sub-sort of coin records.
+* Fixed exit-during-teleport bug.
+* Fixed potential infinite loop when ball is crushed.
+* Warn and continue on audio init failure.
+
+-------------------------------------------------------------------------------
+New in 0.25.3
+
+* Modified camera tracking, disabled direct camera control.
+
+-------------------------------------------------------------------------------
+New in 0.25.2
+
+* Added default records.  Something to shoot for.
+
+-------------------------------------------------------------------------------
+New in 0.25.1
+
+* Added record keeping.
+* Reorganized level selector to include records.
+* Added record name input state.
+* Changed shadow clamp back to CLAMP_TO_EDGE.  Screw broken drivers.
+* Changed timer to display hundredths of seconds.
+* Got rid of clock tick until last 10 seconds (it conflicts with music).
+* Returned original menu pointer motion.  Reorganized point hide.
+* Globalized pause state to generalize pointer grab handling.
+
+-------------------------------------------------------------------------------
+New in 0.25.0
+
+* Added teleportation.
+* Changed menus to work with relative pointer motion.
+* Changed pointer grab policy to lessen grab motion discontinuity impact.
+* Fixed channel order for TGA textures.
+* Fixed level selector link topology.
+* New levels.
+
+-------------------------------------------------------------------------------
+New in 0.21.0
+
+* Display screen shots in level selector.
+* Cut level selector to 25 to make room for level shot.
+* Generalized flyby representation.
+* Added poser state for capturing level shots.
+* New Levels.
+
+-------------------------------------------------------------------------------
+New in 0.16.2
+
+* Native Windows support returned.
+* Fixed HUD not responding to texture quality setting.
+* Hyper-paranoid ARB_multitexture usage.
+
+-------------------------------------------------------------------------------
+New in 0.16.0
+
+* Fixed input smoothing in game_step causing oscillation at low FPS.
+* Worked around broken shadow CLAMP_TO_EDGE on i845G.
+* Added high_level config and modified level select.  Documented cheat.
+* New levels.
+
+-------------------------------------------------------------------------------
+New in 0.14.0
+
+* New version numbering convention.  Minor number is level count.
+* Broke native Windows support.
+* Reorganized source and Makefiles.
+* Modified mapc to take a materials path.
+* Fixed potential overflow in config_home.
+
+-------------------------------------------------------------------------------
+New in 0805b
+
+* Worked around broken color mask attribute pop in ball_draw on ATI.
+
+-------------------------------------------------------------------------------
+New in 0805a
+
+* Sent screenshots to $HOME rather than CWD, fixing segfault.
+
+-------------------------------------------------------------------------------
+New in 0805
+
+* Removed some initial state assumptions that were wrong for some users.
+* Fixed $HOME determination under Windows.
+
+-------------------------------------------------------------------------------
+New in 0804
+
+* First release as "Neverball".
+* Added joystick control.
+* Added camera control.
+* Added ball shadow.
+* Added level intros.
+* Added config file stored in $HOME.
+* Removed text images and added TTF rendering.
+* New textures.
+* New levels.

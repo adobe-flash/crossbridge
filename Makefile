@@ -1513,18 +1513,6 @@ examples:
 	mkdir -p $(BUILDROOT)/extra
 	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
-example_neverball:
-	cd $(BUILD)/github/alcexamples && $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) GLS3D=$(SRCROOT)/samples/Example_GLS3D ALCEXTRA=$(BUILD)/github/alcextra neverball
-	mkdir -p $(BUILDROOT)/extra/neverball
-	cp -f $(BUILD)/github/alcexamples/build/neverball/neverball.swf $(BUILDROOT)/extra/neverball/
-	cp -f $(BUILD)/github/alcexamples/build/neverball/neverputt.swf $(BUILDROOT)/extra/neverball/
-	cp -f $(BUILD)/github/alcexamples/build/neverball/*.zip $(BUILDROOT)/extra/neverball/
-
-example_dosbox:
-	cd $(BUILD)/github/alcexamples && $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) GLS3D=$(SRCROOT)/samples/Example_GLS3D ALCEXTRA=$(BUILD)/github/alcextra dosbox
-	mkdir -p $(BUILDROOT)/extra/neverball
-	cp -f $(BUILD)/github/alcexamples/build/dosbox/dosbox.swf $(BUILDROOT)/extra/
-
 gdbunit:
 	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
 	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18

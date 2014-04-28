@@ -1,0 +1,97 @@
+
+                            * Neverball *
+
+
+* REQUIREMENTS
+
+    SDL               http://www.libsdl.org/download-1.2.php
+    SDL_ttf           http://www.libsdl.org/projects/SDL_ttf/
+    PhysicsFS         http://icculus.org/physfs/
+    libvorbis         http://xiph.org/vorbis/
+    libpng            http://www.libpng.org/pub/png/libpng.html
+    libjpeg
+
+To build Neverball  with native language support on  systems not using
+the GNU C library, an additional library may have to be installed:
+
+    libintl           http://www.gnu.org/software/gettext/
+
+To  build Neverball  with Nintendo  Wii Remote  support on  Linux, the
+"official Linux Bluetooth protocol stack"  or BlueZ and the libwiimote
+library must be installed and configured:
+
+    BlueZ             http://www.bluez.org/
+    libwiimote        http://libwiimote.sourceforge.net/
+
+
+* FONTS
+
+The Deja Vu font used by  Neverball is not suitable for the Simplified
+Chinese translation.   Due to file size concerns,  an appropriate font
+is  not included  with Neverball;  however, if  a font  with  the name
+"ttf/wqy-zenhei.ttc"  is  found in  the  search  path, Neverball  will
+attempt  to use  that  font.  The  Wen  Quan Yi  Chinese  font can  be
+obtained from here:
+
+    Wen Quan Yi       http://wenq.org/en/
+
+
+* COMPILATION
+
+Under Unix and Linux, simply run
+
+    make
+
+Certain features  can be enabled/disabled  at compile time  by passing
+additional arguments to  Make in the form "NAME=VALUE",  where NAME is
+one of those listed below and VALUE is typically 0 for disabled, 1 for
+enabled.
+
+    ENABLE_NLS=1
+
+        Enable  native  language   support.   May  require  additional
+        libraries.
+
+    ENABLE_WII=0
+
+        Enable Wii Remote support.   Requires additional libraries and
+        system configuration.
+
+Under Mac OS X, build using the provided Xcode project files.
+
+For  Windows  builds,  the   MinGW  cross-compilation  environment  is
+supported. (Native builds  are theoretically possible using  MinGW and
+MSYS.  Although care is taken  to preserve compatibility with MSYS, no
+support exists and no actual testing is done.)
+
+By default, an uninstalled build may be executed in place.
+
+
+* INSTALLATION
+
+The game  searches for game assets  in the following three  places, in
+this order.  If the game is to  be installed globally, at least one of
+them must be set.
+
+ 1. The directory  specified as argument to '--data'  (or '-d') option
+    on the command line.
+
+ 2. The directory given by the NEVERBALL_DATA environment variable.
+
+ 3. The directory given by the CONFIG_DATA macro defined in
+    share/base_config.h (which corresponds to the DATADIR Makefile
+    variable).
+
+A normal Linux installation would probably copy the data directory to
+"/usr/local/share/games/neverball/" and set DATADIR to match.
+
+
+* DISTRIBUTION
+
+The dist subdirectory contains some miscellaneous files:
+
+  * "Desktop entry" or .desktop files.
+  * Icons in PNG, SVG and ICO formats.
+
+
+Web: <http://neverball.org/>

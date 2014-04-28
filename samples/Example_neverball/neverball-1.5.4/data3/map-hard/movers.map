@@ -1,0 +1,732 @@
+// entity 0
+{
+"classname" "worldspawn"
+"author" "Robert Kooima"
+"version" "1"
+"back" "map-back/alien.sol"
+"grad" "back/alien.png"
+"shot" "shot-hard/movers.jpg"
+"song" "bgm/track5.ogg"
+"time" "12000"
+"goal" "20"
+"time_hs" "3000 6000"
+"coin_hs" "90 30"
+"goal_hs" "3000 6500"
+"message" "Go for a ride.\"
+// brush 0
+{
+( 128 128 -16 ) ( 0 128 -16 ) ( 0 0 -16 ) mtrl/invisible 0 0 0 0.5 0.5 134217728 0 0
+( 0 0 0 ) ( 0 128 0 ) ( 128 128 0 ) mtrl/arrow-green-light 0 0 0 0.5 0.5 134217728 0 0
+( 0 0 0 ) ( 128 0 0 ) ( 128 0 -16 ) mtrl/invisible 0 0 0 0.5 0.5 134217728 0 0
+( 128 0 0 ) ( 128 128 0 ) ( 128 128 -16 ) mtrl/invisible 0 0 0 0.5 0.5 134217728 0 0
+( 128 128 0 ) ( 0 128 0 ) ( 0 128 -16 ) mtrl/invisible 0 0 0 0.5 0.5 134217728 0 0
+( 0 128 0 ) ( 0 0 0 ) ( 0 0 -16 ) mtrl/invisible 0 0 0 0.5 0.5 134217728 0 0
+}
+// brush 1
+{
+( 136 128 -16 ) ( 128 128 -16 ) ( 128 0 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( 136 0 0 ) ( 128 0 0 ) ( 128 128 0 ) mtrl/edge-green-dark 0 0 0 0.5 0.5 0 0 0
+( 136 -8 0 ) ( 136 -8 -16 ) ( 128 0 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 136 -8 -16 ) ( 136 -8 0 ) ( 136 128 0 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( 136 128 0 ) ( 128 128 0 ) ( 128 128 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( 128 128 0 ) ( 128 0 0 ) ( 128 0 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+}
+// brush 2
+{
+( 0 128 -16 ) ( -8 128 -16 ) ( -8 0 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( -8 0 0 ) ( -8 128 0 ) ( 0 128 0 ) mtrl/edge-green-dark 0 0 0 0.5 0.5 0 0 0
+( -8 -8 -16 ) ( -8 -8 0 ) ( 0 0 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 0 0 0 ) ( 0 128 0 ) ( 0 128 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 0 128 0 ) ( -8 128 0 ) ( -8 128 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( -8 -8 0 ) ( -8 -8 -16 ) ( -8 128 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+}
+// brush 3
+{
+( 128 0 -16 ) ( 0 0 -16 ) ( 0 -8 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( 0 -8 0 ) ( 0 0 0 ) ( 128 0 0 ) mtrl/edge-green-dark 0 0 0 0.5 0.5 0 0 0
+( -8 -8 -16 ) ( -8 -8 0 ) ( 136 -8 0 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( 136 -8 -16 ) ( 136 -8 0 ) ( 128 0 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 128 0 0 ) ( 0 0 0 ) ( 0 0 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( -8 -8 0 ) ( -8 -8 -16 ) ( 0 0 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+}
+// brush 4
+{
+( 128 2048 0 ) ( 128 2176 0 ) ( 128 2176 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 0 2048 0 ) ( 128 2048 0 ) ( 128 2048 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( 0 2176 0 ) ( 0 2048 0 ) ( 0 2048 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 128 2176 0 ) ( 0 2176 0 ) ( 0 2176 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 128 2176 0 ) ( 128 2048 0 ) ( 0 2048 0 ) mtrl/turf-green 0 0 0 0.5 0.5 0 0 0
+( 0 2048 -16 ) ( 128 2048 -16 ) ( 128 2176 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+}
+// brush 5
+{
+( 0 2048 0 ) ( 0 2176 0 ) ( 0 2176 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( -8 2048 0 ) ( 0 2048 0 ) ( 0 2048 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( -8 2184 -16 ) ( -8 2184 0 ) ( -8 2048 0 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( -8 2184 0 ) ( -8 2184 -16 ) ( 0 2176 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( -8 2176 0 ) ( 0 2176 0 ) ( 0 2048 0 ) mtrl/edge-green 0 0 0 0.5 0.5 0 0 0
+( -8 2048 -16 ) ( 0 2048 -16 ) ( 0 2176 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+}
+// brush 6
+{
+( 136 2184 0 ) ( 136 2184 -16 ) ( 136 2048 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( 128 2048 0 ) ( 136 2048 0 ) ( 136 2048 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( 128 2176 0 ) ( 128 2048 0 ) ( 128 2048 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 136 2184 -16 ) ( 136 2184 0 ) ( 128 2176 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 136 2176 0 ) ( 136 2048 0 ) ( 128 2048 0 ) mtrl/edge-green 0 0 0 0.5 0.5 0 0 0
+( 128 2048 -16 ) ( 136 2048 -16 ) ( 136 2176 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+}
+// brush 7
+{
+( 136 2184 0 ) ( 136 2184 -16 ) ( 128 2176 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 0 2176 0 ) ( 128 2176 0 ) ( 128 2176 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( -8 2184 -16 ) ( -8 2184 0 ) ( 0 2176 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 136 2184 -16 ) ( 136 2184 0 ) ( -8 2184 0 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( 128 2184 0 ) ( 128 2176 0 ) ( 0 2176 0 ) mtrl/edge-green 0 0 0 0.5 0.5 0 0 0
+( 0 2176 -16 ) ( 128 2176 -16 ) ( 128 2184 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+}
+// brush 8
+{
+( 0 2048 -16 ) ( 128 2048 -16 ) ( 128 2176 -16 ) mtrl/invisible 0 0 0 0.5 0.5 134217728 0 0
+( 128 2176 0 ) ( 128 2048 0 ) ( 0 2048 0 ) mtrl/goal 0 0 0 0.5 0.5 134217728 0 0
+( 128 2176 0 ) ( 0 2176 0 ) ( 0 2176 -16 ) mtrl/invisible 0 0 0 0.5 0.5 134217728 0 0
+( 0 2176 0 ) ( 0 2048 0 ) ( 0 2048 -16 ) mtrl/invisible 0 0 0 0.5 0.5 134217728 0 0
+( 0 2048 0 ) ( 128 2048 0 ) ( 128 2048 -16 ) mtrl/invisible 0 0 0 0.5 0.5 134217728 0 0
+( 128 2048 0 ) ( 128 2176 0 ) ( 128 2176 -16 ) mtrl/invisible 0 0 0 0.5 0.5 134217728 0 0
+}
+// brush 9
+{
+( 128 128 -16 ) ( 0 128 -16 ) ( 0 0 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( 0 0 0 ) ( 0 128 0 ) ( 128 128 0 ) mtrl/turf-green-dark 0 0 0 0.5 0.5 0 0 0
+( 0 0 0 ) ( 128 0 0 ) ( 128 0 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 128 0 0 ) ( 128 128 0 ) ( 128 128 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+( 128 128 0 ) ( 0 128 0 ) ( 0 128 -16 ) mtrl/turf-grey 0 0 0 0.5 0.5 0 0 0
+( 0 128 0 ) ( 0 0 0 ) ( 0 0 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 0 0
+}
+}
+// entity 1
+{
+"classname" "path_corner"
+"targetname" "t4"
+"target" "t1"
+"speed" "1"
+"origin" "64 192 -64"
+}
+// entity 2
+{
+"classname" "path_corner"
+"target" "t2"
+"targetname" "t1"
+"speed" "4"
+"origin" "64 192 -64"
+}
+// entity 3
+{
+"classname" "path_corner"
+"target" "t3"
+"targetname" "t2"
+"speed" "1"
+"origin" "64 704 -64"
+}
+// entity 4
+{
+"classname" "path_corner"
+"target" "t4"
+"targetname" "t3"
+"speed" "4"
+"origin" "64 704 -64"
+}
+// entity 5
+{
+"classname" "func_train"
+"target" "t3"
+// brush 0
+{
+( 128 768 -16 ) ( 0 768 -16 ) ( 0 640 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 0 638 0 ) ( 0 766 0 ) ( 128 766 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 0 640 0 ) ( 128 640 0 ) ( 128 640 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 128 640 4 ) ( 128 768 4 ) ( 128 768 -12 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 128 768 0 ) ( 0 768 0 ) ( 0 768 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 0 768 4 ) ( 0 640 4 ) ( 0 640 -12 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+}
+}
+// entity 6
+{
+"classname" "info_player_start"
+"origin" "64 64 24"
+}
+// entity 7
+{
+"classname" "func_train"
+"target" "t16"
+// brush 0
+{
+( -128 768 0 ) ( -128 640 0 ) ( -128 640 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 0 768 0 ) ( -128 768 0 ) ( -128 768 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 0 640 4 ) ( 0 768 4 ) ( 0 768 -12 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -128 640 0 ) ( 0 640 0 ) ( 0 640 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -128 638 0 ) ( -128 766 0 ) ( 0 766 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 0 768 -16 ) ( -128 768 -16 ) ( -128 640 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+}
+}
+// entity 8
+{
+"classname" "func_train"
+"target" "t36"
+// brush 0
+{
+( 256 768 -16 ) ( 128 768 -16 ) ( 128 640 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 128 638 0 ) ( 128 766 0 ) ( 256 766 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 128 640 0 ) ( 256 640 0 ) ( 256 640 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 256 640 0 ) ( 256 768 0 ) ( 256 768 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 256 768 0 ) ( 128 768 0 ) ( 128 768 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 128 768 4 ) ( 128 640 4 ) ( 128 640 -12 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+}
+}
+// entity 9
+{
+"classname" "func_train"
+"target" "t8"
+// brush 0
+{
+( 640 1408 4 ) ( 640 1280 4 ) ( 640 1280 -12 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 768 1408 0 ) ( 640 1408 0 ) ( 640 1408 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 768 1280 0 ) ( 768 1408 0 ) ( 768 1408 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 640 1280 0 ) ( 768 1280 0 ) ( 768 1280 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 640 1278 0 ) ( 640 1406 0 ) ( 768 1406 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 768 1408 -16 ) ( 640 1408 -16 ) ( 640 1280 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+}
+}
+// entity 10
+{
+"classname" "func_train"
+"target" "t28"
+// brush 0
+{
+( -512 1408 -16 ) ( -640 1408 -16 ) ( -640 1280 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -640 1278 0 ) ( -640 1406 0 ) ( -512 1406 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -640 1280 0 ) ( -512 1280 0 ) ( -512 1280 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -512 1280 4 ) ( -512 1408 4 ) ( -512 1408 -12 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -512 1408 0 ) ( -640 1408 0 ) ( -640 1408 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -640 1408 0 ) ( -640 1280 0 ) ( -640 1280 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+}
+}
+// entity 11
+{
+"classname" "func_train"
+"target" "t20"
+// brush 0
+{
+( -512 1408 4 ) ( -512 1536 4 ) ( -512 1536 -12 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -640 1408 0 ) ( -512 1408 0 ) ( -512 1408 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -640 1536 0 ) ( -640 1408 0 ) ( -640 1408 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -512 1536 0 ) ( -640 1536 0 ) ( -640 1536 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -512 1538 0 ) ( -512 1410 0 ) ( -640 1410 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( -640 1408 -16 ) ( -512 1408 -16 ) ( -512 1536 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+}
+}
+// entity 12
+{
+"classname" "func_train"
+"target" "t42"
+// brush 0
+{
+( 0 1920 -16 ) ( 128 1920 -16 ) ( 128 2048 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 128 2050 0 ) ( 128 1922 0 ) ( 0 1922 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 128 2048 0 ) ( 0 2048 0 ) ( 0 2048 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 0 2048 4 ) ( 0 1920 4 ) ( 0 1920 -12 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 16 1920 0 ) ( 144 1920 0 ) ( 144 1920 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 128 1920 4 ) ( 128 2048 4 ) ( 128 2048 -12 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+}
+}
+// entity 13
+{
+"classname" "func_train"
+"target" "t40"
+// brush 0
+{
+( 640 1408 -16 ) ( 768 1408 -16 ) ( 768 1536 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 768 1538 0 ) ( 768 1410 0 ) ( 640 1410 0 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 768 1536 0 ) ( 640 1536 0 ) ( 640 1536 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 640 1536 4 ) ( 640 1408 4 ) ( 640 1408 -12 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 640 1408 0 ) ( 768 1408 0 ) ( 768 1408 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+( 768 1408 0 ) ( 768 1536 0 ) ( 768 1536 -16 ) mtrl/invisible 0 0 0 0.5 0.5 0 1 0
+}
+}
+// entity 14
+{
+"classname" "info_player_deathmatch"
+"origin" "64 2112 24"
+}
+// entity 15
+{
+"classname" "path_corner"
+"origin" "704 832 -64"
+"speed" "1"
+"target" "t6"
+"targetname" "t9"
+}
+// entity 16
+{
+"classname" "path_corner"
+"origin" "704 832 -64"
+"speed" "4"
+"targetname" "t6"
+"target" "t7"
+}
+// entity 17
+{
+"classname" "path_corner"
+"origin" "704 1344 -64"
+"speed" "1"
+"targetname" "t7"
+"target" "t8"
+}
+// entity 18
+{
+"classname" "path_corner"
+"origin" "704 1344 -64"
+"speed" "4"
+"targetname" "t8"
+"target" "t9"
+}
+// entity 19
+{
+"classname" "path_corner"
+"origin" "-576 704 -64"
+"speed" "1"
+"target" "t14"
+"targetname" "t17"
+}
+// entity 20
+{
+"classname" "path_corner"
+"origin" "-576 704 -64"
+"speed" "4"
+"targetname" "t14"
+"target" "t15"
+}
+// entity 21
+{
+"classname" "path_corner"
+"origin" "-64 704 -64"
+"speed" "1"
+"targetname" "t15"
+"target" "t16"
+}
+// entity 22
+{
+"classname" "path_corner"
+"origin" "-64 704 -64"
+"speed" "4"
+"targetname" "t16"
+"target" "t17"
+}
+// entity 23
+{
+"classname" "path_corner"
+"targetname" "t21"
+"target" "t18"
+"speed" "1"
+"origin" "-64 1472 -64"
+}
+// entity 24
+{
+"classname" "path_corner"
+"target" "t19"
+"targetname" "t18"
+"speed" "4"
+"origin" "-64 1472 -64"
+}
+// entity 25
+{
+"classname" "path_corner"
+"target" "t20"
+"targetname" "t19"
+"speed" "1"
+"origin" "-576 1472 -64"
+}
+// entity 26
+{
+"classname" "path_corner"
+"target" "t21"
+"targetname" "t20"
+"speed" "4"
+"origin" "-576 1472 -64"
+}
+// entity 27
+{
+"classname" "path_corner"
+"targetname" "t29"
+"target" "t26"
+"speed" "1"
+"origin" "-576 832 -64"
+}
+// entity 28
+{
+"classname" "path_corner"
+"target" "t27"
+"targetname" "t26"
+"speed" "4"
+"origin" "-576 832 -64"
+}
+// entity 29
+{
+"classname" "path_corner"
+"target" "t28"
+"targetname" "t27"
+"speed" "1"
+"origin" "-576 1344 -64"
+}
+// entity 30
+{
+"classname" "path_corner"
+"target" "t29"
+"targetname" "t28"
+"speed" "4"
+"origin" "-576 1344 -64"
+}
+// entity 31
+{
+"classname" "path_corner"
+"origin" "704 704 -64"
+"speed" "1"
+"target" "t34"
+"targetname" "t37"
+}
+// entity 32
+{
+"classname" "path_corner"
+"origin" "704 704 -64"
+"speed" "4"
+"targetname" "t34"
+"target" "t35"
+}
+// entity 33
+{
+"classname" "path_corner"
+"origin" "192 704 -64"
+"speed" "1"
+"targetname" "t35"
+"target" "t36"
+}
+// entity 34
+{
+"classname" "path_corner"
+"origin" "192 704 -64"
+"speed" "4"
+"targetname" "t36"
+"target" "t37"
+}
+// entity 35
+{
+"classname" "path_corner"
+"targetname" "t41"
+"target" "t38"
+"speed" "1"
+"origin" "192 1472 -64"
+}
+// entity 36
+{
+"classname" "path_corner"
+"target" "t39"
+"targetname" "t38"
+"speed" "4"
+"origin" "192 1472 -64"
+}
+// entity 37
+{
+"classname" "path_corner"
+"target" "t40"
+"targetname" "t39"
+"speed" "1"
+"origin" "704 1472 -64"
+}
+// entity 38
+{
+"classname" "path_corner"
+"target" "t41"
+"targetname" "t40"
+"speed" "4"
+"origin" "704 1472 -64"
+}
+// entity 39
+{
+"classname" "path_corner"
+"origin" "64 1984 -64"
+"speed" "1"
+"target" "t42"
+"targetname" "t45"
+}
+// entity 40
+{
+"classname" "path_corner"
+"origin" "64 1984 -64"
+"speed" "4"
+"targetname" "t42"
+"target" "t43"
+}
+// entity 41
+{
+"classname" "path_corner"
+"origin" "64 1472 -64"
+"speed" "1"
+"targetname" "t43"
+"target" "t44"
+}
+// entity 42
+{
+"classname" "path_corner"
+"origin" "64 1472 -64"
+"speed" "4"
+"targetname" "t44"
+"target" "t45"
+}
+// entity 43
+{
+"classname" "light"
+"origin" "-528 1088 16"
+"light" "5"
+}
+// entity 44
+{
+"classname" "light"
+"light" "1"
+"origin" "-624 960 16"
+}
+// entity 45
+{
+"classname" "light"
+"origin" "-528 832 16"
+"light" "1"
+}
+// entity 46
+{
+"classname" "light"
+"light" "1"
+"origin" "-624 1216 16"
+}
+// entity 47
+{
+"classname" "light"
+"origin" "-528 1344 16"
+"light" "1"
+}
+// entity 48
+{
+"classname" "light"
+"light" "10"
+"origin" "-624 1520 16"
+}
+// entity 49
+{
+"classname" "light"
+"origin" "-448 1424 16"
+"light" "1"
+}
+// entity 50
+{
+"classname" "light"
+"light" "1"
+"origin" "-320 1520 16"
+}
+// entity 51
+{
+"classname" "light"
+"origin" "-192 1424 16"
+"light" "5"
+}
+// entity 52
+{
+"classname" "light"
+"light" "1"
+"origin" "-64 1520 16"
+}
+// entity 53
+{
+"classname" "light"
+"origin" "-624 656 16"
+"light" "10"
+}
+// entity 54
+{
+"classname" "light"
+"light" "1"
+"origin" "-320 656 16"
+}
+// entity 55
+{
+"classname" "light"
+"origin" "-448 752 16"
+"light" "1"
+}
+// entity 56
+{
+"classname" "light"
+"light" "5"
+"origin" "-192 752 16"
+}
+// entity 57
+{
+"classname" "light"
+"origin" "-64 656 16"
+"light" "1"
+}
+// entity 58
+{
+"classname" "light"
+"light" "5"
+"origin" "656 1088 16"
+}
+// entity 59
+{
+"classname" "light"
+"origin" "752 960 16"
+"light" "1"
+}
+// entity 60
+{
+"classname" "light"
+"light" "1"
+"origin" "656 832 16"
+}
+// entity 61
+{
+"classname" "light"
+"origin" "752 1216 16"
+"light" "1"
+}
+// entity 62
+{
+"classname" "light"
+"light" "1"
+"origin" "656 1344 16"
+}
+// entity 63
+{
+"classname" "light"
+"origin" "752 1520 16"
+"light" "10"
+}
+// entity 64
+{
+"classname" "light"
+"light" "1"
+"origin" "576 1424 16"
+}
+// entity 65
+{
+"classname" "light"
+"origin" "448 1520 16"
+"light" "1"
+}
+// entity 66
+{
+"classname" "light"
+"light" "5"
+"origin" "320 1424 16"
+}
+// entity 67
+{
+"classname" "light"
+"origin" "192 1520 16"
+"light" "1"
+}
+// entity 68
+{
+"classname" "light"
+"light" "10"
+"origin" "752 656 16"
+}
+// entity 69
+{
+"classname" "light"
+"origin" "448 656 16"
+"light" "1"
+}
+// entity 70
+{
+"classname" "light"
+"light" "1"
+"origin" "576 752 16"
+}
+// entity 71
+{
+"classname" "light"
+"origin" "320 752 16"
+"light" "5"
+}
+// entity 72
+{
+"classname" "light"
+"light" "1"
+"origin" "192 656 16"
+}
+// entity 73
+{
+"classname" "target_position"
+"origin" "192 1152 -320"
+"targetname" "t46"
+}
+// entity 74
+{
+"classname" "info_player_intermission"
+"origin" "-704 -320 512"
+"target" "t46"
+}
+// entity 75
+{
+"classname" "misc_model"
+"origin" "64 1984 0"
+"model" "obj/platform.obj"
+"target" "t42"
+}
+// entity 76
+{
+"classname" "misc_model"
+"origin" "-64 704 0"
+"model" "obj/platform.obj"
+"target" "t16"
+}
+// entity 77
+{
+"classname" "misc_model"
+"origin" "64 704 0"
+"model" "obj/platform.obj"
+"target" "t3"
+}
+// entity 78
+{
+"classname" "misc_model"
+"origin" "192 704 0"
+"model" "obj/platform.obj"
+"target" "t36"
+}
+// entity 79
+{
+"classname" "misc_model"
+"origin" "704 1344 0"
+"model" "obj/platform.obj"
+"target" "t8"
+}
+// entity 80
+{
+"classname" "misc_model"
+"origin" "704 1472 0"
+"model" "obj/platform.obj"
+"target" "t40"
+}
+// entity 81
+{
+"classname" "misc_model"
+"origin" "-576 1472 0"
+"model" "obj/platform.obj"
+"target" "t20"
+}
+// entity 82
+{
+"classname" "misc_model"
+"origin" "-576 1344 0"
+"model" "obj/platform.obj"
+"target" "t28"
+}

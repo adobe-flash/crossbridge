@@ -1,0 +1,63 @@
+How to compile a universal binary of Neverball/Neverputt in OSX
+
+1) Retrieve the universal binary dependencies. 
+To be sure that you have universal binary frameworks installed use the following command :
+
+file /Library/Frameworks/SDL.framework/Versions/Current/SDL
+
+which normally outputs : 
+
+/Library/Frameworks/SDL.framework/Versions/Current/SDL: Mach-O fat file with 2 architectures
+/Library/Frameworks/SDL.framework/Versions/Current/SDL (for architecture i386): Mach-O dynamically linked shared library i386
+/Library/Frameworks/SDL.framework/Versions/Current/SDL (for architecture ppc):  Mach-O dynamically linked shared library ppc
+	
+If it is not the previous output, retrieve SDL.framework here : http://www.libsdl.org/download-1.2.php (Runtime Library for MacOSX)
+Open the dmg file and copy the SDL.framework in /Library/Frameworks.
+Do the same for:
+	- SDL_image	http://www.libsdl.org/projects/SDL_image/
+	- SDL_ttf	http://www.libsdl.org/projects/SDL_ttf/
+	- SDL_mixer	http://www.libsdl.org/projects/SDL_mixer/
+	
+Now, all neverball dependencies have been installed for universal build.
+ - libintl, libpng and msgfmt tool are already included in this archive
+
+2) Check to make sure you have the latest version of Xcode.
+
+3) Use the Xcode project found in the macosx/xcode directory.
+		
+Just double click the file neverball.xcodeproj
+
+5) In Xcode, double click on "Errors and Warnings" in the left tree to open the building view
+
+6) Select :
+	Active target -> "Sparse Disk Image" 
+	Active executable -> neverball (although this doesn't matter as we are going to compile everything)
+	Active build configuration -> "Deployment" (In this mode both universal binary are created)
+ 	
+	Then click on the Build button
+	
+	It will take a long time.
+	First mapc is created
+	Second Maps are compiled
+	Third locale are generated
+	Then neverball is compiled
+	And neverputt
+	and finally a sparse (read and write) dmg file is created with all stuff without temp files
+	The script is now finished.
+	
+	You can modify the the view of the mounted sparse image (background image, icons, ...)
+	
+	Then unmount it and select: 
+		Active target -> "Compressed disk image"
+		Active executable -> neverball
+		Active build configuration -> neverball
+
+	 Then click on the Build button
+	
+	 A read-only dmg file is generated
+	
+	 All stuff is accessible in the svn directory under:
+	
+		macosx/xcode/build/Deployment/
+	
+That's all folks!
