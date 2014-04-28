@@ -44,6 +44,7 @@ $?DEPENDENCY_LIBPROTOBUF=protobuf-2.5.0
 $?DEPENDENCY_LIBNCURSES=ncurses-5.9
 $?DEPENDENCY_LIBREADLINE=readline-6.3
 $?DEPENDENCY_LIBSNDFILE=libsndfile-1.0.25
+$?DEPENDENCY_LIBTIFF=tiff-4.0.3
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.4
 $?DEPENDENCY_LIBWEBP=libwebp-0.4.0
@@ -218,6 +219,9 @@ all:
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
+	@echo "Triple: $(TRIPLE)"
+	@echo "Host Triple: $(HOST_TRIPLE)"
+	@echo "Build Triple: $(BUILD_TRIPLE)"
 	@echo "-  libs"
 	@$(MAKE) install_libs
 	@mkdir -p $(BUILD)/logs
@@ -255,9 +259,8 @@ all_with_local_make:
 continuous:
 	rm -rf $(CCACHE_DIR)
 	$(MAKE) clean
-	$(MAKE) clean_libs
 	$(MAKE) all
-	$(MAKE) all_tests
+	@$(SDK)/usr/bin/make examples
 	cd samples && $(MAKE) clean
 
 # Nightly tests
@@ -267,11 +270,6 @@ nightly:
 # Weekly tests
 weekly:
 	$(MAKE) continuous
-
-# tests not in submittests target
-all_tests:
-	@$(SDK)/usr/bin/make examples
-	@$(SDK)/usr/bin/make alcexamples
 	@$(SDK)/usr/bin/make llvmtests
 	@$(SDK)/usr/bin/make swigtests
 	#$(SDK)/usr/bin/make checkasm
@@ -282,6 +280,9 @@ all_ci:
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
+	@echo "Triple: $(TRIPLE)"
+	@echo "Host Triple: $(HOST_TRIPLE)"
+	@echo "Build Triple: $(BUILD_TRIPLE)"
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) install_libs
 	@$(MAKE) base
@@ -308,7 +309,7 @@ all_ci:
 
 # Dev debug target
 all_dev:
-	@$(SDK)/usr/bin/make extralibs
+	@$(SDK)/usr/bin/make examples
 
 # ====================================================================================
 # CORE
@@ -317,6 +318,7 @@ clean:
 	rm -rf $(BUILDROOT)
 	rm -rf $(SDK)
 	rm -rf $(SRCROOT)/.redo
+	$(MAKE) clean_libs
 	cd samples && $(MAKE) clean
 
 docs:
@@ -342,6 +344,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBOGG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBPNG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSNDFILE).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBTIFF).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBVORBIS).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBWEBP).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBXZ).tar.gz
@@ -373,6 +376,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBOGG)
 	rm -rf $(DEPENDENCY_LIBPNG)
 	rm -rf $(DEPENDENCY_LIBSNDFILE)
+	rm -rf $(DEPENDENCY_LIBTIFF)
 	rm -rf $(DEPENDENCY_LIBVORBIS)
 	rm -rf $(DEPENDENCY_LIBWEBP)
 	rm -rf $(DEPENDENCY_LIBXZ)
@@ -1095,7 +1099,7 @@ dmalloc_all:
 libffi:
 	mkdir -p $(BUILD)/libffi
 	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+		--prefix=$(SDK)/usr --enable-static --disable-shared
 	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # TBD
@@ -1145,6 +1149,14 @@ libxz:
 		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
 		--enable-encoders=lzma1,lzma2,delta --enable-decoders=lzma1,lzma2,delta 
 	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# BZip data compression
+libbzip:
+	rm -rf $(BUILD)/libbzip
+	mkdir -p $(BUILD)/libbzip
+	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBBZIP)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+	cd $(BUILD)/libbzip && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Ogg Vorbis is a completely open, patent-free, professional audio encoding and streaming technology with all the benefits of Open Source.
 libvorbis:
@@ -1462,6 +1474,33 @@ samples:
 	mkdir -p $(BUILDROOT)/extra
 	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
+examples:
+	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS) PAK0FILE=$(SRCROOT)/samples/Example_Quake1/sdlquake-1.0.9/ID1/PAK0.PAK examples
+	mkdir -p $(BUILDROOT)/extra
+	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
+
+alcexamples:
+	mkdir -p $(BUILDROOT)/extra
+	$(MAKE) alcexample_neverball
+	$(MAKE) alcexample_dosbox
+
+sync_alcexamples:
+	rm -rf $(BUILD)/github/alcexamples
+	mkdir -p $(BUILD)/github/alcexamples
+	cd $(BUILD)/github && git clone --depth 1 https://github.com/alexmac/alcexamples.git alcexamples
+
+alcexample_neverball:
+	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra neverball
+	mkdir -p $(BUILDROOT)/extra/neverball
+	cp -f $(BUILD)/github/alcexamples/build/neverball/neverball.swf $(BUILDROOT)/extra/neverball/
+	cp -f $(BUILD)/github/alcexamples/build/neverball/neverputt.swf $(BUILDROOT)/extra/neverball/
+	cp -f $(BUILD)/github/alcexamples/build/neverball/*.zip $(BUILDROOT)/extra/neverball/
+
+alcexample_dosbox:
+	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra dosbox
+	mkdir -p $(BUILDROOT)/extra/neverball
+	cp -f $(BUILD)/github/alcexamples/build/dosbox/dosbox.swf $(BUILDROOT)/extra/
+
 gdbunit:
 	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
 	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
@@ -1511,47 +1550,6 @@ speccpu2006: # works on mac only! (and probably requires local tweaks to alchemy
 	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action build int fp | tee mac32.build.log)
 	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=alchemy.cfg --tune=base --loose --action validate int fp | tee -a alchemy.run.log)
 	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action validate int fp | tee -a mac32.run.log)
-
-# ====================================================================================
-# Examples
-# ====================================================================================
-
-examples:
-	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS) PAK0FILE=$(SRCROOT)/samples/Example_Quake1/sdlquake-1.0.9/ID1/PAK0.PAK examples
-	mkdir -p $(BUILDROOT)/extra
-	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
-
-alcexamples:
-	mkdir -p $(BUILDROOT)/extra
-	$(MAKE) alcexample_neverball
-	$(MAKE) alcexample_dosbox
-
-sync_alcextra:
-	rm -rf $(BUILD)/github/alcextra
-	mkdir -p $(BUILD)/github/alcextra
-	cd $(BUILD)/github && git clone --depth 1 https://github.com/alexmac/alcextra.git alcextra
-
-sync_alcexamples:
-	rm -rf $(BUILD)/github/alcexamples
-	mkdir -p $(BUILD)/github/alcexamples
-	cd $(BUILD)/github && git clone --depth 1 https://github.com/alexmac/alcexamples.git alcexamples
-
-sync_gls3d:
-	rm -rf $(BUILD)/github/GLS3D
-	mkdir -p $(BUILD)/github/GLS3D
-	cd $(BUILD)/github && git clone --depth 1 https://github.com/adobe/GLS3D.git GLS3D
-
-alcexample_neverball:
-	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra neverball
-	mkdir -p $(BUILDROOT)/extra/neverball
-	cp -f $(BUILD)/github/alcexamples/build/neverball/neverball.swf $(BUILDROOT)/extra/neverball/
-	cp -f $(BUILD)/github/alcexamples/build/neverball/neverputt.swf $(BUILDROOT)/extra/neverball/
-	cp -f $(BUILD)/github/alcexamples/build/neverball/*.zip $(BUILDROOT)/extra/neverball/
-
-alcexample_dosbox:
-	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra dosbox
-	mkdir -p $(BUILDROOT)/extra/neverball
-	cp -f $(BUILD)/github/alcexamples/build/dosbox/dosbox.swf $(BUILDROOT)/extra/
 
 # ====================================================================================
 # Extra Tests
