@@ -32,10 +32,16 @@ $?DEPENDENCY_DMALLOC=dmalloc-5.5.2
 $?DEPENDENCY_FFI=libffi-3.0.11
 $?DEPENDENCY_JPEG=jpeg-8c
 $?DEPENDENCY_LIBAA=aalib-1.2
+$?DEPENDENCY_LIBEIGEN=eigen-3.1.2
+$?DEPENDENCY_LIBFREETYPE=freetype-2.5.3
 $?DEPENDENCY_LIBGIF=giflib-5.0.5
+$?DEPENDENCY_LIBGMP=gmp-5.1.3
 $?DEPENDENCY_LIBICONV=libiconv-1.13.1
 $?DEPENDENCY_LIBOGG=libogg-1.3.1
 $?DEPENDENCY_LIBPNG=libpng-1.5.7
+$?DEPENDENCY_LIBPROTOBUF=protobuf-2.5.0
+$?DEPENDENCY_LIBNCURSES=ncurses-5.9
+$?DEPENDENCY_LIBREADLINE=readline-6.3
 $?DEPENDENCY_LIBSNDFILE=libsndfile-1.0.25
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.4
@@ -300,7 +306,8 @@ all_ci:
 
 # Dev debug target
 all_dev:
-	@$(SDK)/usr/bin/make samples
+	@$(SDK)/usr/bin/make libwebp
+	@$(SDK)/usr/bin/make libopenssl
 
 # ====================================================================================
 # CORE
@@ -323,11 +330,19 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
 	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
 	tar xf packages/$(DEPENDENCY_JPEG).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBAA).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBFREETYPE).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBGIF).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBICONV).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBNCURSES).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBPROTOBUF).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBREADLINE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBOGG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBPNG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSNDFILE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBVORBIS).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBWEBP).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBXZ).tar.gz
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
@@ -345,11 +360,19 @@ clean_libs:
 	rm -rf $(DEPENDENCY_DEJAGNU)
 	rm -rf $(DEPENDENCY_DMALLOC)
 	rm -rf $(DEPENDENCY_JPEG)
+	rm -rf $(DEPENDENCY_LIBAA)
+	rm -rf $(DEPENDENCY_LIBFREETYPE)
+	rm -rf $(DEPENDENCY_LIBGIF)
 	rm -rf $(DEPENDENCY_LIBICONV)
+	rm -rf $(DEPENDENCY_LIBNCURSES)
+	rm -rf $(DEPENDENCY_LIBPROTOBUF)
+	rm -rf $(DEPENDENCY_LIBREADLINE)
 	rm -rf $(DEPENDENCY_LIBOGG)
 	rm -rf $(DEPENDENCY_LIBPNG)
 	rm -rf $(DEPENDENCY_LIBSNDFILE)
 	rm -rf $(DEPENDENCY_LIBVORBIS)
+	rm -rf $(DEPENDENCY_LIBWEBP)
+	rm -rf $(DEPENDENCY_LIBXZ)
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_PKG_CFG)
@@ -926,7 +949,7 @@ trd:
 # EXTRA LIBS
 # ====================================================================================
 extralibs:
-	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng libsdl dmalloc libffi libogg libvorbis libsndfile #libopenssl
+	$(MAKE) -j$(THREADS) zlib libncurses libreadline libvgl libjpeg libpng libgif libsdl dmalloc libffi libogg libvorbis libsndfile libxz
 
 zlib:
 	rm -rf $(BUILD)/zlib
@@ -971,6 +994,20 @@ libpng:
 	rm -f $(SDK)/usr/lib/libpng.a
 	cp -f $(SDK)/usr/lib/libpng15.a $(SDK)/usr/lib/libpng.a
 
+libgif:
+	rm -rf $(BUILD)/libgif
+	mkdir -p $(BUILD)/libgif
+	cd $(BUILD)/libgif && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBGIF)/configure \
+		--prefix=$(SDK)/usr --build=$(TRIPLE) --enable-static --disable-shared 
+	cd $(BUILD)/libgif && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+libfreetype:
+	rm -rf $(BUILD)/libfreetype
+	mkdir -p $(BUILD)/libfreetype
+	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBFREETYPE)/configure \
+		--prefix=$(SDK)/usr --build=$(TRIPLE) --without-bzip2 --without-ats --without-old-mac-fonts --disable-mmap --enable-static --disable-shared
+	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
 libsdl_configure:
 	rm -rf $(SRCROOT)/cached_build/libsdl
 	mkdir -p $(SRCROOT)/cached_build/libsdl
@@ -1013,38 +1050,119 @@ dmalloc:
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 installcxx installth
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 heavy
 
+dmalloc_all:
+	rm -rf $(BUILD)/dmalloc
+	mkdir -p $(BUILD)/dmalloc
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=gcc CXX=g++ $(SRCROOT)/$(DEPENDENCY_DMALLOC)/configure \
+		--prefix=$(SDK)/usr --disable-shared --enable-static --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 threads cxx
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 installcxx installth
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 heavy
+
 libffi:
 	mkdir -p $(BUILD)/libffi
-	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 libfficheck:
 	cd $(BUILD)/libffi/testsuite && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) check
 
 libiconv:
+	rm -rf $(BUILD)/libiconv
 	mkdir -p $(BUILD)/libiconv
-	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBICONV)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBICONV)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
+libncurses:
+	rm -rf $(BUILD)/libncurses
+	mkdir -p $(BUILD)/libncurses
+	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBNCURSES)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
+		--disable-pthread --without-shared --without-debug --without-tests \
+		--without-progs --without-dlsym
+	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+libreadline:
+	rm -rf $(BUILD)/libreadline
+	mkdir -p $(BUILD)/libreadline
+	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBREADLINE)/configure \
+		--prefix=$(SDK)/usr --build=$(TRIPLE) --enable-static --disable-shared \
+		--with-curses --without-shared
+	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
 libogg:
+	rm -rf $(BUILD)/libogg
 	mkdir -p $(BUILD)/libogg
-	cd $(BUILD)/libogg && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBOGG)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libogg && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBOGG)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libogg && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
+libxz:
+	rm -rf $(BUILD)/libxz
+	mkdir -p $(BUILD)/libxz
+	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBXZ)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
+		--enable-encoders=lzma1,lzma2,delta --enable-decoders=lzma1,lzma2,delta 
+	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+libwebp:
+	rm -rf $(BUILD)/libwebp
+	mkdir -p $(BUILD)/libwebp
+	cd $(BUILD)/libwebp && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBWEBP)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+	cd $(BUILD)/libwebp && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
 libvorbis:
+	rm -rf $(BUILD)/libvorbis
 	mkdir -p $(BUILD)/libvorbis
-	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBVORBIS)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBVORBIS)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 libsndfile:
+	rm -rf $(BUILD)/libsndfile
 	mkdir -p $(BUILD)/libsndfile
-	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSNDFILE)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSNDFILE)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
+libaa:
+	rm -rf $(BUILD)/libaa
+	mkdir -p $(BUILD)/libaa
+	cd $(BUILD)/libaa && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBAA)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
+		--without-x --with-curses-driver=no
+	cd $(BUILD)/libaa && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
 libopenssl:
+	rm -rf $(BUILD)/openssl
 	mkdir -p $(BUILD)/openssl
-	cd $(BUILD)/openssl && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_OPENSSL)/configure --prefix=$(SDK)/usr
+	cd $(BUILD)/openssl && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_OPENSSL)/configure \
+		BSD-x86 --prefix=$(SDK)/usr -no-hw -no-asm -no-threads -no-shared -no-dso
 	cd $(BUILD)/openssl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+libprotobuf:
+	rm -rf $(BUILD)/libprotobuf
+	mkdir -p $(BUILD)/libprotobuf
+	cd $(BUILD)/libprotobuf && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBPROTOBUF)/configure \
+		--prefix=$(SDK)/usr --disable-shared
+	cd $(BUILD)/libprotobuf && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+libeigen:
+	rm -rf $(BUILD)/libeigen
+	mkdir -p $(BUILD)/libeigen
+	cd $(BUILD)/libeigen && PATH=$(SDK)/usr/bin:$(PATH) cmake "$(SRCROOT)/$(DEPENDENCY_LIBEIGEN)" \
+		-DCMAKE_INSTALL_PREFIX="$(SDK)/usr"
+	cd $(BUILD)/libeigen && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+libgmp:
+	rm -rf $(BUILD)/libgmp
+	mkdir -p $(BUILD)/libgmp
+	cd $(BUILD)/libgmp && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBGMP)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared 
+	cd $(BUILD)/libgmp && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # ====================================================================================
 # EXTRA TOOLS
