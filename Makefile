@@ -292,13 +292,11 @@ all_ci:
 	@$(SDK)/usr/bin/make extralibs
 	@$(SDK)/usr/bin/make extratools
 	@$(SDK)/usr/bin/make -i finalcleanup
-	@$(SDK)/usr/bin/make submittests
-	@$(SDK)/usr/bin/make all_tests
+	@$(SDK)/usr/bin/make -i submittests
 
 # Dev debug target
 all_dev:
-	@$(SDK)/usr/bin/make submittests
-	@$(SDK)/usr/bin/make all_tests
+	@$(SDK)/usr/bin/make samples
 
 # ====================================================================================
 # CORE
@@ -924,7 +922,7 @@ trd:
 # EXTRA LIBS
 # ====================================================================================
 extralibs:
-	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng libsdl dmalloc libffi libogg libvorbis libsndfile libopenssl
+	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng libsdl dmalloc libffi libogg libvorbis libsndfile #libopenssl
 
 zlib:
 	rm -rf $(BUILD)/zlib
