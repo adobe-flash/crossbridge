@@ -1349,7 +1349,7 @@ examples:
 	mkdir -p $(BUILDROOT)/extra
 	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
-alcexamples: sync_alcextra sync_alcexamples sync_gls3d
+alcexamples:
 	mkdir -p $(BUILDROOT)/extra
 	$(MAKE) alcexample_neverball
 	$(MAKE) alcexample_dosbox
