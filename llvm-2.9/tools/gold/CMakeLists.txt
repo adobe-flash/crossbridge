@@ -24,3 +24,8 @@ if(CYGWIN OR LLVM_CYGWINMAC)
   llvm_target_link_libraries(LLVMgold -luuid)
 endif()
 
+if(CMAKE_HOST_UNIX)
+  if (NOT APPLE)
+    llvm_target_link_libraries(LLVMgold -luuid)
+  endif()
+endif()
