@@ -17,11 +17,16 @@ clean:
 	@cd 11_OpenMP && make clean
 	@cd 12_Stage3D && make clean
 	
+	@cd Example_GLS3D && make clean
+	@cd Example_freeglut && make clean
 	@cd Example_Lua && make clean
 	@cd Example_BulletPhysicsLibrary && make clean
 	@cd Example_libqrencode && make clean
-	@cd Example_Quake1 && make clean
 	@cd Example_Box2D && make clean
+	@cd Example_Quake1 && make clean
+	@cd Example_Quake3 && make clean
+	@cd Example_neverball && make clean
+	@cd Example_dosbox && make clean
 
 T01:
 	cd 01_HelloWorld && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"

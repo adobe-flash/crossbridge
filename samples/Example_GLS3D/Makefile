@@ -19,6 +19,9 @@ endif
 
 all: check compile
 
+clean:
+	echo "Cleaning..."
+
 check:
 	@if [ -d $(FLASCC)/usr/bin ] ; then true ; \
 	else echo "Couldn't locate FLASCC sdk directory, please invoke make with \"make FLASCC=/path/to/FLASCC/sdk ...\"" ; exit 1 ; \

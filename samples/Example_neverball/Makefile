@@ -1,0 +1,2 @@
+clean:
+	echo "Cleaning..."
