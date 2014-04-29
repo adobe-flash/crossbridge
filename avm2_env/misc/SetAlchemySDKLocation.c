@@ -109,10 +109,14 @@ void GetAppPath(char *dest, unsigned int *sz) {
       winpath = nativepath(dest);
       strncpy(dest, winpath, strlen(winpath));
     }
-  #else
+  #elif defined(__APPLE__)
     char macpath[PATH_MAX];
     if(_NSGetExecutablePath(&macpath[0], sz) != -1)
       realpath(&macpath[0], dest);
+  #else
+    char linuxpath[PATH_MAX]; memset(linuxpath, 0, PATH_MAX);
+    ssize_t len = readlink("/proc/self/exe", linuxpath, sizeof(linuxpath));
+    strncpy(dest, linuxpath, strlen(linuxpath));
   #endif
   *sz = strlen(dest);
 }
