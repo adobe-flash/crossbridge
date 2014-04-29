@@ -373,7 +373,6 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
-	cp -r ./patches/$(DEPENDENCY_LIBBZIP) .
 
 clean_libs:
 	rm -rf $(DEPENDENCY_CMAKE)
