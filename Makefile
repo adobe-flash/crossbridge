@@ -317,7 +317,7 @@ all_ci:
 
 # Dev debug target
 all_dev:
-	@$(SDK)/usr/bin/make avm2-as
+	@$(SDK)/usr/bin/make examples
 
 # ====================================================================================
 # CORE
@@ -448,6 +448,7 @@ base:
 
 	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/swfmake.as) -outdir . -out swfmake
 	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/projectormake.as) -outdir . -out projectormake
+	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/abcdump.as) -outdir . -out abcdump
 
 # ====================================================================================
 # MAKE
@@ -959,10 +960,10 @@ tr:
 	cp -f $(BUILD)/tr/shell/avmshell $(SDK)/usr/bin/avmshell
 	cd $(SRCROOT)/avmplus/utils && curdir=$(SRCROOT)/avmplus/utils ASC=$(ASC) $(MAKE) -f manifest.mk utils
 	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/projectormake.as) -outdir . -out projectormake
-#ifeq (,$(findstring cygwin,$(PLATFORM)))
-#	$(SDK)/usr/bin/avmshell $(BUILD)/abclibs/projectormake.abc -- -o $(SDK)/usr/bin/abcdump$(EXEEXT) $(SDK)/usr/bin/avmshell $(SRCROOT)/avmplus/utils/abcdump.abc -- -Djitordie
-#	chmod a+x $(SDK)/usr/bin/abcdump$(EXEEXT)
-#endif
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	$(SDK)/usr/bin/avmshell $(BUILD)/abclibs/projectormake.abc -- -o $(SDK)/usr/bin/abcdump$(EXEEXT) $(SDK)/usr/bin/avmshell $(BUILD)/abcdump.abc -- -Djitordie
+	chmod a+x $(SDK)/usr/bin/abcdump$(EXEEXT)
+endif
 
 trd:
 	rm -rf $(BUILD)/trd
