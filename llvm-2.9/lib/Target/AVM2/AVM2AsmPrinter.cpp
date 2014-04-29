@@ -72,7 +72,7 @@ cl::opt<bool> InstrumentFlasccFunctions(
   cl::desc("INERNAL flascc opt"),
   cl::Hidden);
 
-#ifndef __CYGWIN__
+#if !defined(__CYGWIN__) && !defined(__linux__)
 extern "C" char* __dtoa(double d, int mode, int ndigits, int *decpt,
             int *sign, char **rve);
 extern "C" void __freedtoa (char*);
@@ -496,7 +496,7 @@ public:
             sprintf(&buf[0], "-%s.inf", getPackageName(*CurModule).c_str());
         } else {
             
-            #ifdef __CYGWIN__
+            #if defined(__CYGWIN__) || defined(__linux__)
             sprintf(&buf[0], "%.17e", d);
             #else
             // (s)printf is no good on mingw, it lacks the precision we need
@@ -1743,7 +1743,7 @@ extern "C" void LLVMInitializeAVM2AsmPrinter()
     RegisterAsmPrinter<AVM2AsmPrinter> X(TheAVM2Target);
 }
 
-#ifndef __CYGWIN__
+#if !defined(__CYGWIN__) && !defined(__linux__)
 extern "C" {
 #ifdef MULTIPLE_THREADS
     #undef MULTIPLE_THREADS
