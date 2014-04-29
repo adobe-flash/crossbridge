@@ -270,8 +270,6 @@ continuous:
 	rm -rf $(CCACHE_DIR)
 	$(MAKE) clean
 	$(MAKE) all
-	@$(SDK)/usr/bin/make examples
-	cd samples && $(MAKE) clean
 
 # Nightly tests
 nightly:
@@ -280,8 +278,8 @@ nightly:
 # Weekly tests
 weekly:
 	$(MAKE) continuous
-	@$(SDK)/usr/bin/make llvmtests
 	@$(SDK)/usr/bin/make swigtests
+	@$(SDK)/usr/bin/make llvmtests
 	#$(SDK)/usr/bin/make checkasm
 
 # We are ignoring some target errors because of issues with documentation generation
@@ -1332,7 +1330,7 @@ libtool:
 
 submittests: pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
 			hellocpp_shell hellocpp_swf hellocpp_swf_opt posixtest scimark scimark_swf \
-			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest samples
+			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest samples examples
 	cat $(BUILD)/scimark/result.txt
 
 pthreadsubmittests_shell: pthreadsubmittests_shell_compile pthreadsubmittests_shell_run
