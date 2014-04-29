@@ -372,6 +372,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
+	cp -r ./patches/$(DEPENDENCY_LIBBZIP) .
 
 clean_libs:
 	rm -rf $(DEPENDENCY_CMAKE)
@@ -1001,7 +1002,7 @@ libxz:
 
 # BZip data compression
 libbzip:
-	cd $(SRCROOT)/$(DEPENDENCY_LIBBZIP) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) PREFIX=$(SDK)/usr $(MAKE) install
+	cd $(SRCROOT)/$(DEPENDENCY_LIBBZIP) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(MAKE) PREFIX=$(SDK)/usr install
 	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_LIBBZIP)/bzlib.h $(SDK)/usr/include/
 	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_LIBBZIP)/libbz2.a $(SDK)/usr/lib/
 
