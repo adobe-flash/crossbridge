@@ -358,6 +358,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBSDLIMAGE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSDLMIXER).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBTIFF).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBTOOL).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBVORBIS).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBWEBP).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBXZ).tar.gz
@@ -396,6 +397,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBSDLIMAGE)
 	rm -rf $(DEPENDENCY_LIBSDLMIXER)
 	rm -rf $(DEPENDENCY_LIBTIFF)
+	rm -rf $(DEPENDENCY_LIBTOOL)
 	rm -rf $(DEPENDENCY_LIBVORBIS)
 	rm -rf $(DEPENDENCY_LIBWEBP)
 	rm -rf $(DEPENDENCY_LIBXZ)
