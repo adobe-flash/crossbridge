@@ -317,8 +317,7 @@ all_ci:
 
 # Dev debug target
 all_dev:
-	@$(SDK)/usr/bin/make swigtests
-	@$(SDK)/usr/bin/make examples
+	@$(SDK)/usr/bin/make avm2-as
 
 # ====================================================================================
 # CORE
