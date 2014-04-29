@@ -317,6 +317,7 @@ all_ci:
 
 # Dev debug target
 all_dev:
+	@$(SDK)/usr/bin/make swigtests
 	@$(SDK)/usr/bin/make examples
 
 # ====================================================================================
@@ -526,6 +527,8 @@ abclibs_compile:
 
 abclibs_asdocs:
 	mkdir -p $(BUILDROOT)
+	mkdir -p $(BUILDROOT)/apidocs
+	mkdir -p $(BUILDROOT)/apidocs/tempdita
 	mkdir -p $(BUILD)/logs
 	cd $(BUILDROOT) && $(ASDOC) \
 				-load-config= \
