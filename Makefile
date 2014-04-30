@@ -282,7 +282,7 @@ weekly:
 	@$(SDK)/usr/bin/make llvmtests
 	#$(SDK)/usr/bin/make checkasm
 
-# We are ignoring some target errors because of issues with documentation generation
+# Travis CI with Console output
 all_ci:
 	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
 	@echo "User: $(UNAME)"
@@ -294,12 +294,12 @@ all_ci:
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) install_libs
 	@$(MAKE) base
-	@$(MAKE) -i make
+	@$(MAKE) make
 	@$(SDK)/usr/bin/make cmake
 	@$(SDK)/usr/bin/make abclibs
 	@$(SDK)/usr/bin/make basictools
 	@$(SDK)/usr/bin/make llvm
-	@$(SDK)/usr/bin/make -i binutils
+	@$(SDK)/usr/bin/make binutils
 	@$(SDK)/usr/bin/make plugins
 	@$(SDK)/usr/bin/make gcc
 	@$(SDK)/usr/bin/make bmake
@@ -315,7 +315,42 @@ all_ci:
 	@$(SDK)/usr/bin/make -i finalcleanup
 	@$(SDK)/usr/bin/make submittests
 
-# Dev debug target
+# We are ignoring some target errors because of issues with documentation generation
+all_windows:
+	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
+	@echo "User: $(UNAME)"
+	@echo "Platform: $(PLATFORM)"
+	@echo "Build: $(BUILD)"
+	@echo "Triple: $(TRIPLE)"
+	@echo "Host Triple: $(HOST_TRIPLE)"
+	@echo "Build Triple: $(BUILD_TRIPLE)"
+	@mkdir -p $(BUILD)/logs
+	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt 2>&1
+	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
+	@$(MAKE) -i make &> $(BUILD)/logs/make.txt 2>&1
+	@$(SDK)/usr/bin/make cmake &> $(BUILD)/logs/cmake.txt 2>&1
+	@$(SDK)/usr/bin/make abclibs &> $(BUILD)/logs/abclibs.txt 2>&1
+	@$(SDK)/usr/bin/make basictools &> $(BUILD)/logs/basictools.txt 2>&1
+	@$(SDK)/usr/bin/make llvm &> $(BUILD)/logs/llvm.txt 2>&1
+	@$(SDK)/usr/bin/make -i binutils &> $(BUILD)/logs/binutils.txt 2>&1
+	@$(SDK)/usr/bin/make plugins &> $(BUILD)/logs/plugins.txt 2>&1
+	@$(SDK)/usr/bin/make gcc &> $(BUILD)/logs/gcc.txt 2>&1
+	@$(SDK)/usr/bin/make bmake &> $(BUILD)/logs/bmake.txt 2>&1
+	@$(SDK)/usr/bin/make stdlibs &> $(BUILD)/logs/stdlibs.txt 2>&1
+	@$(SDK)/usr/bin/make gcclibs &> $(BUILD)/logs/gcclibs.txt 2>&1
+	@$(SDK)/usr/bin/make as3wig &> $(BUILD)/logs/as3wig.txt 2>&1
+	@$(SDK)/usr/bin/make abcstdlibs &> $(BUILD)/logs/abcstdlibs.txt 2>&1
+	@$(SDK)/usr/bin/make sdkcleanup &> $(BUILD)/logs/sdkcleanup.txt 2>&1
+	@$(SDK)/usr/bin/make tr &> $(BUILD)/logs/tr.txt 2>&1
+	@$(SDK)/usr/bin/make trd &> $(BUILD)/logs/trd.txt 2>&1
+	@$(SDK)/usr/bin/make extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
+	@$(SDK)/usr/bin/make extratools &> $(BUILD)/logs/extratools.txt 2>&1
+	@$(SDK)/usr/bin/make -i finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
+	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt 2>&1
+	@$(SDK)/usr/bin/make examples &> $(BUILD)/logs/examples.txt 2>&1
+	@$(SDK)/usr/bin/make swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
+
+# Debug target
 all_dev:
 	@$(SDK)/usr/bin/make examples
 
@@ -831,14 +866,33 @@ gcclibs:
 	$(SDK)/usr/bin/ranlib $(SDK)/usr/lib/libgomp.a
 	cp -f $(SDK)/usr/lib/gcc/$(TRIPLE)/4.2.1/include/omp.h $(SDK)/usr/include/
 	rm -rf $(SDK)/usr/lib/gcc
-	
 	$(MAKE) libobjc
-
 	mkdir -p $(SDK)/usr/lib/stdlibs_abc
 	cd $(BUILD)/posix && $(SDK)/usr/bin/g++ -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/AS3++.cpp
 	cd $(BUILD)/posix && $(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj AS3++.o -o AS3++.abc
 	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libAS3++.a AS3++.o
 	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libAS3++.a AS3++.abc
+
+libobjc_configure:
+	cd $(BUILD)/llvm-gcc-42 \
+		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' TARGET-target-libobjc="all OBJC_THREAD_FILE=thr-posix" all-target-libobjc > $(SRCROOT)/cached_build/libobjc/compile.log
+	cd $(BUILD)/llvm-gcc-42 \
+		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' install-target-libobjc > $(SRCROOT)/cached_build/libobjc/install.log
+	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/libobjc`
+
+libobjc:
+	rm -rf $(BUILD)/libobjc
+	mkdir -p $(BUILD)/libobjc
+	$(PYTHON) $(SRCROOT)/tools/build-objc.py $(SRCROOT)/cached_build/libobjc/compile.log $(SRCROOT)/cached_build/libobjc/install.log $(SRCROOT) > $(BUILD)/libobjc/build.sh
+	cd $(BUILD)/libobjc && PATH="$(SDK)/usr/bin:$(PATH)" bash -x build.sh
+	# link bitcode
+	cd $(BUILD)/libobjc && rm -f libobjc.a && mkdir NXConstStr && mv NXConstStr.o NXConstStr/. && $(SDK)/usr/bin/llvm-link -o libobjc.o *.o && $(AR) libobjc.a libobjc.o NXConstStr/*.o && cp libobjc.a $(SDK)/usr/lib/.
+
+abclibobjc:
+	mkdir -p $(BUILD)/libobjc_abc
+	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
+	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
+	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
 
 # ====================================================================================
 # AS3WIG
@@ -855,8 +909,6 @@ as3wig:
 	cp $(BUILD)/as3wig/as3wig.jar $(SDK)/usr/lib/.
 	mkdir -p $(SDK)/usr/include/AS3++/
 	cp -f $(SRCROOT)/tools/aet/AS3Wig.h $(SDK)/usr/include/AS3++/AS3Wig.h
-	#java -jar $(SDK)/usr/lib/as3wig.jar -builtins -i $(SDK)/usr/lib/builtin.abc -o $(SDK)/usr/include/AS3++/builtin
-	#java -jar $(SDK)/usr/lib/as3wig.jar -builtins -i $(SDK)/usr/lib/playerglobal.abc -o $(SDK)/usr/include/AS3++/playerglobal
 	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/builtin.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/builtin)
 	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/playerglobal)
 	cp -f $(SRCROOT)/tools/aet/AS3Wig.cpp $(BUILD)/as3wig/
@@ -1338,7 +1390,7 @@ libtool:
 
 submittests: pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
 			hellocpp_shell hellocpp_swf hellocpp_swf_opt posixtest scimark scimark_swf \
-			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest samples examples
+			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest samples
 	cat $(BUILD)/scimark/result.txt
 
 pthreadsubmittests_shell: pthreadsubmittests_shell_compile pthreadsubmittests_shell_run
@@ -1728,26 +1780,6 @@ winstaging:
 # ====================================================================================
 # CROSS
 # ====================================================================================
-libobjc_configure:
-	cd $(BUILD)/llvm-gcc-42 \
-		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' TARGET-target-libobjc="all OBJC_THREAD_FILE=thr-posix" all-target-libobjc > $(SRCROOT)/cached_build/libobjc/compile.log
-	cd $(BUILD)/llvm-gcc-42 \
-		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' install-target-libobjc > $(SRCROOT)/cached_build/libobjc/install.log
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/libobjc`
-
-libobjc:
-	rm -rf $(BUILD)/libobjc
-	mkdir -p $(BUILD)/libobjc
-	$(PYTHON) $(SRCROOT)/tools/build-objc.py $(SRCROOT)/cached_build/libobjc/compile.log $(SRCROOT)/cached_build/libobjc/install.log $(SRCROOT) > $(BUILD)/libobjc/build.sh
-	cd $(BUILD)/libobjc && PATH="$(SDK)/usr/bin:$(PATH)" bash -x build.sh
-	# link bitcode
-	cd $(BUILD)/libobjc && rm -f libobjc.a && mkdir NXConstStr && mv NXConstStr.o NXConstStr/. && $(SDK)/usr/bin/llvm-link -o libobjc.o *.o && $(AR) libobjc.a libobjc.o NXConstStr/*.o && cp libobjc.a $(SDK)/usr/lib/.
-
-abclibobjc:
-	mkdir -p $(BUILD)/libobjc_abc
-	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
-	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
-	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
 
 cxxfiltmingw:
 	# install the version of mingw for osx from here: http://crossgcc.rts-software.org/doku.php
