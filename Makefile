@@ -47,6 +47,7 @@ $?DEPENDENCY_LIBREADLINE=readline-6.3
 $?DEPENDENCY_LIBSNDFILE=libsndfile-1.0.25
 $?DEPENDENCY_LIBSDLIMAGE=SDL_image-1.2.12
 $?DEPENDENCY_LIBSDLMIXER=SDL_mixer-1.2.12
+$?DEPENDENCY_LIBSDLTTF=SDL_ttf-2.0.11
 $?DEPENDENCY_LIBTIFF=tiff-4.0.3
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.4
@@ -355,7 +356,8 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make examples
+	@$(SDK)/usr/bin/make -i libfreetype
+	@$(SDK)/usr/bin/make libsdl_ttf
 
 # ====================================================================================
 # CORE
@@ -395,6 +397,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBSNDFILE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSDLIMAGE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSDLMIXER).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBSDLTTF).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBTIFF).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBTOOL).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBVORBIS).tar.gz
@@ -435,6 +438,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBSNDFILE)
 	rm -rf $(DEPENDENCY_LIBSDLIMAGE)
 	rm -rf $(DEPENDENCY_LIBSDLMIXER)
+	rm -rf $(DEPENDENCY_LIBSDLTTF)
 	rm -rf $(DEPENDENCY_LIBTIFF)
 	rm -rf $(DEPENDENCY_LIBTOOL)
 	rm -rf $(DEPENDENCY_LIBVORBIS)
@@ -1040,7 +1044,7 @@ trd:
 # TBD
 extralibs:
 	$(MAKE) -j$(THREADS) zlib libbzip libxz libeigen libvgl libjpeg libpng libgif libwebp \
-		dmalloc libffi libogg libvorbis libsndfile libsdl
+		dmalloc libffi libogg libvorbis libsndfile libsdl libsdl_image libsdl_mixer
 
 # A Massively Spiffy Yet Delicately Unobtrusive Compression Library
 zlib:
@@ -1153,14 +1157,16 @@ libfreetype:
 	rm -rf $(BUILD)/libfreetype
 	mkdir -p $(BUILD)/libfreetype
 	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBFREETYPE)/configure \
-		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --without-bzip2 --without-ats --without-old-mac-fonts --disable-mmap --enable-static --disable-shared
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared \
+		--disable-mmap --without-ats --without-old-mac-fonts
+	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE)
 	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Simple DirectMedia Layer provide low level access to audio, keyboard, mouse, joystick, and graphics hardware. 
 libsdl_configure:
 	rm -rf $(SRCROOT)/cached_build/libsdl
 	mkdir -p $(SRCROOT)/cached_build/libsdl
-	cd $(SRCROOT)/cached_build/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/SDL-1.2.14/configure \
+	cd $(SRCROOT)/cached_build/libsdl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/SDL-1.2.14/configure \
 		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
 		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
 		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
@@ -1175,8 +1181,8 @@ libsdl:
 	cp -r $(SRCROOT)/cached_build/libsdl $(BUILD)/
 	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libsdl/`
 
-	cd $(BUILD)/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' $(MAKE) -j$(THREADS)
-	cd $(BUILD)/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' $(MAKE) install
+	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
+	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 	$(MAKE) libsdl-install
 	rm $(SDK)/usr/include/SDL/SDL_opengl.h
 
@@ -1184,6 +1190,45 @@ libsdl:
 libsdl-install:
 	cp $(SRCROOT)/tools/sdl-config $(SDK)/usr/bin/. # install our custom sdl-config
 	chmod a+x $(SDK)/usr/bin/sdl-config
+
+# TBD
+libsdl_all:
+	rm -rf $(BUILD)/libsdl
+	mkdir -p $(BUILD)/libsdl
+	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/SDL-1.2.14/configure \
+		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
+		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
+		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
+		--disable-directx --enable-joystick --enable-video-vgl --enable-static --disable-shared
+	rm $(BUILD)/libsdl/config.status
+	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
+	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+	$(MAKE) libsdl-install
+	rm $(SDK)/usr/include/SDL/SDL_opengl.h
+
+# TBD
+libsdl_image:
+	mkdir -p $(BUILD)/libsdlimage
+	cd $(BUILD)/libsdlimage && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLIMAGE)/configure \
+		--prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
+		--disable-sdltest --disable-dependency-tracking --without-x
+	cd $(BUILD)/libsdlimage && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# TBD
+libsdl_mixer:
+	mkdir -p $(BUILD)/libsdlmixer
+	cd $(BUILD)/libsdlmixer && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLMIXER)/configure \
+		--prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
+		--disable-sdltest --disable-dependency-tracking --without-x
+	cd $(BUILD)/libsdlmixer && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# TBD
+libsdl_ttf:
+	mkdir -p $(BUILD)/libsdlttf
+	cd $(BUILD)/libsdlttf && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLTTF)/configure \
+		--prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
+		--disable-sdltest --disable-dependency-tracking --without-x
+	cd $(BUILD)/libsdlttf && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # TBD
 dmalloc_configure:
