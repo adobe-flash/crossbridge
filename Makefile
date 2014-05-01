@@ -282,7 +282,8 @@ weekly:
 	@$(SDK)/usr/bin/make llvmtests
 	#$(SDK)/usr/bin/make checkasm
 
-# Travis CI with Console output
+# Build all with Travis CI
+# Note: Using console output to solve hanging build issues.
 all_ci:
 	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
 	@echo "User: $(UNAME)"
@@ -315,8 +316,9 @@ all_ci:
 	@$(SDK)/usr/bin/make -i finalcleanup
 	@$(SDK)/usr/bin/make submittests
 
-# We are ignoring some target errors because of issues with documentation generation
-all_windows:
+# Build all with Windows 
+# Note: Ignoring some build errors but only documentation generation related
+all_win:
 	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
@@ -347,12 +349,13 @@ all_windows:
 	@$(SDK)/usr/bin/make extratools &> $(BUILD)/logs/extratools.txt 2>&1
 	@$(SDK)/usr/bin/make -i finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
 	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt 2>&1
-	@$(SDK)/usr/bin/make examples &> $(BUILD)/logs/examples.txt 2>&1
+	@$(SDK)/usr/bin/make -i examples &> $(BUILD)/logs/examples.txt 2>&1
 	@$(SDK)/usr/bin/make swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make examples
+	@$(SDK)/usr/bin/make -i examples &> $(BUILD)/logs/examples.txt 2>&1
+	@$(SDK)/usr/bin/make swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
 
 # ====================================================================================
 # CORE

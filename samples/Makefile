@@ -68,17 +68,17 @@ E06:
 E07:
 	@cd Example_Quake1 && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 E08:
-	@cd Example_Quake3 && make all FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-E09:
 	@cd Example_neverball && make all FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-E10:
+E09:
 	@cd Example_dosbox && make all FLASCC="$(FLASCC)" FLEX="$(FLEX)"
+E10:
+	@cd Example_Quake3 && make all FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 
 
 allsamples: T01 T02 T03 T04 T05 T06 T07 T08 T09 T10 T11 T12
 	echo "done!"
 
-examples: E01 E02 E03 E04 E05 E06 E07 E08 E09 E10
+examples: E01 E02 E03 E04 E05 E06 E07 E08 E09
 	echo "done!"
 
 include Makefile.common
