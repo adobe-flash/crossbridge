@@ -283,7 +283,8 @@ weekly:
 	#$(SDK)/usr/bin/make checkasm
 
 # Build all with Travis CI
-# Note: Using console output to solve hanging build issues.
+# Notes: Using console output to solve hanging build issues.
+#       Ignoring some build errors but only documentation generation related.
 all_ci:
 	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
 	@echo "User: $(UNAME)"
@@ -300,7 +301,7 @@ all_ci:
 	@$(SDK)/usr/bin/make abclibs
 	@$(SDK)/usr/bin/make basictools
 	@$(SDK)/usr/bin/make llvm
-	@$(SDK)/usr/bin/make binutils
+	@$(SDK)/usr/bin/make -i binutils
 	@$(SDK)/usr/bin/make plugins
 	@$(SDK)/usr/bin/make gcc
 	@$(SDK)/usr/bin/make bmake
@@ -317,9 +318,9 @@ all_ci:
 	@$(SDK)/usr/bin/make submittests
 
 # Build all with Windows 
-# Note: Ignoring some build errors but only documentation generation related
+# Notes: Ignoring some build errors but only documentation generation related
 all_win:
-	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
+	@echo "~~~ Crossbridge (Windows) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
