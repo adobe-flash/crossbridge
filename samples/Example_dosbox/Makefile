@@ -1,5 +1,4 @@
 FLASCC=/path/to/FLASCC/sdk
-ALCEXTRA=/path/to/alcextra
 GLS3D=/path/to/GLS3D
 
 clean:
@@ -23,8 +22,8 @@ bochs:
 	mkdir -p $(BUILD)/bochs
 	
 	cd $(BUILD)/bochs/ && CFLAGS="-O3" CXXFLAGS="-O3" \
-			PATH=$(FLASCC)/usr/bin:$(ALCEXTRA)/usr/bin:$(PATH) CFLAGS="$(BOCHS_OPTS) " CXXFLAGS="$(BOCHS_OPTS) -I$(ALCEXTRA)/usr/include" $(SRCROOT)/bochs-2.6/configure $(BOCHS_CFG)
-	cd $(BUILD)/bochs/ && PATH=$(FLASCC)/usr/bin:$(ALCEXTRA)/usr/bin:$(PATH) SWF_LINK_OPTS="-Wl,--warn-unresolved-symbols -pthread -emit-swf -swf-preloader=VFSPreLoader.swf -swf-size=1024x768 -symbol-abc=Console.abc $(FLASCC)/usr/lib/AlcVFSZip.abc " make
+			PATH=$(FLASCC)/usr/bin:$(FLASCC)/usr/bin:$(PATH) CFLAGS="$(BOCHS_OPTS) " CXXFLAGS="$(BOCHS_OPTS) -I$(FLASCC)/usr/include" $(SRCROOT)/bochs-2.6/configure $(BOCHS_CFG)
+	cd $(BUILD)/bochs/ && PATH=$(FLASCC)/usr/bin:$(FLASCC)/usr/bin:$(PATH) SWF_LINK_OPTS="-Wl,--warn-unresolved-symbols -pthread -emit-swf -swf-preloader=VFSPreLoader.swf -swf-size=1024x768 -symbol-abc=Console.abc $(FLASCC)/usr/lib/AlcVFSZip.abc " make
 	mv $(BUILD)/bochs/bochs $(BUILD)/bochs/bochs.swf
 
 
@@ -39,10 +38,10 @@ dbnative:
 all:
 	mkdir -p $(BUILD)/dosbox
 
-	cd $(BUILD)/dosbox/ && PATH=$(FLASCC)/usr/bin:$(ALCEXTRA)/usr/bin:$(PATH) CFLAGS="$(DOSBOX_OPTS) " CXXFLAGS="$(DOSBOX_OPTS) -I$(ALCEXTRA)/usr/include" \
+	cd $(BUILD)/dosbox/ && PATH=$(FLASCC)/usr/bin:$(FLASCC)/usr/bin:$(PATH) CFLAGS="$(DOSBOX_OPTS) " CXXFLAGS="$(DOSBOX_OPTS) -I$(FLASCC)/usr/include" \
 			$(SRCROOT)/dosbox-0.74/configure --disable-debug --disable-sdltest --disable-alsa-midi \
 		--disable-alsatest --disable-dynamic-core --disable-dynrec --disable-fpu-x86 --disable-opengl
-	cd $(BUILD)/dosbox/ && PATH=$(FLASCC)/usr/bin:$(ALCEXTRA)/usr/bin:$(PATH) make
+	cd $(BUILD)/dosbox/ && PATH=$(FLASCC)/usr/bin:$(FLASCC)/usr/bin:$(PATH) make
 
 	mkdir -p $(SRCROOT)/dosbox-0.74/fs
 	cd $(SRCROOT)/dosbox-0.74/fs && zip -i -9 -q -r $(BUILD)/dosbox/dosboxvfs.zip *

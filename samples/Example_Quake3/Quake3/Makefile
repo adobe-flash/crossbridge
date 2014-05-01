@@ -1,12 +1,12 @@
 $?BASEQ3DIR=/xxx
-$?CC=$(ALCHEMY)/usr/bin/gcc
-$?LLC=$(ALCHEMY)/usr/bin/llc
-$?LINK=$(ALCHEMY)/usr/bin/llvm-link
-$?OPT=$(ALCHEMY)/usr/bin/opt
+$?CC=$(FLASCC)/usr/bin/gcc
+$?LLC=$(FLASCC)/usr/bin/llc
+$?LINK=$(FLASCC)/usr/bin/llvm-link
+$?OPT=$(FLASCC)/usr/bin/opt
 $?EXTRACFLAGS=
 
 $?BASECFLAGS= -Dstricmp=strcasecmp -DNO_VM_COMPILED -DHARD_LINKED -DARCH_STRING='"AVM2"' -DAPIENTRY="" -DSTANDALONE -DBOTLIB $(EXTRACFLAGS) \
--DOPENGL -DCGAME -DGAME_HARD_LINKED -DC_ONLY -Wno-pointer-sign -I$(ALCHEMY)/usr/include/SDL -I$(GLS3D)/install/usr/include $(EXTRACFLAGS) \
+-DOPENGL -DCGAME -DGAME_HARD_LINKED -DC_ONLY -Wno-pointer-sign -I$(FLASCC)/usr/include/SDL -I$(GLS3D)/install/usr/include $(EXTRACFLAGS) \
 -Icode \
 -Icode/q3_ui \
 -Icode/qcommon \
@@ -274,35 +274,35 @@ q3: $(OBJS)
 	mkdir -p $(BUILDDIR)/q3vfs/home/baseq3
 	cp -fr $(BASEQ3DIR)/* $(BUILDDIR)/q3vfs/baseq3/
 
-	$(ALCHEMY)/usr/bin/genfs --type=http $(BUILDDIR)/q3vfs/ "q3vfs/baseq3"
+	$(FLASCC)/usr/bin/genfs --type=http $(BUILDDIR)/q3vfs/ "q3vfs/baseq3"
 	mv q3vfs/baseq3_manifest.as $(BUILDDIR)/manifest.as
-	cp -f $(ALCHEMY)/usr/share/HTTPBackingStore.as $(BUILDDIR)/HTTPBackingStore.as
+	cp -f $(FLASCC)/usr/share/HTTPBackingStore.as $(BUILDDIR)/HTTPBackingStore.as
 	cp -f Console.as $(BUILDDIR)/
 	cd $(BUILDDIR) && $(LINK) -o quake3.bc *.o
 	cd $(BUILDDIR) && $(LLC) -jvmopt=-Xmx2G quake3.bc -filetype=obj -o quake3.abc
 	make q3link
 
 q3link:
-	cd $(BUILDDIR) && java -classpath $(ALCHEMY)/usr/lib/asc.jar macromedia.asc.embedding.ScriptCompiler \
+	cd $(BUILDDIR) && java -classpath $(FLASCC)/usr/lib/asc.jar macromedia.asc.embedding.ScriptCompiler \
 		-abcfuture -AS3 -swf flascc.preloader.DefaultPreLoader,1024,768 \
-		-import $(ALCHEMY)/usr/lib/builtin.abc \
-		-import $(ALCHEMY)/usr/lib/playerglobal.abc \
-		$(ALCHEMY)/usr/share/IBackingStore.as \
-		$(ALCHEMY)/usr/share/InMemoryBackingStore.as \
-		$(ALCHEMY)/usr/share/DefaultPreLoader.as \
+		-import $(FLASCC)/usr/lib/builtin.abc \
+		-import $(FLASCC)/usr/lib/playerglobal.abc \
+		$(FLASCC)/usr/share/IBackingStore.as \
+		$(FLASCC)/usr/share/InMemoryBackingStore.as \
+		$(FLASCC)/usr/share/DefaultPreLoader.as \
 		HttpBackingStore.as -outdir . -out preloader
-	cd $(BUILDDIR) && java -classpath $(ALCHEMY)/usr/lib/asc.jar macromedia.asc.embedding.ScriptCompiler \
+	cd $(BUILDDIR) && java -classpath $(FLASCC)/usr/lib/asc.jar macromedia.asc.embedding.ScriptCompiler \
 		-abcfuture -AS3 -strict -optimize \
-		-import $(ALCHEMY)/usr/lib/builtin.abc \
-		-import $(ALCHEMY)/usr/lib/playerglobal.abc \
+		-import $(FLASCC)/usr/lib/builtin.abc \
+		-import $(FLASCC)/usr/lib/playerglobal.abc \
 		-import $(GLS3D)/install/usr/lib/libGL.abc \
-		-import $(ALCHEMY)/usr/lib/ISpecialFile.abc \
-		-import $(ALCHEMY)/usr/lib/IBackingStore.abc \
-		-import $(ALCHEMY)/usr/lib/IBackingStoreManager.abc \
-		-import $(ALCHEMY)/usr/lib/CModule.abc \
-		-import $(ALCHEMY)/usr/lib/C_Run.abc \
-		-import $(ALCHEMY)/usr/lib/BinaryData.abc \
-		-import $(ALCHEMY)/usr/lib/PlayerPosix.abc \
+		-import $(FLASCC)/usr/lib/ISpecialFile.abc \
+		-import $(FLASCC)/usr/lib/IBackingStore.abc \
+		-import $(FLASCC)/usr/lib/IBackingStoreManager.abc \
+		-import $(FLASCC)/usr/lib/CModule.abc \
+		-import $(FLASCC)/usr/lib/C_Run.abc \
+		-import $(FLASCC)/usr/lib/BinaryData.abc \
+		-import $(FLASCC)/usr/lib/PlayerPosix.abc \
 		Console.as -outdir . -out Console
 	cd $(BUILDDIR) && $(CC) $(CFLAGS) quake3.abc $(GLS3D)/install/usr/lib/libGL.abc $(GLS3D)/install/usr/lib/libGL.a -lSDL -lvgl \
 		-Wl,--warn-unresolved-symbols -symbol-abc=Console.abc -swf-version=16 -swf-preloader=preloader.swf -emit-swf -swf-size=1024x768 -o ../Quake3.swf
