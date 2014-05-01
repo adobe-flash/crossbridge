@@ -1,5 +1,7 @@
 FLASCC=/path/to/FLASCC/sdk
 GLS3D=/path/to/GLS3D
+BUILD=$(PWD)/build
+SRCROOT=$(PWD)
 
 clean:
 	echo "Cleaning..."

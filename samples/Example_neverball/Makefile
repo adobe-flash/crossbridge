@@ -1,5 +1,6 @@
 FLASCC=/path/to/FLASCC/sdk
-GLS3D=/path/to/GLS3D
+GLS3D=/path/to/GLS3D/
+BUILD=$(PWD)/build
 
 clean:
 	echo "Cleaning..."
@@ -11,34 +12,34 @@ all:
 	cd neverball-1.5.4/data2 && zip -9 -q -r $(BUILD)/neverball/data2.zip *
 	cd neverball-1.5.4/data3 && zip -9 -q -r $(BUILD)/neverball/data3.zip *
 
-	java -jar $(FLASCC)/usr/lib/asc2.jar -merge -md -AS3 -strict -optimize \
-		-import $(FLASCC)/usr/lib/builtin.abc \
-		-import $(FLASCC)/usr/lib/playerglobal.abc \
-		-import $(GLS3D)/install/usr/lib/libGL.abc \
-		-import $(FLASCC)/usr/lib/ISpecialFile.abc \
-		-import $(FLASCC)/usr/lib/IBackingStore.abc \
-		-import $(FLASCC)/usr/lib/IVFS.abc \
-		-import $(FLASCC)/usr/lib/InMemoryBackingStore.abc \
-		-import $(FLASCC)/usr/lib/AlcVFSZip.abc \
-		-import $(FLASCC)/usr/lib/CModule.abc \
-		-import $(FLASCC)/usr/lib/C_Run.abc \
-		-import $(FLASCC)/usr/lib/BinaryData.abc \
-		-import $(FLASCC)/usr/lib/PlayerKernel.abc \
-		neverball-1.5.4/Console.as -outdir $(BUILD)/neverball -out Console
+	java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md -AS3 -strict -optimize \
+		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
+		-import $(call nativepath,$(GLS3D)/install/usr/lib/libGL.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/IBackingStore.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/IVFS.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/InMemoryBackingStore.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/AlcVFSZip.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/CModule.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/C_Run.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/PlayerKernel.abc) \
+		neverball-1.5.4/Console.as -outdir $(call nativepath,$(BUILD)/neverball) -out Console
 
-	java -jar $(FLASCC)/usr/lib/asc2.jar -merge -md -AS3 -strict -optimize \
-		-import $(FLASCC)/usr/lib/builtin.abc \
-		-import $(FLASCC)/usr/lib/playerglobal.abc \
-		-import $(GLS3D)/install/usr/lib/libGL.abc \
-		-import $(FLASCC)/usr/lib/ISpecialFile.abc \
-		-import $(FLASCC)/usr/lib/IBackingStore.abc \
-		-import $(FLASCC)/usr/lib/IVFS.abc \
-		-import $(FLASCC)/usr/lib/CModule.abc \
-		-import $(FLASCC)/usr/lib/C_Run.abc \
-		-import $(FLASCC)/usr/lib/BinaryData.abc \
-		-import $(FLASCC)/usr/lib/PlayerKernel.abc \
-		-import $(BUILD)/neverball/Console.abc \
-		neverball-1.5.4/VFSPreLoader.as -swf com.adobe.flascc.preloader.VFSPreLoader,800,600,60 -outdir $(BUILD)/neverball -out VFSPreLoader
+	java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md -AS3 -strict -optimize \
+		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
+		-import $(call nativepath,$(GLS3D)/install/usr/lib/libGL.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/IBackingStore.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/IVFS.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/CModule.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/C_Run.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/PlayerKernel.abc) \
+		-import $(call nativepath,$(BUILD)/neverball/Console.abc) \
+		neverball-1.5.4/VFSPreLoader.as -swf com.adobe.flascc.preloader.VFSPreLoader,800,600,60 -outdir $(call nativepath,$(BUILD)/neverball) -out VFSPreLoader
 	
 	cd neverball-1.5.4 && PATH=$(FLASCC)/usr/bin:$(PATH) make \
 		DATADIR=data \
