@@ -37,3 +37,5 @@ check:
 	@if [ -d "$(FLEX)/bin" ] ; then true ; \
 	else echo "Couldn't locate Flex sdk directory, please invoke make with \"make FLEX=/path/to/flex  ...\"" ; exit 1 ; \
 	fi
+
+include ../Makefile.common

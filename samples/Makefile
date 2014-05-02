@@ -18,15 +18,16 @@ clean:
 	@cd 12_Stage3D && make clean
 	
 	@cd Example_GLS3D && make clean
+	@cd Example_GLSL2AGAL && make clean
+	@cd Example_Box2D && make clean
+	@cd Example_BulletPhysicsLibrary && make clean
 	@cd Example_freeglut && make clean
 	@cd Example_Lua && make clean
-	@cd Example_BulletPhysicsLibrary && make clean
+	@cd Example_dosbox && make clean
 	@cd Example_libqrencode && make clean
-	@cd Example_Box2D && make clean
+	@cd Example_neverball && make clean
 	@cd Example_Quake1 && make clean
 	@cd Example_Quake3 && make clean
-	@cd Example_neverball && make clean
-	@cd Example_dosbox && make clean
 
 T01:
 	cd 01_HelloWorld && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
@@ -56,29 +57,22 @@ T12:
 E01:
 	@cd Example_GLS3D && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 E02:
-	@cd Example_freeglut && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-E03:
-	@cd Example_Lua && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-E04:
-	@cd Example_BulletPhysicsLibrary && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-E05:
-	@cd Example_libqrencode && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-E06:
 	@cd Example_Box2D && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-E07:
-	@cd Example_Quake1 && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-E08:
-	@cd Example_neverball && make all FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-E09:
+E03:
+	@cd Example_BulletPhysicsLibrary && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
+E04:
+	@cd Example_freeglut && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
+E05:
+	@cd Example_Lua && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
+E06:
 	@cd Example_dosbox && make all FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-E10:
-	@cd Example_Quake3 && make all FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-
+E07:
+	@cd Example_GLSL2AGAL && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 
 allsamples: T01 T02 T03 T04 T05 T06 T07 T08 T09 T10 T11 T12
 	echo "done!"
 
-examples: E01 E02 E03 E04 E05 E06 E07 E08 E09
+examples: E01 E02 E03 E04 E05 E06
 	echo "done!"
 
 include Makefile.common
