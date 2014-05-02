@@ -356,8 +356,7 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make -i libfreetype
-	@$(SDK)/usr/bin/make libsdl_ttf
+	@$(SDK)/usr/bin/make swig3
 
 # ====================================================================================
 # CORE
@@ -1366,10 +1365,20 @@ SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/llvm-2.9/include -I$(BUIL
 SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
 
 # TBD
+swig3:
+	rm -rf $(BUILD)/swig
+	mkdir -p $(BUILD)/swig
+	cp -f packages/pcre-8.20.tar.gz $(BUILD)/swig
+	cd $(BUILD)/swig && $(SRCROOT)/swig-3.0.0/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/swig-3.0.0/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
+	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/3.0.0/$(var);)
+
+# TBD
 swig:
 	rm -rf $(BUILD)/swig
 	mkdir -p $(BUILD)/swig
-	cp -f $(SRCROOT)/$(DEPENDENCY_SWIG)/pcre-8.20.tar.gz $(BUILD)/swig
+	cp -f packages/pcre-8.20.tar.gz $(BUILD)/swig
 	cd $(BUILD)/swig && $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
 	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
 	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
