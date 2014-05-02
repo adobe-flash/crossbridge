@@ -1368,8 +1368,8 @@ SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modul
 swig3:
 	rm -rf $(BUILD)/swig
 	mkdir -p $(BUILD)/swig
-	cp -f packages/pcre-8.20.tar.gz $(BUILD)/swig
-	cd $(BUILD)/swig && $(SRCROOT)/swig-3.0.0/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	#cp -f packages/pcre-8.20.tar.gz $(BUILD)/swig
+	#cd $(BUILD)/swig && $(SRCROOT)/swig-3.0.0/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
 	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/swig-3.0.0/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
 	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
 	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/3.0.0/$(var);)
