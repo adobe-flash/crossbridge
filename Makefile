@@ -279,7 +279,6 @@ nightly:
 # Weekly tests
 weekly:
 	$(MAKE) continuous
-	@$(SDK)/usr/bin/make swigtests
 	@$(SDK)/usr/bin/make llvmtests
 	#$(SDK)/usr/bin/make checkasm
 
@@ -356,7 +355,7 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make swig
+	@$(SDK)/usr/bin/make swigtests
 
 # ====================================================================================
 # CORE
@@ -1362,9 +1361,10 @@ extratools:
 SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
 SWIG_LIBS=-lLLVMAVM2ShimInfo -lLLVMAVM2ShimCodeGen -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport 
 SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/llvm-2.9/include -I$(BUILD)/llvm-debug/include -I$(SRCROOT)/llvm-2.9/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include -I$(SRCROOT)/llvm-2.9/tools/clang/lib -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long
+# VPMedia: Why delete, I would want a full featured swig shipped as possible, so deletion is disabled below
 SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
 
-# TBD
+# Build SWIG
 swig:
 	rm -rf $(BUILD)/swig
 	mkdir -p $(BUILD)/swig
@@ -1374,7 +1374,7 @@ swig:
 	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
 	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/3.0.0/$(var);)
 
-# TBD
+# Run SWIG Tests
 swigtests:
 	# reconfigure so that makefile is up to date (in case Makefile.in changed)
 	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" \
@@ -1389,6 +1389,7 @@ swigtests:
 	cd $(BUILD)/swig && $(MAKE) check-as3-examples
 
 # TBD
+# TODO: Source not found
 swigtestsautomation:
 	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/$(DEPENDENCY_SWIG)
 
@@ -1437,7 +1438,7 @@ libtool:
 
 submittests: pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
 			hellocpp_shell hellocpp_swf hellocpp_swf_opt posixtest scimark scimark_swf \
-			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest samples
+			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest swigtests samples
 	cat $(BUILD)/scimark/result.txt
 
 pthreadsubmittests_shell: pthreadsubmittests_shell_compile pthreadsubmittests_shell_run

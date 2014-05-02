@@ -86,7 +86,7 @@ skip-go		= test -n "@SKIP_GO@"
 skip-d		= test -n "@SKIP_D@"
 
 # AVM2 AS3 PATCH START
-skip-as3		= test -n "@SKIP_D@"
+skip-as3		= test -n "@SKIP_AS3@"
 # AVM2 AS3 PATCH END
 
 # Additional dependencies for some tests
@@ -282,7 +282,8 @@ check-test-suite:				\
 	check-chicken-test-suite		\
 	check-r-test-suite			\
 	check-go-test-suite			\
-	check-d-test-suite
+	check-d-test-suite			\
+	check-as3-test-suite
 
 check-%-test-suite:
 	@if test -z "$(skip-$*)"; then					\
@@ -334,7 +335,8 @@ all-test-suite:					\
 	all-chicken-test-suite			\
 	all-r-test-suite			\
 	all-go-test-suite			\
-	all-d-test-suite
+	all-d-test-suite			\
+	all-as3-test-suite
 
 all-%-test-suite:
 	@$(MAKE) $(FLAGS) check-$*-test-suite ACTION=all
@@ -362,7 +364,8 @@ broken-test-suite:				\
 	broken-chicken-test-suite		\
 	broken-r-test-suite			\
 	broken-go-test-suite			\
-	broken-d-test-suite
+	broken-d-test-suite			\
+	broken-as3-test-suite
 
 broken-%-test-suite:
 	@$(MAKE) $(FLAGS) check-$*-test-suite ACTION=broken
