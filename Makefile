@@ -423,6 +423,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBAA)
 	rm -rf $(DEPENDENCY_LIBBZIP)
 	rm -rf $(DEPENDENCY_LIBEIGEN)
+	rm -rf eigen-eigen-5097c01bcdc4
 	rm -rf $(DEPENDENCY_LIBFLAC)
 	rm -rf $(DEPENDENCY_LIBFREETYPE)
 	rm -rf $(DEPENDENCY_LIBGIF)
