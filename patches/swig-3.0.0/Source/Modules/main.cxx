@@ -11,9 +11,10 @@
  * Main entry point to the SWIG core.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_main_cxx[] = "$Id: main.cxx 12536 2011-03-14 07:22:08Z wsfulton $";
-
-#include "SetAlchemySDKLocation.c"  // for setting swiglib directory
+// AVM2 AS3 PATCH START
+// for setting swiglib directory
+#include "SetAlchemySDKLocation.c"
+// AVM2 AS3 PATCH END
 
 #include "swigconfig.h"
 
@@ -40,7 +41,10 @@ int Verbose = 0;
 int AddExtern = 0;
 int NoExcept = 0;
 int SwigRuntime = 0;		// 0 = no option, 1 = -runtime, 2 = -noruntime
+
+// AVM2 AS3 PATCH START
 char *flasccSDKLocation = 0;
+// AVM2 AS3 PATCH END
 
 /* Suppress warning messages for private inheritance, preprocessor evaluation etc...
    WARN_PP_EVALUATION            202
@@ -54,6 +58,7 @@ char *flasccSDKLocation = 0;
 
 extern "C" {
   extern String *ModuleName;
+  extern int ignore_nested_classes;
 }
 
 /* usage string split into multiple parts otherwise string is too big for some compilers */
@@ -112,6 +117,7 @@ static const char *usage2 = (const char *) "\
      -MM             - List dependencies, but omit files in SWIG library\n\
      -MMD            - Like `-MD', but omit files in SWIG library\n\
      -module <name>  - Set module name to <name>\n\
+     -MP             - Generate phony targets for all dependencies\n\
      -MT <target>    - Set the target of the rule emitted by dependency generation\n\
      -nocontract     - Turn off contract checking\n\
      -nocpperraswarn - Do not treat the preprocessor #error statement as #warning\n\
@@ -158,9 +164,9 @@ is equivalent to: \n\
 \n";
 
 // Local variables
-static String *LangSubDir = 0;	// Target language library subdirectory
-static char *SwigLib = 0;	// Library directory
-static String *SwigLibWin = 0;	// Extra Library directory for Windows
+static String *LangSubDir = 0; // Target language library subdirectory
+static String *SwigLib = 0; // Library directory
+static String *SwigLibWinUnix = 0; // Extra library directory on Windows
 static int freeze = 0;
 static String *lang_config = 0;
 static char *hpp_extension = (char *) "h";
@@ -190,6 +196,7 @@ static int dump_classes = 0;
 static int werror = 0;
 static int depend = 0;
 static int depend_only = 0;
+static int depend_phony = 0;
 static int memory_debug = 0;
 static int allkw = 0;
 static DOH *cpps = 0;
@@ -202,22 +209,24 @@ static List *libfiles = 0;
 static List *all_output_files = 0;
 
 /* -----------------------------------------------------------------------------
- * check_suffix()
+ * check_extension()
  *
- * Checks the suffix of a file to see if we should emit extern declarations.
+ * Checks the extension of a file to see if we should emit extern declarations.
  * ----------------------------------------------------------------------------- */
 
-static int check_suffix(String *filename) {
+static bool check_extension(String *filename) {
+  bool wanted = false;
   const char *name = Char(filename);
-  const char *c;
   if (!name)
     return 0;
-  c = Swig_file_suffix(name);
+  String *extension = Swig_file_extension(name);
+  const char *c = Char(extension);
   if ((strcmp(c, ".c") == 0) ||
       (strcmp(c, ".C") == 0) || (strcmp(c, ".cc") == 0) || (strcmp(c, ".cxx") == 0) || (strcmp(c, ".c++") == 0) || (strcmp(c, ".cpp") == 0)) {
-    return 1;
+    wanted = true;
   }
-  return 0;
+  Delete(extension);
+  return wanted;
 }
 
 /* -----------------------------------------------------------------------------
@@ -286,15 +295,16 @@ static unsigned int decode_numbers_list(String *numlist) {
 }
 
 /* -----------------------------------------------------------------------------
- * Sets the output directory for language specific (proxy) files if not set and 
- * corrects the directory name and adds trailing file separator if necessary.
+ * Sets the output directory for language specific (proxy) files from the
+ * C wrapper file if not set and corrects the directory name and adds a trailing
+ * file separator if necessary.
  * ----------------------------------------------------------------------------- */
 
-static void configure_outdir(const String *c_wrapper_file_dir) {
+static void configure_outdir(const String *c_wrapper_outfile) {
 
   // Use the C wrapper file's directory if the output directory has not been set by user
   if (!outdir || Len(outdir) == 0)
-    outdir = NewString(c_wrapper_file_dir);
+    outdir = Swig_file_dirname(c_wrapper_outfile);
 
   Swig_filename_correct(outdir);
 
@@ -406,7 +416,7 @@ static void SWIG_dump_runtime() {
   s = Swig_include_sys("swiglabels.swg");
   if (!s) {
     Printf(stderr, "*** Unable to open 'swiglabels.swg'\n");
-    Close(runtime);
+    Delete(runtime);
     SWIG_exit(EXIT_FAILURE);
   }
   Printf(runtime, "%s", s);
@@ -415,23 +425,16 @@ static void SWIG_dump_runtime() {
   s = Swig_include_sys("swigerrors.swg");
   if (!s) {
     Printf(stderr, "*** Unable to open 'swigerrors.swg'\n");
-    Close(runtime);
+    Delete(runtime);
     SWIG_exit(EXIT_FAILURE);
   }
   Printf(runtime, "%s", s);
   Delete(s);
 
-  s = Swig_include_sys("swigerrors.swg");
-  if (!s) {
-    Printf(stderr, "*** Unable to open 'swigerrors.swg'\n");
-    Close(runtime);
-    SWIG_exit(EXIT_FAILURE);
-  }
-  Printf(runtime, "%s", s);
   s = Swig_include_sys("swigrun.swg");
   if (!s) {
     Printf(stderr, "*** Unable to open 'swigrun.swg'\n");
-    Close(runtime);
+    Delete(runtime);
     SWIG_exit(EXIT_FAILURE);
   }
   Printf(runtime, "%s", s);
@@ -444,13 +447,12 @@ static void SWIG_dump_runtime() {
   s = Swig_include_sys("runtime.swg");
   if (!s) {
     Printf(stderr, "*** Unable to open 'runtime.swg'\n");
-    Close(runtime);
+    Delete(runtime);
     SWIG_exit(EXIT_FAILURE);
   }
   Printf(runtime, "%s", s);
   Delete(s);
 
-  Close(runtime);
   Delete(runtime);
   SWIG_exit(EXIT_SUCCESS);
 }
@@ -491,6 +493,10 @@ void SWIG_getoptions(int argc, char *argv[]) {
 	Preprocessor_define((DOH *) "__cplusplus __cplusplus", 0);
 	Swig_cparse_cplusplus(1);
 	Swig_mark_arg(i);
+      } else if (strcmp(argv[i], "-c++out") == 0) {
+	// Undocumented
+	Swig_cparse_cplusplusout(1);
+	Swig_mark_arg(i);
       } else if (strcmp(argv[i], "-fcompact") == 0) {
 	Wrapper_compact_print_mode_set(1);
 	Swig_mark_arg(i);
@@ -505,9 +511,6 @@ void SWIG_getoptions(int argc, char *argv[]) {
 	Swig_mark_arg(i);
       } else if (strcmp(argv[i], "-naturalvar") == 0) {
 	Wrapper_naturalvar_mode_set(1);
-	Swig_mark_arg(i);
-      } else if (strcmp(argv[i], "-nonaturalvar") == 0) {
-	Wrapper_naturalvar_mode_set(0);
 	Swig_mark_arg(i);
       } else if (strcmp(argv[i], "-directors") == 0) {
 	SWIG_setfeature("feature:director", "1");
@@ -584,9 +587,9 @@ void SWIG_getoptions(int argc, char *argv[]) {
 	Swig_cparse_follow_locators(1);
 	Swig_mark_arg(i);
       } else if (strcmp(argv[i], "-swiglib") == 0) {
-	if (SwigLibWin)
-	  Printf(stdout, "%s\n", SwigLibWin);
 	Printf(stdout, "%s\n", SwigLib);
+	if (SwigLibWinUnix)
+	  Printf(stdout, "%s\n", SwigLibWinUnix);
 	SWIG_exit(EXIT_SUCCESS);
       } else if (strcmp(argv[i], "-o") == 0) {
 	Swig_mark_arg(i);
@@ -721,6 +724,9 @@ void SWIG_getoptions(int argc, char *argv[]) {
 	Swig_mark_arg(i);
       } else if (strcmp(argv[i], "-MMD") == 0) {
 	depend = 2;
+	Swig_mark_arg(i);
+      } else if (strcmp(argv[i], "-MP") == 0) {
+	depend_phony = 1;
 	Swig_mark_arg(i);
       } else if (strcmp(argv[i], "-MT") == 0) {
 	Swig_mark_arg(i);
@@ -860,10 +866,6 @@ void SWIG_getoptions(int argc, char *argv[]) {
   }
 }
 
-
-
-
-
 int SWIG_main(int argc, char *argv[], Language *l) {
   char *c;
 
@@ -908,29 +910,40 @@ int SWIG_main(int argc, char *argv[], Language *l) {
   Wrapper_director_mode_set(0);
   Wrapper_director_protected_mode_set(1);
 
-  // Create Library search directories
+  // Inform the parser if the nested classes should be ignored unless explicitly told otherwise via feature:flatnested
+  ignore_nested_classes = l->nestedClassesSupport() == Language::NCS_Unknown ? 1 : 0;
 
-  // Set flascc SDK directory
+  // Create Library search directories
+ 
+  // AVM2 AS3 PATCH START
+  // Set flascc SDK directory  
   flasccSDKLocation = SetFlasccSDKLocation("/../..");
+  // AVM2 AS3 PATCH END
 
   // Check for SWIG_LIB environment variable
   if ((c = getenv("SWIG_LIB")) == (char *) 0) {
-#if 0 // defined(_WIN32) // CYGWIN should take the unix path?
+#if 0 //defined(_WIN32)
     char buf[MAX_PATH];
     char *p;
     if (!(GetModuleFileName(0, buf, MAX_PATH) == 0 || (p = strrchr(buf, '\\')) == 0)) {
       *(p + 1) = '\0';
-      SwigLibWin = NewStringf("%sLib", buf);	// Native windows installation path
+      SwigLib = NewStringf("%sLib", buf); // Native windows installation path
+    } else {
+      SwigLib = NewStringf("");	// Unexpected error
     }
-    SwigLib = Swig_copy_string(SWIG_LIB_WIN_UNIX);	// Unix installation path using a drive letter (for msys/mingw)
+    if (Len(SWIG_LIB_WIN_UNIX) > 0)
+      SwigLibWinUnix = NewString(SWIG_LIB_WIN_UNIX); // Unix installation path using a drive letter (for msys/mingw)
 #else
+    // AVM2 AS3 PATCH START
+    //SwigLib = NewString(SWIG_LIB);
     String *alcSDK = NewString(flasccSDKLocation);
-    Append(alcSDK, "/usr/share/swig/2.0.4/");
+    Append(alcSDK, "/usr/share/swig/3.0.0/");
     SwigLib = Swig_copy_string(Char(alcSDK));
     Delete(alcSDK);
+    // AVM2 AS3 PATCH END
 #endif
   } else {
-    SwigLib = Swig_copy_string(c);
+    SwigLib = NewString(c);
   }
 
   libfiles = NewList();
@@ -955,6 +968,11 @@ int SWIG_main(int argc, char *argv[], Language *l) {
   // Don't check for an input file if -external-runtime is passed
   Swig_check_options(external_runtime ? 0 : 1);
 
+  if (CPlusPlus && cparse_cplusplusout) {
+    Printf(stderr, "The -c++out option is for C input but C++ input has been requested via -c++\n");
+    SWIG_exit(EXIT_FAILURE);
+  }
+
   install_opts(argc, argv);
 
   // Add language dependent directory to the search path
@@ -962,9 +980,9 @@ int SWIG_main(int argc, char *argv[], Language *l) {
     String *rl = NewString("");
     Printf(rl, ".%sswig_lib%s%s", SWIG_FILE_DELIMITER, SWIG_FILE_DELIMITER, LangSubDir);
     Swig_add_directory(rl);
-    if (SwigLibWin) {
+    if (SwigLibWinUnix) {
       rl = NewString("");
-      Printf(rl, "%s%s%s", SwigLibWin, SWIG_FILE_DELIMITER, LangSubDir);
+      Printf(rl, "%s%s%s", SwigLibWinUnix, SWIG_FILE_DELIMITER, LangSubDir);
       Swig_add_directory(rl);
     }
     rl = NewString("");
@@ -973,9 +991,9 @@ int SWIG_main(int argc, char *argv[], Language *l) {
   }
 
   Swig_add_directory((String *) "." SWIG_FILE_DELIMITER "swig_lib");
-  if (SwigLibWin)
-    Swig_add_directory((String *) SwigLibWin);
-  Swig_add_directory((String *) SwigLib);
+  if (SwigLibWinUnix)
+    Swig_add_directory((String *) SwigLibWinUnix);
+  Swig_add_directory(SwigLib);
 
   if (Verbose) {
     Printf(stdout, "Language subdirectory: %s\n", LangSubDir);
@@ -1022,7 +1040,7 @@ int SWIG_main(int argc, char *argv[], Language *l) {
           if (Verbose)
             Printf(stdout, "'%s' checked out from the SWIG library.\n", outfile);
           Printv(f_outfile, s, NIL);
-          Close(f_outfile);
+          Delete(f_outfile);
         }
       }
     }
@@ -1082,7 +1100,8 @@ int SWIG_main(int argc, char *argv[], Language *l) {
 	  String *outfile;
           File *f_dependencies_file = 0;
 
-	  char *basename = Swig_file_basename(outcurrentdir ? Swig_file_filename(input_file): Char(input_file));
+	  String *inputfile_filename = outcurrentdir ? Swig_file_filename(input_file): Copy(input_file);
+	  String *basename = Swig_file_basename(inputfile_filename);
 	  if (!outfile_name) {
 	    if (CPlusPlus || lang->cplus_runtime_mode()) {
 	      outfile = NewStringf("%s_wrap.%s", basename, cpp_extension);
@@ -1113,20 +1132,33 @@ int SWIG_main(int argc, char *argv[], Language *l) {
 	    Printf(f_dependencies_file, "%s: ", outfile);
 	  }
 	  List *files = Preprocessor_depend();
+	  List *phony_targets = NewList();
 	  for (int i = 0; i < Len(files); i++) {
             int use_file = 1;
             if (depend == 2) {
-              if ((Strncmp(Getitem(files, i), SwigLib, Len(SwigLib)) == 0) || (SwigLibWin && (Strncmp(Getitem(files, i), SwigLibWin, Len(SwigLibWin)) == 0)))
+              if ((Strncmp(Getitem(files, i), SwigLib, Len(SwigLib)) == 0) || (SwigLibWinUnix && (Strncmp(Getitem(files, i), SwigLibWinUnix, Len(SwigLibWinUnix)) == 0)))
                 use_file = 0;
             }
-            if (use_file)
-	      Printf(f_dependencies_file, "\\\n  %s ", Getitem(files, i));
+            if (use_file) {
+              Printf(f_dependencies_file, "\\\n  %s ", Getitem(files, i));
+              if (depend_phony)
+                Append(phony_targets, Getitem(files, i));
+            }
 	  }
 	  Printf(f_dependencies_file, "\n");
+	  if (depend_phony) {
+	    for (int i = 0; i < Len(phony_targets); i++) {
+	      Printf(f_dependencies_file, "\n%s:\n", Getitem(phony_targets, i));
+	    }
+	  }
+
 	  if (f_dependencies_file != stdout)
-	    Close(f_dependencies_file);
+	    Delete(f_dependencies_file);
 	  if (depend_only)
 	    SWIG_exit(EXIT_SUCCESS);
+	  Delete(inputfile_filename);
+	  Delete(basename);
+	  Delete(phony_targets);
 	} else {
 	  Printf(stderr, "Cannot generate dependencies with -nopreprocess\n");
 	  // Actually we could but it would be inefficient when just generating dependencies, as it would be done after Swig_cparse
@@ -1155,6 +1187,11 @@ int SWIG_main(int argc, char *argv[], Language *l) {
       Printf(stdout, "debug-module stage 1\n");
       Swig_print_tree(Getattr(top, "module"));
     }
+    if (!CPlusPlus) {
+      if (Verbose)
+	Printf(stdout, "Processing unnamed structs...\n");
+      Swig_nested_name_unnamed_c_structs(top);
+    }
 
     if (Verbose) {
       Printf(stdout, "Processing types...\n");
@@ -1174,6 +1211,12 @@ int SWIG_main(int argc, char *argv[], Language *l) {
       Printf(stdout, "C++ analysis...\n");
     }
     Swig_default_allocators(top);
+
+    if (CPlusPlus) {
+      if (Verbose)
+	Printf(stdout, "Processing nested classes...\n");
+      Swig_nested_process_classes(top);
+    }
 
     if (dump_top & STAGE3) {
       Printf(stdout, "debug-top stage 3\n");
@@ -1234,7 +1277,8 @@ int SWIG_main(int argc, char *argv[], Language *l) {
 	Setattr(top, "infile", infile); // Note: if nopreprocess then infile is the original input file, otherwise input_file
 	Setattr(top, "inputfile", input_file);
 
-	char *basename = Swig_file_basename(outcurrentdir ? Swig_file_filename(infile): Char(infile));
+	String *infile_filename = outcurrentdir ? Swig_file_filename(infile): Copy(infile);
+	String *basename = Swig_file_basename(infile_filename);
 	if (!outfile_name) {
 	  if (CPlusPlus || lang->cplus_runtime_mode()) {
 	    Setattr(top, "outfile", NewStringf("%s_wrap.%s", basename, cpp_extension));
@@ -1249,19 +1293,21 @@ int SWIG_main(int argc, char *argv[], Language *l) {
 	} else {
 	  Setattr(top, "outfile_h", outfile_name_h);
 	}
-	configure_outdir(Swig_file_dirname(Getattr(top, "outfile")));
+	configure_outdir(Getattr(top, "outfile"));
 	if (Swig_contract_mode_get()) {
 	  Swig_contracts(top);
 	}
 
-	// Check the suffix for a c/c++ file.  If so, we're going to declare everything we see as "extern"
-	ForceExtern = check_suffix(input_file);
+	// Check the extension for a c/c++ file.  If so, we're going to declare everything we see as "extern"
+	ForceExtern = check_extension(input_file);
 
 	lang->top(top);
 
 	if (browse) {
 	  Swig_browser(top, 0);
 	}
+	Delete(infile_filename);
+	Delete(basename);
       }
     }
     if (dump_lang_symbols) {
@@ -1298,7 +1344,7 @@ int SWIG_main(int argc, char *argv[], Language *l) {
       int i;
       for (i = 0; i < Len(all_output_files); i++)
         Printf(f_outfiles, "%s\n", Getitem(all_output_files, i));
-      Close(f_outfiles);
+      Delete(f_outfiles);
     }
   }
 
@@ -1314,8 +1360,6 @@ int SWIG_main(int argc, char *argv[], Language *l) {
   }
 
   delete lang;
-
-  fflush(stdout);
 
   return Swig_error_count();
 }

@@ -16,8 +16,6 @@
  * to SWIG, you would modify this file.
  * ----------------------------------------------------------------------------- */
 
-char cvsroot_swigmain_cxx[] = "$Id: swigmain.cxx 12299 2010-11-18 00:24:02Z klickverbot $";
-
 #include "swigmod.h"
 #include <ctype.h>
 
