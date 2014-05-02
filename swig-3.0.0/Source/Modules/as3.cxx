@@ -1235,8 +1235,11 @@ public:
         Printf(f_module, "%s", f_proxy_classes);
         Printf(f_module, "} /* package */\n");
 
-        Close(f_module);
-        Close(f_begin);
+        // Changed 02.05.14. CsA: SWIG 3.0.0 Compatibility
+        Delete(f_module);
+        Delete(f_begin);        
+        //Close(f_module);
+        //Close(f_begin);
         Delete(f_func_class);
         Delete(module_name);
         Delete(as_class);

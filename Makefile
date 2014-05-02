@@ -59,7 +59,7 @@ $?DEPENDENCY_MAKE=make-3.82
 $?DEPENDENCY_OPENSSL=openssl-1.0.1g
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SCIMARK=scimark2_1c
-$?DEPENDENCY_SWIG=swig-2.0.4
+$?DEPENDENCY_SWIG=swig-3.0.0
 $?DEPENDENCY_ZLIB=zlib-1.2.5
 $?DEPENDENCY_DEJAGNU=dejagnu-1.5
 
@@ -356,7 +356,7 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make swig3
+	@$(SDK)/usr/bin/make swig
 
 # ====================================================================================
 # CORE
@@ -1365,24 +1365,14 @@ SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/llvm-2.9/include -I$(BUIL
 SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
 
 # TBD
-swig3:
-	rm -rf $(BUILD)/swig
-	mkdir -p $(BUILD)/swig
-	#cp -f packages/pcre-8.20.tar.gz $(BUILD)/swig
-	#cd $(BUILD)/swig && $(SRCROOT)/swig-3.0.0/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/swig-3.0.0/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
-	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/3.0.0/$(var);)
-
-# TBD
 swig:
 	rm -rf $(BUILD)/swig
 	mkdir -p $(BUILD)/swig
 	cp -f packages/pcre-8.20.tar.gz $(BUILD)/swig
-	cd $(BUILD)/swig && $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	cd $(BUILD)/swig && $(SRCROOT)/swig-3.0.0/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/swig-3.0.0/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
 	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
-	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/2.0.4/$(var);)
+	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/3.0.0/$(var);)
 
 # TBD
 swigtests:
