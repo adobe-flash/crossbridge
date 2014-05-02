@@ -350,7 +350,6 @@ all_win:
 	@$(SDK)/usr/bin/make extratools &> $(BUILD)/logs/extratools.txt 2>&1
 	@$(SDK)/usr/bin/make -i finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
 	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt 2>&1
-	@$(SDK)/usr/bin/make swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
 	@$(SDK)/usr/bin/make examples &> $(BUILD)/logs/examples.txt 2>&1
 
 # Debug target
