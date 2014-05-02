@@ -85,6 +85,10 @@ skip-r		= test -n "@SKIP_R@"
 skip-go		= test -n "@SKIP_GO@"
 skip-d		= test -n "@SKIP_D@"
 
+# AVM2 AS3 PATCH START
+skip-as3		= test -n "@SKIP_D@"
+# AVM2 AS3 PATCH END
+
 # Additional dependencies for some tests
 skip-gcj        = test -n "@SKIP_GCJ@"
 skip-android    = test -n "@SKIP_ANDROID@"
@@ -129,6 +133,7 @@ check-aliveness:
 	@$(skip-r) 	  || ./$(TARGET) -r          -help
 	@$(skip-go)	  || ./$(TARGET) -go         -help
 	@$(skip-d) 	  || ./$(TARGET) -d          -help
+	@$(skip-as3) 	  || ./$(TARGET) -as3          -help
 
 check-ccache:
 	test -z "$(ENABLE_CCACHE)" || (cd $(CCACHE) && $(MAKE) check)
@@ -157,7 +162,8 @@ check-versions:					\
 	check-cffi-version			\
 	check-r-version				\
 	check-go-version			\
-	check-d-version
+	check-d-version			\
+	check-as3-version
 
 # all examples
 check-%-version :
@@ -196,7 +202,8 @@ check-examples:					\
 	check-cffi-examples			\
 	check-r-examples			\
 	check-go-examples			\
-	check-d-examples
+	check-d-examples			\
+	check-as3-examples
 
 tcl_examples       :=$(shell sed '/^\#/d' $(srcdir)/Examples/tcl/check.list)
 perl5_examples     :=$(shell sed '/^\#/d' $(srcdir)/Examples/perl5/check.list)
@@ -221,6 +228,7 @@ cffi_examples      :=
 r_examples         :=$(shell sed '/^\#/d' $(srcdir)/Examples/r/check.list)
 go_examples        :=$(shell sed '/^\#/d' $(srcdir)/Examples/go/check.list)
 d_examples         :=$(shell sed '/^\#/d' $(srcdir)/Examples/d/check.list)
+as3_examples       :=$(shell sed '/^\#/d' $(srcdir)/Examples/as3/check.list)
 
 # all examples
 check-%-examples :
