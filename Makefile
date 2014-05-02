@@ -350,11 +350,13 @@ all_win:
 	@$(SDK)/usr/bin/make extratools &> $(BUILD)/logs/extratools.txt 2>&1
 	@$(SDK)/usr/bin/make -i finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
 	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt 2>&1
+	@$(SDK)/usr/bin/make swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
+	@$(SDK)/usr/bin/make samples &> $(BUILD)/logs/samples.txt 2>&1
 	@$(SDK)/usr/bin/make examples &> $(BUILD)/logs/examples.txt 2>&1
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make swigtests
+	@$(SDK)/usr/bin/make examples
 
 # ====================================================================================
 # CORE
@@ -1438,7 +1440,7 @@ libtool:
 
 submittests: pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
 			hellocpp_shell hellocpp_swf hellocpp_swf_opt posixtest scimark scimark_swf \
-			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest swigtests samples
+			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest
 	cat $(BUILD)/scimark/result.txt
 
 pthreadsubmittests_shell: pthreadsubmittests_shell_compile pthreadsubmittests_shell_run
