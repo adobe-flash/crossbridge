@@ -25,6 +25,7 @@ $?SWFEXT=
 # ====================================================================================
 # DEPENDENCIES
 # ====================================================================================
+$?DEPENDENCY_AVMPLUS=avmplus
 $?DEPENDENCY_BINUTILS=binutils
 $?DEPENDENCY_BMAKE=bmake-20140214
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
@@ -165,7 +166,7 @@ $?CXXFLAGS=-O4
 $?JAVA=$(call nativepath,$(shell which java))
 $?JAVAFLAGS=
 $?PYTHON=$(call nativepath,$(shell which python))
-$?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
+$?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 
 $?COPY_DOCS=false
 
@@ -183,9 +184,9 @@ $?CLANG=ON
 
 $?FLEX=$(SRCROOT)/tools/flex
 $?ASDOC=$(FLEX)/bin/asdoc
-$?ASC=$(call nativepath,$(SRCROOT)/avmplus/utils/asc.jar)
-$?SCOMP=java $(JAVAFLAGS) -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
-$?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/avmplus/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/avmplus/generated/shell_toplevel.abc)
+$?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
+$?SCOMP=java $(JAVAFLAGS) -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+$?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
 $?AR=$(SDK)/usr/bin/ar scru -v
 
@@ -490,17 +491,17 @@ base:
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-gcc
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-g++
 
-	$(RSYNC) asc/abc/playerglobal.abc $(SDK)/usr/lib/
-	$(RSYNC) asc/abc/playerglobal.swc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/11.5/playerglobal.abc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/11.5/playerglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
-	cp -f avmplus/generated/*.abc $(SDK)/usr/lib/
+	cp -f $(DEPENDENCY_AVMPLUS)/generated/*.abc $(SDK)/usr/lib/
 
 	$(RSYNC) --exclude '*iconv.h' avm2_env/usr/include/ $(SDK)/usr/include
 	$(RSYNC) avm2_env/usr/lib/ $(SDK)/usr/lib
 
-	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/swfmake.as) -outdir . -out swfmake
-	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/projectormake.as) -outdir . -out projectormake
-	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/abcdump.as) -outdir . -out abcdump
+	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/swfmake.as) -outdir . -out swfmake
+	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/projectormake.as) -outdir . -out projectormake
+	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/abcdump.as) -outdir . -out abcdump
 
 # ====================================================================================
 # MAKE
@@ -536,8 +537,8 @@ cmake:
 # ====================================================================================
 
 builtinabcs:
-	cd $(SRCROOT)/avmplus/core && ./builtin.py
-	cd $(SRCROOT)/avmplus/shell && ./shell_toplevel.py
+	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/core && ./builtin.py
+	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell && ./shell_toplevel.py
 
 abclibs:
 	$(MAKE) -j$(THREADS) abclibs_compile abclibs_asdocs
@@ -787,11 +788,11 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	find $(BUILD)/lib/ -name 'makefile' -exec dos2unix {} +
 endif
 	cd $(BUILD)/posix && $(PYTHON) $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
-	cp $(BUILD)/posix/IKernel.as $(SRCROOT)/avmplus/shell
-	cp $(BUILD)/posix/ShellPosix.as $(SRCROOT)/avmplus/shell
-	cp $(BUILD)/posix/ShellPosixGlue.cpp $(SRCROOT)/avmplus/shell
-	cp $(BUILD)/posix/ShellPosixGlue.h $(SRCROOT)/avmplus/shell
-	cd $(SRCROOT)/avmplus/shell && $(PYTHON) ./shell_toplevel.py -config CONFIG::VMCFG_ALCHEMY_POSIX=true
+	cp $(BUILD)/posix/IKernel.as $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
+	cp $(BUILD)/posix/ShellPosix.as $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
+	cp $(BUILD)/posix/ShellPosixGlue.cpp $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
+	cp $(BUILD)/posix/ShellPosixGlue.h $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
+	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell && $(PYTHON) ./shell_toplevel.py -config CONFIG::VMCFG_ALCHEMY_POSIX=true
 	cd $(BUILD)/posix && $(SDK)/usr/bin/gcc -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c posix.c
 	cd $(BUILD)/posix && $(SDK)/usr/bin/gcc -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/vgl.c
 	cd $(BUILD)/posix && $(SDK)/usr/bin/gcc -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -D_KERNEL -c $(SRCROOT)/avm2_env/usr/src/kern/kern_umtx.c
@@ -1027,8 +1028,8 @@ tr:
 	cd $(BUILD)/tr && rm -f Makefile && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(TAMARINCONFIG) --disable-debugger
 	cd $(BUILD)/tr && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cp -f $(BUILD)/tr/shell/avmshell $(SDK)/usr/bin/avmshell
-	cd $(SRCROOT)/avmplus/utils && curdir=$(SRCROOT)/avmplus/utils ASC=$(ASC) $(MAKE) -f manifest.mk utils
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/avmplus/utils/projectormake.as) -outdir . -out projectormake
+	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils && curdir=$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils ASC=$(ASC) $(MAKE) -f manifest.mk utils
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/projectormake.as) -outdir . -out projectormake
 ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$(SDK)/usr/bin/avmshell $(BUILD)/abclibs/projectormake.abc -- -o $(SDK)/usr/bin/abcdump$(EXEEXT) $(SDK)/usr/bin/avmshell $(BUILD)/abcdump.abc -- -Djitordie
 	chmod a+x $(SDK)/usr/bin/abcdump$(EXEEXT)
