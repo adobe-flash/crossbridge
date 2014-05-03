@@ -585,7 +585,7 @@ abclibs_asdocs:
 	mkdir -p $(BUILD)/logs
 	cd $(BUILDROOT) && $(ASDOC) \
 				-load-config= \
-				-external-library-path=$(call nativepath,$(SRCROOT)/tools/flex/frameworks/libs/player/11.1/playerglobal.swc) \
+				-external-library-path=$(call nativepath,$(FLEX)/frameworks/libs/player/11.1/playerglobal.swc) \
 				-strict=false -define+=CONFIG::player,1 -define+=CONFIG::asdocs,true -define+=CONFIG::actual,false \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix/vfs) \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix) \
@@ -1651,8 +1651,8 @@ examples:
 	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
 gdbunit:
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
+	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
+	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
 
 vfstests:
 	@cd qa/vfs/framework && $(MAKE) FLASCC=$(FLASCC)
