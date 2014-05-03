@@ -16,13 +16,8 @@ Install
 
 ## Build a Windows only SDK.
 
-### From Cygwin Shell
-
 > "make all_win"
 
-### From Windows Prompt
-
-> "build-win.bat"
 
 # Linux
 
