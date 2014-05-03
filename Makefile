@@ -357,8 +357,8 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make libgmp
-	@$(SDK)/usr/bin/make libphysfs
+	@$(SDK)/usr/bin/make libsdl_all
+	@$(SDK)/usr/bin/make dmalloc_all
 
 # ====================================================================================
 # CORE
@@ -1046,9 +1046,10 @@ trd:
 # ====================================================================================
 # TBD
 extralibs:
-	$(MAKE) -j$(THREADS) zlib libbzip libxz libeigen dmalloc libffi libiconv \
+	$(MAKE) -j$(THREADS) zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv \
 		libvgl libjpeg libpng libgif libtiff libwebp \
-		libogg libvorbis libflac libsndfile libsdl libsdl_image libsdl_mixer
+		libogg libvorbis libflac libsndfile libsdl libsdl_image libsdl_mixer \
+		libphysfs
 
 # A Massively Spiffy Yet Delicately Unobtrusive Compression Library
 zlib:
@@ -1121,6 +1122,14 @@ libffi:
 # TBD
 libfficheck:
 	cd $(BUILD)/libffi/testsuite && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) check
+
+# GMP is a free library for arbitrary precision arithmetic, operating on signed integers, rational numbers, and floating-point numbers. 
+libgmp:
+	rm -rf $(BUILD)/libgmp
+	mkdir -p $(BUILD)/libgmp
+	cd $(BUILD)/libgmp && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBGMP)/configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared 
+	cd $(BUILD)/libgmp && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # For historical reasons, international text is often encoded using a language or country dependent character encoding. 
 libiconv:
@@ -1363,17 +1372,13 @@ libprotobuf:
 libphysfs:
 	rm -rf $(BUILD)/libphysfs
 	mkdir -p $(BUILD)/libphysfs
-	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBPHYSFS)/configure \
-		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-shared
+	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/sdk/usr/bin/cmake -G "Unix Makefiles" \
+		$(SRCROOT)/$(DEPENDENCY_LIBPHYSFS) -DCMAKE_INSTALL_PREFIX="$(SDK)/usr" \
+		-DPHYSFS_BUILD_TEST=0 -DPHYSFS_HAVE_THREAD_SUPPORT=0 \
+		-DPHYSFS_HAVE_CDROM_SUPPORT=0 -DPHYSFS_BUILD_STATIC=1 -DPHYSFS_BUILD_SHARED=0 -DPHYSFS_BUILD_PERL=0 \
+		-DPHYSFS_BUILD_RUBY=0 -DOTHER_LDFLAGS=-lz -DPHYSFS_NO_64BIT_SUPPORT=1 -DCMAKE_INCLUDE_PATH="$(SDK)/usr/include" \
+		-DCMAKE_LIBRARY_PATH="$(SDK)/usr/lib"
 	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-# GMP is a free library for arbitrary precision arithmetic, operating on signed integers, rational numbers, and floating-point numbers. 
-libgmp:
-	rm -rf $(BUILD)/libgmp
-	mkdir -p $(BUILD)/libgmp
-	cd $(BUILD)/libgmp && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBGMP)/configure \
-		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared 
-	cd $(BUILD)/libgmp && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # ====================================================================================
 # EXTRA TOOLS
