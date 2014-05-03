@@ -37,11 +37,12 @@ $?DEPENDENCY_LIBEIGEN=eigen-3.1.2
 $?DEPENDENCY_LIBFLAC=flac-1.2.1
 $?DEPENDENCY_LIBFREETYPE=freetype-2.5.3
 $?DEPENDENCY_LIBGIF=giflib-5.0.5
-$?DEPENDENCY_LIBGMP=gmp-5.1.3
-$?DEPENDENCY_LIBICONV=libiconv-1.13.1
+$?DEPENDENCY_LIBGMP=gmp-6.0.0
+$?DEPENDENCY_LIBICONV=libiconv-1.14
 $?DEPENDENCY_LIBOGG=libogg-1.3.1
 $?DEPENDENCY_LIBPNG=libpng-1.5.7
 $?DEPENDENCY_LIBPROTOBUF=protobuf-2.5.0
+$?DEPENDENCY_LIBPHYSFS=physfs-2.0.2
 $?DEPENDENCY_LIBNCURSES=ncurses-5.9
 $?DEPENDENCY_LIBREADLINE=readline-6.3
 $?DEPENDENCY_LIBSNDFILE=libsndfile-1.0.25
@@ -356,9 +357,8 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make libprotobuf
-	@$(SDK)/usr/bin/make libiconv
 	@$(SDK)/usr/bin/make libgmp
+	@$(SDK)/usr/bin/make libphysfs
 
 # ====================================================================================
 # CORE
@@ -392,6 +392,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBICONV).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBNCURSES).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBPROTOBUF).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBPHYSFS).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBREADLINE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBOGG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBPNG).tar.gz
@@ -434,6 +435,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBICONV)
 	rm -rf $(DEPENDENCY_LIBNCURSES)
 	rm -rf $(DEPENDENCY_LIBPROTOBUF)
+	rm -rf $(DEPENDENCY_LIBPHYSFS)
 	rm -rf $(DEPENDENCY_LIBREADLINE)
 	rm -rf $(DEPENDENCY_LIBOGG)
 	rm -rf $(DEPENDENCY_LIBPNG)
@@ -1044,7 +1046,7 @@ trd:
 # ====================================================================================
 # TBD
 extralibs:
-	$(MAKE) -j$(THREADS) zlib libbzip libxz libeigen dmalloc libffi \
+	$(MAKE) -j$(THREADS) zlib libbzip libxz libeigen dmalloc libffi libiconv \
 		libvgl libjpeg libpng libgif libtiff libwebp \
 		libogg libvorbis libflac libsndfile libsdl libsdl_image libsdl_mixer
 
@@ -1125,7 +1127,8 @@ libiconv:
 	rm -rf $(BUILD)/libiconv
 	mkdir -p $(BUILD)/libiconv
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBICONV)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
+		--disable-dependency-tracking
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # The Ncurses (new curses) library is a free software emulation of curses in System V Release 4.0, and more. 
@@ -1355,6 +1358,14 @@ libprotobuf:
 	cd $(BUILD)/libprotobuf && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBPROTOBUF)/configure \
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-shared
 	cd $(BUILD)/libprotobuf && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# Physics FS
+libphysfs:
+	rm -rf $(BUILD)/libphysfs
+	mkdir -p $(BUILD)/libphysfs
+	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBPHYSFS)/configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-shared
+	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # GMP is a free library for arbitrary precision arithmetic, operating on signed integers, rational numbers, and floating-point numbers. 
 libgmp:
