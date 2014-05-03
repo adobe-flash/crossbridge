@@ -357,8 +357,7 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make libsdl_all
-	@$(SDK)/usr/bin/make dmalloc_all
+	@$(SDK)/usr/bin/make libsdl_ttf
 
 # ====================================================================================
 # CORE
