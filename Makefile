@@ -409,8 +409,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# unzip packages
-	mkdir -p $(DEPENDENCY_BMAKE)
-	cd $(DEPENDENCY_BMAKE) && unzip -q ../packages/$(DEPENDENCY_BMAKE).zip
+	unzip -q packages/$(DEPENDENCY_BMAKE).zip
 	mkdir -p $(DEPENDENCY_SCIMARK)
 	cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
 	# apply patches
