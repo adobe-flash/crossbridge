@@ -168,8 +168,6 @@ $?JAVAFLAGS=
 $?PYTHON=$(call nativepath,$(shell which python))
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 
-$?COPY_DOCS=false
-
 $?LN=ln -sfn
 $?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
 
@@ -358,7 +356,7 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make libsdl_ttf
+	@$(SDK)/usr/bin/make abclibs_asdocs
 
 # ====================================================================================
 # CORE
@@ -542,9 +540,6 @@ builtinabcs:
 
 abclibs:
 	$(MAKE) -j$(THREADS) abclibs_compile abclibs_asdocs
-ifeq ($(COPY_DOCS), true)
-	$(MAKE) copy_docs
-endif
 
 abclibs_compile:
 	mkdir -p $(BUILD)/abclibs
@@ -579,13 +574,15 @@ abclibs_compile:
 	cp $(BUILD)/abclibs/*.swf $(SDK)/usr/lib
 
 abclibs_asdocs:
+	rm -rf $(BUILDROOT)/tempdita
+	rm -rf $(BUILDROOT)/apidocs
 	mkdir -p $(BUILDROOT)
 	mkdir -p $(BUILDROOT)/apidocs
 	mkdir -p $(BUILDROOT)/apidocs/tempdita
 	mkdir -p $(BUILD)/logs
 	cd $(BUILDROOT) && $(ASDOC) \
 				-load-config= \
-				-external-library-path=$(call nativepath,$(FLEX)/frameworks/libs/player/11.1/playerglobal.swc) \
+				-external-library-path=$(call nativepath,$(FLEX)/frameworks/libs/player/13.0/playerglobal.swc) \
 				-strict=false -define+=CONFIG::player,1 -define+=CONFIG::asdocs,true -define+=CONFIG::actual,false \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix/vfs) \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix) \
@@ -1002,9 +999,10 @@ finalcleanup:
 	rm -f $(SDK)/usr/lib/*.la
 	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/share/info
 	@$(LN) ../../share $(SDK)/usr/platform/darwin/share
-	$(RSYNC) $(SRCROOT)/tools/swf-info.py $(SDK)/usr/bin/
+	$(RSYNC) $(SRCROOT)/tools/add-opt-in.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/projector-dis.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/swfdink.py $(SDK)/usr/bin/
+	$(RSYNC) $(SRCROOT)/tools/swf-info.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/posix/avm2_tramp.cpp $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/vgl.c $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/Console.as $(SDK)/usr/share/
