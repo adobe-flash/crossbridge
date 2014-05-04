@@ -48,7 +48,10 @@ TITLE %~n0
 
 :: STARTUP
 SET FLASCC_ROOT=%CD:\=/%
-SET PATH=%JAVA_HOME%/bin;%PATH%;%MSYS_HOME%/bin;%MINGW_HOME%/bin
+SET MSYS_HOME=%MSYS_HOME:\=/%
+SET MINGW_HOME=%MINGW_HOME:\=/%
+SET PATH=%JAVA_HOME%/bin;%MSYS_HOME%/bin;%MINGW_HOME%/bin;%PATH%;
+SET PATH=%PATH:\=/%
 make -f build-win-msys.makefile
 GOTO :EXIT
 

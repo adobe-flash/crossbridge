@@ -20,9 +20,9 @@ $?PLATFORM_NAME=win
 $?HOST_TRIPLE=i686-mingw32
 $?BUILD_TRIPLE=i686-mingw32
 
-$?CC=mingw32-gcc
-$?CXX=mingw32-g++
-$?NATIVE_AR=mingw32-ar
+$?CC=gcc
+$?CXX=g++
+$?NATIVE_AR=ar
 export CC:=$(CC)
 export CXX:=$(CXX)
 
