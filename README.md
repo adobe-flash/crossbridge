@@ -19,3 +19,9 @@ Features:
 ### Nightly builds
 
 * [Crossbridge SDK Windows 1.0.2](https://dl.dropboxusercontent.com/u/1375050/cb_master_sdk-win.zip)
+
+### License
+
+The code written by Adobe Systems Incorporated. is all MIT licensed, 
+but Crossbridge contains many different open-source projects which have different licenses, 
+check the source files before making any assumptions.
