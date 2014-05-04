@@ -180,6 +180,7 @@ $?LLVMBUILDTYPE=MinSizeRel
 $?BUILD_LLVM_TESTS=OFF
 $?CLANG=ON
 
+$?PLAYERGLOBALROOT=tools/playerglobal/11.5
 $?FLEX=$(SRCROOT)/tools/flex
 $?ASDOC=$(FLEX)/bin/asdoc
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
@@ -356,7 +357,7 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make abclibs_asdocs
+	@$(SDK)/usr/bin/make abclibs_compile
 
 # ====================================================================================
 # CORE
@@ -489,8 +490,8 @@ base:
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-gcc
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-g++
 
-	$(RSYNC) tools/playerglobal/11.5/playerglobal.abc $(SDK)/usr/lib/
-	$(RSYNC) tools/playerglobal/11.5/playerglobal.swc $(SDK)/usr/lib/
+	$(RSYNC) $(PLAYERGLOBALROOT)/playerglobal.abc $(SDK)/usr/lib/
+	$(RSYNC) $(PLAYERGLOBALROOT)/playerglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
 	cp -f $(DEPENDENCY_AVMPLUS)/generated/*.abc $(SDK)/usr/lib/
 
@@ -541,6 +542,7 @@ builtinabcs:
 abclibs:
 	$(MAKE) -j$(THREADS) abclibs_compile abclibs_asdocs
 
+# Change 04.05.14. DefaultPreloader and C_Run was compiled using ASC.jar, lets use ASC2.jar and test it: $(SCOMP) to $(SCOMPFALCON)
 abclibs_compile:
 	mkdir -p $(BUILD)/abclibs
 	mkdir -p $(BUILD)/abclibsposix
@@ -550,12 +552,12 @@ abclibs_compile:
 	cd $(BUILD)/abclibsposix && $(PYTHON) $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
 	cat $(BUILD)/abclibsposix/IKernel.as | sed '1,1d' | sed '$$d' > $(SRCROOT)/posix/IKernel.as
 
-	cd $(BUILD)/abclibs && $(SCOMP) $(ABCLIBOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/DefaultPreloader.as) -swf com.adobe.flascc.preloader.DefaultPreloader,1024,768,60 -outdir . -out DefaultPreloader
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/DefaultPreloader.as) -swf com.adobe.flascc.preloader.DefaultPreloader,1024,768,60 -outdir . -out DefaultPreloader
 
 	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/ELF.as) -outdir . -out ELF
 	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/Exit.as) -outdir . -out Exit
 	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/LongJmp.as) -outdir . -out LongJmp
-	cd $(BUILD)/abclibs && $(SCOMP) $(ABCLIBOPTS) -import Exit.abc $(call nativepath,$(SRCROOT)/posix/C_Run.as) -outdir . -out C_Run
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -import Exit.abc $(call nativepath,$(SRCROOT)/posix/C_Run.as) -outdir . -out C_Run
 	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/vfs/ISpecialFile.as) -outdir . -out ISpecialFile
 	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/vfs/IBackingStore.as) -outdir . -out IBackingStore
 	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import IBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/InMemoryBackingStore.as) -outdir . -out InMemoryBackingStore

@@ -1,16 +1,18 @@
 CHANGES
 =======
 
-# v1.0.2
+# 1.0.1
+
+* Debug builds no longer fails at runtime with Reference Errors mentioning symbols with “THUNK” in their name
+* avm2_uithunk no longer fails when content was started using CModule.startAsync() due to incorrect assignment of thread ids
+* AS3_GoAsync() can now be used from main when started via CModule.startBackground()
+* Adding directories via the InMemoryBackingStore AS3 API with trailing slashes now works
+
+# 1.0.2
 
 * Updated CMake to v2.8.12.2
-
 * Updated SWIG to v3.0.0
-
 * Merged libs from https://github.com/alexmac/alcextra
-
 * Merged examples from https://github.com/alexmac/alcexamples
-
 * Fixed Makefile Windows compatibility
-
 * Fixed Makefile Linux compatibility
