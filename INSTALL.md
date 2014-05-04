@@ -19,6 +19,10 @@ Install
 
 > "make all_win"
 
+### Build Windows only SDK and package as ZIP.
+
+> "make all_win; make deliverables" 
+
 #### Notes
 
 ##### Edit/duplicate cygwin.bat with the following options

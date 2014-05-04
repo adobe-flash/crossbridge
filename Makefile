@@ -316,7 +316,7 @@ all_ci:
 	@$(SDK)/usr/bin/make trd
 	@$(SDK)/usr/bin/make extralibs
 	@$(SDK)/usr/bin/make extratools
-	@$(SDK)/usr/bin/make -i finalcleanup
+	@$(SDK)/usr/bin/make finalcleanup
 	@$(SDK)/usr/bin/make submittests
 
 # Build all with Windows 
@@ -350,7 +350,7 @@ all_win:
 	@$(SDK)/usr/bin/make trd &> $(BUILD)/logs/trd.txt 2>&1
 	@$(SDK)/usr/bin/make extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
 	@$(SDK)/usr/bin/make extratools &> $(BUILD)/logs/extratools.txt 2>&1
-	@$(SDK)/usr/bin/make -i finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
+	@$(SDK)/usr/bin/make finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
 	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt 2>&1
 	@$(SDK)/usr/bin/make swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
 	@$(SDK)/usr/bin/make samples &> $(BUILD)/logs/samples.txt 2>&1
@@ -999,7 +999,7 @@ sdkcleanup:
 finalcleanup:
 	rm -f $(SDK)/usr/lib/*.la
 	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/share/info
-	@$(LN) ../../share $(SDK)/usr/platform/darwin/share
+	@$(LN) ../../share $(SDK)/usr/platform/$(PLATFORM)/share
 	$(RSYNC) $(SRCROOT)/tools/add-opt-in.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/projector-dis.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/swfdink.py $(SDK)/usr/bin/
@@ -1796,7 +1796,7 @@ staging:
 	rm -rf $(BUILDROOT)/staging
 	mkdir -p $(BUILDROOT)/staging
 	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
-	$(RSYNC) --exclude '*.PAK' --exclude '*.pak' --exclude 13_ObjectiveC --exclude Example_Sound --exclude 13_Example_Neverball --exclude demobaseq2 --exclude 15_Example_Quake3 --exclude 14_Example_Quake2 $(SRCROOT)/samples $(BUILDROOT)/staging/
+	$(RSYNC) --exclude '*.PAK' --exclude '*.pak' $(SRCROOT)/samples $(BUILDROOT)/staging/
 	$(RSYNC) $(SRCROOT)/README.html $(BUILDROOT)/staging/
 	$(RSYNC) $(SRCROOT)/docs $(BUILDROOT)/staging/
 	$(RSYNC) $(BUILDROOT)/apidocs $(BUILDROOT)/staging/docs/
@@ -1817,7 +1817,7 @@ dmg:
 	hdiutil convert $(BUILDROOT)/$(SDKNAME).dmg.tmp -format UDZO -imagekey zlib-level=9 -o $(BUILDROOT)/$(SDKNAME).dmg
 	rm -f $(BUILDROOT)/$(SDKNAME).dmg.tmp
 	find $(BUILDROOT)/staging > $(BUILDROOT)/dmgcontents.txt
-	
+
 zip:
 	cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
 	find $(BUILDROOT)/staging > $(BUILDROOT)/zipcontents.txt
