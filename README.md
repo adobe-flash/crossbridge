@@ -13,7 +13,7 @@ Features:
 ### Getting started
 
 * [Download a copy of SDK for your OS](http://sourceforge.net/projects/crossbridge/files/)
-* Open [README.html](README.html) to get a basic idea of Crossbridge usage
+* Open README.html to get a basic idea of Crossbridge usage
 * For more information about the project, please visit http://www.crossbridge.io
 
 ### Nightly builds
