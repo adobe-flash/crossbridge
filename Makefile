@@ -26,6 +26,7 @@ $?SWFEXT=
 # DEPENDENCIES
 # ====================================================================================
 $?DEPENDENCY_AVMPLUS=avmplus
+$?DEPENDENCY_TAMARIN=tamarin-redux-5571cf86fc68
 $?DEPENDENCY_BINUTILS=binutils
 $?DEPENDENCY_BMAKE=bmake-20140214
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
@@ -227,7 +228,7 @@ BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcc
 BUILDORDER+= sdkcleanup tr trd extralibs extratools finalcleanup submittests
 
 all:
-	@echo "~~~ Crossbridge $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
+	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
@@ -287,7 +288,7 @@ weekly:
 # Notes: Using console output to solve hanging build issues.
 #       Ignoring some build errors but only documentation generation related.
 all_ci:
-	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
+	@echo "~~~ Crossbridge (CI) $(SDKNAME) ~~~"
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
@@ -321,7 +322,7 @@ all_ci:
 # Build all with Windows 
 # Notes: Ignoring some build errors but only documentation generation related
 all_win:
-	@echo "~~~ Crossbridge (Windows) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
+	@echo "~~~ Crossbridge (Windows) $(SDKNAME) ~~~"
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
@@ -377,6 +378,7 @@ docs:
 # DEPENDENCY LIBS
 # ====================================================================================
 install_libs:
+	unzip -q packages/$(DEPENDENCY_BMAKE).zip
 	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
 	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
@@ -407,11 +409,9 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
+	tar xf packages/$(DEPENDENCY_TAMARIN).tar.gz
+	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
-	# unzip packages
-	unzip -q packages/$(DEPENDENCY_BMAKE).zip
-	mkdir -p $(DEPENDENCY_SCIMARK)
-	cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
@@ -453,6 +453,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
+	rm -rf $(DEPENDENCY_TAMARIN)
 	rm -rf $(DEPENDENCY_ZLIB)
 
 # ====================================================================================
@@ -1813,9 +1814,7 @@ dmg:
 	hdiutil attach $(BUILDROOT)/$(SDKNAME).dmg.tmp -readwrite -mountpoint $(BUILDROOT)/dmgmount
 	rm -f $(BUILDROOT)/staging/.DS_Store
 	$(RSYNC) $(BUILDROOT)/staging/ $(BUILDROOT)/dmgmount/
-
 	mv $(BUILDROOT)/dmgmount/.fseventsd $(BUILDROOT)/
-
 	hdiutil detach $(BUILDROOT)/dmgmount
 	hdiutil convert $(BUILDROOT)/$(SDKNAME).dmg.tmp -format UDZO -imagekey zlib-level=9 -o $(BUILDROOT)/$(SDKNAME).dmg
 	rm -f $(BUILDROOT)/$(SDKNAME).dmg.tmp
@@ -1831,11 +1830,10 @@ winstaging:
 	$(LN) cygwin $(SDK)/usr/platform/current
 	mkdir -p $(SDK)/usr/platform/cygwin/bin
 	$(MAKE) libsdl-install
-
 	# copy some parts of the mac bin dir which are actually xplatform
 	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libtool* $(SDK)/usr/platform/cygwin/bin/
 	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libpng* $(SDK)/usr/platform/cygwin/bin/
-
+	# run post cleanup processes
 	$(MAKE) sdkcleanup
 	$(MAKE) finalcleanup
 	@rm -rf $(SDK)/usr/platform/darwin/share
@@ -1883,54 +1881,37 @@ win:
 	@if [ -d $(CYGWINMAC) ] ; then true ; \
 		else echo "Couldn't locate cygwin mac directory, please invoke $(MAKE) with \"$(MAKE) CYGWINMAC=/path/to/cygwinmac/sdk/usr/bin ...\"" ; exit 1; \
 	fi
-
 	@mkdir -p $(WIN_BUILD)/logs
-
 	@echo "-  base (win)"
 	@$(CROSS) base  &> $(WIN_BUILD)/logs/base_win.txt
-
 	@echo "-  make (win)"
 	@$(CROSS) make &> $(WIN_BUILD)/logs/make_win.txt
-	
 	@echo "-  uname (win)"
 	@$(CROSS) uname  &> $(WIN_BUILD)/logs/uname_win.txt
-
 	@echo "-  noenv (win)"
 	@$(CROSS) noenv &> $(WIN_BUILD)/logs/noenv_win.txt
-
 	@echo "-  avm2-as (win)"
 	@$(CROSS) avm2-as &> $(WIN_BUILD)/logs/avm2-as_win.txt
-
 	@echo "-  pkgconfig (win)"
 	@$(CROSS) GLIB_CFLAGS="-I$(CYGWINMAC)/../include/glib-2.0/ -I$(CYGWINMAC)/../lib/glib-2.0/include/" GLIB_LIBS="$(CYGWINMAC)/../lib/libglib-2.0.a -lintl -liconv" pkgconfig -j1 &> $(WIN_BUILD)/logs/pkgconfig_win.txt
-
 	@echo "-  llvm (win/cygwin)"
 	@$(MAKE) cross_llvm_cygwin &> $(WIN_BUILD)/logs/llvm_win_cygwin.txt
-
 	@echo "-  binutils (win)"
 	@$(CROSS) binutils &> $(WIN_BUILD)/logs/binutils_win.txt
-	
 	@echo "-  plugins (win)"
 	@$(CROSS) plugins &> $(WIN_BUILD)/logs/plugins_win.txt
-	
 	@echo "-  gcc (win)"
 	@$(CROSS) gcc &> $(WIN_BUILD)/logs/gcc_win.txt
-	
 	@echo "-  swig (win)"
 	@$(CROSS) swig &> $(WIN_BUILD)/logs/swig_win.txt
-
 	@echo "-  llvm (win/mingw)"
 	@$(MAKE) cross_llvm_mingw &> $(WIN_BUILD)/logs/llvm_win_mingw.txt
-
 	@echo "-  tr (win)"
 	@$(CROSS) tr &> $(WIN_BUILD)/logs/tr_win.txt
-	
 	@echo "-  trd (win)"
 	@$(CROSS) trd &> $(WIN_BUILD)/logs/trd_win.txt
-
 	@echo "-  gdb (win)"
 	@$(CROSS) gdb &> $(WIN_BUILD)/logs/gdb_win.txt
-
 	@echo "-  genfs (win)"
 	@$(CROSS) genfs &> $(WIN_BUILD)/logs/genfs_win.txt
 
@@ -1938,7 +1919,6 @@ cross_llvm_mingw:
 	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
 	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
 	echo  "set(CMAKE_RC_COMPILER $(MINGWTRIPLE)-gcc)" >> $(BUILD)/llvmcross.toolchain
-	
 	PATH="$(BUILD)/ccachebin:$(SRCROOT)/mingwmac/sdk/usr/bin:$(PATH)" $(MAKE) \
 		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(MINGWTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
 		CC=$(MINGWTRIPLE)-gcc CXX=$(MINGWTRIPLE)-g++ \
@@ -1951,7 +1931,6 @@ cross_llvm_cygwin:
 	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
 	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
 	echo  "set(CMAKE_RC_COMPILER $(CC))" >> $(BUILD)/llvmcross.toolchain
-	
 	PATH="$(BUILD)/ccachebin:$(CYGWINMAC)/../altbin:$(CYGWINMAC):$(PATH)" $(MAKE) \
 		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(CYGTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
 		CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ LLVMLDFLAGS="-Wl,--stack,16000000" \
