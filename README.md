@@ -12,9 +12,9 @@ Features:
 
 ### Getting started
 
-* Download a copy of SDK for your OS at http://sourceforge.net/projects/crossbridge/files/
-* Open README.html to get a basic idea of Crossbridge usage
-* For more information about the project, please visit http://adobe-flash.github.io/crossbridge/
+* [Download a copy of SDK for your OS](http://sourceforge.net/projects/crossbridge/files/)
+* Open [README.html](README.html) to get a basic idea of Crossbridge usage
+* For more information about the project, please visit http://www.crossbridge.io
 
 ### Nightly builds
 
@@ -22,6 +22,4 @@ Features:
 
 ### License
 
-The code written by Adobe Systems Incorporated. is all MIT licensed, 
-but Crossbridge contains many different open-source projects which have different licenses, 
-check the source files before making any assumptions.
+The code written by Adobe Systems Incorporated. is all MIT licensed, but Crossbridge contains many different open-source projects which have different licenses, check the source files before making any assumptions.
