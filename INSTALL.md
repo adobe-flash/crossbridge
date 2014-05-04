@@ -1,25 +1,27 @@
 Install
 =======
 
-# OSX
+# Building CrossBridge
 
-## Build a Mac only SDK.
+## OSX
+
+### Build a Mac only SDK.
 
 > "make" 
 
-## Build both Mac and Windows (Cross-Compiled) SDK and package them as DMG and ZIP.
+### Build both Mac and Windows (Cross-Compiled) SDK and package them as DMG and ZIP.
 
 > "make; make win; make deliverables" 
 
-# Windows
+## Windows
 
-## Build a Windows only SDK.
+### Build a Windows only SDK.
 
 > "make all_win"
 
-### Notes
+#### Notes
 
-#### Edit/duplicate cygwin.bat with the following options
+##### Edit/duplicate cygwin.bat with the following options
 
 * Shortened Java home
 
@@ -29,8 +31,45 @@ Install
 
 > set SHELLOPTS=braceexpand:emacs:hashall:histexpand:history:igncr:interactive-comments:monitor
 
-# Linux
+## Linux
 
-## Build a Linux only SDK.
+### Build a Linux only SDK.
 
 > "make"
+
+# Cygwin Dependencies
+
+    * autoconf
+    * automake
+    * bison
+    * ccache
+    * cmbzip2
+    * cmake
+    * expat
+    * flex
+    * gcc-core
+    * gcc-g++
+    * gettext
+    * gettext-devel
+    * glib
+    * help2man
+    * libiconv
+    * libmpfr
+    * libuuid
+    * libuuid-devel
+    * libncurses
+    * libncurses-devel
+    * make
+    * pkg-config
+    * python
+    * rsync
+    * termcap
+    * unzip
+    
+# Hacking
+
+* To discover Crossbridge related changes/patches in 3rd party sources, search for keywords: 'crossbridge', 'flascc', 'alchemy', 'avm2', 'as3'
+
+* Diff tool is great
+
+* Take a look at commits and other forks
