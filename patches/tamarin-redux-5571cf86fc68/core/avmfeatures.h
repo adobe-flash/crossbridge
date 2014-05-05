@@ -430,6 +430,15 @@
 #  error "AVMFEATURE_FLOAT must be defined and 0 or 1 (only)."
 #endif
 
+// CROSSBRIDGE PATCH START
+/* AVMFEATURE_ALCHEMY_POSIX
+ *
+ * Enables the POSIX builtins used by commandline Alchemy apps.
+ */
+#if !defined AVMFEATURE_ALCHEMY_POSIX || AVMFEATURE_ALCHEMY_POSIX != 0 && AVMFEATURE_ALCHEMY_POSIX != 1
+#  error "AVMFEATURE_ALCHEMY_POSIX must be defined and 0 or 1 (only)."
+#endif
+// CROSSBRIDGE PATCH END
 
 /* AVMFEATURE_OSR
  *
