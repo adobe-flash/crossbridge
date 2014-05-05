@@ -39,7 +39,7 @@ endif
 # Common properties
 $?FLASCC:=$(FLASCC_ROOT)/sdk
 $?FLEX=$(AIR_HOME)
-$?AS3COMPILERARGS=java $(JVMARGS) -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md 
+$?AS3COMPILERARGS=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md 
 
 # Stage3D+
 $?GLS3D=$(FLASCC_ROOT)/samples/Example_GLS3D
@@ -51,9 +51,6 @@ $?OPT_CFLAGS=-O4
 
 # ASC2 Compiler
 $?MXMLC_DEBUG=true
-
-# Java Compiler
-$?JVMARGS=-Xmx4G
 
 # Self check
 check:
