@@ -15,7 +15,3 @@ Features:
 * [Download a copy of SDK for your OS](http://sourceforge.net/projects/crossbridge/files/)
 * Open README.html to get a basic idea of Crossbridge usage
 * For more information about the project, please visit http://www.crossbridge.io
-
-### Nightly builds
-
-* [Crossbridge SDK Windows 1.0.2](https://dl.dropboxusercontent.com/u/1375050/cb_master_sdk-win.zip)
