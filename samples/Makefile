@@ -27,7 +27,14 @@
 #
 
 all: check
+	@make clean
 	@make allsamples
+
+allsamples: T01 T02 T03 T04 T05 T06 T07 T08 T09 T10 T11 T12 T13 T14
+	@echo "done!"
+
+examples: E01 E02 E03
+	@echo "done!"
 
 T01:
 	@cd 01_HelloWorld && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
@@ -55,7 +62,7 @@ T12:
 	@cd 12_Stage3D && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 T13:
 	@cd 13_Pathfinder && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-E14:
+T14:
 	@cd 14_Threads && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 
 E01:
@@ -64,12 +71,6 @@ E02:
 	@cd Example_Box2D && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 E03:
 	@cd Example_freeglut && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
-
-allsamples: T01 T02 T03 T04 T05 T06 T07 T08 T09 T10 T11 T12 T13 T14
-	@echo "done!"
-
-examples: E01 E02
-	@echo "done!"
 
 include Makefile.common
 
