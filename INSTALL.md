@@ -79,3 +79,10 @@ Install
 * Take a look at commits and other forks
 
 * Use dis-assembling ABCs if you need to compare outputs: https://github.com/CyberShadow/RABCDAsm
+
+# Upgrading
+
+## PlayerGlobal
+
+* AIR_SDK_HOME\lib\aot\lib\avmglue.abc => \CROSSBRIDGE_SDK_HOME\tools\playerglobal\playerglobal.abc
+* AIR_SDK_HOME\frameworks\libs\player\VERSION\playerglobal.swc => \CROSSBRIDGE_SDK_HOME\tools\playerglobal\playerglobal.swc

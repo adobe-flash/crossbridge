@@ -14,6 +14,7 @@ CHANGES
 * Updated CMake to v2.8.12.2
 * Updated Make to v4.0
 * Updated SWIG to v3.0.0
+* Updated PlayerGlobal to v13.0.0
 * Merged libs from https://github.com/alexmac/alcextra
 * Merged examples from https://github.com/alexmac/alcexamples
 * Fixed Makefile Windows compatibility
