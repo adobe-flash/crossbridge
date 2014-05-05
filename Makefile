@@ -27,6 +27,7 @@ $?SWFEXT=
 # ====================================================================================
 $?DEPENDENCY_AVMPLUS=avmplus
 $?DEPENDENCY_TAMARIN=tamarin-redux-5571cf86fc68
+#$?DEPENDENCY_AVMPLUS=$(DEPENDENCY_TAMARIN)
 $?DEPENDENCY_BINUTILS=binutils
 $?DEPENDENCY_BMAKE=bmake-20140214
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
@@ -58,7 +59,7 @@ $?DEPENDENCY_LIBWEBP=libwebp-0.4.0
 $?DEPENDENCY_LIBXZ=xz-5.0.5
 $?DEPENDENCY_LLVM=llvm-2.9
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
-$?DEPENDENCY_MAKE=make-3.82
+$?DEPENDENCY_MAKE=make-4.0
 $?DEPENDENCY_OPENSSL=openssl-1.0.1g
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SCIMARK=scimark2_1c
@@ -181,7 +182,9 @@ $?LLVMBUILDTYPE=MinSizeRel
 $?BUILD_LLVM_TESTS=OFF
 $?CLANG=ON
 
-$?PLAYERGLOBALROOT=tools/playerglobal/11.5
+# Player version, available: 11.5 | 13.0
+$?PLAYERGLOBALROOT=tools/playerglobal/13.0
+
 $?FLEX=$(SRCROOT)/tools/flex
 $?ASDOC=$(FLEX)/bin/asdoc
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
@@ -378,6 +381,7 @@ docs:
 # DEPENDENCY LIBS
 # ====================================================================================
 install_libs:
+	$(MAKE) clean_libs
 	unzip -q packages/$(DEPENDENCY_BMAKE).zip
 	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
@@ -409,7 +413,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
-	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
+	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q -f ../packages/$(DEPENDENCY_SCIMARK).zip
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .

@@ -41,7 +41,7 @@ Install
 
 > "make"
 
-# Cygwin Dependencies
+# Core Dependencies
 
     * autoconf
     * automake
@@ -69,7 +69,7 @@ Install
     * rsync
     * termcap
     * unzip
-    
+ 
 # Hacking
 
 * To discover Crossbridge related changes/patches in 3rd party sources, search for keywords: 'crossbridge', 'flascc', 'alchemy', 'avm2', 'as3'
@@ -77,3 +77,5 @@ Install
 * Diff tool is great
 
 * Take a look at commits and other forks
+
+* Use dis-assembling ABCs if you need to compare outputs: https://github.com/CyberShadow/RABCDAsm

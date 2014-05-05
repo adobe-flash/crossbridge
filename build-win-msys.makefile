@@ -17,12 +17,12 @@ $?TAMARIN_CONFIG_FLAGS=--target=i686-linux
 $?TAMARINLDFLAGS=" -Wl,--stack,16000000"
 $?SDKEXT=.zip
 $?PLATFORM_NAME=win
-$?HOST_TRIPLE=i686-mingw32
-$?BUILD_TRIPLE=i686-mingw32
+$?HOST_TRIPLE=mingw32
+$?BUILD_TRIPLE=i686-pc-mingw32
 
-$?CC=gcc
-$?CXX=g++
-$?NATIVE_AR=ar
+$?CC=mingw32-gcc
+$?CXX=mingw32-g++
+$?NATIVE_AR=mingw32-ar
 export CC:=$(CC)
 export CXX:=$(CXX)
 
@@ -50,11 +50,11 @@ all:
 	@mkdir -p $(SDK)/usr/lib
 	# Make
 	@mkdir -p $(BUILD)/make/
-	cp -r $(SRCROOT)/make-3.82/* $(BUILD)/make/
-	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --program-prefix="" \
-		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE)
-	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
-	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) install
+	cp -r $(SRCROOT)/make-4.0/* $(BUILD)/make/
+	cd $(BUILD)/make && ./configure --prefix=$(SDK)/usr --program-prefix="" \
+		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) \
+		--disable-nls -disable-dependency-tracking
+	cd $(BUILD)/make && $(MAKE) CC=$(CC) CXX=$(CXX)
 
 diagnostics:
 	@$(CC) --version
