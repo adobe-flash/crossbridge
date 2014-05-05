@@ -47,7 +47,7 @@ PUSHD %CD%
 TITLE %~n0
 
 :: STARTUP
-set FLASCC_ROOT=%CD%
+SET FLASCC_ROOT=%CD:\=/%
 set JAVA_HOME=/cygdrive/c/Progra~1/Java/jdk
 set PATH=%JAVA_HOME%/bin;C:\cygwin\bin;C:\cygwin\usr\X11R6\bin
 set JAVA_HOME=
@@ -59,7 +59,7 @@ set MSYS_HOME=
 set SHELLOPTS=braceexpand:emacs:hashall:histexpand:history:igncr:interactive-comments:monitor
 C:
 chdir C:\cygwin\bin
-bash --login -i %FLASCC_ROOT%/build-win-cygwin.sh
+bash --login %FLASCC_ROOT%/build-win-cygwin.sh
 GOTO :EXIT
 
 :: SHUTDOWN
