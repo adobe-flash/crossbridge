@@ -1,26 +1,32 @@
-FLASCC:=X
-FLEX:=X
-AS3COMPILER:=asc2.jar
-
-$?UNAME=$(shell uname -s)
-ifneq (,$(findstring CYGWIN,$(UNAME)))
-	$?nativepath=$(shell cygpath -at mixed $(1))
-	$?unixpath=$(shell cygpath -at unix $(1))
-else
-	$?nativepath=$(abspath $(1))
-	$?unixpath=$(abspath $(1))
-endif
-
-ifneq (,$(findstring "asc2.jar","$(AS3COMPILER)"))
-	$?AS3COMPILERARGS=java $(JVMARGS) -jar $(call nativepath,$(FLASCC)/usr/lib/$(AS3COMPILER)) -merge -md 
-else
-	echo "ASC is no longer supported" ; exit 1 ;
-endif
+#
+# =BEGIN MIT LICENSE
+# 
+# The MIT License (MIT)
+#
+# Copyright (c) 2014 The CrossBridge Team
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+# 
+# =END MIT LICENSE
+#
 
 all: check compile
-
-clean:
-	echo "Cleaning..."
 
 check:
 	@if [ -d $(FLASCC)/usr/bin ] ; then true ; \
@@ -68,3 +74,8 @@ install: check
 	@cp -r install/usr/include/ $(FLASCC)/usr/include
 	@cp -r install/usr/lib/ $(FLASCC)/usr/lib
 	@cp $(FLASCC)/usr/SDL_opengl.h $(FLASCC)/usr/include/SDL/
+
+include ../Makefile.common
+
+clean:
+	echo "Cleaning..."
