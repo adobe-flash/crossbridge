@@ -39,7 +39,7 @@ recompile:
 
 	cp -f as3api.h build/
 	cd build && "$(FLASCC)/usr/bin/swig" -as3 -c++ -I../Box2D_v2.2.1/ -DSWIGPP -module Box2D -outdir . -includeall -ignoremissing as3api.h
-	cd build && java -jar $(call nativepath,$(FLASCC)/usr/lib/$(AS3COMPILER)) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) Box2D.as
+	cd build && $(AS3COMPILERARGS) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) Box2D.as
 	cd build && "$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) $(OPT_CFLAGS) -I../Box2D_v2.2.1/ Box2D.abc as3api_wrap.cxx Box2D/libBox2D.a -emit-swc=sample.Box2D -o ../Box2D.swc $(EXTRACFLAGS)
 
 	make swfs

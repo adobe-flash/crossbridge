@@ -29,7 +29,7 @@
 T10: check
 	@echo "-------- Example: libQREncode -------"
 	cd libqrencode && "$(FLASCC)/usr/bin/swig" -as3  -I. -module QREncode -outdir . -includeall -ignoremissing as3api.h
-	cd libqrencode && java -jar $(call nativepath,$(FLASCC)/usr/lib/$(AS3COMPILER)) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) QREncode.as
+	cd libqrencode && $(AS3COMPILERARGS) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) QREncode.as
 
 	cd libqrencode && "$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) $(OPT_CFLAGS) -DHAVE_CONFIG_H as3api_wrap.c bitstream.c mask.c mmask.c mqrspec.c qrencode.c qrinput.c qrspec.c rscode.c split.c QREncode.abc -emit-swc=sample.qrencode -o ../qrencode.swc $(EXTRACFLAGS)
 

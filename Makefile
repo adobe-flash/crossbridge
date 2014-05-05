@@ -8,6 +8,8 @@ $?UNAME=$(shell uname -s)
 # DIRECTORIES
 # ====================================================================================
 $?SRCROOT=$(PWD)
+ESCAPED_SRCROOT=$(shell echo $(SRCROOT) | sed -e 's/[\/&]/\\&/g')
+
 $?SDK=$(PWD)/sdk
 $?BUILDROOT=$(PWD)/build
 $?WIN_BUILD=$(BUILDROOT)/win
@@ -146,33 +148,33 @@ endif
 # ====================================================================================
 # TOOLCHAIN
 # ====================================================================================
-
-ESCAPED_SRCROOT=$(shell echo $(SRCROOT) | sed -e 's/[\/&]/\\&/g')
-
+# Cross-Compile Options
 $?CYGTRIPLE=i686-pc-cygwin
 $?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
-
+# Host Tool-Chain
+$?LN=ln -sfn
+$?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
 #$?CC_FOR_BUILD=gcc
 $?CC=gcc
 $?CXX=g++
 $?NATIVE_AR=ar
 export CC:=$(CC)
 export CXX:=$(CXX)
+# SDK Tool-Chain
+$?AR=$(SDK)/usr/bin/ar scru -v
+$?SDK_CMAKE=$(SRCROOT)/sdk/usr/bin/cmake
+# Tool-Chain Options
 $?DBGOPTS=
 $?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
 $?LIBHELPEROPTFLAGS=-O3
 $?CFLAGS=-O4
 $?CXXFLAGS=-O4
-
 $?JAVA=$(call nativepath,$(shell which java))
 $?JAVAFLAGS=
 $?PYTHON=$(call nativepath,$(shell which python))
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
-
-$?LN=ln -sfn
-$?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
-
+# LLVM Options
 $?LLVMASSERTIONS=OFF
 $?LLVMCMAKEOPTS= 
 $?LLVMLDFLAGS=
@@ -181,41 +183,35 @@ $?LLVM_ONLYLLC=false
 $?LLVMBUILDTYPE=MinSizeRel
 $?BUILD_LLVM_TESTS=OFF
 $?CLANG=ON
-
 # Player version, available: 11.5 | 13.0
 $?PLAYERGLOBALROOT=tools/playerglobal/13.0
-
+# Merged Flex SDK
 $?FLEX=$(SRCROOT)/tools/flex
+# Action Script Documentation Generator
 $?ASDOC=$(FLEX)/bin/asdoc
+# Tamarin Action Script Compiler
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
+# Tamarin Action Script Compiler (Deprecated)
 $?SCOMP=java $(JAVAFLAGS) -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+# Adobe Action Script Compiler v2
 $?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+# Tamarin AVM Shell
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
-$?AR=$(SDK)/usr/bin/ar scru -v
-
-# ====================================================================================
-# VERSIONING
-# ====================================================================================
+# Version
 $?FLASCC_VERSION_MAJOR:=1
 $?FLASCC_VERSION_MINOR:=0
 $?FLASCC_VERSION_PATCH:=2
 $?FLASCC_VERSION_BUILD:=devbuild
 $?SDKNAME=Crossbridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH).$(FLASCC_VERSION_BUILD)
 BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_MINOR=$(FLASCC_VERSION_MINOR) -DFLASCC_VERSION_PATCH=$(FLASCC_VERSION_PATCH) -DFLASCC_VERSION_BUILD=$(FLASCC_VERSION_BUILD)"
-
-# ====================================================================================
-# LOGGING
-# ====================================================================================
+# Caching
+export CCACHE_DIR=$(SRCROOT)/ccache
+# Logging
 ifneq (,$(PRINT_LOGS_ON_ERROR))
 	$?PRINT_LOGS_CMD=tail +1
 else
 	$?PRINT_LOGS_CMD=true
 endif
-
-# ====================================================================================
-# CACHING
-# ====================================================================================
-export CCACHE_DIR=$(SRCROOT)/ccache
 
 # ====================================================================================
 # BMAKE
@@ -230,6 +226,7 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
 BUILDORDER+= sdkcleanup tr trd extralibs extratools finalcleanup submittests
 
+# TBD
 all:
 	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
 	@echo "User: $(UNAME)"
@@ -247,6 +244,7 @@ all:
 	@$(MAKE) make &> $(BUILD)/logs/make.txt 2>&1
 	@$(SDK)/usr/bin/make -s all_with_local_make
 
+# TBD
 all_with_local_make:
 	@for target in $(BUILDORDER) ; do \
 		echo "-  $$target" ; \
@@ -362,6 +360,13 @@ all_win:
 # Debug target
 all_dev:
 	@$(SDK)/usr/bin/make builtinabcs
+
+# Print debug information
+diagnostics:
+	@echo "ASC: $(SCOMP)"
+	@echo "ASC2: $(SCOMPFALCON)"
+	@echo "BMAKE: $(BMAKE)"
+	@echo "SDK_CMAKE: $(SDK_CMAKE)"
 
 # ====================================================================================
 # CORE
@@ -670,7 +675,7 @@ alcdb:
 llvm:
 	rm -rf $(BUILD)/llvm-debug
 	mkdir -p $(BUILD)/llvm-debug
-	cd $(BUILD)/llvm-debug && LDFLAGS="$(LLVMLDFLAGS)" CFLAGS="$(LLVMCFLAGS)" CXXFLAGS="$(LLVMCXXFLAGS)" $(SRCROOT)/sdk/usr/bin/cmake -G "Unix Makefiles" \
+	cd $(BUILD)/llvm-debug && LDFLAGS="$(LLVMLDFLAGS)" CFLAGS="$(LLVMCFLAGS)" CXXFLAGS="$(LLVMCXXFLAGS)" $(SDK_CMAKE) -G "Unix Makefiles" \
 		$(LLVMCMAKEOPTS) -DCMAKE_INSTALL_PREFIX=$(LLVMINSTALLPREFIX)/llvm-install -DCMAKE_BUILD_TYPE=$(LLVMBUILDTYPE) -DLLVM_BUILD_CLANG=$(CLANG) \
 		-DLLVM_ENABLE_ASSERTIONS=$(LLVMASSERTIONS) -DLLVM_BUILD_GOLDPLUGIN=ON -DBINUTILS_INCDIR=$(SRCROOT)/$(DEPENDENCY_BINUTILS)/include \
 		-DLLVM_TARGETS_TO_BUILD="AVM2;AVM2Shim;X86;CBackend" -DLLVM_NATIVE_ARCH="avm2" -DLLVM_INCLUDE_TESTS=$(BUILD_LLVM_TESTS) -DLLVM_INCLUDE_EXAMPLES=OFF \
@@ -1125,7 +1130,7 @@ libxz:
 libeigen:
 	rm -rf $(BUILD)/libeigen
 	mkdir -p $(BUILD)/libeigen
-	cd $(BUILD)/libeigen && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/sdk/usr/bin/cmake -G "Unix Makefiles" \
+	cd $(BUILD)/libeigen && PATH=$(SDK)/usr/bin:$(PATH) $(SDK_CMAKE) -G "Unix Makefiles" \
 		$(SRCROOT)/eigen-eigen-5097c01bcdc4 -DCMAKE_INSTALL_PREFIX="$(SDK)/usr"
 	cd $(BUILD)/libeigen && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
@@ -1419,7 +1424,7 @@ libprotobuf:
 libphysfs:
 	rm -rf $(BUILD)/libphysfs
 	mkdir -p $(BUILD)/libphysfs
-	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/sdk/usr/bin/cmake -G "Unix Makefiles" \
+	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(SDK_CMAKE) -G "Unix Makefiles" \
 		$(SRCROOT)/$(DEPENDENCY_LIBPHYSFS) -DCMAKE_INSTALL_PREFIX="$(SDK)/usr" \
 		-DPHYSFS_BUILD_TEST=0 -DPHYSFS_HAVE_THREAD_SUPPORT=0 \
 		-DPHYSFS_HAVE_CDROM_SUPPORT=0 -DPHYSFS_BUILD_STATIC=1 -DPHYSFS_BUILD_SHARED=0 -DPHYSFS_BUILD_PERL=0 \
@@ -1512,23 +1517,28 @@ libtool:
 # Submit tests
 # ====================================================================================
 
+# TBD
 submittests: pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
 			hellocpp_shell hellocpp_swf hellocpp_swf_opt posixtest scimark scimark_swf \
 			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest
 	cat $(BUILD)/scimark/result.txt
 
+# TBD
 pthreadsubmittests_shell: pthreadsubmittests_shell_compile pthreadsubmittests_shell_run
 
+# TBD
 pthreadsubmittests_shell_compile:
 	@rm -rf $(BUILD)/pthreadsubmit_shell
 	@mkdir -p $(BUILD)/pthreadsubmit_shell
 	cd $(BUILD)/pthreadsubmit_shell && $(SDK)/usr/bin/gcc -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized
 	cd $(BUILD)/pthreadsubmit_shell && $(SDK)/usr/bin/gcc -O0 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test
 
+# TBD
 pthreadsubmittests_shell_run:
 	cd $(BUILD)/pthreadsubmit_shell && ./pthread_test_optimized
 	cd $(BUILD)/pthreadsubmit_shell && ./pthread_test
 
+# TBD
 pthreadsubmittests_swf:
 	@rm -rf $(BUILD)/pthreadsubmit_swf
 	@mkdir -p $(BUILD)/pthreadsubmit_swf
@@ -1537,6 +1547,7 @@ pthreadsubmittests_swf:
 	cd $(BUILD)/pthreadsubmit_swf && $(SDK)/usr/bin/gcc -O0 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
 	cp -f $(BUILD)/pthreadsubmit_swf/*.swf $(BUILDROOT)/extra/
 
+# TBD
 pthreadtests:
 	@rm -rf $(BUILD)/pthread$(SWFDIR)
 	@mkdir -p $(BUILD)/pthread$(SWFDIR)
@@ -1554,6 +1565,7 @@ pthreadtests:
 	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps -DORDER_STRENGTH=1 $(SRCROOT)/test/peterson.c -o peterson_nofence$(SWFEXT)
 	$(MAKE) as3++tests
 
+# TBD
 helloswf:
 	@rm -rf $(BUILD)/helloswf
 	@mkdir -p $(BUILD)/helloswf
@@ -1562,26 +1574,31 @@ helloswf:
 	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.as -filetype=asm
 	cd $(BUILD)/helloswf && $(SDK)/usr/bin/gcc -emit-swf -swf-size=200x200 -O0 -g hello.abc -o hello.swf
 
+# TBD
 helloswf_opt:
 	@rm -rf $(BUILD)/helloswf_opt
 	@mkdir -p $(BUILD)/helloswf_opt
 	cd $(BUILD)/helloswf_opt && $(SDK)/usr/bin/gcc -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
 
+# TBD
 hellocpp_shell:
 	@rm -rf $(BUILD)/hellocpp_shell
 	@mkdir -p $(BUILD)/hellocpp_shell
 	cd $(BUILD)/hellocpp_shell && $(SDK)/usr/bin/g++ -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
 
+# TBD
 hellocpp_swf:
 	@rm -rf $(BUILD)/hellocpp_swf
 	@mkdir -p $(BUILD)/hellocpp_swf
 	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/g++ -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
 
+# TBD
 hellocpp_swf_opt:
 	@rm -rf $(BUILD)/hellocpp_swf_opt
 	@mkdir -p $(BUILD)/hellocpp_swf_opt
 	cd $(BUILD)/hellocpp_swf_opt && $(SDK)/usr/bin/g++ -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
 
+# TBD
 as3++tests:
 	@rm -rf $(BUILD)/as3++_swf
 	@mkdir -p $(BUILD)/as3++_swf
@@ -1590,6 +1607,7 @@ as3++tests:
 	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt2.cpp -lAS3++ -o AS3++mt2.swf
 	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt3.cpp -lAS3++ -o AS3++mt3.swf
 
+# TBD
 conctests:
 	mkdir -p $(BUILD)/conc$(SWFDIR)
 	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/newThread.c -o newThread$(SWFEXT)
@@ -1597,6 +1615,7 @@ conctests:
 	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex.c -o avm2_mutex$(SWFEXT)
 	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex2.c -o avm2_mutex2$(SWFEXT)
 
+# TBD
 posixtest:
 	@rm -rf $(BUILD)/posixtest
 	@mkdir -p $(BUILD)/posixtest
@@ -1613,52 +1632,61 @@ posixtest:
 		$(call nativepath, $(BUILD)/posixtest/alcfsBackingStore.as) -outdir . -out alcfs
 	cd $(BUILD)/posixtest && $(SDK)/usr/bin/gcc -emit-swf -O0 -swf-version=15 $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) alcfs.abc $(SRCROOT)/test/fileio.c -o posixtest.swf
 
+# TBD
 scimark:
 	@mkdir -p $(BUILD)/scimark
 	cd $(BUILD)/scimark && $(SDK)/usr/bin/gcc -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
 	$(BUILD)/scimark/scimark2 &> $(BUILD)/scimark/result.txt
 
+# TBD
 scimark_swf:
 	@mkdir -p $(BUILD)/scimark_swf
 	cd $(BUILD)/scimark_swf && $(SDK)/usr/bin/gcc -O4 -swf-version=17 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
 	cd $(BUILD)/scimark_swf && $(SDK)/usr/bin/gcc -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2v18.swf
 	cp -f $(BUILD)/scimark_swf/*.swf $(BUILDROOT)/extra/
 
+# TBD
 scimark_asc:
 	@mkdir -p $(BUILD)/scimark_asc
 	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/gcc -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
 	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/gcc -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
 	$(BUILD)/scimark_asc/scimark2 &> $(BUILD)/scimark_asc/result.txt
 
+# TBD
 parse_scimark_log:
 	$(MAKE) scimark
 	ant -f qa/performance/build.xml -Dbuild=$(FLASCC_VERSION_BUILD) \
 		-DsendResults=true -Dbranch=mainline -DresultsFile=$(BUILD)/scimark/result.txt -DresultsFileFalcon=$(BUILD)/scimark/result.txt
 
+# TBD
 sjljtest:
 	@mkdir -p $(BUILD)/sjljtest
 	cd $(BUILD)/sjljtest && $(SDK)/usr/bin/g++ -O0 $(SRCROOT)/test/sjljtest.c -v -o sjljtest -save-temps
 	$(BUILD)/sjljtest/sjljtest &> $(BUILD)/sjljtest/result.txt
 	diff --strip-trailing-cr $(BUILD)/sjljtest/result.txt $(SRCROOT)/test/sjljtest.expected.txt
 
+# TBD
 sjljtest_opt:
 	@mkdir -p $(BUILD)/sjljtest_opt
 	cd $(BUILD)/sjljtest_opt && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/sjljtest.c -o sjljtest -save-temps
 	$(BUILD)/sjljtest_opt/sjljtest &> $(BUILD)/sjljtest_opt/result.txt
 	diff --strip-trailing-cr $(BUILD)/sjljtest_opt/result.txt $(SRCROOT)/test/sjljtest.expected.txt
 
+# TBD
 ehtest:
 	@mkdir -p $(BUILD)/ehtest
 	cd $(BUILD)/ehtest && $(SDK)/usr/bin/g++ -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
 	-$(BUILD)/ehtest/ehtest &> $(BUILD)/ehtest/result.txt
 	diff --strip-trailing-cr $(BUILD)/ehtest/result.txt $(SRCROOT)/test/ehtest.expected.txt
 
+# TBD
 ehtest_opt:
 	@mkdir -p $(BUILD)/ehtest_opt
 	cd $(BUILD)/ehtest_opt && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
 	-$(BUILD)/ehtest_opt/ehtest &> $(BUILD)/ehtest_opt/result.txt
 	diff --strip-trailing-cr $(BUILD)/ehtest_opt/result.txt $(SRCROOT)/test/ehtest.expected.txt
 
+# TBD
 ehtest_asc:
 	@mkdir -p $(BUILD)/ehtest_asc
 	cd $(BUILD)/ehtest_asc && $(SDK)/usr/bin/g++ -muse-legacy-asc -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
@@ -1669,11 +1697,13 @@ ehtest_asc:
 	-$(BUILD)/ehtest_asc/ehtest &> $(BUILD)/ehtest_asc/result.txt
 	diff --strip-trailing-cr $(BUILD)/ehtest_asc/result.txt $(SRCROOT)/test/ehtest.expected.txt
 
+# TBD
 as3interoptest:
 	@mkdir -p $(BUILD)/as3interoptest
 	cd $(BUILD)/as3interoptest && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/as3interoptest.c -o as3interoptest -save-temps
 	$(BUILD)/as3interoptest/as3interoptest &> $(BUILD)/as3interoptest/result.txt
 
+# TBD
 symboltest:
 	mkdir -p $(BUILD)/symboltest
 	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llvm-as $(SRCROOT)/test/symboltest.ll -o symboltest.bc
@@ -1684,24 +1714,29 @@ symboltest:
 	cd $(BUILD)/symboltest && $(SDK)/usr/bin/nm symboltest.bc | grep symbolTest > syms.bc.txt
 	diff --strip-trailing-cr $(BUILD)/symboltest/*.txt
 
+# TBD
 samples:
 	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS)
 	mkdir -p $(BUILDROOT)/extra
 	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
+# TBD
 examples:
 	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS) \
 	GLS3D=$(SRCROOT)/samples/Example_GLS3D PAK0FILE=$(SRCROOT)/samples/Example_Quake1/sdlquake-1.0.9/ID1/PAK0.PAK examples
 	mkdir -p $(BUILDROOT)/extra
 	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
+# TBD
 gdbunit:
 	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
 	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
 
+# TBD
 vfstests:
 	@cd qa/vfs/framework && $(MAKE) FLASCC=$(FLASCC)
 
+# TBD
 checkasm:
 	rm -rf $(BUILD)/libtoabc
 	@mkdir -p $(BUILD)/logs/libtoabc
@@ -1724,6 +1759,7 @@ checkasm:
 	@echo "Checking headers for asm"
 	$(PYTHON) $(SRCROOT)/tools/search_headers.py $(SDK) $(BUILD)/header-search
 
+# TBD
 libtoabc:
 	mkdir -p $(BUILD)/libtoabc/`basename $(LIB)`
 	cd $(BUILD)/libtoabc/`basename $(LIB)` && $(SDK)/usr/bin/ar x $(LIB)
@@ -1733,6 +1769,7 @@ libtoabc:
 	cd $(BUILD)/libtoabc/`basename $(LIB)` && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS) ; \
 	fi 
 
+# TBD
 speccpu2006: # works on mac only! (and probably requires local tweaks to alchemy.cfg and mac32.cfg)
 	@rm -rf $(BUILD)/speccpu2006
 	@mkdir -p $(BUILD)/speccpu2006
@@ -1748,6 +1785,7 @@ speccpu2006: # works on mac only! (and probably requires local tweaks to alchemy
 # ====================================================================================
 # Extra Tests
 # ====================================================================================
+# TBD
 dejagnu:
 	mkdir -p $(BUILD)/dejagnu
 	cd $(BUILD)/dejagnu && $(SRCROOT)/dejagnu-1.5/configure --prefix=$(BUILD)/dejagnu && $(MAKE) install
@@ -1787,16 +1825,19 @@ gccrun/%:
 gxxrun/%:
 	-$(RUNGCCTESTS) --tool g++ --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/$(@:gxxrun/%=%)
 
+# TBD
 gcctests:
 	$(MAKE) dejagnu
 	cp -f $(SRCROOT)/tools/$(TRIPLE).exp $(BUILD)/dejagnu/share/dejagnu/baseboards/
 	chmod u+rw $(BUILD)/dejagnu/share/dejagnu/baseboards/*
 	$(MAKE) -j$(THREADS) allgcctests
 
+# TBD
 allgcctests: $(CTORTUREDIRS:%=gcctorture/%) $(CTORTUREDIRS:%=gxxtorture/%) $(GCCTESTDIRS:%=gccrun/%) $(GCCTESTDIRS:%=gxxrun/%)
 	cat $(BUILD)/gcctests/*/*/gcc.log  > $(BUILD)/gcctests/gcc.log
 	cat $(BUILD)/gcctests/*/*/g++.log  > $(BUILD)/gcctests/g++.log
 
+# TBD
 ieeetests_conversion:
 	rm -rf $(BUILD)/ieeetests_conversion
 	mkdir -p $(BUILD)/ieeetests_conversion
@@ -1804,6 +1845,7 @@ ieeetests_conversion:
 	echo "b\nb\na" > $(BUILD)/ieeetests_conversion/answers
 	cd $(BUILD)/ieeetests_conversion && PATH=$(SDK)/usr/bin:$(PATH) ./dotests.sh < answers
 
+# TBD
 ieeetests_basicops:
 	rm -rf $(BUILD)/ieeetests_basicops
 	mkdir -p $(BUILD)/ieeetests_basicops
@@ -1814,6 +1856,7 @@ ieeetests_basicops:
 # ====================================================================================
 # DEPLOY
 # ====================================================================================
+# TBD
 deliverables:
 	$(MAKE) staging
 	$(MAKE) flattensymlinks
@@ -1828,16 +1871,19 @@ else
 #		$(MAKE) diffdeliverables
 endif
 
+# TBD
 diffdeliverables:
 		cat $(BUILDROOT)/zipcontents.txt | grep -v staging/cygwin | grep -v "run.bat" | sed -e 's/\.exe//g' -e 's/\.dll/\.~SO~/g' -e 's/\/cygwin/\/~PLAT~/g' | sort > $(BUILDROOT)/zipcontents_munge.txt
 		cat $(BUILDROOT)/dmgcontents.txt | grep -v "share/cmake" | grep -v "bin/cmake" | grep -v "bin/ctest" | grep -v "bin/cpack" | grep -v "bin/ccmake" | sed -e 's/\.exe//g' -e 's/\.dylib/\.~SO~/g' -e 's/\/darwin/\/~PLAT~/g' | sort > $(BUILDROOT)/dmgcontents_munge.txt	
 		diff $(BUILDROOT)/dmgcontents_munge.txt $(BUILDROOT)/zipcontents_munge.txt
 
+# TBD
 flattensymlinks:
 	find $(BUILDROOT)/staging/sdk -type l | xargs rm
 	$(RSYNC) $(BUILDROOT)/staging/sdk/usr/platform/*/ $(BUILDROOT)/staging/sdk/usr
 	rm -rf $(BUILDROOT)/staging/sdk/usr/platform
 
+# TBD
 staging:
 	rm -rf $(BUILDROOT)/staging
 	mkdir -p $(BUILDROOT)/staging
@@ -1850,6 +1896,7 @@ staging:
 	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
 	echo $(FLASCC_VERSION_BUILD) > $(BUILDROOT)/staging/sdk/ver.txt
 
+# TBD
 dmg:
 	rm -f $(BUILDROOT)/$(SDKNAME).dmg $(BUILDROOT)/$(SDKNAME).dmg.tmp
 	cp -f $(SRCROOT)/tools/Base.dmg $(BUILDROOT)/$(SDKNAME).dmg.tmp
@@ -1864,10 +1911,12 @@ dmg:
 	rm -f $(BUILDROOT)/$(SDKNAME).dmg.tmp
 	find $(BUILDROOT)/staging > $(BUILDROOT)/dmgcontents.txt
 
+# TBD
 zip:
 	cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
 	find $(BUILDROOT)/staging > $(BUILDROOT)/zipcontents.txt
 
+# TBD
 winstaging:
 	$(LN) cygwin $(BUILDROOT)/staging/sdk/usr/platform/current
 	# temporarily $(MAKE) sdk cygwin-ish
@@ -1902,6 +1951,7 @@ winstaging:
 # CROSS
 # ====================================================================================
 
+# TBD
 cxxfiltmingw:
 	# install the version of mingw for osx from here: http://crossgcc.rts-software.org/doku.php
 	rm -rf $(BUILD)/cxxfiltmingw
@@ -1921,6 +1971,7 @@ cxxfiltmingw:
 		$(BUILD)/cxxfiltmingw/libiberty/*.o $(BUILD)/cxxfiltmingw/intl/*.o $(BUILD)/cxxfiltmingw/binutils/version.o \
 		$(BUILD)/cxxfiltmingw/binutils/bucomm.o  $(BUILD)/cxxfiltmingw/bfd/*.o -o c++filt.exe
 
+# TBD
 win:
 	@if [ -d $(CYGWINMAC) ] ; then true ; \
 		else echo "Couldn't locate cygwin mac directory, please invoke $(MAKE) with \"$(MAKE) CYGWINMAC=/path/to/cygwinmac/sdk/usr/bin ...\"" ; exit 1; \
@@ -1959,6 +2010,7 @@ win:
 	@echo "-  genfs (win)"
 	@$(CROSS) genfs &> $(WIN_BUILD)/logs/genfs_win.txt
 
+# TBD
 cross_llvm_mingw:
 	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
 	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
@@ -1971,6 +2023,7 @@ cross_llvm_mingw:
 		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
 		llvm BUILD_LLVM_TESTS=ON LLVM_ONLYLLC=true CLANG=OFF
 
+# TBD
 cross_llvm_cygwin:
 	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
 	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
