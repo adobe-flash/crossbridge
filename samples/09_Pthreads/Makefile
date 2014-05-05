@@ -32,7 +32,7 @@ T09: check
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) -O4 -flto-api=exports.txt sound.cpp -lAS3++ -lFlash++ -pthread -emit-swf -o sound.swf
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) -pthread pthread_swc.cpp -emit-swf -o pthread_swc1.swf
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) -pthread pthread_swc.cpp -emit-swc=sample.pthread -o pthread.swc
-	"$(FLEX)/bin/mxmlc" -library-path=pthread.swc -debug=true -swf-version=18 pthread_swc.as -o pthread_swc2.swf
+	"$(FLEX)/bin/mxmlc" -library-path=pthread.swc -debug=$(MXMLC_DEBUG) -swf-version=18 pthread_swc.as -o pthread_swc2.swf
 
 include ../Makefile.common
 

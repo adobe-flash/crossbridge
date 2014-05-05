@@ -34,7 +34,7 @@ T10: check
 	cd libqrencode && "$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) $(OPT_CFLAGS) -DHAVE_CONFIG_H as3api_wrap.c bitstream.c mask.c mmask.c mqrspec.c qrencode.c qrinput.c qrspec.c rscode.c split.c QREncode.abc -emit-swc=sample.qrencode -o ../qrencode.swc $(EXTRACFLAGS)
 
 	@echo && echo "Compiling test app using SWC:"
-	"$(FLEX)/bin/mxmlc" -static-link-runtime-shared-libraries -library-path+=qrencode.swc qrencoder.mxml -debug=$(MXMLC_DEBUG) -o qrencoder.swf
+	"$(FLEX)/bin/mxmlc" -library-path+=qrencode.swc qrencoder.mxml -debug=$(MXMLC_DEBUG) -o qrencoder.swf
 
 T10Debug:
 	make T10 OPT_CFLAGS="-O0 -g" MXMLC_DEBUG=true

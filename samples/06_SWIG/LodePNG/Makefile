@@ -40,7 +40,7 @@ all: check
 	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) LodePNGLib.abc LodePNGLib_wrapper.c lodepngmain.c lodepng.c -emit-swc=sample.LodePNG -o LodePNGLib.swc
 
 	@echo "-> Compile an example SWF that uses that SWC"
-	"$(FLEX)/bin/mxmlc" -static-link-runtime-shared-libraries -library-path+=LodePNGLib.swc LodePNGExample.as -debug=true -o LodePNG.swf
+	"$(FLEX)/bin/mxmlc" -library-path+=LodePNGLib.swc LodePNGExample.as -debug=$(MXMLC_DEBUG) -o LodePNG.swf
 
 include ../../Makefile.common
 

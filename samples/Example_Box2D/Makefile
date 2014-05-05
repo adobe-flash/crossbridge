@@ -45,8 +45,8 @@ recompile:
 	make swfs
 
 swfs:
-	"$(FLEX)/bin/mxmlc" -static-link-runtime-shared-libraries -library-path=Box2D.swc -debug=$(MXMLC_DEBUG) HelloWorld.as -o HelloWorld.swf
-	"$(FLEX)/bin/mxmlc" -static-link-runtime-shared-libraries -library-path=Box2D.swc -debug=$(MXMLC_DEBUG) Boxes.as -o Boxes.swf
+	"$(FLEX)/bin/mxmlc" -library-path=Box2D.swc -debug=$(MXMLC_DEBUG) HelloWorld.as -o HelloWorld.swf
+	"$(FLEX)/bin/mxmlc" -library-path=Box2D.swc -debug=$(MXMLC_DEBUG) Boxes.as -o Boxes.swf
 
 T12Debug:
 	make T12 OPT_CFLAGS="-O0 -g" MXMLC_DEBUG=true

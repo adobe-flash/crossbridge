@@ -35,7 +35,7 @@ all:
 	cd neverball-1.5.4/data2 && zip -9 -q -r $(BUILD)/neverball/data2.zip *
 	cd neverball-1.5.4/data3 && zip -9 -q -r $(BUILD)/neverball/data3.zip *
 
-	java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md -AS3 -strict -optimize \
+	$(AS3COMPILERARGS) -AS3 -strict -optimize \
 		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 		-import $(call nativepath,$(GLS3D)/install/usr/lib/libGL.abc) \
@@ -50,7 +50,7 @@ all:
 		-import $(call nativepath,$(FLASCC)/usr/lib/PlayerKernel.abc) \
 		neverball-1.5.4/Console.as -outdir $(call nativepath,$(BUILD)/neverball) -out Console
 
-	java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md -AS3 -strict -optimize \
+	$(AS3COMPILERARGS) -AS3 -strict -optimize \
 		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 		-import $(call nativepath,$(GLS3D)/install/usr/lib/libGL.abc) \

@@ -41,7 +41,7 @@ all: check
 	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) MyLib.abc MyLib_wrapper.c mylibmain.c mylib.c -emit-swc=sample.MyLib -o MyLib.swc
 
 	@echo "-> Compile an example SWF that uses that SWC"
-	"$(FLEX)/bin/mxmlc" -static-link-runtime-shared-libraries -compiler.omit-trace-statements=false -library-path+=MyLib.swc PassData.as -debug=true -o PassData.swf
+	"$(FLEX)/bin/mxmlc" -library-path+=MyLib.swc PassData.as -debug=$(MXMLC_DEBUG) -o PassData.swf
 
 include ../../Makefile.common
 

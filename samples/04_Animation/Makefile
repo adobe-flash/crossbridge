@@ -34,7 +34,6 @@ T04: check
 		-import $(call nativepath,$(FLASCC)/usr/lib/CModule.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 		Console.as -outdir . -out Console
-
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) $(OPT_CFLAGS) GameOfLife.cpp -symbol-abc=Console.abc -emit-swf -swf-version=17 -swf-size=800x600 -o GameOfLife.swf $(EXTRACFLAGS)
 
 T04Debug: check

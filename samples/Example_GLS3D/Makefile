@@ -28,15 +28,6 @@
 
 all: check compile
 
-check:
-	@if [ -d $(FLASCC)/usr/bin ] ; then true ; \
-	else echo "Couldn't locate FLASCC sdk directory, please invoke make with \"make FLASCC=/path/to/FLASCC/sdk ...\"" ; exit 1 ; \
-	fi
-
-	@if [ -d "$(FLEX)/bin" ] ; then true ; \
-	else echo "Couldn't locate Flex sdk directory, please invoke make with \"make FLEX=/path/to/flex  ...\"" ; exit 1 ; \
-	fi
-	
 compile:
 	@mkdir -p install/usr/lib
 	@mkdir -p install/usr/include
