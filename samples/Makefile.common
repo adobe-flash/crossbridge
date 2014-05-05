@@ -39,8 +39,10 @@ endif
 # Common properties
 $?FLASCC:=$(FLASCC_ROOT)/sdk
 $?FLEX=$(AIR_HOME)
-$?GLS3D=$(PWD)/Example_GLS3D
 $?AS3COMPILERARGS=java $(JVMARGS) -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md 
+
+# Stage3D+
+$?GLS3D=$(FLASCC)/samples/Example_GLS3D
 
 # C/CPP Compiler
 $?BASE_CFLAGS=-Werror -Wno-write-strings -Wno-trigraphs
