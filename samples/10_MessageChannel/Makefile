@@ -28,8 +28,8 @@
 
 T10: check
 	@echo "-------- Sample 10 --------"
-	@echo && echo "Lets compile it as a SWF:"
-	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) mc.cpp -lFlash++ -lAS3++ -pthread -emit-swf -o mc.swf
+	@echo "Lets compile it as a SWF:"
+	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) mc.cpp -lFlash++ -lAS3++ -pthread -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o mc.swf
 
 include ../Makefile.common
 

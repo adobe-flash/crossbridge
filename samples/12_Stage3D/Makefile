@@ -48,7 +48,7 @@ T12: check
 	"$(FLASCC)/usr/bin/g++" AGAL.cpp -c -emit-llvm &> AGAL.txt
 
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) -fllvm-llc-opt=-ascopt=-import -fllvm-llc-opt=-ascopt=$(call nativepath,AGAL.abc) -I. AGAL.o stage3d.cpp AGAL.abc -lAS3++ -lFlash++ \
-		-O4 -flto-api=exports.txt -symbol-abc=Console.abc -swf-size=320x480 -emit-swf -o stage3d.swf
+		-O4 -flto-api=exports.txt -symbol-abc=Console.abc -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o stage3d.swf
 
 	make SpaceTriangle
 

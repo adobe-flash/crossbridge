@@ -28,10 +28,10 @@
 
 T01: check
 	@echo "-------- Sample 1 --------"
-	@echo && echo "First let's compile it as a projector:"
+	@echo "First let's compile it as a projector:"
 	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) hello.c -o hello.exe
-	@echo && echo "Now lets compile it as a SWF:"
-	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) hello.c -emit-swf -swf-size=200x200 -o hello.swf
+	@echo "Now lets compile it as a SWF:"
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) hello.c -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o hello.swf
 
 include ../Makefile.common
 

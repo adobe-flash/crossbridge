@@ -40,7 +40,7 @@ all: check
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) MurmurHash.abc MurmurHash_wrapper.c MurmurHash3.cpp main.cpp -emit-swc=sample.MurmurHash -o MurmurHash.swc
 
 	@echo "-> Compile an example SWF that uses that SWC"
-	"$(FLEX)/bin/mxmlc" -library-path+=MurmurHash.swc swigdemo.as -debug=$(MXMLC_DEBUG) -o swigdemo.swf
+	"$(FLEX)/bin/mxmlc" -load-config+=./../../.flexConfig.xml -library-path+=MurmurHash.swc swigdemo.as -debug=$(MXMLC_DEBUG) -o swigdemo.swf
 
 include ../../Makefile.common
 

@@ -52,7 +52,7 @@ T07: check
 				-import $(call nativepath,$(FLASCC)/usr/lib/PlayerKernel.abc) \
 				-import VFS.abc \
 				Console.as -outdir . -out Console
-	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) -O3 vfstest.cpp VFS.abc $(FLASCC)/usr/lib/AlcVFSZip.abc -symbol-abc=Console.abc -emit-swf -swf-version=17 -swf-size=800x600 -o vfstest.swf
+	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) -O3 vfstest.cpp VFS.abc $(FLASCC)/usr/lib/AlcVFSZip.abc -symbol-abc=Console.abc -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o vfstest.swf
 
 include ../Makefile.common
 
