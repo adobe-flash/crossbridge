@@ -361,11 +361,12 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make abclibs_compile
+	@$(SDK)/usr/bin/make builtinabcs
 
 # ====================================================================================
 # CORE
 # ====================================================================================
+# Clean build outputs
 clean:
 	rm -rf $(BUILDROOT)
 	rm -rf $(SDK)
@@ -373,6 +374,7 @@ clean:
 	$(MAKE) clean_libs
 	cd samples && $(MAKE) clean
 
+# Generate ASDoc documentation
 docs:
 	$(MAKE) base
 	$(MAKE) abclibs_asdocs
@@ -380,6 +382,7 @@ docs:
 # ====================================================================================
 # DEPENDENCY LIBS
 # ====================================================================================
+# Install packaged dependency libraries
 install_libs:
 	$(MAKE) clean_libs
 	unzip -q packages/$(DEPENDENCY_BMAKE).zip
@@ -422,6 +425,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
 
+# Clear depdendency libraries
 clean_libs:
 	rm -rf $(DEPENDENCY_BMAKE)
 	rm -rf $(DEPENDENCY_CMAKE)
@@ -461,6 +465,7 @@ clean_libs:
 # ====================================================================================
 # BASE
 # ====================================================================================
+# Initialize the build
 base:
 	mkdir -p $(BUILDROOT)/extra
 	mkdir -p $(BUILD)/abclibs
@@ -508,6 +513,7 @@ base:
 # ====================================================================================
 # MAKE
 # ====================================================================================
+# Assemble GNU Make
 make:
 	rm -rf $(BUILD)/make
 	mkdir -p $(SDK)/usr/bin
@@ -521,6 +527,7 @@ make:
 # ====================================================================================
 # CMAKE
 # ====================================================================================
+# Assemble CMake
 cmake:
 	rm -rf $(BUILD)/cmake
 	rm -rf $(SDK)/usr/cmake_junk
@@ -537,14 +544,17 @@ cmake:
 # ====================================================================================
 # ABCLIBS
 # ====================================================================================
-
+# Assemble builtin ABCs
+# Use it if Tamarin AS3 code is modified
 builtinabcs:
-	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/core && ./builtin.py
-	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell && ./shell_toplevel.py
+	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/core && python ./builtin.py -config CONFIG::VMCFG_FLOAT=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_POSIX=true
+	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell && python ./shell_toplevel.py -config CONFIG::VMCFG_FLOAT=true -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_POSIX=true
 
+# Assemble ABC library binaries and documentation
 abclibs:
 	$(MAKE) -j$(THREADS) abclibs_compile abclibs_asdocs
 
+# Assemble ABC library binaries
 # Change 04.05.14. DefaultPreloader and C_Run was compiled using ASC.jar, lets use ASC2.jar and test it: $(SCOMP) to $(SCOMPFALCON)
 abclibs_compile:
 	mkdir -p $(BUILD)/abclibs
@@ -578,6 +588,7 @@ abclibs_compile:
 	cp $(BUILD)/abclibs/*.abc $(SDK)/usr/lib
 	cp $(BUILD)/abclibs/*.swf $(SDK)/usr/lib
 
+# Assemble ABC library documentation
 abclibs_asdocs:
 	rm -rf $(BUILDROOT)/tempdita
 	rm -rf $(BUILDROOT)/apidocs
@@ -606,21 +617,26 @@ CROSS=PATH="$(BUILD)/ccachebin:$(CYGWINMAC):$(PATH):$(SDK)/usr/bin" $(MAKE) SDK=
 # ====================================================================================
 # BASICTOOLS
 # ====================================================================================
+# Assemble basic tools (C/CPP)
 basictools:
 	$(MAKE) -j$(THREADS) uname noenv avm2-as alctool alcdb
 
+# Assemble UName Helper
 uname:
 	mkdir -p $(SDK)/usr/bin
 	$(CC) $(SRCROOT)/tools/uname/uname.c -o $(SDK)/usr/bin/uname$(EXEEXT)
 
+# Assemble NoEnv Helper
 noenv:
 	mkdir -p $(SDK)/usr/bin
 	$(CC) $(SRCROOT)/tools/noenv/noenv.c -o $(SDK)/usr/bin/noenv$(EXEEXT)
 
+# Assemble TBD Tool
 avm2-as:
 	mkdir -p $(SDK)/usr/bin
 	$(CXX) $(SRCROOT)/avm2_env/misc/SetAlchemySDKLocation.c $(SRCROOT)/tools/as/as.cpp -o $(SDK)/usr/bin/avm2-as$(EXEEXT)
 
+# Assemble TBD Tool
 alctool:
 	rm -rf $(BUILD)/alctool
 	mkdir -p $(BUILD)/alctool/flascc
@@ -635,6 +651,7 @@ alctool:
 	cd $(BUILD)/alctool && jar cmf MANIFEST.MF alctool.jar flascc/*.class
 	cp $(BUILD)/alctool/alctool.jar $(SDK)/usr/lib/.
 
+# Assemble Debugger Tool
 alcdb:
 	rm -rf $(BUILD)/alcdb
 	mkdir -p $(BUILD)/alcdb/flascc
@@ -649,6 +666,7 @@ alcdb:
 # ====================================================================================
 # LLVM
 # ====================================================================================
+# Assemble LLVM Tool-Chain
 llvm:
 	rm -rf $(BUILD)/llvm-debug
 	mkdir -p $(BUILD)/llvm-debug
@@ -674,6 +692,7 @@ ifeq ($(LLVM_ONLYLLC), false)
 	cp -f $(BUILD)/llvm-debug/bin/fpcmp$(EXEEXT) $(BUILDROOT)/extra/fpcmp$(EXEEXT)
 endif
 
+# Assemble LLVM Tests
 llvmtests:
 	rm -rf $(BUILD)/llvm-tests
 	mkdir -p $(BUILD)/llvm-tests
@@ -685,6 +704,7 @@ llvmtests:
 	$(PYTHON) $(SRCROOT)/tools/llvmtestcheck.py --srcdir $(SRCROOT)/llvm-2.9/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ --fpcmp $(FPCMP)> $(BUILD)/llvm-tests/passfail.txt
 	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_llvm.txt
 
+# TBD
 llvmtests-speccpu2006: # works only on mac!
 	rm -rf $(BUILD)/llvm-tests
 	rm -rf $(BUILD)/llvm-spec-tests
@@ -702,6 +722,7 @@ llvmtests-speccpu2006: # works only on mac!
 # ====================================================================================
 # BINUTILS
 # ====================================================================================
+# TBD
 binutils:
 	rm -rf $(BUILD)/binutils
 	mkdir -p $(BUILD)/binutils
@@ -718,6 +739,7 @@ binutils:
 # ====================================================================================
 # PLUGINS
 # ====================================================================================
+# TBD
 plugins:
 	rm -rf $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
 	mkdir -p $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
@@ -732,6 +754,7 @@ plugins:
 # ====================================================================================
 # GCC
 # ====================================================================================
+# TBD
 gcc:
 	rm -rf $(BUILD)/llvm-gcc-42
 	mkdir -p $(SDK)/usr/bin
@@ -758,6 +781,7 @@ gcc:
 # ====================================================================================
 # BMAKE
 # ====================================================================================
+# TBD
 bmake:
 	rm -rf $(BUILD)/bmake
 	mkdir -p $(BUILD)/bmake
@@ -766,9 +790,11 @@ bmake:
 # ====================================================================================
 # STDLIBS
 # ====================================================================================
+# TBD
 stdlibs:
 	$(MAKE) -j$(THREADS) csu libc libthr libm libBlocksRuntime
 
+# TBD
 csu:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 # Cygwin compatibility
@@ -778,6 +804,7 @@ endif
 	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE) SSP_CFLAGS="" MACHINE_ARCH=avm2 crt1_c.o
 	cp -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
 
+# TBD
 libc:
 	mkdir -p $(BUILD)/posix/
 	rm -f $(BUILD)/posix/*.o
@@ -812,6 +839,7 @@ endif
 	cd $(BUILD)/posix && $(SDK)/usr/bin/gcc -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -fexceptions -c $(SRCROOT)/posix/libcHack.c
 	cp -f $(BUILD)/lib/src/lib/libc/libc.a $(BUILD)/posix/libcHack.o $(SDK)/usr/lib/.
 
+# TBD
 libthr:
 	rm -rf $(BUILD)/libthr
 	mkdir -p $(BUILD)/libthr
@@ -830,6 +858,7 @@ endif
 	cd $(BUILD)/libthr/libthr && rm -f libthr.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libthr.a
 	cp -f $(BUILD)/libthr/libthr/libthr.a $(SDK)/usr/lib/.
 
+# TBD
 libm:
 	cd compiler_rt && $(MAKE) clean && $(MAKE) avm2 CC="$(SDK)/usr/bin/gcc -emit-llvm" RANLIB=$(SDK)/usr/bin/ranlib AR=$(SDK)/usr/bin/ar VERBOSE=1
 	$(SDK)/usr/bin/llvm-link -o $(BUILD)/libcompiler_rt.o compiler_rt/avm2/avm2/avm2/SubDir.lib/*.o
@@ -860,6 +889,7 @@ endif
 	$(SDK)/usr/bin/opt -O3 -o $(SDK)/usr/lib/libm.o $(BUILD)/libmbc/libm.o
 	$(SDK)/usr/bin/nm $(SDK)/usr/lib/libm.o | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/libm.bc.txt
 
+# TBD
 libBlocksRuntime:
 	cd compiler_rt/BlocksRuntime && echo '#define HAVE_SYNC_BOOL_COMPARE_AND_SWAP_INT' > config.h && echo '#define HAVE_SYNC_BOOL_COMPARE_AND_SWAP_LONG' >> config.h
 	cd compiler_rt/BlocksRuntime && $(SDK)/usr/bin/gcc -emit-llvm -c data.c -o data.o
@@ -870,6 +900,7 @@ libBlocksRuntime:
 # ====================================================================================
 # GCCLIBS
 # ====================================================================================
+# TBD
 gcclibs:
 	rm -rf $(BUILD)/llvm-gcc-42/$(TRIPLE)
 	cd $(BUILD)/llvm-gcc-42 \
@@ -888,6 +919,7 @@ gcclibs:
 	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libAS3++.a AS3++.o
 	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libAS3++.a AS3++.abc
 
+# TBD
 libobjc_configure:
 	cd $(BUILD)/llvm-gcc-42 \
 		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' TARGET-target-libobjc="all OBJC_THREAD_FILE=thr-posix" all-target-libobjc > $(SRCROOT)/cached_build/libobjc/compile.log
@@ -895,6 +927,7 @@ libobjc_configure:
 		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' install-target-libobjc > $(SRCROOT)/cached_build/libobjc/install.log
 	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/libobjc`
 
+# TBD
 libobjc:
 	rm -rf $(BUILD)/libobjc
 	mkdir -p $(BUILD)/libobjc
@@ -903,6 +936,7 @@ libobjc:
 	# link bitcode
 	cd $(BUILD)/libobjc && rm -f libobjc.a && mkdir NXConstStr && mv NXConstStr.o NXConstStr/. && $(SDK)/usr/bin/llvm-link -o libobjc.o *.o && $(AR) libobjc.a libobjc.o NXConstStr/*.o && cp libobjc.a $(SDK)/usr/lib/.
 
+# TBD
 abclibobjc:
 	mkdir -p $(BUILD)/libobjc_abc
 	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
@@ -912,6 +946,7 @@ abclibobjc:
 # ====================================================================================
 # AS3WIG
 # ====================================================================================
+# TBD
 as3wig:
 	rm -rf $(BUILD)/as3wig
 	mkdir -p $(BUILD)/as3wig/flascc
@@ -935,13 +970,16 @@ as3wig:
 # ====================================================================================
 # ABCSDTLIBS
 # ====================================================================================
+# TBD
 abcstdlibs:
 	$(MAKE) -j$(THREADS) abcflashpp abcstdlibs_more
 
+# TBD
 abcflashpp:
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvmopt=-Xmx4G -jvm="$(JAVA)" -falcon-parallel -target-player -filetype=obj $(BUILD)/as3wig/Flash++.o -o $(BUILD)/as3wig/Flash++.abc
 	$(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libFlash++.a $(BUILD)/as3wig/Flash++.abc
 
+# TBD
 abcstdlibs_more:
 	mkdir -p $(SDK)/usr/lib/stdlibs_abc
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/crt1_c.o -o $(SDK)/usr/lib/stdlibs_abc/crt1_c.o
@@ -992,6 +1030,7 @@ abcstdlibs_more:
 # ====================================================================================
 # CLEANUP
 # ====================================================================================
+# TBD
 sdkcleanup:
 	mv $(SDK)/usr/share/$(DEPENDENCY_CMAKE) $(SDK)/usr/share_cmake
 	rm -rf $(SDK)/usr/share $(SDK)/usr/info $(SDK)/usr/man $(SDK)/usr/lib/x86_64 $(SDK)/usr/cmake_junk $(SDK)/usr/make_junk
@@ -1000,6 +1039,7 @@ sdkcleanup:
 	rm -f $(SDK)/usr/lib/*.la
 	rm -f $(SDK)/usr/lib/crt1.o $(SDK)/usr/lib/crtbegin.o $(SDK)/usr/lib/crtbeginS.o $(SDK)/usr/lib/crtbeginT.o $(SDK)/usr/lib/crtend.o $(SDK)/usr/lib/crtendS.o $(SDK)/usr/lib/crti.o $(SDK)/usr/lib/crtn.o
 
+# TBD
 finalcleanup:
 	rm -f $(SDK)/usr/lib/*.la
 	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/share/info
@@ -1022,8 +1062,9 @@ finalcleanup:
 	$(RSYNC) --exclude "*.xslt" --exclude "*.html" --exclude ASDoc_Config.xml --exclude overviews.xml $(BUILDROOT)/tempdita/ $(SDK)/usr/share/asdocs
 
 # ====================================================================================
-# TR and TRD
+# TAMARIN HELPERS AND PLAYERS
 # ====================================================================================
+# Tamarin Shell built without debugging
 tr:
 	rm -rf $(BUILD)/tr
 	mkdir -p $(BUILD)/tr
@@ -1038,6 +1079,7 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	chmod a+x $(SDK)/usr/bin/abcdump$(EXEEXT)
 endif
 
+# Tamarin Shell built with debugging
 trd:
 	rm -rf $(BUILD)/trd
 	mkdir -p $(BUILD)/trd

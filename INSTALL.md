@@ -82,7 +82,12 @@ Install
 
 # Upgrading
 
-## PlayerGlobal
+## Adobe PlayerGlobal ASC + SWC
 
 * AIR_SDK_HOME\lib\aot\lib\avmglue.abc => \CROSSBRIDGE_SDK_HOME\tools\playerglobal\playerglobal.abc
 * AIR_SDK_HOME\frameworks\libs\player\VERSION\playerglobal.swc => \CROSSBRIDGE_SDK_HOME\tools\playerglobal\playerglobal.swc
+
+## Mozilla Tamarin ASC
+
+* ftp://ftp.mozilla.org/pub/js/tamarin/builds/asc/latest/asc.jar => patches\tamarin-redux-VERSION\utils\asc.jar
+  * @see: https://developer.mozilla.org/en-US/docs/Archive/Mozilla/Tamarin/Tamarin_Build_Documentation
