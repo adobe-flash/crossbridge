@@ -9,6 +9,10 @@ TODO
 * Improve MingW+MSys compatibility of the makefiles and sources
   * Cannot build core tool (GNU Make) using MingW32+MSys - maybe patched distribution works...
 
+* Improve OSX compatibility (10.X)
+  * In file included from /crossbridge/llvm-2.9/lib/Support/Signals.cpp:30:/crossbridge/llvm-2.9/lib/Support/Unix/Signals.inc:278:23: 
+    * error: use of undeclared identifier 'pthread_self' | return pthread_kill(pthread_self(), sig);
+
 * Introduce multi-OS CI (Linux, OSX, Windows)
 
 * Improve documentation
