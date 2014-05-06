@@ -5,20 +5,20 @@ git:
     depth: 1
 
 # OSX Host Switch
-language: objective-c
+#language: objective-c
 
 compiler: 
-  - clang
   - gcc
+  - clang
 
 # OSX Packages
-before_install:
-    - brew update
+#before_install:
+#    - brew update
 
 # Linux Packages
-#before_install:
-#  - sudo apt-get update
-#  - sudo apt-get install uuid-dev
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install uuid-dev
 
 before_script:
     - chmod -R +x .
