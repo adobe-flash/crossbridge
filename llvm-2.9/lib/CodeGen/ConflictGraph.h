@@ -23,7 +23,15 @@
 
 #include "llvm/Support/DataTypes.h"
 
+#if __cplusplus > 199711L || defined(__GXX_EXPERIMENTAL_CXX0X__) || defined(_MSC_VER)
+#include <unordered_map>
+#else
 #include <tr1/unordered_map>
+namespace std {
+using tr1::unordered_map;
+}
+#endif
+
 #include <vector>
 
 class ConflictGraphVertex;
@@ -32,7 +40,7 @@ class ConflictGraphVertex;
 class ConflictGraph
 {
 	// id => vertex
-	typedef std::tr1::unordered_map<uintptr_t, ConflictGraphVertex *> Vertices;
+	typedef std::unordered_map<uintptr_t, ConflictGraphVertex *> Vertices;
 	Vertices _vertices;
 
 public:
