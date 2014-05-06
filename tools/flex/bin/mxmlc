@@ -43,9 +43,9 @@ elif [ $OS = "Unix" ]; then
 	check64="`java -version 2>&1 | grep -i 64-Bit`"
 	isOSX="`uname | grep -i Darwin`"
 	
-	if [ "$isOSX" != "" -a "$HOSTTYPE" = "x86_64" -a "$check64" != "" ]; then
-		D32='-d32'
-	fi
+	#if [ "$isOSX" != "" -a "$HOSTTYPE" = "x86_64" -a "$check64" != "" ]; then
+	#	D32='-d32'
+	#fi
 fi
 
 # don't use $FLEX_HOME in this variable because it may contain spaces,
