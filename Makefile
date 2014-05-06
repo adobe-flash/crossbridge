@@ -613,7 +613,7 @@ abclibs_asdocs:
 				-package-description-file=$(call nativepath,$(SRCROOT)/test/aspackages.xml) \
 				-main-title "Crossbridge API Reference" \
 				-window-title "Crossbridge API Reference" \
-				-output apidocs &> $(BUILD)/logs/asdoc.txt
+				-output apidocs
 	mv $(BUILDROOT)/apidocs/tempdita $(BUILDROOT)/
 
 CROSS=PATH="$(BUILD)/ccachebin:$(CYGWINMAC):$(PATH):$(SDK)/usr/bin" $(MAKE) SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin LLVMINSTALLPREFIX=$(WIN_BUILD) NATIVE_AR=$(CYGTRIPLE)-ar CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ RANLIB=$(CYGTRIPLE)-ranlib
