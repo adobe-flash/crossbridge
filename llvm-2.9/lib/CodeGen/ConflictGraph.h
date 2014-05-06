@@ -23,7 +23,7 @@
 
 #include "llvm/Support/DataTypes.h"
 
-#if __cplusplus > 199711L || defined(__GXX_EXPERIMENTAL_CXX0X__) || defined(_MSC_VER)
+#if __cplusplus > 199711L || defined(__GXX_EXPERIMENTAL_CXX0X__) || defined(_MSC_VER) || defined(__APPLE__)
 #include <unordered_map>
 #else
 #include <tr1/unordered_map>
