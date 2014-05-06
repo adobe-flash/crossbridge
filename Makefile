@@ -178,11 +178,17 @@ $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUI
 $?LLVMASSERTIONS=OFF
 $?LLVMCMAKEOPTS= 
 $?LLVMLDFLAGS=
+$?LLVMCFLAGS=
+$?LLVMCXXFLAGS=
 $?LLVMINSTALLPREFIX=$(BUILD)
 $?LLVM_ONLYLLC=false
 $?LLVMBUILDTYPE=MinSizeRel
 $?BUILD_LLVM_TESTS=OFF
 $?CLANG=ON
+# Clang 5.X compatibility
+ifneq (,$(findstring 3.3svn,$(shell g++ --version)))
+$?LLVMCXXFLAGS+= -stdlib=libstdc++ 
+endif
 # Player version, available: 11.5 | 13.0
 $?PLAYERGLOBALROOT=tools/playerglobal/13.0
 # Merged Flex SDK
@@ -358,7 +364,7 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make builtinabcs
+	@$(SDK)/usr/bin/make llvm
 
 # Print debug information
 diagnostics:
