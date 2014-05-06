@@ -185,9 +185,6 @@ $?LLVM_ONLYLLC=false
 $?LLVMBUILDTYPE=MinSizeRel
 $?BUILD_LLVM_TESTS=OFF
 $?CLANG=ON
-ifneq (,$(findstring darwin,$(PLATFORM)))
-$?LLVMCXXFLAGS+= -stdlib=libstdc++ 
-endif
 # Player version, available: 11.5 | 13.0
 $?PLAYERGLOBALROOT=tools/playerglobal/13.0
 # Merged Flex SDK
