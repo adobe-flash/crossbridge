@@ -13,7 +13,9 @@
 
 // AVM2 AS3 PATCH START
 // for setting swiglib directory
+#define __IN_FILE_USE__
 #include "SetAlchemySDKLocation.c"
+#undef __IN_FILE_USE__
 // AVM2 AS3 PATCH END
 
 #include "swigconfig.h"
