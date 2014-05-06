@@ -612,9 +612,9 @@ swig_lib
 ac_aux_dir
 EXTRA_CLEAN
 ROOT_DIR
+SKIP_AS3
 SKIP_ANDROID
 SKIP_GCJ
-SKIP_AS3
 SKIP_D
 SKIP_GO
 SKIP_UFFI
@@ -11497,12 +11497,6 @@ fi
 
 
 #----------------------------------------------------------------
-# AS3
-#----------------------------------------------------------------
-
-SKIP_AS3= # TODO: never skipped
-
-#----------------------------------------------------------------
 # Additional language dependencies
 #----------------------------------------------------------------
 SKIP_GCJ=
@@ -11521,8 +11515,9 @@ if test -z "$ANDROID" || test -z "$ADB" || test -z "$ANT" || test -z "$NDKBUILD"
     SKIP_ANDROID="1"
 fi
 
-
-
+# AVM2 AS3 PATCH START
+SKIP_AS3= # TODO: never skipped
+# AVM2 AS3 PATCH END
 
 #----------------------------------------------------------------
 # Miscellaneous

@@ -41,7 +41,7 @@ $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
 $?DEPENDENCY_LLVM=llvm-3.2
 #$?DEPENDENCY_LLVM=llvm-3.4
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
-$?DEPENDENCY_MAKE=make-3.82
+$?DEPENDENCY_MAKE=make-4.0
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_SDL=SDL-1.2.14
@@ -236,7 +236,7 @@ BUILDORDER= cmake abclibs basictools llvm binutils plugins bmake stdlibs as3xx a
 BUILDORDER+= sdkcleanup tr trd extralibs extratools finalcleanup submittests
 
 all:
-	@echo "~~~ Crossbridge $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
+	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
@@ -299,7 +299,7 @@ all_tests:
 
 # We are ignoring some target errors because of issues with documentation generation
 all_ci:
-	@echo "~~~ Crossbridge (CI) $(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH) ~~~"
+	@echo "~~~ Crossbridge (CI) $(SDKNAME) ~~~"
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
@@ -321,9 +321,9 @@ all_ci:
 	@$(SDK)/usr/bin/make tr
 	@$(SDK)/usr/bin/make trd
 	@$(SDK)/usr/bin/make extralibs
-	@$(SDK)/usr/bin/make -i extratools
+	@$(SDK)/usr/bin/make extratools
 	@$(SDK)/usr/bin/make -i finalcleanup
-	@$(SDK)/usr/bin/make -i submittests
+	@$(SDK)/usr/bin/make submittests
 
 # Used to debug specific target
 all_dev:

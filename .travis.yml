@@ -6,12 +6,10 @@ git:
 
 language: objective-c
 
-compiler: gcc
-
 before_install:
     - brew update
 
 before_script:
     - chmod -R +x .
 
-script: make THREADS=1 -j1 -i all_ci
+script: make -j1 all_ci

@@ -11,9 +11,10 @@
  * Main entry point to the SWIG core.
  * ----------------------------------------------------------------------------- */
 
-#define __IN_FILE_USE__
-#include "SetAlchemySDKLocation.c"  // for setting swiglib directory
-#undef __IN_FILE_USE__
+// AVM2 AS3 PATCH START
+// for setting swiglib directory
+#include "SetAlchemySDKLocation.c"
+// AVM2 AS3 PATCH END
 
 #include "swigconfig.h"
 
@@ -40,6 +41,10 @@ int Verbose = 0;
 int AddExtern = 0;
 int NoExcept = 0;
 int SwigRuntime = 0;		// 0 = no option, 1 = -runtime, 2 = -noruntime
+
+// AVM2 AS3 PATCH START
+char *flasccSDKLocation = 0;
+// AVM2 AS3 PATCH END
 
 /* Suppress warning messages for private inheritance, preprocessor evaluation etc...
    WARN_PP_EVALUATION            202
@@ -909,10 +914,15 @@ int SWIG_main(int argc, char *argv[], Language *l) {
   ignore_nested_classes = l->nestedClassesSupport() == Language::NCS_Unknown ? 1 : 0;
 
   // Create Library search directories
+ 
+  // AVM2 AS3 PATCH START
+  // Set flascc SDK directory  
+  flasccSDKLocation = SetFlasccSDKLocation("/../..");
+  // AVM2 AS3 PATCH END
 
   // Check for SWIG_LIB environment variable
   if ((c = getenv("SWIG_LIB")) == (char *) 0) {
-#if 0 // defined(_WIN32) // AS3 TODO: CYGWIN should take the unix path?
+#if 0 //defined(_WIN32)
     char buf[MAX_PATH];
     char *p;
     if (!(GetModuleFileName(0, buf, MAX_PATH) == 0 || (p = strrchr(buf, '\\')) == 0)) {
@@ -924,10 +934,13 @@ int SWIG_main(int argc, char *argv[], Language *l) {
     if (Len(SWIG_LIB_WIN_UNIX) > 0)
       SwigLibWinUnix = NewString(SWIG_LIB_WIN_UNIX); // Unix installation path using a drive letter (for msys/mingw)
 #else
+    // AVM2 AS3 PATCH START
+    //SwigLib = NewString(SWIG_LIB);
     String *alcSDK = NewString(flasccSDKLocation);
     Append(alcSDK, "/usr/share/swig/3.0.0/");
     SwigLib = Swig_copy_string(Char(alcSDK));
     Delete(alcSDK);
+    // AVM2 AS3 PATCH END
 #endif
   } else {
     SwigLib = NewString(c);

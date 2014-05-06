@@ -36,6 +36,7 @@ eswig_SOURCES =	CParse/cscanner.c		\
 		DOH/void.c			\
 		Modules/allegrocl.cxx		\
 		Modules/allocate.cxx		\
+		Modules/as3.cxx		\
 		Modules/browser.cxx		\
 		Modules/cffi.cxx		\
 		Modules/chicken.cxx		\
@@ -71,7 +72,6 @@ eswig_SOURCES =	CParse/cscanner.c		\
 		Modules/uffi.cxx		\
 		Modules/utils.cxx		\
 		Modules/xml.cxx			\
-		Modules/as3.cxx			\
 		Preprocessor/cpp.c		\
 		Preprocessor/expr.c		\
 		Swig/cwrap.c			\

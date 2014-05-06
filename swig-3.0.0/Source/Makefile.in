@@ -63,6 +63,7 @@ am_eswig_OBJECTS = CParse/cscanner.$(OBJEXT) CParse/parser.$(OBJEXT) \
 	DOH/hash.$(OBJEXT) DOH/list.$(OBJEXT) DOH/memory.$(OBJEXT) \
 	DOH/string.$(OBJEXT) DOH/void.$(OBJEXT) \
 	Modules/allegrocl.$(OBJEXT) Modules/allocate.$(OBJEXT) \
+	Modules/as3.$(OBJEXT) \
 	Modules/browser.$(OBJEXT) Modules/cffi.$(OBJEXT) \
 	Modules/chicken.$(OBJEXT) Modules/clisp.$(OBJEXT) \
 	Modules/contract.$(OBJEXT) Modules/csharp.$(OBJEXT) \
@@ -81,7 +82,6 @@ am_eswig_OBJECTS = CParse/cscanner.$(OBJEXT) CParse/parser.$(OBJEXT) \
 	Modules/tcl8.$(OBJEXT) Modules/typepass.$(OBJEXT) \
 	Modules/uffi.$(OBJEXT) Modules/utils.$(OBJEXT) \
 	Modules/xml.$(OBJEXT) Preprocessor/cpp.$(OBJEXT) \
-	Modules/as3.$(OBJEXT) Preprocessor/cpp.$(OBJEXT) \
 	Preprocessor/expr.$(OBJEXT) Swig/cwrap.$(OBJEXT) \
 	Swig/deprecate.$(OBJEXT) Swig/error.$(OBJEXT) \
 	Swig/fragment.$(OBJEXT) Swig/getopt.$(OBJEXT) \
@@ -413,6 +413,7 @@ eswig_SOURCES = CParse/cscanner.c		\
 		DOH/void.c			\
 		Modules/allegrocl.cxx		\
 		Modules/allocate.cxx		\
+		Modules/as3.cxx		\
 		Modules/browser.cxx		\
 		Modules/cffi.cxx		\
 		Modules/chicken.cxx		\
@@ -448,7 +449,6 @@ eswig_SOURCES = CParse/cscanner.c		\
 		Modules/uffi.cxx		\
 		Modules/utils.cxx		\
 		Modules/xml.cxx			\
-		Modules/as3.cxx			\
 		Preprocessor/cpp.c		\
 		Preprocessor/expr.c		\
 		Swig/cwrap.c			\
@@ -596,6 +596,8 @@ Modules/allegrocl.$(OBJEXT): Modules/$(am__dirstamp) \
 	Modules/$(DEPDIR)/$(am__dirstamp)
 Modules/allocate.$(OBJEXT): Modules/$(am__dirstamp) \
 	Modules/$(DEPDIR)/$(am__dirstamp)
+Modules/as3.$(OBJEXT): Modules/$(am__dirstamp) \
+	Modules/$(DEPDIR)/$(am__dirstamp)
 Modules/browser.$(OBJEXT): Modules/$(am__dirstamp) \
 	Modules/$(DEPDIR)/$(am__dirstamp)
 Modules/cffi.$(OBJEXT): Modules/$(am__dirstamp) \
@@ -665,8 +667,6 @@ Modules/uffi.$(OBJEXT): Modules/$(am__dirstamp) \
 Modules/utils.$(OBJEXT): Modules/$(am__dirstamp) \
 	Modules/$(DEPDIR)/$(am__dirstamp)
 Modules/xml.$(OBJEXT): Modules/$(am__dirstamp) \
-	Modules/$(DEPDIR)/$(am__dirstamp)
-Modules/as3.$(OBJEXT): Modules/$(am__dirstamp) \
 	Modules/$(DEPDIR)/$(am__dirstamp)
 Preprocessor/$(am__dirstamp):
 	@$(MKDIR_P) Preprocessor

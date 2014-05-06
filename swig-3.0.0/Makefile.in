@@ -84,7 +84,10 @@ skip-uffi	= test -n "@SKIP_UFFI@"
 skip-r		= test -n "@SKIP_R@"
 skip-go		= test -n "@SKIP_GO@"
 skip-d		= test -n "@SKIP_D@"
+
+# AVM2 AS3 PATCH START
 skip-as3		= test -n "@SKIP_AS3@"
+# AVM2 AS3 PATCH END
 
 # Additional dependencies for some tests
 skip-gcj        = test -n "@SKIP_GCJ@"
@@ -159,8 +162,8 @@ check-versions:					\
 	check-cffi-version			\
 	check-r-version				\
 	check-go-version			\
-	check-as3-version			\
-	check-d-version
+	check-d-version			\
+	check-as3-version
 
 # all examples
 check-%-version :
@@ -199,8 +202,8 @@ check-examples:					\
 	check-cffi-examples			\
 	check-r-examples			\
 	check-go-examples			\
-	check-as3-examples			\
-	check-d-examples
+	check-d-examples			\
+	check-as3-examples
 
 tcl_examples       :=$(shell sed '/^\#/d' $(srcdir)/Examples/tcl/check.list)
 perl5_examples     :=$(shell sed '/^\#/d' $(srcdir)/Examples/perl5/check.list)
@@ -279,7 +282,8 @@ check-test-suite:				\
 	check-chicken-test-suite		\
 	check-r-test-suite			\
 	check-go-test-suite			\
-	check-d-test-suite
+	check-d-test-suite			\
+	check-as3-test-suite
 
 check-%-test-suite:
 	@if test -z "$(skip-$*)"; then					\
@@ -331,7 +335,8 @@ all-test-suite:					\
 	all-chicken-test-suite			\
 	all-r-test-suite			\
 	all-go-test-suite			\
-	all-d-test-suite
+	all-d-test-suite			\
+	all-as3-test-suite
 
 all-%-test-suite:
 	@$(MAKE) $(FLAGS) check-$*-test-suite ACTION=all
@@ -359,7 +364,8 @@ broken-test-suite:				\
 	broken-chicken-test-suite		\
 	broken-r-test-suite			\
 	broken-go-test-suite			\
-	broken-d-test-suite
+	broken-d-test-suite			\
+	broken-as3-test-suite
 
 broken-%-test-suite:
 	@$(MAKE) $(FLAGS) check-$*-test-suite ACTION=broken

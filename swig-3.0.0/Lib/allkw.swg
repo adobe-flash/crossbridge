@@ -30,7 +30,7 @@
 %include <r/rkw.swg>
 %include <ruby/rubykw.swg>
 %include <tcl/tclkw.swg>
-%include <as3/as3kw.swg>
+%include <as3/as3.swg>
 
 
 #endif //__Lib_allkw_swg__
