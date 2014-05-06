@@ -2,7 +2,7 @@ TODO
 ====
 
 * Improve OSX compatibility (10.X)
-  * /crossbridge/llvm-2.9/lib/CodeGen/ConflictGraph.h:26:10: fatal error: 'tr1/unordered_map' file not found (Using Clang 5.1.0)
+  * Fix LLVM Error: /crossbridge/llvm-2.9/lib/Transforms/Utils/CodeExtractor.cpp:728:28: error: no matching constructor for initialization of 'std::vector<BasicBlock *>'
 
 * Improve Linux compatibility of the makefiles and sources
   * Fix LLVM-GCC error: "LLVMgold.so: undefined symbol: _ZN4llvm10MCStreamer12GetCommentOSEv" [LOG](https://s3.amazonaws.com/archive.travis-ci.org/jobs/24382789/log.txt)
