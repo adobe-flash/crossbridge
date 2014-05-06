@@ -1,8 +1,8 @@
 TODO
 ====
 
-* Improve OSX compatibility (10.X)
-  * Fix LLVM Error: /crossbridge/llvm-2.9/lib/Transforms/Utils/CodeExtractor.cpp:728:28: error: no matching constructor for initialization of 'std::vector<BasicBlock *>'
+* Improve OSX compatibility of the makefiles and sources
+  * Fix LLVM error: no matching constructor for initialization of 'std::vector<BasicBlock *>' [LOG](https://s3.amazonaws.com/archive.travis-ci.org/jobs/24555698/log.txt)
 
 * Improve Linux compatibility of the makefiles and sources
   * Fix LLVM-GCC error: "LLVMgold.so: undefined symbol: _ZN4llvm10MCStreamer12GetCommentOSEv" [LOG](https://s3.amazonaws.com/archive.travis-ci.org/jobs/24382789/log.txt)
