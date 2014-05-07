@@ -15,13 +15,11 @@ Install
 
 ## Windows
 
-### Getting Started
+### Bootstrap Cygwin
 
-#### Setup git to handle line endings properly in the local repository
+> "cygwin-dev.bat"
 
-> git config --local core.autocrlf false
-
-#### Start 'cygwin-dev.bat'
+> "cd $FLASCC_ROOT"
 
 ### Build a Windows only SDK.
 
@@ -30,18 +28,6 @@ Install
 ### Build Windows only SDK and package as ZIP.
 
 > "make all_win; make deliverables" 
-
-#### Notes
-
-##### Edit/duplicate cygwin.bat with the following options
-
-* Shortened Java home
-
-> set JAVA_HOME=/cygdrive/c/Progra~1/Java/jdk
-
-* Igncr in shell options
-
-> set SHELLOPTS=braceexpand:emacs:hashall:histexpand:history:igncr:interactive-comments:monitor
 
 ## Linux
 
