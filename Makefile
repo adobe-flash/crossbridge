@@ -39,13 +39,10 @@ $?DEPENDENCY_LIBPNG=libpng-1.5.7
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
 $?DEPENDENCY_LLVM=llvm-3.2
-#$?DEPENDENCY_LLVM=llvm-3.4
-$?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-4.0
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_SDL=SDL-1.2.14
-#$?DEPENDENCY_SWIG=swig-2.0.4
 $?DEPENDENCY_SWIG=swig-3.0.0
 $?DEPENDENCY_SWIG_PCRE=pcre-8.20
 $?DEPENDENCY_ZLIB=zlib-1.2.5
@@ -233,7 +230,7 @@ BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk
 # ALL TARGET
 # ====================================================================================
 BUILDORDER= cmake abclibs basictools llvm binutils plugins bmake stdlibs as3xx as3wig abcstdlibs
-BUILDORDER+= sdkcleanup tr trd extralibs extratools finalcleanup submittests
+BUILDORDER+= sdkcleanup tr trd extratools extralibs finalcleanup submittests
 
 all:
 	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
@@ -283,19 +280,14 @@ continuous:
 nightly:
 	rm -rf $(CCACHE_DIR)
 	$(MAKE) clean
-	$(MAKE) clean_libs
 	$(MAKE) all
-	$(MAKE) all_tests
+	@$(SDK)/usr/bin/make llvmtests
+	@$(SDK)/usr/bin/make swigtests
+	#$(SDK)/usr/bin/make checkasm
 
 # Weekly tests
 weekly:
 	$(MAKE) nightly
-
-# tests not in submittests target
-all_tests:
-	@$(SDK)/usr/bin/make llvmtests
-	@$(SDK)/usr/bin/make swigtests
-	#$(SDK)/usr/bin/make checkasm
 
 # We are ignoring some target errors because of issues with documentation generation
 all_ci:
@@ -320,19 +312,16 @@ all_ci:
 	@$(SDK)/usr/bin/make sdkcleanup
 	@$(SDK)/usr/bin/make tr
 	@$(SDK)/usr/bin/make trd
-	@$(SDK)/usr/bin/make extralibs
 	@$(SDK)/usr/bin/make extratools
-	@$(SDK)/usr/bin/make -i finalcleanup
+	@$(SDK)/usr/bin/make extralibs
+	@$(SDK)/usr/bin/make finalcleanup
 	@$(SDK)/usr/bin/make submittests
-
-# Used to debug specific target
-all_dev:
-	@$(SDK)/usr/bin/make swig
 
 # ====================================================================================
 # CORE
 # ====================================================================================
 clean:
+	$(MAKE) clean_libs
 	rm -rf $(BUILDROOT)
 	rm -rf $(SDK)
 	rm -rf $(SRCROOT)/.redo
@@ -521,7 +510,7 @@ abclibs_asdocs:
 				-package-description-file=$(call nativepath,$(SRCROOT)/test/aspackages.xml) \
 				-main-title "Crossbridge API Reference" \
 				-window-title "Crossbridge API Reference" \
-				-output apidocs &> $(BUILD)/logs/asdoc.txt
+				-output apidocs
 	if [ -d $(BUILDROOT)/tempdita ]; then rm -rf $(BUILDROOT)/tempdita; fi
 	mv $(BUILDROOT)/apidocs/tempdita $(BUILDROOT)/
 
@@ -1239,7 +1228,9 @@ libtool:
 finalcleanup:
 	rm -f $(SDK)/usr/lib/*.la
 	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/share/info
+ifneq (,$(findstring darwin,$(PLATFORM)))
 	@$(LN) ../../share $(SDK)/usr/platform/darwin/share
+endif
 	$(RSYNC) $(SRCROOT)/tools/swf-info.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/projector-dis.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/swfdink.py $(SDK)/usr/bin/
