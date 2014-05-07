@@ -40,7 +40,7 @@ set MSYS_HOME=
 :: Set CrossBridge Home
 set FLASCC_ROOT=%CD%
 :: Line endings compatibility fix (Can make errors in scripts)
-set SHELLOPTS=igncr
+:: set SHELLOPTS=igncr
 :: Trigger Cygwin Bash
 C:
 chdir C:\cygwin\bin

@@ -31,7 +31,7 @@ $?DEPENDENCY_AVMPLUS=avmplus
 $?DEPENDENCY_TAMARIN=tamarin-redux-5571cf86fc68
 #$?DEPENDENCY_AVMPLUS=$(DEPENDENCY_TAMARIN)
 $?DEPENDENCY_BINUTILS=binutils
-$?DEPENDENCY_BMAKE=bmake-20140214
+$?DEPENDENCY_BMAKE=bmake
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
 $?DEPENDENCY_DMALLOC=dmalloc-5.5.2
 $?DEPENDENCY_FFI=libffi-3.0.11
@@ -341,7 +341,7 @@ all_win:
 
 # Debug target
 all_dev:
-	@$(SDK)/usr/bin/make swig
+	@$(SDK)/usr/bin/make examples
 
 # Print debug information
 diagnostics:
@@ -379,7 +379,7 @@ docs:
 # Install packaged dependency libraries
 install_libs:
 	$(MAKE) clean_libs
-	unzip -q packages/$(DEPENDENCY_BMAKE).zip
+	tar xf packages/$(DEPENDENCY_BMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
 	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
@@ -791,10 +791,6 @@ stdlibs:
 # TBD
 csu:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/share/ -name '*.mk' -exec dos2unix {} +
-endif
 	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE) SSP_CFLAGS="" MACHINE_ARCH=avm2 crt1_c.o
 	cp -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
 
@@ -804,12 +800,6 @@ libc:
 	rm -f $(BUILD)/posix/*.o
 	mkdir -p $(BUILD)/lib/src/lib/libc/
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/lib/ -name 'Makefile.inc' -exec dos2unix {} +
-	find $(BUILD)/lib/ -name 'makefile' -exec dos2unix {} +
-endif
 	cd $(BUILD)/posix && $(PYTHON) $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
 	cp $(BUILD)/posix/IKernel.as $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
 	cp $(BUILD)/posix/ShellPosix.as $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
@@ -838,12 +828,6 @@ libthr:
 	rm -rf $(BUILD)/libthr
 	mkdir -p $(BUILD)/libthr
 	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/libthr/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/libthr/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/libthr/ -name 'Makefile.inc' -exec dos2unix {} +
-	find $(BUILD)/libthr/ -name 'makefile' -exec dos2unix {} +
-endif
 	cd $(BUILD)/libthr/libthr && $(SDK)/usr/bin/gcc -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/thrHelpers.c
 	# CWARNFLAGS= because thr_exit() can return and pthread_exit() is marked noreturn (where?)...
 	cd $(BUILD)/libthr/libthr && $(BMAKE) -j$(THREADS) SSP_CFLAGS="" MACHINE_ARCH=avm2 CWARNFLAGS= libthr.a
@@ -864,12 +848,6 @@ libm:
 	rm -rf $(BUILD)/msun/ $(BUILD)/libmbc $(SDK)/usr/lib/libm.a $(SDK)/usr/lib/libm.o
 	mkdir -p $(BUILD)/msun
 	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/msun/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/msun/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/msun/ -name 'Makefile.inc' -exec dos2unix {} +
-	dos2unix $(BUILD)/msun/msun/Makefile
-endif
 	cd $(BUILD)/msun/msun && $(BMAKE) -j$(THREADS) SSP_CFLAGS="" MACHINE_ARCH=avm2 libm.a
 	# find bitcode (and ignore non-bitcode genned from .s files) and put
 	# it in our lib
@@ -1202,11 +1180,6 @@ libreadline:
 # OpenGL-based programs must link with the libGL library. libGL implements the GLX interface as well as the main OpenGL API entrypoints. 
 libvgl:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libvgl/Makefile
-endif
 	cd $(BUILD)/lib/src/lib/libvgl && $(BMAKE) -j$(THREADS) SSP_CFLAGS="" MACHINE_ARCH=avm2 libvgl.a
 	rm -f $(SDK)/usr/lib/libvgl.a
 	$(AR) $(SDK)/usr/lib/libvgl.a $(BUILD)/lib/src/lib/libvgl/*.o
