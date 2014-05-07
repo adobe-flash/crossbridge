@@ -1,6 +1,9 @@
 TODO
 ====
 
+* Improve Windows compatibility of the makefiles and sources
+  * SWIG sometimes fail to configure: Makefile:576: recipe for target '/crossbridge/swig-3.0.0/configure' failed
+
 * Improve OSX compatibility of the makefiles and sources
 
 * Improve Linux compatibility of the makefiles and sources
