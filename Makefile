@@ -418,8 +418,8 @@ base:
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-gcc
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-g++
 
-	$(RSYNC) asc/abc/playerglobal.abc $(SDK)/usr/lib/
-	$(RSYNC) asc/abc/playerglobal.swc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/13.0/playerglobal.abc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/13.0/playerglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
 	cp -f avmplus/generated/*.abc $(SDK)/usr/lib/
 
