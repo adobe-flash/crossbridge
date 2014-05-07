@@ -1448,10 +1448,16 @@ SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modul
 swig:
 	rm -rf $(BUILD)/swig
 	mkdir -p $(BUILD)/swig
+	#unpack PCRE dependency
 	cp -f packages/pcre-8.20.tar.gz $(BUILD)/swig
+	#configure PCRE dependency
 	cd $(BUILD)/swig && $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	#initialize SWIG
+	#cd $(SRCROOT)/$(DEPENDENCY_SWIG) && ./autogen.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	#configure SWIG
 	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	cd $(BUILD)/swig && $(MAKE) -j$(THREADS) && $(MAKE) install
+	#make and install SWIG
+	cd $(BUILD)/swig && $(MAKE) && $(MAKE) install
 	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/3.0.0/$(var);)
 
 # Run SWIG Tests
@@ -1487,7 +1493,7 @@ gdb:
 	rm -rf $(BUILD)/gdb-7.3
 	mkdir -p $(BUILD)/gdb-7.3
 	cd $(BUILD)/gdb-7.3 && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/gdb-7.3/configure \
-		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=avm2-elf && $(MAKE) -j$(THREADS)
+		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=avm2-elf && $(MAKE)
 	cp -f $(BUILD)/gdb-7.3/gdb/gdb$(EXEEXT) $(SDK)/usr/bin/
 	cp -f $(SRCROOT)/tools/flascc.gdb $(SDK)/usr/share/
 	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
@@ -1501,7 +1507,7 @@ pkgconfig:
 	cd $(BUILD)/pkgconfig && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/$(DEPENDENCY_PKG_CFG)/configure \
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --disable-shared \
 		--disable-dependency-tracking
-	cd $(BUILD)/pkgconfig && $(MAKE) -j$(THREADS) && $(MAKE) install
+	cd $(BUILD)/pkgconfig && $(MAKE) && $(MAKE) install
 
 # GNU libtool is a generic library support script. 
 # Libtool hides the complexity of using shared libraries behind a consistent, portable interface. 
@@ -1511,7 +1517,7 @@ libtool:
 	cd $(BUILD)/libtool && CC=$(CC) CXX=$(CXX) $(SRCROOT)/$(DEPENDENCY_LIBTOOL)/configure \
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) \
 		--prefix=$(SDK)/usr --enable-static --disable-shared --disable-ltdl-install
-	cd $(BUILD)/libtool && $(MAKE) -j$(THREADS) && $(MAKE) install-exec
+	cd $(BUILD)/libtool && $(MAKE) && $(MAKE) install-exec
 
 # ====================================================================================
 # Submit tests
