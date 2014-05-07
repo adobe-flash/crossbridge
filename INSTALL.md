@@ -15,6 +15,14 @@ Install
 
 ## Windows
 
+### Getting Started
+
+#### Setup git to handle line endings properly in the local repository
+
+> git config --local core.autocrlf false
+
+#### Start 'cygwin-dev.bat'
+
 ### Build a Windows only SDK.
 
 > "make all_win"
