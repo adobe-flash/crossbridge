@@ -230,13 +230,7 @@ BUILDORDER+= sdkcleanup tr trd extratools extralibs finalcleanup submittests
 
 # TBD
 all:
-	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
-	@echo "User: $(UNAME)"
-	@echo "Platform: $(PLATFORM)"
-	@echo "Build: $(BUILD)"
-	@echo "Triple: $(TRIPLE)"
-	@echo "Host Triple: $(HOST_TRIPLE)"
-	@echo "Build Triple: $(BUILD_TRIPLE)"
+	$(MAKE) diagnostics
 	@echo "-  libs"
 	@$(MAKE) install_libs
 	@mkdir -p $(BUILD)/logs
@@ -289,15 +283,9 @@ weekly:
 
 # Build all with Travis CI
 # Notes: Using console output to solve hanging build issues.
-#       Ignoring some build errors but only documentation generation related.
+#        Ignoring some build errors but only documentation generation related.
 all_ci:
-	@echo "~~~ Crossbridge (CI) $(SDKNAME) ~~~"
-	@echo "User: $(UNAME)"
-	@echo "Platform: $(PLATFORM)"
-	@echo "Build: $(BUILD)"
-	@echo "Triple: $(TRIPLE)"
-	@echo "Host Triple: $(HOST_TRIPLE)"
-	@echo "Build Triple: $(BUILD_TRIPLE)"
+	$(MAKE) diagnostics
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) install_libs
 	@$(MAKE) base
@@ -325,13 +313,7 @@ all_ci:
 # Build all with Windows 
 # Notes: Ignoring some build errors but only documentation generation related
 all_win:
-	@echo "~~~ Crossbridge (Windows) $(SDKNAME) ~~~"
-	@echo "User: $(UNAME)"
-	@echo "Platform: $(PLATFORM)"
-	@echo "Build: $(BUILD)"
-	@echo "Triple: $(TRIPLE)"
-	@echo "Host Triple: $(HOST_TRIPLE)"
-	@echo "Build Triple: $(BUILD_TRIPLE)"
+	$(MAKE) diagnostics
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt 2>&1
 	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
@@ -363,6 +345,13 @@ all_dev:
 
 # Print debug information
 diagnostics:
+	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
+	@echo "User: $(UNAME)"
+	@echo "Platform: $(PLATFORM)"
+	@echo "Build: $(BUILD)"
+	@echo "Triple: $(TRIPLE)"
+	@echo "Host Triple: $(HOST_TRIPLE)"
+	@echo "Build Triple: $(BUILD_TRIPLE)"
 	@echo "ASC: $(SCOMP)"
 	@echo "ASC2: $(SCOMPFALCON)"
 	@echo "BMAKE: $(BMAKE)"
