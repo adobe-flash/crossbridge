@@ -1,9 +1,20 @@
 # [Crossbridge](www.crossbridge.io) (future branch)
 
+
+### Getting started
+
+The master branch contains all of the code necessary to build CrossBridge 1.0.1, this is the current stable version. 
+The future branch contains some work in progress to upgrade the toolchain to LLVM 3.2 and switch to using the Clang compiler instead of GCC.
+
+Both the mac and Cygwin SDKs are built on Mac, you will need XCode and some MacPorts packages installed to be able to build (pkg-config, glib, and mercurial).
+
+Doing a "make" in the root directory should be sufficient to build just the Mac SDK, doing "make; make win; make deliverables" should build both Mac and Windows and package them as DMG and ZIPs
+
 ### Goals 
+
 At present we have quite straight goal:
 
-* LLVM-Clang-3.4 toolchain 
+* LLVM-Clang-3.2 toolchain 
 * Freebsd 9.1 Environment
 * Libc++ with support of c++11 std.
 
@@ -63,7 +74,5 @@ Since the learning curve is not low, what I had were
 ###### Extra ref materials  
 
 [Overview of compiler stages](COMPILER.md)
-
-[Overview of source folders](DEVGUIDE.md)
 
 [Overview of LLVM TODOs](LLVM_UPGRADE.md)
