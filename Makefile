@@ -226,7 +226,7 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 # ALL TARGET
 # ====================================================================================
 BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
-BUILDORDER+= sdkcleanup tr trd extralibs extratools finalcleanup submittests
+BUILDORDER+= sdkcleanup tr trd extratools extralibs finalcleanup submittests
 
 # TBD
 all:
@@ -317,8 +317,8 @@ all_ci:
 	@$(SDK)/usr/bin/make sdkcleanup
 	@$(SDK)/usr/bin/make tr
 	@$(SDK)/usr/bin/make trd
-	@$(SDK)/usr/bin/make extralibs
 	@$(SDK)/usr/bin/make extratools
+	@$(SDK)/usr/bin/make extralibs
 	@$(SDK)/usr/bin/make finalcleanup
 	@$(SDK)/usr/bin/make submittests
 
@@ -351,8 +351,8 @@ all_win:
 	@$(SDK)/usr/bin/make sdkcleanup &> $(BUILD)/logs/sdkcleanup.txt 2>&1
 	@$(SDK)/usr/bin/make tr &> $(BUILD)/logs/tr.txt 2>&1
 	@$(SDK)/usr/bin/make trd &> $(BUILD)/logs/trd.txt 2>&1
-	@$(SDK)/usr/bin/make extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
 	@$(SDK)/usr/bin/make extratools &> $(BUILD)/logs/extratools.txt 2>&1
+	@$(SDK)/usr/bin/make extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
 	@$(SDK)/usr/bin/make finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
 	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt 2>&1
 	@$(SDK)/usr/bin/make samples &> $(BUILD)/logs/samples.txt 2>&1
