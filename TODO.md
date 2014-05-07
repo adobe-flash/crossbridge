@@ -2,7 +2,7 @@ TODO
 ====
 
 * Improve Windows compatibility of the makefiles and sources
-  * SWIG sometimes fail to configure running autogen.sh
+  * SWIG 3.0.X autogen.sh fails when SHELLOPTS=igncr is set
 
 * Improve OSX compatibility of the makefiles and sources
 
