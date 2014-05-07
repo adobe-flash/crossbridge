@@ -45,8 +45,8 @@ $?DEPENDENCY_MAKE=make-4.0
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_SDL=SDL-1.2.14
-$?DEPENDENCY_SWIG=swig-2.0.4
-#$?DEPENDENCY_SWIG=swig-3.0.0
+#$?DEPENDENCY_SWIG=swig-2.0.4
+$?DEPENDENCY_SWIG=swig-3.0.0
 $?DEPENDENCY_SWIG_PCRE=pcre-8.20
 $?DEPENDENCY_ZLIB=zlib-1.2.5
 
@@ -677,10 +677,6 @@ stdlibs:
 # TBD
 csu:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/share/ -name '*.mk' -exec dos2unix {} +
-endif
 	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE) crt1_c.o
 	mv -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
 
@@ -690,11 +686,6 @@ libc:
 	rm -f $(BUILD)/posix/*.o
 	mkdir -p $(BUILD)/lib/src/lib/libc/
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/lib/ -name 'Makefile.inc' -exec dos2unix {} +
-endif
 	cd $(BUILD)/posix && $(PYTHON) $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
 	cp $(BUILD)/posix/IKernel.as $(SRCROOT)/avmplus/shell
 	cp $(BUILD)/posix/ShellPosix.as $(SRCROOT)/avmplus/shell
@@ -729,11 +720,6 @@ libthr:
 	rm -rf $(BUILD)/libthr
 	mkdir -p $(BUILD)/libthr
 	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/libthr/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/libthr/ -name '*.mk' -exec dos2unix {} +
-	find $(BUILD)/libthr/ -name 'Makefile.inc' -exec dos2unix {} +
-endif
 	cd $(BUILD)/libthr/libthr && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/thrHelpers.c
 	# CWARNFLAGS= because thr_exit() can return and pthread_exit() is marked noreturn (where?)...
 	cd $(BUILD)/libthr/libthr && $(BMAKE) -j$(THREADS) CWARNFLAGS= libthr.a
@@ -761,11 +747,6 @@ libm:
 	rm -rf $(BUILD)/msun/ $(BUILD)/libmbc $(SDK)/usr/lib/libm.a $(SDK)/usr/lib/libm.o
 	mkdir -p $(BUILD)/msun
 	$(RSYNC) avm2_env/usr/src/lib/ $(BUILD)/msun/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/msun/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/msun/msun/Makefile
-endif
 	cd $(BUILD)/msun/msun && $(BMAKE) -j$(THREADS) libm.a
 	# find bitcode (and ignore non-bitcode genned from .s files) and put
 	# it in our lib
@@ -795,11 +776,6 @@ libBlocksRuntime:
 
 libcxx: libsupcxx libgcceh
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libc++/Makefile
-endif
 	cd $(BUILD)/lib/src/lib/libc++ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libc++.a
 	cd $(BUILD)/lib/src/lib/libc++ && $(AR) libc++.a *.o && mv libc++.a $(SDK)/usr/lib/.
 
@@ -811,43 +787,23 @@ libcxx.abc:
 
 libsupcxx:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libsupc++/Makefile
-endif
 	cd $(BUILD)/lib/src/lib/libsupc++/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libsupc++.a
 	cd $(BUILD)/lib/src/lib/libsupc++/ && $(SDK)/usr/bin/llvm-link -o libsupc++.o *.o && mv libsupc++.o ../libc++
 
 libgcceh:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libgcceh/Makefile
-endif
 	cd $(BUILD)/lib/src/lib/libgcceh/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libgcceh.a
 	cd $(BUILD)/lib/src/lib/libgcceh/ && $(SDK)/usr/bin/llvm-link -o libgcceh.o *.o && mv libgcceh.o ../libc++
 
 # TBD
 libunwind:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libunwind/Makefile
-endif
 	cd $(BUILD)/lib/src/lib/libunwind/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libunwind.a
 	cd $(BUILD)/lib/src/lib/libunwind/ && $(SDK)/usr/bin/llvm-link -o libunwind.o *.o && mv libunwind.o ../libc++
 
 # TBD
 libcxxrt:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libcxxrt/Makefile
-endif
 	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(BMAKE) clean && $(BMAKE) -j$(THREADS) libcxxrt.a
 	cd $(BUILD)/lib/src/lib/libcxxrt/ && $(SDK)/usr/bin/llvm-link -o libcxxrt.o *.o && mv libcxxrt.o ../libc++
 
@@ -855,11 +811,6 @@ endif
 # TODO: Solve build error
 libcxxabi:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libc++abi/Makefile
-endif
 	cd $(BUILD)/lib/src/lib/libc++abi/ && $(BMAKE) clean && $(BMAKE) libc++abi.a
 	cd $(BUILD)/lib/src/lib/libc++abi/ && $(SDK)/usr/bin/llvm-link -o libc++abi.o *.o && mv libc++abi.o ../libc++
 
@@ -1021,11 +972,6 @@ zlib:
 # Library VGL
 libvgl:
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
-# Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	find $(BUILD)/lib/ -name '*.mk' -exec dos2unix {} +
-	dos2unix $(BUILD)/lib/src/lib/libvgl/Makefile
-endif
 	cd $(BUILD)/lib/src/lib/libvgl && $(BMAKE) -j$(THREADS) libvgl.a
 	rm -f $(SDK)/usr/lib/libvgl.a
 	$(AR) $(SDK)/usr/lib/libvgl.a $(BUILD)/lib/src/lib/libvgl/*.o
