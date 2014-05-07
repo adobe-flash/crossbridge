@@ -341,6 +341,8 @@ all_win:
 
 # Debug target
 all_dev:
+	@$(SDK)/usr/bin/make submittests
+	@$(SDK)/usr/bin/make swigtests
 	@$(SDK)/usr/bin/make examples
 
 # Print debug information
