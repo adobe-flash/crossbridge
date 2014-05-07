@@ -24,4 +24,8 @@ N: Andras Csizmadia
 E: andras@vpmedia.hu
 W: https://github.com/vpmedia
 
+N: Vladislav Kolotvin
+E: vlad.kolotvin@gmail.com
+W: https://github.com/cruelbob
+
 .. Add Your Details Here! ..
