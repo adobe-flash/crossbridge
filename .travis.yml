@@ -4,12 +4,23 @@ notifications:
 git: 
     depth: 1
 
+# OSX Host Switch
 language: objective-c
 
+compiler: 
+  - gcc
+  - clang
+
+# OSX Packages
 before_install:
     - brew update
+
+# Linux Packages
+#before_install:
+#  - sudo apt-get update
+#  - sudo apt-get install uuid-dev
 
 before_script:
     - chmod -R +x .
 
-script: make -j1 all_ci
+script: make all_ci
