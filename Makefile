@@ -38,7 +38,7 @@ $?DEPENDENCY_LIBOGG=libogg-1.3.0
 $?DEPENDENCY_LIBPNG=libpng-1.5.7
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
-$?DEPENDENCY_LLVM=llvm-3.2
+$?DEPENDENCY_LLVM=llvm-3.3
 $?DEPENDENCY_MAKE=make-4.0
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SCIMARK=scimark2_1c
@@ -316,6 +316,10 @@ all_ci:
 	@$(SDK)/usr/bin/make extralibs
 	@$(SDK)/usr/bin/make finalcleanup
 	@$(SDK)/usr/bin/make submittests
+
+# Development
+all_dev:
+	@$(SDK)/usr/bin/make llvm
 
 # ====================================================================================
 # CORE

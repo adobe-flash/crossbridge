@@ -255,13 +255,13 @@ private:
     }
 
 public:
-    AVM2MCAsmStreamer(StreamerKind Kind, MCContext &Context,
+    AVM2MCAsmStreamer(MCContext &Context,
                       formatted_raw_ostream &os,
                       bool isVerboseAsm, bool useLoc,
                       MCInstPrinter *printer,
                       MCCodeEmitter *emitter,
                       bool showInst, formatted_raw_ostream *os2 = NULL)
-        : AVM2MCStreamer(Kind, Context), LC(os), OS(LC), OS2(os2), MAI(Context.getAsmInfo()),
+        : AVM2MCStreamer(Context), LC(os), OS(LC), OS2(os2), MAI(Context.getAsmInfo()),
           InstPrinter(printer), Emitter(emitter), CommentStream(CommentToEmit),
           IsVerboseAsm(false), ShowInst(showInst), TextSection(NULL), Observer(NULL), LastSymbolWeakened(NULL), useSecondStream(false), InFn(false) {
         if (InstPrinter && IsVerboseAsm) {
@@ -378,8 +378,17 @@ public:
     /// @name MCStreamer Interface
     /// @{
 
-    virtual void ChangeSection(const MCSection *Section);
+    virtual void ChangeSection(const MCSection *Section, const MCExpr *);
+    
     virtual void InitSections() {}
+    
+    virtual void InitToTextSection() {}
+    
+    virtual void EmitBundleAlignMode(unsigned AlignPow2) {}
+
+    virtual void EmitBundleLock(bool AlignToEnd) {}
+
+    virtual void EmitBundleUnlock() {}
 
     virtual void EmitLabel(MCSymbol *Symbol);
 
@@ -494,7 +503,7 @@ class AVM2MCABCStreamer : public AVM2MCAsmStreamer
 
     
 public:
-    AVM2MCABCStreamer(StreamerKind Kind, MCContext &Context,
+    AVM2MCABCStreamer(MCContext &Context,
                       bool _deleteTmps,
                       raw_ostream &os,
                       formatted_raw_ostream *fos1,
@@ -505,7 +514,7 @@ public:
                       MCInstPrinter *printer,
                       MCCodeEmitter *emitter,
                       bool showInst)
-        : AVM2MCAsmStreamer(Kind, Context, *fos1, isVerboseAsm, useLoc, printer, emitter, showInst, fos2)
+        : AVM2MCAsmStreamer(Context, *fos1, isVerboseAsm, useLoc, printer, emitter, showInst, fos2)
         , deleteTmps(_deleteTmps)
         , objout(os)
         , FOS1(fos1)
@@ -669,7 +678,7 @@ void AVM2MCAsmStreamer::EmitCommentsAndEOL()
     CommentStream.resync();
 }
 
-void AVM2MCAsmStreamer::ChangeSection(const MCSection *Section)
+void AVM2MCAsmStreamer::ChangeSection(const MCSection *Section, const MCExpr *)
 {
     assert(Section && "Cannot switch to a null section!");
 
@@ -679,9 +688,9 @@ void AVM2MCAsmStreamer::EmitLabel(MCSymbol *Symbol)
 {
     assert(Symbol->isUndefined() && "Cannot define a symbol twice!");
     assert(!Symbol->isVariable() && "Cannot emit a variable symbol!");
-    assert(getCurrentSection() && "Cannot emit before setting section!");
+    assert(getCurrentSection().first && "Cannot emit before setting section!");
 
-    const MCSection *Sect = getCurrentSection();
+    const MCSection *Sect = getCurrentSection().first;
 
     if(Sect->getKind().isText()) {
 		unsigned lineNo = getCurrentLineNo();
@@ -725,7 +734,7 @@ void AVM2MCAsmStreamer::EmitLabel(MCSymbol *Symbol)
             assert(TextSection == Sect && "only support one text section!");
         }
     } else {
-        unsigned Offs = Sections[getCurrentSection()].DataStr.length();
+        unsigned Offs = Sections[getCurrentSection().first].DataStr.length();
         Symbol->setSection(*Sect);
 		Symbol2Value[Symbol] = Offs;
 	    GetOS() << "// " << *Symbol << "\n";
@@ -831,7 +840,7 @@ void AVM2MCAsmStreamer::EmitLocalCommonSymbol(MCSymbol *Symbol, uint64_t Size,
 void AVM2MCAsmStreamer::EmitZerofill(const MCSection *Section, MCSymbol *Symbol,
                                      uint64_t Size, unsigned ByteAlignment)
 {
-    const MCSection *OldSect = getCurrentSection();
+    const MCSection *OldSect = getCurrentSection().first;
 
     if(Section != OldSect) {
         SwitchSection(Section);
@@ -857,13 +866,13 @@ void AVM2MCAsmStreamer::EmitTBSSSymbol(const MCSection *Section,
 
 void AVM2MCAsmStreamer::EmitBytes(StringRef Data, unsigned AddrSpace)
 {
-    assert(getCurrentSection() && "Cannot emit contents before setting section!");
+    assert(getCurrentSection().first && "Cannot emit contents before setting section!");
     if (Data.empty()) {
         return;
     }
 
     std::string str = Data.str();
-    Sections[getCurrentSection()].DataStr += str;
+    Sections[getCurrentSection().first].DataStr += str;
     if(verboseAsm)
     {
         GetOS() << "// EmitBytes\n";
@@ -948,7 +957,7 @@ void AVM2MCAsmStreamer::printFQExpr(formatted_raw_ostream &O, const MCExpr *e, A
 void AVM2MCAsmStreamer::EmitValueImpl(const MCExpr *Value, unsigned Size,
                                       unsigned AddrSpace)
 {
-    assert(getCurrentSection() && "Cannot emit contents before setting section!");
+    assert(getCurrentSection().first && "Cannot emit contents before setting section!");
     assert(AddrSpace == 0);
     assert(getContext().getAsmInfo().isLittleEndian());
 
@@ -958,7 +967,7 @@ void AVM2MCAsmStreamer::EmitValueImpl(const MCExpr *Value, unsigned Size,
         GetOS() << "/* value: (" << *Value << ") size: " << Size << " */\n";
     }
 
-    std::string &DataStr = Sections[getCurrentSection()].DataStr;
+    std::string &DataStr = Sections[getCurrentSection().first].DataStr;
     int64_t IntValue;
     if (Value->EvaluateAsAbsolute(IntValue)) {
         if (verboseAsm) {
@@ -986,7 +995,7 @@ void AVM2MCAsmStreamer::EmitValueImpl(const MCExpr *Value, unsigned Size,
 
     Fixups.resize(Fixups.size()+1);
     Fixup &F = Fixups.back();
-    F.Sect = getCurrentSection();
+    F.Sect = getCurrentSection().first;
     F.Offs = DataStr.length();
     F.Size = Size;
     F.Expr = Value;
@@ -1027,8 +1036,8 @@ void AVM2MCAsmStreamer::EmitValueToAlignment(unsigned ByteAlignment,
         unsigned ValueSize,
         unsigned MaxBytesToEmit)
 {
-    unsigned &DataAlign = Sections[getCurrentSection()].DataAlign;
-    std::string &DataStr = Sections[getCurrentSection()].DataStr;
+    unsigned &DataAlign = Sections[getCurrentSection().first].DataAlign;
+    std::string &DataStr = Sections[getCurrentSection().first].DataStr;
 
     if(ByteAlignment > DataAlign) {
         DataAlign = ByteAlignment;
@@ -1063,7 +1072,7 @@ void AVM2MCAsmStreamer::AddEncodingComment(const MCInst &Inst) {}
 void AVM2MCAsmStreamer::EmitInstruction(const MCInst &Inst)
 {
 	assert(false && "don't think this should get called for us...");
-    assert(getCurrentSection() && "Cannot emit contents before setting section!");
+    assert(getCurrentSection().first && "Cannot emit contents before setting section!");
 
     // Show the encoding in a comment if we have a code emitter.
     if (Emitter) {

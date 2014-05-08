@@ -37,7 +37,7 @@ static const char AdobeInternalCode[] __attribute__((used)) = "This File contain
 using namespace llvm;
 
 AVM2InstrInfo::AVM2InstrInfo(AVM2Subtarget &ST)
-    : TargetInstrInfoImpl(AVM2::ADJCALLSTACKDOWN, AVM2::ADJCALLSTACKUP),
+    : AVM2GenInstrInfo(AVM2::ADJCALLSTACKDOWN, AVM2::ADJCALLSTACKUP),
       Subtarget(ST),
       RI(ST, *this)
 {

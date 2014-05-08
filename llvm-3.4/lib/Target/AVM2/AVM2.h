@@ -33,6 +33,7 @@
 #include "llvm/MC/MCAsmBackend.h"
 #include "llvm/MC/MCInstrInfo.h"
 #include "llvm/MC/MCSubtargetInfo.h"
+#include "llvm/MC/MachineTarget.h"
 #include "llvm/CodeGen/ValueTypes.h"
 
 #include <iosfwd>

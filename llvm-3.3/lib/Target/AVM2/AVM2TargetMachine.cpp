@@ -109,7 +109,8 @@ public:
       disablePass(&BranchFolderPassID);
       disablePass(&TailDuplicateID);
       disablePass(&MachineBlockPlacementID);
-      disablePass(&CodePlacementOptID);
+      // TODO: Implement or Deprecated ? VPMedia
+      //disablePass(&CodePlacementOptID);
       disablePass(&MachineCopyPropagationID);
     } 
   }
@@ -209,7 +210,8 @@ void AVM2PassConfig::addOptimizedRegAlloc(FunctionPass *RegAllocPass) {
     addPass(RegAllocPass);
     printAndVerify("after Register Allocation");
   } else {
-    addPass(createVirtRegReductionPass());
+    // TODO: Implement or Deprecated ? - VPmedia
+    //addPass(createVirtRegReductionPass());
     printAndVerify("after Register reduction");
   }
   printAndVerify("After Register Allocation, before rewriter");
@@ -227,8 +229,9 @@ void AVM2PassConfig::addOptimizedRegAlloc(FunctionPass *RegAllocPass) {
   // it can go away.  Currently, it's the intended place for targets to run
   // FinalizeMachineBundles, because passes other than MachineScheduling an
   // RegAlloc itself may not be aware of bundles.
-  if (addFinalizeRegAlloc())
-    printAndVerify("After RegAlloc finalization");
+  // TODO: Implement or Deprecated ? - VPmedia
+  //if (addFinalizeRegAlloc())
+  //  printAndVerify("After RegAlloc finalization");
 
   // Perform stack slot coloring and post-ra machine LICM.
   //

@@ -33,6 +33,7 @@
 #include "llvm/MC/MCAsmBackend.h"
 #include "llvm/MC/MCInstrInfo.h"
 #include "llvm/MC/MCSubtargetInfo.h"
+#include "llvm/MC/MachineLocation.h"
 #include "llvm/CodeGen/ValueTypes.h"
 
 #include <iosfwd>
@@ -82,7 +83,7 @@ struct AVM2MCStreamerObserver {
 class AVM2MCStreamer : public MCStreamer
 {
 public:
-    AVM2MCStreamer(StreamerKind Kind, MCContext &Context) : MCStreamer(Kind, Context) {}
+    AVM2MCStreamer(MCContext &Context) : MCStreamer(SK_AsmStreamer, Context) {}
     virtual void setObserver(AVM2MCStreamerObserver *O) = 0;
     virtual bool setUseSecondStream() = 0;
     virtual void setModulePackageName(const std::string &mn) = 0;

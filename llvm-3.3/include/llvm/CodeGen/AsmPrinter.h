@@ -410,6 +410,10 @@ namespace llvm {
     /// encoding specified.
     virtual unsigned getISAEncoding() { return 0; }
 
+    // AVM2 PATCH START
+      virtual void EmitInlineAsmProlog(const MachineInstr *MI) const { };
+    // AVM2 PATCH END
+    
     /// EmitDwarfRegOp - Emit dwarf register operation.
     virtual void EmitDwarfRegOp(const MachineLocation &MLoc) const;
 

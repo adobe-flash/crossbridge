@@ -38,40 +38,40 @@ static const char AdobeInternalCode[] __attribute__((used)) = "This File contain
 
 using namespace llvm;
 
-void AVM2FrameLowering::getInitialFrameState(std::vector<MCCFIInstruction> &Moves) const
+void AVM2FrameLowering::getInitialFrameState(std::vector<MachineMove> &Moves) const
 {
   MachineLocation Dst(MachineLocation::VirtualFP);
   MachineLocation Src(AVM2::EDP, -20); // debug frame is 5 x 32bit values
-  Moves.push_back(MCCFIInstruction(0, Dst, Src));
+  Moves.push_back(MachineMove(0, Dst, Src));
 
   {
     MachineLocation RSDst(AVM2::EDP, 0);
     MachineLocation RSSrc(AVM2::EIP);
-    Moves.push_back(MCCFIInstruction(0, RSDst, RSSrc));
+    Moves.push_back(MachineMove(0, RSDst, RSSrc));
   }
 
   {
     MachineLocation RSDst(AVM2::EDP, 4);
     MachineLocation RSSrc(AVM2::EBP);
-    Moves.push_back(MCCFIInstruction(0, RSDst, RSSrc));
+    Moves.push_back(MachineMove(0, RSDst, RSSrc));
   }
 
   {
     MachineLocation RSDst(AVM2::EDP, 8);
     MachineLocation RSSrc(AVM2::EI32);
-    Moves.push_back(MCCFIInstruction(0, RSDst, RSSrc));
+    Moves.push_back(MachineMove(0, RSDst, RSSrc));
   }
 
   {
     MachineLocation RSDst(AVM2::EDP, 12);
     MachineLocation RSSrc(AVM2::EF32);
-    Moves.push_back(MCCFIInstruction(0, RSDst, RSSrc));
+    Moves.push_back(MachineMove(0, RSDst, RSSrc));
   }
 
   {
     MachineLocation RSDst(AVM2::EDP, 16);
     MachineLocation RSSrc(AVM2::EF64);
-    Moves.push_back(MCCFIInstruction(0, RSDst, RSSrc));
+    Moves.push_back(MachineMove(0, RSDst, RSSrc));
   }
 }
 

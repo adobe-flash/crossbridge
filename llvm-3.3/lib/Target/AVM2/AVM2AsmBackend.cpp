@@ -98,7 +98,7 @@ public:
     }
 
     virtual bool fixupNeedsRelaxation(const llvm::MCFixup&, uint64_t, 
-            const llvm::MCInstFragment*, const llvm::MCAsmLayout&) const {
+            const MCRelaxableFragment *DF, const llvm::MCAsmLayout&) const {
         assert(false);
         return false;
     }

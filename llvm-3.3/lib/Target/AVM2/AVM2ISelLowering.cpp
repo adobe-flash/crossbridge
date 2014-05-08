@@ -285,7 +285,8 @@ AVM2TargetLowering::AVM2TargetLowering(TargetMachine &TM)
     // is working!
     //setOperationAction(ISD::EH_SJLJ_DISPATCHSETUP, MVT::Other, Custom);
 
-    setOperationAction(ISD::MEMBARRIER,        MVT::Other,   Expand);
+    // TODO: Makes compiler error - VPMedia (MEMBARRIER is not in ISD anymore)
+    //setOperationAction(ISD::MEMBARRIER,        MVT::Other,   Expand);
 
     for(unsigned int i=0; i<RTLIB::UNKNOWN_LIBCALL; i++) {
       const char *nm = getLibcallName((RTLIB::Libcall)i);
@@ -1061,9 +1062,10 @@ LowerCall(CallLoweringInfo &CLI, SmallVectorImpl<SDValue> &InVals) const
     SmallVector<CCValAssign, 16> RVLocs;
     CCState RVInfo(CallConv, isVarArg, DAG.getMachineFunction(), 
                    DAG.getTarget(), RVLocs, *DAG.getContext());
-    if(!RVInfo.CheckReturn(Ins, RetCC_AVM2_32)) {
+    // TODO: Refactor - Implement
+    /*if(!RVInfo.CheckReturn(Ins, RetCC_AVM2_32)) {
       report_fatal_error("Flascc does not yet support LLVM SIMD intrinsics.\n");
-    }
+    }*/
 
     for (unsigned i = 0, e = Ins.size(); i != e; ++i) {
 
@@ -1220,19 +1222,21 @@ LowerReturn(SDValue Chain,
     CCState CCInfo(CallConv, isVarArg, DAG.getMachineFunction(), 
                    DAG.getTarget(), RVLocs, *DAG.getContext());
 
-    // Analize return values.
-    if(!(CCInfo.CheckReturn(Outs, RetCC_AVM2_32))) {
-        report_fatal_error("Flascc does not yet support LLVM SIMD intrinsics.\n");
-    }
+    // Analyze return values.
+    // TODO: Implement - VPmedia
+    /*if(!(CCInfo.CheckReturn(Outs, RetCC_AVM2_32))) {
+        report_fatal_error("FlasCC does not yet support LLVM SIMD intrinsics.\n");
+    }*/    
 
+    // TODO: Implement - VPMedia
     // If this is the first return lowered for this function, add the regs to the
     // liveout set for the function.
-    if (DAG.getMachineFunction().getRegInfo().liveout_empty()) {
+    /*if (DAG.getMachineFunction().getRegInfo().liveout_empty()) {
         for (unsigned i = 0; i != RVLocs.size(); ++i)
             if (RVLocs[i].isRegLoc()) {
                 DAG.getMachineFunction().getRegInfo().addLiveOut(RVLocs[i].getLocReg());
             }
-    }
+    }*/
 
     SDValue Flag;
 

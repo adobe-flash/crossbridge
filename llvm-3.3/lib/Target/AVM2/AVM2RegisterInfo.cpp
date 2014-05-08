@@ -34,7 +34,7 @@ static const char AdobeInternalCode[] __attribute__((used)) = "This File contain
 #include "llvm/CodeGen/MachineFunction.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
 #include "llvm/Target/TargetInstrInfo.h"
-#include "llvm/Type.h"
+#include "llvm/IR/Type.h"
 #include "llvm/ADT/BitVector.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/ErrorHandling.h"
@@ -95,6 +95,7 @@ eliminateCallFramePseudoInstr(MachineFunction &MF, MachineBasicBlock &MBB,
 
 void AVM2RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
         int AVM2Adj, //int *Value,
+        unsigned FIOperandNum,
         RegScavenger *RS) const
 {
     assert(AVM2Adj == 0 && "Unexpected");

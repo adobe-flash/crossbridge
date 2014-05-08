@@ -42,7 +42,7 @@ public:
     }
 
     // http://lists.cs.uiuc.edu/pipermail/llvm-commits/Week-of-Mon-20130506/174187.html
-    void getInitialFrameState(std::vector<MCCFIInstruction> &Moves) const;
+    void getInitialFrameState(std::vector<MachineMove> &Moves) const;
 	int getFrameIndexReference(const MachineFunction &MF, int FI,
                                      unsigned &FrameReg) const;
     /// emitProlog/emitEpilog - These methods insert prolog and epilog code into

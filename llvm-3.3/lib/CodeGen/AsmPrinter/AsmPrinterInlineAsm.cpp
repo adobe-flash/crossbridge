@@ -413,6 +413,10 @@ static void EmitGCCInlineAsmStr(const char *AsmStr, const MachineInstr *MI,
 void AsmPrinter::EmitInlineAsm(const MachineInstr *MI) const {
   assert(MI->isInlineAsm() && "printInlineAsm only works on inline asms");
 
+  // AVM2 PATCH START
+  EmitInlineAsmProlog(MI);
+  // AVM2 PATCH END
+  
   // Count the number of register definitions to find the asm string.
   unsigned NumDefs = 0;
   for (; MI->getOperand(NumDefs).isReg() && MI->getOperand(NumDefs).isDef();

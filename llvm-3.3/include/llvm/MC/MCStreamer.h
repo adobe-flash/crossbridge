@@ -610,13 +610,18 @@ namespace llvm {
 
     /// \brief Ends a bundle-locked group.
     virtual void EmitBundleUnlock() = 0;
-
+        
     /// EmitRawText - If this file is backed by a assembly streamer, this dumps
     /// the specified string in the output .s file.  This capability is
     /// indicated by the hasRawTextSupport() predicate.  By default this aborts.
     virtual void EmitRawText(StringRef String);
     void EmitRawText(const Twine &String);
-
+    
+    // AVM2 PATCH START
+    virtual void EmitRawTextAsm(StringRef String);
+    void EmitRawTextAsm(const Twine &String);
+    // AVM2 PATCH END
+    
     /// ARM-related methods.
     /// FIXME: Eventually we should have some "target MC streamer" and move
     /// these methods there.
