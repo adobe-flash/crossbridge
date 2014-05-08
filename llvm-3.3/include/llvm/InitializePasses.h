@@ -220,6 +220,9 @@ void initializeProfileEstimatorPassPass(PassRegistry&);
 void initializeProfileInfoAnalysisGroup(PassRegistry&);
 void initializePathProfileInfoAnalysisGroup(PassRegistry&);
 void initializePathProfileVerifierPass(PassRegistry&);
+// AVM2 PATCH START
+void initializePhiToMemPass(PassRegistry&);
+// AVM2 PATCH END
 void initializeProfileVerifierPassPass(PassRegistry&);
 void initializePromotePassPass(PassRegistry&);
 void initializePruneEHPass(PassRegistry&);

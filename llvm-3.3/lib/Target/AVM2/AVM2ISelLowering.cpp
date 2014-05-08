@@ -1062,10 +1062,9 @@ LowerCall(CallLoweringInfo &CLI, SmallVectorImpl<SDValue> &InVals) const
     SmallVector<CCValAssign, 16> RVLocs;
     CCState RVInfo(CallConv, isVarArg, DAG.getMachineFunction(), 
                    DAG.getTarget(), RVLocs, *DAG.getContext());
-    // TODO: Refactor - Implement
-    /*if(!RVInfo.CheckReturn(Ins, RetCC_AVM2_32)) {
+    if(!RVInfo.CheckReturn(Ins, RetCC_AVM2_32)) {
       report_fatal_error("Flascc does not yet support LLVM SIMD intrinsics.\n");
-    }*/
+    }
 
     for (unsigned i = 0, e = Ins.size(); i != e; ++i) {
 
@@ -1223,10 +1222,9 @@ LowerReturn(SDValue Chain,
                    DAG.getTarget(), RVLocs, *DAG.getContext());
 
     // Analyze return values.
-    // TODO: Implement - VPmedia
-    /*if(!(CCInfo.CheckReturn(Outs, RetCC_AVM2_32))) {
+    if(!(CCInfo.CheckReturn(Outs, RetCC_AVM2_32))) {
         report_fatal_error("FlasCC does not yet support LLVM SIMD intrinsics.\n");
-    }*/    
+    }   
 
     // TODO: Implement - VPMedia
     // If this is the first return lowered for this function, add the regs to the

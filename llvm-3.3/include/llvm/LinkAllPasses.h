@@ -115,6 +115,9 @@ namespace {
       (void) llvm::createProfileMetadataLoaderPass();
       (void) llvm::createPathProfileLoaderPass();
       (void) llvm::createPromoteMemoryToRegisterPass();
+      // AVM2 PATCH START
+      (void) llvm::createDemotePhiToMemoryPass();
+      // AVM2 PATCH END
       (void) llvm::createDemoteRegisterToMemoryPass();
       (void) llvm::createPruneEHPass();
       (void) llvm::createPostDomOnlyPrinterPass();

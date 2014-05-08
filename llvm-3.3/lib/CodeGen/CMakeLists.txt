@@ -8,6 +8,7 @@ add_llvm_library(LLVMCodeGen
   CallingConvLower.cpp
   CodeGen.cpp
   CriticalAntiDepBreaker.cpp
+  ConflictGraph.cpp # AVM2 PATCH
   DFAPacketizer.cpp
   DeadMachineInstructionElim.cpp
   DwarfEHPrepare.cpp
@@ -109,6 +110,7 @@ add_llvm_library(LLVMCodeGen
   TwoAddressInstructionPass.cpp
   UnreachableBlockElim.cpp
   VirtRegMap.cpp
+  VirtRegReduction.cpp # AVM2 PATCH
   )
 
 add_dependencies(LLVMCodeGen intrinsics_gen)

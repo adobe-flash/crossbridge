@@ -81,7 +81,10 @@ void AsmPrinter::EmitInlineAsm(StringRef Str, const MDNode *LocMDNode,
   // This is useful in case the asm parser doesn't handle something but the
   // system assembler does.
   if (OutStreamer.hasRawTextSupport()) {
-    OutStreamer.EmitRawText(Str);
+    // AVM2 PATCH START
+    // OutStreamer.EmitRawText(Str);
+    OutStreamer.EmitRawTextAsm(Str);
+    // AVM2 PATCH END
     return;
   }
 

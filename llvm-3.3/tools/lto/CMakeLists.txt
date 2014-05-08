@@ -13,16 +13,22 @@ set(SOURCES
 
 set(LLVM_COMMON_DEPENDS intrinsics_gen)
 
-if( NOT WIN32 AND LLVM_ENABLE_PIC )
-  set(bsl ${BUILD_SHARED_LIBS})
-  set(BUILD_SHARED_LIBS ON)
-  add_llvm_library(LTO ${SOURCES})
-  set_property(TARGET LTO PROPERTY OUTPUT_NAME "LTO")
-  set(BUILD_SHARED_LIBS ${bsl})
-  set(LTO_STATIC_TARGET_NAME LTO_static)
-else()
-  set(LTO_STATIC_TARGET_NAME LTO)
-endif()
+# AVM2 PATCH START
+
+#if( NOT WIN32 AND LLVM_ENABLE_PIC )
+#  set(bsl ${BUILD_SHARED_LIBS})
+#  set(BUILD_SHARED_LIBS ON)
+#  add_llvm_library(LTO ${SOURCES})
+#  set_property(TARGET LTO PROPERTY OUTPUT_NAME "LTO")
+#  set(BUILD_SHARED_LIBS ${bsl})
+#  set(LTO_STATIC_TARGET_NAME LTO_static)
+#else()
+#  set(LTO_STATIC_TARGET_NAME LTO)
+#endif()
+
+set(LTO_STATIC_TARGET_NAME LTO)
+
+# AVM2 PATCH END
 
 if( NOT BUILD_SHARED_LIBS )
   add_llvm_library(${LTO_STATIC_TARGET_NAME} ${SOURCES})

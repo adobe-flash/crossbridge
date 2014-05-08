@@ -95,6 +95,20 @@ bool CCState::CheckReturn(const SmallVectorImpl<ISD::OutputArg> &Outs,
   return true;
 }
 
+// AVM2 PATCH START
+bool CCState::CheckReturn(const SmallVectorImpl<ISD::InputArg> &Outs,
+                          CCAssignFn Fn) {
+  // Determine which register each value should be copied into.
+  for (unsigned i = 0, e = Outs.size(); i != e; ++i) {
+    MVT VT = Outs[i].VT;
+    ISD::ArgFlagsTy ArgFlags = Outs[i].Flags;
+    if (Fn(i, VT, VT, CCValAssign::Full, ArgFlags, *this))
+      return false;
+  }
+  return true;
+}
+// AVM2 PATCH END
+
 /// AnalyzeReturn - Analyze the returned values of a return,
 /// incorporating info about the result values into this state.
 void CCState::AnalyzeReturn(const SmallVectorImpl<ISD::OutputArg> &Outs,

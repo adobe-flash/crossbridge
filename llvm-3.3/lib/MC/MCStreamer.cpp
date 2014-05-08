@@ -595,6 +595,18 @@ void MCStreamer::EmitRawText(const Twine &T) {
   EmitRawText(Str.str());
 }
 
+// AVM2 PATCH START
+void MCStreamer::EmitRawTextAsm(StringRef String) {
+  EmitRawText(String);
+}
+
+void MCStreamer::EmitRawTextAsm(const Twine &T) {
+  SmallString<128> Str;
+  T.toVector(Str);
+  EmitRawTextAsm(Str.str());
+}
+// AVM2 PATCH END
+
 void MCStreamer::EmitFrames(bool usingCFI) {
   if (!getNumFrameInfos())
     return;

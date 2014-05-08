@@ -204,7 +204,7 @@ if( MSVC )
   endif (LLVM_ENABLE_WERROR)
 elseif( LLVM_COMPILER_IS_GCC_COMPATIBLE )
   if (LLVM_ENABLE_WARNINGS)
-    append("-Wall -W -Wno-unused-parameter -Wwrite-strings" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
+    append("-Wall -W -Wno-unused-parameter" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
 
     # Turn off missing field initializer warnings for gcc to avoid noise from
     # false positives with empty {}. Turn them on otherwise (they're off by

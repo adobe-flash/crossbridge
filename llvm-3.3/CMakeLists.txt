@@ -412,6 +412,10 @@ add_subdirectory(include/llvm)
 
 add_subdirectory(lib)
 
+# AVM2 PATCH START
+add_subdirectory(utils/fpcmp)
+# AVM2 PATCH END
+
 add_subdirectory(utils/FileCheck)
 add_subdirectory(utils/FileUpdate)
 add_subdirectory(utils/count)

@@ -554,6 +554,11 @@ namespace llvm {
   /// UnpackMachineBundles - This pass unpack machine instruction bundles.
   extern char &UnpackMachineBundlesID;
 
+  // AVM2 PATCH START
+  /// SEP virtual register reduction pass
+  FunctionPass *createVirtRegReductionPass();
+  // AVM2 PATCH END
+  
   /// FinalizeMachineBundles - This pass finalize machine instruction
   /// bundles (created earlier, e.g. during pre-RA scheduling).
   extern char &FinalizeMachineBundlesID;

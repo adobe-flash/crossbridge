@@ -50,13 +50,13 @@ if( NOT WIN32 )
   add_subdirectory(lto)
 endif()
 
-if( LLVM_ENABLE_PIC )
+#if( LLVM_ENABLE_PIC )
   # TODO: support other systems:
-  if( (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-      OR (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD") )
+#  if( (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+#      OR (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD") )
     add_subdirectory(gold)
-  endif()
-endif()
+#  endif()
+#endif()
 
 add_llvm_external_project(clang)
 add_llvm_external_project(lld)

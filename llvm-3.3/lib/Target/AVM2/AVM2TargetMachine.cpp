@@ -210,8 +210,7 @@ void AVM2PassConfig::addOptimizedRegAlloc(FunctionPass *RegAllocPass) {
     addPass(RegAllocPass);
     printAndVerify("after Register Allocation");
   } else {
-    // TODO: Implement or Deprecated ? - VPmedia
-    //addPass(createVirtRegReductionPass());
+    addPass(createVirtRegReductionPass());
     printAndVerify("after Register reduction");
   }
   printAndVerify("After Register Allocation, before rewriter");

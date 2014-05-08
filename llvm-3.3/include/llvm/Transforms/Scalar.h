@@ -165,6 +165,16 @@ Pass *createLoopIdiomPass();
 //
 FunctionPass *createPromoteMemoryToRegisterPass();
 
+// AVM2 PATCH START
+//===----------------------------------------------------------------------===//
+//
+// DemotePhiToMemoryPass - This pass is used to demote PHIs to memory
+// references.
+//
+FunctionPass *createDemotePhiToMemoryPass();
+extern char &DemotePhiToMemoryID;
+// AVM2 PATCH END
+
 //===----------------------------------------------------------------------===//
 //
 // DemoteRegisterToMemoryPass - This pass is used to demote registers to memory
