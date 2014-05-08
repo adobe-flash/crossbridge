@@ -320,41 +320,6 @@ This work is unfinished and mostly unstable. Some changes are questionable and w
 * Estimate: 1 days
 * Status: In progress
 * Relates to CB-0010
-* Exception:
-
-> /cygdrive/f/crossbridge/llvm-3.2/projects/test-suite/RunSafely.sh: line 129: /cygdrive/f/crossbridge/build/win/llvm-tests/projects/test-suite/tools/timeit-target: No such file or directory
-
-> grep: Output/burg.out-nat.time: No such file or directory
-
-> TEST Output/burg.native FAILED: CAN'T GET EXIT CODE!
-
-> grep "^user" Output/burg.out-nat.time >> Output/burg.nightly.nat.report.txt
-
-> grep: Output/burg.out-nat.time: No such file or directory
-
-> /cygdrive/f/crossbridge/llvm-3.2/projects/test-suite/TEST.nightly.Makefile:51: recipe for target 'Output/burg.nightly.nat.report.txt' failed
-
-> make[3]: [Output/burg.nightly.nat.report.txt] Error 2 (ignored)
-
-> make[3]: *** No rule to make target 'Output/be.bc', needed by 'Output/burg.linked.rbc'.  Stop.
-
-> make[3]: Leaving directory '/cygdrive/f/crossbridge/build/win/llvm-tests/projects/test-suite/MultiSource/Applications/Burg'
-
-> /cygdrive/f/crossbridge/llvm-3.2/projects/test-suite/Makefile.rules:568: recipe for target 'Burg/.maketest' failed
-
-> make[2]: *** [Burg/.maketest] Error 2
-
-> make[2]: Leaving directory '/cygdrive/f/crossbridge/build/win/llvm-tests/projects/test-suite/MultiSource/Applications'
-
-> /cygdrive/f/crossbridge/llvm-3.2/projects/test-suite/Makefile.rules:568: recipe for target 'Applications/.maketest' failed
-
-> make[1]: *** [Applications/.maketest] Error 2
-
-> make[1]: Leaving directory '/cygdrive/f/crossbridge/build/win/llvm-tests/projects/test-suite/MultiSource'
-
-> Makefile:599: recipe for target 'llvmtests' failed
-
-> make: *** [llvmtests] Error 2
 
 ## CB-0017
 * Description: Cannot build lib DMalloc
@@ -368,14 +333,6 @@ This work is unfinished and mostly unstable. Some changes are questionable and w
 * Estimate: 1 days
 * Status: In progress
 * Relates to CB-0004
-* Exception: 
-
-> config.status: creating Makefile
-> awk: ./confMGZtSm/subs.awk:1: BEGIN {\r
-> awk: ./confMGZtSm/subs.awk:1:        ^ backslash not last character on line
-> awk: ./confMGZtSm/subs.awk:1: BEGIN {\r
-> awk: ./confMGZtSm/subs.awk:1:        ^ syntax error
-> config.status: error: could not create Makefile
 
 ## CB-0019
 * Description: Cannot build lib FFI
@@ -401,14 +358,6 @@ This work is unfinished and mostly unstable. Some changes are questionable and w
 * Estimate: 1 days
 * Status: In progress
 * Relates to CB-0004
-* Exception: 
-
-> config.status: creating Makefile
-> awk: ./confMGZtSm/subs.awk:1: BEGIN {\r
-> awk: ./confMGZtSm/subs.awk:1:        ^ backslash not last character on line
-> awk: ./confMGZtSm/subs.awk:1: BEGIN {\r
-> awk: ./confMGZtSm/subs.awk:1:        ^ syntax error
-> config.status: error: could not create Makefile
 
 ## CB-0022
 * Description: Cannot build lib libcxxabi
@@ -425,4 +374,4 @@ This work is unfinished and mostly unstable. Some changes are questionable and w
 * Status: In progress
 * Exception: 
 
-> Related mostly due changes in std:sys::Path (removed)
+> Related mostly due changes in std:sys::Path

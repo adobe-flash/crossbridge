@@ -1265,8 +1265,11 @@ public:
     Printf(f_module, "%s", f_proxy_classes);
     Printf(f_module, "} /* package */\n");
     
-    Close(f_module);
-    Close(f_begin);
+    //Close(f_module);
+    //Close(f_begin);
+    Delete(f_module);
+    Delete(f_begin);
+    
     Delete(f_func_class);
     Delete(module_name);
     Delete(as_class);
