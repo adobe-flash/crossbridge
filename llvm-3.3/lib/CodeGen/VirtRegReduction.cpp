@@ -1,6 +1,6 @@
 //===-- VirtRegReduction.cpp - Virtual register reduction -----------===//
 
-#include "llvm/Function.h"
+#include "llvm/IR/Function.h"
 #include "llvm/CodeGen/LiveIntervalAnalysis.h"
 #include "llvm/CodeGen/MachineFunctionPass.h"
 #include "llvm/CodeGen/MachineRegisterInfo.h"

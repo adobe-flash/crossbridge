@@ -37,7 +37,7 @@ macro(add_llvm_library name)
 endmacro(add_llvm_library name)
 
 macro(add_llvm_loadable_module name)
-  if( NOT LLVM_ON_UNIX OR CYGWIN )
+  if( NOT LLVM_ON_UNIX )
     message(STATUS "Loadable modules not supported on this platform.
 ${name} ignored.")
     # Add empty "phony" target

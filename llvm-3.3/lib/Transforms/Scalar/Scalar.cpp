@@ -50,6 +50,9 @@ void llvm::initializeScalarOpts(PassRegistry &Registry) {
   initializeLowerAtomicPass(Registry);
   initializeLowerExpectIntrinsicPass(Registry);
   initializeMemCpyOptPass(Registry);
+  // AVM2 PATCH START
+  initializePhiToMemPass(Registry);
+  // AVM2 PATCH END
   initializeReassociatePass(Registry);
   initializeRegToMemPass(Registry);
   initializeSCCPPass(Registry);

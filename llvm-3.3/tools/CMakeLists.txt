@@ -46,9 +46,10 @@ add_subdirectory(llvm-symbolizer)
 add_subdirectory(obj2yaml)
 add_subdirectory(yaml2obj)
 
-if( NOT WIN32 )
+# AVM2 PATCH START
+#if( NOT WIN32 )
   add_subdirectory(lto)
-endif()
+#endif()
 
 #if( LLVM_ENABLE_PIC )
   # TODO: support other systems:
@@ -57,6 +58,7 @@ endif()
     add_subdirectory(gold)
 #  endif()
 #endif()
+# AVM2 PATCH END
 
 add_llvm_external_project(clang)
 add_llvm_external_project(lld)

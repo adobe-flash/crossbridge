@@ -21,6 +21,7 @@ add_llvm_library(LLVMScalarOpts
   LoopUnswitch.cpp
   LowerAtomic.cpp
   MemCpyOptimizer.cpp
+  Phi2Mem.cpp
   Reassociate.cpp
   Reg2Mem.cpp
   SCCP.cpp
