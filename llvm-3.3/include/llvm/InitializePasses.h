@@ -270,6 +270,9 @@ void initializeUnreachableMachineBlockElimPass(PassRegistry&);
 void initializeVerifierPass(PassRegistry&);
 void initializeVirtRegMapPass(PassRegistry&);
 void initializeVirtRegRewriterPass(PassRegistry&);
+// AVM2 PATCH START
+void initializeVirtRegReductionPass(PassRegistry&); 
+// AVM2 PATCH END
 void initializeInstSimplifierPass(PassRegistry&);
 void initializeUnpackMachineBundlesPass(PassRegistry&);
 void initializeFinalizeMachineBundlesPass(PassRegistry&);

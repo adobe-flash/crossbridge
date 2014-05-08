@@ -53,7 +53,7 @@ ${name} ignored.")
     add_library( ${name} ${libkind} ${ALL_FILES} )
     set_target_properties( ${name} PROPERTIES PREFIX "" )
 
-    llvm_config( ${name} ${LLVM_LINK_COMPONENTS} )
+    #llvm_config( ${name} ${LLVM_LINK_COMPONENTS} )
     link_system_libs( ${name} )
 
     if (APPLE)

@@ -35,8 +35,8 @@ if( LLVM_USE_INTEL_JITEVENTS )
   add_subdirectory(llvm-jitlistener)
 endif( LLVM_USE_INTEL_JITEVENTS )
 
-add_subdirectory(bugpoint)
-add_subdirectory(bugpoint-passes)
+#add_subdirectory(bugpoint)
+#add_subdirectory(bugpoint-passes)
 add_subdirectory(llvm-bcanalyzer)
 add_subdirectory(llvm-stress)
 add_subdirectory(llvm-mcmarkup)
@@ -48,16 +48,17 @@ add_subdirectory(yaml2obj)
 
 # AVM2 PATCH START
 #if( NOT WIN32 )
-  add_subdirectory(lto)
+add_subdirectory(lto)
 #endif()
 
 #if( LLVM_ENABLE_PIC )
   # TODO: support other systems:
 #  if( (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 #      OR (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD") )
-    add_subdirectory(gold)
+#  add_subdirectory(gold)
 #  endif()
 #endif()
+add_subdirectory(gold)
 # AVM2 PATCH END
 
 add_llvm_external_project(clang)

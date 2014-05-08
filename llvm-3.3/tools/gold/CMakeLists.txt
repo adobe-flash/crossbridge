@@ -4,7 +4,6 @@ set(EXPORTED_SYMBOL_FILE $(PROJ_SRC_DIR)/gold.exports)
 
 set( LLVM_LINK_COMPONENTS
   support
-  LTO
 )
 
 include_directories(${LLVM_BINUTILS_INCDIR})
@@ -14,8 +13,7 @@ add_llvm_loadable_module(LLVMgold
 )
 
 
-target_link_libraries(LLVMgold
-LTO LLVMAnalysis LLVMArchive LLVMAsmParser LLVMAsmPrinter LLVMBitReader LLVMBitWriter LLVMCodeGen LLVMCore LLVMExecutionEngine LLVMInstCombine LLVMInstrumentation LLVMInterpreter LLVMipa LLVMipo LLVMJIT LLVMLinker LLVMMC LLVMMCDisassembler LLVMMCJIT LLVMObject LLVMScalarOpts LLVMSelectionDAG LLVMSupport LLVMTarget LLVMTransformUtils LLVMX86AsmParser LLVMX86AsmPrinter LLVMX86CodeGen LLVMX86Disassembler LLVMX86Info LLVMX86Utils LLVMAVM2AsmParser LLVMAVM2Info LLVMAVM2CodeGen)
+target_link_libraries(LLVMgold LLVMAnalysis LLVMArchive LLVMAsmParser LLVMAsmPrinter LLVMBitReader LLVMBitWriter LLVMCodeGen LLVMCore LLVMExecutionEngine LLVMInstCombine LLVMInstrumentation LLVMInterpreter LLVMipa LLVMipo LLVMJIT LLVMLinker LLVMMC LLVMMCDisassembler LLVMMCJIT LLVMObject LLVMScalarOpts LLVMSelectionDAG LLVMSupport LLVMTarget LLVMTransformUtils LLVMX86AsmParser LLVMX86AsmPrinter LLVMX86CodeGen LLVMX86Disassembler LLVMX86Info LLVMX86Utils LLVMAVM2AsmParser LLVMAVM2Info LLVMAVM2CodeGen)
 if(MINGW)
   target_link_libraries(LLVMgold -lrpcrt4)
 endif()
