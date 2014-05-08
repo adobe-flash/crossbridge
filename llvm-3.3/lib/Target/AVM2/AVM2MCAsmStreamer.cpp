@@ -255,13 +255,13 @@ private:
     }
 
 public:
-    AVM2MCAsmStreamer(MCContext &Context,
+    AVM2MCAsmStreamer(StreamerKind Kind, MCContext &Context,
                       formatted_raw_ostream &os,
                       bool isVerboseAsm, bool useLoc,
                       MCInstPrinter *printer,
                       MCCodeEmitter *emitter,
                       bool showInst, formatted_raw_ostream *os2 = NULL)
-        : AVM2MCStreamer(Context), LC(os), OS(LC), OS2(os2), MAI(Context.getAsmInfo()),
+        : AVM2MCStreamer(Kind, Context), LC(os), OS(LC), OS2(os2), MAI(Context.getAsmInfo()),
           InstPrinter(printer), Emitter(emitter), CommentStream(CommentToEmit),
           IsVerboseAsm(false), ShowInst(showInst), TextSection(NULL), Observer(NULL), LastSymbolWeakened(NULL), useSecondStream(false), InFn(false) {
         if (InstPrinter && IsVerboseAsm) {
@@ -494,7 +494,7 @@ class AVM2MCABCStreamer : public AVM2MCAsmStreamer
 
     
 public:
-    AVM2MCABCStreamer(MCContext &Context,
+    AVM2MCABCStreamer(StreamerKind Kind, MCContext &Context,
                       bool _deleteTmps,
                       raw_ostream &os,
                       formatted_raw_ostream *fos1,
@@ -505,7 +505,7 @@ public:
                       MCInstPrinter *printer,
                       MCCodeEmitter *emitter,
                       bool showInst)
-        : AVM2MCAsmStreamer(Context, *fos1, isVerboseAsm, useLoc, printer, emitter, showInst, fos2)
+        : AVM2MCAsmStreamer(Kind, Context, *fos1, isVerboseAsm, useLoc, printer, emitter, showInst, fos2)
         , deleteTmps(_deleteTmps)
         , objout(os)
         , FOS1(fos1)

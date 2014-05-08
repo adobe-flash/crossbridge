@@ -44,6 +44,7 @@ public:
     UnknownArch,
 
     arm,     // ARM: arm, armv.*, xscale
+    avm2,    // Actionscript VM 2
     aarch64, // AArch64: aarch64
     hexagon, // Hexagon: hexagon
     mips,    // MIPS: mips, mipsallegrex
@@ -303,11 +304,19 @@ public:
     return getOS() == Triple::IOS;
   }
 
+  
   /// isOSDarwin - Is this a "Darwin" OS (OS X or iOS).
   bool isOSDarwin() const {
     return isMacOSX() || isiOS();
   }
 
+  /// AVM2 PATCH START
+  /// IsAVM2 - Is this a "Flash VM targeted" Env
+  bool isAVM2() const {
+    return Arch == avm2;
+  }
+  /// AVM2 PATCH END
+  
   /// \brief Tests for either Cygwin or MinGW OS
   bool isOSCygMing() const {
     return getOS() == Triple::Cygwin || getOS() == Triple::MinGW32;

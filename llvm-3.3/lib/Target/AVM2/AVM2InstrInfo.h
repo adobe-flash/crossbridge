@@ -30,6 +30,9 @@
 #include "llvm/Target/TargetInstrInfo.h"
 #include "AVM2RegisterInfo.h"
 
+#define GET_INSTRINFO_HEADER
+#include "AVM2GenInstrInfo.inc"
+
 namespace llvm
 {
 
@@ -45,7 +48,7 @@ enum {
 };
 }
 
-class AVM2InstrInfo : public TargetInstrInfoImpl
+class AVM2InstrInfo : public AVM2GenInstrInfo
 {
     const AVM2Subtarget &Subtarget;
     const AVM2RegisterInfo RI;

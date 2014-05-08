@@ -36,7 +36,6 @@
 #include "llvm/ADT/Twine.h"
 using namespace llvm;
 
-
 namespace {
     class AVM2AsmParser : public MCTargetAsmParser {
     public:

@@ -41,7 +41,7 @@ public:
         : TargetFrameLowering(TargetFrameLowering::StackGrowsDown, 16, 0), TM(tm), STI(sti) {
     }
 
-    void getInitialFrameState(std::vector<MachineMove> &Moves) const;
+    void getInitialFrameState(std::vector<MCCFIInstruction> &Moves) const;
 	int getFrameIndexReference(const MachineFunction &MF, int FI,
                                      unsigned &FrameReg) const;
     /// emitProlog/emitEpilog - These methods insert prolog and epilog code into

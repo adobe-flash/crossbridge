@@ -20,7 +20,7 @@
 //===-- AVM2TargetInfo.cpp - AVM2 Target Implementation ---------------------===//
 
 #include "AVM2.h"
-#include "llvm/Module.h"
+#include "llvm/IR/Module.h"
 #include "llvm/Support/TargetRegistry.h"
 using namespace llvm;
 

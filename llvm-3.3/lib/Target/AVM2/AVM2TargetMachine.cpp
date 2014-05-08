@@ -24,7 +24,7 @@ static const char AdobeInternalCode[] __attribute__((used)) = "This File contain
 #include "AVM2TargetAsmInfo.h"
 #include "AVM2TargetMachine.h"
 #include "AVM2.h"
-#include "llvm/Module.h"
+#include "llvm/IR/Module.h"
 #include "llvm/PassManager.h"
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Support/TargetRegistry.h"

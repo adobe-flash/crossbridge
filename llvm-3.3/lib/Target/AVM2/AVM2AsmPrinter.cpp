@@ -26,7 +26,7 @@ static const char AdobeInternalCode[] __attribute__((used)) = "This File contain
 #include "AVM2.h"
 #include "AVM2InstrInfo.h"
 #include "AVM2TargetMachine.h"
-#include "llvm/Module.h"
+#include "llvm/IR/Module.h"
 #include "llvm/CodeGen/AsmPrinter.h"
 #include "llvm/CodeGen/MachineInstr.h"
 #include "llvm/CodeGen/MachineModuleInfo.h"
@@ -1350,7 +1350,8 @@ GlobalMethodMD, WeakMD, "[Csym(\"W\", \"memset\")]\n",
         if(FunHasAS3Sig) // set up for return value
           OS << "    var _as3ReturnValue:*;\n";
 
-        FunIsNaked = Fun->getFnAttributes().hasAttribute(Attributes::Naked);
+        // Changed 27.04.2014.: was FunIsNaked = Fun->getFnAttributes().hasAttribute(Attributes::Naked);
+        FunIsNaked = Fun->getAttributes().hasAttribute(AttributeSet::FunctionIndex, Attribute::Naked);
 
         if(!TM.getSubtarget<AVM2Subtarget>().DisableDebugLines && TM.getSubtarget<AVM2Subtarget>().useInlineAsm()) {
 	  OS << "__asm(debugfile, str(\"" << getModulePackageName(M) << "\"))\n";
