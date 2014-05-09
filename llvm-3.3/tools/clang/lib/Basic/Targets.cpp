@@ -5359,6 +5359,9 @@ static TargetInfo *AllocateTarget(const std::string &T) {
   default:
     return NULL;
 
+  case llvm::Triple::avm2:
+    return new FreeBSDTargetInfo<AVM2TargetInfo>(T);
+    
   case llvm::Triple::hexagon:
     return new HexagonTargetInfo(T);
 
