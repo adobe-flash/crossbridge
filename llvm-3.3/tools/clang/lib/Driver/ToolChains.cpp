@@ -1878,11 +1878,11 @@ Tool &AVM2::SelectTool(const JobAction &JA) const {
  /* bool UseIntegratedAs = C.getArgs().hasFlag(options::OPT_integrated_as,
                                              options::OPT_no_integrated_as,
                                              IsIntegratedAssemblerDefault());*/
-  bool UseIntegratedAs = false;                           
+  bool UseIntegratedAs = ToolChain::useIntegratedAs();                           
 
   // Changed 09.05.14. VPMedia
   //Tool *&T = Tools[Key];
-  Tool *&T = ToolChain::getTool(Key);
+  Tool *T = ToolChain::getTool(Key);
   if (!T) {
     switch (Key) {
     case Action::AssembleJobClass:
