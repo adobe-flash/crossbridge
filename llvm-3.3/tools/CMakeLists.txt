@@ -20,16 +20,16 @@ add_subdirectory(llvm-nm)
 add_subdirectory(llvm-size)
 
 add_subdirectory(llvm-cov)
-add_subdirectory(llvm-prof)
+#add_subdirectory(llvm-prof)
 add_subdirectory(llvm-link)
-add_subdirectory(lli)
+#add_subdirectory(lli)
 
 add_subdirectory(llvm-extract)
 add_subdirectory(llvm-diff)
-add_subdirectory(macho-dump)
+#add_subdirectory(macho-dump)
 #add_subdirectory(llvm-objdump)
 add_subdirectory(llvm-readobj)
-add_subdirectory(llvm-rtdyld)
+#add_subdirectory(llvm-rtdyld)
 add_subdirectory(llvm-dwarfdump)
 if( LLVM_USE_INTEL_JITEVENTS )
   add_subdirectory(llvm-jitlistener)
@@ -46,20 +46,8 @@ add_subdirectory(llvm-symbolizer)
 add_subdirectory(obj2yaml)
 add_subdirectory(yaml2obj)
 
-# AVM2 PATCH START
-#if( NOT WIN32 )
 add_subdirectory(lto)
-#endif()
-
-#if( LLVM_ENABLE_PIC )
-  # TODO: support other systems:
-#  if( (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-#      OR (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD") )
-#  add_subdirectory(gold)
-#  endif()
-#endif()
 add_subdirectory(gold)
-# AVM2 PATCH END
 
 add_llvm_external_project(clang)
 add_llvm_external_project(lld)

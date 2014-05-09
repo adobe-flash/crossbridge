@@ -1864,18 +1864,21 @@ AVM2::AVM2(const Driver &D, const llvm::Triple& Triple, const ArgList &Args)
   getFilePaths().push_back(getDriver().SysRoot + "/usr/lib");
 }
 
+// Change 09.05.14. VPmedia
+// Tool &AVM2::SelectTool(const Compilation &C, const JobAction &JA, const ActionList &Inputs) const {
 /// AVM2 - tool chain which can call llc directly.
-Tool &AVM2::SelectTool(const Compilation &C, const JobAction &JA,
-                              const ActionList &Inputs) const {
+Tool &AVM2::SelectTool(const JobAction &JA) const {
   Action::ActionClass Key;
   if (getDriver().ShouldUseClangCompiler(JA))
     Key = Action::AnalyzeJobClass;
   else
     Key = JA.getKind();
 
-  bool UseIntegratedAs = C.getArgs().hasFlag(options::OPT_integrated_as,
+// TODO 09.05.14. VPmedia
+ /* bool UseIntegratedAs = C.getArgs().hasFlag(options::OPT_integrated_as,
                                              options::OPT_no_integrated_as,
-                                             IsIntegratedAssemblerDefault());
+                                             IsIntegratedAssemblerDefault());*/
+  bool UseIntegratedAs = false;                           
 
   // Changed 09.05.14. VPMedia
   //Tool *&T = Tools[Key];

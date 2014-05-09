@@ -57,6 +57,8 @@ Install
     * libuuid-devel
     * libncurses
     * libncurses-devel
+    * libxml2
+    * libxml2-devel
     * make
     * pkg-config
     * python
