@@ -33,7 +33,10 @@ static const char AdobeInternalCode[] __attribute__((used)) = "This File contain
 #include "AVM2TargetMachine.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "llvm/CodeGen/MachineRegisterInfo.h"
+
+#define GET_INSTRINFO_CTOR 
 #include "AVM2GenInstrInfo.inc"
+
 using namespace llvm;
 
 AVM2InstrInfo::AVM2InstrInfo(AVM2Subtarget &ST)

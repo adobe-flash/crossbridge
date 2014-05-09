@@ -472,8 +472,10 @@ class LLVM_LIBRARY_VISIBILITY AVM2 : public Generic_ELF {
 public:
   AVM2(const Driver &D, const llvm::Triple& Triple, const ArgList &Args);
 
-  virtual Tool &SelectTool(const Compilation &C, const JobAction &JA,
-                           const ActionList &Inputs) const;
+  // Change 09.05.14. VPmedia
+  //virtual Tool &SelectTool(const Compilation &C, const JobAction &JA, const ActionList &Inputs) const;
+  virtual Tool &SelectTool(const JobAction &JA) const;
+  
   virtual bool UseSjLjExceptions() const { return true; }
     
   virtual bool HasNativeLLVMSupport() const { return true; }

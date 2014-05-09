@@ -1877,7 +1877,9 @@ Tool &AVM2::SelectTool(const Compilation &C, const JobAction &JA,
                                              options::OPT_no_integrated_as,
                                              IsIntegratedAssemblerDefault());
 
-  Tool *&T = Tools[Key];
+  // Changed 09.05.14. VPMedia
+  //Tool *&T = Tools[Key];
+  Tool *&T = &Generic_GCC::getTool(Key);
   if (!T) {
     switch (Key) {
     case Action::AssembleJobClass:
