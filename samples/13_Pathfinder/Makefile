@@ -39,7 +39,7 @@ T13: check
 	"$(FLASCC)/usr/bin/nm" as3api.o | grep " T " | awk '{print $$3}' | sed 's/__/_/' >> exports.txt
 
 	@echo "-> Compile the AS3 wrapper class to ABC"
-	$(AS3COMPILERARGS) -abcfuture -AS3 -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) PathFinderWrapper.as
+	$(ASC2) -abcfuture -AS3 -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) PathFinderWrapper.as
 
 	@echo "\n->Now compile a SWC and demo SWF"
 	"$(FLASCC)/usr/bin/g++" -O4 -flto-api=exports.txt PathFinderWrapper.abc micropather.cpp pathfinder.cpp as3api.cpp main.cpp -emit-swc=com.renaun.flascc -o PathFinder.swc

@@ -32,12 +32,12 @@ T12: check
 
 	@echo "-------- Sample 12 --------"
 
-	$(AS3COMPILERARGS) -AS3 -strict \
+	$(ASC2) -AS3 -strict \
 		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 		AGALAssembler/*.as AGALAssembler/macro/*.as -outdir . -out AGAL
 
-	$(AS3COMPILERARGS) -AS3 -strict \
+	$(ASC2) -AS3 -strict \
 		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/CModule.abc) \
@@ -54,7 +54,7 @@ T12: check
 
 SpaceTriangle: check
 
-	$(AS3COMPILERARGS) -AS3 -strict \
+	$(ASC2) -AS3 -strict \
 		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/CModule.abc) \

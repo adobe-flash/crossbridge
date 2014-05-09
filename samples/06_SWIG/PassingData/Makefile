@@ -33,7 +33,7 @@ all: check
 	"$(FLASCC)/usr/bin/swig" -as3 -module MyLib -outdir . -includeall -ignoremissing -o MyLib_wrapper.c swig.i
 
 	@echo "-> Compile the SWIG wrapper to ABC"
-	$(AS3COMPILERARGS) -abcfuture -AS3 -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) MyLib.as
+	$(ASC2) -abcfuture -AS3 -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) MyLib.as
 	# rename the output so the compiler doesn't accidentally use both this .as file along with the .abc file we just produced
 	mv MyLib.as MyLib.as3
 

@@ -28,6 +28,7 @@
 
 # Detect host 
 $?UNAME=$(shell uname -s)
+#$(info $(UNAME))
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?unixpath=$(shell cygpath -at unix $(1))
@@ -36,10 +37,27 @@ else
 	$?unixpath=$(abspath $(1))
 endif
 
-# Common properties
-$?FLASCC:=$(FLASCC_ROOT)/sdk
-$?FLEX=$(AIR_HOME)
-$?AS3COMPILERARGS=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md 
+# CrossBridge SDK Home
+ifneq "$(wildcard $(call unixpath,$(FLASCC_ROOT)/sdk))" ""
+ $?FLASCC:=$(call unixpath,$(FLASCC_ROOT)/sdk)
+endif
+
+# Check for Adobe AIR / Apache Flex SDK Home
+ifneq "$(wildcard $(AIR_HOME))" ""
+ $(info Using Adobe AIR SDK: $(AIR_HOME))
+ $?FLEX=$(AIR_HOME)
+else ifneq "$(wildcard $(FLEX_HOME))" ""
+ $(info Using Apache Flex SDK: $(FLEX_HOME))
+ $?FLEX=$(FLEX_HOME)
+endif
+
+# Check for ASC2.jar (Adobe AIR SDK or CrossBridge SDK)
+ifneq "$(wildcard $(FLEX)/lib)" ""
+ $?ASC2=java -jar $(call nativepath,$(FLEX)/lib/asc2-cli.jar) -merge -md 
+else
+ $?ASC2=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md 
+endif
+$(info Using ASC2: $(ASC2))
 
 # Stage3D+
 $?GLS3D=$(FLASCC_ROOT)/samples/Example_GLS3D
@@ -56,10 +74,13 @@ $?SWF_SIZE=800x600
 
 # Self check
 check:
+	@echo "Validating CrossBridge SDK location: $(FLASCC)"
 	@if [ -d $(FLASCC)/usr/bin ] ; then true ; \
 	else echo "Couldn't locate FLASCC sdk directory, please invoke make with \"make FLASCC=/path/to/FLASCC/sdk ...\"" ; exit 1 ; \
 	fi
+	@echo "Validating AIR/Flex SDK location: $(FLEX)"
 	@if [ -d "$(FLEX)/bin" ] ; then true ; \
 	else echo "Couldn't locate Flex sdk directory, please invoke make with \"make FLEX=/path/to/flex  ...\"" ; exit 1 ; \
 	fi
+	@echo "ASC2: $(ASC2)"
 

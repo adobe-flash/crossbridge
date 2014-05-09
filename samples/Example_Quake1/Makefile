@@ -49,14 +49,14 @@ q1build: $(OBJS)
 	
 	cp -f sdlquake-1.0.9/Console.as $(BUILDDIR)/
 
-	cd $(BUILDDIR) && $(AS3COMPILERARGS) \
+	cd $(BUILDDIR) && $(ASC2) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \
 		Console.as 
 
-	cd $(BUILDDIR) && $(AS3COMPILERARGS) \
+	cd $(BUILDDIR) && $(ASC2) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \

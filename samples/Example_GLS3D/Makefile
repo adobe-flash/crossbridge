@@ -33,7 +33,7 @@ compile:
 	@mkdir -p install/usr/include
 	
 	@echo "Compiling libGL.as"
-	$(AS3COMPILERARGS) -md -strict -optimize -abcfuture -AS3 \
+	$(ASC2) -md -strict -optimize -abcfuture -AS3 \
 	-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 	-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 	-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \

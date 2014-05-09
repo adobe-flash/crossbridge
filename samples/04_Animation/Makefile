@@ -28,12 +28,14 @@
 
 T04: check
 	@echo "-------- Sample 4 --------"
-	$(AS3COMPILERARGS) -strict -AS3 \
+	@echo "Assembling Console.abc"
+	$(ASC2) -strict -AS3 \
 		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/CModule.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 		Console.as -outdir . -out Console
+	@echo "Assembling GameOfLife.swf"
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) $(OPT_CFLAGS) GameOfLife.cpp -symbol-abc=Console.abc -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o GameOfLife.swf $(EXTRACFLAGS)
 
 T04Debug: check

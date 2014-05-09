@@ -33,7 +33,7 @@ T07: check
 	cp "$(FLASCC)/usr/share/LSOBackingStore.as" .
 	"$(FLASCC)/usr/bin/genfs" --type=http webvfs testwebvfs
 	mv testwebvfs_manifest.as manifest.as
-	$(AS3COMPILERARGS)	-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
+	$(ASC2)	-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 				-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 				-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \
 				-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \
@@ -42,7 +42,7 @@ T07: check
 				-import $(call nativepath,$(FLASCC)/usr/lib/InMemoryBackingStore.abc) \
 				-import $(call nativepath,$(FLASCC)/usr/lib/PlayerKernel.abc) \
 				HTTPBackingStore.as LSOBackingStore.as testvfsRootFSBackingStore.as -outdir . -out VFS
-	$(AS3COMPILERARGS)	-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
+	$(ASC2)	-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 				-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 				-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \
 				-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \

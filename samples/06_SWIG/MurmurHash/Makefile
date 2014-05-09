@@ -32,7 +32,7 @@ all: check
 	"$(FLASCC)/usr/bin/swig" -as3 -module MurmurHash -outdir . -includeall -ignoremissing -o MurmurHash_wrapper.c swig.h
 
 	@echo "-> Compile the SWIG wrapper to ABC"
-	$(AS3COMPILERARGS) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) MurmurHash.as
+	$(ASC2) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) MurmurHash.as
 	# rename the output so the compiler doesn't accidentally use both this .as file along with the .abc file we just produced
 	mv MurmurHash.as MurmurHash.as3
 

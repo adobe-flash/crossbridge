@@ -31,7 +31,7 @@
 SRC=$(wildcard src/*.c)
 OBJS=$(subst .c,.o,$(SRC))
 
-AS3COMP=$(AS3COMPILERARGS) -AS3 -optimize \
+AS3COMP=$(ASC2) -AS3 -optimize \
 	-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 	-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 	-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \

@@ -58,7 +58,7 @@ swc:
 	mv Bullet.as build
 	
 	# Compile the SWIG AS3 wrappers
-	$(AS3COMPILERARGS) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) build/Bullet.as
+	$(ASC2) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) build/Bullet.as
 
 	# Compile the SWIG C++ wrappers
 	cd build && PATH="$(call unixpath,$(FLASCC)/usr/bin):$(PATH)" g++ $(BASE_CFLAGS) -DBT_USE_DOUBLE_PRECISION -I../$(BULLETDIR)/src \

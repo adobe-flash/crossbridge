@@ -32,7 +32,7 @@ all: check
 	"$(FLASCC)/usr/bin/swig" -as3 -module LodePNGLib -outdir . -includeall -ignoremissing -o LodePNGLib_wrapper.c swig.i
 
 	@echo "-> Compile the SWIG wrapper to ABC"
-	$(AS3COMPILERARGS) -abcfuture -AS3 -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) LodePNGLib.as
+	$(ASC2) -abcfuture -AS3 -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) LodePNGLib.as
 	# rename the output so the compiler doesn't accidentally use both this .as file along with the .abc file we just produced
 	mv LodePNGLib.as LodePNGLib.as3
 

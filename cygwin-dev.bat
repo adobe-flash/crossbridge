@@ -37,10 +37,11 @@ set PYTHONHOME=
 set PYTHONPATH=
 set MINGW_HOME=
 set MSYS_HOME=
+:: Convert some paths
+set AIR_HOME=%AIR_HOME:\=/%
+set FLEX_HOME=%FLEX_HOME:\=/%
 :: Set CrossBridge Home
-set FLASCC_ROOT=%CD%
-:: Line endings compatibility fix (Can make errors in scripts)
-:: set SHELLOPTS=igncr
+set FLASCC_ROOT=%CD:\=/%
 :: Trigger Cygwin Bash
 C:
 chdir C:\cygwin\bin
