@@ -435,7 +435,7 @@ ABIArgInfo AVM2ABIInfo::classifyArgumentType(QualType Ty) const {
   if (isAggregateTypeForABI(Ty)) {
     // Records with non trivial destructors/constructors should not be passed
     // by value.
-    if (isRecordWithNonTrivialDestructorOrCopyConstructor(Ty))
+    if (isRecordReturnIndirect(Ty, CGT))
       return ABIArgInfo::getIndirect(0, /*ByVal=*/false);
 
     return ABIArgInfo::getIndirect(0);
