@@ -36,8 +36,28 @@ static void llog(const char *fmt, ...)
 #endif
 
 #include <memory>
-#include <tr1/unordered_set>
-#include <tr1/unordered_map>
+
+// To avoid problem with non-clang compilers not having this macro.
+#if defined(__has_include)
+	#if __has_include(<unordered_map>)
+		#include <unordered_map>
+		#include <unordered_set>
+	#else
+		#include <tr1/unordered_map>
+		#include <tr1/unordered_set>
+		namespace std {
+			using tr1::unordered_map;
+			using tr1::unordered_set;
+		}
+	#endif
+#else
+	#include <tr1/unordered_map>
+	#include <tr1/unordered_set>
+	namespace std {
+		using tr1::unordered_map;
+		using tr1::unordered_set;
+	}
+#endif
 
 using namespace llvm;
 

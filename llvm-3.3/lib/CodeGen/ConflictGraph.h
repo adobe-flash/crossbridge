@@ -3,7 +3,23 @@
 
 #include "llvm/Support/DataTypes.h"
 
-#include <tr1/unordered_map>
+// To avoid problem with non-clang compilers not having this macro.
+#if defined(__has_include)
+	#if __has_include(<unordered_map>)
+		#include <unordered_map>
+	#else
+		#include <tr1/unordered_map>
+		namespace std {
+			using tr1::unordered_map;
+		}
+	#endif
+#else
+	#include <tr1/unordered_map>
+	namespace std {
+		using tr1::unordered_map;
+	}
+#endif
+
 #include <vector>
 
 class ConflictGraphVertex;

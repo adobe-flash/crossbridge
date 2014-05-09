@@ -8,7 +8,22 @@
 #include <alloca.h>
 #endif
 
-#include <tr1/unordered_set>
+#if defined(__has_include)
+	#if __has_include(<unordered_set>)
+		#include <unordered_set>
+	#else
+		#include <tr1/unordered_set>
+		namespace std {
+			using tr1::unordered_set;
+		}
+	#endif
+#else
+	#include <tr1/unordered_set>
+	namespace std {
+		using tr1::unordered_set;
+	}
+#endif
+
 #include <algorithm>
 
 #if defined(NDEBUG) || defined(_DEBUG)
