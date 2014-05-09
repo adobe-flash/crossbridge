@@ -1868,7 +1868,7 @@ AVM2::AVM2(const Driver &D, const llvm::Triple& Triple, const ArgList &Args)
 Tool &AVM2::SelectTool(const Compilation &C, const JobAction &JA,
                               const ActionList &Inputs) const {
   Action::ActionClass Key;
-  if (getDriver().ShouldUseClangCompiler(C, JA, getTriple()))
+  if (getDriver().ShouldUseClangCompiler(JA))
     Key = Action::AnalyzeJobClass;
   else
     Key = JA.getKind();
@@ -1889,7 +1889,7 @@ Tool &AVM2::SelectTool(const Compilation &C, const JobAction &JA,
     case Action::LinkJobClass:
       T = new tools::avm2::Link(*this); break;
     default:
-      T = &Generic_GCC::SelectTool(C, JA, Inputs);
+      T = &Generic_GCC::SelectTool(JA);
     }
   }
 
