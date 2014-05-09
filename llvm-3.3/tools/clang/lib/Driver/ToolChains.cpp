@@ -1882,7 +1882,7 @@ Tool &AVM2::SelectTool(const JobAction &JA) const {
 
   // Changed 09.05.14. VPMedia
   //Tool *&T = Tools[Key];
-  Tool *&T = &Generic_GCC::getTool(Key);
+  Tool *&T = ToolChain::getTool(Key);
   if (!T) {
     switch (Key) {
     case Action::AssembleJobClass:
@@ -1894,7 +1894,7 @@ Tool &AVM2::SelectTool(const JobAction &JA) const {
     case Action::LinkJobClass:
       T = new tools::avm2::Link(*this); break;
     default:
-      T = &Generic_GCC::SelectTool(JA);
+      T = ToolChain::SelectTool(JA);
     }
   }
 

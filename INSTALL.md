@@ -59,6 +59,9 @@ Install
     * libncurses-devel
     * libxml2
     * libxml2-devel
+    * libzip
+    * libzip2
+    * libzip-devel
     * make
     * pkg-config
     * python
