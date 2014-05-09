@@ -51,6 +51,7 @@ $?DEPENDENCY_LIBPHYSFS=physfs-2.0.2
 $?DEPENDENCY_LIBNCURSES=ncurses-5.9
 $?DEPENDENCY_LIBREADLINE=readline-6.3
 $?DEPENDENCY_LIBSNDFILE=libsndfile-1.0.25
+$?DEPENDENCY_LIBSDL=SDL-1.2.14
 $?DEPENDENCY_LIBSDLIMAGE=SDL_image-1.2.12
 $?DEPENDENCY_LIBSDLMIXER=SDL_mixer-1.2.12
 $?DEPENDENCY_LIBSDLTTF=SDL_ttf-2.0.11
@@ -401,6 +402,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBOGG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBPNG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSNDFILE).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBSDL).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSDLIMAGE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSDLMIXER).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSDLTTF).tar.gz
@@ -444,6 +446,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBOGG)
 	rm -rf $(DEPENDENCY_LIBPNG)
 	rm -rf $(DEPENDENCY_LIBSNDFILE)
+	rm -rf $(DEPENDENCY_LIBSDL)
 	rm -rf $(DEPENDENCY_LIBSDLIMAGE)
 	rm -rf $(DEPENDENCY_LIBSDLMIXER)
 	rm -rf $(DEPENDENCY_LIBSDLTTF)
@@ -1256,7 +1259,7 @@ libfreetype:
 libsdl_configure:
 	rm -rf $(SRCROOT)/cached_build/libsdl
 	mkdir -p $(SRCROOT)/cached_build/libsdl
-	cd $(SRCROOT)/cached_build/libsdl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/SDL-1.2.14/configure \
+	cd $(SRCROOT)/cached_build/libsdl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBSDL)/configure \
 		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
 		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
 		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
@@ -1285,7 +1288,7 @@ libsdl-install:
 libsdl_all:
 	rm -rf $(BUILD)/libsdl
 	mkdir -p $(BUILD)/libsdl
-	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/SDL-1.2.14/configure \
+	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBSDL)/configure \
 		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
 		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
 		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
