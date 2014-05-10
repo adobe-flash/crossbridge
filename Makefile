@@ -39,6 +39,7 @@ $?DEPENDENCY_LIBPNG=libpng-1.5.7
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.2
 $?DEPENDENCY_LLVM=llvm-3.3
+$?DEPENDENCY_LLVM_VERSION=3.3
 $?DEPENDENCY_MAKE=make-4.0
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SCIMARK=scimark2_1c
@@ -218,10 +219,10 @@ export CCACHE_DIR=$(SRCROOT)/ccache
 #TODO are we done sweeping for asm?
 #BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm"' -DSTRIP_FBSDID -D__asm__\(X...\)="\error" -D__asm\(X...\)="\error"' MAKEFLAGS="" MFLAGS="" NO_WERROR=true $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 
-#TBD
+#BMake Tool (Add -v flag to CC and CXX to verbose mode for debugging)
 BMAKE= AR="$(BIN_TRUE) ||" GENCAT=$(BIN_TRUE) RANLIB=$(BIN_TRUE)
-BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-builtin -DSTRIP_FBSDID " 
-BMAKE+= CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm -fno-builtin -DSTRIP_FBSDID "
+BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -I $(SDK)/usr/include -emit-llvm -fno-builtin -D__IEEE_LITTLE_ENDIAN -DSTRIP_FBSDID " 
+BMAKE+= CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -I $(SDK)/usr/include -emit-llvm -fno-builtin -D__IEEE_LITTLE_ENDIAN -DSTRIP_FBSDID "
 BMAKE+= MAKEFLAGS="" MFLAGS="" MK_ICONV= WITHOUT_PROFILE=
 BMAKE+= MACHINE_ARCH=avm2 MACHINE_CPUARCH=AVM2 NO_WERROR=true SSP_CFLAGS=
 BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
@@ -319,7 +320,7 @@ all_ci:
 
 # Development
 all_dev:
-	@$(SDK)/usr/bin/make llvm
+	@$(SDK)/usr/bin/make stdlibs
 
 # ====================================================================================
 # CORE
@@ -581,14 +582,21 @@ llvm:
 		-DLLVM_TARGETS_TO_BUILD="$(LLVMTARGETS)" -DLLVM_NATIVE_ARCH="avm2" -DLLVM_INCLUDE_TESTS=$(LLVMTESTS) -DLLVM_INCLUDE_EXAMPLES=OFF \
 		$(SRCROOT)/$(DEPENDENCY_LLVM) && $(MAKE) -j$(THREADS) 
 	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
+	$(MAKE) llvmcopyheaders
 ifeq ($(LLVM_ONLYLLC), false)
 	$(MAKE) llvm-install
 endif
+
+# This installs clang include headers
+llvmcopyheaders:
+	mkdir -p $(SDK)/usr/lib/clang/$(DEPENDENCY_LLVM_VERSION)/include
+	cp -f $(BUILD)/llvm-debug/lib/clang/$(DEPENDENCY_LLVM_VERSION)/include/*.* $(SDK)/usr/lib/clang/$(DEPENDENCY_LLVM_VERSION)/include
 
 # This re-build the tool chain
 llvmdev:
 	cd $(BUILD)/llvm-debug && $(MAKE) -j$(THREADS) && $(MAKE) install
 	cp $(LLVMINSTALLPREFIX)/llvm-install/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
+	$(MAKE) llvmcopyheaders
 	$(MAKE) llvm-install
 
 # This install the tool chain
@@ -685,11 +693,11 @@ libc:
 	cp $(BUILD)/posix/ShellPosixGlue.cpp $(SRCROOT)/avmplus/shell
 	cp $(BUILD)/posix/ShellPosixGlue.h $(SRCROOT)/avmplus/shell
 	cd $(SRCROOT)/avmplus/shell && $(PYTHON) ./shell_toplevel.py -config CONFIG::VMCFG_ALCHEMY_POSIX=true
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c posix.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/vgl.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -D_KERNEL -c $(SRCROOT)/avm2_env/usr/src/kern/kern_umtx.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -c $(SRCROOT)/posix/thrStubs.c
-	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/kpmalloc.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SDK)/usr/include -c posix.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SDK)/usr/include -c $(SRCROOT)/posix/vgl.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SDK)/usr/include -D_KERNEL -c $(SRCROOT)/avm2_env/usr/src/kern/kern_umtx.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SDK)/usr/include -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -c $(SRCROOT)/posix/thrStubs.c
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SDK)/usr/include -c $(SRCROOT)/posix/kpmalloc.c
 	cd $(BUILD)/posix && cp *.o $(BUILD)/lib/src/lib/libc/
 	cd $(BUILD)/lib/src/lib/libc && $(BMAKE) -j$(THREADS) libc.a
 	# find bitcode (and ignore non-bitcode genned from .s files) and put
@@ -1140,7 +1148,7 @@ SWIG_LIBS+= -lclangEdit -lclangFrontend -lclangCodeGen -lclangDriver -lclangPars
 SWIG_LIBS+= $(GCCLANGFLAG)
 # C++ Flags
 SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/
-#SWIG_CXXFLAGS+= -I$(BUILD)/llvm-debug/lib/clang/3.2/include/
+#SWIG_CXXFLAGS+= -I$(BUILD)/llvm-debug/lib/clang/$(DEPENDENCY_LLVM_VERSION)/include/
 SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/include -I$(BUILD)/llvm-debug/include 
 SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include
 SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/lib
