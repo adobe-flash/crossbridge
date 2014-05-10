@@ -466,8 +466,8 @@ public class AlcTool {
             swf.write(bos, true).close();
             zos.write(bos.toByteArray());
 
-            // TODO: 10.05.14. VPMedia: Fix Java Exception, possibly path issue or due updated ASDoc template?
-            /*File asdocsdir = new File(new File(new File(AS3Wig.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getParentFile(), "share"), "asdocs");
+            // TODO: 10.05.14. VPMedia: Add parameter to skip including docs (Fat SWC)
+            File asdocsdir = new File(new File(new File(AS3Wig.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getParentFile().getParentFile(), "share"), "asdocs");
 
             zos.putNextEntry(new ZipEntry("docs/"));
             for(File f : asdocsdir.listFiles()) {
@@ -485,7 +485,7 @@ public class AlcTool {
 
                     zos.write(b);
                  }
-            }*/
+            }
 
             zos.close();
         } else {

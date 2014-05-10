@@ -44,20 +44,20 @@ endif
 
 # Check for Adobe AIR / Apache Flex SDK Home
 ifneq "$(wildcard $(AIR_HOME))" ""
- $(info Using Adobe AIR SDK: $(AIR_HOME))
+ #$(info Using Adobe AIR SDK: $(AIR_HOME))
  $?FLEX=$(AIR_HOME)
 else ifneq "$(wildcard $(FLEX_HOME))" ""
- $(info Using Apache Flex SDK: $(FLEX_HOME))
+ #$(info Using Apache Flex SDK: $(FLEX_HOME))
  $?FLEX=$(FLEX_HOME)
 endif
 
 # Check for ASC2.jar (Adobe AIR SDK or CrossBridge SDK)
-ifneq "$(wildcard $(FLEX)/lib)" ""
+ifneq "$(wildcard $(FLEX)/lib/legacy)" ""
  $?ASC2=java -jar $(call nativepath,$(FLEX)/lib/asc2-cli.jar) -merge -md 
 else
  $?ASC2=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md 
 endif
-$(info Using ASC2: $(ASC2))
+#$(info Using ASC2: $(ASC2))
 
 # Stage3D+
 $?GLS3D=$(FLASCC_ROOT)/samples/Example_GLS3D
