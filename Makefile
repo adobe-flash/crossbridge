@@ -148,7 +148,7 @@ $?COPY_DOCS=false
 # LLVM
 # ====================================================================================
 $?LLVMASSERTIONS=OFF
-$?LLVMTESTS=ON
+$?LLVMTESTS=OFF
 $?LLVMCMAKEOPTS= 
 $?LLVMLDFLAGS=
 $?LLVMCXXFLAGS=
@@ -320,7 +320,7 @@ all_ci:
 
 # Development
 all_dev:
-	@$(SDK)/usr/bin/make stdlibs
+	@$(SDK)/usr/bin/make llvm
 
 # ====================================================================================
 # CORE
@@ -578,8 +578,8 @@ llvm:
 	mkdir -p $(BUILD)/llvm-debug
 	cd $(BUILD)/llvm-debug && LDFLAGS="$(LLVMLDFLAGS)" CFLAGS="$(LLVMCFLAGS)" CXXFLAGS="$(LLVMCXXFLAGS)" $(SDK)/usr/bin/cmake -G "Unix Makefiles" \
 		$(LLVMCMAKEOPTS) -DCMAKE_INSTALL_PREFIX=$(LLVMINSTALLPREFIX)/llvm-install -DCMAKE_BUILD_TYPE=$(LLVMBUILDTYPE) $(LLVMCMAKEFLAGS) \
-		-DLLVM_ENABLE_ASSERTIONS=$(LLVMASSERTIONS) \
-		-DLLVM_TARGETS_TO_BUILD="$(LLVMTARGETS)" -DLLVM_NATIVE_ARCH="avm2" -DLLVM_INCLUDE_TESTS=$(LLVMTESTS) -DLLVM_INCLUDE_EXAMPLES=OFF \
+		-DLLVM_ENABLE_ASSERTIONS=$(LLVMASSERTIONS) -DLLVM_ENABLE_ZLIB=OFF \
+		-DLLVM_TARGETS_TO_BUILD="$(LLVMTARGETS)" -DLLVM_NATIVE_ARCH="avm2" -DLLVM_INCLUDE_TESTS=$(LLVMTESTS) -DLLVM_BUILD_TESTS=$(LLVMTESTS) -DLLVM_INCLUDE_EXAMPLES=OFF \
 		$(SRCROOT)/$(DEPENDENCY_LLVM) && $(MAKE) -j$(THREADS) 
 	cp $(LLVMINSTALLPREFIX)/llvm-debug/bin/llc$(EXEEXT) $(SDK)/usr/bin/llc$(EXEEXT)
 	$(MAKE) llvmcopyheaders
@@ -1330,34 +1330,34 @@ conctests:
 helloswf:
 	@rm -rf $(BUILD)/helloswf
 	@mkdir -p $(BUILD)/helloswf
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/$(FLASCC_CC) -c -g -O0 $(SRCROOT)/test/hello.c -emit-llvm -o hello.bc
+	cd $(BUILD)/helloswf && $(SDK)/usr/bin/$(FLASCC_CC) -D__IEEE_LITTLE_ENDIAN -c -g -O0 $(SRCROOT)/test/hello.c -emit-llvm -o hello.bc
 	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.abc -filetype=obj
 	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.as -filetype=asm
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/$(FLASCC_CC) -emit-swf -swf-size=200x200 -O0 -g -v hello.abc -o hello.swf
+	cd $(BUILD)/helloswf && $(SDK)/usr/bin/$(FLASCC_CC) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O0 -g -v hello.abc -o hello.swf
 
 # TBD
 helloswf_opt:
 	@rm -rf $(BUILD)/helloswf_opt
 	@mkdir -p $(BUILD)/helloswf_opt
-	cd $(BUILD)/helloswf_opt && $(SDK)/usr/bin/$(FLASCC_CC) -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
+	cd $(BUILD)/helloswf_opt && $(SDK)/usr/bin/$(FLASCC_CC) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
 
 # TBD
 hellocpp_shell:
 	@rm -rf $(BUILD)/hellocpp_shell
 	@mkdir -p $(BUILD)/hellocpp_shell
-	cd $(BUILD)/hellocpp_shell && $(SDK)/usr/bin/$(FLASCC_CXX) -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
+	cd $(BUILD)/hellocpp_shell && $(SDK)/usr/bin/$(FLASCC_CXX) -D__IEEE_LITTLE_ENDIAN -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
 
 # TBD
 hellocpp_swf:
 	@rm -rf $(BUILD)/hellocpp_swf
 	@mkdir -p $(BUILD)/hellocpp_swf
-	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/$(FLASCC_CXX) -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
+	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/$(FLASCC_CXX) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
 
 # TBD
 hellocpp_swf_opt:
 	@rm -rf $(BUILD)/hellocpp_swf_opt
 	@mkdir -p $(BUILD)/hellocpp_swf_opt
-	cd $(BUILD)/hellocpp_swf_opt && $(SDK)/usr/bin/$(FLASCC_CXX) -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
+	cd $(BUILD)/hellocpp_swf_opt && $(SDK)/usr/bin/$(FLASCC_CXX) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
 
 # TBD
 as3++tests:
