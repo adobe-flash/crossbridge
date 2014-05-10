@@ -95,7 +95,7 @@
 * Description: Cannot build SWIG on windows neither with GCC or Clang
 * Estimate: 1 days
 * Status: In progress
-* Relates to CB-0010
+* Relates to CB-0021
 * Exception:
   * GCC
   
@@ -160,22 +160,17 @@
 * Description: Cannot build lib SDL
 * Estimate: 1 days
 * Status: In progress
-* Relates to CB-0004
 
 ## CB-0019
 * Description: Cannot build lib FFI
 * Estimate: 1 days
 * Status: In progress
-* Relates to CB-0004
-* Exception: 
-
-> FFI_TRAMPOLINE_SIZE undeclared here
+* Exception: FFI_TRAMPOLINE_SIZE undeclared here
 
 ## CB-0020
 * Description: Cannot build submittests
 * Estimate: 1 days
 * Status: In progress
-* Relates to CB-0004
 * Exception: 
 
 > /cygdrive/f/crossbridge/sdk/usr/bin/../../usr/lib/libthr.a: error: undefined reference to '___sys_swapcontext'
@@ -186,22 +181,15 @@
 * Description: Cannot build LLVM-3.2
 * Estimate: 1 days
 * Status: In progress
-* Exception: 
-
-> Backend is crashing ?!
+* Exception: Backend Driver is crashing ?!
 
 ## CB-0022
 * Description: Cannot build LLVM-3.3
 * Estimate: 2 days
-* Status: In progress
-* Exception: 
-
-> API Changes
+* Status: Completed
 
 ## CB-0023
 * Description: Cannot build LLVM-3.4
 * Estimate: 7 days
 * Status: In progress
-* Exception: 
-
-> Related mostly due changes in std:sys::Path
+* Exception: Related mostly due changes in std:sys::Path
