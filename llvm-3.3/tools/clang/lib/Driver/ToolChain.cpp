@@ -308,7 +308,9 @@ ToolChain::CXXStdlibType ToolChain::GetCXXStdlibType(const ArgList &Args) const{
       << A->getAsString(Args);
   }
 
-  return ToolChain::CST_Libstdcxx;
+  // AVM2 PATCH START
+  //return ToolChain::CST_Libstdcxx;
+  return ToolChain::CST_Libcxx;
 }
 
 /// \brief Utility function to add a system include directory to CC1 arguments.

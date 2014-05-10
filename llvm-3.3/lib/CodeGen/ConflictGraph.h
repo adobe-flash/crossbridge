@@ -28,7 +28,7 @@ class ConflictGraphVertex;
 class ConflictGraph
 {
 	// id => vertex
-	typedef std::tr1::unordered_map<uintptr_t, ConflictGraphVertex *> Vertices;
+	typedef std::unordered_map<uintptr_t, ConflictGraphVertex *> Vertices;
 	Vertices _vertices;
 
 public:

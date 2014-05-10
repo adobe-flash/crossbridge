@@ -33,7 +33,7 @@ static void debugFail() { *(char *)0 = 0; }
 class ConflictGraphVertex
 {
 	unsigned _color;
-	typedef std::tr1::unordered_set<const ConflictGraphVertex *> Edges;
+	typedef std::unordered_set<const ConflictGraphVertex *> Edges;
 	Edges _edges;
 
 public:
