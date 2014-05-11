@@ -7,21 +7,15 @@ git:
 # OSX Host Switch
 language: objective-c
 
-compiler: 
-  - gcc
-  - clang
-
-# OSX Packages
-before_install:
-#    - brew update
-     - brew --config
+# Set Compiler
+compiler: gcc
 
 # Linux Packages
 #before_install:
 #  - sudo apt-get update
 #  - sudo apt-get install uuid-dev
 
-before_script:
-    - chmod -R +x .
+#before_script:
+#    - chmod -R +x .
 
 script: make all_ci
