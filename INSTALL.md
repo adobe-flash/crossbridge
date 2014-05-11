@@ -79,12 +79,12 @@ Install
 
 * Use dis-assembling ABCs if you need to compare outputs: https://github.com/CyberShadow/RABCDAsm
 
-# Upgrading
+# Updating
 
 ## Adobe PlayerGlobal ASC + SWC
 
-* AIR_SDK_HOME\lib\aot\lib\avmglue.abc => \CROSSBRIDGE_SDK_HOME\tools\playerglobal\playerglobal.abc
-* AIR_SDK_HOME\frameworks\libs\player\VERSION\playerglobal.swc => \CROSSBRIDGE_SDK_HOME\tools\playerglobal\playerglobal.swc
+* AIR_SDK_HOME\lib\aot\lib\avmglue.abc => \CROSSBRIDGE_SDK_HOME\tools\playerglobal\VERSION\playerglobal.abc
+* AIR_SDK_HOME\frameworks\libs\player\VERSION\playerglobal.swc => \CROSSBRIDGE_SDK_HOME\tools\playerglobal\VERSION\playerglobal.swc
 
 ## Mozilla Tamarin ASC
 
