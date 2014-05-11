@@ -31,19 +31,15 @@ In order to compile the master branch you need Apple GCC 4.2:
 
 > "cd $FLASCC_ROOT"
 
-### Build a Windows only SDK.
-
-> "make all_win"
-
-### Build Windows only SDK and package as ZIP.
+### Build a Windows only SDK and package as ZIP.
 
 > "make all_win; make deliverables" 
 
 ## Linux
 
-### Build a Linux only SDK.
+### Build a Linux only SDK and package as ZIP.
 
-> "make"
+> "make all_win; make deliverables" 
 
 # Core Dependencies
 
@@ -61,6 +57,7 @@ In order to compile the master branch you need Apple GCC 4.2:
     * gettext-devel
     * glib
     * help2man
+    * java-jdk
     * libiconv
     * libmpfr
     * libuuid
