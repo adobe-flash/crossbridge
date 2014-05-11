@@ -73,6 +73,7 @@ $?DEPENDENCY_DEJAGNU=dejagnu-1.5
 # ====================================================================================
 # HOST PLATFORM OPTIONS
 # ====================================================================================
+# Windows or OSX or Linux
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
@@ -108,7 +109,10 @@ endif
 # ====================================================================================
 # TARGET PLATFORM OPTIONS
 # ====================================================================================
+# Windows
 ifneq (,$(findstring cygwin,$(PLATFORM)))
+	$?CC=gcc
+	$?CXX=g++
 	$?EXEEXT=.exe
 	$?SOEXT=.dll
 	$?SDLFLAGS=
@@ -119,8 +123,10 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?PLATFORM_NAME=win
 	$?HOST_TRIPLE=i686-pc-cygwin
 endif
-
+# OSX 
 ifneq (,$(findstring darwin,$(PLATFORM)))
+	$?CC=gcc-4.2
+	$?CXX=g++-4.2
 	$?EXEEXT=
 	$?SOEXT=.dylib
 	$?SDLFLAGS=--build=i686-apple-darwin9
@@ -132,8 +138,10 @@ ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?HOST_TRIPLE=x86_64-apple-darwin10
 	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
-
+# Linux
 ifneq (,$(findstring linux,$(PLATFORM)))
+	$?CC=gcc
+	$?CXX=g++
 	$?EXEEXT=
 	$?SOEXT=.so
 	$?SDLFLAGS=--build=i686-unknown-linux
@@ -157,8 +165,6 @@ $?TRIPLE=avm2-unknown-freebsd8
 $?LN=ln -sfn
 $?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
 #$?CC_FOR_BUILD=gcc
-$?CC=gcc
-$?CXX=g++
 $?NATIVE_AR=ar
 export CC:=$(CC)
 export CXX:=$(CXX)
@@ -176,7 +182,7 @@ $?JAVAFLAGS=
 $?PYTHON=$(call nativepath,$(shell which python))
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 # LLVM Options
-$?LLVMASSERTIONS=OFF
+$?LLVMASSERTIONS=ON
 $?LLVMTESTS=ON
 $?LLVMCMAKEOPTS= 
 $?LLVMLDFLAGS=
