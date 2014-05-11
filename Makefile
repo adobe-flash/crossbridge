@@ -617,7 +617,6 @@ abclibs_asdocs:
 				-window-title "Crossbridge API Reference" \
 				-output apidocs
 	mv $(BUILDROOT)/apidocs/tempdita $(BUILDROOT)/
-	$(RSYNC) --exclude "*.xslt" --exclude "*.html" --exclude ASDoc_Config.xml --exclude overviews.xml $(BUILDROOT)/tempdita/ $(SDK)/usr/share/asdocs
 
 CROSS=PATH="$(BUILD)/ccachebin:$(CYGWINMAC):$(PATH):$(SDK)/usr/bin" $(MAKE) SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin LLVMINSTALLPREFIX=$(WIN_BUILD) NATIVE_AR=$(CYGTRIPLE)-ar CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ RANLIB=$(CYGTRIPLE)-ranlib
 
@@ -1043,6 +1042,7 @@ finalcleanup:
 	$(RSYNC) $(SRCROOT)/posix/vfs/IVFS.as $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/vfs/InMemoryBackingStore.as $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/vfs/LSOBackingStore.as $(SDK)/usr/share/
+	$(RSYNC) --exclude "*.xslt" --exclude "*.html" --exclude ASDoc_Config.xml --exclude overviews.xml $(BUILDROOT)/tempdita/ $(SDK)/usr/share/asdocs
 
 # ====================================================================================
 # TAMARIN HELPERS AND PLAYERS

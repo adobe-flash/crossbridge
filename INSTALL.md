@@ -13,6 +13,16 @@ Install
 
 > "make; make win; make deliverables" 
 
+### OSX 10.9+ Notes
+
+In order to compile the master branch you need Apple GCC 4.2:
+
+> brew install apple-gcc42
+
+> sudo ln -s /usr/local/bin/gcc-4.2 /usr/bin/gcc-4.2
+
+> sudo ln -s /usr/local/bin/g++-4.2 /usr/bin/++-4.2
+
 ## Windows
 
 ### Bootstrap Cygwin
