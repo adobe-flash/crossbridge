@@ -346,12 +346,8 @@ all_win:
 	@$(SDK)/usr/bin/make finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
 	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt 2>&1
 	@$(SDK)/usr/bin/make samples &> $(BUILD)/logs/samples.txt 2>&1
-
-# Debug target
-all_dev:
-	@$(SDK)/usr/bin/make samples
-	@$(SDK)/usr/bin/make examples
-	@$(SDK)/usr/bin/make swigtests
+	@$(SDK)/usr/bin/make examples &> $(BUILD)/logs/examples.txt 2>&1
+	@$(SDK)/usr/bin/make swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
 
 # Print debug information
 diagnostics:
@@ -362,6 +358,9 @@ diagnostics:
 	@echo "Triple: $(TRIPLE)"
 	@echo "Host Triple: $(HOST_TRIPLE)"
 	@echo "Build Triple: $(BUILD_TRIPLE)"
+	@echo "CC: $(shell $(CC) --version)"
+	@echo "CXX: $(shell $(CXX) --version)"
+	@echo "AR: $(shell $(NATIVE_AR) --version)"
 	@echo "ASC: $(SCOMP)"
 	@echo "ASC2: $(SCOMPFALCON)"
 	@echo "BMAKE: $(BMAKE)"
