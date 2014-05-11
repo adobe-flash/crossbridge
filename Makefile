@@ -87,7 +87,8 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 else ifneq (,$(findstring Darwin,$(UNAME)))
 	$?PLATFORM="darwin"
 	$?RAWPLAT=darwin
-	$?THREADS=$(shell sysctl -n hw.ncpu)
+	#$?THREADS=$(shell sysctl -n hw.ncpu)
+	$?THREADS=1
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-apple-darwin10
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
@@ -182,8 +183,8 @@ $?JAVAFLAGS=
 $?PYTHON=$(call nativepath,$(shell which python))
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 # LLVM Options
-$?LLVMASSERTIONS=ON
-$?LLVMTESTS=ON
+$?LLVMASSERTIONS=OFF
+$?LLVMTESTS=OFF
 $?LLVMCMAKEOPTS= 
 $?LLVMLDFLAGS=
 $?LLVMCFLAGS=
