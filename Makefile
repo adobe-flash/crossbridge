@@ -198,8 +198,12 @@ $?CLANG=ON
 $?PLAYERGLOBALROOT=tools/playerglobal/13.0
 # Merged Flex SDK
 $?FLEX=$(SRCROOT)/tools/flex
-# Action Script Documentation Generator
-$?ASDOC=$(FLEX)/bin/asdoc
+# Action Script Documentation Generator (Check for AIR SDK or fall back to Flex SDK)
+ifneq "$(wildcard $(AIR_HOME)/lib/legacy)" ""
+ $?ASDOC=java -Dflex.compiler.theme= -Xbootclasspath/p:"$(call nativepath,$($IR_HOME)/asdoc/xalan.jar)" -classpath "$(call nativepath,$(AIR_HOME)/lib/legacy/asdoc.jar)"  -Dflexlib=$(call nativepath,$(AIR_HOME)/frameworks) flex2.tools.ASDoc -compiler.fonts.local-fonts-snapshot=
+else
+ $?ASDOC=$(FLEX)/bin/asdoc
+endif
 # Tamarin Action Script Compiler
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
 # Tamarin Action Script Compiler (Deprecated)
@@ -361,9 +365,10 @@ diagnostics:
 	@echo "Build Triple: $(BUILD_TRIPLE)"
 	@echo "CC: $(shell $(CC) --version)"
 	@echo "CXX: $(shell $(CXX) --version)"
-	@echo "AR: $(shell $(NATIVE_AR) --version)"
+	@echo "FLEX: $(FLEX)"
 	@echo "ASC: $(SCOMP)"
 	@echo "ASC2: $(SCOMPFALCON)"
+	@echo "ASDOC: $(ASDOC)"
 	@echo "BMAKE: $(BMAKE)"
 	@echo "SDK_CMAKE: $(SDK_CMAKE)"
 
