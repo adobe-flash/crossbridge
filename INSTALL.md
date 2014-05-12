@@ -60,6 +60,7 @@ In order to compile the master branch you need Apple GCC 4.2:
     * java-jdk
     * libiconv
     * libmpfr
+    * libgmp-dev
     * libuuid
     * libuuid-devel
     * libncurses

@@ -17,5 +17,4 @@ CHANGES
 * Updated PlayerGlobal to v13.0.0
 * Merged libs from https://github.com/alexmac/alcextra
 * Merged examples from https://github.com/alexmac/alcexamples
-* Fixed Makefile Windows compatibility
-* Fixed Makefile Linux compatibility
+* Improved Linux and Windows compatibility of sources
