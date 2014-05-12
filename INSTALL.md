@@ -54,28 +54,25 @@ In order to compile the master branch you need Apple GCC 4.2:
     * gcc-core
     * gcc-g++
     * gettext
-    * gettext-devel
     * glib
     * help2man
     * java-jdk
     * libiconv
     * libmpfr
-    * libgmp-dev
+    * libgmp
     * libuuid
-    * libuuid-devel
     * libncurses
-    * libncurses-devel
     * libxml2
-    * libxml2-devel
     * libzip
     * libzip2
-    * libzip-devel
     * make
     * pkg-config
     * python
     * rsync
     * termcap
     * unzip
+
+> Install -dev / -devel packages where possible
  
 # Hacking
 
