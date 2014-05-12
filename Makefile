@@ -196,12 +196,12 @@ $?LLVMTARGETS=AVM2;AVM2Shim;X86;CBackend
 $?CLANG=ON
 # Player version, available: 11.5 | 13.0
 $?PLAYERGLOBALROOT=tools/playerglobal/13.0
-# Merged Flex SDK
-$?FLEX=$(SRCROOT)/tools/flex
-# Action Script Documentation Generator (Check for AIR SDK or fall back to Flex SDK)
+# Check for AIR SDK or fall back to merged Flex SDK
 ifneq "$(wildcard $(AIR_HOME)/lib/legacy)" ""
+ $?FLEX=$(AIR_HOME)
  $?ASDOC=java -Dflex.compiler.theme= -Xbootclasspath/p:"$(call nativepath,$($IR_HOME)/asdoc/xalan.jar)" -classpath "$(call nativepath,$(AIR_HOME)/lib/legacy/asdoc.jar)"  -Dflexlib=$(call nativepath,$(AIR_HOME)/frameworks) flex2.tools.ASDoc -compiler.fonts.local-fonts-snapshot=
 else
+ $?FLEX=$(SRCROOT)/tools/flex
  $?ASDOC=$(FLEX)/bin/asdoc
 endif
 # Tamarin Action Script Compiler
@@ -322,6 +322,9 @@ all_ci:
 	@$(SDK)/usr/bin/make extralibs
 	@$(SDK)/usr/bin/make finalcleanup
 	@$(SDK)/usr/bin/make submittests
+	@$(SDK)/usr/bin/make samples
+	@$(SDK)/usr/bin/make examples
+	@$(SDK)/usr/bin/make swigtests
 
 # Build all with Windows 
 # Notes: Ignoring some build errors but only documentation generation related
@@ -567,7 +570,8 @@ builtinabcs:
 
 # Assemble ABC library binaries and documentation
 abclibs:
-	$(MAKE) -j$(THREADS) abclibs_compile abclibs_asdocs
+	$(MAKE) abclibs_compile
+	$(MAKE) abclibs_asdocs && $(MAKE) asdocs_deploy
 
 # Assemble ABC library binaries
 # Change 04.05.14. DefaultPreloader and C_Run was compiled using ASC.jar, lets use ASC2.jar and test it: $(SCOMP) to $(SCOMPFALCON)
@@ -603,7 +607,7 @@ abclibs_compile:
 	cp $(BUILD)/abclibs/*.abc $(SDK)/usr/lib
 	cp $(BUILD)/abclibs/*.swf $(SDK)/usr/lib
 
-# Assemble ABC library documentation
+# Assemble AS3 documentation
 abclibs_asdocs:
 	rm -rf $(BUILDROOT)/tempdita
 	rm -rf $(BUILDROOT)/apidocs
@@ -626,6 +630,12 @@ abclibs_asdocs:
 				-window-title "Crossbridge API Reference" \
 				-output apidocs
 	mv $(BUILDROOT)/apidocs/tempdita $(BUILDROOT)/
+
+# Deploy AS3 documentation
+asdocs_deploy:
+	rm -rf $(SDK)/usr/share/asdocs
+	mkdir -p $(SDK)/usr/share/asdocs
+	$(RSYNC) --exclude "*.xslt" --exclude "*.html" --exclude ASDoc_Config.xml --exclude overviews.xml $(BUILDROOT)/tempdita/ $(SDK)/usr/share/asdocs
 
 CROSS=PATH="$(BUILD)/ccachebin:$(CYGWINMAC):$(PATH):$(SDK)/usr/bin" $(MAKE) SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin LLVMINSTALLPREFIX=$(WIN_BUILD) NATIVE_AR=$(CYGTRIPLE)-ar CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ RANLIB=$(CYGTRIPLE)-ranlib
 
@@ -1692,8 +1702,7 @@ samples:
 
 # TBD
 examples:
-	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS) \
-	GLS3D=$(SRCROOT)/samples/Example_GLS3D PAK0FILE=$(SRCROOT)/samples/Example_Quake1/sdlquake-1.0.9/ID1/PAK0.PAK examples
+	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS) examples
 	mkdir -p $(BUILDROOT)/extra
 	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
