@@ -372,6 +372,10 @@ diagnostics:
 	@echo "BMAKE: $(BMAKE)"
 	@echo "SDK_CMAKE: $(SDK_CMAKE)"
 
+# Generate ASDoc documentation
+all_dev:
+	@$(SDK)/usr/bin/make libsdl_all
+
 # ====================================================================================
 # CORE
 # ====================================================================================
@@ -429,6 +433,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
+	cp -r ./patches/$(DEPENDENCY_DMALLOC) .
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
@@ -1116,27 +1121,9 @@ libeigen:
 		$(SRCROOT)/eigen-eigen-5097c01bcdc4 -DCMAKE_INSTALL_PREFIX="$(SDK)/usr"
 	cd $(BUILD)/libeigen && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# TBD
-dmalloc_configure:
-	rm -rf $(SRCROOT)/cached_build/dmalloc
-	mkdir -p $(SRCROOT)/cached_build/dmalloc
-	cd $(SRCROOT)/cached_build/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) $(SRCROOT)/$(DEPENDENCY_DMALLOC)/configure \
-		--prefix=$(SDK)/usr --disable-shared --enable-static --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/dmalloc`
-
-# TBD
-dmalloc:
-	rm -rf $(BUILD)/dmalloc
-	mkdir -p $(BUILD)/dmalloc
-	cp -r $(SRCROOT)/cached_build/dmalloc $(BUILD)/
-	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/dmalloc/`
-	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 threads cxx
-	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 installcxx installth
-	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 heavy
-
 # The debug memory allocation or dmalloc library has been designed as a drop in replacement for the system's malloc, realloc, calloc, free and other memory management routines while providing powerful debugging facilities configurable at runtime. 
 # These facilities include such things as memory-leak tracking, fence-post write detection, file/line number reporting, and general logging of statistics. 
-dmalloc_all:
+dmalloc:
 	rm -rf $(BUILD)/dmalloc
 	mkdir -p $(BUILD)/dmalloc
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) $(SRCROOT)/$(DEPENDENCY_DMALLOC)/configure \
