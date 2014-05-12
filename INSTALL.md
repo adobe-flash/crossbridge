@@ -39,7 +39,7 @@ In order to compile the master branch you need Apple GCC 4.2:
 
 ### Build a Linux only SDK and package as ZIP.
 
-> "make all_win; make deliverables" 
+> "make all_ci; make deliverables" 
 
 # Core Dependencies
 
