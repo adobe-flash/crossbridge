@@ -433,6 +433,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
+	tar xjf packages/$(DEPENDENCY_TAMARIN).tar.bz2
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
@@ -440,6 +441,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
+	cp -r ./patches/$(DEPENDENCY_TAMARIN) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
 
 # Clear depdendency libraries
@@ -478,6 +480,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
+	rm -rf $(DEPENDENCY_TAMARIN)
 	rm -rf $(DEPENDENCY_ZLIB)
 
 # ====================================================================================
