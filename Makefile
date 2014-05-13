@@ -198,11 +198,11 @@ $?CLANG=ON
 $?PLAYERGLOBALROOT=tools/playerglobal/13.0
 # Check for AIR SDK or fall back to merged Flex SDK
 ifneq "$(wildcard $(AIR_HOME)/lib/legacy)" ""
- $?FLEX=$(AIR_HOME)
+ $?FLEX_SDK_HOME=$(AIR_HOME)
  $?ASDOC=java -Dflex.compiler.theme= -Xbootclasspath/p:"$(call nativepath,$($IR_HOME)/asdoc/xalan.jar)" -classpath "$(call nativepath,$(AIR_HOME)/lib/legacy/asdoc.jar)"  -Dflexlib=$(call nativepath,$(AIR_HOME)/frameworks) flex2.tools.ASDoc -compiler.fonts.local-fonts-snapshot=
 else
- $?FLEX=$(SRCROOT)/tools/flex
- $?ASDOC=$(FLEX)/bin/asdoc
+ $?FLEX_SDK_HOME=$(SRCROOT)/tools/flexsdk
+ $?ASDOC=$(FLEX_SDK_HOME)/bin/asdoc
 endif
 # Tamarin Action Script Compiler
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
@@ -368,7 +368,7 @@ diagnostics:
 	@echo "Build Triple: $(BUILD_TRIPLE)"
 	@echo "CC: $(shell $(CC) --version)"
 	@echo "CXX: $(shell $(CXX) --version)"
-	@echo "FLEX: $(FLEX)"
+	@echo "FLEX_SDK_HOME: $(FLEX_SDK_HOME)"
 	@echo "ASC: $(SCOMP)"
 	@echo "ASC2: $(SCOMPFALCON)"
 	@echo "ASDOC: $(ASDOC)"
@@ -617,7 +617,7 @@ abclibs_asdocs:
 	mkdir -p $(BUILD)/logs
 	cd $(BUILDROOT) && $(ASDOC) \
 				-load-config= \
-				-external-library-path=$(call nativepath,$(FLEX)/frameworks/libs/player/13.0/playerglobal.swc) \
+				-external-library-path=$(call nativepath,$(FLEX_SDK_HOME)/frameworks/libs/player/13.0/playerglobal.swc) \
 				-strict=false -define+=CONFIG::player,1 -define+=CONFIG::asdocs,true -define+=CONFIG::actual,false \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix/vfs) \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix) \
@@ -1696,20 +1696,20 @@ symboltest:
 
 # TBD
 samples:
-	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS)
+	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) -j$(THREADS)
 	mkdir -p $(BUILDROOT)/extra
 	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
 # TBD
 examples:
-	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS) examples
+	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) -j$(THREADS) examples
 	mkdir -p $(BUILDROOT)/extra
 	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
 # TBD
 gdbunit:
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
+	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX_SDK_HOME) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
+	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX_SDK_HOME) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
 
 # TBD
 vfstests:
