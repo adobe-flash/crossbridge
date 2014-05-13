@@ -13,7 +13,7 @@ Install
 
 1. make
 1. make win
-1. make deliverables
+1. make deploy
 
 ### OSX 10.9+ Notes
 
@@ -33,14 +33,14 @@ In order to compile the master branch you need Apple GCC 4.2:
 ### Build a Windows only SDK and package as ZIP.
 
 1. make all_win
-1. make deliverables
+1. make deploy
 
 ## Linux
 
 ### Build a Linux only SDK and package as ZIP.
 
 1. make all_ci
-1. make deliverables
+1. make deploy
 
 # Core Dependencies
 

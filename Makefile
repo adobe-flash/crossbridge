@@ -1835,7 +1835,11 @@ ieeetests_basicops:
 # ====================================================================================
 # DEPLOY
 # ====================================================================================
-# TBD
+# Deploy SDK 
+deploy:
+	$(MAKE) deliverables
+
+# Deploy SDK
 deliverables:
 	$(MAKE) staging
 	$(MAKE) flattensymlinks
@@ -1850,19 +1854,7 @@ else
 #		$(MAKE) diffdeliverables
 endif
 
-# TBD
-diffdeliverables:
-		cat $(BUILDROOT)/zipcontents.txt | grep -v staging/cygwin | grep -v "run.bat" | sed -e 's/\.exe//g' -e 's/\.dll/\.~SO~/g' -e 's/\/cygwin/\/~PLAT~/g' | sort > $(BUILDROOT)/zipcontents_munge.txt
-		cat $(BUILDROOT)/dmgcontents.txt | grep -v "share/cmake" | grep -v "bin/cmake" | grep -v "bin/ctest" | grep -v "bin/cpack" | grep -v "bin/ccmake" | sed -e 's/\.exe//g' -e 's/\.dylib/\.~SO~/g' -e 's/\/darwin/\/~PLAT~/g' | sort > $(BUILDROOT)/dmgcontents_munge.txt	
-		diff $(BUILDROOT)/dmgcontents_munge.txt $(BUILDROOT)/zipcontents_munge.txt
-
-# TBD
-flattensymlinks:
-	find $(BUILDROOT)/staging/sdk -type l | xargs rm
-	$(RSYNC) $(BUILDROOT)/staging/sdk/usr/platform/*/ $(BUILDROOT)/staging/sdk/usr
-	rm -rf $(BUILDROOT)/staging/sdk/usr/platform
-
-# TBD
+# Staging
 staging:
 	rm -rf $(BUILDROOT)/staging
 	mkdir -p $(BUILDROOT)/staging
@@ -1875,7 +1867,18 @@ staging:
 	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
 	echo $(FLASCC_VERSION_BUILD) > $(BUILDROOT)/staging/sdk/ver.txt
 
-# TBD
+# Flatten Symbolic Links
+flattensymlinks:
+	find $(BUILDROOT)/staging/sdk -type l | xargs rm
+	$(RSYNC) $(BUILDROOT)/staging/sdk/usr/platform/*/ $(BUILDROOT)/staging/sdk/usr
+	rm -rf $(BUILDROOT)/staging/sdk/usr/platform
+
+# Assemble ZIP
+zip:
+	cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
+	find $(BUILDROOT)/staging > $(BUILDROOT)/zipcontents.txt
+
+# Assemble DMG
 dmg:
 	rm -f $(BUILDROOT)/$(SDKNAME).dmg $(BUILDROOT)/$(SDKNAME).dmg.tmp
 	cp -f $(SRCROOT)/tools/Base.dmg $(BUILDROOT)/$(SDKNAME).dmg.tmp
@@ -1890,12 +1893,7 @@ dmg:
 	rm -f $(BUILDROOT)/$(SDKNAME).dmg.tmp
 	find $(BUILDROOT)/staging > $(BUILDROOT)/dmgcontents.txt
 
-# TBD
-zip:
-	cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
-	find $(BUILDROOT)/staging > $(BUILDROOT)/zipcontents.txt
-
-# TBD
+# Cross-Deploy Windows Staging
 winstaging:
 	$(LN) cygwin $(BUILDROOT)/staging/sdk/usr/platform/current
 	# temporarily $(MAKE) sdk cygwin-ish
@@ -1925,6 +1923,12 @@ winstaging:
 	# nuke cygwin from sdk
 	rm -rf $(SDK)/usr/platform/cygwin
 	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
+
+# Cross-Deploy SDK (OSX-Windows)
+diffdeliverables:
+		cat $(BUILDROOT)/zipcontents.txt | grep -v staging/cygwin | grep -v "run.bat" | sed -e 's/\.exe//g' -e 's/\.dll/\.~SO~/g' -e 's/\/cygwin/\/~PLAT~/g' | sort > $(BUILDROOT)/zipcontents_munge.txt
+		cat $(BUILDROOT)/dmgcontents.txt | grep -v "share/cmake" | grep -v "bin/cmake" | grep -v "bin/ctest" | grep -v "bin/cpack" | grep -v "bin/ccmake" | sed -e 's/\.exe//g' -e 's/\.dylib/\.~SO~/g' -e 's/\/darwin/\/~PLAT~/g' | sort > $(BUILDROOT)/dmgcontents_munge.txt	
+		diff $(BUILDROOT)/dmgcontents_munge.txt $(BUILDROOT)/zipcontents_munge.txt
 
 # ====================================================================================
 # CROSS

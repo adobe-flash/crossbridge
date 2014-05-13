@@ -27,6 +27,9 @@
 :: =END MIT LICENSE
 ::
 
+:: Purpose: Cygwin Launch Helper Script 
+:: Author: Andras Csizmadia
+
 :: Java Home short format is important to build the SDK
 set JAVA_HOME=/cygdrive/c/Progra~1/Java/jdk
 :: Only include Java in inherited path
