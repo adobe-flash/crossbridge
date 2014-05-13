@@ -202,7 +202,7 @@ ifneq "$(wildcard $(AIR_HOME)/lib/legacy)" ""
  $?ASDOC=java -classpath "$(call nativepath,$(AIR_HOME)/lib/legacy/asdoc.jar)" -Dflex.compiler.theme= -Dflexlib=$(call nativepath,$(AIR_HOME)/frameworks) flex2.tools.ASDoc -compiler.fonts.local-fonts-snapshot=
 else
  $?FLEX_SDK_HOME=$(SRCROOT)/tools/flexsdk
- $?ASDOC=$(FLEX_SDK_HOME)/bin/asdoc
+ $?ASDOC=java -classpath "$(call nativepath,$(FLEX_SDK_HOME)/lib/asdoc.jar)" -Dflexlib=$(call nativepath,$(FLEX_SDK_HOME)/frameworks) flex2.tools.ASDoc
 endif
 # Tamarin Action Script Compiler
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
