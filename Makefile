@@ -199,7 +199,7 @@ $?PLAYERGLOBALROOT=tools/playerglobal/13.0
 # Check for AIR SDK or fall back to merged Flex SDK
 ifneq "$(wildcard $(AIR_HOME)/lib/legacy)" ""
  $?FLEX_SDK_HOME=$(AIR_HOME)
- $?ASDOC=java -Dflex.compiler.theme= -Xbootclasspath/p:"$(call nativepath,$($IR_HOME)/asdoc/xalan.jar)" -classpath "$(call nativepath,$(AIR_HOME)/lib/legacy/asdoc.jar)"  -Dflexlib=$(call nativepath,$(AIR_HOME)/frameworks) flex2.tools.ASDoc -compiler.fonts.local-fonts-snapshot=
+ $?ASDOC=java -classpath "$(call nativepath,$(AIR_HOME)/lib/legacy/asdoc.jar)" -Dflex.compiler.theme= -Dflexlib=$(call nativepath,$(AIR_HOME)/frameworks) flex2.tools.ASDoc -compiler.fonts.local-fonts-snapshot=
 else
  $?FLEX_SDK_HOME=$(SRCROOT)/tools/flexsdk
  $?ASDOC=$(FLEX_SDK_HOME)/bin/asdoc
