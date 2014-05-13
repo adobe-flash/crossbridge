@@ -7,91 +7,97 @@ Install
 
 ### Build a Mac only SDK.
 
-> "make" 
+1. "make" 
 
 ### Build both Mac and Windows (Cross-Compiled) SDK and package them as DMG and ZIP.
 
-> "make; make win; make deliverables" 
+1. make
+1. make win
+1. make deliverables
 
 ### OSX 10.9+ Notes
 
 In order to compile the master branch you need Apple GCC 4.2:
 
-> brew install apple-gcc42
-
-> sudo ln -s /usr/local/bin/gcc-4.2 /usr/bin/gcc-4.2
-
-> sudo ln -s /usr/local/bin/g++-4.2 /usr/bin/++-4.2
+1. brew install apple-gcc42
+1. sudo ln -s /usr/local/bin/gcc-4.2 /usr/bin/gcc-4.2
+1. sudo ln -s /usr/local/bin/g++-4.2 /usr/bin/++-4.2
 
 ## Windows
 
 ### Bootstrap Cygwin
 
-> "cygwin-dev.bat"
-
-> "cd $FLASCC_ROOT"
+1. cygwin-dev.bat
+1. cd $FLASCC_ROOT
 
 ### Build a Windows only SDK and package as ZIP.
 
-> "make all_win; make deliverables" 
+1. make all_win
+1. make deliverables
 
 ## Linux
 
 ### Build a Linux only SDK and package as ZIP.
 
-> "make all_ci; make deliverables" 
+1. make all_ci
+1. make deliverables
 
 # Core Dependencies
 
-    * autoconf
-    * automake
-    * bison
-    * ccache
-    * cmbzip2
-    * cmake
-    * expat
-    * flex
-    * gcc-core
-    * gcc-g++
-    * gettext
-    * glib
-    * help2man
-    * java-jdk
-    * libiconv
-    * libmpfr
-    * libgmp
-    * libuuid
-    * libncurses
-    * libxml2
-    * libzip
-    * libzip2
-    * make
-    * pkg-config
-    * python
-    * rsync
-    * termcap
-    * unzip
+* autoconf
+* automake
+* bison
+* ccache
+* cmbzip2
+* cmake
+* expat
+* flex
+* gcc-core
+* gcc-g++
+* gettext
+* glib
+* help2man
+* java-jdk
+* libiconv
+* libmpfr
+* libgmp
+* libuuid
+* libncurses
+* libxml2
+* libzip
+* libzip2
+* make
+* pkg-config
+* python
+* rsync
+* termcap
+* unzip
 
-> Install -dev / -devel packages where possible
- 
+> Install *dev* or *devel* suffixed packages where possible
+
+## Notes
+
+* It's recommended to set \_JAVA\_OPTIONS environment variable according to your system memory:
+  
+> Example (Windows): set \_JAVA\_OPTIONS=-Xms1024m -Xmx8192m
+  
+> Example (Linux): export \_JAVA\_OPTIONS="-Xms1024m -Xmx8192m"
+
 # Hacking
 
 * To discover Crossbridge related changes/patches in 3rd party sources, search for keywords: 'crossbridge', 'flascc', 'alchemy', 'avm2', 'as3'
-
 * Diff tool is great
-
 * Take a look at commits and other forks
-
 * Use dis-assembling ABCs if you need to compare outputs: https://github.com/CyberShadow/RABCDAsm
 
 # Updating
 
 ## Adobe PlayerGlobal ASC + SWC
 
-* AIR_SDK_HOME\lib\aot\lib\avmglue.abc => \CROSSBRIDGE_SDK_HOME\tools\playerglobal\VERSION\playerglobal.abc
-* AIR_SDK_HOME\frameworks\libs\player\VERSION\playerglobal.swc => \CROSSBRIDGE_SDK_HOME\tools\playerglobal\VERSION\playerglobal.swc
+* AIR-SDK-HOME\lib\aot\lib\avmglue.abc => \CROSSBRIDGE-SDK-HOME\tools\playerglobal\VERSION\playerglobal.abc
+* AIR-SDK-HOME\frameworks\libs\player\VERSION\playerglobal.swc => \CROSSBRIDGE-SDK-HOME\tools\playerglobal\VERSION\playerglobal.swc
 
 ## Mozilla Tamarin ASC
 
-* ftp://ftp.mozilla.org/pub/js/tamarin/builds/asc/latest/asc.jar => patches\tamarin-redux-VERSION\utils\asc.jar
+* ftp://ftp.mozilla.org/pub/js/tamarin/builds/asc/latest/asc.jar => \CROSSBRIDGE-SDK-HOME\patches\tamarin-redux-VERSION\utils\asc.jar
   * @see: https://developer.mozilla.org/en-US/docs/Archive/Mozilla/Tamarin/Tamarin_Build_Documentation
