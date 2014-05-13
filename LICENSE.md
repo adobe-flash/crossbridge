@@ -1,7 +1,7 @@
 License
 =======
 
-The code written by Adobe Systems Incorporated. is all MIT licensed, but Crossbridge contains many different open-source projects which have different licenses, check the source files before making any assumptions.
+The code written by Adobe Systems Incorporated. is all MIT licensed, but CrossBridge contains many different open-source projects which have different licenses, check the source files before making any assumptions.
 
 ----
 

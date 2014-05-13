@@ -217,7 +217,7 @@ $?FLASCC_VERSION_MAJOR:=1
 $?FLASCC_VERSION_MINOR:=0
 $?FLASCC_VERSION_PATCH:=2
 $?FLASCC_VERSION_BUILD:=devbuild
-$?SDKNAME=Crossbridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH).$(FLASCC_VERSION_BUILD)
+$?SDKNAME=CrossBridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH).$(FLASCC_VERSION_BUILD)
 BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_MINOR=$(FLASCC_VERSION_MINOR) -DFLASCC_VERSION_PATCH=$(FLASCC_VERSION_PATCH) -DFLASCC_VERSION_BUILD=$(FLASCC_VERSION_BUILD)"
 # Caching
 export CCACHE_DIR=$(SRCROOT)/ccache
@@ -359,7 +359,7 @@ all_win:
 
 # Print debug information
 diagnostics:
-	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
+	@echo "~~~ $(SDKNAME) ~~~"
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
@@ -626,8 +626,8 @@ abclibs_asdocs:
 				-exclude-sources+=$(call nativepath,$(SRCROOT)/posix/IKernel.as) \
 				-exclude-sources+=$(call nativepath,$(SRCROOT)/posix/vfs/nochump) \
 				-package-description-file=$(call nativepath,$(SRCROOT)/test/aspackages.xml) \
-				-main-title "Crossbridge API Reference" \
-				-window-title "Crossbridge API Reference" \
+				-main-title "CrossBridge API Reference" \
+				-window-title "CrossBridge API Reference" \
 				-output apidocs
 	mv $(BUILDROOT)/apidocs/tempdita $(BUILDROOT)/
 

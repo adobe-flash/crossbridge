@@ -85,7 +85,7 @@ In order to compile the master branch you need Apple GCC 4.2:
 
 # Hacking
 
-* To discover Crossbridge related changes/patches in 3rd party sources, search for keywords: 'crossbridge', 'flascc', 'alchemy', 'avm2', 'as3'
+* To discover CrossBridge related changes/patches in 3rd party sources, search for keywords: 'crossbridge', 'flascc', 'alchemy', 'avm2', 'as3'
 * Diff tool is great
 * Take a look at commits and other forks
 * Use dis-assembling ABCs if you need to compare outputs: https://github.com/CyberShadow/RABCDAsm
