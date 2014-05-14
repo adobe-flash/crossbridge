@@ -26,15 +26,24 @@ Features:
 
 * [Download] (https://dl.dropboxusercontent.com/u/1375050/cb_master_sdk-win.zip)
 
-### Getting involved in development of Master branch
+### Getting involved in development 
+
+#### Master branch
 
 1. Create a fork
-1. Report an issue, properly describing the situation - backed up with logs
+1. Check out [TODOs](https://github.com/vpmedia/crossbridge/blob/master/TODO.md)
+1. Report a new issue, properly describing the situation - backed up with logs
 1. Submit a patch for the issue or ask others to do so
 1. Submit pull requests with complete set of new features
 
-### Getting involved in development of Futures branch
+### Getting involved in development 
+
+#### Futures branch
+
+The main goal is to support C++11 by upgrading the compiler infrastructure to the latest LLVM tool-chain (3.X) with FreeBSD 9+
+
 1. Create a fork
 1. Check out [TODOs](https://github.com/vpmedia/crossbridge/blob/futures/TODO.md)
-1. Solve issues and submit patches
+1. Check out [LLVM Upgrade](https://github.com/vpmedia/crossbridge/blob/futures/LLVM_UPGRADE.md)
+1. Solve issues and submit pull requests
 
