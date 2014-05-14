@@ -196,8 +196,8 @@ $?LLVMTARGETS=AVM2;AVM2Shim;X86;CBackend
 $?CLANG=ON
 # Player version, available: 11.5 | 13.0
 $?PLAYERGLOBALROOT=tools/playerglobal/13.0
-# Check for AIR SDK or fall back to merged Flex SDK
-ifneq "$(wildcard $(AIR_HOME)/lib/legacy)" ""
+# Check for patched AIR SDK or fall back to merged Flex SDK
+ifneq "$(wildcard $(AIR_HOME)/lib/asc2-cli.jar)" ""
  $?FLEX_SDK_HOME=$(AIR_HOME)
  $?ASDOC=java -classpath "$(call nativepath,$(AIR_HOME)/lib/legacy/asdoc.jar)" -Dflex.compiler.theme= -Dflexlib=$(call nativepath,$(AIR_HOME)/frameworks) flex2.tools.ASDoc -compiler.fonts.local-fonts-snapshot=
 else

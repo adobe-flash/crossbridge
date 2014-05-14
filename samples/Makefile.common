@@ -40,21 +40,16 @@ endif
 # CrossBridge SDK Home
 ifneq "$(wildcard $(call unixpath,$(FLASCC_ROOT)/sdk))" ""
  $?FLASCC:=$(call unixpath,$(FLASCC_ROOT)/sdk)
+else
+ $?FLASCC:=/path/to/crossbridge-sdk/
 endif
 
-# Check for Adobe AIR / Apache Flex SDK Home
-ifneq "$(wildcard $(AIR_HOME))" ""
- #$(info Using Adobe AIR SDK: $(AIR_HOME))
+# Check for patched AIR SDK or fall back to merged Flex SDK
+ifneq "$(wildcard $(AIR_HOME)/lib/asc2-cli.jar)" ""
  $?FLEX=$(AIR_HOME)
-else ifneq "$(wildcard $(FLEX_HOME))" ""
- #$(info Using Apache Flex SDK: $(FLEX_HOME))
- $?FLEX=$(FLEX_HOME)
-endif
-
-# Check for ASC2.jar (Adobe AIR SDK or CrossBridge SDK)
-ifneq "$(wildcard $(FLEX)/lib/legacy)" ""
  $?ASC2=java -jar $(call nativepath,$(FLEX)/lib/asc2-cli.jar) -merge -md 
 else
+ $?FLEX:=/path/to/adobe-air-sdk/
  $?ASC2=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md 
 endif
 #$(info Using ASC2: $(ASC2))
