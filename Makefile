@@ -377,7 +377,7 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK)/usr/bin/make libsdl_all
+	@$(SDK)/usr/bin/make diagnostics
 
 # ====================================================================================
 # CORE
@@ -439,6 +439,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
 	cp -r ./patches/$(DEPENDENCY_DMALLOC) .
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
+	cp -r ./patches/$(DEPENDENCY_LIBSDL) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
 	cp -r ./patches/$(DEPENDENCY_TAMARIN) .
@@ -1108,9 +1109,11 @@ trd:
 # ====================================================================================
 # TBD
 extralibs:
-	$(MAKE) -j$(THREADS) zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv \
+	$(MAKE) -j$(THREADS) \
+		zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv \
 		libvgl libjpeg libpng libgif libtiff libwebp \
-		libogg libvorbis libflac libsndfile libsdl libsdl_image libsdl_mixer \
+		libogg libvorbis libflac libsndfile \
+		libsdl libfreetype libsdl_image libsdl_mixer \
 		libphysfs
 
 # A Massively Spiffy Yet Delicately Unobtrusive Compression Library
@@ -1276,6 +1279,21 @@ libfreetype:
 	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Simple DirectMedia Layer provide low level access to audio, keyboard, mouse, joystick, and graphics hardware. 
+libsdl:
+	rm -rf $(BUILD)/libsdl
+	mkdir -p $(BUILD)/libsdl
+	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBSDL)/configure \
+		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
+		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
+		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
+		--disable-directx --enable-joystick --enable-video-vgl --enable-static --disable-shared
+	rm $(BUILD)/libsdl/config.status
+	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
+	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+	$(MAKE) libsdl_install
+	rm $(SDK)/usr/include/SDL/SDL_opengl.h
+
+# Configure SDL - Cached
 libsdl_configure:
 	rm -rf $(SRCROOT)/cached_build/libsdl
 	mkdir -p $(SRCROOT)/cached_build/libsdl
@@ -1287,8 +1305,8 @@ libsdl_configure:
 	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
 	rm $(SRCROOT)/cached_build/libsdl/config.status
 
-# TBD
-libsdl:
+# Compile SDL - Cached
+libsdl_cached:
 	rm -rf $(BUILD)/libsdl
 	mkdir -p $(BUILD)/libsdl
 	cp -r $(SRCROOT)/cached_build/libsdl $(BUILD)/
@@ -1296,28 +1314,13 @@ libsdl:
 
 	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-	$(MAKE) libsdl-install
+	$(MAKE) libsdl_install
 	rm $(SDK)/usr/include/SDL/SDL_opengl.h
 
-# TBD
-libsdl-install:
-	cp $(SRCROOT)/tools/sdl-config $(SDK)/usr/bin/. # install our custom sdl-config
+# Install SDL with our custom sdl-config
+libsdl_install:
+	cp $(SRCROOT)/tools/sdl-config $(SDK)/usr/bin/.
 	chmod a+x $(SDK)/usr/bin/sdl-config
-
-# TBD
-libsdl_all:
-	rm -rf $(BUILD)/libsdl
-	mkdir -p $(BUILD)/libsdl
-	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBSDL)/configure \
-		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
-		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
-		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
-		--disable-directx --enable-joystick --enable-video-vgl --enable-static --disable-shared
-	rm $(BUILD)/libsdl/config.status
-	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
-	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-	$(MAKE) libsdl-install
-	rm $(SDK)/usr/include/SDL/SDL_opengl.h
 
 # TBD
 libsdl_image:
@@ -1912,7 +1915,7 @@ winstaging:
 	# temporarily $(MAKE) sdk cygwin-ish
 	$(LN) cygwin $(SDK)/usr/platform/current
 	mkdir -p $(SDK)/usr/platform/cygwin/bin
-	$(MAKE) libsdl-install
+	$(MAKE) libsdl_install
 	# copy some parts of the mac bin dir which are actually xplatform
 	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libtool* $(SDK)/usr/platform/cygwin/bin/
 	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libpng* $(SDK)/usr/platform/cygwin/bin/
