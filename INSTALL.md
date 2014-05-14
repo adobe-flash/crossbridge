@@ -79,9 +79,9 @@ In order to compile the master branch you need Apple GCC 4.2:
 
 * It's recommended to set \_JAVA\_OPTIONS environment variable according to your system memory:
   
-> Example (Windows): set \_JAVA\_OPTIONS=-Xms1024m -Xmx8192m
+> Example (Windows): set \_JAVA\_OPTIONS=-Xms512m -Xmx4096m
   
-> Example (Linux): export \_JAVA\_OPTIONS="-Xms1024m -Xmx8192m"
+> Example (Linux): export \_JAVA\_OPTIONS="-Xms512m -Xmx4096m"
 
 # Hacking
 

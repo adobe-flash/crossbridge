@@ -80,12 +80,13 @@ swc:
 	-emit-swc=org.bulletphysics -O4 -flto-api=exports.txt $(EXTRA_OPTS) -o Bullet.swc
 
 	make basicswf
-	make away3dswf
+	#make away3dswf
 
 basicswf:
 	# Link the Bullet SWC with a basic sample app
 	"$(FLEX)/bin/mxmlc" -library-path=build/Bullet.swc bulletdemo.as -debug=$(MXMLC_DEBUG) -o build/bulletdemo.swf
 
+# Fails with undefined method createThreadedDispatcher and createThreadedSolver
 away3dswf:
 	# Link the Bullet SWC with a more advanced Away3D based example
 	cd Away3DExample && "$(FLEX)/bin/mxmlc" \
