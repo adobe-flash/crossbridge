@@ -433,7 +433,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
-	tar xjf packages/$(DEPENDENCY_TAMARIN).tar.bz2
+	#tar xjf packages/$(DEPENDENCY_TAMARIN).tar.bz2
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
@@ -441,7 +441,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
-	cp -r ./patches/$(DEPENDENCY_TAMARIN) .
+	#cp -r ./patches/$(DEPENDENCY_TAMARIN) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
 
 # Clear depdendency libraries
@@ -480,7 +480,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
-	rm -rf $(DEPENDENCY_TAMARIN)
+	#rm -rf $(DEPENDENCY_TAMARIN)
 	rm -rf $(DEPENDENCY_ZLIB)
 
 # ====================================================================================
@@ -579,16 +579,23 @@ abclibs:
 # Assemble ABC library binaries
 # Change 04.05.14. DefaultPreloader and C_Run was compiled using ASC.jar, lets use ASC2.jar and test it: $(SCOMP) to $(SCOMPFALCON)
 abclibs_compile:
+	# Cleaning
 	mkdir -p $(BUILD)/abclibs
 	mkdir -p $(BUILD)/abclibsposix
 	mkdir -p $(SDK)/usr/lib/abcs
-
-	# Just use this to get the Posix interface
+	# Generating the Posix interface
 	cd $(BUILD)/abclibsposix && $(PYTHON) $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
+	# Deploying generated classes
+	#cp $(BUILD)/posix/IKernel.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	#cp $(BUILD)/posix/ShellPosix.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	#cp $(BUILD)/posix/ShellPosixGlue.cpp $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	#cp $(BUILD)/posix/ShellPosixGlue.h $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	# Post-Processing IKernel
+	# TODO: Do not print out files in the source folder (VPMedia)
 	cat $(BUILD)/abclibsposix/IKernel.as | sed '1,1d' | sed '$$d' > $(SRCROOT)/posix/IKernel.as
-
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/DefaultPreloader.as) -swf com.adobe.flascc.preloader.DefaultPreloader,1024,768,60 -outdir . -out DefaultPreloader
-
+	# Generating DefaultPreloader
+	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/DefaultPreloader.as) -swf com.adobe.flascc.preloader.DefaultPreloader,800,600,60 -outdir . -out DefaultPreloader
+	# Generating ABC Libs
 	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/ELF.as) -outdir . -out ELF
 	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/Exit.as) -outdir . -out Exit
 	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/LongJmp.as) -outdir . -out LongJmp
@@ -828,6 +835,7 @@ csu:
 	cp -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
 
 # TBD
+# TODO: We are already calling gensyscalls.py in abclibs_compile phase, is second time really necessary?! (VPMedia)
 libc:
 	mkdir -p $(BUILD)/posix/
 	rm -f $(BUILD)/posix/*.o

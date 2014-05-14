@@ -10,7 +10,7 @@ stat: $(TARGET).c
 	$(TARGET).o ../sdk/usr/lib/crt1_c.o ../sdk/usr/lib/libgcc.a \
 	../sdk/usr/lib/libc.a ../sdk/usr/lib/libm.a -o $(TARGET)-linked
 	perl ../llvm-2.9/lib/Target/AVM2/build.pl ../sdk/usr $(TARGET)-linked.bc \
-	../tamarin-redux/utils/asc.jar ../llvm-2.9/lib/Target/AVM2 $(TARGET)
+	../avmplus/utils/asc.jar ../llvm-2.9/lib/Target/AVM2 $(TARGET)
 	$(AVMSHELL) ../build/swfmake.abc -- -o $(TARGET).swf \
 	../sdk/usr/lib/C_Run.abc \
 	../sdk/usr/lib/Exit.abc ../sdk/usr/lib/LongJmp.abc \
@@ -24,7 +24,7 @@ stat: $(TARGET).c
 tests:
 	python genfs.py tests/test-root $(BUILD)/alcfs.as
 	java -ea -DAS3 -Xmx200m -DAVMPLUS -classpath \
-	../tamarin-redux/utils/asc.jar macromedia.asc.embedding.ScriptCompiler \
+	../avmplus/utils/asc.jar macromedia.asc.embedding.ScriptCompiler \
 	-import ../asc/abc/builtin.abc \
 	-import ../asc/abc/playerglobal.abc \
 	-swf posix.test.Main,800,600 -out PosixTester \
