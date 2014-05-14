@@ -155,34 +155,35 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
 
-# ====================================================================================
-# TOOLCHAIN
-# ====================================================================================
 # Cross-Compile Options
 $?CYGTRIPLE=i686-pc-cygwin
 $?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
+
+# ====================================================================================
+# GNU Tool-chain and CC Options
+# ====================================================================================
 # Host Tool-Chain
-$?LN=ln -sfn
-$?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
 #$?CC_FOR_BUILD=gcc
-$?NATIVE_AR=ar
 export CC:=$(CC)
 export CXX:=$(CXX)
-# SDK Tool-Chain
+export CCACHE_DIR=$(SRCROOT)/ccache
+$?LN=ln -sfn
+$?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
+$?NATIVE_AR=ar
+$?JAVA=$(call nativepath,$(shell which java))
+$?PYTHON=$(call nativepath,$(shell which python))
 $?AR=$(SDK)/usr/bin/ar scru -v
 $?SDK_CMAKE=$(SRCROOT)/sdk/usr/bin/cmake
 # Tool-Chain Options
 $?DBGOPTS=
-$?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
 $?LIBHELPEROPTFLAGS=-O3
 $?CFLAGS=-O4
 $?CXXFLAGS=-O4
-$?JAVA=$(call nativepath,$(shell which java))
-$?JAVAFLAGS=
-$?PYTHON=$(call nativepath,$(shell which python))
-$?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
-# LLVM Options
+
+# ====================================================================================
+# LLVM and Clang options
+# ====================================================================================
 $?LLVMASSERTIONS=OFF
 $?LLVMTESTS=OFF
 $?LLVMCMAKEOPTS= 
@@ -194,9 +195,10 @@ $?LLVM_ONLYLLC=false
 $?LLVMBUILDTYPE=MinSizeRel
 $?LLVMTARGETS=AVM2;AVM2Shim;X86;CBackend
 $?CLANG=ON
-# Player version, shipped: 11.5 | 13.0
-$?PLAYERGLOBALROOT=tools/playerglobal/13.0
-# Auto Detect AIR/Flex SDKs
+
+# ====================================================================================
+# AIR or Flex SDK options
+# ====================================================================================
 ifneq "$(wildcard $(AIR_HOME)/lib/compiler.jar)" ""
  $?FLEX_SDK_TYPE=AdobeAIR
  $?FLEX_SDK_HOME=$(AIR_HOME)
@@ -210,22 +212,26 @@ else
  $?FLEX_SDK_HOME=$(SRCROOT)/tools/flexsdk
  $?FLEX_ASDOC=java -classpath "$(call nativepath,$(FLEX_SDK_HOME)/lib/asdoc.jar)" -Dflexlib=$(call nativepath,$(FLEX_SDK_HOME)/frameworks) flex2.tools.ASDoc
 endif
-# Tamarin Action Script Compiler (Deprecated)
+
+# ====================================================================================
+# Tamarin options
+# ====================================================================================
+$?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
-$?SCOMP=java $(JAVAFLAGS) -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
-# Adobe Action Script Compiler v2
-$?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
-# Tamarin AVM Shell
+$?SCOMP=java -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+$?SCOMPFALCON=java -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+$?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
-# Version
+
+# ====================================================================================
+# Other options
+# ====================================================================================
 $?FLASCC_VERSION_MAJOR:=1
 $?FLASCC_VERSION_MINOR:=0
 $?FLASCC_VERSION_PATCH:=2
 $?FLASCC_VERSION_BUILD:=devbuild
 $?SDKNAME=CrossBridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH).$(FLASCC_VERSION_BUILD)
 BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_MINOR=$(FLASCC_VERSION_MINOR) -DFLASCC_VERSION_PATCH=$(FLASCC_VERSION_PATCH) -DFLASCC_VERSION_BUILD=$(FLASCC_VERSION_BUILD)"
-# Caching
-export CCACHE_DIR=$(SRCROOT)/ccache
 # Logging
 ifneq (,$(PRINT_LOGS_ON_ERROR))
 	$?PRINT_LOGS_CMD=tail +1
@@ -334,8 +340,8 @@ all_ci:
 # Build all with Windows 
 # Notes: Ignoring some build errors but only documentation generation related
 all_win:
-	$(MAKE) diagnostics
 	@mkdir -p $(BUILD)/logs
+	$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
 	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt 2>&1
 	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
 	@$(MAKE) -i make &> $(BUILD)/logs/make.txt 2>&1
@@ -526,8 +532,8 @@ base:
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-gcc
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-g++
 
-	$(RSYNC) $(PLAYERGLOBALROOT)/playerglobal.abc $(SDK)/usr/lib/
-	$(RSYNC) $(PLAYERGLOBALROOT)/playerglobal.swc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/13.0/playerglobal.abc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/13.0/playerglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
 	cp -f $(DEPENDENCY_AVMPLUS)/generated/*.abc $(SDK)/usr/lib/
 
