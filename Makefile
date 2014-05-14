@@ -433,7 +433,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
-	#tar xjf packages/$(DEPENDENCY_TAMARIN).tar.bz2
+	unzip -q  packages/$(DEPENDENCY_TAMARIN).zip
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
@@ -441,7 +441,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
-	#cp -r ./patches/$(DEPENDENCY_TAMARIN) .
+	cp -r ./patches/$(DEPENDENCY_TAMARIN) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
 
 # Clear depdendency libraries
@@ -480,7 +480,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
-	#rm -rf $(DEPENDENCY_TAMARIN)
+	rm -rf $(DEPENDENCY_TAMARIN)
 	rm -rf $(DEPENDENCY_ZLIB)
 
 # ====================================================================================
@@ -585,11 +585,13 @@ abclibs_compile:
 	mkdir -p $(SDK)/usr/lib/abcs
 	# Generating the Posix interface
 	cd $(BUILD)/abclibsposix && $(PYTHON) $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
-	# Deploying generated classes
-	#cp $(BUILD)/posix/IKernel.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
-	#cp $(BUILD)/posix/ShellPosix.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
-	#cp $(BUILD)/posix/ShellPosixGlue.cpp $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
-	#cp $(BUILD)/posix/ShellPosixGlue.h $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	# Deploying generated classes (Tamarin is AVMPlus, just duplicated while testing upgrading - VPMedia)
+	cp $(BUILD)/abclibsposix/IKernel.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	cp $(BUILD)/abclibsposix/ShellPosix.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	cp $(BUILD)/abclibsposix/ShellPosixGlue.cpp $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	cp $(BUILD)/abclibsposix/ShellPosixGlue.h $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	cd $(SRCROOT)/$(DEPENDENCY_TAMARIN)/core && python ./builtin.py -config CONFIG::VMCFG_FLOAT=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_POSIX=true
+	cd $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell && python ./shell_toplevel.py -config CONFIG::VMCFG_FLOAT=true -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_POSIX=true
 	# Post-Processing IKernel
 	# TODO: Do not print out files in the source folder (VPMedia)
 	cat $(BUILD)/abclibsposix/IKernel.as | sed '1,1d' | sed '$$d' > $(SRCROOT)/posix/IKernel.as
