@@ -66,6 +66,10 @@ package com.adobe.flascc.vfs.zip {
 		private var lencode:Object;
 		private var distcode:Object;
 		
+        /* Constructor */
+        public function Inflater() {
+		}
+        
 		/**
 		 * Sets the input.
 		 * 

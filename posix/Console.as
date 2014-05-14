@@ -125,7 +125,7 @@ package com.adobe.flascc
     public function exit(code:int):Boolean
     {
       // default to unhandled
-      if (exitHook)
+      if (exitHook != null)
         return exitHook(code)
       else
         throw new Error("exit() called.")

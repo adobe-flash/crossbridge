@@ -194,19 +194,24 @@ $?LLVM_ONLYLLC=false
 $?LLVMBUILDTYPE=MinSizeRel
 $?LLVMTARGETS=AVM2;AVM2Shim;X86;CBackend
 $?CLANG=ON
-# Player version, available: 11.5 | 13.0
+# Player version, shipped: 11.5 | 13.0
 $?PLAYERGLOBALROOT=tools/playerglobal/13.0
-# Check for patched AIR SDK or fall back to merged Flex SDK
-ifneq "$(wildcard $(AIR_HOME)/lib/asc2-cli.jar)" ""
+# Auto Detect AIR/Flex SDKs
+ifneq "$(wildcard $(AIR_HOME)/lib/compiler.jar)" ""
+ $?FLEX_SDK_TYPE=AdobeAIR
  $?FLEX_SDK_HOME=$(AIR_HOME)
- $?ASDOC=java -classpath "$(call nativepath,$(AIR_HOME)/lib/legacy/asdoc.jar)" -Dflex.compiler.theme= -Dflexlib=$(call nativepath,$(AIR_HOME)/frameworks) flex2.tools.ASDoc -compiler.fonts.local-fonts-snapshot=
-else
+ $?FLEX_ASDOC=java -classpath "$(call nativepath,$(AIR_HOME)/lib/legacy/asdoc.jar)" -Dflex.compiler.theme= -Dflexlib=$(call nativepath,$(AIR_HOME)/frameworks) flex2.tools.ASDoc -compiler.fonts.local-fonts-snapshot=
+else ifneq "$(wildcard $(FLEX_HOME)/lib/flex-compiler-oem.jar)" ""
+ $?FLEX_SDK_TYPE=ApacheFlex
+ $?FLEX_SDK_HOME=$(FLEX_HOME)
+ $?FLEX_ASDOC=java -classpath "$(call nativepath,$(FLEX_SDK_HOME)/lib/asdoc.jar)" -Dflexlib=$(call nativepath,$(FLEX_SDK_HOME)/frameworks) flex2.tools.ASDoc
+else 
+ $?FLEX_SDK_TYPE=AdobeFlex
  $?FLEX_SDK_HOME=$(SRCROOT)/tools/flexsdk
- $?ASDOC=java -classpath "$(call nativepath,$(FLEX_SDK_HOME)/lib/asdoc.jar)" -Dflexlib=$(call nativepath,$(FLEX_SDK_HOME)/frameworks) flex2.tools.ASDoc
+ $?FLEX_ASDOC=java -classpath "$(call nativepath,$(FLEX_SDK_HOME)/lib/asdoc.jar)" -Dflexlib=$(call nativepath,$(FLEX_SDK_HOME)/frameworks) flex2.tools.ASDoc
 endif
-# Tamarin Action Script Compiler
-$?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
 # Tamarin Action Script Compiler (Deprecated)
+$?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
 $?SCOMP=java $(JAVAFLAGS) -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
 # Adobe Action Script Compiler v2
 $?SCOMPFALCON=java $(JAVAFLAGS) -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
@@ -368,10 +373,11 @@ diagnostics:
 	@echo "Build Triple: $(BUILD_TRIPLE)"
 	@echo "CC: $(shell $(CC) --version)"
 	@echo "CXX: $(shell $(CXX) --version)"
+	@echo "FLEX_SDK_TYPE: $(FLEX_SDK_TYPE)"
 	@echo "FLEX_SDK_HOME: $(FLEX_SDK_HOME)"
+	@echo "FLEX_ASDOC: $(FLEX_ASDOC)"
 	@echo "ASC: $(SCOMP)"
 	@echo "ASC2: $(SCOMPFALCON)"
-	@echo "ASDOC: $(ASDOC)"
 	@echo "BMAKE: $(BMAKE)"
 	@echo "SDK_CMAKE: $(SDK_CMAKE)"
 
@@ -628,7 +634,7 @@ abclibs_asdocs:
 	mkdir -p $(BUILDROOT)/apidocs
 	mkdir -p $(BUILDROOT)/apidocs/tempdita
 	mkdir -p $(BUILD)/logs
-	cd $(BUILDROOT) && $(ASDOC) \
+	cd $(BUILDROOT) && $(FLEX_ASDOC) \
 				-load-config= \
 				-external-library-path=$(call nativepath,$(FLEX_SDK_HOME)/frameworks/libs/player/13.0/playerglobal.swc) \
 				-strict=false -define+=CONFIG::player,1 -define+=CONFIG::asdocs,true -define+=CONFIG::actual,false \
