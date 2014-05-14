@@ -7,10 +7,10 @@ It provides a complete C/C++ development environment for targeting the Adobe Fla
 
 Features:
 
-* LLVM-GCC 4.2 compiler with Flash backend
-* GDB debugger that debugs your code while running in the Flash player
-* SWIG backend that auto generates interop code allowing you to build Flash libs (SWCs) that wrap C/C++ libraries
-* Multi-threading based on [POSIX Threads] (https://en.wikipedia.org/wiki/POSIX_Threads)
+* [LLVM-GCC 4.2](http://llvm.org) compiler with Flash backend
+* [GDB](http://www.sourceware.org/gdb) debugger that debugs your code while running in the Flash Player
+* [SWIG](http://www.swig.org) backend that auto-generates inter-operability code, allowing you to build Flash libraries (SWCs) that wrap C/C++ libs
+* Multi-threading based on [POSIX Threads](https://en.wikipedia.org/wiki/POSIX_Threads)
 
 ### Getting started using CrossBridge
 
@@ -28,6 +28,8 @@ Features:
 
 ### Getting involved in development 
 
+Check out the [Install Guide](https://github.com/vpmedia/crossbridge/blob/master/INSTALL.md)
+
 #### Master branch
 
 1. Create a fork
@@ -35,8 +37,6 @@ Features:
 1. Report a new issue, properly describing the situation - backed up with logs
 1. Submit a patch for the issue or ask others to do so
 1. Submit pull requests with complete set of new features
-
-### Getting involved in development 
 
 #### Futures branch
 
