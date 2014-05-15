@@ -33,7 +33,7 @@ all: check
 allsamples: T01 T02 T03 T04 T05 T06 T07 T08 T09 T10 T11 T12 T13 T14
 	@echo "done!"
 
-examples: E01 E02 E03 E04 E05 E06 E07
+examples: E01 E02 E03 E04 E05 E06 E07 E08
 	@echo "done!"
 
 T01:
