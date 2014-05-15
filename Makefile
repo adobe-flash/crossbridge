@@ -1,28 +1,15 @@
 # ====================================================================================
 # CrossBridge Makefile
 # ====================================================================================
-
 $?UNAME=$(shell uname -s)
-
-# ====================================================================================
-# DIRECTORIES
-# ====================================================================================
 $?SRCROOT=$(PWD)
 ESCAPED_SRCROOT=$(shell echo $(SRCROOT) | sed -e 's/[\/&]/\\&/g')
-
 $?SDK=$(PWD)/sdk
 $?BUILDROOT=$(PWD)/build
 $?WIN_BUILD=$(BUILDROOT)/win
 $?MAC_BUILD=$(BUILDROOT)/mac
 $?LINUX_BUILD=$(BUILDROOT)/linux
 $?CYGWINMAC=$(SRCROOT)/cygwinmac/sdk/usr/bin
-
-# ====================================================================================
-# THREAD TEST CONFIG
-# ====================================================================================
-$?EMITSWF=
-$?SWFDIR=
-$?SWFEXT=
 
 # ====================================================================================
 # DEPENDENCIES
@@ -35,6 +22,7 @@ $?DEPENDENCY_BMAKE=bmake
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
 $?DEPENDENCY_DMALLOC=dmalloc-5.5.2
 $?DEPENDENCY_FFI=libffi-3.0.11
+$?DEPENDENCY_GDB=gdb-7.3
 $?DEPENDENCY_JPEG=jpeg-8c
 $?DEPENDENCY_LIBAA=aalib-1.2
 $?DEPENDENCY_LIBBZIP=bzip2-1.0.6
@@ -81,7 +69,6 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
-	$?FPCMP=$(BUILDROOT)/extra/fpcmp.exe
 	$?NOPIE=
 	$?BIN_TRUE=/usr/bin/true
 else ifneq (,$(findstring Darwin,$(UNAME)))
@@ -91,7 +78,6 @@ else ifneq (,$(findstring Darwin,$(UNAME)))
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-apple-darwin10
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
-	$?FPCMP=$(BUILDROOT)/extra/fpcmp
 	$?NOPIE=-no_pie
 	$?BIN_TRUE=/usr/bin/true
 else
@@ -101,7 +87,6 @@ else
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-unknown-linux-gnu
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
-	$?FPCMP=$(BUILDROOT)/extra/fpcmp
 	$?NOPIE=
 	$?BIN_TRUE=/bin/true
 endif
@@ -115,7 +100,7 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?CXX=g++
 	$?EXEEXT=.exe
 	$?SOEXT=.dll
-	$?SDLFLAGS=
+	#$?SDLFLAGS=
 	$?TAMARIN_CONFIG_FLAGS=--target=i686-linux
 	$?TAMARINLDFLAGS=" -Wl,--stack,16000000"
 	$?TAMARINOPTFLAGS=-Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations 
@@ -129,7 +114,7 @@ ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?CXX=g++-4.2
 	$?EXEEXT=
 	$?SOEXT=.dylib
-	$?SDLFLAGS=--build=i686-apple-darwin9
+	#$?SDLFLAGS=--build=i686-apple-darwin9
 	$?TAMARIN_CONFIG_FLAGS=
 	$?TAMARINLDFLAGS=" -m32 -arch=i686"
 	$?TAMARINOPTFLAGS=-Wno-deprecated-declarations 
@@ -144,7 +129,7 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 	$?CXX=g++
 	$?EXEEXT=
 	$?SOEXT=.so
-	$?SDLFLAGS=--build=i686-unknown-linux
+	#$?SDLFLAGS=--build=i686-unknown-linux
 	$?TAMARIN_CONFIG_FLAGS=
 	$?TAMARINLDFLAGS=" -m32 -arch=i686"
 	$?TAMARINOPTFLAGS=-Wno-deprecated-declarations 
@@ -180,6 +165,8 @@ $?SDK_AR=$(SDK)/usr/bin/ar
 $?SDK_NM=$(SDK)/usr/bin/nm
 $?SDK_CMAKE=$(SDK)/usr/bin/cmake
 $?SDK_MAKE=$(SDK)/usr/bin/make
+# Extra Tool (Used by LLVM test)
+$?FPCMP=$(BUILDROOT)/extra/fpcmp$(EXEEXT)
 # Common Flags
 $?DBGOPTS=
 $?LIBHELPEROPTFLAGS=-O3
@@ -443,7 +430,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBWEBP).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBXZ).tar.gz
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
-	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
+	#tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
 	unzip -q  packages/$(DEPENDENCY_TAMARIN).zip
@@ -492,7 +479,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBWEBP)
 	rm -rf $(DEPENDENCY_LIBXZ)
 	rm -rf $(DEPENDENCY_MAKE)
-	rm -rf $(DEPENDENCY_OPENSSL)
+	#rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
 	rm -rf $(DEPENDENCY_TAMARIN)
@@ -1492,11 +1479,11 @@ genfs:
 
 # TBD
 gdb:
-	rm -rf $(BUILD)/gdb-7.3
-	mkdir -p $(BUILD)/gdb-7.3
-	cd $(BUILD)/gdb-7.3 && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/gdb-7.3/configure \
+	rm -rf $(BUILD)/$(DEPENDENCY_GDB)
+	mkdir -p $(BUILD)/$(DEPENDENCY_GDB)
+	cd $(BUILD)/$(DEPENDENCY_GDB) && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/$(DEPENDENCY_GDB)/configure \
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=avm2-elf && $(MAKE)
-	cp -f $(BUILD)/gdb-7.3/gdb/gdb$(EXEEXT) $(SDK)/usr/bin/
+	cp -f $(BUILD)/$(DEPENDENCY_GDB)/gdb/gdb$(EXEEXT) $(SDK)/usr/bin/
 	cp -f $(SRCROOT)/tools/flascc.gdb $(SDK)/usr/share/
 	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
 	cp -f $(SRCROOT)/tools/flascc-init.gdb $(SDK)/usr/share/
@@ -1525,28 +1512,28 @@ libtool:
 # Submit tests
 # ====================================================================================
 
-# TBD
+# All Tests
 submittests: pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
 			hellocpp_shell hellocpp_swf hellocpp_swf_opt posixtest scimark scimark_swf \
 			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest
 	cat $(BUILD)/scimark/result.txt
 
-# TBD
+# POSIX Threads - Basic Test
 pthreadsubmittests_shell: pthreadsubmittests_shell_compile pthreadsubmittests_shell_run
 
-# TBD
+# POSIX Threads - Basic Test
 pthreadsubmittests_shell_compile:
 	@rm -rf $(BUILD)/pthreadsubmit_shell
 	@mkdir -p $(BUILD)/pthreadsubmit_shell
 	cd $(BUILD)/pthreadsubmit_shell && $(SDK_CC) -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized
 	cd $(BUILD)/pthreadsubmit_shell && $(SDK_CC) -O0 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test
 
-# TBD
+# POSIX Threads - Basic Test
 pthreadsubmittests_shell_run:
 	cd $(BUILD)/pthreadsubmit_shell && ./pthread_test_optimized
 	cd $(BUILD)/pthreadsubmit_shell && ./pthread_test
 
-# TBD
+# POSIX Threads - Basic Test
 pthreadsubmittests_swf:
 	@rm -rf $(BUILD)/pthreadsubmit_swf
 	@mkdir -p $(BUILD)/pthreadsubmit_swf
@@ -1555,23 +1542,31 @@ pthreadsubmittests_swf:
 	cd $(BUILD)/pthreadsubmit_swf && $(SDK_CC) -O0 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
 	cp -f $(BUILD)/pthreadsubmit_swf/*.swf $(BUILDROOT)/extra/
 
-# TBD
+# POSIX Threads - Basic Tests
 pthreadtests:
-	@rm -rf $(BUILD)/pthread$(SWFDIR)
-	@mkdir -p $(BUILD)/pthread$(SWFDIR)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_cancel.c -o pthread_cancel$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_async_cancel.c -o pthread_async_cancel$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_create.c -o pthread_create$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_create_test.c -o pthread_create_test$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_mutex_test.c -o pthread_mutex_test$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_mutex_test2.c -o pthread_mutex_test2$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_malloc_test.c -o pthread_malloc_test$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_specific.c -o pthread_specific$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_suspend.c -o pthread_suspend$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/thr_kill.c -o thr_kill$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/peterson.c -o peterson$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps -DORDER_STRENGTH=1 $(SRCROOT)/test/peterson.c -o peterson_nofence$(SWFEXT)
+	@rm -rf $(BUILD)/pthreadtests
+	@mkdir -p $(BUILD)/pthreadtests
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_cancel.c -o pthread_cancel.swf
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_async_cancel.c -o pthread_async_cancel.swf
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_create.c -o pthread_create.swf
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_create_test.c -o pthread_create_test.swf
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_mutex_test.c -o pthread_mutex_test.swf
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_mutex_test2.c -o pthread_mutex_test2.swf
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_malloc_test.c -o pthread_malloc_test.swf
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_specific.c -o pthread_specific.swf
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_suspend.c -o pthread_suspend.swf
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/thr_kill.c -o thr_kill.swf
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/peterson.c -o peterson.swf
+	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps -DORDER_STRENGTH=1 $(SRCROOT)/test/peterson.c -o peterson_nofence.swf
 	$(MAKE) as3++tests
+
+# POSIX Threads - Concurrency Test
+conctests:
+	mkdir -p $(BUILD)/conctests
+	cd $(BUILD)/conctests && $(SDK_CC) -O4 -emit-swf -save-temps $(SRCROOT)/test/newThread.c -o newThread.swf
+	cd $(BUILD)/conctests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/avm2_conc.c -o avm2_conc.swf
+	cd $(BUILD)/conctests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/avm2_mutex.c -o avm2_mutex.swf
+	cd $(BUILD)/conctests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/avm2_mutex2.c -o avm2_mutex2.swf
 
 # TBD
 helloswf:
@@ -1614,14 +1609,6 @@ as3++tests:
 	cd $(BUILD)/as3++_swf && $(SDK_CXX) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt1.cpp -lAS3++ -o AS3++mt1.swf
 	cd $(BUILD)/as3++_swf && $(SDK_CXX) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt2.cpp -lAS3++ -o AS3++mt2.swf
 	cd $(BUILD)/as3++_swf && $(SDK_CXX) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt3.cpp -lAS3++ -o AS3++mt3.swf
-
-# TBD
-conctests:
-	mkdir -p $(BUILD)/conc$(SWFDIR)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK_CC) -O4 $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/newThread.c -o newThread$(SWFEXT)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_conc.c -o avm2_conc$(SWFEXT)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex.c -o avm2_mutex$(SWFEXT)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex2.c -o avm2_mutex2$(SWFEXT)
 
 # TBD
 posixtest:
