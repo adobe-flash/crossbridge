@@ -427,7 +427,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBICONV).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBNCURSES).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBPROTOBUF).tar.gz
-	tar xf packages/$(DEPENDENCY_LIBPHYSFS).tar.bz2
+	tar xjf packages/$(DEPENDENCY_LIBPHYSFS).tar.bz2
 	tar xf packages/$(DEPENDENCY_LIBREADLINE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBOGG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBPNG).tar.gz
