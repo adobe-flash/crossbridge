@@ -412,6 +412,7 @@ docs:
 # ====================================================================================
 # Install packaged dependency libraries
 install_libs:
+	$(MAKE) clean_libs
 	tar xf packages/$(DEPENDENCY_BMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
