@@ -166,7 +166,7 @@ $?TRIPLE=avm2-unknown-freebsd8
 # ====================================================================================
 # GNU Tool-chain and CC Options
 # ====================================================================================
-# Host Tool-Chain
+# Host Tools
 #$?CC_FOR_BUILD=gcc
 export CC:=$(CC)
 export CXX:=$(CXX)
@@ -176,9 +176,15 @@ $?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
 $?NATIVE_AR=ar
 $?JAVA=$(call nativepath,$(shell which java))
 $?PYTHON=$(call nativepath,$(shell which python))
+# Target Tools
 $?AR=$(SDK)/usr/bin/ar scru -v
-$?SDK_CMAKE=$(SRCROOT)/sdk/usr/bin/cmake
-# Tool-Chain Options
+$?SDK_CC=$(SDK)/usr/bin/gcc
+$?SDK_CXX=$(SDK)/usr/bin/g++
+$?SDK_AR=$(SDK)/usr/bin/ar
+$?SDK_NM=$(SDK)/usr/bin/nm
+$?SDK_CMAKE=$(SDK)/usr/bin/cmake
+$?SDK_MAKE=$(SDK)/usr/bin/make
+# Common Flags
 $?DBGOPTS=
 $?LIBHELPEROPTFLAGS=-O3
 $?CFLAGS=-O4
@@ -265,7 +271,7 @@ all:
 	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
 	@echo "-  make"
 	@$(MAKE) make &> $(BUILD)/logs/make.txt 2>&1
-	@$(SDK)/usr/bin/make -s all_with_local_make
+	@$(SDK_MAKE) -s all_with_local_make
 
 # TBD
 all_with_local_make:
@@ -305,8 +311,8 @@ nightly:
 # Weekly tests
 weekly:
 	$(MAKE) continuous
-	@$(SDK)/usr/bin/make llvmtests
-	#$(SDK)/usr/bin/make checkasm
+	@$(SDK_MAKE) llvmtests
+	#$(SDK_MAKE) checkasm
 
 # Build all with Travis CI
 # Notes: Using console output to solve hanging build issues.
@@ -317,28 +323,28 @@ all_ci:
 	@$(MAKE) install_libs
 	@$(MAKE) base
 	@$(MAKE) make
-	@$(SDK)/usr/bin/make cmake
-	@$(SDK)/usr/bin/make abclibs
-	@$(SDK)/usr/bin/make basictools
-	@$(SDK)/usr/bin/make llvm
-	@$(SDK)/usr/bin/make -i binutils
-	@$(SDK)/usr/bin/make plugins
-	@$(SDK)/usr/bin/make gcc
-	@$(SDK)/usr/bin/make bmake
-	@$(SDK)/usr/bin/make stdlibs
-	@$(SDK)/usr/bin/make gcclibs
-	@$(SDK)/usr/bin/make as3wig
-	@$(SDK)/usr/bin/make abcstdlibs
-	@$(SDK)/usr/bin/make sdkcleanup
-	@$(SDK)/usr/bin/make tr
-	@$(SDK)/usr/bin/make trd
-	@$(SDK)/usr/bin/make extratools
-	@$(SDK)/usr/bin/make extralibs
-	@$(SDK)/usr/bin/make finalcleanup
-	@$(SDK)/usr/bin/make submittests
-	@$(SDK)/usr/bin/make samples
-	@$(SDK)/usr/bin/make examples
-	@$(SDK)/usr/bin/make swigtests
+	@$(SDK_MAKE) cmake
+	@$(SDK_MAKE) abclibs
+	@$(SDK_MAKE) basictools
+	@$(SDK_MAKE) llvm
+	@$(SDK_MAKE) -i binutils
+	@$(SDK_MAKE) plugins
+	@$(SDK_MAKE) gcc
+	@$(SDK_MAKE) bmake
+	@$(SDK_MAKE) stdlibs
+	@$(SDK_MAKE) gcclibs
+	@$(SDK_MAKE) as3wig
+	@$(SDK_MAKE) abcstdlibs
+	@$(SDK_MAKE) sdkcleanup
+	@$(SDK_MAKE) tr
+	@$(SDK_MAKE) trd
+	@$(SDK_MAKE) extratools
+	@$(SDK_MAKE) extralibs
+	@$(SDK_MAKE) finalcleanup
+	@$(SDK_MAKE) submittests
+	@$(SDK_MAKE) samples
+	@$(SDK_MAKE) examples
+	@$(SDK_MAKE) swigtests
 
 # Build all with Windows 
 # Notes: Ignoring some build errors but only documentation generation related
@@ -348,28 +354,28 @@ all_win:
 	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt 2>&1
 	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
 	@$(MAKE) -i make &> $(BUILD)/logs/make.txt 2>&1
-	@$(SDK)/usr/bin/make cmake &> $(BUILD)/logs/cmake.txt 2>&1
-	@$(SDK)/usr/bin/make abclibs &> $(BUILD)/logs/abclibs.txt 2>&1
-	@$(SDK)/usr/bin/make basictools &> $(BUILD)/logs/basictools.txt 2>&1
-	@$(SDK)/usr/bin/make llvm &> $(BUILD)/logs/llvm.txt 2>&1
-	@$(SDK)/usr/bin/make -i binutils &> $(BUILD)/logs/binutils.txt 2>&1
-	@$(SDK)/usr/bin/make plugins &> $(BUILD)/logs/plugins.txt 2>&1
-	@$(SDK)/usr/bin/make gcc &> $(BUILD)/logs/gcc.txt 2>&1
-	@$(SDK)/usr/bin/make bmake &> $(BUILD)/logs/bmake.txt 2>&1
-	@$(SDK)/usr/bin/make stdlibs &> $(BUILD)/logs/stdlibs.txt 2>&1
-	@$(SDK)/usr/bin/make gcclibs &> $(BUILD)/logs/gcclibs.txt 2>&1
-	@$(SDK)/usr/bin/make as3wig &> $(BUILD)/logs/as3wig.txt 2>&1
-	@$(SDK)/usr/bin/make abcstdlibs &> $(BUILD)/logs/abcstdlibs.txt 2>&1
-	@$(SDK)/usr/bin/make sdkcleanup &> $(BUILD)/logs/sdkcleanup.txt 2>&1
-	@$(SDK)/usr/bin/make tr &> $(BUILD)/logs/tr.txt 2>&1
-	@$(SDK)/usr/bin/make trd &> $(BUILD)/logs/trd.txt 2>&1
-	@$(SDK)/usr/bin/make extratools &> $(BUILD)/logs/extratools.txt 2>&1
-	@$(SDK)/usr/bin/make extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
-	@$(SDK)/usr/bin/make finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
-	@$(SDK)/usr/bin/make submittests &> $(BUILD)/logs/submittests.txt 2>&1
-	@$(SDK)/usr/bin/make samples &> $(BUILD)/logs/samples.txt 2>&1
-	@$(SDK)/usr/bin/make examples &> $(BUILD)/logs/examples.txt 2>&1
-	@$(SDK)/usr/bin/make swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
+	@$(SDK_MAKE) cmake &> $(BUILD)/logs/cmake.txt 2>&1
+	@$(SDK_MAKE) abclibs &> $(BUILD)/logs/abclibs.txt 2>&1
+	@$(SDK_MAKE) basictools &> $(BUILD)/logs/basictools.txt 2>&1
+	@$(SDK_MAKE) llvm &> $(BUILD)/logs/llvm.txt 2>&1
+	@$(SDK_MAKE) -i binutils &> $(BUILD)/logs/binutils.txt 2>&1
+	@$(SDK_MAKE) plugins &> $(BUILD)/logs/plugins.txt 2>&1
+	@$(SDK_MAKE) gcc &> $(BUILD)/logs/gcc.txt 2>&1
+	@$(SDK_MAKE) bmake &> $(BUILD)/logs/bmake.txt 2>&1
+	@$(SDK_MAKE) stdlibs &> $(BUILD)/logs/stdlibs.txt 2>&1
+	@$(SDK_MAKE) gcclibs &> $(BUILD)/logs/gcclibs.txt 2>&1
+	@$(SDK_MAKE) as3wig &> $(BUILD)/logs/as3wig.txt 2>&1
+	@$(SDK_MAKE) abcstdlibs &> $(BUILD)/logs/abcstdlibs.txt 2>&1
+	@$(SDK_MAKE) sdkcleanup &> $(BUILD)/logs/sdkcleanup.txt 2>&1
+	@$(SDK_MAKE) tr &> $(BUILD)/logs/tr.txt 2>&1
+	@$(SDK_MAKE) trd &> $(BUILD)/logs/trd.txt 2>&1
+	@$(SDK_MAKE) extratools &> $(BUILD)/logs/extratools.txt 2>&1
+	@$(SDK_MAKE) extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
+	@$(SDK_MAKE) finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
+	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
+	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
+	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt 2>&1
+	@$(SDK_MAKE) swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
 
 # Print debug information
 diagnostics:
@@ -384,15 +390,10 @@ diagnostics:
 	@echo "CXX: $(shell $(CXX) --version)"
 	@echo "FLEX_SDK_TYPE: $(FLEX_SDK_TYPE)"
 	@echo "FLEX_SDK_HOME: $(FLEX_SDK_HOME)"
-	@echo "FLEX_ASDOC: $(FLEX_ASDOC)"
-	@echo "ASC: $(SCOMP)"
-	@echo "ASC2: $(SCOMPFALCON)"
-	@echo "BMAKE: $(BMAKE)"
-	@echo "SDK_CMAKE: $(SDK_CMAKE)"
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK)/usr/bin/make tr
+	@$(SDK_MAKE) diagnostics
 
 # ====================================================================================
 # CORE
@@ -899,9 +900,9 @@ libthr:
 
 # TBD
 libm:
-	cd compiler_rt && $(MAKE) clean && $(MAKE) avm2 CC="$(SDK)/usr/bin/gcc -emit-llvm" RANLIB=$(SDK)/usr/bin/ranlib AR=$(SDK)/usr/bin/ar VERBOSE=1
+	cd compiler_rt && $(MAKE) clean && $(MAKE) avm2 CC="$(SDK)/usr/bin/gcc -emit-llvm" RANLIB=$(SDK)/usr/bin/ranlib AR=$(SDK_AR) VERBOSE=1
 	$(SDK)/usr/bin/llvm-link -o $(BUILD)/libcompiler_rt.o compiler_rt/avm2/avm2/avm2/SubDir.lib/*.o
-	$(SDK)/usr/bin/nm $(BUILD)/libcompiler_rt.o  | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/compiler_rt.txt
+	$(SDK_NM) $(BUILD)/libcompiler_rt.o  | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/compiler_rt.txt
 	cat $(BUILD)/compiler_rt.txt >> $(SDK)/public-api.txt
 	cat $(SRCROOT)/$(DEPENDENCY_LLVM)/lib/CodeGen/SelectionDAG/TargetLowering.cpp | grep "Names\[RTLIB::" | awk '{print $$3}' | sed 's/"//g' | sed 's/;//' | sort | uniq > $(BUILD)/rtlib.txt
 	cat avm2_env/rtlib-extras.txt >> $(BUILD)/rtlib.txt
@@ -914,13 +915,13 @@ libm:
 	# it in our lib
 	cd $(BUILD)/msun/msun && rm -f libm.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libm.a
 	# remove symbols for sin, cos, other things we support as intrinsics
-	cd $(BUILD)/msun/msun && $(SDK)/usr/bin/ar sd libm.a s_cos.o s_sin.o e_pow.o e_sqrt.o
-	$(SDK)/usr/bin/ar r $(SDK)/usr/lib/libm.a
+	cd $(BUILD)/msun/msun && $(SDK_AR) sd libm.a s_cos.o s_sin.o e_pow.o e_sqrt.o
+	$(SDK_AR) r $(SDK)/usr/lib/libm.a
 	mkdir -p $(BUILD)/libmbc
-	cd $(BUILD)/libmbc && $(SDK)/usr/bin/ar x $(BUILD)/msun/msun/libm.a
+	cd $(BUILD)/libmbc && $(SDK_AR) x $(BUILD)/msun/msun/libm.a
 	cd $(BUILD)/libmbc && $(SDK)/usr/bin/llvm-link -o $(BUILD)/libmbc/libm.o $(BUILD)/libcompiler_rt.o *.o
 	$(SDK)/usr/bin/opt -O3 -o $(SDK)/usr/lib/libm.o $(BUILD)/libmbc/libm.o
-	$(SDK)/usr/bin/nm $(SDK)/usr/lib/libm.o | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/libm.bc.txt
+	$(SDK_NM) $(SDK)/usr/lib/libm.o | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/libm.bc.txt
 
 # TBD
 libBlocksRuntime:
@@ -949,8 +950,8 @@ gcclibs:
 	mkdir -p $(SDK)/usr/lib/stdlibs_abc
 	cd $(BUILD)/posix && $(SDK)/usr/bin/g++ -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/AS3++.cpp
 	cd $(BUILD)/posix && $(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj AS3++.o -o AS3++.abc
-	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libAS3++.a AS3++.o
-	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libAS3++.a AS3++.abc
+	cd $(BUILD)/posix && $(SDK_AR) crus $(SDK)/usr/lib/libAS3++.a AS3++.o
+	cd $(BUILD)/posix && $(SDK_AR) crus $(SDK)/usr/lib/stdlibs_abc/libAS3++.a AS3++.abc
 
 # TBD
 libobjc_configure:
@@ -972,7 +973,7 @@ libobjc:
 # TBD
 abclibobjc:
 	mkdir -p $(BUILD)/libobjc_abc
-	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
+	cd $(BUILD)/libobjc_abc && $(SDK_AR) x $(SDK)/usr/lib/libobjc.a
 	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
 	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
 
@@ -998,7 +999,7 @@ as3wig:
 	echo "#include <AS3++/builtin.h>\n" > $(BUILD)/as3wig/AS3WigIncludes.h
 	echo "#include <AS3++/playerglobal.h>\n" >> $(BUILD)/as3wig/AS3WigIncludes.h
 	cd $(BUILD)/as3wig && $(SDK)/usr/bin/g++ -c -emit-llvm -I. AS3Wig.cpp -o Flash++.o
-	cd $(BUILD)/as3wig && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libFlash++.a Flash++.o
+	cd $(BUILD)/as3wig && $(SDK_AR) crus $(SDK)/usr/lib/libFlash++.a Flash++.o
 
 # ====================================================================================
 # ABCSDTLIBS
@@ -1010,7 +1011,7 @@ abcstdlibs:
 # TBD
 abcflashpp:
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvmopt=-Xmx4G -jvm="$(JAVA)" -falcon-parallel -target-player -filetype=obj $(BUILD)/as3wig/Flash++.o -o $(BUILD)/as3wig/Flash++.abc
-	$(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libFlash++.a $(BUILD)/as3wig/Flash++.abc
+	$(SDK_AR) crus $(SDK)/usr/lib/stdlibs_abc/libFlash++.a $(BUILD)/as3wig/Flash++.abc
 
 # TBD
 abcstdlibs_more:
@@ -1020,43 +1021,43 @@ abcstdlibs_more:
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
 
 	mkdir -p $(BUILD)/libc_abc
-	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc.a
+	cd $(BUILD)/libc_abc && $(SDK_AR) x $(SDK)/usr/lib/libc.a
 	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
 	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
 
 	mkdir -p $(BUILD)/libthr_abc
-	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
+	cd $(BUILD)/libthr_abc && $(SDK_AR) x $(SDK)/usr/lib/libthr.a
 	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
 	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
 
 	mkdir -p $(BUILD)/libgcc_abc
-	cd $(BUILD)/libgcc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libgcc.a
+	cd $(BUILD)/libgcc_abc && $(SDK_AR) x $(SDK)/usr/lib/libgcc.a
 	cd $(BUILD)/libgcc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
 	mv $(BUILD)/libgcc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libgcc.a
 
 	mkdir -p $(BUILD)/libstdcpp_abc
-	cd $(BUILD)/libstdcpp_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libstdc++.a
+	cd $(BUILD)/libstdcpp_abc && $(SDK_AR) x $(SDK)/usr/lib/libstdc++.a
 	cd $(BUILD)/libstdcpp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
 	mv $(BUILD)/libstdcpp_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libstdc++.a
 
 	mkdir -p $(BUILD)/libsupcpp_abc
-	cd $(BUILD)/libsupcpp_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libsupc++.a
+	cd $(BUILD)/libsupcpp_abc && $(SDK_AR) x $(SDK)/usr/lib/libsupc++.a
 	cd $(BUILD)/libsupcpp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
 	mv $(BUILD)/libsupcpp_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libsupc++.a
 
 	# disable this until aliases work in our abc
 	# mkdir -p $(BUILD)/libgomp_abc
-	# cd $(BUILD)/libgomp_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libgomp.a
+	# cd $(BUILD)/libgomp_abc && $(SDK_AR) x $(SDK)/usr/lib/libgomp.a
 	# cd $(BUILD)/libgomp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
 	# mv $(BUILD)/libgomp_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libgomp.a
 
 	mkdir -p $(BUILD)/libobjc_abc
-	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
+	cd $(BUILD)/libobjc_abc && $(SDK_AR) x $(SDK)/usr/lib/libobjc.a
 	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
 	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
 
 	mkdir -p $(BUILD)/libBlocksRuntime_abc
-	cd $(BUILD)/libBlocksRuntime_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libBlocksRuntime.a
+	cd $(BUILD)/libBlocksRuntime_abc && $(SDK_AR) x $(SDK)/usr/lib/libBlocksRuntime.a
 	cd $(BUILD)/libBlocksRuntime_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
 	mv $(BUILD)/libBlocksRuntime_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libBlocksRuntime.a
 
@@ -1541,8 +1542,8 @@ pthreadsubmittests_shell: pthreadsubmittests_shell_compile pthreadsubmittests_sh
 pthreadsubmittests_shell_compile:
 	@rm -rf $(BUILD)/pthreadsubmit_shell
 	@mkdir -p $(BUILD)/pthreadsubmit_shell
-	cd $(BUILD)/pthreadsubmit_shell && $(SDK)/usr/bin/gcc -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized
-	cd $(BUILD)/pthreadsubmit_shell && $(SDK)/usr/bin/gcc -O0 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test
+	cd $(BUILD)/pthreadsubmit_shell && $(SDK_CC) -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized
+	cd $(BUILD)/pthreadsubmit_shell && $(SDK_CC) -O0 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test
 
 # TBD
 pthreadsubmittests_shell_run:
@@ -1553,78 +1554,78 @@ pthreadsubmittests_shell_run:
 pthreadsubmittests_swf:
 	@rm -rf $(BUILD)/pthreadsubmit_swf
 	@mkdir -p $(BUILD)/pthreadsubmit_swf
-	cd $(BUILD)/pthreadsubmit_swf && $(SDK)/usr/bin/gcc -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized.swf
-	cd $(BUILD)/pthreadsubmit_swf && $(SDK)/usr/bin/gcc -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -emit-swc=com.adobe.flascc -o pthread_test_optimized.swc
-	cd $(BUILD)/pthreadsubmit_swf && $(SDK)/usr/bin/gcc -O0 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
+	cd $(BUILD)/pthreadsubmit_swf && $(SDK_CC) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized.swf
+	cd $(BUILD)/pthreadsubmit_swf && $(SDK_CC) -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -emit-swc=com.adobe.flascc -o pthread_test_optimized.swc
+	cd $(BUILD)/pthreadsubmit_swf && $(SDK_CC) -O0 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
 	cp -f $(BUILD)/pthreadsubmit_swf/*.swf $(BUILDROOT)/extra/
 
 # TBD
 pthreadtests:
 	@rm -rf $(BUILD)/pthread$(SWFDIR)
 	@mkdir -p $(BUILD)/pthread$(SWFDIR)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_cancel.c -o pthread_cancel$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_async_cancel.c -o pthread_async_cancel$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_create.c -o pthread_create$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_create_test.c -o pthread_create_test$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_mutex_test.c -o pthread_mutex_test$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_mutex_test2.c -o pthread_mutex_test2$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_malloc_test.c -o pthread_malloc_test$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_specific.c -o pthread_specific$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_suspend.c -o pthread_suspend$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/thr_kill.c -o thr_kill$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/peterson.c -o peterson$(SWFEXT)
-	cd $(BUILD)/pthread$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps -DORDER_STRENGTH=1 $(SRCROOT)/test/peterson.c -o peterson_nofence$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_cancel.c -o pthread_cancel$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_async_cancel.c -o pthread_async_cancel$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_create.c -o pthread_create$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_create_test.c -o pthread_create_test$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_mutex_test.c -o pthread_mutex_test$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_mutex_test2.c -o pthread_mutex_test2$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_malloc_test.c -o pthread_malloc_test$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_specific.c -o pthread_specific$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/pthread_suspend.c -o pthread_suspend$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/thr_kill.c -o thr_kill$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/peterson.c -o peterson$(SWFEXT)
+	cd $(BUILD)/pthread$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps -DORDER_STRENGTH=1 $(SRCROOT)/test/peterson.c -o peterson_nofence$(SWFEXT)
 	$(MAKE) as3++tests
 
 # TBD
 helloswf:
 	@rm -rf $(BUILD)/helloswf
 	@mkdir -p $(BUILD)/helloswf
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/gcc -c -g -O0 $(SRCROOT)/test/hello.c -emit-llvm -o hello.bc
+	cd $(BUILD)/helloswf && $(SDK_CC) -c -g -O0 $(SRCROOT)/test/hello.c -emit-llvm -o hello.bc
 	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.abc -filetype=obj
 	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.as -filetype=asm
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/gcc -emit-swf -swf-size=200x200 -O0 -g hello.abc -o hello.swf
+	cd $(BUILD)/helloswf && $(SDK_CC) -emit-swf -swf-size=200x200 -O0 -g hello.abc -o hello.swf
 
 # TBD
 helloswf_opt:
 	@rm -rf $(BUILD)/helloswf_opt
 	@mkdir -p $(BUILD)/helloswf_opt
-	cd $(BUILD)/helloswf_opt && $(SDK)/usr/bin/gcc -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
+	cd $(BUILD)/helloswf_opt && $(SDK_CC) -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
 
 # TBD
 hellocpp_shell:
 	@rm -rf $(BUILD)/hellocpp_shell
 	@mkdir -p $(BUILD)/hellocpp_shell
-	cd $(BUILD)/hellocpp_shell && $(SDK)/usr/bin/g++ -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
+	cd $(BUILD)/hellocpp_shell && $(SDK_CXX) -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
 
 # TBD
 hellocpp_swf:
 	@rm -rf $(BUILD)/hellocpp_swf
 	@mkdir -p $(BUILD)/hellocpp_swf
-	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/g++ -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
+	cd $(BUILD)/hellocpp_swf && $(SDK_CXX) -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
 
 # TBD
 hellocpp_swf_opt:
 	@rm -rf $(BUILD)/hellocpp_swf_opt
 	@mkdir -p $(BUILD)/hellocpp_swf_opt
-	cd $(BUILD)/hellocpp_swf_opt && $(SDK)/usr/bin/g++ -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
+	cd $(BUILD)/hellocpp_swf_opt && $(SDK_CXX) -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
 
 # TBD
 as3++tests:
 	@rm -rf $(BUILD)/as3++_swf
 	@mkdir -p $(BUILD)/as3++_swf
-	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt.cpp -lAS3++ -o AS3++mt.swf
-	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt1.cpp -lAS3++ -o AS3++mt1.swf
-	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt2.cpp -lAS3++ -o AS3++mt2.swf
-	cd $(BUILD)/as3++_swf && $(SDK)/usr/bin/g++ -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt3.cpp -lAS3++ -o AS3++mt3.swf
+	cd $(BUILD)/as3++_swf && $(SDK_CXX) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt.cpp -lAS3++ -o AS3++mt.swf
+	cd $(BUILD)/as3++_swf && $(SDK_CXX) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt1.cpp -lAS3++ -o AS3++mt1.swf
+	cd $(BUILD)/as3++_swf && $(SDK_CXX) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt2.cpp -lAS3++ -o AS3++mt2.swf
+	cd $(BUILD)/as3++_swf && $(SDK_CXX) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt3.cpp -lAS3++ -o AS3++mt3.swf
 
 # TBD
 conctests:
 	mkdir -p $(BUILD)/conc$(SWFDIR)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/newThread.c -o newThread$(SWFEXT)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_conc.c -o avm2_conc$(SWFEXT)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex.c -o avm2_mutex$(SWFEXT)
-	cd $(BUILD)/conc$(SWFDIR) && $(SDK)/usr/bin/gcc -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex2.c -o avm2_mutex2$(SWFEXT)
+	cd $(BUILD)/conc$(SWFDIR) && $(SDK_CC) -O4 $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/newThread.c -o newThread$(SWFEXT)
+	cd $(BUILD)/conc$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_conc.c -o avm2_conc$(SWFEXT)
+	cd $(BUILD)/conc$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex.c -o avm2_mutex$(SWFEXT)
+	cd $(BUILD)/conc$(SWFDIR) && $(SDK_CC) -O4 -pthread $(EMITSWF) $(SWFVER) -save-temps $(SRCROOT)/test/avm2_mutex2.c -o avm2_mutex2$(SWFEXT)
 
 # TBD
 posixtest:
@@ -1641,26 +1642,26 @@ posixtest:
 		-import $(call nativepath,$(SDK)/usr/lib/InMemoryBackingStore.abc) \
 		-import $(call nativepath,$(SDK)/usr/lib/PlayerKernel.abc) \
 		$(call nativepath, $(BUILD)/posixtest/alcfsBackingStore.as) -outdir . -out alcfs
-	cd $(BUILD)/posixtest && $(SDK)/usr/bin/gcc -emit-swf -O0 -swf-version=15 $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) alcfs.abc $(SRCROOT)/test/fileio.c -o posixtest.swf
+	cd $(BUILD)/posixtest && $(SDK_CC) -emit-swf -O0 -swf-version=15 $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) alcfs.abc $(SRCROOT)/test/fileio.c -o posixtest.swf
 
 # TBD
 scimark:
 	@mkdir -p $(BUILD)/scimark
-	cd $(BUILD)/scimark && $(SDK)/usr/bin/gcc -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
+	cd $(BUILD)/scimark && $(SDK_CC) -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
 	$(BUILD)/scimark/scimark2 &> $(BUILD)/scimark/result.txt
 
 # TBD
 scimark_swf:
 	@mkdir -p $(BUILD)/scimark_swf
-	cd $(BUILD)/scimark_swf && $(SDK)/usr/bin/gcc -O4 -swf-version=17 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
-	cd $(BUILD)/scimark_swf && $(SDK)/usr/bin/gcc -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2v18.swf
+	cd $(BUILD)/scimark_swf && $(SDK_CC) -O4 -swf-version=17 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
+	cd $(BUILD)/scimark_swf && $(SDK_CC) -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2v18.swf
 	cp -f $(BUILD)/scimark_swf/*.swf $(BUILDROOT)/extra/
 
 # TBD
 scimark_asc:
 	@mkdir -p $(BUILD)/scimark_asc
-	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/gcc -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
-	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/gcc -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
+	cd $(BUILD)/scimark_asc && $(SDK_CC) -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
+	cd $(BUILD)/scimark_asc && $(SDK_CC) -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
 	$(BUILD)/scimark_asc/scimark2 &> $(BUILD)/scimark_asc/result.txt
 
 # TBD
@@ -1672,46 +1673,46 @@ parse_scimark_log:
 # TBD
 sjljtest:
 	@mkdir -p $(BUILD)/sjljtest
-	cd $(BUILD)/sjljtest && $(SDK)/usr/bin/g++ -O0 $(SRCROOT)/test/sjljtest.c -v -o sjljtest -save-temps
+	cd $(BUILD)/sjljtest && $(SDK_CXX) -O0 $(SRCROOT)/test/sjljtest.c -v -o sjljtest -save-temps
 	$(BUILD)/sjljtest/sjljtest &> $(BUILD)/sjljtest/result.txt
 	diff --strip-trailing-cr $(BUILD)/sjljtest/result.txt $(SRCROOT)/test/sjljtest.expected.txt
 
 # TBD
 sjljtest_opt:
 	@mkdir -p $(BUILD)/sjljtest_opt
-	cd $(BUILD)/sjljtest_opt && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/sjljtest.c -o sjljtest -save-temps
+	cd $(BUILD)/sjljtest_opt && $(SDK_CXX) -O4 $(SRCROOT)/test/sjljtest.c -o sjljtest -save-temps
 	$(BUILD)/sjljtest_opt/sjljtest &> $(BUILD)/sjljtest_opt/result.txt
 	diff --strip-trailing-cr $(BUILD)/sjljtest_opt/result.txt $(SRCROOT)/test/sjljtest.expected.txt
 
 # TBD
 ehtest:
 	@mkdir -p $(BUILD)/ehtest
-	cd $(BUILD)/ehtest && $(SDK)/usr/bin/g++ -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	cd $(BUILD)/ehtest && $(SDK_CXX) -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
 	-$(BUILD)/ehtest/ehtest &> $(BUILD)/ehtest/result.txt
 	diff --strip-trailing-cr $(BUILD)/ehtest/result.txt $(SRCROOT)/test/ehtest.expected.txt
 
 # TBD
 ehtest_opt:
 	@mkdir -p $(BUILD)/ehtest_opt
-	cd $(BUILD)/ehtest_opt && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	cd $(BUILD)/ehtest_opt && $(SDK_CXX) -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
 	-$(BUILD)/ehtest_opt/ehtest &> $(BUILD)/ehtest_opt/result.txt
 	diff --strip-trailing-cr $(BUILD)/ehtest_opt/result.txt $(SRCROOT)/test/ehtest.expected.txt
 
 # TBD
 ehtest_asc:
 	@mkdir -p $(BUILD)/ehtest_asc
-	cd $(BUILD)/ehtest_asc && $(SDK)/usr/bin/g++ -muse-legacy-asc -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	cd $(BUILD)/ehtest_asc && $(SDK_CXX) -muse-legacy-asc -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
 	-$(BUILD)/ehtest_asc/ehtest &> $(BUILD)/ehtest_asc/result.txt
 	diff --strip-trailing-cr $(BUILD)/ehtest_asc/result.txt $(SRCROOT)/test/ehtest.expected.txt
 
-	cd $(BUILD)/ehtest_asc && $(SDK)/usr/bin/g++ -muse-legacy-asc -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	cd $(BUILD)/ehtest_asc && $(SDK_CXX) -muse-legacy-asc -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
 	-$(BUILD)/ehtest_asc/ehtest &> $(BUILD)/ehtest_asc/result.txt
 	diff --strip-trailing-cr $(BUILD)/ehtest_asc/result.txt $(SRCROOT)/test/ehtest.expected.txt
 
 # TBD
 as3interoptest:
 	@mkdir -p $(BUILD)/as3interoptest
-	cd $(BUILD)/as3interoptest && $(SDK)/usr/bin/g++ -O4 $(SRCROOT)/test/as3interoptest.c -o as3interoptest -save-temps
+	cd $(BUILD)/as3interoptest && $(SDK_CXX) -O4 $(SRCROOT)/test/as3interoptest.c -o as3interoptest -save-temps
 	$(BUILD)/as3interoptest/as3interoptest &> $(BUILD)/as3interoptest/result.txt
 
 # TBD
@@ -1721,8 +1722,8 @@ symboltest:
 	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=asm -o symboltest.s
 	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=obj -o symboltest.abc
 
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/nm symboltest.abc | grep symbolTest > syms.abc.txt
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/nm symboltest.bc | grep symbolTest > syms.bc.txt
+	cd $(BUILD)/symboltest && $(SDK_NM) symboltest.abc | grep symbolTest > syms.abc.txt
+	cd $(BUILD)/symboltest && $(SDK_NM) symboltest.bc | grep symbolTest > syms.bc.txt
 	diff --strip-trailing-cr $(BUILD)/symboltest/*.txt
 
 # TBD
@@ -1772,7 +1773,7 @@ checkasm:
 # TBD
 libtoabc:
 	mkdir -p $(BUILD)/libtoabc/`basename $(LIB)`
-	cd $(BUILD)/libtoabc/`basename $(LIB)` && $(SDK)/usr/bin/ar x $(LIB)
+	cd $(BUILD)/libtoabc/`basename $(LIB)` && $(SDK_AR) x $(LIB)
 	@abcdir=$(BUILD)/libtoabc/`basename $(LIB)` ; \
 	numos=`find $$abcdir -maxdepth 1 -name '*.o' | wc -l` ; \
 	if [$$numos -gt 0 ] ; then \
