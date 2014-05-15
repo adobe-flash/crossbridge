@@ -47,7 +47,7 @@ $?DEPENDENCY_LIBICONV=libiconv-1.14
 $?DEPENDENCY_LIBOGG=libogg-1.3.1
 $?DEPENDENCY_LIBPNG=libpng-1.5.7
 $?DEPENDENCY_LIBPROTOBUF=protobuf-2.5.0
-$?DEPENDENCY_LIBPHYSFS=physfs-2.0.2
+$?DEPENDENCY_LIBPHYSFS=physfs-2.0.3
 $?DEPENDENCY_LIBNCURSES=ncurses-5.9
 $?DEPENDENCY_LIBREADLINE=readline-6.3
 $?DEPENDENCY_LIBSNDFILE=libsndfile-1.0.25
@@ -389,7 +389,7 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK)/usr/bin/make extralibs
+	@$(SDK)/usr/bin/make libphysfs
 
 # ====================================================================================
 # CORE
@@ -427,7 +427,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBICONV).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBNCURSES).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBPROTOBUF).tar.gz
-	tar xf packages/$(DEPENDENCY_LIBPHYSFS).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBPHYSFS).tar.bz2
 	tar xf packages/$(DEPENDENCY_LIBREADLINE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBOGG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBPNG).tar.gz
@@ -450,6 +450,7 @@ install_libs:
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
 	cp -r ./patches/$(DEPENDENCY_DMALLOC) .
+	cp -r ./patches/$(DEPENDENCY_LIBPHYSFS) .
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_LIBSDL) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
@@ -1428,9 +1429,7 @@ libphysfs:
 	mkdir -p $(BUILD)/libphysfs
 	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(SDK_CMAKE) -G "Unix Makefiles" \
 		$(SRCROOT)/$(DEPENDENCY_LIBPHYSFS) -DCMAKE_INSTALL_PREFIX="$(SDK)/usr" \
-		-DPHYSFS_BUILD_TEST=0 -DPHYSFS_HAVE_THREAD_SUPPORT=0 \
-		-DPHYSFS_HAVE_CDROM_SUPPORT=0 -DPHYSFS_BUILD_STATIC=1 -DPHYSFS_BUILD_SHARED=0 -DPHYSFS_BUILD_PERL=0 \
-		-DPHYSFS_BUILD_RUBY=0 -DOTHER_LDFLAGS=-lz -DPHYSFS_NO_64BIT_SUPPORT=1 -DCMAKE_INCLUDE_PATH="$(SDK)/usr/include" \
+		-DPHYSFS_BUILD_TEST=0 -DPHYSFS_HAVE_THREAD_SUPPORT=0 -DPHYSFS_HAVE_CDROM_SUPPORT=0 -DPHYSFS_BUILD_STATIC=1 -DPHYSFS_BUILD_SHARED=0 -DOTHER_LDFLAGS=-lz -DCMAKE_INCLUDE_PATH="$(SDK)/usr/include" \
 		-DCMAKE_LIBRARY_PATH="$(SDK)/usr/lib"
 	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
