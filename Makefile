@@ -119,7 +119,6 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?TAMARIN_CONFIG_FLAGS=--target=i686-linux
 	$?TAMARINLDFLAGS=" -Wl,--stack,16000000"
 	$?TAMARINOPTFLAGS=-Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations 
-	$?SDKEXT=.zip
 	$?BUILD=$(WIN_BUILD)
 	$?PLATFORM_NAME=win
 	$?HOST_TRIPLE=i686-pc-cygwin
@@ -134,7 +133,6 @@ ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?TAMARIN_CONFIG_FLAGS=
 	$?TAMARINLDFLAGS=" -m32 -arch=i686"
 	$?TAMARINOPTFLAGS=-Wno-deprecated-declarations 
-	$?SDKEXT=.dmg
 	$?BUILD=$(MAC_BUILD)
 	$?PLATFORM_NAME=mac
 	$?HOST_TRIPLE=x86_64-apple-darwin10
@@ -150,7 +148,6 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 	$?TAMARIN_CONFIG_FLAGS=
 	$?TAMARINLDFLAGS=" -m32 -arch=i686"
 	$?TAMARINOPTFLAGS=-Wno-deprecated-declarations 
-	$?SDKEXT=.dmg
 	$?BUILD=$(LINUX_BUILD)
 	$?PLATFORM_NAME=linux
 	$?HOST_TRIPLE=x86_64-unknown-linux
