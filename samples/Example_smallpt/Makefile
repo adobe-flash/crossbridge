@@ -26,7 +26,7 @@
 # =END MIT LICENSE
 #
 
-T01: check
+all: check
 	@echo "-------- Example SmallPT --------"
 	@echo "First let's compile it as a projector:"
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) -O3 -fopenmp smallpt.cpp -o smallpt.exe

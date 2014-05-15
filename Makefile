@@ -389,7 +389,7 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK)/usr/bin/make libsdl_ttf
+	@$(SDK)/usr/bin/make extralibs
 
 # ====================================================================================
 # CORE
