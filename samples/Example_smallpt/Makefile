@@ -26,15 +26,14 @@
 # =END MIT LICENSE
 #
 
-.PHONY: quake3
-
-# http://ioquake3.org/data/quake3-latest-pk3s.zip
-BASEQ3DIR=baseq3
-
-all:
-	cd Quake3 && PATH=$(FLASCC)/usr/bin:$(PATH) make FLASCC=$(FLASCC) GLS3D=$(GLS3D) BASEQ3DIR=$(BASEQ3DIR) -j8
+T01: check
+	@echo "-------- Example SmallPT --------"
+	@echo "First let's compile it as a projector:"
+	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) -O3 -fopenmp smallpt.cpp -o smallpt.exe
+	@echo "Now lets compile it as a SWF:"
+	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) -O3 -fopenmp smallpt.cpp -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o smallpt.swf
 
 include ../Makefile.common
 
 clean:
-	@echo "Cleaning..."
+	@rm -f *.swf *.swc *.bc *.abc *.exe

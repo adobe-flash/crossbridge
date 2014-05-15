@@ -26,15 +26,14 @@
 # =END MIT LICENSE
 #
 
-.PHONY: quake3
-
-# http://ioquake3.org/data/quake3-latest-pk3s.zip
-BASEQ3DIR=baseq3
-
-all:
-	cd Quake3 && PATH=$(FLASCC)/usr/bin:$(PATH) make FLASCC=$(FLASCC) GLS3D=$(GLS3D) BASEQ3DIR=$(BASEQ3DIR) -j8
+T01: check
+	@echo "-------- Example rand_points --------"
+	@echo "First let's compile it as a projector:"
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) -O3 -lSDL -lpthread rand_points.cpp -o rand_points.exe
+	@echo "Now lets compile it as a SWF:"
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) -O3 -lSDL -lpthread rand_points.cpp -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o rand_points.swf
 
 include ../Makefile.common
 
 clean:
-	@echo "Cleaning..."
+	@rm -f *.swf *.swc *.bc *.abc *.exe

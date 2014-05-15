@@ -26,15 +26,12 @@
 # =END MIT LICENSE
 #
 
-.PHONY: quake3
-
-# http://ioquake3.org/data/quake3-latest-pk3s.zip
-BASEQ3DIR=baseq3
-
-all:
-	cd Quake3 && PATH=$(FLASCC)/usr/bin:$(PATH) make FLASCC=$(FLASCC) GLS3D=$(GLS3D) BASEQ3DIR=$(BASEQ3DIR) -j8
+all: check
+	@echo "-------- Example: Libco --------"
+	# TODO
 
 include ../Makefile.common
 
 clean:
-	@echo "Cleaning..."
+	rm -rf build
+	rm -f *.swf *.swc *.abc *.o
