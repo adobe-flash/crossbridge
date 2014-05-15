@@ -119,6 +119,7 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?SDLFLAGS=
 	$?TAMARIN_CONFIG_FLAGS=--target=i686-linux
 	$?TAMARINLDFLAGS=" -Wl,--stack,16000000"
+	$?TAMARINOPTFLAGS=-Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations 
 	$?SDKEXT=.zip
 	$?BUILD=$(WIN_BUILD)
 	$?PLATFORM_NAME=win
@@ -133,6 +134,7 @@ ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?SDLFLAGS=--build=i686-apple-darwin9
 	$?TAMARIN_CONFIG_FLAGS=
 	$?TAMARINLDFLAGS=" -m32 -arch=i686"
+	$?TAMARINOPTFLAGS=-Wno-deprecated-declarations 
 	$?SDKEXT=.dmg
 	$?BUILD=$(MAC_BUILD)
 	$?PLATFORM_NAME=mac
@@ -148,6 +150,7 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 	$?SDLFLAGS=--build=i686-unknown-linux
 	$?TAMARIN_CONFIG_FLAGS=
 	$?TAMARINLDFLAGS=" -m32 -arch=i686"
+	$?TAMARINOPTFLAGS=-Wno-deprecated-declarations 
 	$?SDKEXT=.dmg
 	$?BUILD=$(LINUX_BUILD)
 	$?PLATFORM_NAME=linux
@@ -216,7 +219,7 @@ endif
 # ====================================================================================
 # Tamarin options
 # ====================================================================================
-$?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
+$?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc $(TAMARINOPTFLAGS) -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
 $?SCOMP=java -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
 $?SCOMPFALCON=java -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
@@ -389,7 +392,7 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK)/usr/bin/make libphysfs
+	@$(SDK)/usr/bin/make tr
 
 # ====================================================================================
 # CORE
