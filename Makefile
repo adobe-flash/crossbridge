@@ -389,7 +389,7 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK)/usr/bin/make diagnostics
+	@$(SDK)/usr/bin/make libsdl_ttf
 
 # ====================================================================================
 # CORE
@@ -1125,7 +1125,7 @@ extralibs:
 		zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv \
 		libvgl libjpeg libpng libgif libtiff libwebp \
 		libogg libvorbis libflac libsndfile \
-		libsdl libfreetype libsdl_image libsdl_mixer \
+		libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image \
 		libphysfs
 
 # A Massively Spiffy Yet Delicately Unobtrusive Compression Library
@@ -1286,7 +1286,7 @@ libfreetype:
 	mkdir -p $(BUILD)/libfreetype
 	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBFREETYPE)/configure \
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared \
-		--disable-mmap --without-ats --without-old-mac-fonts
+		--disable-mmap --without-bzip2 --without-ats --without-old-mac-fonts
 	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE)
 	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
@@ -1354,7 +1354,7 @@ libsdl_mixer:
 libsdl_ttf:
 	mkdir -p $(BUILD)/libsdlttf
 	cd $(BUILD)/libsdlttf && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLTTF)/configure \
-		--prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
+		--prefix=$(SDK)/usr --with-sdl-prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
 		--disable-dependency-tracking --disable-sdltest --without-x
 	cd $(BUILD)/libsdlttf && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 

@@ -32,7 +32,7 @@
 BASEQ3DIR=baseq3
 
 all:
-	cd Quake3 && PATH=$(FLASCC)/usr/bin:$(PATH) make FLASCC=$(FLASCC) GLS3D=$(GLS3D) BASEQ3DIR=$(BASEQ3DIR) -j8
+	cd Quake3 && PATH=$(FLASCC)/usr/bin:$(PATH) make FLASCC=$(FLASCC) GLS3D=$(GLS3D) BASEQ3DIR=$(BASEQ3DIR) -j4
 
 include ../Makefile.common
 

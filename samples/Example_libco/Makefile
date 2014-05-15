@@ -28,7 +28,9 @@
 
 all: check
 	@echo "-------- Example: Libco --------"
-	# TODO
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) libco_v16/libco.c -o libco.exe
+	@echo "Now lets compile it as a SWF:"
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) libco_v16/libco.c -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o libco.swf 
 
 include ../Makefile.common
 

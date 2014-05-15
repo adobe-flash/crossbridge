@@ -29,9 +29,9 @@
 T01: check
 	@echo "-------- Example rand_points --------"
 	@echo "First let's compile it as a projector:"
-	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) -O3 -lSDL -lpthread rand_points.cpp -o rand_points.exe
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) -O3 -lSDL -lpthread rand_points.c -o rand_points.exe
 	@echo "Now lets compile it as a SWF:"
-	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) -O3 -lSDL -lpthread rand_points.cpp -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o rand_points.swf
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) -O3 -lSDL -lpthread rand_points.c -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o rand_points.swf
 
 include ../Makefile.common
 
