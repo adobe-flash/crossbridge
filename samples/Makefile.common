@@ -69,13 +69,11 @@ $?SWF_SIZE=800x600
 
 # Self check
 check:
-	@echo "Validating CrossBridge SDK location: $(FLASCC)"
 	@if [ -d $(FLASCC)/usr/bin ] ; then true ; \
-	else echo "Couldn't locate FLASCC sdk directory, please invoke make with \"make FLASCC=/path/to/FLASCC/sdk ...\"" ; exit 1 ; \
+	else echo "Couldn't locate CrossBridge SDK directory, please invoke make with \"make FLASCC=/path/to/CrossBridge/ ...\"" ; exit 1 ; \
 	fi
-	@echo "Validating AIR/Flex SDK location: $(FLEX)"
 	@if [ -d "$(FLEX)/bin" ] ; then true ; \
-	else echo "Couldn't locate Flex sdk directory, please invoke make with \"make FLEX=/path/to/flex  ...\"" ; exit 1 ; \
+	else echo "Couldn't locate Adobe AIR or Apache Flex SDK directory, please invoke make with \"make FLEX=/path/to/AirOrFlex  ...\"" ; exit 1 ; \
 	fi
 	@echo "ASC2: $(ASC2)"
 

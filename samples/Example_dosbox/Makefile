@@ -26,6 +26,8 @@
 # =END MIT LICENSE
 #
 
+.PHONY: clean all 
+
 BUILD=$(PWD)/build
 SRCROOT=$(PWD)
 

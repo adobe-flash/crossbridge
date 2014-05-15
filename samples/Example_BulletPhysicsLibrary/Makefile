@@ -26,6 +26,8 @@
 # =END MIT LICENSE
 #
 
+.PHONY: debug clean all 
+
 BULLETDIR:=bullet-2.80-rev2531
 #EXTRA_CFLAGS:=-DUSE_PTHREADS
 #EXTRA_OPTS:=-pthread
@@ -34,7 +36,7 @@ EXTRA_CFLAGS:=
 EXTRA_OPTS:=
 EXTRA_LIBS:=
 
-T09: check
+all: check
 	@echo "-------- Example: Bullet --------"
 	
 	mkdir -p build

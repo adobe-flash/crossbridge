@@ -26,6 +26,8 @@
 # =END MIT LICENSE
 #
 
+.PHONY: clean all 
+
 all: check
 	@echo "-------- Example SmallPT --------"
 	@echo "First let's compile it as a projector:"

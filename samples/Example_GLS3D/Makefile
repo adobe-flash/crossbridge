@@ -26,6 +26,8 @@
 # =END MIT LICENSE
 #
 
+.PHONY: debug clean all 
+
 all: check compile
 
 compile:

@@ -26,6 +26,8 @@
 # =END MIT LICENSE
 #
 
+.PHONY: clean all 
+
 all:
 	$(FLASCC)/usr/bin/swig -as3 gme.i
 	$(FLASCC)/usr/bin/genfs --type=embed testfiles testfs

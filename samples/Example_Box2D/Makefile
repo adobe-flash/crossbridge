@@ -26,7 +26,9 @@
 # =END MIT LICENSE
 #
 
-T12: check
+.PHONY: debug clean all 
+
+all: check
 	@echo "------- Example: Box2D --------"
 
 	mkdir -p build
@@ -48,7 +50,7 @@ swfs:
 	"$(FLEX)/bin/mxmlc" -library-path=Box2D.swc -debug=$(MXMLC_DEBUG) HelloWorld.as -o HelloWorld.swf
 	"$(FLEX)/bin/mxmlc" -library-path=Box2D.swc -debug=$(MXMLC_DEBUG) Boxes.as -o Boxes.swf
 
-T12Debug:
+debug:
 	make T12 OPT_CFLAGS="-O0 -g" MXMLC_DEBUG=true
 
 include ../Makefile.common

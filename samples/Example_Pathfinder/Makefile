@@ -26,7 +26,9 @@
 # =END MIT LICENSE
 #
 
-T13: check
+.PHONY: clean all 
+
+all: check
 	@echo "-------- PathFinder Example --------"
 
 	@echo "\n->Create LLVM bitcode of just our interface to get symbols"

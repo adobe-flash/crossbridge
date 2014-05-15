@@ -26,6 +26,8 @@
 # =END MIT LICENSE
 #
 
+.PHONY: clean all 
+
 all: check
 	@echo "-------- Example: Libco --------"
 	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) libco_v16/libco.c -o libco.exe

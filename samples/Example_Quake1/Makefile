@@ -26,6 +26,8 @@
 # =END MIT LICENSE
 #
 
+.PHONY: clean all 
+
 $?PAK0FILE=baseq1/pak0.pak
 $?BUILDDIR=build
 $?QUAKECFLAGS=$(BASE_CFLAGS) -D_THREAD_SAFE -DSDL -Wno-pointer-sign `"$(call unixpath,$(FLASCC)/usr/bin/sdl-config)" --cflags` $(EXTRACFLAGS)

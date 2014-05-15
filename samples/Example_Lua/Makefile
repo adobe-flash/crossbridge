@@ -26,7 +26,9 @@
 # =END MIT LICENSE
 #
 
-T08: check
+.PHONY: debug clean all 
+
+all: check
 	@echo "-------- Example: Lua --------"
 	cd lua-5.2.0 && make FLASCC="$(call unixpath,$(FLASCC))" NP_FLASCC="$(call nativepath,$(FLASCC))" OPT_FLAGS="$(OPT_CFLAGS) $(EXTRACFLAGS)" flash
 
@@ -34,13 +36,10 @@ T08: check
 	#TODO: AIR SDK Does not provide MXML support, we should port the example to pure AS3
 	#"$(FLEX)/bin/mxmlc" -library-path+=lua.swc luatest.mxml -debug=$(MXMLC_DEBUG) -o luatest.swf
 	#TODO: AIR SDK Fails to compile with ambiguous reference to Starling Texture
-	#make starlingdemo
+	#cd LuaStarling && "$(FLEX)/bin/mxmlc" -library-path+=../lua.swc LuaStarling.as -debug=$(MXMLC_DEBUG) -o LuaStarling.swf
 
-T08Debug:
-	make T08 OPT_CFLAGS="-O0 -g" MXMLC_DEBUG=true
-
-starlingdemo:
-	cd LuaStarling && "$(FLEX)/bin/mxmlc" -library-path+=../lua.swc LuaStarling.as -debug=$(MXMLC_DEBUG) -o LuaStarling.swf
+debug:
+	make all OPT_CFLAGS="-O0 -g" MXMLC_DEBUG=true
 
 include ../Makefile.common
 

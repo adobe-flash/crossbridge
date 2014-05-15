@@ -26,7 +26,7 @@
 # =END MIT LICENSE
 #
 
-.PHONY: demos
+.PHONY: clean all demos
 
 SRC=$(wildcard src/*.c)
 OBJS=$(subst .c,.o,$(SRC))

@@ -26,7 +26,9 @@
 # =END MIT LICENSE
 #
 
-T10: check
+.PHONY: debug clean all 
+
+all: check
 	@echo "-------- Example: libQREncode -------"
 	cd libqrencode && "$(FLASCC)/usr/bin/swig" -as3  -I. -module QREncode -outdir . -includeall -ignoremissing as3api.h
 	cd libqrencode && $(ASC2) -import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) -import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) QREncode.as
@@ -36,7 +38,7 @@ T10: check
 	@echo "Compiling test app using SWC:"
 	"$(FLEX)/bin/mxmlc" -library-path+=qrencode.swc qrencoder.mxml -debug=$(MXMLC_DEBUG) -o qrencoder.swf
 
-T10Debug:
+debug:
 	make T10 OPT_CFLAGS="-O0 -g" MXMLC_DEBUG=true
 
 include ../Makefile.common

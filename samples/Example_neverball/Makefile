@@ -26,6 +26,8 @@
 # =END MIT LICENSE
 #
 
+.PHONY: clean all 
+
 BUILD=$(PWD)/build
 
 # CFlag -flto-api=exports.txt removes used symbols, generate..

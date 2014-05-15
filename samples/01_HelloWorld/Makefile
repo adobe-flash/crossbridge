@@ -28,10 +28,16 @@
 
 T01: check
 	@echo "-------- Sample 1 --------"
-	@echo "First let's compile it as a projector:"
+	@echo "Compiling EXE ..."
 	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) hello.c -o hello.exe
-	@echo "Now lets compile it as a SWF:"
+	@echo "Compiling SWF ..."
 	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) hello.c -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o hello.swf
+	@echo "Generating Exports.txt ..."
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) -c hello.c -o hello.o
+	cp -f exports.tpl exports.txt
+	"$(FLASCC)/usr/bin/nm" hello.o | grep ' T ' | sed 's/.*__/_/' | sed 's/.* T //' >> exports.txt
+	@echo "Compiling SWF (LTO) ..."
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) hello.c -flto-api=exports.txt -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o hello-lto.swf
 
 include ../Makefile.common
 

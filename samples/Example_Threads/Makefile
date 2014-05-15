@@ -26,9 +26,11 @@
 # =END MIT LICENSE
 #
 
+.PHONY: clean all
+
 SWFS=atomic.swf flash++flavors.swf flash++ui.swf openmp.swf pthreads.swf sema.swf workers.swf
 
-T14: check $(SWFS)
+all: check $(SWFS)
 
 atomic.swf: atomic.cpp
 	$(FLASCC)/usr/bin/g++ -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -O4 -flto-api=exports.txt -pthread atomic.cpp -o atomic.swf

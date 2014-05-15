@@ -26,7 +26,7 @@
 # =END MIT LICENSE
 #
 
-.PHONY: quake3
+.PHONY: clean all quake3
 
 # http://ioquake3.org/data/quake3-latest-pk3s.zip
 BASEQ3DIR=baseq3
