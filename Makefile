@@ -87,8 +87,7 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 else ifneq (,$(findstring Darwin,$(UNAME)))
 	$?PLATFORM="darwin"
 	$?RAWPLAT=darwin
-	#$?THREADS=$(shell sysctl -n hw.ncpu)
-	$?THREADS=1
+	$?THREADS=$(shell sysctl -n hw.ncpu)
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-apple-darwin10
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
