@@ -64,10 +64,12 @@ $?VGL_TARGETS=	02_matrices_and_coloring_polygons \
 	35_glsl_font \
 	36_vertex_array_objects
 
-all: init check $(VGL_TARGETS)
-
+all: clean init check $(VGL_TARGETS)
+ 
 %:
-	@curl -L -o $@.zip http://lazyfoo.net/tutorials/OpenGL/$@/$@.zip && mv $@.zip temp/ && unzip temp/$@.zip && mv $@ lessons
+	@curl -L -o $@.zip http://lazyfoo.net/tutorials/OpenGL/$@/$@.zip && mv $@.zip temp/ && unzip -qq temp/$@.zip && mv $@ lessons
+	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/main.cpp -I../Example_freeglut/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -I$(GLS3D)/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -o $@.exe
+	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/main.cpp -I../Example_freeglut/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -I$(GLS3D)/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o $@.swf 
 
 include ../Makefile.common
 
