@@ -21,13 +21,17 @@ Demo:
 * Open README.html to get a basic idea of CrossBridge usage
 * For more information about the project, please visit http://www.crossbridge.io
 
-### Maintenance releases by VPMedia
+### Community release by VPMedia
 
 * [Changes] (https://github.com/vpmedia/crossbridge/blob/master/CHANGES.md)
 
 #### CrossBridge 1.0.2 - Windows only
 
-* [Download] (https://dl.dropboxusercontent.com/u/1375050/cb_master_sdk-win.zip)
+* [Download SDK with Cygwin Installer] (https://dl.dropboxusercontent.com/u/1375050/cb_master_sdk-win.zip)
+
+* [Download SDK Only] (https://dl.dropboxusercontent.com/u/1375050/CrossBridge_1.0.2.devbuild.zip)
+
+> The SDK requires newer Cygwin installation than previous releases.
 
 ### Getting involved in development 
 
