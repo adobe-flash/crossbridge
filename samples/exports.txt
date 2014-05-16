@@ -26,15 +26,30 @@
 # =END MIT LICENSE
 #
 
-.PHONY: clean all quake3
+# Purpose: List of symbols that must be always preserved using CrossBridge SDK
+# Author: Andras Csizmadia (www.vpmedia.hu)
+# Important: Always leave one blank line at the end, for appending custom symbols
 
-# http://ioquake3.org/data/quake3-latest-pk3s.zip
-BASEQ3DIR=baseq3
+# built in symbols that must always be preserved
+_start1
+malloc
+free
+memcpy
+memmove
+flascc_uiTickProc
+_sync_synchronize
 
-all:
-	cd Quake3 && PATH=$(FLASCC)/usr/bin:$(PATH) make FLASCC=$(FLASCC) GLS3D=$(GLS3D) BASEQ3DIR=$(BASEQ3DIR) -j4
+# symbols for C++ exception handling
+_Unwind_SjLj_Register
+_Unwind_SjLj_Resume
+_Unwind_SjLj_Unregister
+_Unwind_SjLj_RaiseException
 
-include ../Makefile.common
+# update by VPMedia
+__hack_used
+main
 
-clean:
-	rm -rf quake3/build
+# symbols specific to libVGL
+vglttyioctl
+
+# custom symbols

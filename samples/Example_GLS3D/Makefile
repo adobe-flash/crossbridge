@@ -71,4 +71,4 @@ install: check
 include ../Makefile.common
 
 clean:
-	echo "Cleaning..."
+	#rm -rf build

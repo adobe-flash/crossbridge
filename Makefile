@@ -100,7 +100,7 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?CXX=g++
 	$?EXEEXT=.exe
 	$?SOEXT=.dll
-	#$?SDLFLAGS=
+	$?SDLFLAGS=
 	$?TAMARIN_CONFIG_FLAGS=--target=i686-linux
 	$?TAMARINLDFLAGS=" -Wl,--stack,16000000"
 	$?TAMARINOPTFLAGS=-Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations 
@@ -114,7 +114,7 @@ ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?CXX=g++-4.2
 	$?EXEEXT=
 	$?SOEXT=.dylib
-	#$?SDLFLAGS=--build=i686-apple-darwin9
+	$?SDLFLAGS=--build=i686-apple-darwin9
 	$?TAMARIN_CONFIG_FLAGS=
 	$?TAMARINLDFLAGS=" -m32 -arch=i686"
 	$?TAMARINOPTFLAGS=-Wno-deprecated-declarations 
@@ -129,7 +129,7 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 	$?CXX=g++
 	$?EXEEXT=
 	$?SOEXT=.so
-	#$?SDLFLAGS=--build=i686-unknown-linux
+	$?SDLFLAGS=--build=i686-unknown-linux
 	$?TAMARIN_CONFIG_FLAGS=
 	$?TAMARINLDFLAGS=" -m32 -arch=i686"
 	$?TAMARINOPTFLAGS=-Wno-deprecated-declarations 
@@ -333,7 +333,6 @@ all_ci:
 	@$(SDK_MAKE) submittests
 	@$(SDK_MAKE) samples
 	@$(SDK_MAKE) examples
-	@$(SDK_MAKE) swigtests
 
 # Build all with Windows 
 # Notes: Ignoring some build errors but only documentation generation related
@@ -364,7 +363,6 @@ all_win:
 	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
 	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
 	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt 2>&1
-	@$(SDK_MAKE) swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
 
 # Print debug information
 diagnostics:
@@ -382,9 +380,6 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
-	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
-	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt 2>&1
 	@$(SDK_MAKE) swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
 
 # ====================================================================================

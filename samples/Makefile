@@ -74,11 +74,11 @@ E06:
 E07:
 	@cd Example_gme && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 E08:
-	@cd Example_neverball && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
+	@cd Example_Threads && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 E09:
 	@cd Example_Pathfinder && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 E10:
-	@cd Example_Threads && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
+	@cd Example_neverball && make FLASCC="$(FLASCC)" FLEX="$(FLEX)"
 
 include Makefile.common
 

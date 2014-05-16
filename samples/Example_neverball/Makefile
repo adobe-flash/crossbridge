@@ -87,4 +87,4 @@ all:
 include ../Makefile.common
 
 clean:
-	echo "Cleaning..."
+	rm -rf $(BUILD)
