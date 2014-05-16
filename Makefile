@@ -68,7 +68,7 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?THREADS=1
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
-	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
+	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/FlashPlayerDebugger.exe
 	$?NOPIE=
 	$?BIN_TRUE=/usr/bin/true
 else ifneq (,$(findstring Darwin,$(UNAME)))
@@ -77,7 +77,7 @@ else ifneq (,$(findstring Darwin,$(UNAME)))
 	$?THREADS=$(shell sysctl -n hw.ncpu)
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-apple-darwin10
-	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
+	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/Flash Player.app
 	$?NOPIE=-no_pie
 	$?BIN_TRUE=/usr/bin/true
 else
@@ -86,7 +86,7 @@ else
 	$?THREADS=1
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-unknown-linux-gnu
-	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app
+	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/Flash Player.app
 	$?NOPIE=
 	$?BIN_TRUE=/bin/true
 endif
@@ -1719,8 +1719,8 @@ test_symbols:
 
 # Run GDB tests
 test_gdb:
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX_SDK_HOME) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX_SDK_HOME) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
+	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(FLASH_PLAYER_EXE)" -Dflex.dir=$(FLEX_SDK_HOME) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
+	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(FLASH_PLAYER_EXE)" -Dflex.dir=$(FLEX_SDK_HOME) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
 
 # Run Virtual File System (VFS) tests
 test_vfs:
@@ -1730,12 +1730,12 @@ test_vfs:
 # Samples and Examples
 # ====================================================================================
 
-# TBD
+# Samples shipped with the SDK
 samples:
 	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) -j$(THREADS)
 	#find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
-# TBD
+# Examples used to test the SDK
 examples:
 	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) -j$(THREADS) examples
 	#find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
@@ -1744,7 +1744,7 @@ examples:
 # Extra Tests
 # ====================================================================================
 
-# TBD
+# Check headers for ASM
 checkasm:
 	rm -rf $(BUILD)/libtoabc
 	@mkdir -p $(BUILD)/logs/libtoabc
@@ -1767,7 +1767,7 @@ checkasm:
 	@echo "Checking headers for asm"
 	$(PYTHON) $(SRCROOT)/tools/search_headers.py $(SDK) $(BUILD)/header-search
 
-# TBD
+# Helper target for 'checkasm'
 libtoabc:
 	mkdir -p $(BUILD)/libtoabc/`basename $(LIB)`
 	cd $(BUILD)/libtoabc/`basename $(LIB)` && $(SDK_AR) x $(LIB)
@@ -1777,7 +1777,7 @@ libtoabc:
 	cd $(BUILD)/libtoabc/`basename $(LIB)` && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS) ; \
 	fi 
 
-# TBD
+# Deprecated test (Source missing)
 speccpu2006: # works on mac only! (and probably requires local tweaks to alchemy.cfg and mac32.cfg)
 	@rm -rf $(BUILD)/speccpu2006
 	@mkdir -p $(BUILD)/speccpu2006
@@ -1790,7 +1790,7 @@ speccpu2006: # works on mac only! (and probably requires local tweaks to alchemy
 	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=alchemy.cfg --tune=base --loose --action validate int fp | tee -a alchemy.run.log)
 	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action validate int fp | tee -a mac32.run.log)
 
-# TBD
+# Helper lib for GCC tests
 dejagnu:
 	mkdir -p $(BUILD)/dejagnu
 	cd $(BUILD)/dejagnu && $(SRCROOT)/dejagnu-1.5/configure --prefix=$(BUILD)/dejagnu && $(MAKE) install

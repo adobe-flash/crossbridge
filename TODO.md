@@ -13,3 +13,5 @@ TODO
 * Apply naming convention across the code base (Alchemy -> FlasCC -> CrossBridge)
 
 * Solve Linux build issues: [LOG](https://s3.amazonaws.com/archive.travis-ci.org/jobs/24450137/log.txt)
+
+* Try to get missing 'qa/gdbunit/build.xml' build script
