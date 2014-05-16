@@ -15,3 +15,7 @@ TODO
 * Solve Linux build issues: [LOG](https://s3.amazonaws.com/archive.travis-ci.org/jobs/24450137/log.txt)
 
 * Try to get missing 'qa/gdbunit/build.xml' build script
+
+* Use Adobe AIR SDK ASC2 if available (Building the SDK and Projects)
+
+* Improve test coverage and documentation
