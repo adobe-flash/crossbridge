@@ -19,3 +19,5 @@ TODO
 * Use Adobe AIR SDK ASC2 if available (Building the SDK and Projects)
 
 * Improve test coverage and documentation
+
+* Merge GLSL2AGAL into the tool-chain

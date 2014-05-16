@@ -35,7 +35,7 @@ all: check
 	"$(FLASCC)/usr/bin/g++" -O4 -c as3api.cpp
 
 	@echo "\n->Copy the base flascc symbols need to run"
-	cp -f flascc_exports.txt exports.txt
+	cp -f ../exports.txt exports.txt
 
 	@echo "\n->Pull out symbols of the LLVM bitcode of our interface "
 	"$(FLASCC)/usr/bin/nm" as3api.o | grep " T " | awk '{print $$3}' | sed 's/__/_/' >> exports.txt

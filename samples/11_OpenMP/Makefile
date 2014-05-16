@@ -30,7 +30,7 @@ T11: check
 	@echo "-------- Sample 11 --------"
 	@echo "Lets compile it as a SWF:"
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) mandel.cpp -lAS3++ -lFlash++ \
-		-pthread -fopenmp -O4 -flto-api=exports.txt -fno-stack-protector -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o mandel.swf
+		-pthread -fopenmp -O4 -flto-api=../exports.txt -fno-stack-protector -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o mandel.swf
 
 include ../Makefile.common
 
