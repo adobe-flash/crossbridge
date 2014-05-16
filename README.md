@@ -12,6 +12,9 @@ Features:
 * [SWIG](http://www.swig.org) backend that auto-generates inter-operability code, allowing you to build Flash libraries (SWCs) that wrap C/C++ libs
 * Multi-threading based on [POSIX Threads](https://en.wikipedia.org/wiki/POSIX_Threads)
 
+Demo:
+* [NeverBall](http://www.cmodule.org/neverball/)
+
 ### Getting started using CrossBridge
 
 * [Download the latest stable SDK for your OS](http://sourceforge.net/projects/crossbridge/files/)
