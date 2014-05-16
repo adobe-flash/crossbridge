@@ -239,14 +239,20 @@ endif
 $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SDK)/usr/bin/gcc -emit-llvm -DSTRIP_FBSDID" MAKEFLAGS="" MFLAGS="" $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 
 # ====================================================================================
-# ALL TARGET
+# ALL TARGETS
 # ====================================================================================
 BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
 BUILDORDER+= sdkcleanup tr trd extratools extralibs finalcleanup submittests
 
-# TBD
+TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
+TESTORDER+=  test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols 
+
+# All Tests
+submittests: $(TESTORDER)
+
+# All Targets
 all:
-	$(MAKE) diagnostics
+	@$(MAKE) diagnostics
 	@echo "-  libs"
 	@$(MAKE) install_libs
 	@mkdir -p $(BUILD)/logs
@@ -256,7 +262,7 @@ all:
 	@$(MAKE) make &> $(BUILD)/logs/make.txt 2>&1
 	@$(SDK_MAKE) -s all_with_local_make
 
-# TBD
+# Macro for Targets with local Make
 all_with_local_make:
 	@for target in $(BUILDORDER) ; do \
 		echo "-  $$target" ; \
@@ -376,7 +382,10 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK_MAKE) diagnostics
+	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
+	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
+	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt 2>&1
+	@$(SDK_MAKE) swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
 
 # ====================================================================================
 # CORE
@@ -1512,110 +1521,99 @@ libtool:
 # Submit tests
 # ====================================================================================
 
-# All Tests
-submittests: pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
-			hellocpp_shell hellocpp_swf hellocpp_swf_opt posixtest scimark scimark_swf \
-			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest
-	cat $(BUILD)/scimark/result.txt
+# Test HelloWorld.C
+test_hello_c:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_hello_c
+	@mkdir -p $(BUILD)/test_hello_c
+	# Assembling BitCode Output (BC)
+	cd $(BUILD)/test_hello_c && $(SDK_CC) -c -g -O0 $(SRCROOT)/test/hello.c -emit-llvm -o hello.bc
+	# Assembling ABC Output (OBJ)
+	cd $(BUILD)/test_hello_c && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.abc -filetype=obj
+	# Assembling AS3 Output (ASM)
+	cd $(BUILD)/test_hello_c && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.as -filetype=asm
+	# Assembling SWF Output
+	cd $(BUILD)/test_hello_c && $(SDK_CC) -emit-swf -swf-size=320x240 -O0 -g hello.abc -o hello.swf
+	# Assembling SWF Output (Optimized)
+	cd $(BUILD)/test_hello_c && $(SDK_CC) -emit-swf -swf-size=320x240 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
+	# Assembling SWF Output (Use AS3 Assembly instead of intrinsics - Does not work)
+	# cd $(BUILD)/test_hello_c && $(SDK_CC) -emit-swf -swf-size=320x240 -O4 -muse-legacy-asc $(SRCROOT)/test/hello.c -o hello-muse.swf
 
-# POSIX Threads - Basic Test
-pthreadsubmittests_shell: pthreadsubmittests_shell_compile pthreadsubmittests_shell_run
+# Test HelloWorld.CPP
+test_hello_cpp:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_hello_cpp
+	@mkdir -p $(BUILD)/test_hello_cpp
+	# Assembling Native Output
+	cd $(BUILD)/test_hello_cpp && $(SDK_CXX) -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
+	# Assembling SWF Output
+	cd $(BUILD)/test_hello_cpp && $(SDK_CXX) -emit-swf -swf-size=320x240 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
+	# Assembling SWF Output (Optimized)
+	cd $(BUILD)/test_hello_cpp && $(SDK_CXX) -emit-swf -swf-size=320x240 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
 
-# POSIX Threads - Basic Test
-pthreadsubmittests_shell_compile:
-	@rm -rf $(BUILD)/pthreadsubmit_shell
-	@mkdir -p $(BUILD)/pthreadsubmit_shell
-	cd $(BUILD)/pthreadsubmit_shell && $(SDK_CC) -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized
-	cd $(BUILD)/pthreadsubmit_shell && $(SDK_CC) -O0 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test
+# Test POSIX Threads - C
+test_pthreads_c_shell:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_pthreads_c_shell
+	@mkdir -p $(BUILD)/test_pthreads_c_shell
+	# Assembling SWF Output
+	cd $(BUILD)/test_pthreads_c_shell && $(SDK_CC) -O0 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test
+	# Assembling SWF Output (Optimized)
+	cd $(BUILD)/test_pthreads_c_shell && $(SDK_CC) -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized
+	# Running Output
+	cd $(BUILD)/test_pthreads_c_shell && ./pthread_test &> $(BUILD)/test_pthreads_c_shell/pthread_test.txt
+	# Running Output (Optimized)
+	cd $(BUILD)/test_pthreads_c_shell && ./pthread_test_optimized &> $(BUILD)/test_pthreads_c_shell/pthread_test_optimized.txt
 
-# POSIX Threads - Basic Test
-pthreadsubmittests_shell_run:
-	cd $(BUILD)/pthreadsubmit_shell && ./pthread_test_optimized
-	cd $(BUILD)/pthreadsubmit_shell && ./pthread_test
+# Test POSIX Threads - C
+test_pthreads_c_swf:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_pthreads_c_swf
+	@mkdir -p $(BUILD)/test_pthreads_c_swf
+	# Assembling SWC
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -emit-swc=com.adobe.flascc -o pthread_test_optimized.swc
+	# Assembling SWF
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O0 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
+	# Assembling SWF (Optimized)
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized.swf
+	# Assembling SWFs (Optimized)
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/pthread_cancel.c -o pthread_cancel.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/pthread_async_cancel.c -o pthread_async_cancel.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/pthread_create.c -o pthread_create.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/pthread_create_test.c -o pthread_create_test.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/pthread_mutex_test.c -o pthread_mutex_test.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/pthread_mutex_test2.c -o pthread_mutex_test2.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/pthread_malloc_test.c -o pthread_malloc_test.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/pthread_specific.c -o pthread_specific.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/pthread_suspend.c -o pthread_suspend.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/thr_kill.c -o thr_kill.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/peterson.c -o peterson.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf -DORDER_STRENGTH=1 $(SRCROOT)/test/peterson.c -o peterson_nofence.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -emit-swf $(SRCROOT)/test/newThread.c -o newThread.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/avm2_conc.c -o avm2_conc.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/avm2_mutex.c -o avm2_mutex.swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O4 -pthread -emit-swf $(SRCROOT)/test/avm2_mutex2.c -o avm2_mutex2.swf
 
-# POSIX Threads - Basic Test
-pthreadsubmittests_swf:
-	@rm -rf $(BUILD)/pthreadsubmit_swf
-	@mkdir -p $(BUILD)/pthreadsubmit_swf
-	cd $(BUILD)/pthreadsubmit_swf && $(SDK_CC) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test_optimized.swf
-	cd $(BUILD)/pthreadsubmit_swf && $(SDK_CC) -O4 -pthread -save-temps $(SRCROOT)/test/pthread_test.c -emit-swc=com.adobe.flascc -o pthread_test_optimized.swc
-	cd $(BUILD)/pthreadsubmit_swf && $(SDK_CC) -O0 -emit-swf -pthread -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
-	cp -f $(BUILD)/pthreadsubmit_swf/*.swf $(BUILDROOT)/extra/
+# Test POSIX Threads - CPP
+test_pthreads_cpp_swf:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_pthreads_cpp_swf
+	@mkdir -p $(BUILD)/test_pthreads_cpp_swf
+	# Assembling SWFs
+	cd $(BUILD)/test_pthreads_cpp_swf && $(SDK_CXX) -O4 -emit-swf -pthread $(SRCROOT)/test/AS3++mt.cpp -lAS3++ -o AS3++mt.swf
+	cd $(BUILD)/test_pthreads_cpp_swf && $(SDK_CXX) -O4 -emit-swf -pthread $(SRCROOT)/test/AS3++mt1.cpp -lAS3++ -o AS3++mt1.swf
+	cd $(BUILD)/test_pthreads_cpp_swf && $(SDK_CXX) -O4 -emit-swf -pthread $(SRCROOT)/test/AS3++mt2.cpp -lAS3++ -o AS3++mt2.swf
+	cd $(BUILD)/test_pthreads_cpp_swf && $(SDK_CXX) -O4 -emit-swf -pthread $(SRCROOT)/test/AS3++mt3.cpp -lAS3++ -o AS3++mt3.swf
 
-# POSIX Threads - Basic Tests
-pthreadtests:
-	@rm -rf $(BUILD)/pthreadtests
-	@mkdir -p $(BUILD)/pthreadtests
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_cancel.c -o pthread_cancel.swf
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_async_cancel.c -o pthread_async_cancel.swf
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_create.c -o pthread_create.swf
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_create_test.c -o pthread_create_test.swf
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_mutex_test.c -o pthread_mutex_test.swf
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_mutex_test2.c -o pthread_mutex_test2.swf
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_malloc_test.c -o pthread_malloc_test.swf
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_specific.c -o pthread_specific.swf
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_suspend.c -o pthread_suspend.swf
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/thr_kill.c -o thr_kill.swf
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/peterson.c -o peterson.swf
-	cd $(BUILD)/pthreadtests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps -DORDER_STRENGTH=1 $(SRCROOT)/test/peterson.c -o peterson_nofence.swf
-	$(MAKE) as3++tests
-
-# POSIX Threads - Concurrency Test
-conctests:
-	mkdir -p $(BUILD)/conctests
-	cd $(BUILD)/conctests && $(SDK_CC) -O4 -emit-swf -save-temps $(SRCROOT)/test/newThread.c -o newThread.swf
-	cd $(BUILD)/conctests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/avm2_conc.c -o avm2_conc.swf
-	cd $(BUILD)/conctests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/avm2_mutex.c -o avm2_mutex.swf
-	cd $(BUILD)/conctests && $(SDK_CC) -O4 -pthread -emit-swf -save-temps $(SRCROOT)/test/avm2_mutex2.c -o avm2_mutex2.swf
-
-# TBD
-helloswf:
-	@rm -rf $(BUILD)/helloswf
-	@mkdir -p $(BUILD)/helloswf
-	cd $(BUILD)/helloswf && $(SDK_CC) -c -g -O0 $(SRCROOT)/test/hello.c -emit-llvm -o hello.bc
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.abc -filetype=obj
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.as -filetype=asm
-	cd $(BUILD)/helloswf && $(SDK_CC) -emit-swf -swf-size=200x200 -O0 -g hello.abc -o hello.swf
-
-# TBD
-helloswf_opt:
-	@rm -rf $(BUILD)/helloswf_opt
-	@mkdir -p $(BUILD)/helloswf_opt
-	cd $(BUILD)/helloswf_opt && $(SDK_CC) -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
-
-# TBD
-hellocpp_shell:
-	@rm -rf $(BUILD)/hellocpp_shell
-	@mkdir -p $(BUILD)/hellocpp_shell
-	cd $(BUILD)/hellocpp_shell && $(SDK_CXX) -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
-
-# TBD
-hellocpp_swf:
-	@rm -rf $(BUILD)/hellocpp_swf
-	@mkdir -p $(BUILD)/hellocpp_swf
-	cd $(BUILD)/hellocpp_swf && $(SDK_CXX) -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
-
-# TBD
-hellocpp_swf_opt:
-	@rm -rf $(BUILD)/hellocpp_swf_opt
-	@mkdir -p $(BUILD)/hellocpp_swf_opt
-	cd $(BUILD)/hellocpp_swf_opt && $(SDK_CXX) -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
-
-# TBD
-as3++tests:
-	@rm -rf $(BUILD)/as3++_swf
-	@mkdir -p $(BUILD)/as3++_swf
-	cd $(BUILD)/as3++_swf && $(SDK_CXX) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt.cpp -lAS3++ -o AS3++mt.swf
-	cd $(BUILD)/as3++_swf && $(SDK_CXX) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt1.cpp -lAS3++ -o AS3++mt1.swf
-	cd $(BUILD)/as3++_swf && $(SDK_CXX) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt2.cpp -lAS3++ -o AS3++mt2.swf
-	cd $(BUILD)/as3++_swf && $(SDK_CXX) -O4 -emit-swf -pthread -save-temps $(SRCROOT)/test/AS3++mt3.cpp -lAS3++ -o AS3++mt3.swf
-
-# TBD
-posixtest:
-	@rm -rf $(BUILD)/posixtest
-	@mkdir -p $(BUILD)/posixtest
-	$(SDK)/usr/bin/genfs --name my.test.BackingStore $(SRCROOT)/test/zipfsroot $(BUILD)/posixtest/alcfs
-	cd $(BUILD)/posixtest && $(SCOMPFALCON) \
+# Test POSIX VFS
+test_posix:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_posix
+	@mkdir -p $(BUILD)/test_posix
+	# Assembling VFS
+	$(SDK)/usr/bin/genfs --name my.test.BackingStore $(SRCROOT)/test/zipfsroot $(BUILD)/test_posix/alcfs
+	# Assembling ABC
+	cd $(BUILD)/test_posix && $(SCOMPFALCON) \
 		-import $(call nativepath,$(SDK)/usr/lib/BinaryData.abc) \
 		-import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) \
 		-import $(call nativepath,$(SDK)/usr/lib/ISpecialFile.abc) \
@@ -1624,111 +1622,127 @@ posixtest:
 		-import $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) \
 		-import $(call nativepath,$(SDK)/usr/lib/InMemoryBackingStore.abc) \
 		-import $(call nativepath,$(SDK)/usr/lib/PlayerKernel.abc) \
-		$(call nativepath, $(BUILD)/posixtest/alcfsBackingStore.as) -outdir . -out alcfs
-	cd $(BUILD)/posixtest && $(SDK_CC) -emit-swf -O0 -swf-version=15 $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) alcfs.abc $(SRCROOT)/test/fileio.c -o posixtest.swf
+		$(call nativepath, $(BUILD)/test_posix/alcfsBackingStore.as) -outdir . -out alcfs
+	# Assembling SWF
+	cd $(BUILD)/test_posix && $(SDK_CC) -emit-swf -O0 -swf-version=15 $(call nativepath,$(SDK)/usr/lib/AlcVFSZip.abc) alcfs.abc $(SRCROOT)/test/fileio.c -o posixtest.swf
+
+# Test with SciMark
+test_scimark_shell:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_scimark_shell
+	@mkdir -p $(BUILD)/test_scimark_shell
+	# Assembling Native
+	cd $(BUILD)/test_scimark_shell && $(SDK_CC) -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
+	# Running Native
+	$(BUILD)/test_scimark_shell/scimark2 &> $(BUILD)/test_scimark_shell/result.txt
+
+# Test with SciMark SWF
+test_scimark_swf:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_scimark_swf
+	@mkdir -p $(BUILD)/test_scimark_swf
+	# Assembling SWFs
+	cd $(BUILD)/test_scimark_swf && $(SDK_CC) -O4 -swf-version=17 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2-SWF17.swf
+	cd $(BUILD)/test_scimark_swf && $(SDK_CC) -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
+	cd $(BUILD)/test_scimark_swf && $(SDK_CC) -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2v18.swf
 
 # TBD
-scimark:
-	@mkdir -p $(BUILD)/scimark
-	cd $(BUILD)/scimark && $(SDK_CC) -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
-	$(BUILD)/scimark/scimark2 &> $(BUILD)/scimark/result.txt
+test_sjlj:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_sjlj
+	@mkdir -p $(BUILD)/test_sjlj
+	# Assembling Native
+	cd $(BUILD)/test_sjlj && $(SDK_CXX) -O0 $(SRCROOT)/test/sjljtest.c -v -o sjljtest -save-temps
+	# Running Native
+	$(BUILD)/test_sjlj/sjljtest &> $(BUILD)/test_sjlj/result.txt
+	diff --strip-trailing-cr $(BUILD)/test_sjlj/result.txt $(SRCROOT)/test/sjljtest.expected.txt
 
 # TBD
-scimark_swf:
-	@mkdir -p $(BUILD)/scimark_swf
-	cd $(BUILD)/scimark_swf && $(SDK_CC) -O4 -swf-version=17 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
-	cd $(BUILD)/scimark_swf && $(SDK_CC) -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2v18.swf
-	cp -f $(BUILD)/scimark_swf/*.swf $(BUILDROOT)/extra/
+test_sjlj_opt:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_sjlj_opt
+	@mkdir -p $(BUILD)/test_sjlj_opt
+	# Assembling Native
+	cd $(BUILD)/test_sjlj_opt && $(SDK_CXX) -O4 $(SRCROOT)/test/sjljtest.c -o sjljtest -save-temps
+	# Running Native
+	$(BUILD)/test_sjlj_opt/sjljtest &> $(BUILD)/test_sjlj_opt/result.txt
+	diff --strip-trailing-cr $(BUILD)/test_sjlj_opt/result.txt $(SRCROOT)/test/sjljtest.expected.txt
 
 # TBD
-scimark_asc:
-	@mkdir -p $(BUILD)/scimark_asc
-	cd $(BUILD)/scimark_asc && $(SDK_CC) -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
-	cd $(BUILD)/scimark_asc && $(SDK_CC) -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
-	$(BUILD)/scimark_asc/scimark2 &> $(BUILD)/scimark_asc/result.txt
+test_eh:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_eh
+	@mkdir -p $(BUILD)/test_eh
+	# Assembling Native
+	cd $(BUILD)/test_eh && $(SDK_CXX) -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	# Running Native
+	-$(BUILD)/test_eh/ehtest &> $(BUILD)/test_eh/result.txt
+	diff --strip-trailing-cr $(BUILD)/test_eh/result.txt $(SRCROOT)/test/ehtest.expected.txt
 
 # TBD
-parse_scimark_log:
-	$(MAKE) scimark
-	ant -f qa/performance/build.xml -Dbuild=$(FLASCC_VERSION_BUILD) \
-		-DsendResults=true -Dbranch=mainline -DresultsFile=$(BUILD)/scimark/result.txt -DresultsFileFalcon=$(BUILD)/scimark/result.txt
+test_eh_opt:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_eh_opt
+	@mkdir -p $(BUILD)/test_eh_opt
+	# Assembling Native
+	cd $(BUILD)/test_eh_opt && $(SDK_CXX) -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	# Running Native
+	-$(BUILD)/test_eh_opt/ehtest &> $(BUILD)/test_eh_opt/result.txt
+	diff --strip-trailing-cr $(BUILD)/test_eh_opt/result.txt $(SRCROOT)/test/ehtest.expected.txt
 
 # TBD
-sjljtest:
-	@mkdir -p $(BUILD)/sjljtest
-	cd $(BUILD)/sjljtest && $(SDK_CXX) -O0 $(SRCROOT)/test/sjljtest.c -v -o sjljtest -save-temps
-	$(BUILD)/sjljtest/sjljtest &> $(BUILD)/sjljtest/result.txt
-	diff --strip-trailing-cr $(BUILD)/sjljtest/result.txt $(SRCROOT)/test/sjljtest.expected.txt
+test_as3interop:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_as3interop
+	@mkdir -p $(BUILD)/test_as3interop
+	# Assembling Native
+	cd $(BUILD)/test_as3interop && $(SDK_CXX) -O4 $(SRCROOT)/test/as3interoptest.c -o as3interoptest -save-temps
+	# Running Native
+	$(BUILD)/test_as3interop/as3interoptest &> $(BUILD)/test_as3interop/result.txt
 
-# TBD
-sjljtest_opt:
-	@mkdir -p $(BUILD)/sjljtest_opt
-	cd $(BUILD)/sjljtest_opt && $(SDK_CXX) -O4 $(SRCROOT)/test/sjljtest.c -o sjljtest -save-temps
-	$(BUILD)/sjljtest_opt/sjljtest &> $(BUILD)/sjljtest_opt/result.txt
-	diff --strip-trailing-cr $(BUILD)/sjljtest_opt/result.txt $(SRCROOT)/test/sjljtest.expected.txt
+# Tests Listing of Symbols from ASM and ABC Object Formats
+# 'llvm-as': Reads from human readable LLVM assembly language, translates it to LLVM byte-code
+# 'llc': Compiles LLVM byte-code into assembly language
+# 'nm': Lists the symbols from object files
+test_symbols:
+	# Cleaning test folder
+	@rm -rf $(BUILD)/test_symbols
+	mkdir -p $(BUILD)/test_symbols
+	# Assembling Native
+	cd $(BUILD)/test_symbols && $(SDK)/usr/bin/llvm-as $(SRCROOT)/test/symboltest.ll -o symboltest.bc
+	cd $(BUILD)/test_symbols && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=asm -o symboltest.s
+	cd $(BUILD)/test_symbols && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=obj -o symboltest.abc
+	cd $(BUILD)/test_symbols && $(SDK_NM) symboltest.abc | grep symbolTest > syms.abc.txt
+	cd $(BUILD)/test_symbols && $(SDK_NM) symboltest.bc | grep symbolTest > syms.bc.txt
+	# Generating Result
+	diff --strip-trailing-cr $(BUILD)/test_symbols/*.txt
 
-# TBD
-ehtest:
-	@mkdir -p $(BUILD)/ehtest
-	cd $(BUILD)/ehtest && $(SDK_CXX) -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
-	-$(BUILD)/ehtest/ehtest &> $(BUILD)/ehtest/result.txt
-	diff --strip-trailing-cr $(BUILD)/ehtest/result.txt $(SRCROOT)/test/ehtest.expected.txt
+# Run GDB tests
+test_gdb:
+	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX_SDK_HOME) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
+	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX_SDK_HOME) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
 
-# TBD
-ehtest_opt:
-	@mkdir -p $(BUILD)/ehtest_opt
-	cd $(BUILD)/ehtest_opt && $(SDK_CXX) -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
-	-$(BUILD)/ehtest_opt/ehtest &> $(BUILD)/ehtest_opt/result.txt
-	diff --strip-trailing-cr $(BUILD)/ehtest_opt/result.txt $(SRCROOT)/test/ehtest.expected.txt
+# Run Virtual File System (VFS) tests
+test_vfs:
+	@cd qa/vfs/framework && $(MAKE) FLASCC=$(FLASCC)
 
-# TBD
-ehtest_asc:
-	@mkdir -p $(BUILD)/ehtest_asc
-	cd $(BUILD)/ehtest_asc && $(SDK_CXX) -muse-legacy-asc -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
-	-$(BUILD)/ehtest_asc/ehtest &> $(BUILD)/ehtest_asc/result.txt
-	diff --strip-trailing-cr $(BUILD)/ehtest_asc/result.txt $(SRCROOT)/test/ehtest.expected.txt
-
-	cd $(BUILD)/ehtest_asc && $(SDK_CXX) -muse-legacy-asc -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
-	-$(BUILD)/ehtest_asc/ehtest &> $(BUILD)/ehtest_asc/result.txt
-	diff --strip-trailing-cr $(BUILD)/ehtest_asc/result.txt $(SRCROOT)/test/ehtest.expected.txt
-
-# TBD
-as3interoptest:
-	@mkdir -p $(BUILD)/as3interoptest
-	cd $(BUILD)/as3interoptest && $(SDK_CXX) -O4 $(SRCROOT)/test/as3interoptest.c -o as3interoptest -save-temps
-	$(BUILD)/as3interoptest/as3interoptest &> $(BUILD)/as3interoptest/result.txt
-
-# TBD
-symboltest:
-	mkdir -p $(BUILD)/symboltest
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llvm-as $(SRCROOT)/test/symboltest.ll -o symboltest.bc
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=asm -o symboltest.s
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=obj -o symboltest.abc
-
-	cd $(BUILD)/symboltest && $(SDK_NM) symboltest.abc | grep symbolTest > syms.abc.txt
-	cd $(BUILD)/symboltest && $(SDK_NM) symboltest.bc | grep symbolTest > syms.bc.txt
-	diff --strip-trailing-cr $(BUILD)/symboltest/*.txt
+# ====================================================================================
+# Samples and Examples
+# ====================================================================================
 
 # TBD
 samples:
 	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) -j$(THREADS)
-	mkdir -p $(BUILDROOT)/extra
-	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
+	#find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
 # TBD
 examples:
 	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) -j$(THREADS) examples
-	mkdir -p $(BUILDROOT)/extra
-	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
+	#find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
 
-# TBD
-gdbunit:
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX_SDK_HOME) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(FLEX_SDK_HOME) -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
-
-# TBD
-vfstests:
-	@cd qa/vfs/framework && $(MAKE) FLASCC=$(FLASCC)
+# ====================================================================================
+# Extra Tests
+# ====================================================================================
 
 # TBD
 checkasm:
@@ -1776,9 +1790,6 @@ speccpu2006: # works on mac only! (and probably requires local tweaks to alchemy
 	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=alchemy.cfg --tune=base --loose --action validate int fp | tee -a alchemy.run.log)
 	cd $(BUILD)/speccpu2006/speccpu2006 && (source shrc && time runspec --config=mac32.cfg --tune=base --loose --action validate int fp | tee -a mac32.run.log)
 
-# ====================================================================================
-# Extra Tests
-# ====================================================================================
 # TBD
 dejagnu:
 	mkdir -p $(BUILD)/dejagnu
