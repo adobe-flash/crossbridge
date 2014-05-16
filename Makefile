@@ -307,7 +307,7 @@ weekly:
 # Notes: Using console output to solve hanging build issues.
 #        Ignoring some build errors but only documentation generation related.
 all_ci:
-	$(MAKE) diagnostics
+	@$(MAKE) diagnostics
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) install_libs
 	@$(MAKE) base
@@ -338,7 +338,7 @@ all_ci:
 # Notes: Ignoring some build errors but only documentation generation related
 all_win:
 	@mkdir -p $(BUILD)/logs
-	$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
+	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
 	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt 2>&1
 	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
 	@$(MAKE) -i make &> $(BUILD)/logs/make.txt 2>&1

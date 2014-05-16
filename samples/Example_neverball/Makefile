@@ -72,7 +72,7 @@ all:
 		LDFLAGS="-L$(FLASCC)/install/usr/lib/ $(GLS3D)/install/usr/lib/libGL.abc -L$(GLS3D)/install/usr/lib/ $(FLASCC)/usr/lib/AlcVFSZip.abc -swf-preloader=$(BUILD)/neverball/VFSPreLoader.swf -swf-version=17 -symbol-abc=$(BUILD)/neverball/Console.abc -jvmopt=-Xmx4G -emit-swf -swf-size=800x600 " \
 		CFLAGS="-O3 " \
 		CC="gcc" \
-		SDL_CPPFLAGS="-I$(FLASCC)/usr/include/ -I$(GLS3D)/install/usr/include " \
+		SDL_CPPFLAGS="-I$(FLASCC)/usr/include/ -I$(GLS3D)/install/usr/include/ -I$(FLASCC)/usr/include/SDL/ -I$(FLASCC)/usr/include/libpng15/  " \
 		PNG_CPPFLAGS="$(shell $(FLASCC)/usr/bin/libpng-config --cflags)" \
 		SDL_LIBS="$(shell $(FLASCC)/usr/bin/sdl-config --libs) -lvgl" \
 		PNG_LIBS="$(shell $(FLASCC)/usr/bin/libpng-config --libs)" \
