@@ -296,6 +296,7 @@ all_with_local_make:
 # Build all with Windows 
 # Notes: Ignoring some build errors but only documentation generation related
 all_win:
+	@$(MAKE) clean
 	@echo "Building $(SDKNAME) ..."
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
@@ -323,6 +324,7 @@ all_win:
 	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
 	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
 	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt 2>&1
+	@echo "Done."
 
 # Print debug information
 diagnostics:
@@ -342,26 +344,17 @@ diagnostics:
 all_dev:
 	@$(SDK_MAKE) glsl2agal
 
-# ====================================================================================
-# CORE
-# ====================================================================================
 # Clean build outputs
 clean:
-	rm -rf $(CCACHE_DIR)
-	rm -rf $(BUILDROOT)
-	rm -rf $(SDK)
-	rm -rf $(SRCROOT)/.redo
-	$(MAKE) clean_libs
-	cd samples && $(MAKE) clean
+	@echo "Cleaning ..."
+	@rm -rf $(CCACHE_DIR)
+	@rm -rf $(BUILDROOT)
+	@rm -rf $(SDK)
+	@rm -rf $(SRCROOT)/.redo
+	@$(MAKE) -s clean_libs
+	@cd samples && $(MAKE) -s clean
+	@echo "Done."
 
-# Generate ASDoc documentation
-docs:
-	$(MAKE) base
-	$(MAKE) abclibs_asdocs
-
-# ====================================================================================
-# DEPENDENCY LIBS
-# ====================================================================================
 # Install packaged dependency libraries
 install_libs:
 	$(MAKE) clean_libs
@@ -537,8 +530,13 @@ cmake:
 # Assemble builtin ABCs
 # Use it if Tamarin AS3 code is modified
 builtinabcs:
-	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/core && python ./builtin.py -config CONFIG::VMCFG_FLOAT=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_POSIX=true
-	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell && python ./shell_toplevel.py -config CONFIG::VMCFG_FLOAT=true -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_POSIX=true
+	cp $(BUILD)/abclibsposix/IKernel.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	cp $(BUILD)/abclibsposix/ShellPosix.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	cp $(BUILD)/abclibsposix/ShellPosixGlue.cpp $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	cp $(BUILD)/abclibsposix/ShellPosixGlue.h $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
+	cd $(SRCROOT)/$(DEPENDENCY_TAMARIN)/core && python ./builtin.py -abcfuture -config CONFIG::VMCFG_FLOAT=false -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -config CONFIG::VMCFG_ALCHEMY_POSIX=true
+	cd $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell && python ./shell_toplevel.py -abcfuture -config CONFIG::VMCFG_FLOAT=false -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -config CONFIG::VMCFG_ALCHEMY_POSIX=true
+	cp -f $(DEPENDENCY_TAMARIN)/generated/*.abc $(SDK)/usr/lib/
 
 # Assemble ABC library binaries and documentation
 abclibs:
@@ -554,13 +552,8 @@ abclibs_compile:
 	mkdir -p $(SDK)/usr/lib/abcs
 	# Generating the Posix interface
 	cd $(BUILD)/abclibsposix && $(PYTHON) $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
-	# Deploying generated classes (Tamarin is AVMPlus, just duplicated while testing upgrading - VPMedia)
-	cp $(BUILD)/abclibsposix/IKernel.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
-	cp $(BUILD)/abclibsposix/ShellPosix.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
-	cp $(BUILD)/abclibsposix/ShellPosixGlue.cpp $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
-	cp $(BUILD)/abclibsposix/ShellPosixGlue.h $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
-	cd $(SRCROOT)/$(DEPENDENCY_TAMARIN)/core && python ./builtin.py -config CONFIG::VMCFG_FLOAT=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_POSIX=true
-	cd $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell && python ./shell_toplevel.py -config CONFIG::VMCFG_FLOAT=true -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -abcfuture -config CONFIG::VMCFG_ALCHEMY_POSIX=true
+	# TODO: Deploying generated classes (Tamarin is AVMPlus, just duplicated while testing upgrading - VPMedia)
+	#$(MAKE) builtinabcs
 	# Post-Processing IKernel
 	# TODO: Do not print out files in the source folder (VPMedia)
 	cat $(BUILD)/abclibsposix/IKernel.as | sed '1,1d' | sed '$$d' > $(SRCROOT)/posix/IKernel.as
