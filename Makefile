@@ -152,10 +152,15 @@ $?TRIPLE=avm2-unknown-freebsd8
 export CC:=$(CC)
 export CXX:=$(CXX)
 export CCACHE_DIR=$(SRCROOT)/ccache
+# linker tool (symbolic force no-dereference)
 $?LN=ln -sfn
+# sync tool
 $?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
+# archive tool
 $?NATIVE_AR=ar
+# java tool
 $?JAVA=$(call nativepath,$(shell which java))
+# python tool
 $?PYTHON=$(call nativepath,$(shell which python))
 # Target Tools
 $?AR=$(SDK)/usr/bin/ar scru -v
@@ -515,6 +520,8 @@ base:
 	cd $(SDK)/usr/platform/current/bin && $(LN) ranlib$(EXEEXT) avm2-unknown-freebsd8-ranlib$(EXEEXT)
 	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) avm2-unknown-freebsd8-gcc$(EXEEXT)
 	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) avm2-unknown-freebsd8-g++$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) gcc-4.2$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) g++-4.2$(EXEEXT)
 
 	mkdir -p $(BUILD)/ccachebin
 	mkdir -p ccache
