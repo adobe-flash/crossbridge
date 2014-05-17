@@ -385,7 +385,7 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK_MAKE) swigtests &> $(BUILD)/logs/swigtests.txt 2>&1
+	@$(SDK_MAKE) glsl2agal
 
 # ====================================================================================
 # CORE
@@ -1518,6 +1518,14 @@ libtool:
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) \
 		--prefix=$(SDK)/usr --enable-static --disable-shared --disable-ltdl-install
 	cd $(BUILD)/libtool && $(MAKE) && $(MAKE) install-exec
+
+# Converts GLSL Shaders to Stage3D AGAL format
+glsl2agal:
+	rm -rf $(BUILD)/glsl2agal
+	mkdir -p $(BUILD)/glsl2agal
+	$(RSYNC) $(SRCROOT)/tools/glsl2agal/ $(BUILD)/glsl2agal
+	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(SDK_CMAKE) -G "Unix Makefiles" -DSDK="$(call nativepath, $(SDK))" $(BUILD)/glsl2agal/swc
+	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
 
 # ====================================================================================
 # Submit tests

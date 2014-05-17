@@ -5,15 +5,22 @@ include_directories(src/mesa)
 include_directories(src/mapi)
 include_directories(src/glsl)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -DUNIX")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O4 -DUNIX")
+option (DEBUG "Enable debugging" FALSE)
+
+if(${DEBUG} MATCHES "on")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -DUNIX")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -O0 -DUNIX")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O4 -DUNIX")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O4 -DUNIX")
+endif()
 
 file(GLOB agalasm_sources agalassembler/*.cpp)
 add_library(agalasm ${agalasm_sources})
 
 file(GLOB glcpp-library_sources src/glsl/glcpp/*.c)
-file(GLOB glcpp-library_sources_remove src/glsl/glcpp/glcpp.c)
-list(REMOVE_ITEM glcpp-library_sources ${glcpp-library_sources_remove})
+#file(GLOB glcpp-library_sources_remove src/glsl/glcpp/glcpp.c)
+#list(REMOVE_ITEM glcpp-library_sources ${glcpp-library_sources_remove})
 add_library(glcpp-library ${glcpp-library_sources})
 
 file(GLOB mesa_sources src/mesa/program/*.c)

@@ -4,14 +4,23 @@ include_directories(../include)
 include_directories(../src/mesa)
 include_directories(../src/glsl)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti -O4 -DNDEBUG -DUNIX")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-exceptions -fno-rtti -O4 -DNDEBUG -DUNIX")
-option (SDK "Path to the Alchemy2 SDK" "/path/to/alchemy2/sdk")
+option (DEBUG "Enable debugging" FALSE)
+
+if(${DEBUG} MATCHES "on")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti -g -O0 -DNDEBUG -DUNIX")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-exceptions -fno-rtti -g -O0 -DNDEBUG -DUNIX")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti -O4 -DNDEBUG -DUNIX")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-exceptions -fno-rtti -O4 -DNDEBUG -DUNIX")
+endif()
+
+
+option (SDK "Path to the CrossBridge SDK" "/path/to/crossbridge/sdk")
 
 file(GLOB agalasm_sources ../agalassembler/*.cpp)
 file(GLOB glcpp-library_sources ../src/glsl/glcpp/*.c)
-file(GLOB glcpp-library_sources_remove ../src/glsl/glcpp/glcpp.c)
-list(REMOVE_ITEM glcpp-library_sources ${glcpp-library_sources_remove})
+#file(GLOB glcpp-library_sources_remove ../src/glsl/glcpp/glcpp.c)
+#list(REMOVE_ITEM glcpp-library_sources ${glcpp-library_sources_remove})
 file(GLOB mesa_sources ../src/mesa/program/*.c)
 file(GLOB glsl_sources ../src/glsl/*.cpp ../src/glsl/*.c)
 file(GLOB glsl_sources_remove ../src/glsl/main.cpp ../src/glsl/builtin_stubs.cpp ../src/glsl/swc.cpp)
