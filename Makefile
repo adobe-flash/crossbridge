@@ -229,12 +229,6 @@ $?FLASCC_VERSION_PATCH:=2
 $?FLASCC_VERSION_BUILD:=devbuild
 $?SDKNAME=CrossBridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH).$(FLASCC_VERSION_BUILD)
 BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_MINOR=$(FLASCC_VERSION_MINOR) -DFLASCC_VERSION_PATCH=$(FLASCC_VERSION_PATCH) -DFLASCC_VERSION_BUILD=$(FLASCC_VERSION_BUILD)"
-# Logging
-ifneq (,$(PRINT_LOGS_ON_ERROR))
-	$?PRINT_LOGS_CMD=tail +1
-else
-	$?PRINT_LOGS_CMD=true
-endif
 
 # ====================================================================================
 # BMAKE
@@ -250,28 +244,35 @@ BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcc
 BUILDORDER+= sdkcleanup tr trd extratools extralibs finalcleanup submittests
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
-TESTORDER+=  test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols 
+TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols 
+#TESTORDER+= swigtests llvmtests checkasm 
 
 # All Tests
 submittests: $(TESTORDER)
 
+$?ERR2INF=2>&1
+
 # All Targets
 all:
-	@$(MAKE) diagnostics
-	@echo "-  libs"
-	@$(MAKE) install_libs
+	@echo "Building $(SDKNAME) ..."
 	@mkdir -p $(BUILD)/logs
-	@echo "-  base"
-	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
-	@echo "-  make"
-	@$(MAKE) make &> $(BUILD)/logs/make.txt 2>&1
+	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt $(ERR2INF)
+	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt $(ERR2INF)
+	@$(MAKE) base &> $(BUILD)/logs/base.txt $(ERR2INF)
+	@$(MAKE) make &> $(BUILD)/logs/make.txt $(ERR2INF)
 	@$(SDK_MAKE) -s all_with_local_make
 
+# Helper for 'all_with_local_make'
+ifneq (,$(PRINT_LOGS_ON_ERROR))
+	$?PRINT_LOGS_CMD=tail +1
+else
+	$?PRINT_LOGS_CMD=true
+endif
 # Macro for Targets with local Make
 all_with_local_make:
 	@for target in $(BUILDORDER) ; do \
 		echo "-  $$target" ; \
-		$(MAKE) $$target &> $(BUILD)/logs/$$target.txt 2>&1; \
+		$(MAKE) $$target &> $(BUILD)/logs/$$target.txt $(ERR2INF); \
 		mret=$$? ; \
 		logs="$$logs $(BUILD)/logs/$$target.txt" ; \
 		grep -q "Resource temporarily unavailable" $(BUILD)/logs/$$target.txt ; \
@@ -279,7 +280,7 @@ all_with_local_make:
 		rcount=1 ; \
 		while [ $$gret == 0 ] && [ $$rcount -lt 6 ] ; do \
 			echo "-  $$target (retry $$rcount)" ; \
-			$(MAKE) $$target &> $(BUILD)/logs/$$target.txt 2>&1; \
+			$(MAKE) $$target &> $(BUILD)/logs/$$target.txt $(ERR2INF); \
 			mret=$$? ; \
 			grep -q "Resource temporarily unavailable" $(BUILD)/logs/$$target.txt ; \
 			gret=$$? ; \
@@ -292,56 +293,10 @@ all_with_local_make:
 		fi ; \
 	done 
 
-# CI hook
-continuous:
-	rm -rf $(CCACHE_DIR)
-	$(MAKE) clean
-	$(MAKE) all
-
-# Nightly tests
-nightly:
-	$(MAKE) continuous
-
-# Weekly tests
-weekly:
-	$(MAKE) continuous
-	@$(SDK_MAKE) llvmtests
-	#$(SDK_MAKE) checkasm
-
-# Build all with Travis CI
-# Notes: Using console output to solve hanging build issues.
-#        Ignoring some build errors but only documentation generation related.
-all_ci:
-	@$(MAKE) diagnostics
-	@mkdir -p $(BUILD)/logs
-	@$(MAKE) install_libs
-	@$(MAKE) base
-	@$(MAKE) make
-	@$(SDK_MAKE) cmake
-	@$(SDK_MAKE) abclibs
-	@$(SDK_MAKE) basictools
-	@$(SDK_MAKE) llvm
-	@$(SDK_MAKE) -i binutils
-	@$(SDK_MAKE) plugins
-	@$(SDK_MAKE) gcc
-	@$(SDK_MAKE) bmake
-	@$(SDK_MAKE) stdlibs
-	@$(SDK_MAKE) gcclibs
-	@$(SDK_MAKE) as3wig
-	@$(SDK_MAKE) abcstdlibs
-	@$(SDK_MAKE) sdkcleanup
-	@$(SDK_MAKE) tr
-	@$(SDK_MAKE) trd
-	@$(SDK_MAKE) extratools
-	@$(SDK_MAKE) extralibs
-	@$(SDK_MAKE) finalcleanup
-	@$(SDK_MAKE) submittests
-	@$(SDK_MAKE) samples
-	@$(SDK_MAKE) examples
-
 # Build all with Windows 
 # Notes: Ignoring some build errors but only documentation generation related
 all_win:
+	@echo "Building $(SDKNAME) ..."
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
 	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt 2>&1
@@ -392,6 +347,7 @@ all_dev:
 # ====================================================================================
 # Clean build outputs
 clean:
+	rm -rf $(CCACHE_DIR)
 	rm -rf $(BUILDROOT)
 	rm -rf $(SDK)
 	rm -rf $(SRCROOT)/.redo
