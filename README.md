@@ -40,7 +40,7 @@ Check out the [Install Guide](https://github.com/vpmedia/crossbridge/blob/master
 #### Master branch
 
 1. Create a fork
-1. Check out [TODOs](https://github.com/vpmedia/crossbridge/blob/master/TODO.md)
+1. Check out [GitHub Issue Tracker](https://github.com/vpmedia/crossbridge/issues/)
 1. Report a new issue, properly describing the situation - backed up with logs
 1. Submit a patch for the issue or ask others to do so
 1. Submit pull requests with complete set of new features
