@@ -65,7 +65,7 @@ $?DEPENDENCY_DEJAGNU=dejagnu-1.5
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
-	$?THREADS=1
+	$?THREADS=2
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/FlashPlayerDebugger.exe
@@ -83,7 +83,7 @@ else ifneq (,$(findstring Darwin,$(UNAME)))
 else
 	$?PLATFORM="linux"
 	$?RAWPLAT=linux
-	$?THREADS=1
+	$?THREADS=2
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-unknown-linux-gnu
 	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/Flash Player.app
@@ -618,7 +618,7 @@ CROSS=PATH="$(BUILD)/ccachebin:$(CYGWINMAC):$(PATH):$(SDK)/usr/bin" $(MAKE) SDK=
 # ====================================================================================
 # Assemble basic tools (C/CPP)
 basictools:
-	$(MAKE) -j$(THREADS) uname noenv avm2-as alctool alcdb
+	$(MAKE) uname noenv avm2-as alctool alcdb
 
 # Assemble UName Helper
 uname:
@@ -790,7 +790,7 @@ bmake:
 # ====================================================================================
 # TBD
 stdlibs:
-	$(MAKE) -j$(THREADS) csu libc libthr libm libBlocksRuntime
+	$(MAKE) csu libc libthr libm libBlocksRuntime
 
 # TBD
 csu:
@@ -949,7 +949,7 @@ as3wig:
 # ====================================================================================
 # TBD
 abcstdlibs:
-	$(MAKE) -j$(THREADS) abcflashpp abcstdlibs_more
+	$(MAKE) abcflashpp abcstdlibs_more
 
 # TBD
 abcflashpp:
@@ -1070,8 +1070,7 @@ trd:
 # ====================================================================================
 # TBD
 extralibs:
-	$(MAKE) -j$(THREADS) \
-		zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv \
+	$(MAKE) zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv \
 		libvgl libjpeg libpng libgif libtiff libwebp \
 		libogg libvorbis libflac libsndfile \
 		libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image \
@@ -1385,7 +1384,7 @@ libphysfs:
 # EXTRA TOOLS
 # ====================================================================================
 extratools:
-	$(MAKE) -j$(THREADS) swig genfs gdb pkgconfig libtool
+	$(MAKE) swig genfs gdb pkgconfig libtool
 
 SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
 SWIG_LIBS=-lLLVMAVM2ShimInfo -lLLVMAVM2ShimCodeGen -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport 
