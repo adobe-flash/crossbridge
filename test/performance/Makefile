@@ -51,7 +51,7 @@ clean:
 
 build:
 	@echo "Building ..."
-	cd library && "$(FLASCC)/usr/bin/g++" -jvmopt=-Xmx1G $(CFLAGS) cmath.cpp cmath4as.cpp main.cpp -emit-swc=ccsample.cmath -o cmath.swc
+	#cd library && "$(FLASCC)/usr/bin/g++" -jvmopt=-Xmx1G $(CFLAGS) cmath.cpp cmath4as.cpp main.cpp -emit-swc=ccsample.cmath -o cmath.swc
 	cd client && "$(AIR_HOME)/bin/mxmlc" Main.as -load-config+=../.flexConfig.xml
 
 debug:
