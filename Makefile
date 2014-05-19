@@ -1468,6 +1468,7 @@ libtool:
 	cd $(BUILD)/libtool && $(MAKE) && $(MAKE) install-exec
 
 # Converts GLSL Shaders to Stage3D AGAL format
+# About 'peflags' see: http://www.cygwin.com/cygwin-ug-net/setup-maxmem.html
 glsl2agal:
 	rm -rf $(BUILD)/glsl2agal
 	mkdir -p $(BUILD)/glsl2agal
@@ -1475,14 +1476,21 @@ glsl2agal:
 	cd $(BUILD)/glsl2agal/agaloptimiser/src && SDK="$(call nativepath, $(SDK))" ./genabc.sh
 	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(SDK_CMAKE) -G "Unix Makefiles" $(BUILD)/glsl2agal/swc
 	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
-	#cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(CXX) -fno-exceptions -fno-rtti -O4 -flto-api=exports.txt -jvmopt=-Xmx8G -emit-swc=com.adobe.glsl2agal -o glsl2agal.swc agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl
-	#cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(CXX) -DCMDLINE=1 -fno-exceptions -fno-rtti --enable-debug -O4 -flto-api=exports.txt -jvmopt=-Xmx8G -o glsl2agalopt agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl
-	#$(PYTHON) $(FLASCC)/usr/bin/projector-dis.py bin/glsl2agalopt
-	#$(FLASCC)/usr/bin/avmshell external/projectormake.abc -- -o bin/glsl2agalopt.exe external/avmshell.exe output.swf -- -osr=1
-	#rm -f output*
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	peflags --cygwin-heap=4096 $(SDK)/usr/bin/llc$(EXEEXT)
+endif
+	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(CXX) -fno-exceptions -fno-rtti -O4 -flto-api=exports.txt -emit-swc=com.adobe.glsl2agal -o glsl2agal.swc agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl
+	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(CXX) -DCMDLINE=1 -fno-exceptions -fno-rtti --enable-debug -O4 -flto-api=exports.txt -o glsl2agalopt agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	peflags --cygwin-heap=0 $(SDK)/usr/bin/llc$(EXEEXT)
+endif
+	cd $(BUILD)/glsl2agal/swc && $(PYTHON) $(SRCROOT)/tools/projector-dis.py $(BUILD)/glsl2agal/swc/glsl2agalopt
+	cd $(BUILD)/glsl2agal/swc && $(SDK)/usr/bin/avmshell $(BUILD)/projectormake.abc -- -o $(BUILD)/glsl2agal/swc/glsl2agalopt$(EXEEXT) \
+		$(SDK)/usr/bin/avmshell $(BUILD)/glsl2agal/swc/output.swf --  -osr=1
+	#cp -f glsl2agal.swc glsl2agalopt.* $(SDK)/usr/bin/
 
 #glsl2agal_example:
-#	cd examples/basic && $(FLEX)/bin/mxmlc -omit-trace-statements=false -library-path+=../../bin/glsl2agal.swc \
+#	cd examples/basic && $(FLEX)/bin/mxmlc -omit-trace-statements=false -library-path+=$(BUILD)/glsl2agal/swc/glsl2agal.swc \
 #	GLSLCompiler.mxml -o GLSLCompiler.swf
 
 # ====================================================================================
