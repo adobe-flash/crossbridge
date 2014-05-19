@@ -1472,8 +1472,18 @@ glsl2agal:
 	rm -rf $(BUILD)/glsl2agal
 	mkdir -p $(BUILD)/glsl2agal
 	$(RSYNC) $(SRCROOT)/tools/glsl2agal/ $(BUILD)/glsl2agal
-	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(SDK_CMAKE) -G "Unix Makefiles" -DSDK="$(call nativepath, $(SDK))" $(BUILD)/glsl2agal/swc
+	cd $(BUILD)/glsl2agal/agaloptimiser/src && SDK="$(call nativepath, $(SDK))" ./genabc.sh
+	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(SDK_CMAKE) -G "Unix Makefiles" $(BUILD)/glsl2agal/swc
 	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
+	#cd $(BUILD)/glsl2agal/swc && $(CXX) -fno-exceptions -fno-rtti -O4 -flto-api=exports.txt -emit-swc=com.adobe.glsl2agal -o glsl2agal.swc agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl
+	#cd $(BUILD)/glsl2agal/swc && $(CXX) -DCMDLINE=1 -fno-exceptions -fno-rtti --enable-debug -O4 -flto-api=exports.txt -o glsl2agalopt agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl
+	#python $(FLASCC)/usr/bin/projector-dis.py bin/glsl2agalopt
+	#$(FLASCC)/usr/bin/avmshell external/projectormake.abc -- -o bin/glsl2agalopt.exe external/avmshell.exe output.swf -- -osr=1
+	#rm -f output*
+
+#glsl2agal_example:
+#	cd examples/basic && $(FLEX)/bin/mxmlc -omit-trace-statements=false -library-path+=../../bin/glsl2agal.swc \
+#	GLSLCompiler.mxml -o GLSLCompiler.swf
 
 # ====================================================================================
 # Submit tests

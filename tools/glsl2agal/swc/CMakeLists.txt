@@ -7,15 +7,12 @@ include_directories(../src/glsl)
 option (DEBUG "Enable debugging" FALSE)
 
 if(${DEBUG} MATCHES "on")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti -g -O0 -DNDEBUG -DUNIX")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-exceptions -fno-rtti -g -O0 -DNDEBUG -DUNIX")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti -g -O0 -DUNIX")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-exceptions -fno-rtti -g -O0 -DUNIX")
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-exceptions -fno-rtti -O4 -DNDEBUG -DUNIX")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-exceptions -fno-rtti -O4 -DNDEBUG -DUNIX")
 endif()
-
-
-option (SDK "Path to the CrossBridge SDK" "/path/to/crossbridge/sdk")
 
 file(GLOB agalasm_sources ../agalassembler/*.cpp)
 file(GLOB glcpp-library_sources ../src/glsl/glcpp/*.c)
@@ -27,10 +24,3 @@ file(GLOB glsl_sources_remove ../src/glsl/main.cpp ../src/glsl/builtin_stubs.cpp
 list(REMOVE_ITEM glsl_sources ${glsl_sources_remove})
 
 add_library(glsl2agal ${agalasm_sources} ${glcpp-library_sources} ${mesa_sources} ${glsl_sources})
-
-add_custom_target(agal_optimizer COMMAND cd ../agaloptimiser/src && SDK=${SDK} bash genabc.sh && cd ../../swc && mv ../agaloptimiser/src/agaloptimiser.abc agaloptimiser.abc)
-
-add_custom_target(swc ALL COMMAND g++ -fno-exceptions -fno-rtti -O4 -flto-api=exports.txt -emit-swc=com.adobe.glsl2agal -o glsl2agal.swc agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl DEPENDS glsl2agal agal_optimizer)
-
-add_custom_target(glsl2agalopt ALL COMMAND g++ -DCMDLINE=1 -fno-exceptions -fno-rtti --enable-debug -O4 -flto-api=exports.txt -o glsl2agalopt agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl DEPENDS glsl2agal agal_optimizer)
-
