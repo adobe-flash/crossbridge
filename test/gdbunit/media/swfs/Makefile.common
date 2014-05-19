@@ -49,15 +49,8 @@ else
 endif
 
 #
-# Whether to use falcon or legacy asc
+# ASC2 Setup
 #
-ifneq (,$(USE_ASC))
-	$?ASC=$(NATIVE_FLASCC_DIR)/sdk/usr/lib/asc.jar
-	$?CFLAGS=-muse-legacy-asc
-	$?CXXFLAGS=-muse-legacy-asc
-else
 	$?ASC=$(NATIVE_FLASCC_DIR)/sdk/usr/lib/asc2.jar
 	$?CFLAGS=
 	$?CXXFLAGS=
-endif
-
