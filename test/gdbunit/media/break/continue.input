@@ -1,0 +1,15 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # break inside the loop\n
+break 25
+continue
+echo # show the local values\n
+info locals
+echo # show the local values 5 iterations later\n
+continue 5
+info locals
+kill
+q

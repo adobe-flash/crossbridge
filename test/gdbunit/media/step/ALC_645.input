@@ -1,0 +1,11 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+# Regression test for http://bugs.adobe.com/jira/browse/ALC-645
+set breakpoint pending on
+break main
+run
+display square(2)
+n
+n
+kill
+q

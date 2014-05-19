@@ -1,0 +1,16 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # break at line 25\n
+break 25
+c
+info locals
+clear 25
+echo # break at one line later\n
+break +1
+c
+info locals
+kill
+q

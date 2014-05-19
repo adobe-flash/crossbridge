@@ -1,0 +1,14 @@
+# gdbunit_config_target_makefile="as3Commands.make"
+# gdbunit_config_target_swf="as3Commands.swf"
+set breakpoint pending on
+break main
+run
+echo # step\n
+step
+echo # step\n
+step
+echo # step over an inline_as3 call\n
+step
+
+kill
+q

@@ -1,0 +1,21 @@
+# gdbunit_config_target_makefile="helloWorldCPP.make"
+# gdbunit_config_target_swf="helloWorldCPP.swf"
+set breakpoint pending on
+break main
+run
+echo # break at lines 40 and 41\n
+break 40
+break 41
+c
+echo # step into square\n
+step
+echo # show locals\n
+info locals
+echo # change a parameter value\n
+set variable a=5
+echo # continue to line 41\n
+c
+echo # squared should be 25\n
+info locals
+kill
+q

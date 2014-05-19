@@ -1,0 +1,29 @@
+# gdbunit_config_target_makefile="nestedFunctions.make"
+# gdbunit_config_target_swf="nestedFunctions.swf"
+set breakpoint pending on
+break main
+run
+# break in a nested function
+break nestedFunction3
+c
+echo # show backtrace\n
+bt
+echo # show args + locals\n
+info args
+info locals
+echo # go up a frame\n
+up
+echo # show backtrace\n
+bt
+echo # show args + locals\n
+info args
+info locals
+echo # go down a frame\n
+down
+echo # show backtrace\n
+bt
+echo # show args + locals\n
+info args
+info locals
+kill
+q

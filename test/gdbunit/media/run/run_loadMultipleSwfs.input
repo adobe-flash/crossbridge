@@ -1,0 +1,23 @@
+# gdbunit_config_target_makefile="loadMultipleSWFsMain.make"
+# gdbunit_config_target_swf="loadMultipleSWFsMain.swf"
+set breakpoint pending on
+break main
+echo # \n
+echo # Load multiple SWFs at runtime and ensure we can debug them \n
+echo # \n
+set as3namespace my.a
+run
+step
+info locals
+step
+echo # Now try breaking in the second SWF\n
+kill
+set as3namespace my.b
+run
+c
+step
+info locals
+step
+echo # Finish \n
+kill
+q

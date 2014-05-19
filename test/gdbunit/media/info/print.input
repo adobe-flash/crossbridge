@@ -1,0 +1,40 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # show the value of a variable\n
+print a
+p a
+echo # show the value of a variable in hex\n
+p/x a
+echo # show the value of a variable as a signed integer\n
+p/d a
+echo # show the value of a variable as an un-signed integer\n
+p/u a
+echo # show the value of a variable in octal\n
+p/o a
+echo # show the value of a variable in binary\n
+p/t a
+echo # show the value of a variable as a char\n
+p/c a
+echo # show the value of a variable as a float\n
+p/f a
+echo # show the value of a variable as a hex address\n
+p/a a
+echo # show a pointer\n
+p aPointer
+echo # show the address of a pointer\n
+p &aPointer
+echo # show the value of a pointer\n
+p *aPointer
+echo # show some elements of an array\n
+p *letters@3
+echo # show the value of a pointer in binary\n
+x/b aPointer
+echo # show the binary representation of memory pointed to by address\n
+x/4b aPointer
+echo # print an integer value\n
+print 10
+kill
+q

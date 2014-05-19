@@ -1,0 +1,71 @@
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=IGNORE --target=avm2-elf".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+No symbol table is loaded.  Use the "file" command.
+Breakpoint 1 (main) pending.
+0xdddddddd in ?? ()
+
+Breakpoint 1, INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+20	    int s = 2;
+# show backtrace
+#0  INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+#1  INSTRUCTPT in _start1 () from remote:IGNORE.elf
+#2  0x00000000 in ?? ()
+# check backtrace shortcut works
+#0  INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+#1  INSTRUCTPT in _start1 () from remote:IGNORE.elf
+#2  0x00000000 in ?? ()
+# show values of local variables
+#0  INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+        s = 0
+        t = 0
+        i = 0
+#1  INSTRUCTPT in _start1 () from remote:IGNORE.elf
+No symbol table info available.
+#2  0x00000000 in ?? ()
+No symbol table info available.
+# show the first line of the backtrace
+#0  INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+# show the last line of the backtrace
+#2  0x00000000 in ?? ()
+# show an as3 backtrace
+(*)global/C_Run::F_main()[IGNORE]
+   global/C_Run::F__start1()[IGNORE]
+   com.adobe.flascc::CModule$/callI()
+   com.adobe.flascc::CModule$/start()
+   com.adobe.flascc::CModule$/startAsync()
+   com.adobe.flascc::Console/init()
+   com.adobe.flascc::Console()
+   com.adobe.flascc.preloader::DefaultPreloader/onPreloaderComplete()
+# select frame 0
+#0  INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+20	    int s = 2;
+# select frame 1
+#1  INSTRUCTPT in _start1 () from remote:IGNORE.elf
+# select non-existent frame 2
+#2  0x00000000 in ?? ()
+# check that the frame shortcut works
+#0  INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+20	    int s = 2;
+# show info on the frame
+Stack level 0, frame at 0xe1ffff74:
+ eip = INSTRUCTPT in main (helloWorld.c:20); saved eip INSTRUCTPT
+ called by frame at 0xe1ffff90
+ source language c.
+ Arglist at 0xe1ffff74, args: argc=0, argv=0x200ff0
+ Locals at 0xe1ffff74, Previous frame's sp is 0xe1ffff74
+ Saved registers:
+  ebx at 0xe1ffff7c, ebp at 0xe1ffff78, esi at 0xe1ffff80, edi at 0xe1ffff84, eip at 0xe1ffff74
+# show local variables of this frame
+s = 0
+t = 0
+i = 0
+# show exception handlers of this frame
+print_frame_label_vars disabled.
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]

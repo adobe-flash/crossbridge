@@ -1,0 +1,33 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # show backtrace\n
+backtrace
+echo # check backtrace shortcut works\n
+bt
+echo # show values of local variables\n
+backtrace full
+echo # show the first line of the backtrace\n
+bt 1
+echo # show the last line of the backtrace\n
+bt -1
+echo # show an as3 backtrace\n
+as3bt
+echo # select frame 0\n
+frame 0
+echo # select frame 1\n
+frame 1
+echo # select non-existent frame 2\n
+frame 2
+echo # check that the frame shortcut works\n
+f 0
+echo # show info on the frame\n
+info frame
+echo # show local variables of this frame\n
+info locals
+echo # show exception handlers of this frame\n
+info catch
+kill
+q

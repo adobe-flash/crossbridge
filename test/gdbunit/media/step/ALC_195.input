@@ -1,0 +1,15 @@
+# gdbunit_config_target_makefile="nestedFunctions.make"
+# gdbunit_config_target_swf="nestedFunctions.swf"
+set breakpoint pending on
+break main
+run
+echo # break at line 17\n
+break 17
+c
+echo # step a few times shouldn't show a breakpoint hit (ALC-195)\n
+step
+step
+step
+step
+kill
+q

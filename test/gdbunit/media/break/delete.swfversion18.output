@@ -1,0 +1,54 @@
+GNU gdb (GDB) 7.3
+Copyright (C) 2011 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "--host=IGNORE --target=avm2-elf".
+For bug reporting instructions, please see:
+<http://www.gnu.org/software/gdb/bugs/>...
+No symbol table is loaded.  Use the "file" command.
+Breakpoint 1 (main) pending.
+0xdddddddd in ?? ()
+
+Breakpoint 1, INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:20
+20	    int s = 2;
+# setup a couple breakpoints
+Breakpoint 2 at INSTRUCTPT: file helloWorld.c, line 15.
+Breakpoint 3 at INSTRUCTPT: file helloWorld.c, line 21.
+Breakpoint 4 at INSTRUCTPT: file helloWorld.c, line 25.
+Breakpoint 5 at INSTRUCTPT: file helloWorld.c, line 28.
+# show the current breakpoints
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:20
+	breakpoint already hit 1 time
+2       breakpoint     keep y   INSTRUCTPT in square at helloWorld.c:15
+3       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:21
+4       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:25
+5       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:28
+# delete a couple breakpoints
+# show the current breakpoints
+Num     Type           Disp Enb Address    What
+1       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:20
+	breakpoint already hit 1 time
+5       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:28
+# continuing should go to the last breakpoint
+
+Breakpoint 5, INSTRUCTPT in main (argc=0, argv=0x200ff0) at helloWorld.c:28
+28	    printf("Hello, World!\n");
+# delete the rest of the breakpoints
+# show the current breakpoints
+No breakpoints or watchpoints.
+# add a couple more breakpoints
+Breakpoint 6 at INSTRUCTPT: file helloWorld.c, line 21.
+Breakpoint 7 at INSTRUCTPT: file helloWorld.c, line 22.
+Breakpoint 8 at INSTRUCTPT: file helloWorld.c, line 23.
+Num     Type           Disp Enb Address    What
+6       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:21
+7       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:22
+8       breakpoint     keep y   INSTRUCTPT in main at helloWorld.c:23
+# ensure d also deletes them
+No breakpoints or watchpoints.
+# try to delete a non-existent breakpoint
+No breakpoint number 999.
+Kill the program being debugged? (y or n) [answered Y; input not from terminal]

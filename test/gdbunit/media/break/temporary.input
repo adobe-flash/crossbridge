@@ -1,0 +1,14 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # setup a temporary breakpoint in the loop\n
+tbreak 25
+echo # setup another breakpoint after the loop\n
+break 28
+c
+echo # should now break outside of the loop since tbreak should only hit once\n
+c
+kill
+q

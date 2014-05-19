@@ -1,0 +1,17 @@
+# gdbunit_config_target_makefile="setjmp.make"
+# gdbunit_config_target_swf="setjmp.swf"
+set breakpoint pending on
+break main
+run
+echo # continue to the goto loop
+break 28
+c
+echo # next a few times \n
+next
+next
+next
+next
+next
+next
+kill
+quit

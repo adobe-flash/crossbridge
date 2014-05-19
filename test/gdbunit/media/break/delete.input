@@ -1,0 +1,35 @@
+# gdbunit_config_target_makefile="helloWorld.make"
+# gdbunit_config_target_swf="helloWorld.swf"
+set breakpoint pending on
+break main
+run
+echo # setup a couple breakpoints\n
+break square
+break 21
+break 25
+break 28
+echo # show the current breakpoints\n
+info break
+echo # delete a couple breakpoints\n
+delete 2
+delete 3-4
+echo # show the current breakpoints\n
+info break
+echo # continuing should go to the last breakpoint\n
+continue
+echo # delete the rest of the breakpoints\n
+delete
+echo # show the current breakpoints\n
+info break
+echo # add a couple more breakpoints\n
+break 21
+break 22
+break 23
+info break
+echo # ensure d also deletes them\n
+d
+info break
+echo # try to delete a non-existent breakpoint\n
+delete 999
+kill
+q
