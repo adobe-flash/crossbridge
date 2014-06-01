@@ -21,7 +21,7 @@ Demo:
 * Open README.html to get a basic idea of CrossBridge usage
 * For more information about the project, please visit http://www.crossbridge.io
 
-### Community release by VPMedia
+### Community release
 
 * [Changes] (https://github.com/vpmedia/crossbridge/blob/master/CHANGES.md)
 
@@ -43,7 +43,7 @@ Demo:
 
 Read the [Install Guide](https://github.com/vpmedia/crossbridge/blob/master/INSTALL.md)
 
-Visit the [SourceForge Project Home](https://sourceforge.net/projects/crossbridge-community/)
+Join the [SourceForge Project](https://sourceforge.net/projects/crossbridge-community/)
 
 #### Master branch
 
