@@ -104,6 +104,7 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$?SDLFLAGS=
 	$?TAMARIN_CONFIG_FLAGS=--target=i686-linux
 	$?TAMARINLDFLAGS=" -Wl,--stack,16000000"
+	$?TAMARINOPTFLAGS=-Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations 
 	$?SDKEXT=.zip
 	$?BUILD=$(WIN_BUILD)
 	$?PLATFORM_NAME=win
@@ -116,6 +117,7 @@ ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?SDLFLAGS=--build=i686-apple-darwin9
 	$?TAMARIN_CONFIG_FLAGS=
 	$?TAMARINLDFLAGS=" -m32 -arch=i686"
+	$?TAMARINOPTFLAGS=-Wno-deprecated-declarations 
 	$?SDKEXT=.dmg
 	$?BUILD=$(MAC_BUILD)
 	$?PLATFORM_NAME=mac
@@ -129,6 +131,7 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 	$?SDLFLAGS=--build=i686-unknown-linux
 	$?TAMARIN_CONFIG_FLAGS=
 	$?TAMARINLDFLAGS=" -m32 -arch=i686"
+	$?TAMARINOPTFLAGS=-Wno-deprecated-declarations 
 	$?SDKEXT=.dmg
 	$?BUILD=$(LINUX_BUILD)
 	$?PLATFORM_NAME=linux
@@ -140,7 +143,7 @@ ESCAPED_SRCROOT=$(shell echo $(SRCROOT) | sed -e 's/[\/&]/\\&/g')
 $?JAVA=$(call nativepath,$(shell which java))
 $?JAVAFLAGS=
 $?PYTHON=$(call nativepath,$(shell which python))
-$?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -Wno-unused-function -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-narrowing -Wno-sizeof-pointer-memaccess -Wno-unused-variable -Wno-unused-but-set-variable -Wno-deprecated-declarations -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
+$?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc $(TAMARINOPTFLAGS) -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?LN=ln -sfn
 $?COPY_DOCS=false
 
@@ -238,12 +241,10 @@ all:
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
-	@echo "-  libs"
-	@$(MAKE) install_libs
+	@$(MAKE) clean
 	@mkdir -p $(BUILD)/logs
-	@echo "-  base"
+	@$(MAKE) install_libs > $(BUILD)/logs/install_libs.txt 2>&1
 	@$(MAKE) base > $(BUILD)/logs/base.txt 2>&1
-	@echo "-  make"
 	@$(MAKE) make > $(BUILD)/logs/make.txt 2>&1
 	@$(SDK)/usr/bin/make -s all_with_local_make
 
@@ -271,56 +272,50 @@ all_with_local_make:
 		fi ; \
 	done
 
-# CI hook
-continuous:
+# Build using CI
+all_ci:
+	rm -rf $(CCACHE_DIR)
 	$(MAKE) all COPY_DOCS=true
 	$(MAKE) examples neverball
 	cd samples && $(MAKE) clean
-
-# Nightly tests
-nightly:
-	rm -rf $(CCACHE_DIR)
-	$(MAKE) clean
-	$(MAKE) all
 	@$(SDK)/usr/bin/make llvmtests
 	@$(SDK)/usr/bin/make swigtests
 	#$(SDK)/usr/bin/make checkasm
 
-# Weekly tests
-weekly:
-	$(MAKE) nightly
-
+# Build using Windows Cygwin
 # We are ignoring some target errors because of issues with documentation generation
-all_ci:
-	@echo "~~~ Crossbridge (CI) $(SDKNAME) ~~~"
+all_win:
+	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
-	@$(MAKE) install_libs
-	@$(MAKE) base
-	@$(MAKE) make
-	@$(SDK)/usr/bin/make cmake
-	@$(SDK)/usr/bin/make abclibs
-	@$(SDK)/usr/bin/make basictools
-	@$(SDK)/usr/bin/make llvm
-	@$(SDK)/usr/bin/make -i binutils
-	@$(SDK)/usr/bin/make plugins
-	@$(SDK)/usr/bin/make bmake
-	@$(SDK)/usr/bin/make stdlibs
-	@$(SDK)/usr/bin/make as3xx
-	@$(SDK)/usr/bin/make as3wig
-	@$(SDK)/usr/bin/make abcstdlibs
-	@$(SDK)/usr/bin/make sdkcleanup
-	@$(SDK)/usr/bin/make tr
-	@$(SDK)/usr/bin/make trd
-	@$(SDK)/usr/bin/make extratools
-	@$(SDK)/usr/bin/make extralibs
-	@$(SDK)/usr/bin/make finalcleanup
-	@$(SDK)/usr/bin/make submittests
+	@$(MAKE) clean
+	@mkdir -p $(BUILD)/logs
+	@$(MAKE) install_libs > $(BUILD)/logs/install_libs.txt 2>&1
+	@$(MAKE) base > $(BUILD)/logs/base.txt 2>&1
+	@$(MAKE) make > $(BUILD)/logs/make.txt 2>&1
+	@$(SDK)/usr/bin/make cmake > $(BUILD)/logs/cmake.txt 2>&1
+	@$(SDK)/usr/bin/make abclibs > $(BUILD)/logs/abclibs.txt 2>&1
+	@$(SDK)/usr/bin/make basictools > $(BUILD)/logs/basictools.txt 2>&1
+	@$(SDK)/usr/bin/make llvm > $(BUILD)/logs/llvm.txt 2>&1
+	@$(SDK)/usr/bin/make -i binutils > $(BUILD)/logs/binutils.txt 2>&1
+	@$(SDK)/usr/bin/make plugins > $(BUILD)/logs/plugins.txt 2>&1
+	@$(SDK)/usr/bin/make bmake > $(BUILD)/logs/bmake.txt 2>&1
+	@$(SDK)/usr/bin/make stdlibs > $(BUILD)/logs/stdlibs.txt 2>&1
+	@$(SDK)/usr/bin/make as3xx > $(BUILD)/logs/as3xx.txt 2>&1
+	@$(SDK)/usr/bin/make as3wig > $(BUILD)/logs/as3wig.txt 2>&1
+	@$(SDK)/usr/bin/make abcstdlibs > $(BUILD)/logs/abcstdlibs.txt 2>&1
+	@$(SDK)/usr/bin/make sdkcleanup > $(BUILD)/logs/sdkcleanup.txt 2>&1
+	@$(SDK)/usr/bin/make tr > $(BUILD)/logs/tr.txt 2>&1
+	@$(SDK)/usr/bin/make trd > $(BUILD)/logs/trd.txt 2>&1
+	@$(SDK)/usr/bin/make extratools > $(BUILD)/logs/extratools.txt 2>&1
+	@$(SDK)/usr/bin/make extralibs > $(BUILD)/logs/extralibs.txt 2>&1
+	@$(SDK)/usr/bin/make finalcleanup > $(BUILD)/logs/finalcleanup.txt 2>&1
+	@$(SDK)/usr/bin/make submittests > $(BUILD)/logs/submittests.txt 2>&1
 
 # Development
 all_dev:
-	@$(SDK)/usr/bin/make llvm
+	@$(SDK)/usr/bin/make swig
 
 # ====================================================================================
 # CORE
@@ -402,6 +397,8 @@ base:
 	cd $(SDK)/usr/platform/current/bin && $(LN) ranlib$(EXEEXT) avm2-unknown-freebsd8-ranlib$(EXEEXT)
 	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) avm2-unknown-freebsd8-gcc$(EXEEXT)
 	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) avm2-unknown-freebsd8-g++$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) gcc-4.2$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) g++-4.2$(EXEEXT)
 
 	mkdir -p $(BUILD)/ccachebin
 	mkdir -p ccache
@@ -1181,10 +1178,22 @@ swig-build:
 
 # SWIG All
 swig:
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	peflags --cygwin-heap=4096 $(SDK)/usr/bin/llc$(EXEEXT)
+	peflags --cygwin-heap=4096 $(SDK)/usr/bin/avm2-as$(EXEEXT)
+	peflags --cygwin-heap=4096 $(SDK)/usr/bin/clang$(EXEEXT)
+	peflags --cygwin-heap=4096 $(SDK)/usr/bin/clang++$(EXEEXT)
+endif
 	$(MAKE) swig-clean
 	$(MAKE) swig-pcre
 	$(MAKE) swig-configure
 	$(MAKE) swig-build
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	peflags --cygwin-heap=0 $(SDK)/usr/bin/llc$(EXEEXT)
+	peflags --cygwin-heap=0 $(SDK)/usr/bin/avm2-as$(EXEEXT)
+	peflags --cygwin-heap=0 $(SDK)/usr/bin/clang$(EXEEXT)
+	peflags --cygwin-heap=0 $(SDK)/usr/bin/clang++$(EXEEXT)
+endif
 
 # SWIG Tests
 swigtests:
