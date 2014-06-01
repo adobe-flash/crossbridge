@@ -32,8 +32,11 @@ Demo:
 * [Download SDK] (https://dl.dropboxusercontent.com/u/1375050/CrossBridge_1.0.2.devbuild.zip)
 
 > Requirements:
+
 > Cygwin 1.7.29 (32bit) incl. libuuid-devel package
+
 > Java 1.8 (64bit) 
+
 > Adobe AIR SDK (optional)
 
 ### Getting involved in development 
