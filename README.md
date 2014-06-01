@@ -27,15 +27,20 @@ Demo:
 
 #### CrossBridge 1.0.2 - Windows only
 
-* [Download SDK with Cygwin Installer] (https://dl.dropboxusercontent.com/u/1375050/cb_master_sdk-win.zip)
+* [Download Cygwin Installer] (https://dl.dropboxusercontent.com/u/1375050/cb_master_sdk-win.zip)
 
-* [Download SDK Only] (https://dl.dropboxusercontent.com/u/1375050/CrossBridge_1.0.2.devbuild.zip)
+* [Download SDK] (https://dl.dropboxusercontent.com/u/1375050/CrossBridge_1.0.2.devbuild.zip)
 
-> The SDK requires newer Cygwin installation than previous releases.
+> Requirements:
+> Cygwin 1.7.29 (32bit) incl. libuuid-devel package
+> Java 1.8 (64bit) 
+> Adobe AIR SDK (optional)
 
 ### Getting involved in development 
 
-Check out the [Install Guide](https://github.com/vpmedia/crossbridge/blob/master/INSTALL.md)
+Read the [Install Guide](https://github.com/vpmedia/crossbridge/blob/master/INSTALL.md)
+
+Visit the [SourceForge Project Home](https://sourceforge.net/projects/crossbridge-community/)
 
 #### Master branch
 
