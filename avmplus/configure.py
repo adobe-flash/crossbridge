@@ -95,6 +95,9 @@ def _setSDKParams(sdk_version, os_ver, xcode_version):
 
 def _setGCCVersionedFlags(FLAGS, MAJOR_VERSION, MINOR_VERSION, current_cpu):
     # warnings have been updated to try to include all those enabled by current Flash/AIR builds -- disable with caution, or risk integration pain
+    if MAJOR_VERSION >= 5:
+        return FLAGS
+
     if MAJOR_VERSION >= 4:
         FLAGS += "-Wstrict-null-sentinel "
         if current_cpu == 'mips':
@@ -240,11 +243,17 @@ if config.getCompiler() == 'GCC':
     else:
         rawver = build.process.run_for_output(['gcc', '--version'])
     vre = re.compile(".* ([3-9]\.[0-9]+\.[0-9]+)[ \n]")
-    ver = vre.match(rawver).group(1)
-    ver_arr = ver.split('.')
-    GCC_MAJOR_VERSION = int(ver_arr[0])
-    GCC_MINOR_VERSION = int(ver_arr[1])
 
+    if vre.match(rawver) != None:
+        ver = vre.match(rawver).group(1)
+        ver_arr = ver.split('.')
+        GCC_MAJOR_VERSION = int(ver_arr[0])
+        GCC_MINOR_VERSION = int(ver_arr[1])
+    else:
+        GCC_MAJOR_VERSION = 10
+        GCC_MINOR_VERSION = 0
+
+    
 
     if the_os == 'android':
         try:
@@ -270,7 +279,7 @@ if config.getCompiler() == 'GCC':
                            "-fmessage-length=0 -fno-exceptions -fno-rtti -fsigned-char -fno-inline-functions-called-once -ffunction-sections -fdata-sections -Wno-ctor-dtor-privacy "
 
         # Additional flags used by android
-        APP_CXX_FLAGS = "%s -Wno-ctor-dtor-privacy -Wlogical-op -Wstrict-overflow=1 " \
+        APP_CXX_FLAGS = "%s -Qunused-arguments -Wno-ctor-dtor-privacy -Wlogical-op -Wstrict-overflow=1 " \
                     "-Wmissing-include-dirs -Wno-missing-field-initializers -Wno-type-limits -Wno-unused-parameter " \
                     "-Wnon-virtual-dtor -Wstrict-null-sentinel -Wno-missing-braces -Wno-multichar -Wno-psabi -Wno-reorder " \
                     "-fno-short-enums -fno-strict-aliasing -fpic -funwind-tables -fstack-protector -finline-limit=200 -ftree-vectorize " \
@@ -438,7 +447,10 @@ if the_os == "darwin":
                          '_MAC': None,
                          'AVMPLUS_MAC': None,
                          'TARGET_RT_MAC_MACHO': 1})
-    APP_CXXFLAGS += "-fpascal-strings -faltivec -fasm-blocks "
+    APP_CXXFLAGS += "-fpascal-strings -fasm-blocks "
+
+    if os_ver != '10.9' :
+        APP_CXXFLAGS += "-faltiveca"
 
     # If an sdk is selected align OS and gcc/g++ versions to it
     os_ver,sdk_path = _setSDKParams(o.mac_sdk, os_ver, o.mac_xcode)
