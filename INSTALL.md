@@ -7,7 +7,7 @@ Install
 
 ### Build a Mac only SDK.
 
-1. "make" 
+1. make all 
 
 ### Build both Mac and Windows (Cross-Compiled) SDK and package them as DMG and ZIP.
 
