@@ -210,6 +210,11 @@ def featureSettings(o):
         args += "-DAVMTWEAK_SIN_COS_NONFINITE=1 "
     if (arg == False):
         args += "-DAVMTWEAK_SIN_COS_NONFINITE=0 "
+    arg = o.getBoolArg("pepper-mac")
+    if (arg == True):
+        args += "-DAVMTWEAK_PEPPER_MAC=1 "
+    if (arg == False):
+        args += "-DAVMTWEAK_PEPPER_MAC=0 "
     arg = o.getBoolArg("epoc-emulator")
     if (arg == True):
         args += "-DAVMTWEAK_EPOC_EMULATOR=1 "
@@ -230,12 +235,7 @@ def builtinBuildFlags(o):
     buildFlags = ""
     arg = o.getBoolArg("float", False, False)
     if (arg == True):
-        buildFlags += "-config CONFIG::VMCFG_FLOAT=true -abcfuture "
+        buildFlags += "-config CONFIG::VMCFG_FLOAT=true -abcfuture"
     if (arg == False):
-        buildFlags += "-config CONFIG::VMCFG_FLOAT=false "
-    arg = o.getBoolArg("alchemy-posix", False, False)
-    if (arg == True):
-        buildFlags += "-config CONFIG::VMCFG_ALCHEMY_POSIX=true  "
-    if (arg == False):
-        buildFlags += "-config CONFIG::VMCFG_ALCHEMY_POSIX=false "
+        buildFlags += "-config CONFIG::VMCFG_FLOAT=false"
     return buildFlags

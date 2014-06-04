@@ -99,6 +99,7 @@
 #undef VMCFG_SWF20
 
 #undef VMCFG_TWEAK_SIN_COS_NONFINITE
+#undef VMCFG_PEPPER_MAC
 #undef VMCFG_EPOC_EMULATOR
 #undef VMCFG_EXACT_TRACING
 #undef VMCFG_SELECTABLE_EXACT_TRACING
@@ -796,6 +797,21 @@
 #endif
 
 
+/* AVMTWEAK_PEPPER_MAC
+ *
+ * The Pepper plug-in environment on the Macintosh was set-up such that it builds
+ * on the Mac as if it is a UNIX platform.  This is problematic as there are
+ * special cases in the VM for the Mac that are required. Ideally, Pepper on the
+ * Mac should be build as _MAC not UNIX. But that is not the case.
+ */
+#if !defined AVMTWEAK_PEPPER_MAC
+#  define AVMTWEAK_PEPPER_MAC 0
+#endif
+#if AVMTWEAK_PEPPER_MAC != 0 && AVMTWEAK_PEPPER_MAC != 1
+#  error "AVMTWEAK_PEPPER_MAC must be defined and 0 or 1 (only)."
+#endif
+
+
 /* AVMTWEAK_EPOC_EMULATOR
  *
  * The current (June 2010) EPOC/Symbian emulator has certain limitations,
@@ -1054,6 +1070,7 @@
 
 
 
+
 #if AVMSYSTEM_IA32+AVMSYSTEM_AMD64+AVMSYSTEM_ARM+AVMSYSTEM_PPC+AVMSYSTEM_SPARC+AVMSYSTEM_MIPS+AVMSYSTEM_SH4 > 1
 #  error "At most one of AVMSYSTEM_IA32,AVMSYSTEM_AMD64,AVMSYSTEM_ARM,AVMSYSTEM_PPC,AVMSYSTEM_SPARC,AVMSYSTEM_MIPS,AVMSYSTEM_SH4 must be defined."
 #endif
@@ -1221,14 +1238,14 @@
 #if AVMFEATURE_FLOAT
 #  define VMCFG_FLOAT
 #endif
-#if AVMFEATURE_FLOAT
-#  define VMCFG_GENERIC_FLOAT4
-#endif
 // CROSSBRIDGE PATCH START
 #if AVMFEATURE_ALCHEMY_POSIX
 #  define VMCFG_ALCHEMY_POSIX
 #endif
 // CROSSBRIDGE PATCH END
+#if AVMFEATURE_FLOAT
+#  define VMCFG_GENERIC_FLOAT4
+#endif
 #if AVMFEATURE_OSR
 #  define VMCFG_OSR
 #endif
@@ -1343,6 +1360,9 @@
 
 #if AVMTWEAK_SIN_COS_NONFINITE
 #  define VMCFG_TWEAK_SIN_COS_NONFINITE
+#endif
+#if AVMTWEAK_PEPPER_MAC
+#  define VMCFG_PEPPER_MAC
 #endif
 #if AVMTWEAK_EPOC_EMULATOR
 #  define VMCFG_EPOC_EMULATOR

@@ -199,6 +199,9 @@ const char * const avmfeatures = ""
   #if AVMTWEAK_SIN_COS_NONFINITE
     "AVMTWEAK_SIN_COS_NONFINITE;"
   #endif
+  #if AVMTWEAK_PEPPER_MAC
+    "AVMTWEAK_PEPPER_MAC;"
+  #endif
   #if AVMTWEAK_EPOC_EMULATOR
     "AVMTWEAK_EPOC_EMULATOR;"
   #endif

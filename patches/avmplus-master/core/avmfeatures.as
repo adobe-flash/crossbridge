@@ -474,7 +474,7 @@ var FEATURES =
     <build-flags type="onoff"> -abcfuture </build-flags>
     <precludes> AVMFEATURE_AOT </precludes> <!-- AOT + float doesn't work yet, byt that will change eventually -->
   </feature>
-
+  
   <!-- CROSSBRIDGRE PATCH START -->
   <feature>
     <desc> Enables the POSIX builtins used by commandline Alchemy apps. </desc>
@@ -484,7 +484,7 @@ var FEATURES =
     <build-flags type="onoff"> </build-flags>
   </feature>
   <!-- CROSSBRIDGRE PATCH END -->
-  
+
   <feature>
     <desc> Enables delayed JIT-compilation with on-stack replacement, by default,
            and supports runtime-disabling of OSR to get the legacy policy (OSR=0).
@@ -824,6 +824,16 @@ var FEATURES =
            and infinity.  See https://bugzilla.mozilla.org/show_bug.cgi?id=556149. </desc>
     <name> AVMTWEAK_SIN_COS_NONFINITE </name>
     <defines> VMCFG_TWEAK_SIN_COS_NONFINITE </defines>
+    <default> false </default>
+  </tweak>
+
+  <tweak>
+    <desc> The Pepper plug-in environment on the Macintosh was set-up such that it builds
+           on the Mac as if it is a UNIX platform.  This is problematic as there are 
+           special cases in the VM for the Mac that are required. Ideally, Pepper on the 
+           Mac should be build as _MAC not UNIX. But that is not the case. </desc>
+    <name> AVMTWEAK_PEPPER_MAC </name>
+    <defines> VMCFG_PEPPER_MAC </defines>
     <default> false </default>
   </tweak>
 
