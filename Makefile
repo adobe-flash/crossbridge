@@ -15,8 +15,6 @@ $?CYGWINMAC=$(SRCROOT)/cygwinmac/sdk/usr/bin
 # DEPENDENCIES
 # ====================================================================================
 $?DEPENDENCY_AVMPLUS=avmplus
-$?DEPENDENCY_TAMARIN=tamarin-redux-5571cf86fc68
-#$?DEPENDENCY_AVMPLUS=$(DEPENDENCY_TAMARIN)
 $?DEPENDENCY_BINUTILS=binutils
 $?DEPENDENCY_BMAKE=bmake
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
@@ -425,7 +423,6 @@ install_libs:
 	#tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
-	#unzip -q  packages/$(DEPENDENCY_TAMARIN).zip
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
@@ -435,7 +432,6 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_LIBSDL) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
-	#cp -r ./patches/$(DEPENDENCY_TAMARIN) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
 
 # Clear depdendency libraries
@@ -474,7 +470,6 @@ clean_libs:
 	#rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
-	#rm -rf $(DEPENDENCY_TAMARIN)
 	rm -rf $(DEPENDENCY_ZLIB)
 
 # ====================================================================================
@@ -564,13 +559,13 @@ cmake:
 # Assemble builtin ABCs
 # Use it if Tamarin AS3 code is modified
 builtinabcs:
-	cp $(BUILD)/abclibsposix/IKernel.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
-	cp $(BUILD)/abclibsposix/ShellPosix.as $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
-	cp $(BUILD)/abclibsposix/ShellPosixGlue.cpp $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
-	cp $(BUILD)/abclibsposix/ShellPosixGlue.h $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell
-	cd $(SRCROOT)/$(DEPENDENCY_TAMARIN)/core && $(PYTHON) ./builtin.py -abcfuture -config CONFIG::VMCFG_FLOAT=false -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -config CONFIG::VMCFG_ALCHEMY_POSIX=true
-	cd $(SRCROOT)/$(DEPENDENCY_TAMARIN)/shell && $(PYTHON) ./shell_toplevel.py -abcfuture -config CONFIG::VMCFG_FLOAT=false -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -config CONFIG::VMCFG_ALCHEMY_POSIX=true
-	cp -f $(DEPENDENCY_TAMARIN)/generated/*.abc $(SDK)/usr/lib/
+	cp $(BUILD)/abclibsposix/IKernel.as $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
+	cp $(BUILD)/abclibsposix/ShellPosix.as $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
+	cp $(BUILD)/abclibsposix/ShellPosixGlue.cpp $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
+	cp $(BUILD)/abclibsposix/ShellPosixGlue.h $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
+	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/core && $(PYTHON) ./builtin.py -abcfuture -config CONFIG::VMCFG_FLOAT=false -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -config CONFIG::VMCFG_ALCHEMY_POSIX=true
+	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell && $(PYTHON) ./shell_toplevel.py -abcfuture -config CONFIG::VMCFG_FLOAT=false -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -config CONFIG::VMCFG_ALCHEMY_POSIX=true
+	cp -f $(DEPENDENCY_AVMPLUS)/generated/*.abc $(SDK)/usr/lib/
 
 # Assemble ABC library binaries and documentation
 abclibs:
@@ -586,8 +581,6 @@ abclibs_compile:
 	mkdir -p $(SDK)/usr/lib/abcs
 	# Generating the Posix interface
 	cd $(BUILD)/abclibsposix && $(PYTHON) $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
-	# TODO: Deploying generated classes (Tamarin is AVMPlus, just duplicated while testing upgrading - VPMedia)
-	#$(MAKE) builtinabcs
 	# Post-Processing IKernel
 	# TODO: Do not print out files in the source folder (VPMedia)
 	cat $(BUILD)/abclibsposix/IKernel.as | sed '1,1d' | sed '$$d' > $(SRCROOT)/posix/IKernel.as
