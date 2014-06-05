@@ -423,6 +423,7 @@ install_libs:
 	#tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
+	unzip -q packages/avmplus-master.zip
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
@@ -433,6 +434,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
+	cp -r ./patches/avmplus-master .
 
 # Clear depdendency libraries
 clean_libs:
@@ -471,6 +473,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
 	rm -rf $(DEPENDENCY_ZLIB)
+	rm -rf avmplus-master
 
 # ====================================================================================
 # BASE
@@ -517,7 +520,6 @@ base:
 
 	$(RSYNC) --exclude '*iconv.h' avm2_env/usr/include/ $(SDK)/usr/include
 	$(RSYNC) avm2_env/usr/lib/ $(SDK)/usr/lib
-
 	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/swfmake.as) -outdir . -out swfmake
 	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/projectormake.as) -outdir . -out projectormake
 	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/abcdump.as) -outdir . -out abcdump
@@ -584,6 +586,8 @@ abclibs_compile:
 	# Post-Processing IKernel
 	# TODO: Do not print out files in the source folder (VPMedia)
 	cat $(BUILD)/abclibsposix/IKernel.as | sed '1,1d' | sed '$$d' > $(SRCROOT)/posix/IKernel.as
+	# Rebuild AVMPlus ABCs
+	#$(MAKE) builtinabcs
 	# Generating DefaultPreloader
 	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/DefaultPreloader.as) -swf com.adobe.flascc.preloader.DefaultPreloader,800,600,60 -outdir . -out DefaultPreloader
 	# Generating ABC Libs

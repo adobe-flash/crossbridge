@@ -238,4 +238,9 @@ def builtinBuildFlags(o):
         buildFlags += "-config CONFIG::VMCFG_FLOAT=true -abcfuture"
     if (arg == False):
         buildFlags += "-config CONFIG::VMCFG_FLOAT=false"
+    arg = o.getBoolArg("alchemy-posix", False, False)
+    if (arg == True):
+        buildFlags += "-config CONFIG::VMCFG_ALCHEMY_POSIX=true "
+    if (arg == False):
+        buildFlags += "-config CONFIG::VMCFG_ALCHEMY_POSIX=false "
     return buildFlags
