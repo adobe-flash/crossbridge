@@ -120,6 +120,8 @@ ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?PLATFORM_NAME=mac
 	$?HOST_TRIPLE=x86_64-apple-darwin10
 	export PATH:=$(BUILD)/ccachebin:$(PATH)
+	export APP_CFLAGS=" -I/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/lib/gcc/i686-apple-darwin11/4.2.1/include/ "
+	export APP_CXXFLAGS=" -I/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/lib/gcc/i686-apple-darwin11/4.2.1/include/ "
 endif
 # Linux
 ifneq (,$(findstring linux,$(PLATFORM)))
