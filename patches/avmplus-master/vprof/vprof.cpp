@@ -10,10 +10,9 @@
 
 #ifdef WIN32
 #include "windows.h"
+#elif defined(__CYGWIN__)
 #else
-#ifndef __cdecl
 #define __cdecl
-#endif
 #include <stdarg.h>
 #include <string.h>
 #endif

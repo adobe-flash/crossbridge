@@ -63,7 +63,7 @@ $?DEPENDENCY_DEJAGNU=dejagnu-1.5
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
-	$?THREADS=1
+	$?THREADS=2
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/FlashPlayerDebugger.exe
@@ -72,8 +72,7 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 else ifneq (,$(findstring Darwin,$(UNAME)))
 	$?PLATFORM="darwin"
 	$?RAWPLAT=darwin
-	#$?THREADS=$(shell sysctl -n hw.ncpu)
-	$?THREADS=1
+	$?THREADS=$(shell sysctl -n hw.ncpu)
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-apple-darwin10
 	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/Flash Player.app
@@ -82,7 +81,7 @@ else ifneq (,$(findstring Darwin,$(UNAME)))
 else
 	$?PLATFORM="linux"
 	$?RAWPLAT=linux
-	$?THREADS=1
+	$?THREADS=2
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-unknown-linux-gnu
 	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/Flash Player.app
@@ -113,7 +112,7 @@ ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?CXX=g++-4.2
 	$?EXEEXT=
 	$?SOEXT=.dylib
-	$?SDLFLAGS=--build=i686-apple-darwin9
+	$?SDLFLAGS=--build=i686-apple-darwin10
 	$?TAMARIN_CONFIG_FLAGS=
 	$?TAMARINLDFLAGS=" -m32 -arch=i686"
 	$?TAMARINOPTFLAGS=-Wno-deprecated-declarations 
@@ -154,7 +153,7 @@ export CCACHE_DIR=$(SRCROOT)/ccache
 # linker tool (symbolic force no-dereference)
 $?LN=ln -sfn
 # sync tool
-$?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX
+$?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX -l
 # archive tool
 $?NATIVE_AR=ar
 # java tool
@@ -317,6 +316,7 @@ all_win:
 	@$(SDK_MAKE) sdkcleanup &> $(BUILD)/logs/sdkcleanup.txt 2>&1
 	@$(SDK_MAKE) tr &> $(BUILD)/logs/tr.txt 2>&1
 	@$(SDK_MAKE) trd &> $(BUILD)/logs/trd.txt 2>&1
+	@$(SDK_MAKE) test_hello_cpp &> $(BUILD)/logs/test_hello_cpp.txt 2>&1
 	@$(SDK_MAKE) extratools &> $(BUILD)/logs/extratools.txt 2>&1
 	@$(SDK_MAKE) extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
 	@$(SDK_MAKE) finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
@@ -348,8 +348,9 @@ all_osx:
 	@$(SDK_MAKE) as3wig &> $(BUILD)/logs/as3wig.txt 2>&1
 	@$(SDK_MAKE) abcstdlibs &> $(BUILD)/logs/abcstdlibs.txt 2>&1
 	@$(SDK_MAKE) sdkcleanup &> $(BUILD)/logs/sdkcleanup.txt 2>&1
-	#@$(SDK_MAKE) tr &> $(BUILD)/logs/tr.txt 2>&1
-	#@$(SDK_MAKE) trd &> $(BUILD)/logs/trd.txt 2>&1
+	@$(SDK_MAKE) tr &> $(BUILD)/logs/tr.txt 2>&1
+	@$(SDK_MAKE) trd &> $(BUILD)/logs/trd.txt 2>&1
+	@$(SDK_MAKE) test_hello_cpp &> $(BUILD)/logs/test_hello_cpp.txt 2>&1
 	@$(SDK_MAKE) extratools &> $(BUILD)/logs/extratools.txt 2>&1
 	@$(SDK_MAKE) extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
 	@$(SDK_MAKE) finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
@@ -374,7 +375,7 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK_MAKE) test_gdb
+	@$(SDK_MAKE) tr
 
 # Clean build outputs
 clean:
