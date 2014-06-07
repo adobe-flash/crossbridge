@@ -325,40 +325,6 @@ all_win:
 	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt 2>&1
 	@echo "Done."
 
-# Build all with OSX Mavericks (10.9) 
-# Notes: Ignoring some build errors with Tamarin (VPMedia Fork: Issue #18)
-all_osx:
-	@$(MAKE) clean
-	@echo "Building $(SDKNAME) ..."
-	@mkdir -p $(BUILD)/logs
-	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
-	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt 2>&1
-	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
-	@$(MAKE) -i make &> $(BUILD)/logs/make.txt 2>&1
-	@$(SDK_MAKE) cmake &> $(BUILD)/logs/cmake.txt 2>&1
-	@$(SDK_MAKE) abclibs &> $(BUILD)/logs/abclibs.txt 2>&1
-	@$(SDK_MAKE) basictools &> $(BUILD)/logs/basictools.txt 2>&1
-	@$(SDK_MAKE) llvm &> $(BUILD)/logs/llvm.txt 2>&1
-	@$(SDK_MAKE) binutils &> $(BUILD)/logs/binutils.txt 2>&1
-	@$(SDK_MAKE) plugins &> $(BUILD)/logs/plugins.txt 2>&1
-	@$(SDK_MAKE) gcc &> $(BUILD)/logs/gcc.txt 2>&1
-	@$(SDK_MAKE) bmake &> $(BUILD)/logs/bmake.txt 2>&1
-	@$(SDK_MAKE) stdlibs &> $(BUILD)/logs/stdlibs.txt 2>&1
-	@$(SDK_MAKE) gcclibs &> $(BUILD)/logs/gcclibs.txt 2>&1
-	@$(SDK_MAKE) as3wig &> $(BUILD)/logs/as3wig.txt 2>&1
-	@$(SDK_MAKE) abcstdlibs &> $(BUILD)/logs/abcstdlibs.txt 2>&1
-	@$(SDK_MAKE) sdkcleanup &> $(BUILD)/logs/sdkcleanup.txt 2>&1
-	@$(SDK_MAKE) tr &> $(BUILD)/logs/tr.txt 2>&1
-	@$(SDK_MAKE) trd &> $(BUILD)/logs/trd.txt 2>&1
-	@$(SDK_MAKE) test_hello_cpp &> $(BUILD)/logs/test_hello_cpp.txt 2>&1
-	@$(SDK_MAKE) extratools &> $(BUILD)/logs/extratools.txt 2>&1
-	@$(SDK_MAKE) extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
-	@$(SDK_MAKE) finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
-	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
-	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
-	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt 2>&1
-	@echo "Done."
-
 # Print debug information
 diagnostics:
 	@echo "~~~ $(SDKNAME) ~~~"
