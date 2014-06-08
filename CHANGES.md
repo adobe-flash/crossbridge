@@ -19,11 +19,12 @@ CHANGES
 * Updated PlayerGlobal to v13.0.0
 * Merged libs from https://github.com/alexmac/alcextra
 * Merged examples from https://github.com/alexmac/alcexamples
-* Improved Linux and Windows compatibility of sources
+* Improved cross-platform compatibility of sources
+* Created sourceforge project: http://sourceforge.net/projects/crossbridge-community/
 
 > Pre-Release by VPMedia
 
 # 1.0.3
 
-* TBD
+* TBA
  
