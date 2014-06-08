@@ -5,23 +5,25 @@ Install
 
 ## OSX
 
-### Build a Mac only SDK.
+### Build a Mac only SDK and package as DMG
 
 1. make all 
+1. make staging 
+1. make flattensymlinks
+1. make dmg
 
-### Build both Mac and Windows (Cross-Compiled) SDK and package them as DMG and ZIP.
+### Build both Mac and Windows (Cross-Compiled) SDK and package them as DMG and ZIP
 
 1. make all
+1. make cygwinmac
 1. make win
 1. make deploy
 
 ### OSX 10.9+ Notes
 
-In order to compile the master branch you need Apple GCC 4.2:
+In order to compile the Master branch you will need Apple GCC 4.2:
 
 1. brew install apple-gcc42
-1. sudo ln -s /usr/local/bin/gcc-4.2 /usr/bin/gcc-4.2
-1. sudo ln -s /usr/local/bin/g++-4.2 /usr/bin/++-4.2
 
 ## Windows
 
@@ -30,17 +32,16 @@ In order to compile the master branch you need Apple GCC 4.2:
 1. cygwin-dev.bat
 1. cd $FLASCC_ROOT
 
-### Build a Windows only SDK and package as ZIP.
+### Build a Windows only SDK and package as ZIP
 
 1. make all_win
 1. make deploy
 
 ## Linux
 
-### Build a Linux only SDK and package as ZIP.
+### Build a Linux only SDK
 
 1. make all
-1. make deploy
 
 # Core Dependencies
 
@@ -90,14 +91,7 @@ In order to compile the master branch you need Apple GCC 4.2:
 * Take a look at commits and other forks
 * Use dis-assembling ABCs if you need to compare outputs: https://github.com/CyberShadow/RABCDAsm
 
-# Updating
-
-## Adobe PlayerGlobal ASC + SWC
+# Updating Flash Player Libs
 
 * AIR-SDK-HOME\lib\aot\lib\avmglue.abc => \CROSSBRIDGE-SDK-HOME\tools\playerglobal\VERSION\playerglobal.abc
 * AIR-SDK-HOME\frameworks\libs\player\VERSION\playerglobal.swc => \CROSSBRIDGE-SDK-HOME\tools\playerglobal\VERSION\playerglobal.swc
-
-## Mozilla Tamarin ASC
-
-* ftp://ftp.mozilla.org/pub/js/tamarin/builds/asc/latest/asc.jar => \CROSSBRIDGE-SDK-HOME\patches\tamarin-redux-VERSION\utils\asc.jar
-  * @see: https://developer.mozilla.org/en-US/docs/Archive/Mozilla/Tamarin/Tamarin_Build_Documentation
