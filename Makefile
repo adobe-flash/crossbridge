@@ -1897,17 +1897,18 @@ zip:
 
 # Assemble DMG
 dmg:
-	rm -f $(BUILDROOT)/$(SDKNAME).dmg $(BUILDROOT)/$(SDKNAME).dmg.tmp
-	cp -f $(SRCROOT)/tools/Base.dmg $(BUILDROOT)/$(SDKNAME).dmg.tmp
-	chmod u+rw $(BUILDROOT)/$(SDKNAME).dmg.tmp
-	hdiutil resize -size 2G $(BUILDROOT)/$(SDKNAME).dmg.tmp
-	hdiutil attach $(BUILDROOT)/$(SDKNAME).dmg.tmp -readwrite -mountpoint $(BUILDROOT)/dmgmount
+	mkdir -p $(BUILDROOT)/dmgmount
+	rm -f $(BUILDROOT)/$(SDKNAME).dmg $(BUILDROOT)/$(SDKNAME)-tmp.dmg
+	cp -f $(SRCROOT)/tools/Base.dmg $(BUILDROOT)/$(SDKNAME)-tmp.dmg
+	chmod u+rw $(BUILDROOT)/$(SDKNAME)-tmp.dmg
+	hdiutil resize -size 1G $(BUILDROOT)/$(SDKNAME)-tmp.dmg
+	hdiutil attach $(BUILDROOT)/$(SDKNAME)-tmp.dmg -readwrite -mountpoint $(BUILDROOT)/dmgmount
 	rm -f $(BUILDROOT)/staging/.DS_Store
 	$(RSYNC) $(BUILDROOT)/staging/ $(BUILDROOT)/dmgmount/
 	mv $(BUILDROOT)/dmgmount/.fseventsd $(BUILDROOT)/
 	hdiutil detach $(BUILDROOT)/dmgmount
-	hdiutil convert $(BUILDROOT)/$(SDKNAME).dmg.tmp -format UDZO -imagekey zlib-level=9 -o $(BUILDROOT)/$(SDKNAME).dmg
-	rm -f $(BUILDROOT)/$(SDKNAME).dmg.tmp
+	hdiutil convert $(BUILDROOT)/$(SDKNAME)-tmp.dmg -format UDZO -imagekey zlib-level=9 -o $(BUILDROOT)/$(SDKNAME).dmg
+	rm -f $(BUILDROOT)/$(SDKNAME)-tmp.dmg
 	find $(BUILDROOT)/staging > $(BUILDROOT)/dmgcontents.txt
 
 # Cross-Deploy Windows Staging
