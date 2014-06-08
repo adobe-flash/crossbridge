@@ -16,17 +16,7 @@ Demo:
 
 * [NeverBall](http://www.cmodule.org/neverball/)
 
-### Downloads
+Download:
 
 * [Adobe Releases - latest stable](http://sourceforge.net/projects/crossbridge/files/)
 * [Community Releases - development] (https://sourceforge.net/projects/crossbridge-community/files/)
-
-> Requirements:
-
-> LibUUID
-
-> Java 1.8+ (64bit) 
-
-> Cygwin 1.7.29+ (32bit) (Windows only)
-
-> Adobe AIR SDK (optional)
