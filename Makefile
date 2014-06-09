@@ -81,7 +81,7 @@ else ifneq (,$(findstring Darwin,$(UNAME)))
 else
 	$?PLATFORM="linux"
 	$?RAWPLAT=linux
-	$?THREADS=2
+	$?THREADS=1
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-unknown-linux-gnu
 	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/Flash Player.app
