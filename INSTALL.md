@@ -7,6 +7,7 @@ Install
 
 ### Build a Mac only SDK and package as DMG
 
+1. make clean
 1. make all 
 1. make staging 
 1. make flattensymlinks
@@ -14,6 +15,7 @@ Install
 
 ### Build both Mac and Windows (Cross-Compiled) SDK and package them as DMG and ZIP
 
+1. make clean
 1. make all
 1. make cygwinmac
 1. make win
@@ -34,6 +36,7 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 
 ### Build a Windows only SDK and package as ZIP
 
+1. make clean
 1. make all_win
 1. make deploy
 
@@ -41,6 +44,7 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 
 ### Build a Linux only SDK
 
+1. make clean
 1. make all
 
 # Core Dependencies
