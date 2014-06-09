@@ -248,16 +248,14 @@ TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh 
 # All Tests
 submittests: $(TESTORDER)
 
-$?ERR2INF=2>&1
-
 # All Targets
 all:
 	@echo "Building $(SDKNAME) ..."
 	@mkdir -p $(BUILD)/logs
-	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt $(ERR2INF)
-	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt $(ERR2INF)
-	@$(MAKE) base &> $(BUILD)/logs/base.txt $(ERR2INF)
-	@$(MAKE) make &> $(BUILD)/logs/make.txt $(ERR2INF)
+	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
+	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt 2>&1
+	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
+	@$(MAKE) make &> $(BUILD)/logs/make.txt 2>&1
 	@$(SDK_MAKE) -s all_with_local_make
 
 # Helper for 'all_with_local_make'
@@ -266,11 +264,12 @@ ifneq (,$(PRINT_LOGS_ON_ERROR))
 else
 	$?PRINT_LOGS_CMD=true
 endif
+
 # Macro for Targets with local Make
 all_with_local_make:
 	@for target in $(BUILDORDER) ; do \
 		echo "-  $$target" ; \
-		$(MAKE) $$target &> $(BUILD)/logs/$$target.txt $(ERR2INF); \
+		$(MAKE) $$target &> $(BUILD)/logs/$$target.txt 2>&1; \
 		mret=$$? ; \
 		logs="$$logs $(BUILD)/logs/$$target.txt" ; \
 		grep -q "Resource temporarily unavailable" $(BUILD)/logs/$$target.txt ; \
@@ -278,7 +277,7 @@ all_with_local_make:
 		rcount=1 ; \
 		while [ $$gret == 0 ] && [ $$rcount -lt 6 ] ; do \
 			echo "-  $$target (retry $$rcount)" ; \
-			$(MAKE) $$target &> $(BUILD)/logs/$$target.txt $(ERR2INF); \
+			$(MAKE) $$target &> $(BUILD)/logs/$$target.txt 2>&1; \
 			mret=$$? ; \
 			grep -q "Resource temporarily unavailable" $(BUILD)/logs/$$target.txt ; \
 			gret=$$? ; \
@@ -323,6 +322,38 @@ all_win:
 	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
 	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
 	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt 2>&1
+	@echo "Done."
+
+# Build all with Console output
+all_console:
+	@echo "Building $(SDKNAME) ..."
+	@mkdir -p $(BUILD)/logs
+	@$(MAKE) diagnostics
+	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt
+	@$(MAKE) base &> $(BUILD)/logs/base.txt
+	@$(MAKE) make &> $(BUILD)/logs/make.txt
+	@$(SDK_MAKE) cmake &> $(BUILD)/logs/cmake.txt
+	@$(SDK_MAKE) abclibs &> $(BUILD)/logs/abclibs.txt
+	@$(SDK_MAKE) basictools &> $(BUILD)/logs/basictools.txt
+	@$(SDK_MAKE) llvm &> $(BUILD)/logs/llvm.txt
+	@$(SDK_MAKE) binutils &> $(BUILD)/logs/binutils.txt
+	@$(SDK_MAKE) plugins &> $(BUILD)/logs/plugins.txt
+	@$(SDK_MAKE) gcc &> $(BUILD)/logs/gcc.txt
+	@$(SDK_MAKE) bmake &> $(BUILD)/logs/bmake.txt
+	@$(SDK_MAKE) stdlibs &> $(BUILD)/logs/stdlibs.txt
+	@$(SDK_MAKE) gcclibs &> $(BUILD)/logs/gcclibs.txt
+	@$(SDK_MAKE) as3wig &> $(BUILD)/logs/as3wig.txt
+	@$(SDK_MAKE) abcstdlibs &> $(BUILD)/logs/abcstdlibs.txt
+	@$(SDK_MAKE) sdkcleanup &> $(BUILD)/logs/sdkcleanup.txt
+	@$(SDK_MAKE) tr &> $(BUILD)/logs/tr.txt
+	@$(SDK_MAKE) trd &> $(BUILD)/logs/trd.txt
+	@$(SDK_MAKE) test_hello_cpp &> $(BUILD)/logs/test_hello_cpp.txt
+	@$(SDK_MAKE) extratools &> $(BUILD)/logs/extratools.txt
+	@$(SDK_MAKE) extralibs &> $(BUILD)/logs/extralibs.txt
+	@$(SDK_MAKE) finalcleanup &> $(BUILD)/logs/finalcleanup.txt
+	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt
+	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt
+	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt
 	@echo "Done."
 
 # Print debug information
