@@ -328,31 +328,28 @@ all_console:
 	@echo "Building $(SDKNAME) ..."
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) diagnostics
-	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt
-	@$(MAKE) base &> $(BUILD)/logs/base.txt
-	@$(MAKE) make &> $(BUILD)/logs/make.txt
-	@$(SDK_MAKE) cmake &> $(BUILD)/logs/cmake.txt
-	@$(SDK_MAKE) abclibs &> $(BUILD)/logs/abclibs.txt
-	@$(SDK_MAKE) basictools &> $(BUILD)/logs/basictools.txt
-	@$(SDK_MAKE) llvm &> $(BUILD)/logs/llvm.txt
-	@$(SDK_MAKE) binutils &> $(BUILD)/logs/binutils.txt
-	@$(SDK_MAKE) plugins &> $(BUILD)/logs/plugins.txt
-	@$(SDK_MAKE) gcc &> $(BUILD)/logs/gcc.txt
-	@$(SDK_MAKE) bmake &> $(BUILD)/logs/bmake.txt
-	@$(SDK_MAKE) stdlibs &> $(BUILD)/logs/stdlibs.txt
-	@$(SDK_MAKE) gcclibs &> $(BUILD)/logs/gcclibs.txt
-	@$(SDK_MAKE) as3wig &> $(BUILD)/logs/as3wig.txt
-	@$(SDK_MAKE) abcstdlibs &> $(BUILD)/logs/abcstdlibs.txt
-	@$(SDK_MAKE) sdkcleanup &> $(BUILD)/logs/sdkcleanup.txt
-	@$(SDK_MAKE) tr &> $(BUILD)/logs/tr.txt
-	@$(SDK_MAKE) trd &> $(BUILD)/logs/trd.txt
-	@$(SDK_MAKE) test_hello_cpp &> $(BUILD)/logs/test_hello_cpp.txt
-	@$(SDK_MAKE) extratools &> $(BUILD)/logs/extratools.txt
-	@$(SDK_MAKE) extralibs &> $(BUILD)/logs/extralibs.txt
-	@$(SDK_MAKE) finalcleanup &> $(BUILD)/logs/finalcleanup.txt
-	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt
-	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt
-	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt
+	@$(MAKE) install_libs
+	@$(MAKE) base
+	@$(MAKE) make
+	@$(SDK_MAKE) cmake
+	@$(SDK_MAKE) abclibs
+	@$(SDK_MAKE) basictools
+	@$(SDK_MAKE) llvm
+	@$(SDK_MAKE) binutils
+	@$(SDK_MAKE) plugins
+	@$(SDK_MAKE) gcc
+	@$(SDK_MAKE) bmake
+	@$(SDK_MAKE) stdlibs
+	@$(SDK_MAKE) gcclibs
+	@$(SDK_MAKE) as3wig
+	@$(SDK_MAKE) abcstdlibs
+	@$(SDK_MAKE) sdkcleanup
+	@$(SDK_MAKE) tr
+	@$(SDK_MAKE) trd
+	@$(SDK_MAKE) extratools
+	@$(SDK_MAKE) extralibs
+	@$(SDK_MAKE) finalcleanup
+	@$(SDK_MAKE) submittests
 	@echo "Done."
 
 # Print debug information
