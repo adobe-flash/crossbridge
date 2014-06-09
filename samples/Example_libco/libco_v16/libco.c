@@ -20,7 +20,7 @@ int main()
 } 
 
 #if defined(__AVM2__)
-  #include "x86.c"
+  #include "ppc.c"
 #elif defined(__GNUC__) && defined(__i386__)
   #include "x86.c"
 #elif defined(__GNUC__) && defined(__amd64__)

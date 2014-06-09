@@ -30,9 +30,9 @@
 
 all: check
 	@echo "-------- Example: Libco --------"
-	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) libco_v16/libco.c -g -pthread -o libco.exe
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) libco_v16/libco.c -fopenmp -pthread -o libco.exe
 	@echo "Now lets compile it as a SWF:"
-	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) libco_v16/libco.c -g -pthread -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o libco.swf 
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) libco_v16/libco.c -fopenmp -pthread -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o libco.swf 
 
 include ../Makefile.common
 
