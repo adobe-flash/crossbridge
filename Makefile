@@ -293,7 +293,6 @@ all_with_local_make:
 # Build all with Windows 
 # Notes: Ignoring some build errors but only documentation generation related
 all_win:
-	@$(MAKE) clean
 	@echo "Building $(SDKNAME) ..."
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
@@ -387,7 +386,6 @@ clean:
 
 # Install packaged dependency libraries
 install_libs:
-	$(MAKE) clean_libs
 	tar xf packages/$(DEPENDENCY_BMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
