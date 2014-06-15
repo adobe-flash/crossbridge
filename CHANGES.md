@@ -1,16 +1,18 @@
 CHANGES
 =======
 
-# 1.0.1 
+## Adobe Releases
+
+### 1.0.1 
 
 * Debug builds no longer fails at runtime with Reference Errors mentioning symbols with “THUNK” in their name
 * avm2_uithunk no longer fails when content was started using CModule.startAsync() due to incorrect assignment of thread ids
 * AS3_GoAsync() can now be used from main when started via CModule.startBackground()
 * Adding directories via the InMemoryBackingStore AS3 API with trailing slashes now works
 
-> Last release from Adobe 
+## Community Releases
 
-# 1.0.2 
+### 1.0.2 
 
 * Updated BMake from VCS
 * Updated CMake to v2.8.12.2
@@ -20,11 +22,9 @@ CHANGES
 * Merged libs from https://github.com/alexmac/alcextra
 * Merged examples from https://github.com/alexmac/alcexamples
 * Improved cross-platform compatibility of sources
-* Created sourceforge project: http://sourceforge.net/projects/crossbridge-community/
+* Created SourceForge project: http://sourceforge.net/projects/crossbridge-community/
 
-> Pre-Release by VPMedia
+### 1.0.3
 
-# 1.0.3
-
-* TBA
+* Updated PlayerGlobal to v14.0.0
  
