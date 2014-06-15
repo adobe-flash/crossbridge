@@ -239,7 +239,7 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 # ALL TARGETS
 # ====================================================================================
 BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
-BUILDORDER+= sdkcleanup tr trd extratools extralibs finalcleanup submittests
+BUILDORDER+= sdkcleanup tr trd extralibs extratools finalcleanup submittests
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
 TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols 
@@ -315,8 +315,8 @@ all_win:
 	@$(SDK_MAKE) tr &> $(BUILD)/logs/tr.txt 2>&1
 	@$(SDK_MAKE) trd &> $(BUILD)/logs/trd.txt 2>&1
 	@$(SDK_MAKE) test_hello_cpp &> $(BUILD)/logs/test_hello_cpp.txt 2>&1
-	@$(SDK_MAKE) extratools &> $(BUILD)/logs/extratools.txt 2>&1
 	@$(SDK_MAKE) extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
+	@$(SDK_MAKE) extratools &> $(BUILD)/logs/extratools.txt 2>&1
 	@$(SDK_MAKE) finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
 	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
 	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
@@ -346,8 +346,8 @@ all_console:
 	@$(SDK_MAKE) sdkcleanup
 	@$(SDK_MAKE) tr
 	@$(SDK_MAKE) trd
-	@$(SDK_MAKE) extratools
 	@$(SDK_MAKE) extralibs
+	@$(SDK_MAKE) extratools
 	@$(SDK_MAKE) finalcleanup
 	@$(SDK_MAKE) submittests
 	@echo "Done."
