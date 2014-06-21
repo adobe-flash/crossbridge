@@ -320,7 +320,6 @@ all_win:
 	@$(SDK_MAKE) finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
 	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
 	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
-	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt 2>&1
 	@echo "Done."
 
 # Build all with Console output
