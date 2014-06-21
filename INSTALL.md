@@ -88,6 +88,8 @@ In order to compile the Master branch you will need Apple GCC 4.2:
   
 > Example (Linux): export \_JAVA\_OPTIONS="-Xms512m -Xmx4096m"
 
+* Disable anti-virus software for faster builds
+
 # Hacking
 
 * To discover CrossBridge related changes/patches in 3rd party sources, search for keywords: 'crossbridge', 'flascc', 'alchemy', 'avm2', 'as3'

@@ -367,7 +367,7 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK_MAKE) tr
+	@$(SDK_MAKE) glsl2agal
 
 # Clean build outputs
 clean:
@@ -505,8 +505,8 @@ base:
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-gcc
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-g++
 
-	$(RSYNC) tools/playerglobal/13.0/playerglobal.abc $(SDK)/usr/lib/
-	$(RSYNC) tools/playerglobal/13.0/playerglobal.swc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/14.0/playerglobal.abc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/14.0/playerglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
 	cp -f $(DEPENDENCY_AVMPLUS)/generated/*.abc $(SDK)/usr/lib/
 
@@ -614,7 +614,7 @@ abclibs_asdocs:
 	mkdir -p $(BUILD)/logs
 	cd $(BUILDROOT) && $(FLEX_ASDOC) \
 				-load-config= \
-				-external-library-path=$(call nativepath,$(FLEX_SDK_HOME)/frameworks/libs/player/13.0/playerglobal.swc) \
+				-external-library-path=$(call nativepath,$(FLEX_SDK_HOME)/frameworks/libs/player/14.0/playerglobal.swc) \
 				-strict=false -define+=CONFIG::player,1 -define+=CONFIG::asdocs,true -define+=CONFIG::actual,false \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix/vfs) \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix) \
