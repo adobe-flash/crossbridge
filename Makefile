@@ -344,9 +344,9 @@ diagnostics:
 	@echo "FLEX_SDK_TYPE: $(FLEX_SDK_TYPE)"
 	@echo "FLEX_SDK_HOME: $(FLEX_SDK_HOME)"
 
-# Generate ASDoc documentation
+# Development target
 all_dev:
-	@$(MAKE) diagnostics
+	@$(SDK_MAKE) diagnostics
 
 # Clean build outputs
 clean:
@@ -391,7 +391,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBWEBP).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBXZ).tar.gz
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
-	#tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
+	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
 	unzip -q packages/avmplus-master.zip
@@ -440,7 +440,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBWEBP)
 	rm -rf $(DEPENDENCY_LIBXZ)
 	rm -rf $(DEPENDENCY_MAKE)
-	#rm -rf $(DEPENDENCY_OPENSSL)
+	rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
 	rm -rf $(DEPENDENCY_ZLIB)
@@ -704,7 +704,7 @@ llvmtests:
 	$(PYTHON) $(SRCROOT)/tools/llvmtestcheck.py --srcdir $(SRCROOT)/$(DEPENDENCY_LLVM)/projects/test-suite/ --builddir $(BUILD)/llvm-tests/projects/test-suite/ --fpcmp $(FPCMP)> $(BUILD)/llvm-tests/passfail.txt
 	cp $(BUILD)/llvm-tests/passfail.txt $(BUILD)/passfail_llvm.txt
 
-# TBD
+# Assemble LLVM SpecCPU2006 Test
 llvmtests-speccpu2006: # works only on mac!
 	rm -rf $(BUILD)/llvm-tests
 	rm -rf $(BUILD)/llvm-spec-tests
@@ -722,7 +722,7 @@ llvmtests-speccpu2006: # works only on mac!
 # ====================================================================================
 # BINUTILS
 # ====================================================================================
-# TBD
+# Assemble LLVM BinUtils
 binutils:
 	rm -rf $(BUILD)/binutils
 	mkdir -p $(BUILD)/binutils
@@ -739,7 +739,7 @@ binutils:
 # ====================================================================================
 # PLUGINS
 # ====================================================================================
-# TBD
+# Assemble LLVM Plug-ins
 plugins:
 	rm -rf $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
 	mkdir -p $(BUILD)/makeswf $(BUILD)/multiplug $(BUILD)/zlib
@@ -754,7 +754,7 @@ plugins:
 # ====================================================================================
 # GCC
 # ====================================================================================
-# TBD
+# Assemble LLVM GCC 4.2
 gcc:
 	rm -rf $(BUILD)/llvm-gcc-42
 	mkdir -p $(SDK)/usr/bin
@@ -781,7 +781,7 @@ gcc:
 # ====================================================================================
 # BMAKE
 # ====================================================================================
-# TBD
+# Assemble BMake
 bmake:
 	rm -rf $(BUILD)/bmake
 	mkdir -p $(BUILD)/bmake
@@ -1020,8 +1020,9 @@ sdkcleanup:
 
 # TBD
 finalcleanup:
+	perl -p -i -e 's~$(SRCROOT)~\$$\{flascc_sdk_root\}~g' `grep -ril $(SRCROOT) $(SDK)/usr/lib/pkgconfig`
 	rm -f $(SDK)/usr/lib/*.la
-	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/share/info
+	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/man $(SDK)/usr/share/info
 	@$(LN) ../../share $(SDK)/usr/platform/$(PLATFORM)/share
 	$(RSYNC) $(SRCROOT)/tools/add-opt-in.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/projector-dis.py $(SDK)/usr/bin/
@@ -1138,7 +1139,6 @@ pkgconfig:
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --disable-shared \
 		--disable-dependency-tracking
 	cd $(BUILD)/pkgconfig && $(MAKE) && $(MAKE) install
-	perl -p -i -e 's~$(SRCROOT)~\$$\{flascc_sdk_root\}~g' `grep -ril $(SRCROOT) $(SDK)/usr/lib/pkgconfig`
 
 # GNU libtool is a generic library support script. 
 # Libtool hides the complexity of using shared libraries behind a consistent, portable interface. 
