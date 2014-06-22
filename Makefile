@@ -213,8 +213,12 @@ endif
 # ====================================================================================
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -I/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/lib/gcc/i686-apple-darwin11/4.2.1/include/ -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -I/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/lib/gcc/i686-apple-darwin11/4.2.1/include/ $(TAMARINOPTFLAGS) -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
-$?SCOMP=java -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
-$?SCOMPFALCON=java -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+#$?SCOMP=java -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+ifeq "$(FLEX_SDK_TYPE)" "AdobeAIR"
+ $?SCOMPFALCON=java -classpath $(call nativepath,$(AIR_HOME)/lib/compiler.jar) com.adobe.flash.compiler.clients.ASC -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+else
+ $?SCOMPFALCON=java -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+endif
 $?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
 
@@ -367,7 +371,7 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK_MAKE) glsl2agal
+	@$(SDK_MAKE) submittests
 
 # Clean build outputs
 clean:
