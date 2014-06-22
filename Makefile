@@ -243,7 +243,7 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 # ALL TARGETS
 # ====================================================================================
 BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
-BUILDORDER+= sdkcleanup tr trd extralibs extratools finalcleanup submittests
+BUILDORDER+= sdkcleanup tr trd swig genfs gdb pkgconfig libtool extralibs finalcleanup submittests
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
 TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols 
@@ -319,40 +319,15 @@ all_win:
 	@$(SDK_MAKE) tr &> $(BUILD)/logs/tr.txt 2>&1
 	@$(SDK_MAKE) trd &> $(BUILD)/logs/trd.txt 2>&1
 	@$(SDK_MAKE) test_hello_cpp &> $(BUILD)/logs/test_hello_cpp.txt 2>&1
+	@$(SDK_MAKE) swig &> $(BUILD)/logs/swig.txt 2>&1
+	@$(SDK_MAKE) genfs &> $(BUILD)/logs/genfs.txt 2>&1
+	@$(SDK_MAKE) gdb &> $(BUILD)/logs/gdb.txt 2>&1
+	@$(SDK_MAKE) pkgconfig &> $(BUILD)/logs/pkgconfig.txt 2>&1
+	@$(SDK_MAKE) libtool &> $(BUILD)/logs/libtool.txt 2>&1
 	@$(SDK_MAKE) extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
-	@$(SDK_MAKE) extratools &> $(BUILD)/logs/extratools.txt 2>&1
 	@$(SDK_MAKE) finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
 	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
 	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
-	@echo "Done."
-
-# Build all with Console output
-all_console:
-	@echo "Building $(SDKNAME) ..."
-	@mkdir -p $(BUILD)/logs
-	@$(MAKE) diagnostics
-	@$(MAKE) install_libs
-	@$(MAKE) base
-	@$(MAKE) make
-	@$(SDK_MAKE) cmake
-	@$(SDK_MAKE) abclibs
-	@$(SDK_MAKE) basictools
-	@$(SDK_MAKE) llvm
-	@$(SDK_MAKE) binutils
-	@$(SDK_MAKE) plugins
-	@$(SDK_MAKE) gcc
-	@$(SDK_MAKE) bmake
-	@$(SDK_MAKE) stdlibs
-	@$(SDK_MAKE) gcclibs
-	@$(SDK_MAKE) as3wig
-	@$(SDK_MAKE) abcstdlibs
-	@$(SDK_MAKE) sdkcleanup
-	@$(SDK_MAKE) tr
-	@$(SDK_MAKE) trd
-	@$(SDK_MAKE) extralibs
-	@$(SDK_MAKE) extratools
-	@$(SDK_MAKE) finalcleanup
-	@$(SDK_MAKE) submittests
 	@echo "Done."
 
 # Print debug information
@@ -371,7 +346,7 @@ diagnostics:
 
 # Generate ASDoc documentation
 all_dev:
-	@$(SDK_MAKE) submittests
+	@$(MAKE) diagnostics
 
 # Clean build outputs
 clean:
@@ -1066,8 +1041,9 @@ finalcleanup:
 	$(RSYNC) --exclude "*.xslt" --exclude "*.html" --exclude ASDoc_Config.xml --exclude overviews.xml $(BUILDROOT)/tempdita/ $(SDK)/usr/share/asdocs
 
 # ====================================================================================
-# TAMARIN HELPERS AND PLAYERS
+# EXTRA TOOLS
 # ====================================================================================
+
 # Tamarin Shell built without debugging
 tr:
 	rm -rf $(BUILD)/tr
@@ -1092,16 +1068,121 @@ trd:
 	cd $(BUILD)/trd && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cp -f $(BUILD)/trd/shell/avmshell $(SDK)/usr/bin/avmshell-release-debugger
 
+SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
+SWIG_LIBS=-lLLVMAVM2ShimInfo -lLLVMAVM2ShimCodeGen -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport 
+SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/$(DEPENDENCY_LLVM)/include -I$(BUILD)/llvm-debug/include -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/lib -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long
+# VPMedia: Why delete, I would want a full featured swig shipped as possible, so deletion is disabled below
+SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
+
+# Build SWIG
+swig:
+	rm -rf $(BUILD)/swig
+	mkdir -p $(BUILD)/swig
+	#unpack PCRE dependency
+	cp -f packages/pcre-8.20.tar.gz $(BUILD)/swig
+	#configure PCRE dependency
+	cd $(BUILD)/swig && $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	#initialize SWIG
+	#cd $(SRCROOT)/$(DEPENDENCY_SWIG) && ./autogen.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	#configure SWIG
+	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
+	#make and install SWIG
+	cd $(BUILD)/swig && $(MAKE) && $(MAKE) install
+	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/3.0.0/$(var);)
+
+# Run SWIG Tests
+swigtests:
+	# reconfigure so that makefile is up to date (in case Makefile.in changed)
+	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" \
+		CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache
+	rm -rf $(BUILD)/swig/Examples/as3
+	cp -R $(SRCROOT)/$(DEPENDENCY_SWIG)/Examples/as3 $(BUILD)/swig/Examples
+	rm -rf $(BUILD)/swig/Lib/
+	mkdir -p $(BUILD)/swig/Lib/as3
+	cp -R $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/as3/* $(BUILD)/swig/Lib/as3
+	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.i $(BUILD)/swig/Lib
+	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.swg $(BUILD)/swig/Lib
+	cd $(BUILD)/swig && $(MAKE) check-as3-examples
+
+# Run SWIG Automation Tests (Legacy / Deprecated)
+swigtestsautomation:
+	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/$(DEPENDENCY_SWIG)
+
+# 04.06. Removed -Werror after -Wall from $CC for Maverick compatibility
+# Generate Virtual File System ZLib Dependency
+genfs:
+	rm -rf $(BUILD)/zlib-native
+	mkdir -p $(BUILD)/zlib-native
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_ZLIB)/ $(BUILD)/zlib-native
+	cd $(BUILD)/zlib-native && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) ./configure --static && $(MAKE) 
+	cd $(BUILD)/zlib-native/contrib/minizip/ && $(MAKE) 
+	$$CC -Wall -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
+
+# Build GDB Debugger
+gdb:
+	rm -rf $(BUILD)/$(DEPENDENCY_GDB)
+	mkdir -p $(BUILD)/$(DEPENDENCY_GDB)
+	cd $(BUILD)/$(DEPENDENCY_GDB) && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/$(DEPENDENCY_GDB)/configure \
+		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=avm2-elf && $(MAKE)
+	cp -f $(BUILD)/$(DEPENDENCY_GDB)/gdb/gdb$(EXEEXT) $(SDK)/usr/bin/
+	cp -f $(SRCROOT)/tools/flascc.gdb $(SDK)/usr/share/
+	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
+	cp -f $(SRCROOT)/tools/flascc-init.gdb $(SDK)/usr/share/
+
+# pkg-config is a helper tool used when compiling applications and libraries. 
+# It is language-agnostic, so it can be used for defining the location of documentation tools, for instance. 
+pkgconfig:
+	rm -rf $(BUILD)/pkgconfig
+	mkdir -p $(BUILD)/pkgconfig
+	cd $(BUILD)/pkgconfig && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/$(DEPENDENCY_PKG_CFG)/configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --disable-shared \
+		--disable-dependency-tracking
+	cd $(BUILD)/pkgconfig && $(MAKE) && $(MAKE) install
+	perl -p -i -e 's~$(SRCROOT)~\$$\{flascc_sdk_root\}~g' `grep -ril $(SRCROOT) $(SDK)/usr/lib/pkgconfig`
+
+# GNU libtool is a generic library support script. 
+# Libtool hides the complexity of using shared libraries behind a consistent, portable interface. 
+libtool:
+	rm -rf $(BUILD)/libtool
+	mkdir -p $(BUILD)/libtool
+	cd $(BUILD)/libtool && CC=$(CC) CXX=$(CXX) $(SRCROOT)/$(DEPENDENCY_LIBTOOL)/configure \
+		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) \
+		--prefix=$(SDK)/usr --enable-static --disable-shared --disable-ltdl-install
+	cd $(BUILD)/libtool && $(MAKE) && $(MAKE) install-exec
+
+# Converts GLSL Shaders to Stage3D AGAL format
+# About 'peflags' see: http://www.cygwin.com/cygwin-ug-net/setup-maxmem.html
+glsl2agal:
+	rm -rf $(BUILD)/glsl2agal
+	mkdir -p $(BUILD)/glsl2agal
+	$(RSYNC) $(SRCROOT)/tools/glsl2agal/ $(BUILD)/glsl2agal
+	cd $(BUILD)/glsl2agal/agaloptimiser/src && SDK="$(call nativepath, $(SDK))" ./genabc.sh
+	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(SDK_CMAKE) -G "Unix Makefiles" $(BUILD)/glsl2agal/swc
+	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	peflags --cygwin-heap=4096 $(SDK)/usr/bin/llc$(EXEEXT)
+endif
+	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(CXX) -fno-exceptions -fno-rtti -O4 -flto-api=exports.txt -emit-swc=com.adobe.glsl2agal -o glsl2agal.swc agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl
+	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(CXX) -DCMDLINE=1 -fno-exceptions -fno-rtti --enable-debug -O4 -flto-api=exports.txt -o glsl2agalopt agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	peflags --cygwin-heap=0 $(SDK)/usr/bin/llc$(EXEEXT)
+endif
+	cd $(BUILD)/glsl2agal/swc && $(PYTHON) $(SRCROOT)/tools/projector-dis.py $(BUILD)/glsl2agal/swc/glsl2agalopt
+	cd $(BUILD)/glsl2agal/swc && $(SDK)/usr/bin/avmshell $(BUILD)/projectormake.abc -- -o $(BUILD)/glsl2agal/swc/glsl2agalopt$(EXEEXT) \
+		$(SDK)/usr/bin/avmshell $(BUILD)/glsl2agal/swc/output.swf --  -osr=1
+	#cp -f glsl2agal.swc glsl2agalopt.* $(SDK)/usr/bin/
+
+#glsl2agal_example:
+#	cd examples/basic && $(FLEX)/bin/mxmlc -omit-trace-statements=false -library-path+=$(BUILD)/glsl2agal/swc/glsl2agal.swc \
+#	GLSLCompiler.mxml -o GLSLCompiler.swf
+
 # ====================================================================================
 # EXTRA LIBS
 # ====================================================================================
 # TBD
 extralibs:
-	$(MAKE) zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv \
-		libvgl libjpeg libpng libgif libtiff libwebp \
-		libogg libvorbis libflac libsndfile \
-		libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image \
-		libphysfs
+	$(MAKE) zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv libvgl libjpeg libpng libgif libtiff libwebp \
+		libogg libvorbis libflac libsndfile libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image libphysfs
 
 # A Massively Spiffy Yet Delicately Unobtrusive Compression Library
 zlib:
@@ -1280,30 +1361,6 @@ libsdl:
 	$(MAKE) libsdl_install
 	rm $(SDK)/usr/include/SDL/SDL_opengl.h
 
-# Configure SDL - Cached
-libsdl_configure:
-	rm -rf $(SRCROOT)/cached_build/libsdl
-	mkdir -p $(SRCROOT)/cached_build/libsdl
-	cd $(SRCROOT)/cached_build/libsdl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBSDL)/configure \
-		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
-		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
-		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
-		--disable-directx --enable-joystick --enable-video-vgl --enable-static --disable-shared
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/`
-	rm $(SRCROOT)/cached_build/libsdl/config.status
-
-# Compile SDL - Cached
-libsdl_cached:
-	rm -rf $(BUILD)/libsdl
-	mkdir -p $(BUILD)/libsdl
-	cp -r $(SRCROOT)/cached_build/libsdl $(BUILD)/
-	perl -p -i -e 's~FLASCC_SRC_DIR~$(SRCROOT)~g' `grep -ril FLASCC_SRC_DIR $(BUILD)/libsdl/`
-
-	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
-	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-	$(MAKE) libsdl_install
-	rm $(SDK)/usr/include/SDL/SDL_opengl.h
-
 # Install SDL with our custom sdl-config
 libsdl_install:
 	cp $(SRCROOT)/tools/sdl-config $(SDK)/usr/bin/.
@@ -1406,120 +1463,6 @@ libphysfs:
 		-DPHYSFS_BUILD_TEST=0 -DPHYSFS_HAVE_THREAD_SUPPORT=0 -DPHYSFS_HAVE_CDROM_SUPPORT=0 -DPHYSFS_BUILD_STATIC=1 -DPHYSFS_BUILD_SHARED=0 -DOTHER_LDFLAGS=-lz -DCMAKE_INCLUDE_PATH="$(SDK)/usr/include" \
 		-DCMAKE_LIBRARY_PATH="$(SDK)/usr/lib"
 	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-# ====================================================================================
-# EXTRA TOOLS
-# ====================================================================================
-extratools:
-	$(MAKE) swig genfs gdb pkgconfig libtool
-
-SWIG_LDFLAGS=-L$(BUILD)/llvm-debug/lib
-SWIG_LIBS=-lLLVMAVM2ShimInfo -lLLVMAVM2ShimCodeGen -lclangFrontend -lclangCodeGen -lclangDriver -lclangParse -lclangSema -lclangAnalysis -lclangLex -lclangAST -lclangBasic -lLLVMSelectionDAG -lLLVMCodeGen -lLLVMTarget -lLLVMMC -lLLVMScalarOpts -lLLVMTransformUtils -lLLVMAnalysis -lclangSerialization -lLLVMCore -lLLVMSupport 
-SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/ -I$(SRCROOT)/$(DEPENDENCY_LLVM)/include -I$(BUILD)/llvm-debug/include -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/lib -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long
-# VPMedia: Why delete, I would want a full featured swig shipped as possible, so deletion is disabled below
-SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
-
-# Build SWIG
-swig:
-	rm -rf $(BUILD)/swig
-	mkdir -p $(BUILD)/swig
-	#unpack PCRE dependency
-	cp -f packages/pcre-8.20.tar.gz $(BUILD)/swig
-	#configure PCRE dependency
-	cd $(BUILD)/swig && $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	#initialize SWIG
-	#cd $(SRCROOT)/$(DEPENDENCY_SWIG) && ./autogen.sh --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	#configure SWIG
-	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
-	#make and install SWIG
-	cd $(BUILD)/swig && $(MAKE) && $(MAKE) install
-	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/3.0.0/$(var);)
-
-# Run SWIG Tests
-swigtests:
-	# reconfigure so that makefile is up to date (in case Makefile.in changed)
-	cd $(BUILD)/swig && CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" \
-		CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure --prefix=$(SDK)/usr --disable-ccache
-	rm -rf $(BUILD)/swig/Examples/as3
-	cp -R $(SRCROOT)/$(DEPENDENCY_SWIG)/Examples/as3 $(BUILD)/swig/Examples
-	rm -rf $(BUILD)/swig/Lib/
-	mkdir -p $(BUILD)/swig/Lib/as3
-	cp -R $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/as3/* $(BUILD)/swig/Lib/as3
-	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.i $(BUILD)/swig/Lib
-	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.swg $(BUILD)/swig/Lib
-	cd $(BUILD)/swig && $(MAKE) check-as3-examples
-
-# TBD
-# TODO: Source not found
-swigtestsautomation:
-	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/$(DEPENDENCY_SWIG)
-
-# 04.06. Removed -Werror after -Wall from $CC for Maverick compatibility
-# Generate Virtual File System ZLib Dependency
-genfs:
-	rm -rf $(BUILD)/zlib-native
-	mkdir -p $(BUILD)/zlib-native
-	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_ZLIB)/ $(BUILD)/zlib-native
-	cd $(BUILD)/zlib-native && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) ./configure --static && $(MAKE) 
-	cd $(BUILD)/zlib-native/contrib/minizip/ && $(MAKE) 
-	$$CC -Wall -I$(BUILD)/zlib-native/contrib/minizip -o $(SDK)/usr/bin/genfs$(EXEEXT) $(BUILD)/zlib-native/contrib/minizip/zip.o $(BUILD)/zlib-native/contrib/minizip/ioapi.o $(BUILD)/zlib-native/libz.a $(SRCROOT)/tools/vfs/genfs.c
-
-# TBD
-gdb:
-	rm -rf $(BUILD)/$(DEPENDENCY_GDB)
-	mkdir -p $(BUILD)/$(DEPENDENCY_GDB)
-	cd $(BUILD)/$(DEPENDENCY_GDB) && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/$(DEPENDENCY_GDB)/configure \
-		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=avm2-elf && $(MAKE)
-	cp -f $(BUILD)/$(DEPENDENCY_GDB)/gdb/gdb$(EXEEXT) $(SDK)/usr/bin/
-	cp -f $(SRCROOT)/tools/flascc.gdb $(SDK)/usr/share/
-	cp -f $(SRCROOT)/tools/flascc-run.gdb $(SDK)/usr/share/
-	cp -f $(SRCROOT)/tools/flascc-init.gdb $(SDK)/usr/share/
-
-# pkg-config is a helper tool used when compiling applications and libraries. 
-# It is language-agnostic, so it can be used for defining the location of documentation tools, for instance. 
-pkgconfig:
-	rm -rf $(BUILD)/pkgconfig
-	mkdir -p $(BUILD)/pkgconfig
-	cd $(BUILD)/pkgconfig && CFLAGS="-I$(SRCROOT)/avm2_env/misc" $(SRCROOT)/$(DEPENDENCY_PKG_CFG)/configure \
-		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --disable-shared \
-		--disable-dependency-tracking
-	cd $(BUILD)/pkgconfig && $(MAKE) && $(MAKE) install
-
-# GNU libtool is a generic library support script. 
-# Libtool hides the complexity of using shared libraries behind a consistent, portable interface. 
-libtool:
-	rm -rf $(BUILD)/libtool
-	mkdir -p $(BUILD)/libtool
-	cd $(BUILD)/libtool && CC=$(CC) CXX=$(CXX) $(SRCROOT)/$(DEPENDENCY_LIBTOOL)/configure \
-		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) \
-		--prefix=$(SDK)/usr --enable-static --disable-shared --disable-ltdl-install
-	cd $(BUILD)/libtool && $(MAKE) && $(MAKE) install-exec
-
-# Converts GLSL Shaders to Stage3D AGAL format
-# About 'peflags' see: http://www.cygwin.com/cygwin-ug-net/setup-maxmem.html
-glsl2agal:
-	rm -rf $(BUILD)/glsl2agal
-	mkdir -p $(BUILD)/glsl2agal
-	$(RSYNC) $(SRCROOT)/tools/glsl2agal/ $(BUILD)/glsl2agal
-	cd $(BUILD)/glsl2agal/agaloptimiser/src && SDK="$(call nativepath, $(SDK))" ./genabc.sh
-	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(SDK_CMAKE) -G "Unix Makefiles" $(BUILD)/glsl2agal/swc
-	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	peflags --cygwin-heap=4096 $(SDK)/usr/bin/llc$(EXEEXT)
-endif
-	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(CXX) -fno-exceptions -fno-rtti -O4 -flto-api=exports.txt -emit-swc=com.adobe.glsl2agal -o glsl2agal.swc agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl
-	cd $(BUILD)/glsl2agal/swc && PATH=$(SDK)/usr/bin:$(PATH) $(CXX) -DCMDLINE=1 -fno-exceptions -fno-rtti --enable-debug -O4 -flto-api=exports.txt -o glsl2agalopt agaloptimiser.abc swc.cpp libglsl2agal.a -I../include -I../src/mesa -I../src/mapi -I../src/glsl
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	peflags --cygwin-heap=0 $(SDK)/usr/bin/llc$(EXEEXT)
-endif
-	cd $(BUILD)/glsl2agal/swc && $(PYTHON) $(SRCROOT)/tools/projector-dis.py $(BUILD)/glsl2agal/swc/glsl2agalopt
-	cd $(BUILD)/glsl2agal/swc && $(SDK)/usr/bin/avmshell $(BUILD)/projectormake.abc -- -o $(BUILD)/glsl2agal/swc/glsl2agalopt$(EXEEXT) \
-		$(SDK)/usr/bin/avmshell $(BUILD)/glsl2agal/swc/output.swf --  -osr=1
-	#cp -f glsl2agal.swc glsl2agalopt.* $(SDK)/usr/bin/
-
-#glsl2agal_example:
-#	cd examples/basic && $(FLEX)/bin/mxmlc -omit-trace-statements=false -library-path+=$(BUILD)/glsl2agal/swc/glsl2agal.swc \
-#	GLSLCompiler.mxml -o GLSLCompiler.swf
 
 # ====================================================================================
 # Submit tests
