@@ -27,4 +27,4 @@ CHANGES
 ### 1.0.3
 
 * Updated PlayerGlobal to v14.0.0
-* Improved AIR SDK integration
+* Updated Flash Compilers

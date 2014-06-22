@@ -214,11 +214,7 @@ endif
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -I/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/lib/gcc/i686-apple-darwin11/4.2.1/include/ -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -I/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/lib/gcc/i686-apple-darwin11/4.2.1/include/ $(TAMARINOPTFLAGS) -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
 #$?SCOMP=java -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
-ifeq "$(FLEX_SDK_TYPE)" "AdobeAIR"
- $?SCOMPFALCON=java -classpath $(call nativepath,$(AIR_HOME)/lib/compiler.jar) com.adobe.flash.compiler.clients.ASC -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
-else
- $?SCOMPFALCON=java -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
-endif
+$?SCOMPFALCON=java -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
 $?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
 
@@ -295,14 +291,14 @@ all_with_local_make:
 	done 
 
 # Build all with Windows 
-# Notes: Ignoring some build errors but only documentation generation related
+# Notes: Ignoring BinUtils documentation generation error
 all_win:
 	@echo "Building $(SDKNAME) ..."
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
 	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt 2>&1
 	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
-	@$(MAKE) -i make &> $(BUILD)/logs/make.txt 2>&1
+	@$(MAKE) make &> $(BUILD)/logs/make.txt 2>&1
 	@$(SDK_MAKE) cmake &> $(BUILD)/logs/cmake.txt 2>&1
 	@$(SDK_MAKE) abclibs &> $(BUILD)/logs/abclibs.txt 2>&1
 	@$(SDK_MAKE) basictools &> $(BUILD)/logs/basictools.txt 2>&1
@@ -346,7 +342,7 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(SDK_MAKE) diagnostics
+	@$(MAKE) diagnostics
 
 # Clean build outputs
 clean:
@@ -642,13 +638,13 @@ alctool:
 	rm -rf $(BUILD)/alctool
 	mkdir -p $(BUILD)/alctool/flascc
 	cp -f $(SRCROOT)/tools/lib/*.jar $(SDK)/usr/lib/
-	cp -f $(SRCROOT)/tools/lib/falcon.txt $(SDK)/usr/lib/.
-	rm -f $(SDK)/usr/lib/mxmlc.jar
+#	cp -f $(SRCROOT)/tools/lib/falcon.txt $(SDK)/usr/lib/.
+#	rm -f $(SDK)/usr/lib/mxmlc.jar
 	cp -f $(SRCROOT)/tools/aet/*.java $(BUILD)/alctool/flascc/.
 	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/alctool/flascc/.
-	cd $(BUILD)/alctool && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib/aet.jar)
+	cd $(BUILD)/alctool && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib/compiler.jar)
 	cd $(BUILD)/alctool && echo "Main-Class: flascc.AlcTool" > MANIFEST.MF
-	cd $(BUILD)/alctool && echo "Class-Path: aet.jar" >> MANIFEST.MF
+	cd $(BUILD)/alctool && echo "Class-Path: compiler.jar" >> MANIFEST.MF
 	cd $(BUILD)/alctool && jar cmf MANIFEST.MF alctool.jar flascc/*.class
 	cp $(BUILD)/alctool/alctool.jar $(SDK)/usr/lib/.
 
@@ -931,9 +927,9 @@ as3wig:
 	mkdir -p $(BUILD)/as3wig/flascc
 	cp -f $(SRCROOT)/tools/aet/AS3Wig.java $(BUILD)/as3wig/flascc/.
 	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/as3wig/flascc/.
-	cd $(BUILD)/as3wig && javac flascc/*.java -cp $(call nativepath,$(SDK)/usr/lib/aet.jar)
+	cd $(BUILD)/as3wig && javac flascc/*.java -cp $(call nativepath,$(SDK)/usr/lib/compiler.jar)
 	cd $(BUILD)/as3wig && echo "Main-Class: flascc.AS3Wig" > MANIFEST.MF
-	cd $(BUILD)/as3wig && echo "Class-Path: aet.jar" >> MANIFEST.MF
+	cd $(BUILD)/as3wig && echo "Class-Path: compiler.jar" >> MANIFEST.MF
 	cd $(BUILD)/as3wig && jar cmf MANIFEST.MF as3wig.jar flascc/*.class
 	cp $(BUILD)/as3wig/as3wig.jar $(SDK)/usr/lib/.
 	mkdir -p $(SDK)/usr/include/AS3++/
