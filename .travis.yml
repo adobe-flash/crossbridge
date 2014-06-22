@@ -34,29 +34,29 @@ git:
     depth: 1
 
 # Set Host (OSX)
-# language: objective-c
+language: objective-c
 
 # Set Host (Linux)
-language: c
+#language: c
 
 # Set JDK
-jdk: oraclejdk7
+#jdk: oraclejdk7
 
 # Set Compiler
 compiler:
   - gcc
-  - clang
+#  - clang
 
 # Packages (OSX)
-#before_install:
-#  - brew install libuuid
+before_install:
+  - brew install libuuid
 
 # Packages (Linux)
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install uuid-dev
-  - sudo apt-get install libgmp-dev
-  - sudo apt-get install libmpfr-dev
+#before_install:
+#  - sudo apt-get update
+#  - sudo apt-get install uuid-dev
+#  - sudo apt-get install libgmp-dev
+#  - sudo apt-get install libmpfr-dev
 
 # Assemble
 script: PRINT_LOGS_ON_ERROR=1 make all
