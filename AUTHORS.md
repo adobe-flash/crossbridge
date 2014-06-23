@@ -37,4 +37,8 @@ N: Vladislav Kolotvin
 W: https://github.com/cruelbob
 D: Linux fixes
 
+N: Romain Tisserand
+W: https://github.com/rtissera
+D: Testing, feedbacks
+
 .. Add Your Details Here! ..
