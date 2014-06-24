@@ -9,9 +9,7 @@ Install
 
 1. make clean
 1. make all 
-1. make staging 
-1. make flattensymlinks
-1. make dmg
+1. make deploy
 
 ### Build both Mac and Windows (Cross-Compiled) SDK and package them as DMG and ZIP
 
@@ -20,6 +18,7 @@ Install
 1. make cygwinmac
 1. make win
 1. make deploy
+1. make deploy_mac2win
 
 ### OSX 10.9+ Notes
 
