@@ -31,7 +31,7 @@ D: Linux fixes
 
 N: Andras Csizmadia
 W: https://github.com/vpmedia
-D: Cross platform fixes, refactorings
+D: Bug fixes, updates, Windows releases
 
 N: Vladislav Kolotvin
 W: https://github.com/cruelbob
@@ -39,6 +39,6 @@ D: Linux fixes
 
 N: Romain Tisserand
 W: https://github.com/rtissera
-D: Testing, feedbacks
+D: Testing, OSX releases
 
 .. Add Your Details Here! ..

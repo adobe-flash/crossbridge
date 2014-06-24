@@ -11,15 +11,6 @@ Install
 1. make all 
 1. make deploy
 
-### Build both Mac and Windows (Cross-Compiled) SDK and package them as DMG and ZIP
-
-1. make clean
-1. make all
-1. make cygwinmac
-1. make win
-1. make deploy
-1. make deploy_mac2win
-
 ### OSX 10.9+ Notes
 
 In order to compile the Master branch you will need Apple GCC 4.2:
