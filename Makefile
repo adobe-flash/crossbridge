@@ -342,7 +342,7 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(MAKE) diagnostics
+	@$(MAKE) examples
 
 # Clean build outputs
 clean:
@@ -1822,22 +1822,22 @@ ieeetests_basicops:
 # ====================================================================================
 # Deploy SDK 
 deploy:
-	$(MAKE) deliverables
-
-# Deploy SDK
-deliverables:
 	$(MAKE) staging
 	$(MAKE) flattensymlinks
 ifneq (,$(findstring cygwin,$(PLATFORM)))
 		$(MAKE) zip
 else
 		$(MAKE) dmg
-		$(MAKE) staging
-		$(MAKE) winstaging
-		$(MAKE) flattensymlinks
-		$(MAKE) zip
-#		$(MAKE) diffdeliverables
 endif
+
+
+# Cross-Deploy SDK (OSX to Windows)
+deploy_mac2win:
+	$(MAKE) staging
+	$(MAKE) winstaging
+	$(MAKE) flattensymlinks
+	$(MAKE) zip
+	$(MAKE) diffdeliverables
 
 # Staging
 staging:
