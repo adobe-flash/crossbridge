@@ -66,7 +66,6 @@ ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?THREADS=2
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
-	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/FlashPlayerDebugger.exe
 	$?NOPIE=
 	$?BIN_TRUE=/usr/bin/true
 else ifneq (,$(findstring Darwin,$(UNAME)))
@@ -75,7 +74,6 @@ else ifneq (,$(findstring Darwin,$(UNAME)))
 	$?THREADS=$(shell sysctl -n hw.ncpu)
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-apple-darwin10
-	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/Flash Player.app
 	$?NOPIE=-no_pie
 	$?BIN_TRUE=/usr/bin/true
 else
@@ -84,7 +82,6 @@ else
 	$?THREADS=1
 	$?nativepath=$(1)
 	$?BUILD_TRIPLE=x86_64-unknown-linux-gnu
-	$?FLASH_PLAYER_EXE=$(SRCROOT)/test/player/Debug/Flash Player.app
 	$?NOPIE=
 	$?BIN_TRUE=/bin/true
 endif
@@ -242,7 +239,7 @@ BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcc
 BUILDORDER+= sdkcleanup tr trd swig genfs gdb pkgconfig libtool extralibs finalcleanup submittests
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
-TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols 
+TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols test_gdb 
 #TESTORDER+= swigtests llvmtests checkasm 
 
 # All Tests
@@ -342,7 +339,7 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(MAKE) examples
+	@$(MAKE) test_vfs
 
 # Clean build outputs
 clean:
@@ -1683,7 +1680,7 @@ test_gdb:
 
 # Run Virtual File System (VFS) tests
 test_vfs:
-	@cd qa/vfs/framework && $(MAKE) FLASCC=$(FLASCC)
+	@cd qa/vfs/framework && $(MAKE) FLASCC=$(SDK)
 
 # ====================================================================================
 # Samples and Examples

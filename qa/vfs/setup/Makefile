@@ -13,11 +13,11 @@ $?UNAME=$(shell uname -s)
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?SHARED_OBJECTS_DIR="$(USERPROFILE)/AppData/Roaming/Macromedia/Flash Player/\#SharedObjects"
-	$?PLAYER="$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe"
+	$?PLAYER=$(FLASH_PLAYER_EXE)
 else
 	$?nativepath=$(abspath $(1))
 	$?SHARED_OBJECTS_DIR="$(HOME)/Library/Preferences/Macromedia/Flash Player/\#SharedObjects/"
-	$?PLAYER=open -a "$(SRCROOT)/qa/runtimes/player/Debug/Flash Player.app"
+	$?PLAYER=open -a "$(FLASH_PLAYER_EXE)"
 endif
 
 # Note that we move the framework directory so it has the same name/location as the test swf.  This allows

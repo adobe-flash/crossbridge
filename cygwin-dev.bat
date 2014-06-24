@@ -43,6 +43,7 @@ set MSYS_HOME=
 :: Convert some paths
 set AIR_HOME=%AIR_HOME:\=/%
 set FLEX_HOME=%FLEX_HOME:\=/%
+set FLASH_PLAYER_EXE=%FLASH_PLAYER_EXE:\=/%
 :: Set CrossBridge Home
 set FLASCC_ROOT=%CD:\=/%
 :: Trigger Cygwin Bash
