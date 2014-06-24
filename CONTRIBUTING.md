@@ -9,4 +9,10 @@ Reporting Bugs
 Contributing
 ------------
 
-Please send pull requests.
+- Submit new pull requests (LLVM/FreeBSD upgrade is important)
+
+- Subscribe to mailing lists / apply as contributor
+http://sourceforge.net/p/crossbridge-community/mailman/?source=navbar
+
+- Visit the forum
+https://sourceforge.net/p/crossbridge-community/discussion/general/
