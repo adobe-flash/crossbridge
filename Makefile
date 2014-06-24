@@ -9,7 +9,6 @@ $?BUILDROOT=$(PWD)/build
 $?WIN_BUILD=$(BUILDROOT)/win
 $?MAC_BUILD=$(BUILDROOT)/mac
 $?LINUX_BUILD=$(BUILDROOT)/linux
-$?CYGWINMAC=$(SRCROOT)/cygwinmac/sdk/usr/bin
 
 # ====================================================================================
 # DEPENDENCIES
@@ -140,8 +139,8 @@ endif
 
 # Cross-Compile Options
 $?CYGTRIPLE=i686-pc-cygwin
-$?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
+#$?MINGWTRIPLE=i686-mingw32
 
 # ====================================================================================
 # GNU Tool-chain and CC Options
@@ -343,7 +342,7 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(MAKE) libsdl2
+	@$(MAKE) diagnostics
 
 # Clean build outputs
 clean:
@@ -403,6 +402,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_LIBPHYSFS) .
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_LIBSDL) .
+	cp -r ./patches/$(DEPENDENCY_LIBSDL2) .
 	cp -r ./patches/$(DEPENDENCY_OPENSSL) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
@@ -618,8 +618,6 @@ asdocs_deploy:
 	rm -rf $(SDK)/usr/share/asdocs
 	mkdir -p $(SDK)/usr/share/asdocs
 	$(RSYNC) --exclude "*.xslt" --exclude "*.html" --exclude ASDoc_Config.xml --exclude overviews.xml $(BUILDROOT)/tempdita/ $(SDK)/usr/share/asdocs
-
-CROSS=PATH="$(BUILD)/ccachebin:$(CYGWINMAC):$(PATH):$(SDK)/usr/bin" $(MAKE) SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin LLVMINSTALLPREFIX=$(WIN_BUILD) NATIVE_AR=$(CYGTRIPLE)-ar CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ RANLIB=$(CYGTRIPLE)-ranlib
 
 # ====================================================================================
 # BASICTOOLS
@@ -1902,137 +1900,5 @@ dmg:
 	hdiutil convert $(BUILDROOT)/$(SDKNAME)-tmp.dmg -format UDZO -imagekey zlib-level=9 -o $(BUILDROOT)/$(SDKNAME).dmg
 	rm -f $(BUILDROOT)/$(SDKNAME)-tmp.dmg
 	find $(BUILDROOT)/staging > $(BUILDROOT)/dmgcontents.txt
-
-# ====================================================================================
-# CROSS (Deprecated)
-# ====================================================================================
-
-# Cross-Deploy SDK (OSX-Windows)
-diffdeliverables:
-		cat $(BUILDROOT)/zipcontents.txt | grep -v staging/cygwin | grep -v "run.bat" | sed -e 's/\.exe//g' -e 's/\.dll/\.~SO~/g' -e 's/\/cygwin/\/~PLAT~/g' | sort > $(BUILDROOT)/zipcontents_munge.txt
-		cat $(BUILDROOT)/dmgcontents.txt | grep -v "share/cmake" | grep -v "bin/cmake" | grep -v "bin/ctest" | grep -v "bin/cpack" | grep -v "bin/ccmake" | sed -e 's/\.exe//g' -e 's/\.dylib/\.~SO~/g' -e 's/\/darwin/\/~PLAT~/g' | sort > $(BUILDROOT)/dmgcontents_munge.txt	
-		diff $(BUILDROOT)/dmgcontents_munge.txt $(BUILDROOT)/zipcontents_munge.txt
-
-# Cross-Deploy SDK (OSX to Windows)
-deploy_mac2win:
-	$(MAKE) staging
-	$(MAKE) winstaging
-	$(MAKE) flattensymlinks
-	$(MAKE) zip
-	$(MAKE) diffdeliverables
-    
-# TBD
-cxxfiltmingw:
-	# install the version of mingw for osx from here: http://crossgcc.rts-software.org/doku.php
-	rm -rf $(BUILD)/cxxfiltmingw
-	mkdir -p $(BUILD)/cxxfiltmingw
-	cd $(BUILD)/cxxfiltmingw && CC=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-gcc \
-		AR=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-ar  CXX=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-g++ \
-		CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " \
-		CXXFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " $(SRCROOT)/$(DEPENDENCY_BINUTILS)/configure \
-		--disable-doc --disable-nls --disable-gold --disable-ld --disable-plugins \
-		--build=$(BUILD_TRIPLE) --host=$(MINGWTRIPLE) --target=$(MINGWTRIPLE) \
-		--program-prefix="" --disable-werror \
-		--enable-targets=$(TRIPLE)
-	-cd $(BUILD)/cxxfiltmingw && $(MAKE) -j$(THREADS)
-	-cd $(BUILD)/cxxfiltmingw && $(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-gcc -DMINGW_MONOCLE_HACKS  \
-		-I$(BUILD)/cxxfiltmingw/binutils -I$(BUILD)/cxxfiltmingw/bfd -I$(SRCROOT)/$(DEPENDENCY_BINUTILS)/include  \
-		-I$(BUILD)/cxxfiltmingw/intl $(SRCROOT)/$(DEPENDENCY_BINUTILS)/binutils/cxxfilt.c   \
-		$(BUILD)/cxxfiltmingw/libiberty/*.o $(BUILD)/cxxfiltmingw/intl/*.o $(BUILD)/cxxfiltmingw/binutils/version.o \
-		$(BUILD)/cxxfiltmingw/binutils/bucomm.o  $(BUILD)/cxxfiltmingw/bfd/*.o -o c++filt.exe
-
-# Cross-Deploy Windows Staging
-winstaging:
-	$(LN) cygwin $(BUILDROOT)/staging/sdk/usr/platform/current
-	# temporarily $(MAKE) sdk cygwin-ish
-	$(LN) cygwin $(SDK)/usr/platform/current
-	mkdir -p $(SDK)/usr/platform/cygwin/bin
-	$(MAKE) libsdl_install
-	# copy some parts of the mac bin dir which are actually xplatform
-	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libtool* $(SDK)/usr/platform/cygwin/bin/
-	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libpng* $(SDK)/usr/platform/cygwin/bin/
-	# run post cleanup processes
-	$(MAKE) sdkcleanup
-	$(MAKE) finalcleanup
-	@rm -rf $(SDK)/usr/platform/darwin/share
-	$(RSYNC) $(SRCROOT)/tools/run.bat $(BUILDROOT)/staging/
-	$(RSYNC) $(SRCROOT)/cygwin $(BUILDROOT)/staging/
-	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
-	rm -rf $(BUILDROOT)/staging/sdk/usr/libexec
-	rm -rf $(BUILDROOT)/staging/sdk/usr/share/$(DEPENDENCY_CMAKE)
-	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/platform/cygwin $(BUILDROOT)/staging/sdk/usr/platform/
-	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/*.dll $(BUILDROOT)/staging/sdk/usr/lib/
-	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/bfd-plugins/*.dll $(BUILDROOT)/staging/sdk/usr/lib/bfd-plugins/
-	rm -rf $(BUILDROOT)/staging/sdk/usr/platform/darwin
-	rm -f $(BUILDROOT)/staging/sdk/usr/lib/*.dylib
-	rm -f $(BUILDROOT)/staging/sdk/usr/lib/*.la
-	rm -f $(BUILDROOT)/staging/sdk/usr/lib/bfd-plugins/*.dylib
-	$(LN) darwin $(SDK)/usr/platform/current
-	# nuke cygwin from sdk
-	rm -rf $(SDK)/usr/platform/cygwin
-	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
-
-# TBD
-win:
-	@if [ -d $(CYGWINMAC) ] ; then true ; \
-		else echo "Couldn't locate cygwin mac directory, please invoke $(MAKE) with \"$(MAKE) CYGWINMAC=/path/to/cygwinmac/sdk/usr/bin ...\"" ; exit 1; \
-	fi
-	@mkdir -p $(WIN_BUILD)/logs
-	@echo "-  base (win)"
-	@$(CROSS) base  &> $(WIN_BUILD)/logs/base_win.txt
-	@echo "-  make (win)"
-	@$(CROSS) make &> $(WIN_BUILD)/logs/make_win.txt
-	@echo "-  uname (win)"
-	@$(CROSS) uname  &> $(WIN_BUILD)/logs/uname_win.txt
-	@echo "-  noenv (win)"
-	@$(CROSS) noenv &> $(WIN_BUILD)/logs/noenv_win.txt
-	@echo "-  avm2-as (win)"
-	@$(CROSS) avm2-as &> $(WIN_BUILD)/logs/avm2-as_win.txt
-	@echo "-  pkgconfig (win)"
-	@$(CROSS) GLIB_CFLAGS="-I$(CYGWINMAC)/../include/glib-2.0/ -I$(CYGWINMAC)/../lib/glib-2.0/include/" GLIB_LIBS="$(CYGWINMAC)/../lib/libglib-2.0.a -lintl -liconv" pkgconfig -j1 &> $(WIN_BUILD)/logs/pkgconfig_win.txt
-	@echo "-  llvm (win/cygwin)"
-	@$(MAKE) cross_llvm_cygwin &> $(WIN_BUILD)/logs/llvm_win_cygwin.txt
-	@echo "-  binutils (win)"
-	@$(CROSS) binutils &> $(WIN_BUILD)/logs/binutils_win.txt
-	@echo "-  plugins (win)"
-	@$(CROSS) plugins &> $(WIN_BUILD)/logs/plugins_win.txt
-	@echo "-  gcc (win)"
-	@$(CROSS) gcc &> $(WIN_BUILD)/logs/gcc_win.txt
-	@echo "-  swig (win)"
-	@$(CROSS) swig &> $(WIN_BUILD)/logs/swig_win.txt
-	@echo "-  llvm (win/mingw)"
-	@$(MAKE) cross_llvm_mingw &> $(WIN_BUILD)/logs/llvm_win_mingw.txt
-	@echo "-  tr (win)"
-	@$(CROSS) tr &> $(WIN_BUILD)/logs/tr_win.txt
-	@echo "-  trd (win)"
-	@$(CROSS) trd &> $(WIN_BUILD)/logs/trd_win.txt
-	@echo "-  gdb (win)"
-	@$(CROSS) gdb &> $(WIN_BUILD)/logs/gdb_win.txt
-	@echo "-  genfs (win)"
-	@$(CROSS) genfs &> $(WIN_BUILD)/logs/genfs_win.txt
-
-# TBD
-cross_llvm_mingw:
-	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_RC_COMPILER $(MINGWTRIPLE)-gcc)" >> $(BUILD)/llvmcross.toolchain
-	PATH="$(BUILD)/ccachebin:$(SRCROOT)/mingwmac/sdk/usr/bin:$(PATH)" $(MAKE) \
-		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(MINGWTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
-		CC=$(MINGWTRIPLE)-gcc CXX=$(MINGWTRIPLE)-g++ \
-		LLVMCFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" \
-		LLVMCXXFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" LLVMLDFLAGS="-lrpcrt4 -Wl,--stack,16000000" \
-		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
-		llvm LLVMTESTS=ON LLVM_ONLYLLC=true CLANG=OFF
-
-# TBD
-cross_llvm_cygwin:
-	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_RC_COMPILER $(CC))" >> $(BUILD)/llvmcross.toolchain
-	PATH="$(BUILD)/ccachebin:$(CYGWINMAC)/../altbin:$(CYGWINMAC):$(PATH)" $(MAKE) \
-		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(CYGTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
-		CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ LLVMLDFLAGS="-Wl,--stack,16000000" \
-		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
-		llvm LLVMTESTS=OFF
 
 .PHONY: bmake posix binutils docs gcc samples
