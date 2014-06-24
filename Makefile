@@ -49,7 +49,7 @@ $?DEPENDENCY_LIBXZ=xz-5.0.5
 $?DEPENDENCY_LLVM=llvm-2.9
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-4.0
-$?DEPENDENCY_OPENSSL=openssl-1.0.1g
+$?DEPENDENCY_OPENSSL=openssl-1.0.1h
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_SWIG=swig-3.0.0
@@ -339,7 +339,7 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(MAKE) test_vfs
+	@$(MAKE) libopenssl
 
 # Clean build outputs
 clean:
@@ -395,6 +395,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_LIBPHYSFS) .
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_LIBSDL) .
+	cp -r ./patches/$(DEPENDENCY_OPENSSL) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
@@ -1359,7 +1360,7 @@ libsdl_install:
 	cp $(SRCROOT)/tools/sdl-config $(SDK)/usr/bin/.
 	chmod a+x $(SDK)/usr/bin/sdl-config
 
-# TBD
+# SDL Image Extension
 libsdl_image:
 	mkdir -p $(BUILD)/libsdlimage
 	cd $(BUILD)/libsdlimage && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLIMAGE)/configure \
@@ -1367,7 +1368,7 @@ libsdl_image:
 		--disable-dependency-tracking --disable-sdltest --without-x
 	cd $(BUILD)/libsdlimage && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# TBD
+# SDL Mixer Extension
 libsdl_mixer:
 	mkdir -p $(BUILD)/libsdlmixer
 	cd $(BUILD)/libsdlmixer && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLMIXER)/configure \
@@ -1375,7 +1376,7 @@ libsdl_mixer:
 		--disable-dependency-tracking --disable-sdltest --without-x
 	cd $(BUILD)/libsdlmixer && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# TBD
+# SDL TTF Extension
 libsdl_ttf:
 	mkdir -p $(BUILD)/libsdlttf
 	cd $(BUILD)/libsdlttf && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLTTF)/configure \
@@ -1401,7 +1402,7 @@ libvorbis:
 		--disable-dependency-tracking
 	cd $(BUILD)/libvorbis && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# TBD
+# FLAC library
 libflac:
 	rm -rf $(BUILD)/libflac
 	mkdir -p $(BUILD)/libflac
@@ -1421,6 +1422,7 @@ libsndfile:
 	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # AAlib is an portable ascii art GFX library.
+# TODO: add to build chain
 libaa:
 	rm -rf $(BUILD)/libaa
 	mkdir -p $(BUILD)/libaa
@@ -1430,16 +1432,17 @@ libaa:
 	cd $(BUILD)/libaa && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Cryptography library.
+# TODO: add to build chain
 libopenssl:
-	rm -rf $(BUILD)/openssl
-	mkdir -p $(BUILD)/openssl
-	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./configure \
-		BSD-x86 --prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) \
-		-no-hw -no-asm -no-threads -no-shared -no-dso
+	rm -rf $(BUILD)/libopenssl
+	mkdir -p $(BUILD)/libopenssl
+	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./config \
+		no-hw no-asm no-threads no-shared no-dso --prefix=$(SDK)/usr 
 	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Protocol Buffers are a way of encoding structured data in an efficient yet extensible format. 
 # Google uses Protocol Buffers for almost all of its internal RPC protocols and file formats. 
+# TODO: add to build chain
 libprotobuf:
 	rm -rf $(BUILD)/libprotobuf
 	mkdir -p $(BUILD)/libprotobuf
@@ -1827,15 +1830,6 @@ else
 		$(MAKE) dmg
 endif
 
-
-# Cross-Deploy SDK (OSX to Windows)
-deploy_mac2win:
-	$(MAKE) staging
-	$(MAKE) winstaging
-	$(MAKE) flattensymlinks
-	$(MAKE) zip
-	$(MAKE) diffdeliverables
-
 # Staging
 staging:
 	rm -rf $(BUILDROOT)/staging
@@ -1876,6 +1870,44 @@ dmg:
 	rm -f $(BUILDROOT)/$(SDKNAME)-tmp.dmg
 	find $(BUILDROOT)/staging > $(BUILDROOT)/dmgcontents.txt
 
+# ====================================================================================
+# CROSS (Deprecated)
+# ====================================================================================
+
+# Cross-Deploy SDK (OSX-Windows)
+diffdeliverables:
+		cat $(BUILDROOT)/zipcontents.txt | grep -v staging/cygwin | grep -v "run.bat" | sed -e 's/\.exe//g' -e 's/\.dll/\.~SO~/g' -e 's/\/cygwin/\/~PLAT~/g' | sort > $(BUILDROOT)/zipcontents_munge.txt
+		cat $(BUILDROOT)/dmgcontents.txt | grep -v "share/cmake" | grep -v "bin/cmake" | grep -v "bin/ctest" | grep -v "bin/cpack" | grep -v "bin/ccmake" | sed -e 's/\.exe//g' -e 's/\.dylib/\.~SO~/g' -e 's/\/darwin/\/~PLAT~/g' | sort > $(BUILDROOT)/dmgcontents_munge.txt	
+		diff $(BUILDROOT)/dmgcontents_munge.txt $(BUILDROOT)/zipcontents_munge.txt
+
+# Cross-Deploy SDK (OSX to Windows)
+deploy_mac2win:
+	$(MAKE) staging
+	$(MAKE) winstaging
+	$(MAKE) flattensymlinks
+	$(MAKE) zip
+	$(MAKE) diffdeliverables
+    
+# TBD
+cxxfiltmingw:
+	# install the version of mingw for osx from here: http://crossgcc.rts-software.org/doku.php
+	rm -rf $(BUILD)/cxxfiltmingw
+	mkdir -p $(BUILD)/cxxfiltmingw
+	cd $(BUILD)/cxxfiltmingw && CC=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-gcc \
+		AR=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-ar  CXX=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-g++ \
+		CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " \
+		CXXFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " $(SRCROOT)/$(DEPENDENCY_BINUTILS)/configure \
+		--disable-doc --disable-nls --disable-gold --disable-ld --disable-plugins \
+		--build=$(BUILD_TRIPLE) --host=$(MINGWTRIPLE) --target=$(MINGWTRIPLE) \
+		--program-prefix="" --disable-werror \
+		--enable-targets=$(TRIPLE)
+	-cd $(BUILD)/cxxfiltmingw && $(MAKE) -j$(THREADS)
+	-cd $(BUILD)/cxxfiltmingw && $(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-gcc -DMINGW_MONOCLE_HACKS  \
+		-I$(BUILD)/cxxfiltmingw/binutils -I$(BUILD)/cxxfiltmingw/bfd -I$(SRCROOT)/$(DEPENDENCY_BINUTILS)/include  \
+		-I$(BUILD)/cxxfiltmingw/intl $(SRCROOT)/$(DEPENDENCY_BINUTILS)/binutils/cxxfilt.c   \
+		$(BUILD)/cxxfiltmingw/libiberty/*.o $(BUILD)/cxxfiltmingw/intl/*.o $(BUILD)/cxxfiltmingw/binutils/version.o \
+		$(BUILD)/cxxfiltmingw/binutils/bucomm.o  $(BUILD)/cxxfiltmingw/bfd/*.o -o c++filt.exe
+
 # Cross-Deploy Windows Staging
 winstaging:
 	$(LN) cygwin $(BUILDROOT)/staging/sdk/usr/platform/current
@@ -1906,36 +1938,6 @@ winstaging:
 	# nuke cygwin from sdk
 	rm -rf $(SDK)/usr/platform/cygwin
 	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
-
-# Cross-Deploy SDK (OSX-Windows)
-diffdeliverables:
-		cat $(BUILDROOT)/zipcontents.txt | grep -v staging/cygwin | grep -v "run.bat" | sed -e 's/\.exe//g' -e 's/\.dll/\.~SO~/g' -e 's/\/cygwin/\/~PLAT~/g' | sort > $(BUILDROOT)/zipcontents_munge.txt
-		cat $(BUILDROOT)/dmgcontents.txt | grep -v "share/cmake" | grep -v "bin/cmake" | grep -v "bin/ctest" | grep -v "bin/cpack" | grep -v "bin/ccmake" | sed -e 's/\.exe//g' -e 's/\.dylib/\.~SO~/g' -e 's/\/darwin/\/~PLAT~/g' | sort > $(BUILDROOT)/dmgcontents_munge.txt	
-		diff $(BUILDROOT)/dmgcontents_munge.txt $(BUILDROOT)/zipcontents_munge.txt
-
-# ====================================================================================
-# CROSS
-# ====================================================================================
-
-# TBD
-cxxfiltmingw:
-	# install the version of mingw for osx from here: http://crossgcc.rts-software.org/doku.php
-	rm -rf $(BUILD)/cxxfiltmingw
-	mkdir -p $(BUILD)/cxxfiltmingw
-	cd $(BUILD)/cxxfiltmingw && CC=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-gcc \
-		AR=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-ar  CXX=$(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-g++ \
-		CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " \
-		CXXFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) -DMINGW_MONOCLE_HACKS " $(SRCROOT)/$(DEPENDENCY_BINUTILS)/configure \
-		--disable-doc --disable-nls --disable-gold --disable-ld --disable-plugins \
-		--build=$(BUILD_TRIPLE) --host=$(MINGWTRIPLE) --target=$(MINGWTRIPLE) \
-		--program-prefix="" --disable-werror \
-		--enable-targets=$(TRIPLE)
-	-cd $(BUILD)/cxxfiltmingw && $(MAKE) -j$(THREADS)
-	-cd $(BUILD)/cxxfiltmingw && $(SRCROOT)/mingwmac/sdk/usr/bin/$(MINGWTRIPLE)-gcc -DMINGW_MONOCLE_HACKS  \
-		-I$(BUILD)/cxxfiltmingw/binutils -I$(BUILD)/cxxfiltmingw/bfd -I$(SRCROOT)/$(DEPENDENCY_BINUTILS)/include  \
-		-I$(BUILD)/cxxfiltmingw/intl $(SRCROOT)/$(DEPENDENCY_BINUTILS)/binutils/cxxfilt.c   \
-		$(BUILD)/cxxfiltmingw/libiberty/*.o $(BUILD)/cxxfiltmingw/intl/*.o $(BUILD)/cxxfiltmingw/binutils/version.o \
-		$(BUILD)/cxxfiltmingw/binutils/bucomm.o  $(BUILD)/cxxfiltmingw/bfd/*.o -o c++filt.exe
 
 # TBD
 win:
