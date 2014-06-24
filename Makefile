@@ -41,6 +41,10 @@ $?DEPENDENCY_LIBSDL=SDL-1.2.14
 $?DEPENDENCY_LIBSDLIMAGE=SDL_image-1.2.12
 $?DEPENDENCY_LIBSDLMIXER=SDL_mixer-1.2.12
 $?DEPENDENCY_LIBSDLTTF=SDL_ttf-2.0.11
+$?DEPENDENCY_LIBSDL2=SDL2-2.0.3
+$?DEPENDENCY_LIBSDL2IMAGE=SDL2_image-2.0.0
+$?DEPENDENCY_LIBSDL2MIXER=SDL2_mixer-2.0.0
+$?DEPENDENCY_LIBSDL2TTF=SDL2_ttf-2.0.12
 $?DEPENDENCY_LIBTIFF=tiff-4.0.3
 $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.4
@@ -339,7 +343,7 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(MAKE) libopenssl
+	@$(MAKE) libsdl2
 
 # Clean build outputs
 clean:
@@ -378,6 +382,10 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBSDLIMAGE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSDLMIXER).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSDLTTF).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBSDL2).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBSDL2IMAGE).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBSDL2MIXER).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBSDL2TTF).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBTIFF).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBTOOL).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBVORBIS).tar.gz
@@ -428,6 +436,10 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBSDLIMAGE)
 	rm -rf $(DEPENDENCY_LIBSDLMIXER)
 	rm -rf $(DEPENDENCY_LIBSDLTTF)
+	rm -rf $(DEPENDENCY_LIBSDL2)
+	rm -rf $(DEPENDENCY_LIBSDL2IMAGE)
+	rm -rf $(DEPENDENCY_LIBSDL2MIXER)
+	rm -rf $(DEPENDENCY_LIBSDL2TTF)
 	rm -rf $(DEPENDENCY_LIBTIFF)
 	rm -rf $(DEPENDENCY_LIBTOOL)
 	rm -rf $(DEPENDENCY_LIBVORBIS)
@@ -1014,7 +1026,8 @@ sdkcleanup:
 
 # TBD
 finalcleanup:
-	perl -p -i -e 's~$(SRCROOT)~\$$\{flascc_sdk_root\}~g' `grep -ril $(SRCROOT) $(SDK)/usr/lib/pkgconfig`
+	perl -p -i -e 's~$(SRCROOT)/sdk~\$$\{flascc_sdk_root\}~g' `grep -ril $(SRCROOT) $(SDK)/usr/lib/pkgconfig`
+	rm -f $(SDK)/usr/lib/pkgconfig/*.bak
 	rm -f $(SDK)/usr/lib/*.la
 	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/man $(SDK)/usr/share/info
 	@$(LN) ../../share $(SDK)/usr/platform/$(PLATFORM)/share
@@ -1383,6 +1396,26 @@ libsdl_ttf:
 		--prefix=$(SDK)/usr --with-sdl-prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
 		--disable-dependency-tracking --disable-sdltest --without-x
 	cd $(BUILD)/libsdlttf && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# Assemble SDL2 core
+libsdl2:
+	rm -rf $(BUILD)/libsdl2
+	mkdir -p $(BUILD)/libsdl2
+	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBSDL2)/configure \
+		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
+		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
+		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
+		--disable-directx --enable-joystick --enable-video-vgl --enable-static --disable-shared
+	rm $(BUILD)/libsdl2/config.status
+	cd $(BUILD)/libsdl2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
+	cd $(BUILD)/libsdl2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+	$(MAKE) libsdl2_install
+	rm $(SDK)/usr/include/SDL2/SDL_opengl.h
+
+# Install SDL2 with our custom sdl2-config
+libsdl2_install:
+	cp $(SRCROOT)/tools/sdl2-config $(SDK)/usr/bin/.
+	chmod a+x $(SDK)/usr/bin/sdl2-config
 
 # Ogg is a multimedia container format, and the native file and stream format for the Xiph.org multimedia codecs. 
 libogg:
