@@ -1,0 +1,35 @@
+/*This source code copyrighted by Lazy Foo' Productions (2004-2013)
+and may not be redestributed without written permission.*/
+
+//Transformation Matrices
+uniform mat4 LProjectionMatrix;
+uniform mat4 LModelViewMatrix;
+
+#if __VERSION__ >= 130
+
+//Vertex position attribute
+in vec2 LVertexPos2D;
+
+//Multicolor attribute
+in vec3 LMultiColor;
+out vec4 multiColor;
+
+#else
+
+//Vertex position attribute
+attribute vec2 LVertexPos2D;
+
+//Multicolor attribute
+attribute vec3 LMultiColor;
+varying vec4 multiColor;
+
+#endif
+
+void main()
+{
+	//Process color
+	multiColor = vec4( LMultiColor.r, LMultiColor.g, LMultiColor.b, 1.0 );
+	
+	//Process vertex
+	gl_Position = LProjectionMatrix * LModelViewMatrix * vec4( LVertexPos2D.x, LVertexPos2D.y, 0.0, 1.0 );
+}

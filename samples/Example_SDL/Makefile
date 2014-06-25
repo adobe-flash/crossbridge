@@ -36,17 +36,17 @@ $?SDL_TARGETS=	lesson01 lesson02 lesson03 lesson04 lesson05 lesson06 lesson07 le
 all: clean init check $(SDL_TARGETS)
 
 %:
-	@curl -L -o $@.zip http://lazyfoo.net/downloads/index.php?file=SDLTut_$@ && mv $@.zip temp/ && unzip -qq temp/$@.zip && mv $@ lessons
+	#@curl -L -o $@.zip http://lazyfoo.net/downloads/index.php?file=SDLTut_$@ && mv $@.zip temp/ && unzip -qq temp/$@.zip && mv $@ lessons
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/$@.cpp -lSDL -lvgl -o $@.exe
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/$@.cpp -lSDL -lvgl -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o $@.swf 
 
 include ../Makefile.common
 
 init:
-	@mkdir -p temp
-	@mkdir -p lessons
+	#@mkdir -p temp
+	#@mkdir -p lessons
   
 clean:
-	@rm -fr lessons
-	@rm -fr temp
+	#@rm -fr lessons
+	#@rm -fr temp
 	@rm -f *.swf *.swc *.bc *.abc *.exe *.zip

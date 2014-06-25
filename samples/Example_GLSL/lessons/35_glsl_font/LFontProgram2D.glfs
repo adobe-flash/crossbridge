@@ -1,0 +1,30 @@
+/*This source code copyrighted by Lazy Foo' Productions (2004-2013)
+and may not be redestributed without written permission.*/
+
+//Texture Color
+uniform vec4 LTextColor;
+uniform sampler2D LTextureUnit;
+
+#if __VERSION__ >= 130
+
+//Texture coordinate
+in vec4 texCoord;
+
+//Final color
+out vec4 gl_FragColor;
+
+#else
+
+//Texture coordinate
+varying vec4 texCoord;
+
+#endif
+
+void main()
+{
+	//Get red texture color
+	vec4 red = texture( LTextureUnit, texCoord.st );
+	
+	//Set alpha fragment
+	gl_FragColor = vec4( 1.0, 1.0, 1.0, red.r ) * LTextColor;
+}
