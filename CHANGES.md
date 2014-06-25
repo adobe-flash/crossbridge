@@ -27,4 +27,5 @@ CHANGES
 ### 1.0.3
 
 * Updated PlayerGlobal to v14.0.0
-* Updated Flash Compilers
+* Updated ASC2 Compiler to v14.0.0
+* Deprecated ObjectiveC support
