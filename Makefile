@@ -243,7 +243,7 @@ BUILDORDER+= sdkcleanup tr trd swig genfs gdb pkgconfig libtool extralibs finalc
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
 TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols test_gdb 
-#TESTORDER+= swigtests llvmtests checkasm 
+#TESTORDER+= gcctests swigtests llvmtests checkasm 
 
 # All Tests
 submittests: $(TESTORDER)
@@ -343,7 +343,7 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(MAKE) examples
+	@$(MAKE) swig
 
 # Clean build outputs
 clean:
@@ -394,6 +394,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
+	tar xf packages/$(DEPENDENCY_SWIG).tar.gz
 	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
 	unzip -q packages/avmplus-master.zip
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
@@ -407,6 +408,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_OPENSSL) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
+	cp -r ./patches/$(DEPENDENCY_SWIG) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
 	cp -r ./patches/avmplus-master .
 
@@ -450,6 +452,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
+	rm -rf $(DEPENDENCY_SWIG)
 	rm -rf $(DEPENDENCY_ZLIB)
 	rm -rf avmplus-master
 
@@ -1800,12 +1803,13 @@ gcc.apple \
 gcc.dg \
 gcc.misc-tests \
 gcc.target \
-gcc.test-framework \
-llvm.obj-c++ \
-llvm.objc \
-obj-c++.dg \
-objc \
-objc.dg
+gcc.test-framework 
+#\
+#llvm.obj-c++ \
+#llvm.objc \
+#obj-c++.dg \
+#objc \
+#objc.dg
 
 gcctorture/%:
 	-$(RUNGCCTESTS) --tool gcc --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/gcc.c-torture $(@:gcctorture/%=%).exp
