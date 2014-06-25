@@ -239,7 +239,7 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 # ALL TARGETS
 # ====================================================================================
 BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
-BUILDORDER+= sdkcleanup tr trd swig genfs gdb pkgconfig libtool extralibs finalcleanup submittests
+BUILDORDER+= sdkcleanup tr trd swig genfs gdb pkgconfig libtool extralibs finalcleanup submittests samples examples
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
 TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols test_gdb 
@@ -324,6 +324,7 @@ all_win:
 	@$(SDK_MAKE) finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
 	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
 	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
+	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt 2>&1
 	@echo "Done."
 
 # Print debug information
@@ -342,7 +343,7 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(MAKE) diagnostics
+	@$(MAKE) examples
 
 # Clean build outputs
 clean:
@@ -1722,13 +1723,11 @@ test_vfs:
 
 # Samples shipped with the SDK
 samples:
-	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) -j$(THREADS)
-	#find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
+	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME)
 
 # Examples used to test the SDK
 examples:
-	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) -j$(THREADS) examples
-	#find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
+	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) examples
 
 # ====================================================================================
 # Extra Tests
