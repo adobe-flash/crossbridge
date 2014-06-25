@@ -68,8 +68,8 @@ all: clean init check $(VGL_TARGETS)
  
 %:
 	#@curl -L -o $@.zip http://lazyfoo.net/tutorials/OpenGL/$@/$@.zip && mv $@.zip temp/ && unzip -qq temp/$@.zip && mv $@ lessons
-	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/main.cpp -I../Example_freeglut/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -I$(GLS3D)/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -o $@.exe
-	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/main.cpp -I../Example_freeglut/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -I$(GLS3D)/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o $@.swf 
+	#"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/main.cpp -I../Example_freeglut/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -I$(GLS3D)/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -o $@.exe
+	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/main.cpp -I../Example_freeglut/install/usr/include/ -L../Example_freeglut/install/usr/lib/ -I$(GLS3D)/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -lGL -lglut -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o $@.swf 
 
 include ../Makefile.common
 

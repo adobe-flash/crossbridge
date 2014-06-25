@@ -4,6 +4,10 @@ and may not be redistributed without written permission.*/
 
 #include "LUtil.h"
 
+#ifdef __AVM2__
+    #include <AS3/AS3.h>
+#endif
+
 void runMainLoop( int val );
 /*
 Pre Condition:

@@ -4,6 +4,10 @@ and may not be redistributed without written permission.*/
 //Include SDL functions and datatypes
 #include "SDL/SDL.h"
 
+#ifdef __AVM2__
+    #include <AS3/AS3.h>
+#endif
+
 int main( int argc, char* args[] )
 {
     //The images
@@ -24,6 +28,10 @@ int main( int argc, char* args[] )
 
     //Update Screen
     SDL_Flip( screen );
+        
+#ifdef __AVM2__
+    AS3_GoAsync();
+#endif 
 
     //Pause
     SDL_Delay( 2000 );

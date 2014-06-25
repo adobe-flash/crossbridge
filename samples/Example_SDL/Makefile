@@ -37,7 +37,7 @@ all: clean init check $(SDL_TARGETS)
 
 %:
 	#@curl -L -o $@.zip http://lazyfoo.net/downloads/index.php?file=SDLTut_$@ && mv $@.zip temp/ && unzip -qq temp/$@.zip && mv $@ lessons
-	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/$@.cpp -lSDL -lvgl -o $@.exe
+	#"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/$@.cpp -lSDL -lvgl -o $@.exe
 	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/$@.cpp -lSDL -lvgl -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o $@.swf 
 
 include ../Makefile.common
