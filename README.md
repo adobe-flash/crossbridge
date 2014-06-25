@@ -14,7 +14,7 @@ Features:
 
 Demo:
 
-* [NeverBall](http://www.cmodule.org/neverball/)
+* [NeverBall](http://www.vpmedia.hu/crossbridge/neverball)
 
 Download:
 
