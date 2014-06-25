@@ -43,16 +43,14 @@ ifneq "$(wildcard $(call unixpath,$(FLASCC_ROOT)/sdk))" ""
 else
  $?FLASCC:=/path/to/crossbridge-sdk/
 endif
-
+$?ASC2=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md -parallel
+ 
 # Auto Detect AIR/Flex SDKs
 ifneq "$(wildcard $(AIR_HOME)/lib/compiler.jar)" ""
  $?FLEX=$(AIR_HOME)
- $?ASC2=java -classpath $(call nativepath,$(FLEX)/lib/compiler.jar) com.adobe.flash.compiler.clients.ASC -merge -md 
 else
  $?FLEX:=/path/to/adobe-air-sdk/
- $?ASC2=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md 
 endif
-#$(info Using ASC2: $(ASC2))
 
 # Stage3D+
 $?GLS3D=$(FLASCC)/../samples/Example_GLS3D

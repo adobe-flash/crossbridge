@@ -30,14 +30,14 @@ T01: check
 	@echo "-------- Sample 1 --------"
 	@echo "Compiling EXE ..."
 	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) hello.c -o hello.exe
-	@echo "Compiling SWF ..."
-	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) hello.c -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o hello.swf
+	@echo "Compiling SWF (Debug) ..."
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) hello.c -g -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o hello-debug.swf
 	@echo "Generating Exports.txt ..."
 	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) -c hello.c -o hello.o
 	cp -f ../exports.txt exports.txt
 	"$(FLASCC)/usr/bin/nm" hello.o | grep ' T ' | sed 's/.*__/_/' | sed 's/.* T //' >> exports.txt
-	@echo "Compiling SWF (LTO) ..."
-	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) hello.c -flto-api=exports.txt -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o hello-lto.swf
+	@echo "Compiling SWF (LTO) with save-temporary-files ..."
+	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) hello.c -flto-api=exports.txt -save-temps -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o hello-lto.swf
 
 include ../Makefile.common
 
