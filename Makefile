@@ -343,7 +343,7 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(MAKE) swig
+	@$(MAKE) llvmtests
 
 # Clean build outputs
 clean:
