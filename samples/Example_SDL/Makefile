@@ -35,18 +35,29 @@ $?SDL_TARGETS=	lesson01 lesson02 lesson03 lesson04 lesson05 lesson06 lesson07 le
 
 all: clean init check $(SDL_TARGETS)
 
+#@curl -L -o $@.zip http://lazyfoo.net/downloads/index.php?file=SDLTut_$@ && mv $@.zip temp/ && unzip -qq temp/$@.zip && mv $@ lessons
 %:
-	#@curl -L -o $@.zip http://lazyfoo.net/downloads/index.php?file=SDLTut_$@ && mv $@.zip temp/ && unzip -qq temp/$@.zip && mv $@ lessons
-	#"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/$@.cpp -lSDL -lvgl -o $@.exe
-	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/$@.cpp -lSDL -lvgl -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o $@.swf 
+	"$(FLASCC)/usr/bin/g++" $(BASE_CFLAGS) lessons/$@/$@.cpp $(GLS3D)/install/usr/lib/libGL.abc -symbol-abc=Console.abc \
+	-I$(GLS3D)/install/usr/include/ -L$(GLS3D)/install/usr/lib/ \
+	-lSDL -lvgl -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -o $@.swf 
 
 include ../Makefile.common
 
 init:
-	#@mkdir -p temp
-	#@mkdir -p lessons
+	$(ASC2) -AS3 -optimize \
+		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
+		-import $(call nativepath,$(GLS3D)/install/usr/lib/libGL.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/IBackingStore.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/IVFS.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/InMemoryBackingStore.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/AlcVFSZip.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/CModule.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/C_Run.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \
+		-import $(call nativepath,$(FLASCC)/usr/lib/PlayerKernel.abc) \
+		Console.as -outdir . -out Console 
   
 clean:
-	#@rm -fr lessons
-	#@rm -fr temp
 	@rm -f *.swf *.swc *.bc *.abc *.exe *.zip

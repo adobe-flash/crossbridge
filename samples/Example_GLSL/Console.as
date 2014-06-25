@@ -54,7 +54,7 @@ package com.adobe.flascc
   */
   public class Console extends Sprite implements ISpecialFile
   {
-    private var enableConsole:Boolean = false;
+    private var enableConsole:Boolean = true;
     private static var _width:int = 500;
     private static var _height:int = 500;
     private var mainloopTickPtr:int, keyHandlerPtr:int;
@@ -197,7 +197,7 @@ package com.adobe.flascc
       }
 
       CModule.startAsync(this, argv);
-      mainloopTickPtr = CModule.getPublicSymbol("glutMainLoopBody");
+      mainloopTickPtr = CModule.getPublicSymbol("runMainLoop");
       keyHandlerPtr = CModule.getPublicSymbol("_avm2_glut_keyhandler");
 
       enterFrame(null);
