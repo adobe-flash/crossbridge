@@ -1,13 +1,18 @@
-AC_INIT(QRencode)
+m4_define([__MAJOR_VERSION], [3])dnl
+m4_define([__MINOR_VERSION], [9])dnl
+m4_define([__MICRO_VERSION], [0])dnl
+m4_define([__VERSION], [__MAJOR_VERSION.__MINOR_VERSION.__MICRO_VERSION])dnl
+AC_INIT(QRencode, __VERSION)
 
-MAJOR_VERSION=3
-MINOR_VERSION=2
-MICRO_VERSION=0
-VERSION=$MAJOR_VERSION.$MINOR_VERSION.$MICRO_VERSION
+MAJOR_VERSION=__MAJOR_VERSION
+MINOR_VERSION=__MINOR_VERSION
+MICRO_VERSION=__MICRO_VERSION
 AC_SUBST(MAJOR_VERSION)
 AC_SUBST(MINOR_VERSION)
 AC_SUBST(MICRO_VERSION)
-AC_SUBST(VERSION)
+AC_DEFINE_UNQUOTED([MAJOR_VERSION], [$MAJOR_VERSION], [Major version number])
+AC_DEFINE_UNQUOTED([MINOR_VERSION], [$MINOR_VERSION], [Minor version number])
+AC_DEFINE_UNQUOTED([MICRO_VERSION], [$MICRO_VERSION], [Micro version number])
 
 AC_CONFIG_SRCDIR([qrencode.c])
 AC_CONFIG_HEADERS([config.h])
@@ -16,7 +21,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
-AM_INIT_AUTOMAKE(qrencode, $VERSION)
+AM_INIT_AUTOMAKE
 
 AC_DISABLE_STATIC
 AC_C_CONST
@@ -39,9 +44,13 @@ AC_ARG_ENABLE([thread-safety], [AS_HELP_STRING([--enable-thread-safety], [make t
  [], [enable_thread_safety=yes])
 
 if test x$enable_thread_safety = xyes; then
-	AC_CHECK_LIB([pthread], [pthread_mutex_init])
+	AC_CHECK_LIB([pthread], [pthread_mutex_init], [AC_SUBST([LIBPTHREAD], [-lpthread])])
 fi
-AM_CONDITIONAL([HAVE_LIBPTHREAD], [test "x$HAVE_LIBPTHREAD" = "xyes" ])
+AM_CONDITIONAL([HAVE_LIBPTHREAD], [test "x$ac_cv_lib_pthread_pthread_mutex_init" = "xyes" ])
+# FIXME: isn't it able to integrate the followings to AC_CHECK_LIB?
+if test x$ac_cv_lib_pthread_pthread_mutex_init = xyes ; then
+	AC_DEFINE([HAVE_LIBPTHREAD], [1], [Define to 1 if using pthread is enabled.])
+fi
 
 
 dnl --with-tools
@@ -73,8 +82,7 @@ fi
 
 if test x$build_tests = xyes ; then
 	SDL_REQUIRED_VERSION=1.2.0
-	AM_PATH_SDL($SDL_REQUIRED_VERSION,,AC_MSG_WARN([*** SDL $SDL_REQUIRED_VERSION or better is required.]))
-	AC_MSG_NOTICE([SDL check done.])
+	PKG_CHECK_MODULES(SDL, [sdl >= $SDL_REQUIRED_VERSION])
 	AM_ICONV_LINK
 fi
 AM_CONDITIONAL(HAVE_SDL, [test "x$SDL_CFLAGS" != "x" ])

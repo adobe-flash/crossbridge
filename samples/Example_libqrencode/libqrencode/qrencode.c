@@ -1,7 +1,7 @@
 /*
  * qrencode - QR Code encoder
  *
- * Copyright (C) 2006-2011 Kentaro Fukuchi <kentaro@fukuchi.org>
+ * Copyright (C) 2006-2012 Kentaro Fukuchi <kentaro@fukuchi.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,7 +31,7 @@
 #include "mqrspec.h"
 #include "bitstream.h"
 #include "qrinput.h"
-#include "rscode.h"
+#include "rsecc.h"
 #include "split.h"
 #include "mask.h"
 #include "mmask.h"
@@ -59,14 +59,14 @@ typedef struct {
 	int count;
 } QRRawCode;
 
-static void RSblock_initBlock(RSblock *block, int dl, unsigned char *data, int el, unsigned char *ecc, RS *rs)
+static void RSblock_initBlock(RSblock *block, int dl, unsigned char *data, int el, unsigned char *ecc)
 {
 	block->dataLength = dl;
 	block->data = data;
 	block->eccLength = el;
 	block->ecc = ecc;
 
-	encode_rs_char(rs, data, ecc);
+	RSECC_encode(dl, el, data, ecc);
 }
 
 static int RSblock_init(RSblock *blocks, int spec[5], unsigned char *data, unsigned char *ecc)
@@ -74,19 +74,16 @@ static int RSblock_init(RSblock *blocks, int spec[5], unsigned char *data, unsig
 	int i;
 	RSblock *block;
 	unsigned char *dp, *ep;
-	RS *rs;
 	int el, dl;
 
 	dl = QRspec_rsDataCodes1(spec);
 	el = QRspec_rsEccCodes1(spec);
-	rs = init_rs(8, 0x11d, 0, 1, el, 255 - dl - el);
-	if(rs == NULL) return -1;
 
 	block = blocks;
 	dp = data;
 	ep = ecc;
 	for(i=0; i<QRspec_rsBlockNum1(spec); i++) {
-		RSblock_initBlock(block, dl, dp, el, ep, rs);
+		RSblock_initBlock(block, dl, dp, el, ep);
 		dp += dl;
 		ep += el;
 		block++;
@@ -96,10 +93,8 @@ static int RSblock_init(RSblock *blocks, int spec[5], unsigned char *data, unsig
 
 	dl = QRspec_rsDataCodes2(spec);
 	el = QRspec_rsEccCodes2(spec);
-	rs = init_rs(8, 0x11d, 0, 1, el, 255 - dl - el);
-	if(rs == NULL) return -1;
 	for(i=0; i<QRspec_rsBlockNum2(spec); i++) {
-		RSblock_initBlock(block, dl, dp, el, ep, rs);
+		RSblock_initBlock(block, dl, dp, el, ep);
 		dp += dl;
 		ep += el;
 		block++;
@@ -137,7 +132,7 @@ __STATIC QRRawCode *QRraw_new(QRinput *input)
 	}
 
 	raw->blocks = QRspec_rsBlockNum(spec);
-	raw->rsblock = (RSblock *)calloc(sizeof(RSblock), raw->blocks);
+	raw->rsblock = (RSblock *)calloc(raw->blocks, sizeof(RSblock));
 	if(raw->rsblock == NULL) {
 		QRraw_free(raw);
 		return NULL;
@@ -211,7 +206,6 @@ __STATIC void MQRraw_free(MQRRawCode *raw);
 __STATIC MQRRawCode *MQRraw_new(QRinput *input)
 {
 	MQRRawCode *raw;
-	RS *rs;
 
 	raw = (MQRRawCode *)malloc(sizeof(MQRRawCode));
 	if(raw == NULL) return NULL;
@@ -232,19 +226,13 @@ __STATIC MQRRawCode *MQRraw_new(QRinput *input)
 		return NULL;
 	}
 
-	raw->rsblock = (RSblock *)calloc(sizeof(RSblock), 1);
+	raw->rsblock = (RSblock *)calloc(1, sizeof(RSblock));
 	if(raw->rsblock == NULL) {
 		MQRraw_free(raw);
 		return NULL;
 	}
 
-	rs = init_rs(8, 0x11d, 0, 1, raw->eccLength, 255 - raw->dataLength - raw->eccLength);
-	if(rs == NULL) {
-		MQRraw_free(raw);
-		return NULL;
-	}
-
-	RSblock_initBlock(raw->rsblock, raw->dataLength, raw->datacode, raw->eccLength, raw->ecccode, rs);
+	RSblock_initBlock(raw->rsblock, raw->dataLength, raw->datacode, raw->eccLength, raw->ecccode);
 
 	raw->count = 0;
 
@@ -533,6 +521,9 @@ __STATIC QRcode *QRcode_encodeMask(QRinput *input, int mask)
 		goto EXIT;
 	}
 	qrcode = QRcode_new(version, width, masked);
+	if(qrcode == NULL) {
+		free(masked);
+	}
 
 EXIT:
 	QRraw_free(raw);
@@ -584,7 +575,7 @@ __STATIC QRcode *QRcode_encodeMaskMQR(QRinput *input, int mask)
 	for(i=0; i<raw->dataLength + raw->eccLength; i++) {
 		code = MQRraw_getCode(raw);
 		if(raw->oddbits && i == raw->dataLength - 1) {
-			bit = 1 << raw->oddbits;
+			bit = 1 << (raw->oddbits - 1);
 			for(j=0; j<raw->oddbits; j++) {
 				p = FrameFiller_next(filler);
 				if(p == NULL) goto EXIT;
@@ -903,9 +894,26 @@ QRcode_List *QRcode_encodeStringStructured(const char *string, int version, QRec
  * System utilities
  *****************************************************************************/
 
+void QRcode_APIVersion(int *major_version, int *minor_version, int *micro_version)
+{
+	if(major_version != NULL) {
+		*major_version = MAJOR_VERSION;
+	}
+	if(minor_version != NULL) {
+		*minor_version = MINOR_VERSION;
+	}
+	if(micro_version != NULL) {
+		*micro_version = MICRO_VERSION;
+	}
+}
+
+char *QRcode_APIVersionString(void)
+{
+	return VERSION;
+}
+
 void QRcode_clearCache(void)
 {
 	QRspec_clearCache();
 	MQRspec_clearCache();
-	free_rs_cache();
 }

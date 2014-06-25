@@ -7,7 +7,7 @@
 #include "../mqrspec.h"
 #include "../qrinput.h"
 #include "../mask.h"
-#include "../rscode.h"
+#include "../rsecc.h"
 #include "../split.h"
 #include "decoder.h"
 
@@ -19,6 +19,15 @@ static const char decodeAnTable[45] = {
 	'+', '-', '.', '/', ':'
 };
 
+typedef struct {
+	char *str;
+	int version;
+	QRecLevel level;
+	QRencodeMode hint;
+	int casesensitive;
+} TestString;
+#define _countof(_Array) (sizeof(_Array) / sizeof(_Array[0]))
+
 #define drand(__scale__) ((__scale__) * (double)rand() / ((double)RAND_MAX + 1.0))
 
 int inputSize(QRinput *input)
@@ -26,7 +35,8 @@ int inputSize(QRinput *input)
 	BitStream *bstream;
 	int size;
 
-	bstream = QRinput_mergeBitStream(input);
+	bstream = BitStream_new();
+	QRinput_mergeBitStream(input, bstream);
 	size = BitStream_size(bstream);
 	BitStream_free(bstream);
 
@@ -245,6 +255,7 @@ void test_format(void)
 	testStart("Test format information(level L,mask 0)");
 	width = QRspec_getWidth(1);
 	frame = QRspec_newFrame(1);
+	if(frame == NULL) goto ABORT;
 	format = QRspec_getFormatInfo(1, QR_ECLEVEL_L);
 	blacks = Mask_writeFormatInformation(width, frame, 1, QR_ECLEVEL_L);
 	decode = 0;
@@ -294,6 +305,7 @@ void test_format(void)
 
 	free(frame);
 
+ABORT:
 	testEnd(0);
 }
 
@@ -336,11 +348,13 @@ void test_encode(void)
 
 	testStart("Test encode (1-M)");
 	stream = QRinput_new();
+	if(stream == NULL) goto ABORT;
 	QRinput_append(stream, QR_MODE_NUM, 8, (unsigned char *)num);
 	for(mask=0; mask<8; mask++) {
 		QRinput_setVersion(stream, 1);
 		QRinput_setErrorCorrectionLevel(stream, QR_ECLEVEL_M);
 		qrcode = QRcode_encodeMask(stream, mask);
+		if(qrcode == NULL) goto ABORT;
 		w = qrcode->width;
 		frame = qrcode->data;
 		for(y=0; y<w; y++) {
@@ -354,6 +368,7 @@ void test_encode(void)
 		QRcode_free(qrcode);
 	}
 	QRinput_free(stream);
+ABORT:
 	testEnd(err);
 }
 
@@ -430,26 +445,59 @@ void test_encodeEmpty8(void)
 	if(qrcode != NULL) QRcode_free(qrcode);
 }
 
-void test_encodeTooLong(void)
+void test_encodeLongData(void)
 {
-	QRcode *code;
-	char *data;
+	QRinput *stream;
+	unsigned char data[7090];
+	int maxlength[4][4] = {{7089,5596,3993,3057},
+						   {4296,3391,2420,1852},
+						   {2953,2331,1663,1273},
+						   {1817*2,1435*2,1024*2, 784*2}};
+	int i, l, len, ret;
+	QRcode *qrcode;
 
-	testStart("Encode too large data");
-	data = (char *)malloc(4300);
-	memset(data, 'a', 4295);
-	memset(data + 4295, '0', 4);
-	data[4299] = '\0';
+	testStart("Encoding long data.");
 
-	code = QRcode_encodeString(data, 0, QR_ECLEVEL_L, QR_MODE_8, 0);
-	assert_null(code, "Too large data is incorrectly accepted.\n");
-	assert_equal(errno, ERANGE, "errno != ERANGE\n");
-	testFinish();
+	for(i=QR_MODE_NUM; i<=QR_MODE_KANJI; i++) {
+		if(i != QR_MODE_KANJI) {
+			memset(data, '0', maxlength[i][0] + 1);
+		} else {
+			for(l=0; l<=maxlength[i][0]/2+1; l++) {
+				data[l*2] = 0x93; data[l*2+1] = 0x5f;
+			}
+		}
+		for(l=QR_ECLEVEL_L; l<=QR_ECLEVEL_H; l++) {
+			stream = QRinput_new2(0, l);
+			ret = QRinput_append(stream, i, maxlength[i][l], data);
+			assert_zero(ret, "Failed to add %d-byte %s to a QRinput\n", maxlength[i][l], modeStr[i]);
+			qrcode = QRcode_encodeInput(stream);
+			assert_nonnull(qrcode, "(QRcode_encodeInput) failed to encode %d-byte %s in level %d.\n", maxlength[i][l], modeStr[i], l);
+			if(qrcode != NULL) {
+				QRcode_free(qrcode);
+			}
+			QRinput_free(stream);
 
-	if(code != NULL) {
-		QRcode_free(code);
+			stream = QRinput_new2(0, l);
+			len = maxlength[i][l];
+			if(i == QR_MODE_KANJI) {
+				len += 2;
+			} else {
+				len += 1;
+			}
+			ret = QRinput_append(stream, i, len, data);
+			if(ret == 0) {
+				qrcode = QRcode_encodeInput(stream);
+				assert_null(qrcode, "(QRcode_encodeInput) incorrectly succeeded to encode %d-byte %s in level %d.\n", len, modeStr[i], l);
+				if(qrcode != NULL) {
+					printf("version: %d\n", qrcode->version);
+					QRcode_free(qrcode);
+				}
+			}
+			QRinput_free(stream);
+		}
 	}
-	free(data);
+
+	testFinish();
 }
 
 void test_01234567(void)
@@ -813,6 +861,38 @@ void test_decodeShortMQR(void)
 	testFinish();
 }
 
+void test_oddBitCalcMQR(void)
+{
+	/* test issue #25 (odd bits calculation bug) */
+	/* test pattern contributed by vlad417 */
+	TestString tests[] = {
+		{"46194", 1, QR_ECLEVEL_L, QR_MODE_8, 1},
+		{"WBA5Y47YPQQ", 3, QR_ECLEVEL_L, QR_MODE_8, 1}
+	};
+	QRcode *qrcode;
+	QRdata *qrdata;
+	int i;
+
+	testStart("Odd bits calculation bug checking (MQR).");
+
+	for(i=0; i<_countof(tests); i++) {
+		qrcode = QRcode_encodeStringMQR(tests[i].str,
+										tests[i].version,
+										tests[i].level,
+										tests[i].hint,
+										tests[i].casesensitive);
+		assert_nonnull(qrcode, "Failed to encode: %s\n", tests[i].str);
+		if(qrcode == NULL) continue;
+		qrdata = QRcode_decodeMQR(qrcode);
+		assert_nonnull(qrdata, "Failed to decode.\n");
+		assert_zero(strcmp((char *)qrdata->data, tests[i].str), "Decoded data (%s) mismatched (%s)\n", (char *)qrdata->data, tests[i].str);
+		if(qrdata != NULL) QRdata_free(qrdata);
+		QRcode_free(qrcode);
+	}
+
+	testFinish();
+}
+
 void test_mqrencode(void)
 {
 	char *str = "MICROQR";
@@ -860,6 +940,23 @@ void test_mqrencode(void)
 	testFinish();
 }
 
+void test_apiversion(void)
+{
+	int major_version, minor_version, micro_version;
+	char *str, *str2;
+
+	testStart("API Version check");
+	QRcode_APIVersion(&major_version, &minor_version, &micro_version);
+	assert_equal(major_version, MAJOR_VERSION, "Major version number mismatched: %d (%d expected)\n", major_version, MAJOR_VERSION);
+	assert_equal(minor_version, MINOR_VERSION, "Minor version number mismatched: %d (%d expected)\n", minor_version, MINOR_VERSION);
+	assert_equal(micro_version, MICRO_VERSION, "Micro version number mismatched: %d (%d expected)\n", micro_version, MICRO_VERSION);
+	str = QRcode_APIVersionString();
+	str2 = QRcode_APIVersionString();
+	assert_zero(strcmp(VERSION, str), "Version string mismatched: %s (%s expected)\n", str, VERSION);
+	assert_equal(str, str2, "Version strings are not identical.");
+	testFinish();
+}
+
 int main(void)
 {
 	test_iterate();
@@ -874,7 +971,7 @@ int main(void)
 	test_encodeEmpty();
 	test_encodeNull8();
 	test_encodeEmpty8();
-	test_encodeTooLong();
+	test_encodeLongData();
 	test_01234567();
 	test_invalid_input();
 //	print_01234567();
@@ -893,7 +990,9 @@ int main(void)
 	test_formatInfoMQR();
 	test_encodeTooLongMQR();
 	test_decodeShortMQR();
+	test_oddBitCalcMQR();
 	test_mqrencode();
+	test_apiversion();
 
 	QRcode_clearCache();
 
