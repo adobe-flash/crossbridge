@@ -347,7 +347,10 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(MAKE) llvmtests
+	@$(MAKE) abclibs
+	@rm -rf $(BUILD)/test_pthreads_c_swf
+	@mkdir -p $(BUILD)/test_pthreads_c_swf
+	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O0 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
 
 # Clean build outputs
 clean:
@@ -613,7 +616,7 @@ abclibs_asdocs:
 	cd $(BUILDROOT) && $(FLEX_ASDOC) \
 				-load-config= \
 				-external-library-path=$(call nativepath,$(FLEX_SDK_HOME)/frameworks/libs/player/14.0/playerglobal.swc) \
-				-strict=false -define+=CONFIG::player,1 -define+=CONFIG::asdocs,true -define+=CONFIG::actual,false \
+				-strict=false -define+=CONFIG::asdocs,true -define+=CONFIG::actual,false -define+=CONFIG::debug,false \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix/vfs) \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix) \
 				-keep-xml=true \

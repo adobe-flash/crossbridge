@@ -38,9 +38,9 @@ package com.adobe.flascc
   */
   public class Console extends Sprite implements ISpecialFile
   {
-    private var enableConsole:Boolean = true
-    private var _tf:TextField
-    private var inputContainer:DisplayObjectContainer
+    private var enableConsole:Boolean = true;
+    private var _tf:TextField;
+    private var inputContainer:DisplayObjectContainer;
 
     /**
     * To Support the preloader case you might want to have the Console
@@ -48,7 +48,7 @@ package com.adobe.flascc
     */
     public function Console(container:DisplayObjectContainer = null)
     {
-      CModule.rootSprite = container ? container.root : this
+      CModule.rootSprite = container ? container.root : this;
 
       if(CModule.runningAsWorker()) {
         return;

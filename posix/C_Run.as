@@ -23,7 +23,7 @@ package C_Run
   import flash.utils.ByteArray;
   import flash.utils.Endian;
 
-//trace("C_Run");
+  //CONFIG::debug { trace("CRun::loaded"); }
 
   /**
   * mapping of function pointer to Function
@@ -77,28 +77,27 @@ package C_Run
 
   /**
   * @private
+  * @see http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/concurrent/Mutex.html
   */
   public const mutexClass:Class = (function():Class
   {
     try
     {
       var flashconcNS:Namespace = new Namespace("flash.concurrent");
-
-      var mc:Class = flashconcNS::["Mutex"];
-
-      /* 
-      AIR 3.5 for mobile exposes the Worker Class, but does not
-      provide a working implementation. This can only be detected
-      by attempting to construct one to see if it throws an
-      exception
-      */
-      var m:Object = new mc();
-      m.lock();
-      m.unlock();
-
+      return flashconcNS::["Mutex"];    
+      
+      // 2014.06.26. Disabled, newer AIR distributions are x-platform (VPMedia)
+      
+      //var mc:Class = flashconcNS::["Mutex"];      
+      //AIR 3.5 for mobile exposes the Worker Class, but does not
+      //provide a working implementation. This can only be detected
+      //by attempting to construct one to see if it throws an
+      //exception      
+      //var m:Object = new mc();
+      //m.lock();
+      //m.unlock();
       // If the Mutex was useable, we can safely claim to support the Mutex class
-      return mc;
-
+      //return mc;
     }
     catch(e:*) {}
 
@@ -294,7 +293,8 @@ package C_Run
   [GlobalMethod]
   public function newThread(tid:int, esp_init:int, entryFun:int, args:Vector.<int>):*
   {
-    //trace("newThread: " + tid + " => " + args.length);
+    CONFIG::debug { trace("CRun::newThread: " + tid + " => " + args.length); }
+    
     var w:* = createflasccWorker();
 
     // set up the basics
