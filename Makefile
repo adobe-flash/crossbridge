@@ -463,6 +463,9 @@ clean_libs:
 base:
 	mkdir -p $(BUILDROOT)/extra
 	mkdir -p $(BUILD)/abclibs
+	mkdir -p $(SDK)/usr
+	mkdir -p $(SDK)/usr/bin
+	mkdir -p $(SDK)/usr/lib
 	mkdir -p $(SDK)/usr/lib/bfd-plugins
 	mkdir -p $(SDK)/usr/share
 	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/bin
@@ -494,6 +497,11 @@ base:
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-gcc
 	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-g++
 
+	$(RSYNC) $(SRCROOT)/tools/utils-py/add-opt-in.py $(SDK)/usr/bin/
+	$(RSYNC) $(SRCROOT)/tools/utils-py/projector-dis.py $(SDK)/usr/bin/
+	$(RSYNC) $(SRCROOT)/tools/utils-py/swfdink.py $(SDK)/usr/bin/
+	$(RSYNC) $(SRCROOT)/tools/utils-py/swf-info.py $(SDK)/usr/bin/
+
 	$(RSYNC) tools/playerglobal/14.0/playerglobal.abc $(SDK)/usr/lib/
 	$(RSYNC) tools/playerglobal/14.0/playerglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
@@ -511,7 +519,6 @@ base:
 # Assemble GNU Make
 make:
 	rm -rf $(BUILD)/make
-	mkdir -p $(SDK)/usr/bin
 	mkdir -p $(BUILD)/make
 	cp -r $(SRCROOT)/$(DEPENDENCY_MAKE)/* $(BUILD)/make/
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --program-prefix="" \
@@ -526,7 +533,6 @@ make:
 cmake:
 	rm -rf $(BUILD)/cmake
 	rm -rf $(SDK)/usr/cmake_junk
-	mkdir -p $(SDK)/usr/bin
 	mkdir -p $(BUILD)/cmake
 	mkdir -p $(SDK)/usr/cmake_junk
 	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/share/$(DEPENDENCY_CMAKE)/
@@ -561,7 +567,7 @@ abclibs_compile:
 	# Cleaning
 	mkdir -p $(BUILD)/abclibs
 	mkdir -p $(BUILD)/abclibsposix
-	mkdir -p $(SDK)/usr/lib/abcs
+	#mkdir -p $(SDK)/usr/lib/abcs
 	# Generating the Posix interface
 	cd $(BUILD)/abclibsposix && $(PYTHON) $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
 	# Post-Processing IKernel
@@ -632,17 +638,14 @@ basictools:
 
 # Assemble UName Helper
 uname:
-	mkdir -p $(SDK)/usr/bin
 	$(CC) $(SRCROOT)/tools/uname/uname.c -o $(SDK)/usr/bin/uname$(EXEEXT)
 
 # Assemble NoEnv Helper
 noenv:
-	mkdir -p $(SDK)/usr/bin
 	$(CC) $(SRCROOT)/tools/noenv/noenv.c -o $(SDK)/usr/bin/noenv$(EXEEXT)
 
 # Assemble TBD Tool
 avm2-as:
-	mkdir -p $(SDK)/usr/bin
 	$(CXX) $(SRCROOT)/avm2_env/misc/SetAlchemySDKLocation.c $(SRCROOT)/tools/as/as.cpp -o $(SDK)/usr/bin/avm2-as$(EXEEXT)
 
 # Assemble TBD Tool
@@ -734,7 +737,6 @@ llvmtests-speccpu2006: # works only on mac!
 binutils:
 	rm -rf $(BUILD)/binutils
 	mkdir -p $(BUILD)/binutils
-	mkdir -p $(SDK)/usr
 	cd $(BUILD)/binutils && CC=$(CC) CXX=$(CXX) CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " CXXFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " $(SRCROOT)/$(DEPENDENCY_BINUTILS)/configure \
 		--disable-doc --disable-nls --enable-gold --disable-ld --enable-plugins \
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --with-sysroot=$(SDK)/usr \
@@ -765,11 +767,9 @@ plugins:
 # Assemble LLVM GCC 4.2
 gcc:
 	rm -rf $(BUILD)/llvm-gcc-42
-	mkdir -p $(SDK)/usr/bin
-	mkdir -p $(SDK)/usr/lib
 	mkdir -p $(BUILD)/llvm-gcc-42
 	cd $(BUILD)/llvm-gcc-42 && CFLAGS='$(NOPIE) -DSHARED_LIBRARY_EXTENSION=$(SOEXT) $(BUILD_VER_DEFS) -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -Os $(DBGOPTS) -I$(SRCROOT)/avm2_env/misc/ ' \
-		CC=$(CC) CXX=$(CXX) $(SRCROOT)/llvm-gcc-4.2-2.9/configure --enable-languages=c,c++,objc,obj-c++ \
+		CC=$(CC) CXX=$(CXX) $(SRCROOT)/llvm-gcc-4.2-2.9/configure --enable-languages=c,c++ \
 		--enable-llvm=$(LLVMINSTALLPREFIX)/llvm-install/ --disable-bootstrap --disable-multilib --disable-libada --disable-doc --disable-nls \
 		--enable-sjlj-exceptions --disable-shared --program-prefix="" \
 		--prefix=$(SDK)/usr --with-sysroot="" --with-build-sysroot=$(SDK)/ \
@@ -899,36 +899,11 @@ gcclibs:
 	$(SDK)/usr/bin/ranlib $(SDK)/usr/lib/libgomp.a
 	cp -f $(SDK)/usr/lib/gcc/$(TRIPLE)/4.2.1/include/omp.h $(SDK)/usr/include/
 	rm -rf $(SDK)/usr/lib/gcc
-	$(MAKE) libobjc
 	mkdir -p $(SDK)/usr/lib/stdlibs_abc
 	cd $(BUILD)/posix && $(SDK)/usr/bin/g++ -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/AS3++.cpp
 	cd $(BUILD)/posix && $(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj AS3++.o -o AS3++.abc
 	cd $(BUILD)/posix && $(SDK_AR) crus $(SDK)/usr/lib/libAS3++.a AS3++.o
 	cd $(BUILD)/posix && $(SDK_AR) crus $(SDK)/usr/lib/stdlibs_abc/libAS3++.a AS3++.abc
-
-# TBD
-libobjc_configure:
-	cd $(BUILD)/llvm-gcc-42 \
-		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' TARGET-target-libobjc="all OBJC_THREAD_FILE=thr-posix" all-target-libobjc > $(SRCROOT)/cached_build/libobjc/compile.log
-	cd $(BUILD)/llvm-gcc-42 \
-		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' install-target-libobjc > $(SRCROOT)/cached_build/libobjc/install.log
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/libobjc`
-
-# TBD
-libobjc:
-	rm -rf $(BUILD)/libobjc
-	mkdir -p $(BUILD)/libobjc
-	$(PYTHON) $(SRCROOT)/tools/build-objc.py $(SRCROOT)/cached_build/libobjc/compile.log $(SRCROOT)/cached_build/libobjc/install.log $(SRCROOT) > $(BUILD)/libobjc/build.sh
-	cd $(BUILD)/libobjc && PATH="$(SDK)/usr/bin:$(PATH)" bash -x build.sh
-	# link bitcode
-	cd $(BUILD)/libobjc && rm -f libobjc.a && mkdir NXConstStr && mv NXConstStr.o NXConstStr/. && $(SDK)/usr/bin/llvm-link -o libobjc.o *.o && $(AR) libobjc.a libobjc.o NXConstStr/*.o && cp libobjc.a $(SDK)/usr/lib/.
-
-# TBD
-abclibobjc:
-	mkdir -p $(BUILD)/libobjc_abc
-	cd $(BUILD)/libobjc_abc && $(SDK_AR) x $(SDK)/usr/lib/libobjc.a
-	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
-	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
 
 # ====================================================================================
 # AS3WIG
@@ -1004,11 +979,6 @@ abcstdlibs_more:
 	# cd $(BUILD)/libgomp_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
 	# mv $(BUILD)/libgomp_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libgomp.a
 
-	mkdir -p $(BUILD)/libobjc_abc
-	cd $(BUILD)/libobjc_abc && $(SDK_AR) x $(SDK)/usr/lib/libobjc.a
-	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
-	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
-
 	mkdir -p $(BUILD)/libBlocksRuntime_abc
 	cd $(BUILD)/libBlocksRuntime_abc && $(SDK_AR) x $(SDK)/usr/lib/libBlocksRuntime.a
 	cd $(BUILD)/libBlocksRuntime_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
@@ -1033,10 +1003,6 @@ finalcleanup:
 	rm -f $(SDK)/usr/lib/*.la
 	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/man $(SDK)/usr/share/info
 	@$(LN) ../../share $(SDK)/usr/platform/$(PLATFORM)/share
-	$(RSYNC) $(SRCROOT)/tools/add-opt-in.py $(SDK)/usr/bin/
-	$(RSYNC) $(SRCROOT)/tools/projector-dis.py $(SDK)/usr/bin/
-	$(RSYNC) $(SRCROOT)/tools/swfdink.py $(SDK)/usr/bin/
-	$(RSYNC) $(SRCROOT)/tools/swf-info.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/posix/avm2_tramp.cpp $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/vgl.c $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/Console.as $(SDK)/usr/share/
@@ -1058,7 +1024,6 @@ finalcleanup:
 tr:
 	rm -rf $(BUILD)/tr
 	mkdir -p $(BUILD)/tr
-	mkdir -p $(SDK)/usr/bin
 	cd $(BUILD)/tr && rm -f Makefile && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(TAMARINCONFIG) --disable-debugger
 	cd $(BUILD)/tr && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cp -f $(BUILD)/tr/shell/avmshell $(SDK)/usr/bin/avmshell
@@ -1073,7 +1038,6 @@ endif
 trd:
 	rm -rf $(BUILD)/trd
 	mkdir -p $(BUILD)/trd
-	mkdir -p $(SDK)/usr/bin
 	cd $(BUILD)/trd && rm -f Makefile && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(TAMARINCONFIG) --enable-debugger
 	cd $(BUILD)/trd && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cp -f $(BUILD)/trd/shell/avmshell $(SDK)/usr/bin/avmshell-release-debugger
@@ -1804,12 +1768,6 @@ gcc.dg \
 gcc.misc-tests \
 gcc.target \
 gcc.test-framework 
-#\
-#llvm.obj-c++ \
-#llvm.objc \
-#obj-c++.dg \
-#objc \
-#objc.dg
 
 gcctorture/%:
 	-$(RUNGCCTESTS) --tool gcc --directory $(SRCROOT)/llvm-gcc-4.2-2.9/gcc/testsuite/gcc.c-torture $(@:gcctorture/%=%).exp
