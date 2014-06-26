@@ -51,7 +51,7 @@ T09_5:
 include ../Makefile.common
 
 clean:
-	rm -f *.swf
+	rm -f *.swf *.swc
     
 debug:
 	"$(FLASCC)/usr/bin/gdb" pthread_swc2.swf
