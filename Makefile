@@ -242,15 +242,20 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 # ====================================================================================
 # ALL TARGETS
 # ====================================================================================
-BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
-BUILDORDER+= sdkcleanup tr trd swig genfs gdb pkgconfig libtool extralibs finalcleanup submittests samples examples
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
 TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols test_gdb 
 #TESTORDER+= gcctests swigtests llvmtests checkasm 
 
+BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
+BUILDORDER+= sdkcleanup tr trd swig genfs gdb pkgconfig libtool extralibs finalcleanup 
+#BUILDORDER+= all_tests
+BUILDORDER+= $(TESTORDER)
+BUILDORDER+= samples
+BUILDORDER+= examples
+
 # All Tests
-submittests: $(TESTORDER)
+all_tests: $(TESTORDER)
 
 # All Targets
 all:
@@ -262,11 +267,18 @@ all:
 	@$(MAKE) make &> $(BUILD)/logs/make.txt 2>&1
 	@$(SDK_MAKE) -s all_with_local_make
 
-# Helper for 'all_with_local_make'
+# Helper for 'all_with_local_make' logging
 ifneq (,$(PRINT_LOGS_ON_ERROR))
 	$?PRINT_LOGS_CMD=tail +1
 else
 	$?PRINT_LOGS_CMD=true
+endif
+
+# Helper for 'all_with_local_make' Cygwin compatibility
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	$?BINUTILS_MKFLAG=-i
+else
+	$?BINUTILS_MKFLAG=
 endif
 
 # Macro for Targets with local Make
@@ -293,43 +305,6 @@ all_with_local_make:
 			exit 1 ; \
 		fi ; \
 	done 
-
-# Build all with Windows 
-# Notes: Ignoring BinUtils documentation generation error
-all_win:
-	@echo "Building $(SDKNAME) ..."
-	@mkdir -p $(BUILD)/logs
-	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
-	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt 2>&1
-	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
-	@$(MAKE) make &> $(BUILD)/logs/make.txt 2>&1
-	@$(SDK_MAKE) cmake &> $(BUILD)/logs/cmake.txt 2>&1
-	@$(SDK_MAKE) abclibs &> $(BUILD)/logs/abclibs.txt 2>&1
-	@$(SDK_MAKE) basictools &> $(BUILD)/logs/basictools.txt 2>&1
-	@$(SDK_MAKE) llvm &> $(BUILD)/logs/llvm.txt 2>&1
-	@$(SDK_MAKE) -i binutils &> $(BUILD)/logs/binutils.txt 2>&1
-	@$(SDK_MAKE) plugins &> $(BUILD)/logs/plugins.txt 2>&1
-	@$(SDK_MAKE) gcc &> $(BUILD)/logs/gcc.txt 2>&1
-	@$(SDK_MAKE) bmake &> $(BUILD)/logs/bmake.txt 2>&1
-	@$(SDK_MAKE) stdlibs &> $(BUILD)/logs/stdlibs.txt 2>&1
-	@$(SDK_MAKE) gcclibs &> $(BUILD)/logs/gcclibs.txt 2>&1
-	@$(SDK_MAKE) as3wig &> $(BUILD)/logs/as3wig.txt 2>&1
-	@$(SDK_MAKE) abcstdlibs &> $(BUILD)/logs/abcstdlibs.txt 2>&1
-	@$(SDK_MAKE) sdkcleanup &> $(BUILD)/logs/sdkcleanup.txt 2>&1
-	@$(SDK_MAKE) tr &> $(BUILD)/logs/tr.txt 2>&1
-	@$(SDK_MAKE) trd &> $(BUILD)/logs/trd.txt 2>&1
-	@$(SDK_MAKE) test_hello_cpp &> $(BUILD)/logs/test_hello_cpp.txt 2>&1
-	@$(SDK_MAKE) swig &> $(BUILD)/logs/swig.txt 2>&1
-	@$(SDK_MAKE) genfs &> $(BUILD)/logs/genfs.txt 2>&1
-	@$(SDK_MAKE) gdb &> $(BUILD)/logs/gdb.txt 2>&1
-	@$(SDK_MAKE) pkgconfig &> $(BUILD)/logs/pkgconfig.txt 2>&1
-	@$(SDK_MAKE) libtool &> $(BUILD)/logs/libtool.txt 2>&1
-	@$(SDK_MAKE) extralibs &> $(BUILD)/logs/extralibs.txt 2>&1
-	@$(SDK_MAKE) finalcleanup &> $(BUILD)/logs/finalcleanup.txt 2>&1
-	@$(SDK_MAKE) submittests &> $(BUILD)/logs/submittests.txt 2>&1
-	@$(SDK_MAKE) samples &> $(BUILD)/logs/samples.txt 2>&1
-	@$(SDK_MAKE) examples &> $(BUILD)/logs/examples.txt 2>&1
-	@echo "Done."
 
 # Print debug information
 diagnostics:
@@ -748,7 +723,7 @@ binutils:
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --with-sysroot=$(SDK)/usr \
 		--program-prefix="" --prefix=$(SDK)/usr --disable-werror \
 		--enable-targets=$(TRIPLE)
-	cd $(BUILD)/binutils && $(MAKE) -j$(THREADS) && $(MAKE) install
+	cd $(BUILD)/binutils && $(MAKE) -j$(THREADS) $(BINUTILS_MKFLAG) && $(MAKE) $(BINUTILS_MKFLAG) install
 	mv $(SDK)/usr/bin/ld.gold$(EXEEXT) $(SDK)/usr/bin/ld$(EXEEXT)
 	rm -rf $(SDK)/usr/bin/readelf$(EXEEXT) $(SDK)/usr/bin/elfedit$(EXEEXT) $(SDK)/usr/bin/ld.bfd$(EXEEXT) $(SDK)/usr/bin/objdump$(EXEEXT) $(SDK)/usr/bin/objcopy$(EXEEXT) $(SDK)/usr/share/info $(SDK)/usr/share/man
 

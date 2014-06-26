@@ -27,7 +27,7 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 ### Build a Windows only SDK and package as ZIP
 
 1. make clean
-1. make all_win
+1. make all
 1. make deploy
 
 ## Linux
