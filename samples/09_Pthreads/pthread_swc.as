@@ -32,19 +32,28 @@ package
   {
     public function pthread_swc()
     {
-      addEventListener(Event.ADDED_TO_STAGE, initCode);
-      addEventListener(Event.ENTER_FRAME, enterFrame);
+      addEventListener(Event.ADDED_TO_STAGE, onAdded);
+      addEventListener(Event.ENTER_FRAME, onFrameEnter);
       // wait 2s and spawn a thread via interface exposed by swc
-      setTimeout(function():void {
+      setTimeout(wrapSpawnThread, 2000);
+    }
+    
+    private function wrapSpawnThread():void
+    {
+        trace(this, "wrapSpawnThread");
         spawnThread();
-      }, 2000);
     }
  
-    public function initCode(e:Event):void
+    public function onAdded(e:Event):void
     {
+      trace(this, "onAdded");
+      removeEventListener(Event.ADDED_TO_STAGE, onAdded);
+      
       CModule.rootSprite = this
 
-      if(CModule.runningAsWorker()) {
+      const isRunningAsWorker:Boolean = CModule.runningAsWorker();
+      trace("\t", "isRunningAsWorker", isRunningAsWorker);
+      if(isRunningAsWorker) {
         return;
       }
 
@@ -56,7 +65,7 @@ package
     public function write(fd:int, buf:int, nbyte:int, errno_ptr:int):int
     {
       var str:String = CModule.readString(buf, nbyte);
-      trace(str);
+      trace(this, "write", str);
       return nbyte;
     }
 
@@ -75,7 +84,7 @@ package
       return 0
     }
 
-    public function enterFrame(e:Event):void
+    public function onFrameEnter(e:Event):void
     {
       CModule.serviceUIRequests();
     }
