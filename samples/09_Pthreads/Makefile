@@ -46,7 +46,7 @@ T09_4:
 
 T09_5:
 	@echo "-------- Sample 9 / 5 --------"
-	"$(FLEX)/bin/mxmlc" -load-config+=./../.flexConfig.xml -library-path=pthread.swc -debug=$(MXMLC_DEBUG) pthread_swc.as -o pthread_swc2.swf
+	"$(FLEX)/bin/mxmlc" -load-config+=./../.flexConfig.xml -default-script-limits 1000000 5 -library-path=pthread.swc -debug=$(MXMLC_DEBUG) pthread_swc.as -o pthread_swc2.swf
 
 include ../Makefile.common
 
@@ -54,4 +54,4 @@ clean:
 	rm -f *.swf
     
 debug:
-	"$(FLASCC)/usr/bin/fdb" pthread_swc2.swf
+	"$(FLASCC)/usr/bin/gdb" pthread_swc2.swf

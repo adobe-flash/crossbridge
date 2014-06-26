@@ -211,11 +211,15 @@ endif
 # ====================================================================================
 # Tamarin options
 # ====================================================================================
+# ASC1 Flags
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -I/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/lib/gcc/i686-apple-darwin11/4.2.1/include/ -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -I/usr/local/Cellar/apple-gcc42/4.2.1-5666.3/lib/gcc/i686-apple-darwin11/4.2.1/include/ $(TAMARINOPTFLAGS) -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
+# ASC1 Tool
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
-#$?SCOMP=java -classpath $(ASC) macromedia.asc.embedding.ScriptCompiler -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+# ASC2 Tool
 $?SCOMPFALCON=java -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
-$?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
+# ASC2 configuration definitions
+$?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true -config CONFIG::debug=true
+# AVMShell link
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
 
 # ====================================================================================
@@ -562,7 +566,6 @@ abclibs:
 	$(MAKE) abclibs_asdocs && $(MAKE) asdocs_deploy
 
 # Assemble ABC library binaries
-# Change 04.05.14. DefaultPreloader and C_Run was compiled using ASC.jar, lets use ASC2.jar and test it: $(SCOMP) to $(SCOMPFALCON)
 abclibs_compile:
 	# Cleaning
 	mkdir -p $(BUILD)/abclibs
