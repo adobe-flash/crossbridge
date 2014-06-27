@@ -281,13 +281,6 @@ else
 	$?PRINT_LOGS_CMD=true
 endif
 
-# Helper for 'all_with_local_make' Cygwin compatibility
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	$?BINUTILS_MKFLAG=-i
-else
-	$?BINUTILS_MKFLAG=
-endif
-
 # Macro for Targets with local Make
 all_with_local_make:
 	@for target in $(BUILDORDER) ; do \
@@ -333,10 +326,6 @@ all_dev:
 	@rm -rf $(BUILD)/test_pthreads_c_swf
 	@mkdir -p $(BUILD)/test_pthreads_c_swf
 	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O0 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
-
-# Development target
-all_dev2:
-	@$(SDK_MAKE) llvmtests
 
 # Clean build outputs
 clean:
@@ -726,8 +715,15 @@ llvmtests-speccpu2006: # works only on mac!
 # ====================================================================================
 # BINUTILS
 # ====================================================================================
-# Assemble LLVM BinUtils
 binutils:
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	$(SDK_MAKE) -i binutils_build
+else
+	$(SDK_MAKE) binutils_build
+endif
+
+# Assemble LLVM BinUtils
+binutils_build:
 	rm -rf $(BUILD)/binutils
 	mkdir -p $(BUILD)/binutils
 	cd $(BUILD)/binutils && CC=$(CC) CXX=$(CXX) CFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " CXXFLAGS="-I$(SRCROOT)/avm2_env/misc/ $(DBGOPTS) " $(SRCROOT)/$(DEPENDENCY_BINUTILS)/configure \
@@ -735,7 +731,7 @@ binutils:
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) --with-sysroot=$(SDK)/usr \
 		--program-prefix="" --prefix=$(SDK)/usr --disable-werror \
 		--enable-targets=$(TRIPLE)
-	cd $(BUILD)/binutils && $(MAKE) -j$(THREADS) $(BINUTILS_MKFLAG) && $(MAKE) $(BINUTILS_MKFLAG) install
+	cd $(BUILD)/binutils && $(MAKE) -j$(THREADS) && $(MAKE) install
 	mv $(SDK)/usr/bin/ld.gold$(EXEEXT) $(SDK)/usr/bin/ld$(EXEEXT)
 	rm -rf $(SDK)/usr/bin/readelf$(EXEEXT) $(SDK)/usr/bin/elfedit$(EXEEXT) $(SDK)/usr/bin/ld.bfd$(EXEEXT) $(SDK)/usr/bin/objdump$(EXEEXT) $(SDK)/usr/bin/objcopy$(EXEEXT) $(SDK)/usr/share/info $(SDK)/usr/share/man
 
