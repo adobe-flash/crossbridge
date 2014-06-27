@@ -293,7 +293,7 @@ package C_Run
   [GlobalMethod]
   public function newThread(tid:int, esp_init:int, entryFun:int, args:Vector.<int>):*
   {
-    CONFIG::debug { trace("CRun::newThread: " + tid + " => " + args.length); }
+    CONFIG::debug { trace("CRun::newThread: " + arguments); }
     
     var w:* = createflasccWorker();
 

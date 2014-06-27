@@ -93,7 +93,7 @@ package
       {
         // change to false to prevent running main in the background
         // when Workers are supported
-        const runMainBg:Boolean = false
+        const runMainBg:Boolean = true
 
         // PlayerKernel will delegate read/write requests to the "/dev/tty"
         // file to the object specified with this API.

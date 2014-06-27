@@ -182,7 +182,8 @@ package C_Run
 
     public function run():void
     {
-      //trace("run");
+      CONFIG::debug { trace("AlcWorkerSprite::run"); }
+
       //TODO most code shared w/ startHack.as ... unify?
       try
       {

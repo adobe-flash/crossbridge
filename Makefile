@@ -323,9 +323,7 @@ diagnostics:
 # Development target
 all_dev:
 	@$(SDK_MAKE) abclibs_compile
-	@rm -rf $(BUILD)/test_pthreads_c_swf
-	@mkdir -p $(BUILD)/test_pthreads_c_swf
-	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O0 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
+	cd samples/09_Pthreads && $(SDK_MAKE) T09_3 T09_4 T09_5
 
 # Clean build outputs
 clean:
@@ -537,6 +535,24 @@ builtinabcs:
 	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/core && $(PYTHON) ./builtin.py -abcfuture -config CONFIG::VMCFG_FLOAT=false -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -config CONFIG::VMCFG_ALCHEMY_POSIX=true
 	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell && $(PYTHON) ./shell_toplevel.py -abcfuture -config CONFIG::VMCFG_FLOAT=false -config CONFIG::VMCFG_ALCHEMY_SDK_BUILD=true -config CONFIG::VMCFG_ALCHEMY_POSIX=true
 	cp -f $(DEPENDENCY_AVMPLUS)/generated/*.abc $(SDK)/usr/lib/
+
+# Assemble builtin SysCalls
+builtinsyscalls:
+	$(SDK)/usr/bin/gcc -c print_stat_info.c 
+	$(SDK)/usr/bin/llvm-ld -internalize-public-api-file=$(SDK)/public-api.txt \
+	print_stat_info.o $(SDK)/usr/lib/crt1_c.o $(SDK)/usr/lib/libgcc.a \
+	$(SDK)/usr/lib/libc.a $(SDK)/usr/lib/libm.a -o print_stat_info-linked
+	perl $(SRCROOT)/llvm-2.9/lib/Target/AVM2/build.pl $(SDK)/usr print_stat_info-linked.bc \
+	$(SRCROOT)/avmplus/utils/asc.jar $(SRCROOT)/llvm-2.9/lib/Target/AVM2 print_stat_info
+	$(AVMSHELL) $(BUILD)/swfmake.abc -- -o print_stat_info.swf \
+	$(SDK)/usr/lib/C_Run.abc \
+	$(SDK)/usr/lib/Exit.abc $(SDK)/usr/lib/LongJmp.abc \
+	$(SDK)/usr/lib/CModule.abc print_stat_info.abc $(SDK)/usr/lib/startHack.abc 
+	$(AVMSHELL) $(BUILD)/projectormake.abc -- -o print_stat_info $(AVMSHELL) \
+	print_stat_info.swf -- -Djitordie
+	chmod u+x print_stat_info
+	rm print_stat_info-linked print_stat_info-linked.bc* print_stat_info.abc print_stat_info.cpp \
+	print_stat_info.h print_stat_info.o print_stat_info.swf
 
 # Assemble ABC library binaries and documentation
 abclibs:

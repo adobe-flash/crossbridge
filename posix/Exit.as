@@ -39,6 +39,7 @@ package C_Run
     */
     public function Exit(code:int)
     {
+      CONFIG::debug { trace("Exit::exit: " + code); }
       this.code = code;
     }
   }

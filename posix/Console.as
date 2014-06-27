@@ -47,7 +47,9 @@ package com.adobe.flascc
     * act as a child of some other DisplayObjectContainer.
     */
     public function Console(container:DisplayObjectContainer = null)
-    {
+    {      
+      CONFIG::debug { trace("Console::created"); }
+      
       CModule.rootSprite = container ? container.root : this;
 
       if(CModule.runningAsWorker()) {
@@ -69,6 +71,8 @@ package com.adobe.flascc
     */
     protected function init(e:Event):void
     {
+      CONFIG::debug { trace("Console::init"); }
+      
       inputContainer = new Sprite()
       addChild(inputContainer)
 
@@ -124,6 +128,8 @@ package com.adobe.flascc
     */
     public function exit(code:int):Boolean
     {
+      CONFIG::debug { trace("Console::exit: " + code); }
+      
       // default to unhandled
       if (exitHook != null)
         return exitHook(code)
