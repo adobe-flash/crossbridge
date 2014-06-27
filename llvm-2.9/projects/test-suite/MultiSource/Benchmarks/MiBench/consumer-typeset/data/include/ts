@@ -1,0 +1,106 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @ToySetup package (Jeff Kingston, July 1993, updated October 1994)    #
+#                                                                             #
+#  In response to a user request I have put together this tiny package for    #
+#  people to play with who want to start learning how to do page layout and   #
+#  galleys with Lout.  It produces a very simple sequence of pages.  To       #
+#  invoke the package, run "lout myfile > op" where myfile looks like this:   #
+#                                                                             #
+#     @SysInclude { ts }                                                      #
+#     @Use { @ToySetup }                                                      #
+#     @Document                                                               #
+#     //                                                                      #
+#     @Text {                                                                 #
+#     Any text you like here, using @I, @B, @Heading, @PP, @LP, @DP,          #
+#     @LeftDisplay, @IndentedDisplay, and @CenteredDisplay just as in         #
+#     DocumentSetup.                                                          #
+#     }                                                                       #
+#                                                                             #
+###############################################################################
+
+@SysInclude { langdefs }
+
+export @I @B @Heading @PP @LP @DP @NP
+       @LeftDisplay @IndentedDisplay @CenteredDisplay
+       @Text @Document
+
+def @ToySetup
+    named @PageWidth  { 21.0c }
+    named @PageHeight { 29.7c }
+@Begin
+
+    ###########################################################################
+    #                                                                         #
+    #  Font changes, headings, and paragraphs.                                #
+    #                                                                         #
+    ###########################################################################
+
+    def @I       right x { Slope @Font x      }
+    def @B       right x { Bold @Font x       }
+    def @Heading right x { ragged @Break @B x }
+
+    macro @PP        { //1.3vx 1.0f @Wide &0i }
+    macro @LP        { //1.3vx                }
+    macro @DP        { //0.5v                 }
+    macro @NP        { //1.1b                 }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Displays.                                                              #
+    #                                                                         #
+    ###########################################################################
+
+    def @DispPlace { @Galley }
+
+    def @Disp into { @DispPlace&&preceding }
+	right x
+    {
+	@OneRow x
+    }
+
+    macro @LeftDisplay     { @DP |       @DispPlace  |  @DP // @Disp   }
+    macro @IndentedDisplay { @DP |2f     @DispPlace  |  @DP // @Disp   }
+    macro @CenteredDisplay { @DP |0.5rt  @DispPlace  |  @DP // @Disp   }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Page layout.                                                           #
+    #                                                                         #
+    ###########################################################################
+
+    def @TextPlace { @Galley }
+
+    def @Text force into { @TextPlace&&preceding }
+        right x
+    {
+	x
+    }
+
+    def @Page right x
+    {
+	@PageWidth @Wide @PageHeight @High
+	{ Times Base 12p } @Font
+	{ adjust nohyphen 14px } @Break
+	English @Language { 0 0 0 } @SetColour
+	{   //1i ||1i
+	    @HExpand @VExpand x
+	    ||1i //1i
+	}
+    }
+
+    def @PageList right num
+    {
+	@Page { |0.5rt - num - //0.4i @TextPlace }
+	//
+	@PageList @Next num
+    }
+
+    def @Document { @PageList 1 }
+
+@End @ToySetup
+
+@SysDatabase @FontDef  { fontdefs }		  # font definitions

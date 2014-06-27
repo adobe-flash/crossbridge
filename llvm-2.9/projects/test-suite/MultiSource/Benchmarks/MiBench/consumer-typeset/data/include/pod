@@ -1,0 +1,176 @@
+###############################################################################
+#                                                                             #
+#   Lout setup file for Pod documentation printing                            #
+#                                                                             #
+#   Note: although Pod is treated like a programming language in some         #
+#   respects, the setup file options below are largely unrelated to           #
+#   the setup file options for other languages.                               #
+#                                                                             #
+#   Version 3.0                                                               #
+#   Jeffrey H. Kingston                                                       #
+#   5 April 2000                                                              #
+#                                                                             #
+###############################################################################
+
+
+###############################################################################
+#                                                                             #
+#  @SysInclude line                                                           #
+#                                                                             #
+#  This line causes Lout to read the definitions for this programming         #
+#  language, and should not be touched.                                       #
+#                                                                             #
+###############################################################################
+
+@SysInclude { podf }
+
+
+###############################################################################
+#                                                                             #
+#  @Use clause                                                                #
+#                                                                             #
+#  To change the default value of any option, delete the # at the start of    #
+#  its line and change the value between braces.                              #
+#                                                                             #
+#  Pod has two quite different kinds of paragraphs: verbatim and non-         #
+#  verbatim.  When we say "verbatim" and "text" below we refer to these.      #
+#  There is no paragraph breaking option for verbatim since line breaks       #
+#  are honoured.                                                              #
+#                                                                             #
+#  As you can see below, we have been obliged to give "Times Base" as         #
+#  the default text font for varying style, rather than the usual empty,      #
+#  to get a varying-width font when Pod is embedded in fixed-width Perl.  If  #
+#  you are using a different text font family in your document you will have  #
+#  to change this option if you want your varying-width Pod in that family.   #
+#                                                                             #
+###############################################################################
+
+@Use { @PodSetup
+  # pipe			{		} # pipe source through this
+  # style	     { varying @OrIfPlain fixed	} # fixed, varying, or symbol
+
+  # the following options apply when style is "fixed"
+
+  # fixedtextfont		{ Courier Base -1p	} # text font
+  # fixedtextbreak		{ adjust 1.0vx hyphen	} # text para breaking
+  # fixedverbatimfont		{ Courier Base		} # verbatim font
+  # fixedtabin			{ 8			} # tab interval
+  # fixedtabout			{ 8s			} # tab width
+  # fixedlinenumbersfont	{ 			} # line numbers font
+  # fixedlinenumbersformat	{ @Body			} # line numbers format
+
+  # fixedparagap		{ 1.0v			} # gap between paras
+  # fixedlistgap		{ 1.0v			} # gap within lists
+  # fixedlistindent		{ 0s			} # list label indent
+  # fixedlistrightindent	{ 0s			} # list right indent
+  # fixedlistlabelwidth		{ 2.0f			} # default label space
+  # fixedlistlabelfont 		{ 			} # list label font
+  # fixedlistlabelformat	{ @Body			} # list label format
+
+  # fixedaheadfont		{ Bold +4p		} # =head1 font
+  # fixedaheadbreak		{ lines 1.1vx		} # =head1 para break
+  # fixedaheadformat		{ @DP @Body		} # =head1 format
+  # fixedbheadfont		{ Bold +2p		} # =head2 font
+  # fixedbheadbreak		{ lines 1.1vx		} # =head2 para break
+  # fixedbheadformat		{ @Body			} # =head2 format
+  # fixedcheadfont		{ Bold			} # =head3 font
+  # fixedcheadbreak		{ lines 1.1vx		} # =head3 para break
+  # fixedcheadformat		{ @Body			} # =head3 format
+
+  # fixeditalicfont		{ Slope			} # font of I<>
+  # fixeditalicformat		{ @Body			} # format of I<>
+  # fixedboldfont		{ Bold			} # font of B<>
+  # fixedboldformat		{ @Body			} # format of B<>
+  # fixedcodefont		{ Base			} # font of C<>
+  # fixedcodeformat		{ @Body			} # format of C<>
+  # fixedfilefont		{ Slope			} # font of F<>
+  # fixedfileformat		{ @Body			} # format of F<>
+  # fixedlinkfont		{ Slope			} # font of L<>
+  # fixedlinkformat		{ @Underline @Body	} # format of L<>
+  # fixedindexfont		{ Slope			} # font of X<>
+  # fixedindexformat		{ @Body			} # format of X<>
+
+
+  # the following options apply when style is "varying"
+
+  # varyingtextfont		{ Times Base		} # text font
+  # varyingtextbreak		{ adjust 1.0vx hyphen	} # text para breaking
+  # varyingverbatimfont		{ Courier Base -1p	} # verbatim font
+  # varyingtabin		{ 8			} # tab interval
+  # varyingtabout		{ 8s			} # tab width
+  # varyinglinenumbersfont	{ 			} # line numbers font
+  # varyinglinenumbersformat	{ @Body			} # line numbers format
+
+  # varyingparagap		{ 1.0v			} # gap between paras
+  # varyinglistgap		{ 1.0v			} # gap within lists
+  # varyinglistindent		{ 0s			} # list label indent
+  # varyinglistrightindent	{ 0s			} # list right indent
+  # varyinglistlabelwidth	{ 2.0f			} # default label space
+  # varyinglistlabelfont 	{ 			} # list label font
+  # varyinglistlabelformat	{ @Body			} # list label format
+
+  # varyingaheadfont		{ Bold +4p		} # =head1 font
+  # varyingaheadbreak		{ lines 1.1vx		} # =head1 para break
+  # varyingaheadformat		{ @DP @Body		} # =head1 format
+  # varyingbheadfont		{ Bold +2p		} # =head2 font
+  # varyingbheadbreak		{ lines 1.1vx		} # =head2 para break
+  # varyingbheadformat		{ @Body			} # =head2 format
+  # varyingcheadfont		{ Bold			} # =head3 font
+  # varyingcheadbreak		{ lines 1.1vx		} # =head3 para break
+  # varyingcheadformat		{ @Body			} # =head3 format
+
+  # varyingitalicfont		{ Slope			} # font of I<>
+  # varyingitalicformat		{ @Body			} # format of I<>
+  # varyingboldfont		{ Bold			} # font of B<>
+  # varyingboldformat		{ @Body			} # format of B<>
+  # varyingcodefont		{ Courier Base -1p	} # font of C<>
+  # varyingcodeformat		{ @Body			} # format of C<>
+  # varyingfilefont		{ Slope			} # font of F<>
+  # varyingfileformat		{ @Body			} # format of F<>
+  # varyinglinkfont		{ Slope			} # font of L<>
+  # varyinglinkformat		{ @Underline @Body	} # format of L<>
+  # varyingindexfont		{ Slope			} # font of X<>
+  # varyingindexformat		{ @Body			} # format of X<>
+
+  # the following options apply when style is "symbol"
+
+  # symboltextfont		{ Times Base		} # text font
+  # symboltextbreak		{ adjust 1.0vx hyphen	} # text para breaking
+  # symbolverbatimfont		{ Courier Base -1p	} # verbatim font
+  # symboltabin			{ 8			} # tab interval
+  # symboltabout		{ 8s			} # tab width
+  # symbollinenumbersfont	{ 			} # line numbers font
+  # symbollinenumbersformat	{ @Body			} # line numbers format
+
+  # symbolparagap		{ 1.0v			} # gap between paras
+  # symbollistgap		{ 1.0v			} # gap within lists
+  # symbollistindent		{ 0s			} # list label indent
+  # symbollistrightindent	{ 0s			} # list right indent
+  # symbollistlabelwidth	{ 2.0f			} # default label space
+  # symbollistlabelfont 	{ 			} # list label font
+  # symbollistlabelformat	{ @Body			} # list label format
+
+  # symbolaheadfont		{ Bold +4p		} # =head1 font
+  # symbolaheadbreak		{ lines 1.1vx		} # =head1 para break
+  # symbolaheadformat		{ @DP @Body		} # =head1 format
+  # symbolbheadfont		{ Bold +2p		} # =head2 font
+  # symbolbheadbreak		{ lines 1.1vx		} # =head2 para break
+  # symbolbheadformat		{ @Body			} # =head2 format
+  # symbolcheadfont		{ Bold			} # =head3 font
+  # symbolcheadbreak		{ lines 1.1vx		} # =head3 para break
+  # symbolcheadformat		{ @Body			} # =head3 format
+
+  # symbolitalicfont		{ Slope			} # font of I<>
+  # symbolitalicformat		{ @Body			} # format of I<>
+  # symbolboldfont		{ Bold			} # font of B<>
+  # symbolboldformat		{ @Body			} # format of B<>
+  # symbolcodefont		{ Courier Base -1p	} # font of C<>
+  # symbolcodeformat		{ @Body			} # format of C<>
+  # symbolfilefont		{ Slope			} # font of F<>
+  # symbolfileformat		{ @Body			} # format of F<>
+  # symbollinkfont		{ Slope			} # font of L<>
+  # symbollinkformat		{ @Underline @Body	} # format of L<>
+  # symbolindexfont		{ Slope			} # font of X<>
+  # symbolindexformat		{ @Body			} # format of X<>
+
+}

@@ -1,0 +1,99 @@
+-----------------------------------------------------------------------
+  MAFFT: a multiple sequence alignment program
+  version 6.624beta, 2008/12/18
+
+  http://align.bmr.kyushu-u.ac.jp/mafft/software/
+  katoh@bioreg.kyushu-u.ac.jp
+-----------------------------------------------------------------------
+
+1. COMPILE
+% cd core
+% make clean
+% make
+% cd ..
+
+If you have the './extensions' directory, which is for RNA alignments,
+% cd extensions
+% make clean
+% make
+% cd ..
+
+
+2. INSTALL (with make)
+# cd core
+# make install
+# cd ..
+
+If you have the './extensions' directory,
+# cd extensions 
+# make install
+# cd ..
+
+By default, programs are installed into /usr/local/bin/ and 
+some binaries are installed into /usr/local/lib/mafft/.
+
+
+2. INSTALL (without make)
+If you want to install the binaries to a different directory 
+than /usr/local/lib/mafft/, 
+% cp ./binaries/* /somewhere/else/
+
+In this case, you have to set the MAFFT_BINARIES environment 
+variable to point to the directory where the binaries are.
+% setenv MAFFT_BINARIES /somewhere/else/  # for csh, tcsh
+$ export MAFFT_BINARIES=/somewhere/else/  # for sh, bash
+
+
+3. CHECK
+% cd test
+% rehash                                                   # if necessary
+% setenv MAFFT_BINARIES /where/binaries/were/installed     # if necessary
+% mafft sample > test.fftns2                               # FFT-NS-2
+% mafft --maxiterate 100  sample > test.fftnsi             # FFT-NS-i
+% mafft --globalpair sample > test.gins1                   # G-INS-1 
+% mafft --globalpair --maxiterate 100  sample > test.ginsi # G-INS-i 
+% mafft --localpair sample > test.lins1                    # L-INS-1 
+% mafft --localpair --maxiterate 100  sample > test.linsi  # L-INS-i 
+% diff test.fftns2 sample.fftns2
+% diff test.fftnsi sample.fftnsi
+% diff test.gins1 sample.gins1
+% diff test.ginsi sample.ginsi
+% diff test.lins1 sample.lins1
+
+If you have the './extensions' directory,
+% mafft-qinsi samplerna > test.qinsi                       # Q-INS-i
+% mafft-xinsi samplerna > test.xinsi                       # X-INS-i
+% diff test.linsi sample.linsi
+% diff test.qinsi sample.qinsi
+% diff test.xinsi sample.xinsi
+
+
+4. INPUT FORMAT
+fasta format.
+
+The type of input sequences (nucleotide or amino acid) is 
+automatically recognized based on the frequency of A, T, G, C, U and N.
+
+
+5.  USAGE
+% /usr/local/bin/mafft input > output
+
+See also http://align.bmr.kyushu-u.ac.jp/mafft/software/
+
+
+6. UNINSTALL
+# rm -r /usr/local/lib/mafft
+# rm /usr/local/bin/mafft
+# rm /usr/local/bin/fftns
+# rm /usr/local/bin/fftnsi
+# rm /usr/local/bin/nwns
+# rm /usr/local/bin/nwnsi
+# rm /usr/local/bin/linsi
+# rm /usr/local/bin/ginsi
+# rm /usr/local/bin/mafft-*
+
+
+7. LICENSE
+See the './license' file.
+
+If you have the extensions, see the './license.extensions' file, 

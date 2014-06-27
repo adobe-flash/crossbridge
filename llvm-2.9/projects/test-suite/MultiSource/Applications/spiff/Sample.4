@@ -1,0 +1,36 @@
+spiffword rem this file should be named Sample.4
+spiffword rem it is a test input file for spiff
+spiffword rem it should be compared with a file named Sample.3, to use it
+spiffword rem execute: spiff -s 'command spiffword' Sample.3 Sample.4
+spiffword rem the -s argument is  essential, otherwise spiff will
+spiffword rem will not recognized these comments for what they are.
+spiffword rem first we'll check the default tolerances.  this is the
+spiffword rem same test as is found in Sample.1/Sample.2
+default absolute tolerance should be .0000000001   
+no difference --> 0.0000000001  different --> 0.00000000011
+default relative tolerance should be 1.0e-10   
+no difference --> 10.000000001  different --> 10.0000000011
+spiffword rem Note that spiff said that the differences were on lines 1 and 3
+spiffword rem of the input files even though they were really on lines 10 and
+spiffword rem of this file.
+spiffword rem That's because spiff does not count lines with commands.
+spiffword rem As part of spiff's design, it is assumed that "embedded commands"
+spiffword rem such as these are not of direct interest and have been added
+spiffword rem soley for the purpose of controlling the spiffing process.
+spiffword rem OK. Now we'll try changing some things. first, we'll add 
+spiffword rem a commenting convention, everything from # to end of line
+spiffword rem will be ignored.
+spiffword comment # $
+there should be NO differences on this line !!!! # No difference here !!
+spiffword rem Well, that was fun. Now we'll ignore all differences
+spiffword tol i
+spiffword rem and there should be no differences the following lines
+no difference --> 0.0000000001  NO difference --> 0.00000000011
+no difference --> 10.000000001  NO difference --> 10.0000000011
+spiffword rem now we'll set the tolerance for the second number
+spiffword rem on each line, to be lower than the others.
+spiffword tol a0.02 ; a0.01 ; a0.02
+spiffword rem and only the middle number should appear different
+not different --> 0.011  different --> 0.011  not different --> 0.011  
+spiffword rem You get the idea. Enough fun for now.
+All done.

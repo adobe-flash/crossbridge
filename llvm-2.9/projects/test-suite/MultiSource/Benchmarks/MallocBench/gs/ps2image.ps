@@ -1,0 +1,106 @@
+%    Copyright (C) 1990 Aladdin Enterprises.  All rights reserved.
+%    Distributed by Free Software Foundation, Inc.
+%
+% This file is part of Ghostscript.
+%
+% Ghostscript is distributed in the hope that it will be useful, but
+% WITHOUT ANY WARRANTY.  No author or distributor accepts responsibility
+% to anyone for the consequences of using it or for whether it serves any
+% particular purpose or works at all, unless he says so in writing.  Refer
+% to the Ghostscript General Public License for full details.
+%
+% Everyone is granted permission to copy, modify and redistribute
+% Ghostscript, but only under the conditions described in the Ghostscript
+% General Public License.  A copy of this license is supposed to have been
+% given to you along with Ghostscript so you can know your rights and
+% responsibilities.  It should be in a file named COPYING.  Among other
+% things, the copyright notice and this notice must be preserved on all
+% copies.
+
+% Convert a .ps file to another .ps file containing only a bit image.
+% Usage:
+%	(filename) ps2image
+% This replaces the current device, writing the output on the file
+% instead of to the device.  To display the image at a later time,
+% simply run the file that was written.
+
+% Initialize, and redefine copypage and showpage.
+/ps2idict 25 dict def
+ps2idict begin
+				% Save the showpage operator
+  /realshowpage //showpage def
+				% Define a monochrome palette
+  /monopalette [ 0 0 0 rgbcolor 1 1 1 rgbcolor ] def
+				% The main procedure
+  /ps2image
+   {				% Open the file
+     (w) file /myfile exch def
+     myfile (/readimage ) writestring
+     myfile /readimage load write==only
+     myfile ( bind def\n) writestring
+					% Get the device parameters
+     currentdevice matrix deviceparams
+     /devheight exch def
+     /devwidth exch def
+     /devmatrix exch def
+     cleartomark
+				% Make a corresponding memory device
+     devmatrix devwidth devheight monopalette
+     makeimagedevice
+     /mydevice exch def
+     mydevice setdevice
+     erasepage
+     /row devwidth 7 add 8 idiv string def
+     /prevrow row length string def
+				% Replace the definition of showpage
+     userdict /showpage { ps2idict begin myshowpage end } bind put
+   } def
+				% Procedure for reading and displaying
+				% the rendered image.
+				% <width> <height> readimage
+  /readimage
+   { gsave matrix setmatrix
+     1 matrix
+     3 index 7 add 8 idiv string currentfile
+     				% At each iteration of the loop,
+				% the stack contains <buffer> <file>
+      { 2 copy exch
+        1 index token pop	% starting index
+        2 index token pop	% count
+	getinterval
+        readhexstring pop pop 1 index }
+     3 1 roll
+     7 2 roll
+     image pop pop
+     grestore showpage
+   } def
+				% Write the image on the file
+  /myshowpage
+   { myfile devwidth write==only   myfile ( ) writestring
+     myfile devheight write==only   myfile ( readimage\n) writestring
+     0 1 prevrow length 1 sub { row exch 0 put } for
+	 			% Write the hex data
+     0 1 devheight 1 sub
+      { mydevice exch row copyscanlines
+        0 row length 1 sub -1 0
+	 { dup dup prevrow exch get exch row exch get
+	   ne { 1 add exch pop exit } { pop } ifelse
+	 } for
+	dup dup 0 exch 1 exch 1 sub
+	 { dup dup prevrow exch get exch row exch get
+	   ne { exch pop exit } { pop } ifelse
+	 } for
+	   			% stack now has stop index, start index
+	exch 1 index sub 2 copy exch	% start, length, length, start
+	myfile exch write==only   myfile ( ) writestring
+	myfile exch write==only   myfile ( ) writestring
+	getinterval myfile exch writehexstring
+	row prevrow copy pop
+	myfile (\n) writestring
+      } for
+     myfile flushfile
+   } bind def
+
+end
+
+/ps2image { ps2idict begin ps2image end } bind def

@@ -1,0 +1,502 @@
+@SysInclude { tbl }
+@SysInclude { doc }
+def @HeaderA right x { @CD +8p @Font { x } }
+def @HeaderB right x { @CD +6p @Font { x } }
+def @HeaderC right x { @CD +4p @Font { x } }
+def @HeaderD right x { @CD +2p @Font { x } }
+def @HeaderE right x { @CD -1p @Font { x } }
+def @HeaderF right x { @CD -2p @Font { x } }
+# Created by HTML::LoutParser.pm on 2001/06/28 from SimpleScalar.htm.
+@Doc @Text @Begin
+#DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+
+# saved from url=(0041)http://www.simplescalar.org/overview.html 
+
+#start html
+#start head
+
+@InitialBreak {adjust 1.2fx hyphen}
+
+@CentredDisplay { +10p } @Font {#start title
+SimpleScalar Tools Overview Page}
+#end title
+
+#unhandled start meta attributes= (content=>text/html; charset=iso-8859-1), (http-equiv=>Content-Type)
+
+#unhandled start meta attributes= (name=>GENERATOR), (content=>MSHTML 5.50.4616.200)
+#end head
+
+#start body attributes= (background=>SimpleScalar_files/whitevellum.gif)
+
+{ clines } @Break {
+#start center
+
+
+@HeaderB {#start h2
+{ Times Base 10p } @Font {#start font attributes= (color=>#006aff)
+Announcements}
+#end font
+}
+#end h2
+}
+#end center
+
+
+@BulletList
+#start ul
+
+  
+@ListItem {#start li
+
+  
+@HeaderC {#start h3
+New web pages!}
+#end h3
+The new domain and mailing lists are just about up!
+  
+@PP
+#start p
+@LLP
+#end p
+#end li
+}
+
+@EndList
+#end ul
+
+
+@PP
+#start p
+
+@LLP
+#start br
+
+
+@LLP @FullWidthRule @LLP
+#start hr
+
+
+@PP
+#start p
+
+{ clines } @Break {
+#start center
+
+
+@HeaderB {#start h2
+{ Times Base 10p } @Font {#start font attributes= (color=>#006aff)
+SimpleScalar Overview}
+#end font
+}
+#end h2
+}
+#end center
+{}@B {#start strong
+What 
+is the SimpleScalar tool set? }
+#end strong
+
+
+@PP
+#start p
+This tool set consists of compiler, assembler, linker, simulation, and 
+visualization tools for the SimpleScalar architecture. With this tool set,
+the 
+user can simulate real programs on a range of modern processors and
+systems, 
+using fast execution-driven simulation. We provide simulators ranging from
+a 
+fast functional simulator to a detailed, out-of-order issue processor that 
+supports non-blocking caches, speculative execution, and state-of-the-art
+branch 
+prediction. The tool set is partly derived from the GNU software
+development 
+tools. It provides researchers with an easily extensible, portable, 
+high-performance test bed for systems design. 
+
+@PP
+#start p
+{}@B {#start strong
+Who wrote the SimpleScalar tool set?}
+#end strong
+
+
+@PP
+#start p
+Much of the compiler tools are simply ports of the GNU software development 
+tools to the SimpleScalar architecture. The ports as well as the simulators
+were 
+written by Todd Austin (while he was a Ph.D. student at the University of 
+Wisconsin-Madison, working in the Multiscalar Group under {}@Underline {#start a attributes= (href=>http://www.cs.wisc.edu/~sohi)
+Guri Sohi}
+#end a
+; he is now with Intel Corp.). 
+The tool set is now supported by {}@Underline {#start a attributes= (href=>http://www.cs.utexas.edu/users/dburger)
+Doug Burger}
+#end a
+, who wrote the 
+documentation for both releases 1.0 and 2.0. Contributions have also been
+made 
+by Manoj Franklin, {}@Underline {#start a attributes= (href=>http://www.cs.wisc.edu/~breach)
+Scott Breach}
+#end a
+, 
+and Kevin Skadron.
+
+@PP
+#start p
+The development of this code was originally supported by grants from the 
+National Science Foundation (grant CCR-9303030 plus software capitalization 
+supplement) and the Office of Naval Research (grant N00014-93-1-0465). Many 
+sources, all appreciated, currently fund development on several fronts.
+
+@PP
+#start p
+{}@B {#start strong
+On which platforms does it run?}
+#end strong
+
+
+@PP
+#start p
+SimpleScalar should port easily to any 32-bit flavor of UNIX, particularly 
+those that support POSIX-compliant syscalls. The tools have been installed
+(and 
+should cleanly build) on the following systems:
+
+@PP
+#start p
+
+{ clines } @Break {
+#start center
+
+
+@LLP
+@Tbl
+    rule { yes }
+    aformat {@Cell A | @Cell B | @Cell C | @Cell D | @Cell E | @Cell F }
+{
+#start table
+
+  #unhandled start tbody
+
+  @Rowa
+#start tr
+
+        A {#start td attributes= (width=>100)
+{}@B {#start b
+Architecture}
+#end b
+}
+#end td
+
+        B {#start td
+{}@B {#start b
+Operating System}
+#end b
+}
+#end td
+
+        C {#start td
+{}@B {#start b
+Compiler}
+#end b
+}
+#end td
+
+#end tr
+
+  @Rowa
+#start tr
+
+        A {#start td
+x86}
+#end td
+
+        B {#start td
+Free BSD 2.2}
+#end td
+
+        C {#start td
+gcc}
+#end td
+
+#end tr
+
+  @Rowa
+#start tr
+
+        A {#start td
+x86}
+#end td
+
+        B {#start td
+CygWin32"/"Windows NT}
+#end td
+
+        C {#start td
+gcc}
+#end td
+
+#end tr
+
+  @Rowa
+#start tr
+
+        A {#start td
+x86}
+#end td
+
+        B {#start td
+Linux1.3}
+#end td
+
+        C {#start td
+gcc}
+#end td
+
+#end tr
+
+  @Rowa
+#start tr
+
+        A {#start td
+x86}
+#end td
+
+        B {#start td
+Solaris2}
+#end td
+
+        C {#start td
+gcc}
+#end td
+
+#end tr
+
+  @Rowa
+#start tr
+
+        A {#start td
+SPARC}
+#end td
+
+        B {#start td
+SunOS 4.1.3}
+#end td
+
+        C {#start td
+gcc}
+#end td
+
+#end tr
+
+  @Rowa
+#start tr
+
+        A {#start td
+SPARC}
+#end td
+
+        B {#start td
+Solaris 2}
+#end td
+
+        C {#start td
+gcc}
+#end td
+
+#end tr
+
+  @Rowa
+#start tr
+
+        A {#start td
+RS6000}
+#end td
+
+        B {#start td
+AIX 4.1.3}
+#end td
+
+        C {#start td
+gcc}
+#end td
+
+#end tr
+
+  @Rowa
+#start tr
+
+        A {#start td
+RS6000}
+#end td
+
+        B {#start td
+AIX 4.1.3}
+#end td
+
+        C {#start td
+xlc}
+#end td
+
+#end tr
+
+  @Rowa
+#start tr
+
+        A {#start td
+PA-RISC}
+#end td
+
+        B {#start td
+HPUX}
+#end td
+
+        C {#start td
+gcc}
+#end td
+
+#end tr
+
+  @Rowa
+#start tr
+
+        A {#start td
+Alpha}
+#end td
+
+        B {#start td
+DEC Unix 3.2}
+#end td
+
+        C {#start td
+gcc}
+#end td
+
+#end tr
+
+  @Rowa
+#start tr
+
+        A {#start td
+Alpha}
+#end td
+
+        B {#start td
+DEC Unix 3.2}
+#end td
+
+        C {#start td
+c89}
+#end td
+
+#end tr
+#unhandled end tbody
+}@LLP
+#end table
+}
+#end center
+
+
+@PP
+#start p
+{}@B {#start strong
+How can I keep informed as to new releases and 
+announcements?}
+#end strong
+
+
+@PP
+#start p
+We have set up serveral SimpleScalar mailing lists for various topics. To 
+subscribe, go to the {}@Underline {#start a attributes= (href=>http://www.simplescalar.org/subscribe.html)
+mailing list page}
+#end a
+ and 
+follow the directions. {}@B {#start strong
+How do I see old mailing list messages?}
+#end strong
+
+
+@PP
+#start p
+Steve Raasch at Michigan was kind enough to set up an SS mailing list 
+archive. You should pore through these before sending a question to the
+list, 
+which goes to hundreds of people. Lots of the same questions gets asked
+over and 
+over, and the answers to new users' questions are likely to be in the
+archive!
+
+@PP
+#start p
+The archive is available at: {}@Underline {#start a attributes= (href=>http://ord.eecs.umich.edu/)
+http:"/""/"ord.eecs.umich.edu"/"}
+#end a
+. 
+
+@PP
+#start p
+{}@B {#start strong
+What's new in version 2.0?}
+#end strong
+
+
+@PP
+#start p
+We have added numerous features and utilities. The code has been cleaned up 
+and is better documented, plus all known bugs have been fixed. The code now 
+includes much more sophisticated arguments and statistics packages (that
+allow 
+you to use config files to set simulation parameters), plus cleaner
+statistics 
+reporting. We have provided a source-level debugger called DLite!, which
+allows 
+you to step through the program being simulated. We have also added a
+pipeline 
+tracer, which allows you to track pipeline state in the out-of-order
+simulator. 
+We have removed the simulators' dependence on the BFD utilities, making 
+binutils' installation optional. There are two new simulators, sim-profile
+and 
+sim-cheetah, that do useful profiling and multiple simultaneous cache 
+configuration simulations, respectively. Finally, we include pre-built
+binaries, 
+both small test binaries and a complete set of the SPEC95 binaries built
+for 
+SimpleScalar (both big- and little-endian).
+
+@PP
+#start p
+@LLP
+#end table
+
+{ clines } @Break {
+#start center
+}
+#end center
+
+
+@PP
+#start p
+
+
+@LLP @FullWidthRule @LLP
+#start hr
+
+Last modified: Sun Feb 27 2000 23:29 by {}@Underline {#start a attributes= (href=>mailto:dburger@cs.utexas.edu)
+Doug Burger}
+#end a
+
+@LLP
+#start br
+
+
+@LLP @FullWidthRule @LLP
+#start hr
+
+#end body
+#end html
+
+@End @Text

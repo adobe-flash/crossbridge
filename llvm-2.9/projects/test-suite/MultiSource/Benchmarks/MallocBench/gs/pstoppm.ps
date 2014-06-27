@@ -1,0 +1,403 @@
+%! PS-Adobe-2.0
+%% for GhostScript 2.0
+%% Program for reading a .ps file and writing out a PPM file.
+%% Original version by Phillip Conrad - Perfect Byte, Inc.
+%% Modified 06/26/90 for a color file
+%% Modified on 08/02/90 for using the CORRECT color map.
+%% Modified by L. Peter Deutsch -- Aladdin Enterprises -- 08/02/90
+%% Modified by L. Peter Deutsch -- Aladdin Enterprises -- 08/25/90 --
+%%   converted from a one-shot program to a utility package,
+%%   designed to be used from an interactive terminal.
+%% Modified by Henry Minsky 11/03/90
+%%   for each showpage, it writes out a ppm file with name filename.ppm.N
+%%   where N increments each showpage, starting at 1
+%% Modified by L. Peter Deutsch 11/07/90
+%%   to use filename.ppm for the first page, renamed to filename.1ppm
+%%   with subsequent pages .2ppm, etc. if more than one page.
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%% Define the directory for holding the PPM information
+
+/ppmdict 30 dict def
+ppmdict begin
+
+  /Horz_dpi 72 def		% defaults to screen density
+  /Vert_dpi 72 def
+
+  /OutFilePrefix () def		% default to null (current directory)
+
+  /Palette1 [1 1 1 rgbcolor 0 0 0 rgbcolor] def
+  /Palette8
+    [
+%========== Here we define all 256 color entries as color objects. ======
+%========== Colors were taken from the W Xindows default colors. ======
+0.000   0.000   0.000   rgbcolor
+1.000   1.000   1.000   rgbcolor
+0.659   0.659   0.659   rgbcolor
+0.922   0.922   0.922   rgbcolor
+0.361   0.361   0.361   rgbcolor
+0.216   0.216   0.216   rgbcolor
+0.373   0.573   0.620   rgbcolor
+0.522   0.800   0.867   rgbcolor
+0.204   0.314   0.341   rgbcolor
+0.122   0.188   0.204   rgbcolor
+0.447   0.620   0.996   rgbcolor
+0.627   0.867   1.000   rgbcolor
+0.247   0.341   0.549   rgbcolor
+0.149   0.204   0.329   rgbcolor
+0.380   0.525   0.847   rgbcolor
+0.184   0.184   0.392   rgbcolor
+1.000   1.000   0.000   rgbcolor
+0.690   0.886   1.000   rgbcolor
+1.000   0.000   0.000   rgbcolor
+0.502   0.502   0.502   rgbcolor
+0.937   0.875   0.518   rgbcolor
+0.333   0.996   0.333   rgbcolor
+0.996   0.000   0.000   rgbcolor
+0.400   0.996   0.341   rgbcolor
+0.996   0.596   0.478   rgbcolor
+0.996   0.792   0.443   rgbcolor
+0.996   0.996   0.996   rgbcolor
+0.996   0.553   0.486   rgbcolor
+0.996   0.663   0.467   rgbcolor
+0.996   0.769   0.447   rgbcolor
+0.996   0.722   0.459   rgbcolor
+0.996   0.576   0.482   rgbcolor
+0.996   0.584   0.478   rgbcolor
+0.996   0.710   0.459   rgbcolor
+0.596   0.996   0.365   rgbcolor
+0.996   0.545   0.490   rgbcolor
+0.996   0.651   0.467   rgbcolor
+0.996   0.698   0.463   rgbcolor
+0.996   0.686   0.463   rgbcolor
+0.996   0.745   0.455   rgbcolor
+0.996   0.514   0.494   rgbcolor
+0.996   0.988   0.416   rgbcolor
+0.996   0.047   0.604   rgbcolor
+0.996   0.012   0.314   rgbcolor
+0.996   0.031   0.710   rgbcolor
+0.404   0.082   0.996   rgbcolor
+0.996   0.984   0.247   rgbcolor
+0.996   0.329   0.294   rgbcolor
+0.000   0.753   0.000   rgbcolor
+0.125   0.753   0.000   rgbcolor
+0.251   0.753   0.000   rgbcolor
+0.376   0.753   0.000   rgbcolor
+0.502   0.753   0.000   rgbcolor
+0.627   0.753   0.000   rgbcolor
+0.753   0.753   0.000   rgbcolor
+0.878   0.753   0.000   rgbcolor
+0.000   0.878   0.000   rgbcolor
+0.125   0.878   0.000   rgbcolor
+0.251   0.878   0.000   rgbcolor
+0.376   0.878   0.000   rgbcolor
+0.502   0.878   0.000   rgbcolor
+0.627   0.878   0.000   rgbcolor
+0.753   0.878   0.000   rgbcolor
+0.878   0.878   0.000   rgbcolor
+0.000   0.000   0.251   rgbcolor
+0.125   0.000   0.251   rgbcolor
+0.251   0.000   0.251   rgbcolor
+0.376   0.000   0.251   rgbcolor
+0.502   0.000   0.251   rgbcolor
+0.627   0.000   0.251   rgbcolor
+0.753   0.000   0.251   rgbcolor
+0.878   0.000   0.251   rgbcolor
+0.000   0.125   0.251   rgbcolor
+0.125   0.125   0.251   rgbcolor
+0.251   0.125   0.251   rgbcolor
+0.376   0.125   0.251   rgbcolor
+0.502   0.125   0.251   rgbcolor
+0.627   0.125   0.251   rgbcolor
+0.753   0.125   0.251   rgbcolor
+0.878   0.125   0.251   rgbcolor
+0.000   0.251   0.251   rgbcolor
+0.125   0.251   0.251   rgbcolor
+0.251   0.251   0.251   rgbcolor
+0.376   0.251   0.251   rgbcolor
+0.502   0.251   0.251   rgbcolor
+0.627   0.251   0.251   rgbcolor
+0.753   0.251   0.251   rgbcolor
+0.878   0.251   0.251   rgbcolor
+0.000   0.376   0.251   rgbcolor
+0.125   0.376   0.251   rgbcolor
+0.251   0.376   0.251   rgbcolor
+0.376   0.376   0.251   rgbcolor
+0.502   0.376   0.251   rgbcolor
+0.627   0.376   0.251   rgbcolor
+0.753   0.376   0.251   rgbcolor
+0.878   0.376   0.251   rgbcolor
+0.000   0.502   0.251   rgbcolor
+0.125   0.502   0.251   rgbcolor
+0.251   0.502   0.251   rgbcolor
+0.376   0.502   0.251   rgbcolor
+0.502   0.502   0.251   rgbcolor
+0.627   0.502   0.251   rgbcolor
+0.753   0.502   0.251   rgbcolor
+0.878   0.502   0.251   rgbcolor
+0.000   0.627   0.251   rgbcolor
+0.125   0.627   0.251   rgbcolor
+0.251   0.627   0.251   rgbcolor
+0.376   0.627   0.251   rgbcolor
+0.502   0.627   0.251   rgbcolor
+0.627   0.627   0.251   rgbcolor
+0.753   0.627   0.251   rgbcolor
+0.878   0.627   0.251   rgbcolor
+0.000   0.753   0.251   rgbcolor
+0.125   0.753   0.251   rgbcolor
+0.251   0.753   0.251   rgbcolor
+0.376   0.753   0.251   rgbcolor
+0.502   0.753   0.251   rgbcolor
+0.627   0.753   0.251   rgbcolor
+0.753   0.753   0.251   rgbcolor
+0.878   0.753   0.251   rgbcolor
+0.000   0.878   0.251   rgbcolor
+0.125   0.878   0.251   rgbcolor
+0.251   0.878   0.251   rgbcolor
+0.376   0.878   0.251   rgbcolor
+0.502   0.878   0.251   rgbcolor
+0.627   0.878   0.251   rgbcolor
+0.753   0.878   0.251   rgbcolor
+0.878   0.878   0.251   rgbcolor
+0.000   0.000   0.502   rgbcolor
+0.125   0.000   0.502   rgbcolor
+0.251   0.000   0.502   rgbcolor
+0.376   0.000   0.502   rgbcolor
+0.502   0.000   0.502   rgbcolor
+0.627   0.000   0.502   rgbcolor
+0.753   0.000   0.502   rgbcolor
+0.878   0.000   0.502   rgbcolor
+0.000   0.125   0.502   rgbcolor
+0.125   0.125   0.502   rgbcolor
+0.251   0.125   0.502   rgbcolor
+0.376   0.125   0.502   rgbcolor
+0.502   0.125   0.502   rgbcolor
+0.627   0.125   0.502   rgbcolor
+0.753   0.125   0.502   rgbcolor
+0.878   0.125   0.502   rgbcolor
+0.000   0.251   0.502   rgbcolor
+0.125   0.251   0.502   rgbcolor
+0.251   0.251   0.502   rgbcolor
+0.376   0.251   0.502   rgbcolor
+0.502   0.251   0.502   rgbcolor
+0.627   0.251   0.502   rgbcolor
+0.753   0.251   0.502   rgbcolor
+0.878   0.251   0.502   rgbcolor
+0.000   0.376   0.502   rgbcolor
+0.125   0.376   0.502   rgbcolor
+0.251   0.376   0.502   rgbcolor
+0.376   0.376   0.502   rgbcolor
+0.502   0.376   0.502   rgbcolor
+0.627   0.376   0.502   rgbcolor
+0.753   0.376   0.502   rgbcolor
+0.878   0.376   0.502   rgbcolor
+0.000   0.502   0.502   rgbcolor
+0.125   0.502   0.502   rgbcolor
+0.251   0.502   0.502   rgbcolor
+0.376   0.502   0.502   rgbcolor
+0.502   0.502   0.502   rgbcolor
+0.627   0.502   0.502   rgbcolor
+0.753   0.502   0.502   rgbcolor
+0.878   0.502   0.502   rgbcolor
+0.000   0.627   0.502   rgbcolor
+0.125   0.627   0.502   rgbcolor
+0.251   0.627   0.502   rgbcolor
+0.376   0.627   0.502   rgbcolor
+0.502   0.627   0.502   rgbcolor
+0.627   0.627   0.502   rgbcolor
+0.753   0.627   0.502   rgbcolor
+0.878   0.627   0.502   rgbcolor
+0.000   0.753   0.502   rgbcolor
+0.125   0.753   0.502   rgbcolor
+0.251   0.753   0.502   rgbcolor
+0.376   0.753   0.502   rgbcolor
+0.502   0.753   0.502   rgbcolor
+0.627   0.753   0.502   rgbcolor
+0.753   0.753   0.502   rgbcolor
+0.878   0.753   0.502   rgbcolor
+0.000   0.878   0.502   rgbcolor
+0.125   0.878   0.502   rgbcolor
+0.251   0.878   0.502   rgbcolor
+0.376   0.878   0.502   rgbcolor
+0.502   0.878   0.502   rgbcolor
+0.627   0.878   0.502   rgbcolor
+0.753   0.878   0.502   rgbcolor
+0.878   0.878   0.502   rgbcolor
+0.000   0.000   0.753   rgbcolor
+0.125   0.000   0.753   rgbcolor
+0.251   0.000   0.753   rgbcolor
+0.376   0.000   0.753   rgbcolor
+0.502   0.000   0.753   rgbcolor
+0.627   0.000   0.753   rgbcolor
+0.753   0.000   0.753   rgbcolor
+0.878   0.000   0.753   rgbcolor
+0.000   0.125   0.753   rgbcolor
+0.125   0.125   0.753   rgbcolor
+0.251   0.125   0.753   rgbcolor
+0.376   0.125   0.753   rgbcolor
+0.502   0.125   0.753   rgbcolor
+0.627   0.125   0.753   rgbcolor
+0.753   0.125   0.753   rgbcolor
+0.878   0.125   0.753   rgbcolor
+0.000   0.251   0.753   rgbcolor
+0.125   0.251   0.753   rgbcolor
+0.251   0.251   0.753   rgbcolor
+0.376   0.251   0.753   rgbcolor
+0.502   0.251   0.753   rgbcolor
+0.627   0.251   0.753   rgbcolor
+0.753   0.251   0.753   rgbcolor
+0.878   0.251   0.753   rgbcolor
+0.000   0.376   0.753   rgbcolor
+0.125   0.376   0.753   rgbcolor
+0.251   0.376   0.753   rgbcolor
+0.376   0.376   0.753   rgbcolor
+0.502   0.376   0.753   rgbcolor
+0.627   0.376   0.753   rgbcolor
+0.753   0.376   0.753   rgbcolor
+0.878   0.376   0.753   rgbcolor
+0.000   0.502   0.753   rgbcolor
+0.125   0.502   0.753   rgbcolor
+0.251   0.502   0.753   rgbcolor
+0.376   0.502   0.753   rgbcolor
+0.502   0.502   0.753   rgbcolor
+0.627   0.502   0.753   rgbcolor
+0.753   0.502   0.753   rgbcolor
+0.878   0.502   0.753   rgbcolor
+0.000   0.627   0.753   rgbcolor
+0.125   0.627   0.753   rgbcolor
+0.251   0.627   0.753   rgbcolor
+0.376   0.627   0.753   rgbcolor
+0.502   0.627   0.753   rgbcolor
+0.627   0.627   0.753   rgbcolor
+0.753   0.627   0.753   rgbcolor
+0.878   0.627   0.753   rgbcolor
+0.000   0.753   0.753   rgbcolor
+0.125   0.753   0.753   rgbcolor
+0.251   0.753   0.753   rgbcolor
+0.376   0.753   0.753   rgbcolor
+0.502   0.753   0.753   rgbcolor
+0.627   0.753   0.753   rgbcolor
+0.753   0.753   0.753   rgbcolor
+0.878   0.753   0.753   rgbcolor
+0.000   0.878   0.753   rgbcolor
+0.125   0.878   0.753   rgbcolor
+0.251   0.878   0.753   rgbcolor
+0.376   0.878   0.753   rgbcolor
+0.502   0.878   0.753   rgbcolor
+0.627   0.878   0.753   rgbcolor
+0.753   0.878   0.753   rgbcolor
+0.878   0.878   0.753   rgbcolor
+    ] def
+
+  % Redefine copypage and showpage appropriately
+  /copypage
+   { ppmdict begin
+
+       /PageCount PageCount 1 add def
+
+       OutFilePrefix FileName concatstrings
+       PageCount 1 eq
+	{ (.ppm) concatstrings			% first page
+	}
+	{ PageCount 2 eq
+	   {					% second page, rename first
+	     dup dup (.ppm) concatstrings
+	     exch (.1ppm) concatstrings
+	     (Renaming ) print 1 index print ( to ) print
+	       dup print (\n) print
+	     flush
+	     renamefile
+	   } if
+	  (.) PageCount (xxxxxx) cvs concatstrings
+	  (ppm) concatstrings concatstrings
+	} ifelse
+       /FileNameOut exch def
+
+       FileNameOut (w) file
+         /FileDescOut exch def
+
+       (Writing ) print FileNameOut print (\n) print
+       flush
+       FileDescOut Device writeppmfile
+       FileDescOut closefile
+
+       /WrotePage true def
+
+     end
+   } userdict begin def end
+  /showpage
+   { copypage erasepage initgraphics
+   } userdict begin def end
+
+  /Convert			% the main procedure
+  				% <filename> <palette> Convert -
+   { /Palette exch def
+     /FileName exch def
+
+     /PageCount 0 def
+
+     /ScaleX Horz_dpi 72 div def
+     /ScaleY Vert_dpi 72 div def
+
+     /Width 85 Horz_dpi mul 5 add 10 div cvi def % add 5 to round up!
+     /Height 11 Vert_dpi mul def
+
+     FileName (.ps) concatstrings
+       /FileNameIn exch def		% file name with extension
+
+     [ScaleX 0.0 0.0 ScaleY neg 0.0 Height]
+     Width Height Palette makeimagedevice
+       /Device exch def
+     Device setdevice
+
+     /WrotePage false def
+
+     % For running the file, remove ppmdict from the dict stack
+     FileNameIn end run		% ppmdict
+     ppmdict begin
+     WrotePage not { showpage } if	% make sure the page got written
+     end			% ppmdict
+
+   } def
+
+end				% ppmdict
+
+%%%%%% Define the user-callable procedures
+
+/ppmsetdensity
+ { ppmdict begin
+   /Vert_dpi exch def
+   /Horz_dpi exch def
+   end
+ } def
+
+/ppmsetprefix
+ { ppmdict begin
+   /OutFilePrefix exch def
+   end
+ } def
+
+/ppm1run
+ { ppmdict begin   Palette1 Convert
+ } def
+
+/ppm8run
+ { ppmdict begin   Palette8 Convert
+ } def
+
+/ppm24run
+ { ppmdict begin   null Convert
+ } def
+
+%%%%%% Display instructions for the user.
+
+(Usage: (file) ppmNrun\n) print
+(   converts file.ps to file.ppm (single page),\n) print
+(     or file.1ppm, file.2ppm, ... (multi page).\n) print
+(   N is # of bits per pixel (1, 8, or 24).\n) print
+(Examples: (golfer) ppm1run   ..or..   (escher) ppm8run\n) print
+(Optional commands you can give first:\n) print
+(   horiz_DPI vert_DPI ppmsetdensity\n) print
+(   (dirname/) ppmsetprefix\n) print
+flush

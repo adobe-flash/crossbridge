@@ -1,0 +1,45 @@
+##===- Makefile.f2c ----------------------------------------*- Makefile -*-===##
+#
+#                     The LLVM Compiler Infrastructure
+#
+# This file is distributed under the University of Illinois Open Source
+# License. See LICENSE.TXT for details.
+# 
+#===------------------------------------------------------------------------===#
+#
+# Enable running Fortran programs with LLVM by using f2c to convert to C and
+# link with libf2c, but only until we have a Fortran front-end.
+#
+##===----------------------------------------------------------------------===##
+
+# FIXME: This would be autoconf'd
+include $(LEVEL)/Makefile.config
+
+# Make sure the correct targets come first.
+ifdef TEST
+test::
+else
+all::
+endif
+
+ifneq ($(USE_F2C),1)
+all test::
+	echo "The f2c program was not found"
+	exit 1
+endif
+
+.PRECIOUS: %.c
+
+clean::
+	rm -f $(Source:%.f=%.c)
+
+%.c: %.f
+	$(F2C) $< > /dev/null 2>&1
+
+CPPFLAGS = -I$(F2C_INC) 
+LDFLAGS += -L$(F2C_LIB) -lf2c
+
+
+# 'main' is defined in the f2c runtime library.  The function exported from the
+# program is named MAIN__
+EXTRA_LINKTIME_OPT_FLAGS += -internalize-public-api-list=MAIN__

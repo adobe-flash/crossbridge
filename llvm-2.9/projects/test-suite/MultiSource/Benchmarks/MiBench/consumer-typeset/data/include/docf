@@ -1,0 +1,779 @@
+
+###########################################################################
+#                                                                         #
+#  @OrdinarySetup extension to @DocumentSetup.                            #
+#                                                                         #
+#  Jeffrey H. Kingston                                                    #
+#  August 1994                                                            #
+#  5 February 1999                                                        #
+#                                                                         #
+#  This package extends DocumentSetup for ordinary documents.             #
+#                                                                         #
+###########################################################################
+
+extend @BasicSetup @DocumentSetup
+export @Doc @Document @Text
+def @OrdinarySetup
+
+    named @IndexWord			{ index			}
+    named @IndexAWord			{ index			}
+    named @IndexBWord			{ index			}
+    named @AppendixWord			{ appendix		}
+
+    named @SectionNumbers		{ Arabic		}
+    named @FirstSectionNumber		{ 1			}
+    named @SubSectionNumbers		{ Arabic		}
+    named @FirstSubSectionNumber	{ 1			}
+    named @SubSubSectionNumbers		{ Arabic		}
+    named @FirstSubSubSectionNumber	{ 1			}
+    named @AppendixNumbers		{ UCAlpha		}
+    named @FirstAppendixNumber		{ 1			}
+    named @SubAppendixNumbers		{ Arabic		}
+    named @FirstSubAppendixNumber	{ 1			}
+    named @SubSubAppendixNumbers	{ Arabic		}
+    named @FirstSubSubAppendixNumber	{ 1			}
+
+    named @SectionHeadingFont		{ Bold			}
+    named @SectionHeadingBreak		{ ragged 1.2fx nohyphen }
+    named @SectionHeadingFormat
+	    left number right title	{ number @Sep title	}
+
+    named @SubSectionHeadingFont	{ Bold			}
+    named @SubSectionHeadingBreak	{ ragged 1.2fx nohyphen	}
+    named @SubSectionHeadingFormat
+	    left number right title	{ number @Sep title	}
+
+    named @SubSubSectionHeadingFont	{ Slope			}
+    named @SubSubSectionHeadingBreak	{ ragged 1.2fx nohyphen	}
+    named @SubSubSectionHeadingFormat
+	    left number right title	{ number @Sep title	}
+
+    named @AppendixHeadingFont		{ Bold			}
+    named @AppendixHeadingBreak		{ ragged 1.2fx nohyphen	}
+    named @AppendixHeadingFormat
+	    left number right title	{ number @Sep title	}
+
+    named @SubAppendixHeadingFont	{ Bold			}
+    named @SubAppendixHeadingBreak	{ ragged 1.2fx nohyphen	}
+    named @SubAppendixHeadingFormat
+	    left number right title	{ number @Sep title	}
+
+    named @SubSubAppendixHeadingFont	{ Slope			}
+    named @SubSubAppendixHeadingBreak	{ ragged 1.2fx nohyphen	}
+    named @SubSubAppendixHeadingFormat
+	    left number right title	{ number @Sep title	}
+
+    named @ReferencesHeadingFont	{ Bold			}
+    named @ReferencesHeadingBreak	{ ragged 1.2fx nohyphen	}
+    named @ReferencesHeadingFormat
+	    right title			{ title			}
+
+    named @IndexHeadingFont		{ Bold			}
+    named @IndexHeadingBreak		{ ragged 1.2fx nohyphen	}
+    named @IndexHeadingFormat
+	    right title			{ title			}
+
+    named @IndexAHeadingFont		{ Bold			}
+    named @IndexAHeadingBreak		{ ragged 1.2fx nohyphen	}
+    named @IndexAHeadingFormat
+	    right title			{ title			}
+
+    named @IndexBHeadingFont		{ Bold			}
+    named @IndexBHeadingBreak		{ ragged 1.2fx nohyphen	}
+    named @IndexBHeadingFormat
+	    right title			{ title			}
+
+    named @SectionGap			{ 2.0v  @OrIfPlain 3f	}
+    named @SubSectionGap		{ 1.5v  @OrIfPlain 2f	}
+    named @SubSubSectionGap		{ 1.5v  @OrIfPlain 2f	}
+    named @AppendixGap			{ 2.0v  @OrIfPlain 3f	}
+    named @SubAppendixGap		{ 1.5v  @OrIfPlain 2f	}
+    named @SubSubAppendixGap		{ 1.5v  @OrIfPlain 2f	}
+
+    named @SectionInContents		{ Yes			}
+    named @SubSectionInContents		{ Yes			}
+    named @SubSubSectionInContents	{ No			}
+    named @AppendixInContents		{ Yes			}
+    named @SubAppendixInContents	{ Yes			}
+    named @SubSubAppendixInContents	{ No			}
+    named @ReferencesInContents		{ Yes			}
+    named @IndexInContents		{ Yes			}
+    named @IndexAInContents		{ Yes			}
+    named @IndexBInContents		{ Yes			}
+
+    named @SectionNumInTheorems		{ No			}
+    named @SubSectionNumInTheorems	{ No			}
+    named @SubSubSectionNumInTheorems	{ No			}
+    named @AppendixNumInTheorems	{ No			}
+    named @SubAppendixNumInTheorems	{ No			}
+    named @SubSubAppendixNumInTheorems	{ No			}
+
+    named @SectionNumInDisplays		{ Yes			}
+    named @SubSectionNumInDisplays	{ No			}
+    named @SubSubSectionNumInDisplays	{ No			}
+    named @AppendixNumInDisplays	{ Yes			}
+    named @SubAppendixNumInDisplays	{ No			}
+    named @SubSubAppendixNumInDisplays	{ No			}
+
+    named @SectionNumInFigures		{ No			}
+    named @SubSectionNumInFigures	{ No			}
+    named @SubSubSectionNumInFigures	{ No			}
+    named @AppendixNumInFigures		{ No			}
+    named @SubAppendixNumInFigures	{ No			}
+    named @SubSubAppendixNumInFigures	{ No			}
+
+    named @SectionNumInTables		{ No			}
+    named @SubSectionNumInTables	{ No			}
+    named @SubSubSectionNumInTables	{ No			}
+    named @AppendixNumInTables		{ No			}
+    named @SubAppendixNumInTables	{ No			}
+    named @SubSubAppendixNumInTables	{ No			}
+
+    named @SectionNumInRunners		{ Yes			}
+    named @SubSectionNumInRunners	{ No			}
+    named @SubSubSectionNumInRunners	{ No			}
+    named @AppendixNumInRunners		{ Yes			}
+    named @SubAppendixNumInRunners	{ No			}
+    named @SubSubAppendixNumInRunners	{ No			}
+
+    named @SectionPrefix		{			}
+    named @AppendixPrefix		{			}
+    named @ReferencesPrefix		{			}
+    named @IndexPrefix			{			}
+    named @IndexAPrefix			{			}
+    named @IndexBPrefix			{			}
+@Begin
+
+    #######################################################################
+    #                                                                     #
+    #  Lists of sections, sub(-sub)sections, appendices, etc.             #
+    #                                                                     #
+    #######################################################################
+
+    def @TextPlace { @Galley }
+
+    export num
+    def @SectionList named @Tag {} right num
+    {
+	@Galley
+        //@SectionGap	@SectionList @Next num
+    }
+
+    export num
+    def @SubSectionList named @Tag {} right num
+    {
+	@Galley
+        //@SubSectionGap    @SubSectionList @Next num
+    }
+
+    export num
+    def @SubSubSectionList named @Tag {} right num
+    {
+	@Galley
+        //@SubSubSectionGap @SubSubSectionList @Next num
+    }
+
+    export num
+    def @AppendixList named @Tag {} right num
+    {
+	@Galley
+        //@AppendixGap	@AppendixList @Next num
+    }
+
+    export num
+    def @SubAppendixList named @Tag {} right num
+    {
+	@Galley
+        //@SubAppendixGap   @SubAppendixList @Next num
+    }
+
+    export num
+    def @SubSubAppendixList named @Tag {} right num
+    {
+	@Galley
+        //@SubSubAppendixGap   @SubSubAppendixList @Next num
+    }
+
+
+    #######################################################################
+    #                                                                     #
+    #  @SendFull - send full-width text.                                  #
+    #                                                                     #
+    #######################################################################
+
+    def @SendFull force into { @FullPlace&&following }
+	right x
+    {
+	x
+    }
+
+
+    #######################################################################
+    #                                                                     #
+    #  Document.                                                          #
+    #                                                                     #
+    #######################################################################
+
+    def @Document
+        named @InitialFont { @InitialFont }
+        named @InitialBreak { @InitialBreak }
+        named @InitialSpace { @InitialSpace }
+        named @InitialLanguage { @InitialLanguage }
+	named @PageOrientation { @PageOrientation }
+        named @PageHeaders { @PageHeaders }
+        named @ColumnNumber { @ColumnNumber }
+        named @FirstPageNumber { @FirstPageNumber }
+	named @OptimizePages { @OptimizePages }
+	named @Unpaginated { No }
+    {
+	def @ReferencesPart
+	    named @Tag {}
+	{
+	    @LargeScaleStructure
+		tag { @Tag }
+		type { Major }
+		initiallanguage { @InitialLanguage }
+		title { @RefHeading @RefListTitle }
+		headingfont { @ReferencesHeadingFont }
+		headingbreak { @ReferencesHeadingBreak }
+		headingformat { @ReferencesHeadingFormat @Body }
+		incontents { @ReferencesInContents }
+		pnprefix { @ReferencesPrefix }
+		majornum {}
+		majortitle {}
+		minornum {}
+		minortitle { @RefHeading @RefListTitle }
+		inrunners { Yes }
+		sendheader { @Body }
+		aboveheadinggap { 0f }
+		{ //@RefListGap @ReferencesSection }
+
+	}
+
+        def @IndexPart
+	    named @Tag {}
+        {
+
+	    def @Run
+	    {
+		NonStart @Runner
+		    @MajorNum {}
+		    @MajorTitle { index @WordVal @IndexWord }
+		    @MinorNum {}
+		    @MinorTitle {}
+		    @Owner { @Tag }
+		    @Prefix { @IndexPrefix }
+	    }
+
+	    @LargeScaleStructure
+		tag { @Tag }
+		type { Major }
+		initiallanguage { @InitialLanguage }
+		title { index @WordVal @IndexWord }
+		headingfont { @IndexHeadingFont }
+		headingbreak { @IndexHeadingBreak }
+		headingformat { @IndexHeadingFormat @Body }
+		incontents { @IndexInContents }
+		pnprefix { @IndexPrefix }
+		inrunners { Yes }
+		majornum {}
+		majortitle {}
+		minornum {}
+		minortitle { index @WordVal @IndexWord }
+		sendheader { @SendFull @Body }
+		innergap { @SectionGap }
+		wantindefinite { Yes }
+		@IndexSection @Run
+
+        }
+
+        def @IndexAPart
+	    named @Tag {}
+        {
+	    def @Run
+	    {
+		NonStart @Runner
+		    @MajorNum {}
+		    @MajorTitle { index @WordVal @IndexAWord }
+		    @MinorNum {}
+		    @MinorTitle {}
+		    @Owner { @Tag }
+		    @Prefix { @IndexAPrefix }
+	    }
+
+	    @LargeScaleStructure
+		tag { @Tag }
+		type { Major }
+		initiallanguage { @InitialLanguage }
+		title { index @WordVal @IndexAWord }
+		headingfont { @IndexAHeadingFont }
+		headingbreak { @IndexAHeadingBreak }
+		headingformat { @IndexAHeadingFormat @Body }
+		incontents { @IndexAInContents }
+		pnprefix { @IndexAPrefix }
+		inrunners { Yes }
+		majornum {}
+		majortitle {}
+		minornum {}
+		minortitle { index @WordVal @IndexAWord }
+		sendheader { @SendFull @Body }
+		innergap { @SectionGap }
+		wantindefinite { Yes }
+		@IndexASection @Run
+
+        }
+
+        def @IndexBPart
+	    named @Tag {}
+        {
+	    def @Run
+	    {
+		NonStart @Runner
+		    @MajorNum {}
+		    @MajorTitle { index @WordVal @IndexBWord }
+		    @MinorNum {}
+		    @MinorTitle {}
+		    @Owner { @Tag }
+		    @Prefix { @IndexBPrefix }
+	    }
+
+	    @LargeScaleStructure
+		tag { @Tag }
+		type { Major }
+		initiallanguage { @InitialLanguage }
+		title { index @WordVal @IndexBWord }
+		headingfont { @IndexBHeadingFont }
+		headingbreak { @IndexBHeadingBreak }
+		headingformat { @IndexBHeadingFormat @Body }
+		incontents { @IndexBInContents }
+		pnprefix { @IndexBPrefix }
+		inrunners { Yes }
+		majornum {}
+		majortitle {}
+		minornum {}
+		minortitle { index @WordVal @IndexBWord }
+		sendheader { @SendFull @Body }
+		innergap { @SectionGap }
+		wantindefinite { Yes }
+		@IndexBSection @Run
+
+        }
+
+        def @DocumentBody force into { @ColPlace&&preceding }
+	    named @Optimize { @OptimizePages }
+        {
+	    # this whole comment is now obsolete:
+	    # It's important that the first component of @DocumentBody be
+	    # indefinite.  If it was definite, then @DocumentBody would
+	    # attach immediately to the first page.  This would prevent
+	    # @FullWidth from attaching to that page, with the result that
+	    # a document starting with @FullWidth would start on page 2!
+
+	    //  @FootNoteThrough @Do @BeginFootNoteCounter
+	    //	@TextPlace
+	    //@SectionGap @EndFigureList
+	    //@SectionGap @EndNoteList 1
+	    //@SectionGap @MakeReferences @Do @ReferencesPart
+	    //  @MakeIndexA @Do @IndexAPart
+	    //  @MakeIndexB @Do @IndexBPart
+	    //  @MakeIndex  @Do @IndexPart
+            //	NonStart @Runner
+        }
+
+        @InitialFont @Font @InitialBreak @Break @InitialLanguage @Language
+	@InitialSpace @Space { @ColourCommand @InitialColour } @SetColour
+        {
+		Yes @BeginAllCounters {}
+		Yes @BeginDisplayCounter {}
+		Yes @BeginFigureCounter {}
+		Yes @BeginTableCounter {}
+            //  @BackEnd @Case {
+
+		    PlainText @Yield {
+			@Unpaginated @Case {
+
+			    { Yes yes } @Yield {
+				@ContinuousPageList
+				    @Orient { @PageOrientation }
+			    }
+
+			    { No no } @Yield {
+				@PageList
+				    @ColumnNumber { @ColumnNumber }
+				    @PageHeaders { @PageHeaders }
+				    @Orient { @PageOrientation }
+				    extra { Yes }
+				    @FirstPageNumber
+			    }
+			}
+		    }
+
+		    else @Yield {
+			    @PageList
+				@ColumnNumber { @ColumnNumber }
+				@PageHeaders { @PageHeaders }
+				@Orient { @PageOrientation }
+				extra { Yes }
+				@FirstPageNumber
+		    }
+		}
+	    //  @DocumentBody
+        }
+    }
+
+    macro @Doc { @Document // }
+
+
+    #######################################################################
+    #                                                                     #
+    #  @Text containing sections, appendices, etc.                        #
+    #                                                                     #
+    #######################################################################
+
+    export @ContentsGoesHere @FullWidth
+	   @BeginSections @EndSections @Section
+	   @BeginAppendices @EndAppendices @Appendix
+    def @Text force into { @TextPlace&&preceding }
+        body @Body
+    {
+
+	def @ContentsGoesHere { @ContentsSection }
+
+	export @ContentsGoesHere
+	def @FullWidth body @Body
+	{
+	    def @ContentsGoesHere {}
+
+            @SendFull { Start @Runner // @Body }
+	    & NonStart @Runner & &2.1b &
+	}
+
+        def @EndSectionsPlace { @Galley }
+
+        def @EndSections force into { @EndSectionsPlace&&preceding }
+	{}
+
+        macro @BeginSections
+	{   //@SectionGap @SectionList @FirstSectionNumber
+	    // @EndSectionsPlace //
+	}
+
+        export @BeginSubSections @EndSubSections @SubSection @Title
+        def @Section force into { @SectionList&&preceding }
+            named @Tag {}
+            named @Title {}
+            named @RunningTitle { dft }
+	    named @InitialLanguage {}
+	    named @BypassNumber { dft }
+            body @Body
+        {
+
+            def @EndSubSectionsPlace { @Galley }
+
+            def @EndSubSections force into { @EndSubSectionsPlace&&preceding }
+	    {}
+
+            macro @BeginSubSections
+            {	//@SubSectionGap @SubSectionList @FirstSubSectionNumber
+		// @EndSubSectionsPlace //
+	    }
+
+            def @SectionShortNum
+	    {
+		@SectionNumbers @Then {
+		    @BypassNumber @Dft {
+			@SectionNumbers @Num @SectionList&&@Tag @Open { num }
+		    }
+		}
+	    }
+
+	    export @BeginSubSubSections @EndSubSubSections @SubSubSection
+            def @SubSection force into { @SubSectionList&&preceding }
+		named @Tag {}
+		named @Title {}
+		named @RunningTitle { dft }
+		named @InitialLanguage { @InitialLanguage }
+		named @BypassNumber { dft }
+		body @Body
+            {
+
+                def @EndSubSubSectionsPlace { @Galley }
+
+                def @EndSubSubSections force into
+		    { @EndSubSubSectionsPlace&&preceding }
+		{}
+
+                macro @BeginSubSubSections
+                {   //@SubSubSectionGap
+			@SubSubSectionList @FirstSubSubSectionNumber
+		    // @EndSubSubSectionsPlace //
+		}
+
+                def @SubSectionShortNum
+		{
+		    @SubSectionNumbers @Then {
+			@BypassNumber @Dft {
+			    @SectionShortNum @Join @SubSectionNumbers @Num
+			    { @SubSectionList&&@Tag @Open { num } }
+			}
+		    }
+		}
+
+		def @SubSubSection force into { @SubSubSectionList&&preceding }
+		    named @Tag {}
+		    named @Title {}
+		    named @RunningTitle { dft }
+		    named @InitialLanguage { @InitialLanguage }
+		    named @BypassNumber { dft }
+		    body @Body
+		{
+
+		    @LargeScaleStructure
+			tag { @Tag }
+			type { Minor }
+			initiallanguage { @InitialLanguage }
+			title { @Title }
+			runningtitle { @RunningTitle }
+			headingfont { @SubSubSectionHeadingFont }
+			headingbreak { @SubSubSectionHeadingBreak }
+			headingformat { @Num @SubSubSectionHeadingFormat @Body }
+			incontents { @SubSubSectionInContents }
+			contentsindent { 6f }
+			numbers { @SubSubSectionNumbers }
+			attachnum { @SubSubSectionList&&preceding @Tagged @Tag }
+			retrievenum { @SubSubSectionList&&@Tag @Open { num } }
+			bypassnumber { @BypassNumber }
+			prefix { @SubSectionShortNum }
+			majornum {}
+			majortitle {}
+			intheorems { @SubSubSectionNumInTheorems }
+			indisplays { @SubSubSectionNumInDisplays }
+			infigures { @SubSubSectionNumInFigures }
+			intables { @SubSubSectionNumInTables }
+			inrunners { @SubSubSectionNumInRunners }
+			@Body
+
+	        }
+
+		@LargeScaleStructure
+		    tag { @Tag }
+		    type { Minor }
+		    initiallanguage { @InitialLanguage }
+		    title { @Title }
+		    runningtitle { @RunningTitle }
+		    headingfont { @SubSectionHeadingFont }
+		    headingbreak { @SubSectionHeadingBreak }
+		    headingformat { @Num @SubSectionHeadingFormat @Body }
+		    incontents { @SubSectionInContents }
+		    contentsindent { 3f }
+		    numbers { @SubSectionNumbers }
+		    attachnum { @SubSectionList&&preceding @Tagged @Tag }
+		    retrievenum { @SubSectionList&&@Tag @Open { num } }
+		    bypassnumber { @BypassNumber }
+		    prefix { @SectionShortNum }
+		    majornum {}
+		    majortitle {}
+		    intheorems { @SubSectionNumInTheorems }
+		    indisplays { @SubSectionNumInDisplays }
+		    infigures { @SubSectionNumInFigures }
+		    intables { @SubSectionNumInTables }
+		    inrunners { @SubSectionNumInRunners }
+		    @Body
+
+            }
+
+            @LargeScaleStructure
+                tag { @Tag }
+                type { Minor }
+                initiallanguage { @InitialLanguage }
+                title { @Title }
+                runningtitle { @RunningTitle }
+                headingfont { @SectionHeadingFont }
+                headingbreak { @SectionHeadingBreak }
+                headingformat { @Num @SectionHeadingFormat @Body }
+                incontents { @SectionInContents }
+                numbers { @SectionNumbers }
+                attachnum { @SectionList&&preceding @Tagged @Tag }
+                retrievenum { @SectionList&&@Tag @Open { num } }
+		pnprefix { @SectionPrefix }
+		majornum {}
+		majortitle {}
+                bypassnumber { @BypassNumber }
+                intheorems { @SectionNumInTheorems }
+                indisplays { @SectionNumInDisplays }
+                infigures { @SectionNumInFigures }
+                intables { @SectionNumInTables }
+                inrunners { @SectionNumInRunners }
+                @Body
+
+        }
+
+        def @EndAppendicesPlace { @Galley }
+
+        def @EndAppendices force into { @EndAppendicesPlace&&preceding }
+	{}
+
+        macro @BeginAppendices
+        {   //@AppendixGap @AppendixList @FirstAppendixNumber
+	    // @EndAppendicesPlace //
+	}
+
+	export @BeginSubAppendices @EndSubAppendices @SubAppendix
+	def @Appendix force into { @AppendixList&&preceding }
+            named @Tag {}
+            named @Title {}
+            named @RunningTitle { dft }
+	    named @InitialLanguage {}
+	    named @BypassNumber { dft }
+            body @Body
+	{
+
+            def @EndSubAppendicesPlace { @Galley }
+
+            def @EndSubAppendices force into
+		{ @EndSubAppendicesPlace&&preceding }
+	    {}
+
+            macro @BeginSubAppendices
+            {	//@SubAppendixGap @SubAppendixList @FirstSubAppendixNumber
+		// @EndSubAppendicesPlace //
+	    }
+
+            def @AppendixShortNum
+            {
+		@AppendixNumbers @Then {
+		    @BypassNumber @Dft {
+			@AppendixNumbers @Num @AppendixList&&@Tag @Open { num }
+		    }
+		}
+            }
+
+            export @BeginSubSubAppendices @EndSubSubAppendices @SubSubAppendix
+            def @SubAppendix force into { @SubAppendixList&&preceding }
+		named @Tag {}
+		named @Title {}
+		named @RunningTitle { dft }
+		named @InitialLanguage { @InitialLanguage }
+		named @BypassNumber { dft }
+		body @Body
+            {
+
+		def @EndSubSubAppendicesPlace { @Galley }
+
+		def @EndSubSubAppendices force into
+		    { @EndSubSubAppendicesPlace&&preceding }
+		{}
+
+		macro @BeginSubSubAppendices
+		{   //@SubSubAppendixGap
+			@SubSubAppendixList @FirstSubSubAppendixNumber
+		    // @EndSubSubAppendicesPlace //
+		}
+
+		def @SubAppendixShortNum
+		{
+		    @SubAppendixNumbers @Then {
+			@BypassNumber @Dft {
+			    @AppendixShortNum @Join @SubAppendixNumbers @Num
+			    { @SubAppendixList&&@Tag @Open { num } }
+			}
+		    }
+		}
+
+		def @SubSubAppendix force into {@SubSubAppendixList&&preceding}
+		    named @Tag {}
+		    named @Title {}
+		    named @RunningTitle { dft }
+		    named @InitialLanguage { @InitialLanguage }
+		    named @BypassNumber { dft }
+		    body @Body
+		{
+
+		    @LargeScaleStructure
+			tag { @Tag }
+			type { Minor }
+			initiallanguage { @InitialLanguage }
+			title { @Title }
+			runningtitle { @RunningTitle }
+			headingfont { @SubSubAppendixHeadingFont }
+			headingbreak { @SubSubAppendixHeadingBreak }
+			headingformat { @Num @SubSubAppendixHeadingFormat @Body }
+			incontents { @SubSubAppendixInContents }
+			contentsindent { 6f }
+			numbers { @SubSubAppendixNumbers }
+			attachnum { @SubSubAppendixList&&preceding @Tagged @Tag }
+			retrievenum { @SubSubAppendixList&&@Tag @Open { num } }
+			bypassnumber { @BypassNumber }
+			prefix { @SubAppendixShortNum }
+			majornum {}
+			majortitle {}
+			intheorems { @SubSubAppendixNumInTheorems }
+			indisplays { @SubSubAppendixNumInDisplays }
+			infigures { @SubSubAppendixNumInFigures }
+			intables { @SubSubAppendixNumInTables }
+			inrunners { @SubSubAppendixNumInRunners }
+			@Body
+
+		}
+
+		@LargeScaleStructure
+		    tag { @Tag }
+		    type { Minor }
+		    initiallanguage { @InitialLanguage }
+		    title { @Title }
+		    runningtitle { @RunningTitle }
+		    headingfont { @SubAppendixHeadingFont }
+		    headingbreak { @SubAppendixHeadingBreak }
+		    headingformat { @Num @SubAppendixHeadingFormat @Body }
+		    incontents { @SubAppendixInContents }
+		    contentsindent { 3f }
+		    numbers { @SubAppendixNumbers }
+		    attachnum { @SubAppendixList&&preceding @Tagged @Tag }
+		    retrievenum { @SubAppendixList&&@Tag @Open { num } }
+		    bypassnumber { @BypassNumber }
+		    prefix { @AppendixShortNum }
+		    majornum {}
+		    majortitle {}
+		    intheorems { @SubAppendixNumInTheorems }
+		    indisplays { @SubAppendixNumInDisplays }
+		    infigures { @SubAppendixNumInFigures }
+		    intables { @SubAppendixNumInTables }
+		    inrunners { @SubAppendixNumInRunners }
+		    @Body
+	    }
+
+	    @LargeScaleStructure
+		tag { @Tag }
+		type { Minor }
+		initiallanguage { @InitialLanguage }
+		title { @Title }
+		runningtitle { @RunningTitle }
+		headingfont { @AppendixHeadingFont }
+		headingbreak { @AppendixHeadingBreak }
+		headingformat { @Num @AppendixHeadingFormat @Body }
+		incontents { @AppendixInContents }
+		contentsindent { 0f }
+		word { appendix @WordVal @AppendixWord }
+		numbers { @AppendixNumbers }
+		attachnum { @AppendixList&&preceding @Tagged @Tag }
+		retrievenum { @AppendixList&&@Tag @Open { num } }
+		pnprefix { @AppendixPrefix }
+		majornum {}
+		majortitle {}
+		bypassnumber { @BypassNumber }
+		intheorems { @AppendixNumInTheorems }
+		indisplays { @AppendixNumInDisplays }
+		infigures { @AppendixNumInFigures }
+		intables { @AppendixNumInTables }
+		inrunners { Yes }
+		@Body
+
+	}
+
+	//  Start @Runner
+	//  @Body
+	//  NonStart @Runner
+
+    }
+
+@End @OrdinarySetup

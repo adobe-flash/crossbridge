@@ -1,0 +1,51 @@
+##===- Makefile.nagfortran ---------------------------------*- Makefile -*-===##
+#
+#                     The LLVM Compiler Infrastructure
+#
+# This file is distributed under the University of Illinois Open Source
+# License. See LICENSE.TXT for details.
+# 
+#===------------------------------------------------------------------------===#
+#
+# Enable running Fortran programs with LLVM by using NAGWare Fortran front-end
+# to convert it to C.
+#
+##===----------------------------------------------------------------------===##
+
+include $(LEVEL)/Makefile.config
+
+# Make sure the correct targets come first.
+ifdef TEST
+test::
+else
+all::
+endif
+
+ifneq ($(USE_F95),1)
+all test::
+	echo "NAG Fortran is not support?"
+	exit 1
+endif
+
+.PRECIOUS: %.c
+
+clean::
+	rm -f $(patsubst %.f,%.c, $(filter %.f,$(Source))) \
+	      $(patsubst %.F,%.c, $(filter %.F,$(Source))) \
+	      $(patsubst %.f90,%.c, $(filter %.f90,$(Source))) \
+	      $(patsubst %.F90,%.c, $(filter %.F90,$(Source)))
+
+%.c: %.f
+	-$(F95) -w -S -O2 $< -o $@ $(NAGFORTRAN_FLAGS)
+
+%.f: %.F
+	-$(PROJ_SRC_ROOT)/filepp $< -o $@ -M $(SPEC_BENCH_DIR)/src/ $(FPPFLAGS)
+
+%.c: %.f90
+	-$(F95) -w -S -O2 $< -o $@ $(NAGFORTRAN_FLAGS)
+
+%.f90: %.F90
+	-$(PROJ_SRC_ROOT)/filepp $< -o $@ -M $(SPEC_BENCH_DIR)/src/ $(FPPFLAGS)
+
+CPPFLAGS += -I$(F95_DIR)/lib/NAGWare 
+LDFLAGS += $(F95_DIR)/lib/NAGWare/quickfit.o -Xlinker -flat_namespace $(F95_DIR)/lib/NAGWare/libf97.dylib $(F95_DIR)/lib/NAGWare/libf96.a

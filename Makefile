@@ -322,10 +322,14 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(MAKE) abclibs
+	@$(SDK_MAKE) abclibs_compile
 	@rm -rf $(BUILD)/test_pthreads_c_swf
 	@mkdir -p $(BUILD)/test_pthreads_c_swf
 	cd $(BUILD)/test_pthreads_c_swf && $(SDK_CC) -O0 -pthread -emit-swf -save-temps $(SRCROOT)/test/pthread_test.c -o pthread_test.swf
+
+# Development target
+all_dev2:
+	@$(SDK_MAKE) llvmtests
 
 # Clean build outputs
 clean:

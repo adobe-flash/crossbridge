@@ -1,0 +1,2114 @@
+<!--
+<!DOCTYPE DocBook>
+
+< kimwitu++ part II: manual >
+-->
+
+<chapter><title>Definition of Phyla</title>
+  <sect1><title>Basic Definition</title>
+    <para>A phylum definition consists of two sides. The left-hand side
+      specifies the phylum name, the right-hand side, behind a colon, a set of
+      alternative operators, which are separated by bars. An operator is
+      followed by a matching pair of parentheses, which may enclose a list of
+      phyla as arguments. A nullary operator has an empty list.
+      Example <xref linkend="exa:phylumdef"/> presents a basic definition with
+      operators of different arity.
+      Before the semicolon closing the definition an attribute block may appear.
+      The definition of a phylum follows the general form:</para>
+    <informalexample>
+      <programlisting role="none">
+<![CDATA[  phylum   := phylum_name ":" operator { "|" operator } [ attributes ] ";"
+  operator := operator_name "(" [ phylum_name ] { " " phylum_name } ")"]]>
+      </programlisting>
+    </informalexample>
+    <para>For the names of phyla and operators, the same restrictions hold as
+      for &cpp; identifiers.
+      Multiple definitions of of a phylum with the same name are interpreted
+      as additional alternative branches of the first definition.</para>
+    <para>There are some simple predefined phyla:
+      <classname>integer</classname><indexterm significance="preferred"><primary>integer</primary></indexterm>, <classname>real</classname><indexterm significance="preferred"><primary>real</primary></indexterm>,
+      <classname>casestring</classname><indexterm significance="preferred"><primary>casestring</primary></indexterm>,
+      and <classname>nocasestring</classname><indexterm significance="preferred"><primary>nocasestring</primary></indexterm>, representing integer values,
+      real values, case sensitive
+      strings, and case insensitive strings respectively. Terms of these are not
+      created by calls of operators but of special generated functions:
+      <function>mkinteger()</function><indexterm><primary>mkinteger</primary></indexterm>,
+      <function>mkreal()</function><indexterm><primary>mkreal</primary></indexterm>,
+      <function>mkcasestring()</function><indexterm><primary>mkcasestring</primary></indexterm> and
+      <function>mknocasestring()</function><indexterm><primary>mknocasestring</primary></indexterm>.
+    </para>
+    <para>The phylum 
+      <classname>abstract_phylum</classname> represents the direct base of all
+      phyla. Adding properties, like attributes or methods, to it makes them
+      available for all phyla. Other direct bases may be specified for a phylum
+      by using the keyword
+      <constant>%base</constant><indexterm significance="preferred"><primary>%base</primary></indexterm>.
+      One of them has to be derived from <classname>abstract_phylum</classname>,
+      not necessarily directly. Example <xref linkend="exa:base"/> makes phylum
+      <classname>math_expression</classname> to be derived from a phylum
+      <classname>expression</classname> and a user defined &cpp; class
+      <classname>counter_class</classname>. </para>
+    <example id="exa:phylumdef">
+      <title>Definition of a Phylum</title>
+      <programlisting>
+<![CDATA[expression:
+      Plus   ( expression expression )
+    | Neg    ( expression )
+    | Null   ( ) ;]]>
+      </programlisting>
+    </example>
+        <example id="exa:base">
+      <title>Changing base of a phylum</title>
+      <indexterm><primary>%base</primary></indexterm>
+      <programlisting>
+<![CDATA[  %base math_expression : expression, counter_class;
+
+  %{ KC_TYPES_HEADER /* code redirection */
+    class counter_class {
+      ...
+    };
+  %}]]>
+      </programlisting>
+    </example>
+  </sect1>
+  <sect1>
+    <title>List Phyla<indexterm id="idx:list_man" significance="preferred"
+	class="startofrange"><primary>list</primary></indexterm></title>
+    <indexterm><primary>phylum</primary><secondary>list</secondary><see>list</see></indexterm>
+    <para>A list phylum can be defined by using the basic form of phylum
+      definitions in a (right-) recursive way. The nullary operator constructs
+      a list which is empty, and the binary, a list which is concatenated of
+      a single list element and a list.
+      The other variant uses the predefined operator <constant>list</constant>
+      after which is specified the phylum of the list elements. The latter
+      notation is to prefer because it is concise and causes the generation of
+      additional list functions. That includes two operators which are named
+      according to the scheme which is used in the right-recursive definition
+      (prefixes <constant>Nil</constant> and
+      <constant>Const</constant>). Other names could be chosen as
+      well but this may cause some confusion. With either variants, a term is
+      created by calling one of the two operators.
+      The two definitions in example <xref linkend="exa:listdef"/> yield the
+      same list of elements of a phylum <classname>expression</classname>.
+    </para>
+    <example id="exa:listdef">
+      <title>Alternative Definitions of one List</title>
+      <programlisting>
+<![CDATA[  expression_list:
+      Nilexpression_list  ( )
+    | Consexpression_list ( expression expression_list )
+    ;
+
+  expression_list: list expression;]]>
+      </programlisting>
+    </example>
+    <indexterm class="endofrange" startref="idx:list_man"/>
+  </sect1>
+  <sect1><title>Attributes of Phyla<indexterm significance="preferred" class="startofrange" id="idx:attributes"><primary>attributes</primary></indexterm></title>
+    <para>A phylum definition may have an attribute part attached which is
+      enclosed in braces. It contains declarations of attributes of phylum types
+      or other &cpp; types and optionally their initial value assignment. After
+      that arbitrary &cpp; code can follow again enclosed in braces. This is the
+      general form of the attribute part:</para>
+    <informalexample>
+      <programlisting role="none">
+<![CDATA[  attributes := "{" {attr_type " " attr_name [ "=" init_value ] ";"} [ cpp_part ] "}"
+  cpp_part   := "{" arbitrary_cpp_code "}"]]>
+      </programlisting>
+    </informalexample>
+    <para>In particular, the initialization of attributes can be done in the
+      &cpp; part too; though technically then it is not initialization, but
+      assignment. Attributes may also be defined outside the phylum
+      definition according to the general form beneath.</para>
+    <informalexample>
+      <programlisting role="none">
+<![CDATA[  attributes := "%attr " attr_type phylum_name "::" attr_name ";"
+  members := "%member " attr_type phylum_name "::" attr_name ";"]]>
+      </programlisting>
+    </informalexample>
+    <para>Only attributes of phylum types can be defined with
+      <constant>%attr</constant><indexterm><primary>%attr</primary></indexterm>.
+      This is because they are considered part of the enclosing phylum by &kpp;.
+      When a term is written to a file using the CSGIO functions (see <xref
+	linkend="sec:csgiofuncs"/>), its
+      attributes are saved and can thus be restored.</para>
+    <para>Using the keyword
+      <constant>%member</constant><indexterm><primary>%member</primary></indexterm>
+      instead allows also &cpp; types to be used. The values of attributes
+      defined in this way will get lost when their term is written to a
+      file.  Restoring a saved term will assign the initial values to all
+      <constant>%member</constant> attributes.</para>
+    <para>The &cpp; code is executed after the term creation and the attribute
+      initializations. Inside that code the newly created term can be referred
+      to as
+      <varname>$0</varname><indexterm><primary>$0</primary></indexterm>.
+      Attributes are accessed via the operator
+      <constant><![CDATA[->]]></constant>. Each predefined phylum has an
+      attribute which holds its value, which is <varname>value</varname> for
+      <classname>integer</classname><indexterm><primary>integer</primary></indexterm>
+      and
+      <classname>real</classname><indexterm><primary>real</primary></indexterm>,
+      and <varname>name</varname> for
+      <classname>casestring</classname><indexterm><primary>casestring</primary></indexterm>
+      and
+      <classname>nocasestring</classname><indexterm><primary>nocasestring</primary></indexterm>.
+      Example <xref linkend="exa:alter"/> shows three alternative ways to define
+      and initialize one attribute (of &cpp; type). </para>
+    <example id="exa:alter">
+      <title>Alternative Definitions of one Attribute</title>
+      <programlisting>
+<![CDATA[  expression: Div ( expression expression )
+    { bool is_valid = true; };
+
+  expression: Div ( expression expression )
+    { bool is_valid; 
+      { $0 -> is_valid = true; } };
+
+  expression: Div ( expression expression );
+  %member bool expression::is_valid = true;]]>
+      </programlisting>
+    </example>
+    <indexterm class="endofrange" startref="idx:attributes"/>
+  </sect1>
+  <sect1><title>Supplemental Definitions</title>
+    <para>It is possible to supplement the classes which will be generated from
+      phylum definitions with additional methods. These are defined as usual but
+      have as qualifier the name of either a phylum or of an operator. Such a
+      method is known for all terms of the phylum or only for those constructed
+      by the specified operator. Predefined phyla can get additional methods
+      too. </para>
+    <example id="exa:methods">
+      <title>Additional Methods Definitions</title>
+      <programlisting>
+<![CDATA[  bool aritherm::equals( aritherm a ) {...}
+
+  int Number::get_int( ) {...}
+
+  nocasestring casestring::convert_to_nocase( ) {...}]]>
+      </programlisting>
+    </example>
+    <para>It may appear desirable to initialize
+      attributes<indexterm> <primary>attributes</primary></indexterm> of a phylum
+      with non-default values immediately at term creation. This can be realized
+      by using the &kpp; keyword <constant>%ctor</constant><indexterm
+	significance="preferred"><primary>%ctor</primary></indexterm> to define
+      own constructors which will replace the default ones. Additional
+      constructors are possible for phyla as well as for operators, but not for
+      predefined phyla. </para>
+    <para>
+      If these constructors are defined to have arguments then of some points
+      are to take note. First, when used with operators the arguments will be
+      added to those in the operator definition. Second, since the default
+      constructors are replaced but relied on by some internal mechanism, the
+      user has to define new ones or alternatively just provide default values
+      for all new arguments. The latter may cause performance loss in the case
+      of many or non-simple arguments.</para>
+    <para>The keyword <constant>%dtor</constant><indexterm
+	significance="preferred"><primary>%dtor</primary></indexterm> allows
+      own destructor definitions for freeing memory of attributes or something
+      similar. It is applicable to phyla and operators but not to predefined
+      phyla.</para>
+    <example id="exa:cdtor">
+      <title>User provided Constructors and Destructors</title>
+      <programlisting>
+<![CDATA[  %ctor simpleterm( int i ) {...}
+  %ctor simpleterm( ) {...}
+
+  %ctor Minus( bool neg = true ) {...}
+  // Minus now has 3 arguments, but the third is optional
+  
+  %dtor virtual term( ) {...}]]>
+      </programlisting>
+    </example>
+  </sect1>
+  <sect1><title>Phylum Storage Options</title>
+    <indexterm><primary>storage options</primary><see>storage class</see></indexterm>
+    <indexterm id="idx:storage" class="startofrange"><primary>storage class</primary></indexterm>
+    <para>For every phylum a &cpp; class is generated, with one create-method for
+      every operator. A term is created by calling the appropriate method, which
+      returns a pointer to the object representing the term. As a default for
+      every such object a new cell is allocated in memory. But the user may
+      influence the memory management for optimization purposes. At phylum
+      definition time the phylum can be declared to use a special storage class.
+      There is one predefined storage class: <constant>uniq</constant><indexterm
+	significance="preferred" class="startofrange" id="uniq"><primary>uniq</primary></indexterm>.
+      It is allowed to specify <constant>!uniq</constant> what is the same as
+      specifying nothing and results in usage of the default storage.
+      Subphyla of a phylum with storage class can not use the default storage,
+      but
+      must be defined with a storage class too. The completed
+      general form of a phylum definition is the following one.</para>
+    <informalexample>
+      <programlisting role='none'>
+<![CDATA[  phylum := phylum_name [ "{" storage_class "}" ] ":" operator 
+	    { "|" operator } [ attributes ] ";"]]>
+      </programlisting>
+    </informalexample>
+    <example id="exa:storage">
+      <title>Phylum with Storage Class</title>
+      <programlisting>
+<![CDATA[  aritherm    {!uniq} : Plus	( aritherm aritherm );
+
+  simpleterm  {uniq}  : Number	( integer );]]>
+      </programlisting>
+    </example>
+    <para>The first phylum in example <xref linkend="exa:storage"/> declares
+      explicitly to use the default storage. All other phyla defined until now
+      got that implicitly. Memory of such terms can be freed individually,
+      terms of the second phylum can not. They are kept under
+      <constant>uniq</constant> storage. What does this mean?
+      Each storage class has a <indexterm><primary>hashtables</primary>
+      </indexterm> hashtable assigned. All terms
+      of phyla with that class are stored there. If a term is to be created the
+      create routine does conditionally allocate new storage. It
+      checks first whether there is already stored an object created with the
+      same arguments. If found true, the routine will return a pointer to that
+      object in memory. Such every term is created only once. All predefined
+      phyla, such as <classname>integer</classname>, are declared
+      <constant>uniq</constant><indexterm
+	significance="preferred" class="endofrange" startref="uniq"/>. So the
+      example has the effect that if two &simpleterm;s are created from the
+      same <constant>int</constant> value they will both point to the same
+      memory cell.</para>
+    <para>It is possible to define additional storage classes, which each get
+      their own table. Tables also can be explicitly created and assigned to
+      storage classes, as well as cleared or freed (see <xref
+	linkend="sec:hashtable"/>).
+      Example <xref linkend="exa:ownstorage"/> declares two additional storage
+      classes and defines two phyla using them.
+      </para>
+    <example id="exa:ownstorage">
+      <title>Storage Class Definition and Application</title>
+      <programlisting>
+<![CDATA[  %storageclass table1 table2;
+
+  intermediate {table1}: Div	( aritherm aritherm );
+
+  final	       {table2}: Ident  ( casestring );]]>
+      </programlisting>
+    </example>
+    <!-- Always move to end of enclosing chapter -->
+    <para><indexterm class="endofrange" startref="idx:storage"/></para>
+  </sect1>
+</chapter>
+
+<chapter><title>Processing phyla</title>
+  <sect1>
+    <title>Pattern Matching<indexterm
+	significance="preferred"><primary>patterns</primary></indexterm></title>
+    <para>Patterns make it easier to select terms and subterms and to
+      distinguish cases. They appear in rules for rewriting and unparsing and in
+      &with;- and &foreach;-statements. Here there are explained common features
+      while the slight differences will be mentioned in the appropriate place.
+    </para>
+    <para>The term &lsquo;pattern&rsquo; can be defined through induction.
+      Each of the following is a pattern in the context of &kpp;:
+    </para>
+    <orderedlist>
+      <listitem id="i:patternlit"><para>the literal of a predefined phylum or the
+	  asterisk sign,</para></listitem>
+      <listitem><para>the phylum operator with zero or more patterns as arguments,</para>
+      </listitem>
+      <listitem><para>the assignment of a pattern to a variable, and</para>
+      </listitem>
+      <listitem id="i:patternenum"><para>the enumeration of patterns delimited by
+	  commas.</para></listitem>
+    </orderedlist>
+    <para>Additionally some restrictions hold regarding the use of patterns. The
+      patterns of item <xref linkend="i:patternlit"/> are not allowed as the
+      outermost pattern, while these of item  <xref linkend="i:patternenum"/>
+      are allowed only as the outermost pattern. The assignment of an asterisk
+      to a variable can be abbreviated by stating only the variable.</para>
+    <para>If more than one pattern matches a term, the most specific pattern is
+      chosen. If there is no most specific one, the first of the matches is
+      chosen. The matched term can be accessed
+      as <varname>$0</varname><indexterm><primary>$0</primary></indexterm>,
+      its first subterm<indexterm><primary>subterm</primary></indexterm> as
+      <varname>$1</varname>, the second as <varname>$2</varname> etc. (not in
+      rewrite rules). Table <xref linkend="tab:patterns"/> lists pattern
+      examples, which are in each group equally specific. &kpp; is
+      not yet able to decide between more
+      complex patterns (maybe partly overlapping each other) which to be most
+      specific, but chooses the first found.</para>
+    <table id="tab:patterns"><title>Pattern groups increasingly specific</title>
+      <tgroup cols='2' align='left' colsep='1' rowsep='1'>
+	<?latex-table-type tabularx?>
+	<?latex-table-option {\textwidth}?>
+	<?latex-table-head p{0.33\textwidth}X?>
+	<colspec colname='c1'/>
+	<colspec colname='c2'/>
+	<thead>
+	  <row>
+	    <entry>pattern</entry>
+	    <entry>matches</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry><constant>*</constant></entry>
+	    <entry>any term; not allowed as the outermost pattern.</entry>
+	  </row>
+	  <row>
+	    <entry>&mdash;</entry>
+	    <entry>&mdash;</entry>
+	  </row>
+	  <row>
+	    <entry><constant>SimpleTerm</constant></entry>
+	    <entry>term <constant>SimpleTerm</constant> with an unspecified
+	      number of subterms; only allowed as the outermost pattern.</entry>
+	  </row>
+	  <row>
+	    <entry><constant>SimpleTerm(*)</constant></entry>
+	    <entry>term <constant>SimpleTerm</constant> with a subterm.</entry>
+	  </row>
+	  <row>
+	    <entry><constant>a=SimpleTerm(b)</constant></entry>
+	    <entry>term <constant>SimpleTerm</constant> with a subterm; the term
+	      is assigned to a variable <varname>a</varname>, the subterm, to
+	      <varname>b</varname>.</entry>
+	  </row>
+	  <row>
+	    <entry><constant>Number(7)</constant></entry>
+	    <entry>term <constant>Number</constant> with an
+	      <classname>integer</classname> subterm of value the
+	      <literal>7</literal>.</entry>
+	  </row>
+	  <row>
+	    <entry><constant>SimpleTerm(*),Mul(b,b)</constant></entry>
+	    <entry>either term <constant>SimpleTerm</constant> with a subterm or
+	      term <constant>Mul</constant> with two subterms which are
+	      structurally equal (the first of the two is assigned to
+	      <varname>b</varname>).</entry>
+	  </row>
+	  <row>
+	    <entry>&mdash;</entry>
+	    <entry>&mdash;</entry>
+	  </row>
+	  <row>
+	    <entry><constant>SimpleTerm(Number(*))</constant></entry>
+	    <entry>term <constant>SimpleTerm</constant> with a subterm being a
+	      <constant>Number</constant>.</entry>
+	  </row>
+	  <row>
+	    <entry><constant>a=SimpleTerm(Number(b))</constant></entry>
+	    <entry>term <constant>SimpleTerm</constant> with a subterm being a
+	      <constant>Number</constant>; the term is
+	      assigned to <varname>a</varname> and the sub-subterm to
+	      <varname>b</varname>.</entry>
+	  </row>
+	  <row>
+	    <entry>&mdash;</entry>
+	    <entry>&mdash;</entry>
+	  </row>
+	  <row>
+	    <entry><constant><![CDATA[SimpleTerm(Number(b)) 
+		provided (b->value!=0)]]></constant></entry>
+	    <entry>term <constant>SimpleTerm</constant> with a subterm
+	      being a <constant>Number</constant>, which is
+	      assigned to <varname>b</varname>, but matches only if the
+	      <classname>integer</classname> <varname>b</varname> is not zero.
+	      </entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
+  </sect1>
+
+  <sect1 id="sec:statements"><title>&kpp; Control Structures</title>
+    <para>&kpp; provides two control structures which help dealing with
+      terms: the
+      &with;<indexterm significance="preferred"><primary>&with;</primary></indexterm>-statement and the
+      &foreach;<indexterm significance="preferred"><primary>&foreach;</primary></indexterm>-statement. They appear in
+      different variants, fitting slightly different purposes. </para>
+    <sect2><title>Explicit
+	&with;<indexterm><primary>&with;</primary><secondary>explicit</secondary></indexterm></title>
+      <para>The &with;-statement is similar to a &cpp;
+	<constant>switch</constant>
+	and decides for a given term which alternative branch to choose. The
+	alternatives are patterns describing &kind;s of one phylum and have
+	assigned a &cpp; block, maybe an empty one.</para>
+      <para>The example <xref linkend="exa:withex"/> lists a code piece
+	containing an explicitly stated &with;. It decides whether the term
+	<varname>a</varname> is an identifier or a number and executes its code.
+	That term is accessable throughout the whole &with; body unless
+	an other term is assigned to the variable <varname>a</varname>, as it is
+	done in the second case. There, variable <varname>a</varname> gets
+	assigned the subterm of the <constant>Number</constant>.
+	The special pattern <constant>default</constant> matches when the
+	preceding patterns do not. Here this would never occur, because a
+	&simpleterm; is defined to be one of the two specified.
+	If no default case is specified and none of the patterns matches the
+	term a runtime exception is released (program execution aborted).
+	The pattern <constant>default</constant> is allowed in all
+	&with;-variants (implicit-, explicit-, and &foreach;-&with;).</para>
+      <example id="exa:withex">
+	<title>Explicit &with;</title>
+	<programlisting>
+<![CDATA[  simpleterm a;
+  ...
+  with( a ){
+    Ident( * )	    : { $0 -> computable = false; }
+    c=Number( a )   : { c -> computable = true; c -> result = a -> value; }
+    default	    : { // never reached, because simpleterm has only
+			// the above two ]]>&kind;<![CDATA[s
+		      }
+  }
+	  ]]>
+	</programlisting>
+      </example>
+    </sect2>
+    <sect2><title>Implicit
+	&with;<indexterm><primary>&with;</primary><secondary>implicit</secondary></indexterm></title>
+      <para>If a function is defined to have a phylum argument whose variable
+	name begins with a dollar sign, the function body is assumed to be
+	the body of an implicitly given &with;-statement. Example <xref 
+	linkend="exa:withim"/> presents a function which returns
+	<literal>true</literal> if the given &aritherm;
+	matches one of
+	the specified patterns, that is represents an arithmetic term. If the
+	term has the &kind; <constant>SimpleTerm</constant>, the default case
+	would catch.</para>
+      <example id="exa:withim">
+	<title>Implicit &with;</title>
+	<programlisting>
+<![CDATA[  bool is_arithmetic_term( aritherm $a ) {
+    Plus, Minus, Mul, Div:    { return true; }
+    default:	              { return false; }
+  }
+	  ]]>
+	</programlisting>
+      </example>
+    </sect2>
+    <sect2><title>Simple &foreach;</title>
+      <para>The &foreach;-statement is a loop which runs over all elements of a
+	term which is a list phylum and executes at every run the code which is
+	specified in the statement body.</para>
+      <para>The &foreach; in example <xref linkend="exa:simpleforeach"/> counts
+	the appearances of arithmetic terms by calling the function
+	<function>is_arithmetic_term</function> for <varname>a</varname>
+	during each run. This variable holds the current list element.</para>
+      <example id="exa:simpleforeach">
+	<title>Simple foreach</title>
+	<programlisting>
+<![CDATA[  int count = 0;
+  foreach( a; arithermlist A ) {
+    if( is_arithmetic_term( a ) ) count++;
+  }
+	  ]]>
+	</programlisting>
+      </example>
+    </sect2>
+    <sect2><title>&foreach;-&with;<indexterm><primary>&foreach;-&with;</primary></indexterm></title>
+      <para>This foreach variant also steps through a list, but performs a
+	&with; for every element. A dollar prefixed list variable is used
+	instead of a simple variable. The statement body contains patterns with
+	a &cpp; block assigned to each.
+	Example <xref linkend="exa:foreachwith"/>
+	demonstrates the usage. It counts the number of sums and differences
+	within the term list.</para>
+      <example id="exa:foreachwith">
+	<title>&foreach;-&with;</title>
+	<programlisting>
+<![CDATA[  int num_plus = 0;
+  int num_minus = 0;
+  foreach( $a; arithermlist A ) {
+    Plus:   { num_plus++; }
+    Minus:  { num_minus++; }
+  }
+	  ]]>
+	</programlisting>
+      </example>
+    </sect2>
+    <sect2><title>&foreach; with Pattern</title>
+      <para>This third variant of &foreach; allows to specify a pattern instead
+	of
+	a list variable. The action is executed only for those list elements
+	which match the pattern. Thus it combines &foreach; and an implicit
+	&with; containing only one pattern of interest. Example <xref
+	linkend="exa:foreachpat"/> is similar to example <xref
+	linkend="exa:foreachwith"/> but it counts only the number of sums in the
+	list.</para>
+      <example id="exa:foreachpat">
+	<title>&foreach; with Pattern</title>
+	<programlisting>
+<![CDATA[  int num_plus = 0;
+  foreach( Plus( *, * ); arithermlist A ) {
+    num_plus++;
+  }
+	  ]]>
+	</programlisting>
+      </example>
+    </sect2>
+    <sect2><title>Multiple Patterns<indexterm><primary>multiple
+	    patterns</primary></indexterm></title>
+      <para>For every one of the preceding statements it is possible to specify
+	not only one but multiple variables or patterns respectively. Used with
+	&foreach;, multiple lists can be iterated over at one time. The
+	variables or patterns are separated by ampersand signs (&amp;), the list
+	specifications by commas. Used with &with;, multiple terms can be
+	checked at one time whether matching complex patterns. Here, the
+	variables are separated by commas.</para>
+      <para>The complex patterns are made up by concatenating
+	single patterns by ampersand signs
+	(&amp;)<indexterm><primary>&amp;</primary></indexterm>, where the first
+	pattern has to match the first term, the second the second term (and so
+	on) to have the complex pattern to match. A complex pattern can also be
+	a grouping of patterns, but then it must be enclosed in
+	parentheses.</para>
+      <para>Example <xref linkend="exa:multipat"/> shows a &with; over two
+	variables. The statement simply prints out whether the two terms have
+	the same &kind;.</para>
+	
+      <example id="exa:multipat">
+	<title>Multiple Patterns in &with;</title>
+	<programlisting>
+<![CDATA[  simpleterm a, b;
+  ...
+  with ( a, b ) {
+    Number & Number:              { std::cout << "numbers"       <<  std::endl; }
+    Ident & Ident:                { std::cout << "identifiers"   <<  std::endl; }
+    Number & (Number, Ident):     { std::cout << "first num"	 <<  std::endl; }
+    default:                      { std::cout << "first ident"   <<  std::endl; }
+  }
+	  ]]>
+	</programlisting>
+      </example>
+    </sect2>
+    <sect2><title><constant>afterforeach</constant><indexterm><primary>afterforeach</primary></indexterm></title>
+      <para>When a &foreach; iterates over more than one list at one time, the
+      execution will stop if one of the lists reaches its end, while the others
+      may still contain elements. The 
+      <constant>afterforeach</constant>-statement is useful
+      if it is desired to iterate further over the remainders of the lists. The
+      variables of the <constant>afterforeach</constant> refer to the list
+      remainders. Their phyla are already known
+      from the preceding &foreach;. The
+      code fragment in example <xref linkend="exa:afterfor"/> uses
+      &foreach;-&with; and
+      <constant>afterforeach</constant> to decide whether list
+      <varname>A</varname> is longer than list <varname>B</varname>, returning
+      <literal>true</literal> if it is.</para>
+    <example id="exa:afterfor">
+	<title><constant>afterforeach</constant> in Length Test</title>
+	<programlisting>
+<![CDATA[  foreach( $a & $b; arithermlist A, arithermlist B ) {
+    default: { /* do nothing */ }
+  }
+  // at least one list ran out of elements
+  afterforeach( $a & $b ) {
+    Consarithermlist & Nilarithermlist: { return true; 
+				    /* A has elements, B doesn't */ }
+    default: { return false; }
+  }
+	  ]]>
+	</programlisting>
+      </example>
+    </sect2>
+  </sect1>
+  <sect1>
+    <title>Rewriting<indexterm
+	significance="preferred" id="idx:rewriting"
+	class="startofrange"><primary>rewriting</primary></indexterm></title>
+    <para>The process of rewriting transforms a term tree. The left-hand side of
+      each rewrite rule is a pattern specifying which term to substitute. The
+      right-hand side denotes the term to substitute by, which has to be of the
+      same phylum as the original one. This is done by calls of operators and
+      term returning functions. Variables from the left-hand side may be used.
+      Example <xref linkend="exa:rewrite2"/> simplifies terms by replacing every
+      sum of numbers by its evaluated result. A helper function is necessary
+      since it is not possible directly to use &cpp; operators in a
+      rewrite rule (except method calls, see <xref linkend="sec:restriction"/>). </para>
+    <example id="exa:rewrite2">
+      <title>Rewriting</title>
+      <programlisting>
+<![CDATA[  Plus( SimpleTerm( Number( a ) ), SimpleTerm( Number( b ) ) ) ->
+    <: SimpleTerm( Number( plus( a, b ) ) ) >;
+    
+  %{ KC_REWRITE /* code redirection */
+  integer plus( integer a, integer b ){
+      return mkinteger( a -> value + b -> value );
+    }
+  %}]]>
+      </programlisting>
+    </example>
+    <para>To allow rewriting to end, each rule has to replace the
+      term in question by one which is really simpler, reduced, or closer to a
+      normal form. Since rewriting searches depth first, the
+      subterms<indexterm><primary>subterm</primary></indexterm> are usually
+      already the result of a transformation.
+      Calling the
+      <function>rewrite</function><indexterm><primary>rewrite()</primary></indexterm> method of the root term
+      starts the transforming process for the tree. Choosing an arbitrary term
+      instead rewrites the subtree beneath. </para>
+    <indexterm class="endofrange" startref="idx:rewriting"/>
+  </sect1>
+  <sect1>
+    <title>Unparsing<indexterm class="startofrange" significance="preferred"
+	id="idx:unparsing"><primary>unparsing</primary></indexterm></title>
+    <para>The process of unparsing traverses a term tree and executes the
+      instructions for every term matching a pattern as specified in the unparse
+      rules. The left-hand side of a rule denotes a term pattern, the right-hand
+      side a list of unparse items which are evaluated for matching terms. The
+      various items allowed are listed below and appear all in example <xref
+      linkend="exa:unparseitems"/>, which is completely nonsensically.
+      </para>
+    <variablelist>
+      <varlistentry><term>string</term>
+	<listitem><para>Text strings in double quotes are delivered to the
+	  printer unchanged.</para>
+	</listitem>
+      </varlistentry>
+      <varlistentry><term>variable</term>
+	<listitem><para>The term denoted by this term variable will be
+	  unparsed by calling its <function>unparse</function>-method.</para>
+	</listitem>
+      </varlistentry>
+      <varlistentry><term>attribute</term>
+	<listitem><para>The
+	    attribute<indexterm><primary>attributes</primary></indexterm> of
+	    a term will be unparsed by calling
+	    its
+	    <function>unparse</function><indexterm><primary>unparse()</primary></indexterm>-method. If it is of non-phylum
+	  type the user has to provide such a method.</para>
+	</listitem>
+      </varlistentry>
+      <varlistentry><term>&cpp; code</term>
+	<listitem><para>Inside a pair of braces arbitrary &cpp; code may be
+	    placed. </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry><term>escaped braces</term>
+	<listitem><para><indexterm><primary>${</primary></indexterm>
+	    <indexterm><primary>$}</primary></indexterm>
+	    If a non-matching brace is needed it has to be escaped by a dollar sign.
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry><term>variable with view</term>
+	<listitem><para>A view can be specified if a variable should be
+	  unparsed under other than the current view (see <xref linkend="sec:viewclass"/>).
+	  </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry><term>unparse view variable definition</term>
+	<listitem><para>Variables of user defined unparse view classes can be
+	    defined inside a rule (see <xref linkend="sec:viewclass"/>).
+	  </para>
+	</listitem>
+      </varlistentry>
+    </variablelist>  
+    <example id="exa:unparseitems">
+    <title>Unparse Items</title>
+      <programlisting>
+<![CDATA[  Mul( a, b ) ->  [:  "zero"
+		      a
+		      b->result
+		      { if (a->value == 0) } ${
+			  a:infix
+			$}
+		      %uviewvar prefix p1;
+		      a:p1
+		];]]>
+      </programlisting>
+    </example>
+    <para>For every operator, there is a default pattern which matches if
+      no other pattern does. Its associated rule unparses all subterms<indexterm><primary>subterm</primary></indexterm>.
+      The <function>unparse</function>-method
+      generated for every phylum can also be called explicitly. It has 3
+      arguments: the term to be unparsed, a printer and an
+      unparse view. The names <varname>kc_printer</varname><indexterm><primary>kc_printer</primary></indexterm> and
+      <varname>kc_current_view</varname><indexterm><primary>kc_current_view</primary></indexterm>
+      respectively refer to the printer and the view 
+      which are currently in use.</para>
+    <sect2><title>Printer</title>
+      <indexterm id="idx:printer"
+	class="startofrange"><primary>printer</primary></indexterm>
+      <para>The user himself has to provide a printer function which satisfies
+	his needs. Usually it prints to the standard output or into some file,
+	and may take actions dependent on the view.
+	</para>
+      <informalexample>
+	<programlisting>
+  void printer( const char* the_string, uview the_view ) { ... };
+	</programlisting>
+      </informalexample>
+      <para>
+	Since several printer instances may be needed also a printer functor
+	can be
+	specified as the printer. The printer functor class must be derived
+	<constant>public</constant> from the class
+	<classname>printer_functor_class</classname>.</para>
+      <informalexample>
+	<programlisting>
+  %{ HEADER /* redirection since no class definitions allowed in .k */
+  class example_printer : public printer_functor_class {
+    public:
+      void operator( ) ( const char* the_string, uview the_view ) { ... };
+  }
+  %}
+	</programlisting>
+      </informalexample>
+      <!-- Always move to end of enclosing sect2 -->
+      <para><indexterm class="endofrange" startref="idx:printer"/></para>
+    </sect2>
+    <sect2><title>Language Options</title>
+      <indexterm><primary>language options</primary></indexterm>
+      <para>Often a term tree has to be pretty printed into different but
+	similar destination languages, which sometimes require only slightly
+	different output to be generated. To avoid whole rule sets to be
+	multiplied and to allow a more flexible choice concerning the
+	destination language, the concept of language options has been
+	introduced.
+	Every unparse item can be preceded by a language option, which is a
+	language name in angle brackets followed by a colon. That item will be
+	unparsed only if the language specified is active. Languages are
+	declared using the keyword
+	<constant>%language</constant><indexterm><primary>%language</primary></indexterm>
+	and they are set by
+	calling
+	<function>set_language(...)</function><indexterm><primary>set_language()</primary></indexterm>. The active language can
+	be checked by calling
+	<function>is_language(...)</function><indexterm><primary>is_language()</primary></indexterm>. The
+	language names must satisfy the requirements for &cpp; identifiers.
+	Example
+	<xref linkend="exa:langopt"/> demonstrates the application of language
+	options. </para>
+      <example id="exa:langopt"><title>Language Options</title>
+	<programlisting>
+<![CDATA[  %language CPP, JAVA;
+
+  ClassDefinition( name, base_name, class_body ) ->
+    [:	<JAVA>: "public " "class " name
+	<JAVA>: " extends " <CPP>: " : "
+	base_name " {\n" class_body "}"
+	<CPP>: ";"
+	"\n"
+    ];
+	  ]]>
+	</programlisting>
+      </example>
+      <!-- Always move to end of enclosing sect1 -->
+    <para><indexterm class="endofrange" startref="idx:unparsing"/></para>
+    </sect2>
+  </sect1>
+  <sect1 id="sec:viewclass"><title>View
+      Classes<indexterm significance="preferred" class="startofrange"
+	id="idx:view_man"><primary>view</primary></indexterm></title>
+    <para>Rewriting and unparsing of each term is done under a certain view. The
+      view serves as a means to further differentiate between rules when
+      choosing one to apply. To be a match a rule must have the current view
+      to appear in its view list, which is the left part of the right-hand side
+      between the bracket and the colon. If no rule matches the rules with
+      empty list are considered. Below is shown the general form of rules with
+      views. </para>
+    <informalexample>
+      <programlisting>
+<![CDATA[  rewrite_rule   := pattern "->"  "<" rview_list ":" {operator|function}  ">;"
+  unparse_rule   := pattern "->"  "[" uview_list ":" unparse_items          "];"]]>
+      </programlisting>
+    </informalexample>
+    <para>Views are declared by enumerating them after the keyword
+      <constant>%rview</constant><indexterm
+	significance="preferred"><primary>%rview</primary></indexterm> and
+      <constant>%uview</constant><indexterm
+	significance="preferred"><primary>%uview</primary></indexterm> for
+      rewriting and unparsing respectively, separated by a space or
+      a comma. These declarations enable &kpp; to check for view consistency,
+      although it is possible to leave them out entirely. But that
+      should be avoided, because then even simple misspellings in a view list
+      cause the implicit introduction of new views. One view is predefined for
+      rewriting and unparsing respectively,
+      <varname>base_rview</varname><indexterm
+	significance="preferred"><primary>base_rview</primary></indexterm> and
+      <varname>base_uview</varname><indexterm
+	significance="preferred"><primary>base_uview</primary></indexterm>,
+      which is implicitly included in the empty view list.</para>
+    <para>The view can be changed for a term by calling its
+      <function>rewrite/unparse</function><indexterm><primary>rewrite()</primary></indexterm>-method
+      with a new view argument. In unparse rules there the same can also
+      be achieved by appending a colon and a new view name to a variable unparse
+      item. Thus a whole subtree can be rewritten/unparsed under a different
+      view, or even multiple times under changing views. Changing views allows
+      to interlock several tasks on a certain subtree. </para>
+    <informalexample>
+      <programlisting>
+<![CDATA[  %rview demo1 ;
+
+  Plus( a, SimpleTerm( Number( 0 ) ) ) -> <: a -> rewrite( demo1 ) >;
+
+  %uview demo2 ;
+
+  Plus( a, b ) -> [: a:demo2 { b->unparse( kc_printer, demo2 ); } ];
+  // both subterms of Plus are further unparsed under view demo2;]]>
+      </programlisting>
+    </informalexample>
+    <para><indexterm id="idx:viewclass"
+	class="startofrange"><primary>view</primary><secondary>class</secondary></indexterm>Every
+      view introduced by the user actually causes the generation of a view
+      class and one view variable of the same name. Since the user cannot
+      distinguish them, the generalizing term &lsquo;view&rsquo; is used.
+      For unparse views that may matter since the user can define his own
+      unparse view classes. These are declared by
+      enclosing the view name in parentheses. The user has
+      to provide a class <varname>view</varname><classname>_class</classname>
+      derived from a generated class
+      <varname>view</varname><classname>_baseclass</classname>. In particular,
+      that class may contain member variables to hold information persistent
+      over several rules. The base class provides an equality
+      operator (<function>==</function>) deciding whether two view variables
+      are of the same class and a
+      <function>name</function>-method returning the name of the view.</para>
+    <para>No global view variable of the same name is generated for a user
+      defined unparse view class. Variables of such a view are instantiated
+      inside of unparse rules by <constant>%uviewvar</constant><indexterm
+	significance="preferred"><primary>%uviewvar</primary></indexterm>
+      and may bear the same name as their class. They can be used
+      like the implicitly created view variables, but
+      additionally provide all features of their class. Example <xref
+      linkend="exa:uviewvar"/> shows the definition of an unparse view class and
+      demonstrates its usage.</para>
+    <example id="exa:uviewvar">
+      <title>User defined Unparse View Class</title>
+      <programlisting>
+<![CDATA[  %uview ( number_count ) ;
+
+  %{ KC_UNPARSE /* code redirection to where it is needed */
+  class number_count_class : public number_count_baseclass {
+    public:
+      number_count_class() : counter( 0 ) { };
+      int counter;
+  };
+  %}
+
+  c=Plus, c=Minus, c=Mul, c=Div, c=SimpleTerm  ->  [:
+	%uviewvar number_count nc;    // instantiate view variable
+	c:nc			      // and unparse c with it
+	{ std::cout << "Numbers counted: " << nc.counter << std::endl; }
+  ];
+  Plus( a, b ), Minus( a, b ), Mul( a, b ), Div( a, b )
+		    -> [ number_count: a b ];
+  SimpleTerm( a )   -> [ number_count: a ];
+  Number	    -> [ number_count: { kc_current_view.counter++; } ];
+  Ident		    -> [ number_count: ];]]>
+      </programlisting>
+    </example>
+    <para>View lists contain names of view classes, all other occurrences of
+      views actually are view variables. The scope of an unparse view variable
+      ends with its defining rule. Since its
+      name is not known inside other rules there it can be accessed only by
+      means of the name <varname>kc_current_view</varname><indexterm><primary>kc_current_view</primary></indexterm>, which always
+      refers to the view variable currently used. </para>
+    <indexterm class="endofrange" startref="idx:viewclass"/>
+    <indexterm class="endofrange" startref="idx:view_man"/>
+  </sect1>
+  <sect1 id="sec:restriction"><title>Restrictions on &cpp; in &kpp;</title>
+    <para>There are many places
+      in a <filename>.k</filename>-file where &cpp; code can be used. But for
+      some of them, the &kpp; processor allows only restricted use of &cpp;
+      constructs. These places are listed in the following along with the
+      restrictions they impose.</para>
+    <variablelist>
+      <varlistentry><term><filename>.k</filename>-file</term>
+	<listitem><para>Only function definitions are allowed. These
+	    must have no types as arguments which have compound names
+	    (for example no <constant>long int</constant>). &cpp;
+	    comments<indexterm><primary>comments</primary></indexterm> are
+	    allowed everywhere in <filename>.k</filename>-files.</para>
+	</listitem>
+      </varlistentry>
+      <varlistentry><term>&cpp; unparse item</term>
+	<listitem><para>Almost arbitrary &cpp; code is allowed, that is,
+	    everything which is allowed inside a local &cpp; block. </para>
+	</listitem>
+      </varlistentry>
+      <varlistentry><term>rewrite rule</term>
+	<listitem><para>Only simple function calls are allowed, that is, calls
+	    which have as arguments only term variables and term literals,
+	    phylum operators and other simple function calls; in particular no
+	    &cpp; operators, except access of member functions.</para>
+	</listitem>
+      </varlistentry>
+      <varlistentry><term>code redirection</term>
+	<listitem><para>Arbitrary &cpp; code is allowed, but it has to be pure
+	    &cpp; since redirection code is not evaluated by &kpp;.</para>
+	</listitem>
+      </varlistentry>
+    </variablelist>
+  <para>There is a way to get around the restrictions of the &kpp; processor
+    using macros. A macro is defined inside a code redirection, which the
+    processor does not evaluate. Therefore it can
+    be as complex as necessary, while the macro call inside the rewrite rule
+    looks as simple as &kpp; wishes. Example
+    <xref linkend="exa:rewrite2"/> defines a function for addition, which can be
+    avoided when using a macro as in example <xref linkend="exa:macro"/>.
+  </para>
+  <example id="exa:macro">
+    <title>Macro Application in Rewriting</title>
+      <programlisting>
+<![CDATA[  Plus( SimpleTerm( Number( a ) ), SimpleTerm( Number( b ) ) ) ->
+    <: SimpleTerm( Number( PLUS( a, b ) ) ) >;
+    
+  %{ KC_REWRITE /* code redirection */
+  #define PLUS( a, b )	  mkinteger( ( a ) -> value + ( b ) -> value )
+  %}]]>
+      </programlisting>
+    </example>
+    <para>Some generated functions return terms of the phylum
+      <classname>abstract_phylum</classname> which have to be cast to the
+      actual phylum. The &cpp; cast operators may be used also for phylum
+      conversion<indexterm><primary>phylum</primary><secondary>conversion</secondary></indexterm>
+      but &kpp; provides
+    <function>phylum_cast</function><indexterm><primary>phylum_cast</primary></indexterm>,
+    a cast operator for phyla, which is better to use. </para>
+  </sect1>
+</chapter>
+
+<chapter><title>Generated Code</title>
+  <para>From the &kpp; definitions, rules and &cpp; code pieces, several classes
+    and functions in pure &cpp; are generated and distributed over multiple
+    files. Compiled, they will perform the desired tree handling.
+    Additional code is needed to create the trees, probably created by scanner
+    and parser generators, for instance <application>Flex</application> and 
+    &bison;.</para>
+  <sect1><title>Generated Classes and Types</title>
+    <para>The definition of phyla and operators result in generated &cpp;
+      classes.
+      But these should be of no further interest for the user since the phylum
+      names can be used in &cpp; code as if being pointer types of these
+      classes, the operators as if being &cpp; constructors.
+      Every phylum has a <constant>const</constant> counterpart of the same name
+      prefixed by <constant>c_</constant>, which is the only means to get a
+      <constant>const</constant> phylum variable. </para>
+    <para>Just for the sake of completeness, be it mentioned that every
+      phylum corresponds to a class
+      <classname>impl_</classname><varname>phylum</varname> and every
+      operator to a subclass
+      <classname>impl_</classname><varname>phylum</varname>_<varname>operator</varname>.
+      All the classes are derived from a common base class which can be referred
+      to as
+      <classname>abstract_phylum</classname>. By adding constructors, methods
+      or attributes to it, all phyla will be changed in that way.
+      </para>
+    <para>The interworking with &yacc;/&bison; requires a type
+      <classname>YYSTYPE</classname> which will be generated by &kpp; when the
+      option <constant>yystype</constant> is specified (see <xref linkend="sec:options"/>)</para>
+    <sect2><title>Smart-pointer<indexterm><primary>smart
+	    pointer</primary></indexterm></title>
+      <para>Memory often leaks when phylum operators are used in expressions,
+	and that is sometimes hard to detect.
+	The option <constant>smart-pointer</constant> enables a smart memory
+	management which avoids unnecessary copying of terms and automatically
+	frees memory of unused terms. This is achieved
+	by using so called smart-pointers which do reference counting and
+	allow to free a term if it is no longer referenced.</para>
+      <para>An additional type is generated for every phylum with the suffix
+	<classname>_ptr</classname>. Variables of such types are unnecessary
+	ever to be freed. Avoid mixing them with variables of the usual types,
+	especially never assign between them, because that is likely to cause
+	memory access errors.
+	<!--(detailed description of implementation? TODO)--></para>
+    </sect2>
+    <sect2><title>Weak-pointer<indexterm><primary>weak
+	    pointer</primary></indexterm></title>
+      <para>The option <constant>weak-pointer</constant> extends the
+	smart-pointer technique and supports a third
+	type for every phylum. It gets prefix <constant>weak_</constant> and
+	suffix <constant>_ptr</constant>. Weak-pointer variables of a term will
+	not contribute to the reference counting, such that the term already is
+	freed if merely weak-pointers reference it yet. That is why they are
+	only usefully employed in conjunction with smart-pointers.
+	In contrast to usual variables, weak-pointers have their own
+	reference counting, which allows to determine whether such a pointer
+	dangles, that is points to a term already freed and thus is no longer
+	valid.</para>
+    </sect2>
+  </sect1>
+  <sect1 id="sec:genfunc"><title>Generated Functions</title>
+    <para>&kpp; generates a number of functions which are available wherever 
+      &cpp; code is allowed in <filename>.k</filename>-files. The table <xref
+	linkend="tab:functions"/> lists all these functions and the sections
+      which contain a more detailed description.</para>
+    <table id="tab:functions"><title>Generated Functions</title>
+      <?latex \hfill?>
+      <tgroup cols='2' align='left' colsep='1' rowsep='1'>
+	<?latex-table-option [t]?>
+	<thead>
+	  <row>
+	    <entry>function</entry>
+	    <entry>see section</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry>append</entry>
+	    <entry><xref linkend="sec:listfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>concat</entry>
+	    <entry><xref linkend="sec:listfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>eq</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>CSGIOread</entry>
+	    <entry><xref linkend="sec:csgiofuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>CSGIOwrite</entry>
+	    <entry><xref linkend="sec:csgiofuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>filter</entry>
+	    <entry><xref linkend="sec:listfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>fprint</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>fprintdot</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>fprintdotepilogue</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>fprintdotprologue</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>free</entry>
+	    <entry><xref linkend="sec:memfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>freelist</entry>
+	    <entry><xref linkend="sec:memfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>ht_create_simple</entry>
+	    <entry><xref linkend="sec:memfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>ht_assign</entry>
+	    <entry><xref linkend="sec:memfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>ht_assigned</entry>
+	    <entry><xref linkend="sec:memfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>ht_clear</entry>
+	    <entry><xref linkend="sec:memfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>ht_delete</entry>
+	    <entry><xref linkend="sec:memfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>is_nil</entry>
+	    <entry><xref linkend="sec:listfuncs"/></entry>
+	  </row>
+	</tbody>
+      </tgroup>
+      <?latex \hfill?>
+      <tgroup cols='2' align='left' colsep='1' rowsep='1'>
+	<?latex-table-option [t]?>
+	<thead>
+	  <row>
+	    <entry>function</entry>
+	    <entry>see section</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry>last</entry>
+	    <entry><xref linkend="sec:listfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>length</entry>
+	    <entry><xref linkend="sec:listfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>map</entry>
+	    <entry><xref linkend="sec:listfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>merge</entry>
+	    <entry><xref linkend="sec:listfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>mkcasestring</entry>
+	    <entry><xref linkend="sec:creationfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>mkinteger</entry>
+	    <entry><xref linkend="sec:creationfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>mknocasestring</entry>
+	    <entry><xref linkend="sec:creationfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>mkreal</entry>
+	    <entry><xref linkend="sec:creationfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>op_name</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>phylum_name</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>print</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>reduce</entry>
+	    <entry><xref linkend="sec:listfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>reverse</entry>
+	    <entry><xref linkend="sec:listfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>rewrite</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>set_subphylum</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>subphylum</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	  <row>
+	    <entry>unparse</entry>
+	    <entry><xref linkend="sec:commonfuncs"/></entry>
+	  </row>
+	</tbody>
+      </tgroup>
+      <?latex \hspace*{\fill}?>
+    </table>
+    <sect2 id="sec:commonfuncs"><title>Common Functions</title>
+      <para>Since <classname>abstract_phylum</classname> has an
+	<function>unparse</function>-method defined and all phyla are derived
+	from <classname>abstract_phylum</classname> all phyla have it. The same
+	is true for some other methods.</para>
+      <sect3><title>copy<indexterm><primary>copy()</primary></indexterm></title>
+	<informalexample>
+	<programlisting>
+  abstract_phylum copy( bool copy_attributes ) const;
+</programlisting>
+</informalexample>
+	<para>The method copies this term completely, including its subterms.
+	  Since the result is always <classname>abstract_phylum</classname> it
+	  has to be casted to the phylum of this term. If
+	  <literal>true</literal> is specified as argument, the attributes are
+	  copied too. But beware! Merely the addresses are copied if the
+	  attributes are phyla or &cpp; pointers, that is, the new term
+	  references the attributes of the old one. </para>
+      </sect3>
+      <sect3><title>eq<indexterm><primary>eq()</primary></indexterm></title>
+	<informalexample>
+	<programlisting>
+  bool eq( c_abstract_phylum c_p ) const;
+</programlisting>
+</informalexample>
+	<para>The method returns <literal>true</literal> if this term is
+	  structurally equal to the argument, that is, both terms have
+	  equal subtrees.</para>
+      </sect3>
+      <sect3><title>fprint<indexterm><primary>fprint()</primary></indexterm></title>
+	<informalexample>
+	<programlisting>
+  void fprint( FILE* file );
+	</programlisting>
+      </informalexample>
+	<para>The method prints a textual presentation of this term to
+	  the specified file. This simple example produces the output
+	  underneath. </para>
+	<programlisting>
+  simpleterm a_number = SimpleTerm( mkinteger( 23 ) );
+  a_number -> print( );
+
+  SimpleTerm(
+    Number(
+      23
+    )
+  )
+	</programlisting>
+      </sect3>
+      <sect3><title>fprintdot<indexterm><primary>fprintdot()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  void fprintdot( FILE *f,			  
+		  const char *root_label_prefix,
+		  const char *edge_label_prefix,
+		  const char *edge_attributes,	  
+		  bool print_node_labels,
+		  bool use_context_when_sharing_leaves,
+		  bool print_prologue_and_epilogue
+		 ) const;
+	  </programlisting>
+	</informalexample>
+	<para>This function creates a representation of the term in a format
+	  understood by the program <application>dot</application>, which is part
+	  of the graphics package <application>graphviz</application> and draws
+	  directed acyclic graphs in various output formats like PostScript or
+	  GIF. The target of the operation is the file <varname>f</varname>, while
+	  the other arguments control the details of the graphs appearence.
+	</para>
+	<variablelist>
+	  <varlistentry><term>root_label_prefix</term>
+	    <listitem><para>Adds a label to the graph denoting the root term.
+		The label has the name of the phylum of that term prefixed by
+		this string argument. </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry><term>edge_label_prefix</term>
+	    <listitem><para>Every edge in the graph is labelled with a number.
+		This string argument appears as the prefix of these labels.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry><term>edge_attributes</term>
+	    <listitem><para>For <application>dot</application>, the edges can
+		have attributes which specify additional features like font name
+		or edge colour (see <application>dot</application> manual for
+		attribute names and values). This string argument is a list of
+		attribute/value pairs
+		(<varname>attribute</varname>=<varname>value</varname>),
+		separated by commas.</para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry><term>print_node_labels</term>
+	    <listitem><para>If this argument is set to <literal>true</literal>,
+		the names of the subterms phyla appear in the graph. Otherwise
+		they are suppressed and only the term names (operator names) are
+		printed.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry><term>use_context_when_sharing_leaves</term>
+	    <listitem><para>Terms which are shared in the tree usually appear
+		only once in the graph (terms of <constant>uniq</constant>
+		phyla). In particular, terms of predefined phyla are shared if
+		they are equal. They are always leaves since they have no
+		subphyla. If this argument is set to <literal>true</literal>,
+		the leaves appear shared in the graph only if they are subterms
+		of shared (<constant>uniq</constant>) terms.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry><term>print_prologue_and_epilogue</term>
+	    <listitem><para>This argument is usually set to
+		<literal>true</literal> since a certain prologue and epilogue
+		are necessary to frame the graph. This is set to
+		<literal>false</literal> if multiple graphs are to be grouped
+		into one figure. In that case the prologue function has to be
+		called explicitly, then some <function>fprintdot</function>
+		calls follow, and finally the epilogue call finishes the figure
+		creation. </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+	<para>The following call of <function>fprintdot</function> writes a
+	  a presentation of the term <varname>t</varname> to a file
+	  <varname>exa</varname>. From that file <application>dot</application>
+	  creates a graph like that in figure <xref linkend="fig:fprintdot"/>.</para>
+	<programlisting>
+  aterm t = Plus( SimpleTerm( Number( mkinteger( 7 ) ) ),
+		  SimpleTerm( Number( mkinteger( 7 ) ) ) );
+  t -> fprintdot(exa, "root_", "edge", "style=dashed", true, false, true);
+	</programlisting>
+	<figure id="fig:fprintdot">
+	  <title>Dot Created Graph of an Example Term</title>
+	  <mediaobject><imageobject><imagedata
+		align="center" fileref="imagesgen/fprintdot.png" format="PNG"/>
+	    </imageobject>
+	    <imageobject><imagedata
+		align="center" fileref="imagesgen/fprintdot" format="TEX"/>
+	    </imageobject>
+	  </mediaobject>
+	</figure>
+      </sect3>
+      <sect3><title>fprintdotprologue<indexterm><primary>fprintdotprologue()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  void fprintdotprologue ( FILE *f );
+	  </programlisting>
+	</informalexample>
+	<para>This function writes the prologue to <varname>f</varname>, which
+	  is needed to set up <application>graphviz</application>.
+	  Usually, when the figure contains only one graph, this function will
+	  be called implicitly by <function>fprintdot</function>; call this
+	  function when you set <varname>print_prologue_and_epilogue</varname>
+	  to <literal>false</literal> in the function call above.
+	  </para>
+      </sect3>
+      <sect3><title>fprintdotepilogue<indexterm><primary>fprintdotepilogue()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  void fprintdotepilogue ( FILE *f );
+	  </programlisting>
+	</informalexample>
+	<para>This function writes the epilogue to <varname>f</varname>, which
+	  is needed to finish the graph for <application>graphviz</application>.
+	  Usually, when the figure contains only one graph, this function will
+	  be called implicitly by <function>fprintdot</function>; call this
+	  function when you set <varname>print_prologue_and_epilogue</varname>
+	  to <literal>false</literal> in the function call above.
+	  </para>
+      </sect3>
+      <sect3><title>op_name<indexterm><primary>op_name()</primary></indexterm></title>
+	<informalexample>
+	<programlisting>
+  const char* op_name( ) const;
+	</programlisting>
+      </informalexample>
+	<para>This function returns the name of the phylum operator which has
+	  been used to create this term. </para>
+      </sect3>
+      <sect3><title>phylum_name<indexterm><primary>phylum_name()</primary></indexterm></title>
+	<informalexample>
+	<programlisting>
+  const char* phylum_name( ) const;
+	</programlisting>
+      </informalexample>
+	<para>This function returns the name of the phylum of this term. </para>
+      </sect3>
+      <sect3><title>print<indexterm><primary>print()</primary></indexterm></title>
+	<informalexample>
+	<programlisting>
+  void print( );
+	</programlisting>
+      </informalexample>
+	<para>This function prints a textual presentation of this term to the
+	  standard output. It is similar to the output of
+	  <function>fprint</function>.</para>
+      </sect3>
+      <sect3><title>set_subphylum<indexterm><primary>set_subphylum()</primary></indexterm></title>
+	<informalexample>
+	<programlisting>
+  void set_subphylum( int n, abstract_phylum p, bool=false );
+	</programlisting>
+      </informalexample>
+      <para>This function replaces the <varname>n</varname>th subterm of this term by term
+	<varname>p</varname>, which must be of a phylum castable to the phylum
+	of the appropriate subterm. Numbering starts with <literal>0</literal>.
+	  </para>
+      </sect3>
+      <sect3><title>subphylum<indexterm><primary>subphylum()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  abstract_phylum subphylum( int n, bool=false ) const;
+	  </programlisting>
+	</informalexample>
+	<para>This function returns the <varname>n</varname>th subterm of this
+	  term. Numbering starts with <literal>0</literal>. </para>
+      </sect3>
+      <sect3><title>unparse<indexterm significance=
+	    "preferred"><primary>unparse()</primary></indexterm></title>
+	<informalexample>
+	<programlisting>
+  void unparse( printer_functor pf, uview uv);
+  void unparse( printer_function opf, uview uv );
+	</programlisting>
+      </informalexample>
+      <para>This function starts unparsing for this term. It is recursively
+	called for every subterm. Unparsing is processed under the specified
+	unparse view, and the strings to output are delivered to the printer
+	functor or function respectively. </para>
+      </sect3>
+      <sect3><title>rewrite<indexterm><primary>rewrite()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  <actual phylum> rewrite( rview rv );
+	      ]]>
+	  </programlisting>
+	</informalexample>
+	<para>This functions starts rewriting for this term. It returns a new term
+	  of the actual phylum. Usually it is called at the root term whereupon
+	  the entire tree is searched under the specified view. </para>
+      </sect3>
+    </sect2>
+    <sect2 id="sec:csgiofuncs"><title>CSGIO Functions</title>
+      <para>The generated files <filename>csgiok.h</filename> and
+	<filename>csgiok.cc</filename><indexterm><primary>csgiok.cc,h</primary></indexterm>
+	provide means to write terms to files and
+	to reconstruct terms from such files. Whole term trees thus can be saved
+	and exchanged between different applications. Reading and writing
+	is performed by two functions.</para>
+      <para>The format of the files has once been designed to be compatible to
+	the structure files of the commercial tool <application>Synthesizer
+	Generator</application>. The format written now by &kpp; is somewhat
+	extended so that they are not compatible any more, but old structure
+	files are expected to be still understood.</para>
+      <sect3><title>CSGIOwrite<indexterm><primary>CSGIOwrite()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  void CSGIOwrite( FILE *f ) const;
+	      ]]>
+	  </programlisting>
+	</informalexample>
+	<para>The methods writes this term to <varname>f</varname>, that is, the
+	  entire subterm tree. The
+	  attributes are ignored except they are phyla which have been defined
+	  using the keyword <constant>%member</constant>. </para>
+      </sect3>
+      <sect3><title>CSGIOread<indexterm><primary>CSGIOread()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  template<typename P> void
+  CSGIOread( FILE *f, P &p )
+	      ]]>
+	  </programlisting>
+	</informalexample>
+	<para>The function reads from <varname>f</varname> the presentation of a
+	  term. The term is constructed by successively calling the appropriate
+	  operators of the subterms. The operators initialize the attributes
+	  according to the phylum definition; except the
+	  <constant>%member</constant>-attributes which get their values from
+	  the saved term. The created term is assigned to <varname>p</varname>
+	  which has to be a variable of the correct phylum.
+	  </para>
+      </sect3>
+    </sect2>
+    <sect2 id="sec:creationfuncs"><title>Creation Functions</title>
+      <para>Terms of predefined phyla are created by functions.</para>
+      <sect3><title>mkcasestring<indexterm significance=
+	    "preferred"><primary>mkcasestring()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  casestring mkcasestring( const char *str );
+  casestring mkcasestring( const char *str, unsigned int length );
+	  </programlisting>
+	</informalexample>
+	<para>The function creates a term of the phylum
+	  <classname>casestring</classname>
+	  from the specified string. Upper and lower case characters are
+	  distinguished. The second variant uses only the first
+	  <varname>length</varname> characters of the specified string.
+	  </para>
+      </sect3>
+      <sect3><title>mkinteger<indexterm significance=
+	    "preferred"><primary>mkinteger()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  integer mkinteger( const INTEGER i );
+	  </programlisting>
+	</informalexample>
+	<para>The function creates a term of the phylum
+	  <classname>integer</classname>
+	  from the specified value. <classname>INTEGER</classname> is a macro
+	  which can be defined by the user as needed but defaults to
+	  <classname>int</classname>. </para>
+      </sect3>
+      <sect3><title>mknocasestring<indexterm significance=
+	    "preferred"><primary>mknocasestring()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  nocasestring mknocasestring( const char *str );
+  nocasestring mknocasestring( const char *str, unsigned int length );
+	  </programlisting>
+	</informalexample>
+	<para>The function creates a term of the phylum
+	  <classname>nocasestring</classname>
+	  from the specified string. Upper and lower case characters are not
+	  distinguished. The second variant uses only the first
+	  <varname>length</varname> characters of the specified string. </para>
+      </sect3>
+      <sect3><title>mkreal<indexterm significance=
+	    "preferred"><primary>mkreal()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  real mkreal( const REAL r );
+	  </programlisting>
+	</informalexample>
+	<para>The function creates a term of the phylum
+	  <classname>real</classname>
+	  from the specified value. <classname>REAL</classname> is a macro
+	  which can be defined by the user as needed but defaults to
+	  <classname>double</classname>. </para>
+      </sect3>
+    </sect2>
+    <sect2 id="sec:memfuncs"><title>Memory Management Functions</title>
+      <para>When terms, once constructed, are no longer needed it is usually
+	reasonable to free the memory they allocate,
+	especially when dealing with large numbers of
+	terms.</para>
+      <para>The same does not hold not for the use of smart-pointers, because
+	these keep track of allocated memory by their own. Never apply
+	<function>free</function> or <function>freelist</function> to
+	smart-pointers. The
+	&cpp; <constant>delete</constant> should never be applied to
+	any term, since that would get around some &kpp; mechanisms. </para>
+      <sect3><title>free<indexterm><primary>free()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  void free( bool recursive=true );
+	  </programlisting>
+	</informalexample>
+	<para>The method frees the memory allocated by this term and by
+	  default it frees also the subterms recursively. When it is applied to
+	  a list term, the whole list and all its elements are freed. The
+	  non-recursive form only separates the list into its first element and
+	  the remainder of the list. Terms of phyla under non-default storage
+	  management can not be freed individually, calling
+	  <function>free</function> on them has no effect.</para>
+      </sect3>
+      <sect3><title>freelist<indexterm><primary>freelist()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  void freelist( );
+	  </programlisting>
+	</informalexample>
+	<para>The method frees the spine of this list term and leaves the list
+	  elements untouched. </para>
+      </sect3>
+      
+      <sect3 id="sec:hashtable">
+	<title>Hashtable Functions</title>
+	<indexterm significance="preferred"><primary>hashtables</primary></indexterm>
+	<para>The memory management of terms of storage class
+	  <constant>uniq</constant><indexterm><primary>uniq</primary></indexterm>
+	  or a user defined one can only be influenced by hashtable operations.
+	  </para>
+      </sect3>
+	<sect3><title>ht_create_simple<indexterm><primary>ht_create_simple()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  hashtable_t  ht_create_simple ( int size );
+	  </programlisting>
+	</informalexample>
+	<para>The function creates a new hashtable and returns it. The current
+	  implementation ignores the <varname>size</varname> argument.
+	  </para>
+      </sect3>
+      <sect3><title>ht_assign<indexterm><primary>ht_assign()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  hashtable_t  ht_assign ( hashtable_t ht, storageclass_t sc,
+    bool still_unique=false );
+	  </programlisting>
+	</informalexample>
+	<para>The function assigns the hashtable <varname>ht</varname> to the
+	  storage class <varname>sc</varname> and returns the hashtable which
+	  has previously been assigned to <varname>sc</varname>. </para>
+      </sect3>
+      <sect3><title>ht_assigned<indexterm><primary>ht_assigned()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  hashtable_t  ht_assigned ( storageclass_t sc );
+	  </programlisting>
+	</informalexample>
+	<para>The function returns the hashtable which is assigned to the
+	  storageclass <varname>sc</varname>. </para>
+      </sect3>
+      <sect3><title>ht_clear<indexterm><primary>ht_clear()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  void	ht_clear ( hashtable_t ht );
+	  </programlisting>
+	</informalexample>
+	<para>The function removes all entries from the hashtable
+	  <varname>ht</varname>. </para>
+      </sect3>
+      <sect3><title>ht_delete<indexterm><primary>ht_delete()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+  void	ht_delete ( hashtable_t ht );
+	  </programlisting>
+	</informalexample>
+	<para>The function deletes the hashtable <varname>ht</varname> entirely.
+	</para>
+      </sect3>
+    </sect2>
+    <sect2 id="sec:listfuncs"><title>List Functions<indexterm id="idx:listfunc"
+	  class="startofrange"><primary>list</primary></indexterm></title>
+      <para>List phyla which have been defined using the
+	<constant>list</constant> keyword get some methods performing convenient
+	tasks. In the function signatures, the name
+	<classname><![CDATA[<phylum list>]]></classname> denotes the actual
+	  list phylum, <constant><![CDATA[<phylum>]]></constant> denotes the
+	  phylum of the list elements. </para>
+      <sect3><title>append<indexterm><primary>append()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  <phylum list> append( <phylum> p );]]>
+	  </programlisting>
+	</informalexample>
+	<para>The method appends the specified term to this list and returns
+	  the tail of the new list, <abbrev>ie.</abbrev> the sublist that has
+	  <varname>p</varname> as its only element. This make appending several
+	  elements in a row more efficient.
+	</para>
+      </sect3>
+      <sect3><title>concat<indexterm><primary>concat()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  friend <phylum list> concat( c_<phylum list> l1, c_<phylum list> l2 );]]>
+	  </programlisting>
+	</informalexample>
+	<para>The function constructs a new list from the terms of
+	  <varname>l1</varname> followed by the terms of <varname>l2</varname>
+	  and returns that list.
+	</para>
+      </sect3>
+      <sect3><title>filter<indexterm><primary>filter()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  <phylum list> filter( bool (*fp) (<phylum>) );]]>
+	  </programlisting>
+	</informalexample>
+	<para>The method constructs a new list from the terms of this
+	    list for which the function <function>fp</function> yields
+	    <literal>true</literal>.
+	</para>
+      </sect3>
+      <sect3><title>is_nil<indexterm><primary>is_nil()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  bool is_nil( ) const;]]>
+	  </programlisting>
+	</informalexample>
+	<para>The method returns <literal>true</literal> if this list is empty.
+	</para>
+      </sect3>
+      <sect3><title>last<indexterm><primary>last()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  <phylum list> last( ) const;]]>
+	  </programlisting>
+	</informalexample>
+	<para>The method returns the remainder of this list which contains only
+	  one, the last, element. If this list is empty the empty list is
+	  returned.
+	</para>
+      </sect3>
+      <sect3><title>length<indexterm><primary>length()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  int length( ) const;]]>
+	  </programlisting>
+	</informalexample>
+	<para>The method returns the number of elements in this list.
+	</para>
+      </sect3>
+      <sect3><title>map<indexterm><primary>map()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  <phylum list> map( <phylum> (*fp) (<phylum>) );]]>
+	  </programlisting>
+	</informalexample>
+	<para>The method constructs a new list containing the terms which are
+	  returned by the <function>fp</function> which is called for every
+	  element of this list. The new list is returned.
+	</para>
+      </sect3>
+      <sect3><title>merge<indexterm><primary>merge()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  <phylum list> merge( <phylum list> l, <phylum> (*fp) (<phylum>, <phylum>) );]]>
+	  </programlisting>
+	</informalexample>
+	<para>The method constructs a new list containing the terms which are
+	  returned by the <function>fp</function> which is called for every
+	  element of this list taking the second argument from the specified
+	  list. The new list is returned.
+	</para>
+      </sect3>
+      <sect3><title>reduce<indexterm><primary>reduce()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  <phylum> reduce( <phylum> p, <phylum> (*fp) (<phylum>, <phylum>) );]]>
+	  </programlisting>
+	</informalexample>
+	<para>The method successively applies the function
+	  <function>fp</function> to each element of this list and
+	  <function>fp</function>s last result which initially is the term
+	  <varname>p</varname>. The final result is returned.
+	</para>
+      </sect3>
+	<sect3><title>reverse<indexterm><primary>reverse()</primary></indexterm></title>
+	<informalexample>
+	  <programlisting>
+<![CDATA[  <phylum list> reverse( ) const;]]>
+	  </programlisting>
+	</informalexample>
+	<para>The method constructs a new list which contains the elements of
+	  this list in reverse order. The new list is returned.
+    <!-- Always move to end of enclosing sect2 -->
+    <indexterm class="endofrange" startref="idx:listfunc"/>
+	</para>
+      </sect3>
+    </sect2>
+  </sect1>
+  <sect1><title>Generated Files</title>
+    <para>The generated code is spread over several files. The table <xref
+	linkend="tab:filenames"/> lists these files and a description of their
+      contents.
+      Every file defines a macro symbol which can be used in preprocessor
+      instructions and in code redirections<indexterm><primary>redirection</primary></indexterm>.
+      These symbols are listed as well. From every &kpp; file
+      a &cpp; file and a header file are generated. The name
+      <varname>file</varname> in the table refers to such files.</para>
+    <table id="tab:filenames"><title>Generated files</title>
+      <tgroup cols='3' align='left' colsep='1' rowsep='1'>
+	<?latex-table-type tabularx?>
+	<?latex-table-option {\textwidth}?>
+	<?latex-table-head lp{0.4\textwidth}X?>
+	<colspec colname='c1'/>
+	<colspec colname='c2'/>
+	<colspec colname='c3'/>
+	<thead>
+	  <row>
+	    <entry>file</entry>
+	    <entry>symbol</entry>
+	    <entry>contents</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry><filename>csgiok.cc</filename><indexterm><primary>csgiok.cc,h</primary></indexterm></entry>
+	    <entry>KC_CSGIO</entry>
+	    <entry>functions for saving and restoring of terms</entry>
+	  </row>
+	  <row>
+	    <entry><filename>csgiok.h</filename></entry>
+	    <entry>KC_CSGIO_HEADER</entry>
+	    <entry>some definitions for saving and restoring of terms</entry>
+	  </row>
+	  <row>
+	    <entry><filename>k.cc</filename><indexterm><primary>k.cc,h</primary></indexterm></entry>
+	    <entry>KC_TYPES</entry>
+	    <entry>implementation of all classes generated from phylum definitions</entry>
+	  </row>
+	  <row>
+	    <entry><filename>k.h</filename></entry>
+	    <entry>KC_TYPES_HEADER</entry>
+	    <entry>all class declarations generated from phylum definitions;
+	      included by all implicitly generated files</entry>
+	  </row>
+	  <row>
+	    <entry><filename>rk.cc</filename><indexterm><primary>rk.cc,h</primary></indexterm></entry>
+	    <entry>KC_REWRITE</entry>
+	    <entry>rewrite methods for all phyla</entry>
+	  </row>
+	  <row>
+	    <entry><filename>rk.h</filename></entry>
+	    <entry>KC_REWRITE_HEADER</entry>
+	    <entry>rewrite view class definitions</entry>
+	  </row>
+	  <row>
+	    <entry><filename>unpk.cc</filename><indexterm><primary>unpk.cc,h</primary></indexterm></entry>
+	    <entry>KC_UNPARSE</entry>
+	    <entry>unparse methods for all phyla</entry>
+	  </row>
+	  <row>
+	    <entry><filename>unpk.h</filename></entry>
+	    <entry>KC_UNPARSE_HEADER</entry>
+	    <entry>unparse view class definitions</entry>
+	  </row>
+	  <row>
+	    <entry><varname>file</varname><filename>.cc</filename></entry>
+	    <entry>KC_FUNCTIONS_<varname>file</varname> or CODE</entry>
+	    <entry>function definitions from <varname>file</varname><filename>.k</filename>-file</entry>
+	  </row>
+	  <row>
+	    <entry><varname>file</varname><filename>.h</filename></entry>
+	    <entry>KC_FUNCTIONS_<varname>file</varname>_HEADER or HEADER</entry>
+	    <entry>declarations of functions from <varname>file</varname><filename>.k</filename>-file</entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
+    <sect2 id="sec:redirection"><title>Code Redirection<indexterm significance="preferred"><primary>redirection</primary></indexterm></title>
+      <para>A <filename>.k</filename>-file can contain pieces of arbitrary &cpp;
+	enclosed between a line
+	starting with
+	<constant>%{</constant><indexterm><primary>%{</primary></indexterm> and
+	one starting with
+	<constant>%}</constant><indexterm><primary>%}</primary></indexterm>.
+	Since it will not be
+	parsed by &kpp; but copied directly into generated code, it can not
+	contain special &kpp; constructs, but merely pure &cpp;. It will go to
+	the matching <filename>.cc</filename>-file, if no redirection is
+	specified. Giving a list of
+	file symbols after <constant>%{</constant> will copy the code each
+	of the specified files instead. The available redirection symbols
+	are listed in table <xref linkend="tab:filenames"/>.</para>
+      <informalexample>
+	<programlisting>
+  // this be a file example.k
+
+  %{
+  // everything between the brace lines will be copied to example.cc
+  %}
+
+  %{ HEADER KC_UNPARSE /* beware of //-comments here */
+  // everything between the brace lines will be copied to example.h and unpk.cc
+  %}
+	</programlisting>
+      </informalexample>
+    </sect2>
+  </sect1>
+</chapter>
+
+<chapter><title>Running &kpp;</title>
+  <para>The &kpp; processor is invoked with the command
+    <userinput>kc++</userinput>. It can be invoked on any number of
+    <filename>.k</filename>-files and will create a number of output files
+    as outlined above. A typical call looks like this:
+  </para>
+  <informalexample>
+    <userinput>kc++ abstr.k rpn.k main.k</userinput>
+  </informalexample>
+  <para>When used together with other tools (see
+    <xref linkend="sec:yacc"/>) a makefile is helpful.
+    Be aware, though, that every source file may influence every
+    generated file (because of the code redirections). Thus multiple destination
+    files depend on multiple source files. That means the makefile becomes more
+    complicated in order to handle these dependencies. That is why an example makefile
+    is provided in appendix (see <xref linkend="app:make"/>). It is sufficient
+    for the <acronym>RPN</acronym> example and
+    may easily be adapted for many more.</para>
+  <sect1
+    id="sec:options"><title>Options<indexterm id="idx:options"
+	class="startofrange"><primary>options</primary></indexterm></title>
+    <para>&kpp; recognizes a number of command line options which affect the
+      process of parsing and code generation, some rather drastically. Table 
+      <xref linkend="tab:options"/> presents, in alphabetical order,
+      all available options and their explanation. In most environments, two
+      forms are provided, short and <acronym>GNU</acronym> style long options.
+    </para>
+    <para>Suppose you do not need CSGIO input/output, but want to interface with
+      your favourite compiler compiler, you might use:</para>
+    <informalexample>
+      <userinput>kc++ --no-csgio --yystype abstr.k rpn.k main.k</userinput>
+    </informalexample>
+    <para>Some vital options can be specified directly in &kpp; using the
+      keyword <constant>%option</constant>. Such specified options take higher
+      priority than command line options and thus override them.
+      Table <xref linkend="tab:vitaloptions"/> lists them in alphabetical order.
+      They behave like their command line counterparts.
+      A line like this could be specified in a &kpp; file:</para>
+    <informalexample>
+      <programlisting>
+  %option yystype smart-pointer
+      </programlisting>
+    </informalexample>
+    <table id="tab:options"><title>Command line options</title>
+      <tgroup cols='3' align='left' colsep='1' rowsep='1'>
+	<?latex-table-type tabularx?>
+	<?latex-table-option {\textwidth}?>
+	<?latex-table-head llX?>
+	<colspec colname='c1'/>
+	<colspec colname='c2'/>
+	<colspec colname='c3'/>
+	<thead>
+	  <row>
+	    <entry></entry>
+	    <entry>option</entry>
+	    <entry>explanation</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <!-- Kimwitu++ Features -->
+	  <row>
+	    <entry>–c</entry>
+	    <entry>––no–csgio</entry>
+	    <entry>do not generate phylum read/write functions
+	      (<filename>csgiok.{h,cc}</filename>)
+	      </entry>
+	  </row>
+	  <row>
+	    <entry>–r</entry>
+	    <entry>––no–rewrite</entry>
+	    <entry>do not generate code for rewrite rules
+	      (<filename>rk.{h,cc}</filename>)</entry>
+	  </row>
+	  <row>
+	    <entry>–u</entry>
+	    <entry>––no–unparse</entry>
+	    <entry>do not generate code for unparse rules
+	      (<filename>unpk.{h,cc}</filename>)</entry>
+	  </row>
+	  <row>
+	    <entry>–d</entry>
+	    <entry>––no–printdot</entry>
+	    <entry>no fprintdot functions are generated</entry>
+	  </row>
+	  <row>
+	    <entry>–t</entry>
+	    <entry>––no–hashtables</entry>
+	    <entry>do not generate code for hashtable operations
+	    </entry>
+	  </row>
+	  <!-- C++ Compiler Options -->
+	  <row>
+	    <entry>–n</entry>
+	    <entry>––covariant=C</entry>
+	    <entry>use covariant return types: y|n|p (yes, no or generate both
+	      and decide per preprocessor macro
+	      <constant>NO_COVARIANT_RETURN</constant>)</entry>
+	  </row>
+	  <row>
+	    <entry></entry>
+	    <entry>––stdafx[=FILE]</entry>
+	    <entry>generate include for Microsoft precompiled header files
+	      (default <filename>stdafx.h</filename>)</entry>
+	  </row>
+	  <row>
+	    <entry>–e</entry>
+	    <entry>––dllexport=STRING</entry>
+	    <entry>generates string between keyword class and the
+               class name of all operators and phyla</entry>
+	  </row>
+	  <row>
+	    <entry>–m</entry>
+	    <entry>––smart–pointer</entry>
+	    <entry>generates code for smart pointers (reference counting)</entry>
+	  </row>
+	  <row>
+	    <entry>–w</entry>
+	    <entry>––weak–pointer</entry>
+	    <entry>generates code for weak pointers (implies smart pointers)</entry>
+	  </row>
+	  <!-- Files -->
+	  <row>
+	    <entry>–s</entry>
+	    <entry>––suffix=EXT</entry>
+	    <entry>extension for generated source files (default
+	      <filename>.cc</filename>)</entry>
+	  </row>
+	  <row>
+	    <entry>–f</entry>
+	    <entry>––file–prefix=PREF</entry>
+	    <entry>prefix all generated files</entry>
+	  </row>
+	  <row>
+	    <entry>–o</entry>
+	    <entry>––overwrite</entry>
+	    <entry>always write generated files even if not changed</entry>
+	  </row>
+	  <row>
+	    <entry>–b</entry>
+	    <entry>––yystype[=FILE]</entry>
+	    <entry>generate file (default <filename>yystype.h</filename>)
+	      containing <classname>YYSTYPE</classname>, for &yacc; and &bison;
+	    </entry>
+	  </row>
+	  <row>
+	    <entry>–y</entry>
+	    <entry>––yxxunion</entry>
+	    <entry>generate file <filename>yxx_union.h</filename>)
+	      for use with for <application>Yacc++</application>.
+	    </entry>
+	  </row>
+	  <!-- Advanced -->
+	  <row>
+	    <entry>–l</entry>
+	    <entry>––no–linedirec</entry>
+	    <entry>omit the line directives (<constant>#line</constant>)
+	      altogether</entry>
+	  </row>
+	  <row>
+	    <entry />
+	    <entry>––comment–line</entry>
+	    <entry>change line directives to mere comments</entry>
+	  </row>
+	  <row>
+	    <entry />
+	    <entry>––dir–line</entry>
+	    <entry>prepends the current working directory to the file name
+	      in line directives</entry>
+	  </row>
+	  <row>
+	    <entry>–p</entry>
+	    <entry>––pipe=CMD</entry>
+	    <entry>process all files while piping them through CMD</entry>
+	  </row>
+	  <!-- Other -->
+	  <row>
+	    <entry>–M</entry>
+	    <entry>––msg–format=PAT</entry>
+	    <entry><?latex \raggedright ?>specifies format of (error) messages, PAT can contain:
+	      <?latex \linebreak ?>
+	      <userinput>%p</userinput> (program name),
+	      <userinput>%s</userinput> (severity),
+	      <userinput>%f</userinput> (file name),
+	      <?latex \linebreak ?>
+	      <userinput>%d</userinput> (current working directory),
+	      <userinput>%l</userinput> (line number),
+	      <userinput>%c</userinput> (column);
+	      <?latex \linebreak ?>
+	      the actual message is appended</entry>
+	  </row>
+	  <row>
+	    <entry>–q</entry>
+	    <entry>––quiet</entry>
+	    <entry>quiet operation (is default)</entry>
+	  </row>
+	  <row>
+	    <entry>–v</entry>
+	    <entry>––verbose</entry>
+	    <entry>print additional status information while processing</entry>
+	  </row>
+	  <row>
+	    <entry>–h</entry>
+	    <entry>––help</entry>
+	    <entry>display the help and exit</entry>
+	  </row>
+	  <row>
+	    <entry>–V</entry>
+	    <entry>––version</entry>
+	    <entry>output version information and exit</entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
+    <table id="tab:vitaloptions"><title>Built-in options</title>
+      <tgroup cols='1' align='left' colsep='1' rowsep='1'>
+	<?latex-table-type tabularx?>
+	<?latex-table-option {\textwidth}?>
+	<?latex-table-head X?>
+	<colspec colname='c1'/>
+	<tbody>
+	  <row><entry>no–csgio</entry></row>
+	  <row><entry>no–hashtables</entry></row>
+	  <row><entry>no–printdot</entry></row>
+	  <row><entry>no–rewrite</entry></row>
+	  <row><entry>no–unparse</entry></row>
+	  <row><entry>smart–pointer</entry></row>
+	  <row><entry>weak–pointer</entry></row>
+	  <row><entry>yystype</entry></row>
+	</tbody>
+      </tgroup>
+    </table>
+    <indexterm class="endofrange" startref="idx:options"/>
+  </sect1>
+  <sect1 id="sec:yacc"><title>&yacc;/&bison;</title>
+    <para>Interfacing with a compiler generator is useful when a tree should be
+      build from some kind of input. &kpp; provides the
+      <constant>yystype</constant>-option (see <xref linkend="sec:options"/>)
+      which causes the generation of a header file needed by &yacc; to
+      cooperate. For
+      every token found, the desired &kpp; operator is called to create a term.
+      If <application>lex/flex</application> is used too, &yacc; has to be
+      run with the option which causes the generation of an other header file
+      needed
+      by <application>lex/flex</application> (<userinput>–d</userinput>
+      for &bison;). Appropriate files for the example can be found in appendix
+      <xref linkend="app:rpn"/>. The makefile uses implicit rules for
+      <application>flex</application> and &bison;.</para>
+  </sect1>
+</chapter>
+
+<!-- vim:set sw=2 ts=8 tw=80: -->

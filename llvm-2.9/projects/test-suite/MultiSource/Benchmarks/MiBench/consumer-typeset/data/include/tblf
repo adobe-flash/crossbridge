@@ -1,0 +1,3175 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @Tbl package for tables                                               #
+#                                                                             #
+#  Version 1.0 (22 November 1998)                                             #
+#  Jeffrey H. Kingston                                                        #
+#                                                                             #
+#  Based on the @Tab package (Jeffrey H. Kingston, September 1991).           #
+#                                                                             #
+###############################################################################
+
+@SysPrependGraphic { tblf.lpg }
+
+export @OrIfPlain
+def @TOIP {
+
+    def @OrIfPlain
+	left ps
+	right plain
+    {
+	@BackEnd @Case {
+	    PlainText @Yield plain
+	    else      @Yield ps
+	}
+    }
+}
+
+export @Tbl
+def @TblSetup
+    import @TOIP named paint		p	{ nopaint }
+    import @TOIP named background	bg	{}
+    import @TOIP named font		f	{}
+    import @TOIP named break		b	{}
+    import @TOIP named width		w	{}
+    import @TOIP named height		h	{}
+    import @TOIP named indent		i	{}
+    import @TOIP named indentvertical	iv	{}
+    import @TOIP named strut		s	{ yes }
+    import @TOIP named struthorizontal	sh	{ no }
+    import @TOIP named margin		m	{}
+    import @TOIP named marginhorizontal	mh	{ 0.6f @OrIfPlain 2s }
+    import @TOIP named marginleft	ml	{}
+    import @TOIP named marginright	mr	{}
+    import @TOIP named marginvertical	mv	{ 0.3f @OrIfPlain 2f }
+    import @TOIP named marginabove	ma	{}
+    import @TOIP named marginbelow	mb	{}
+    import @TOIP named rule		r	{ no }
+    import @TOIP named rulehorizontal	rh	{}
+    import @TOIP named ruleabove	ra	{}
+    import @TOIP named rulebelow	rb	{}
+    import @TOIP named rulevertical	rv	{}
+    import @TOIP named ruleleft		rl	{}
+    import @TOIP named ruleright	rr	{}
+    import @TOIP named rulewidth	rw	{ 0.05f }
+    import @TOIP named rulehorizontalwidth rhw	{ {} @OrIfPlain 1f }
+    import @TOIP named ruleabovewidth	raw	{}
+    import @TOIP named rulebelowwidth	rbw	{}
+    import @TOIP named ruleverticalwidth rvw	{ {} @OrIfPlain 1s }
+    import @TOIP named ruleleftwidth	rlw	{}
+    import @TOIP named rulerightwidth	rrw	{}
+    import @TOIP named rulegap		rg	{ 0.15f }
+    import @TOIP named rulehorizontalgap rhg	{ {} @OrIfPlain 0f }
+    import @TOIP named ruleabovegap	rag	{}
+    import @TOIP named rulebelowgap	rbg	{}
+    import @TOIP named ruleverticalgap	rvg	{ {} @OrIfPlain 0s }
+    import @TOIP named ruleleftgap	rlg	{}
+    import @TOIP named rulerightgap	rrg	{}
+    import @TOIP named rulecolour rulecolor	rc	{ black }
+    import @TOIP named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+    import @TOIP named ruleabovecolour ruleabovecolor		rac	{}
+    import @TOIP named rulebelowcolour rulebelowcolor		rbc	{}
+    import @TOIP named ruleverticalcolour ruleverticalcolor	rvc	{}
+    import @TOIP named ruleleftcolour ruleleftcolor		rlc	{}
+    import @TOIP named rulerightcolour rulerightcolor		rrc	{}
+    import @TOIP named ruleplainchar	rpc	{ . }
+
+@Begin
+
+    def @Else
+	precedence 20
+	associativity right
+	left x
+	right y
+    {
+	x @Case {
+	    ""   @Yield y
+	    else @Yield x
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Specific option values as the setup file knows them (i.e. Level 1)     #
+    #                                                                         #
+    ###########################################################################
+
+    def setupp    { p   }
+    def setupbg   { bg  }
+    def setupf    { f   }
+    def setupb    { b   }
+    def setupw    { w   }
+    def setuph    { h   }
+    def setupi    { i   }
+    def setupiv   { iv  }
+    def setups    { s   }
+    def setupsh   { sh  }
+    def setupml   { ml  @Else mh  @Else m  }
+    def setupmr   { mr  @Else mh  @Else m  }
+    def setupma   { ma  @Else mv  @Else m  }
+    def setupmb   { mb  @Else mv  @Else m  }
+    def setupra   { ra  @Else rh  @Else r  }
+    def setuprb   { rb  @Else rh  @Else r  }
+    def setuprl   { rl  @Else rv  @Else r  }
+    def setuprr   { rr  @Else rv  @Else r  }
+    def setupraw  { raw @Else rhw @Else rw }
+    def setuprbw  { rbw @Else rhw @Else rw }
+    def setuprlw  { rlw @Else rvw @Else rw }
+    def setuprrw  { rrw @Else rvw @Else rw }
+    def setuprag  { rag @Else rhg @Else rg }
+    def setuprbg  { rbg @Else rhg @Else rg }
+    def setuprlg  { rlg @Else rvg @Else rg }
+    def setuprrg  { rrg @Else rvg @Else rg }
+    def setuprac  { rac @Else rhc @Else rc }
+    def setuprbc  { rbc @Else rhc @Else rc }
+    def setuprlc  { rlc @Else rvc @Else rc }
+    def setuprrc  { rrc @Else rvc @Else rc }
+    def setuprpc  { rpc }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @Tbl symbol                                                            #
+    #                                                                         #
+    ###########################################################################
+
+    export
+
+	@Row
+	@Rowa
+	@Rowb
+	@Rowc
+	@Rowd
+	@Rowe
+	@Rowf
+	@Rowg
+	@Rowh
+
+	@FirstRow
+	@FirstRowa
+	@FirstRowb
+	@FirstRowc
+	@FirstRowd
+	@FirstRowe
+	@FirstRowf
+	@FirstRowg
+	@FirstRowh
+
+	@MarkRow
+	@MarkRowa
+	@MarkRowb
+	@MarkRowc
+	@MarkRowd
+	@MarkRowe
+	@MarkRowf
+	@MarkRowg
+	@MarkRowh
+
+	@NoBreakRow
+	@NoBreakRowa
+	@NoBreakRowb
+	@NoBreakRowc
+	@NoBreakRowd
+	@NoBreakRowe
+	@NoBreakRowf
+	@NoBreakRowg
+	@NoBreakRowh
+
+	@HeaderRow
+	@HeaderRowa
+	@HeaderRowb
+	@HeaderRowc
+	@HeaderRowd
+	@HeaderRowe
+	@HeaderRowf
+	@HeaderRowg
+	@HeaderRowh
+
+	@HeaderFirstRow
+	@HeaderFirstRowa
+	@HeaderFirstRowb
+	@HeaderFirstRowc
+	@HeaderFirstRowd
+	@HeaderFirstRowe
+	@HeaderFirstRowf
+	@HeaderFirstRowg
+	@HeaderFirstRowh
+
+	@EndHeaderRow
+
+	@NP
+
+    def @Tbl
+
+	# parameters for formatting the entire table
+	named paint			p	{}
+	named background		bg	{}
+	named font			f	{}
+	named break			b	{}
+	named width			w	{}
+	named height			h	{}
+	named indent			i	{}
+	named indentvertical		iv	{}
+	named strut			s	{}
+	named struthorizontal		sh	{}
+	named margin			m	{}
+	named marginhorizontal		mh	{}
+	named marginleft		ml	{}
+	named marginright		mr	{}
+	named marginvertical		mv	{}
+	named marginabove		ma	{}
+	named marginbelow		mb	{}
+	named rule			r	{}
+	named rulehorizontal		rh	{}
+	named ruleabove			ra	{}
+	named rulebelow			rb	{}
+	named rulevertical		rv	{}
+	named ruleleft			rl	{}
+	named ruleright			rr	{}
+	named rulewidth			rw	{}
+	named rulehorizontalwidth	rhw	{}
+	named ruleabovewidth		raw	{}
+	named rulebelowwidth		rbw	{}
+	named ruleverticalwidth		rvw	{}
+	named ruleleftwidth		rlw	{}
+	named rulerightwidth		rrw	{}
+	named rulegap			rg	{}
+	named rulehorizontalgap		rhg	{}
+	named ruleabovegap		rag	{}
+	named rulebelowgap		rbg	{}
+	named ruleverticalgap		rvg	{}
+	named ruleleftgap		rlg	{}
+	named rulerightgap		rrg	{}
+	named rulecolour rulecolor			rc	{}
+	named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+	named ruleabovecolour ruleabovecolor		rac	{}
+	named rulebelowcolour rulebelowcolor		rbc	{}
+	named ruleverticalcolour ruleverticalcolor	rvc	{}
+	named ruleleftcolour ruleleftcolor		rlc	{}
+	named rulerightcolour rulerightcolor		rrc	{}
+	named ruleplainchar		rpc	{}
+
+	# parameters for formatting @Rowa rows
+	named apaint			ap	{}
+	named abackground		abg	{}
+	named afont			af	{}
+	named abreak			ab	{}
+	named awidth			aw	{}
+	named aheight			ah	{}
+	named aindent			ai	{}
+	named aindentvertical		aiv	{}
+	named astrut			as	{}
+	named astruthorizontal		ash	{}
+	named amargin			am	{}
+	named amarginhorizontal		amh	{}
+	named amarginleft		aml	{}
+	named amarginright		amr	{}
+	named amarginvertical		amv	{}
+	named amarginabove		ama	{}
+	named amarginbelow		amb	{}
+	named arule			ar	{}
+	named arulehorizontal		arh	{}
+	named aruleabove		ara	{}
+	named arulebelow		arb	{}
+	named arulevertical		arv	{}
+	named aruleleft			arl	{}
+	named aruleright		arr	{}
+	named arulewidth		arw	{}
+	named arulehorizontalwidth	arhw	{}
+	named aruleabovewidth		araw	{}
+	named arulebelowwidth		arbw	{}
+	named aruleverticalwidth	arvw	{}
+	named aruleleftwidth		arlw	{}
+	named arulerightwidth		arrw	{} 
+	named arulegap			arg	{}
+	named arulehorizontalgap	arhg	{}
+	named aruleabovegap		arag	{}
+	named arulebelowgap		arbg	{}
+	named aruleverticalgap		arvg	{}
+	named aruleleftgap		arlg	{}
+	named arulerightgap		arrg	{}
+	named arulecolour arulecolor			arc	{}
+	named arulehorizontalcolour arulehorizontalcolor arhc	{}
+	named aruleabovecolour aruleabovecolor		arac	{}
+	named arulebelowcolour arulebelowcolor		arbc	{}
+	named aruleverticalcolour aruleverticalcolor	arvc	{}
+	named aruleleftcolour aruleleftcolor		arlc	{}
+	named arulerightcolour arulerightcolor		arrc	{}
+	named aruleplainchar		arpc	{}
+	named aformat
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	    named @Cell
+		named paint			p	{}
+		named background		bg	{}
+		named font			f	{}
+		named break			b	{}
+		named width			w	{}
+		named height			h	{}
+		named indent			i	{}
+		named indentvertical		iv	{}
+		named strut			s	{}
+		named struthorizontal		sh	{}
+		named margin			m	{}
+		named marginhorizontal		mh	{}
+		named marginleft		ml	{}
+		named marginright		mr	{}
+		named marginvertical		mv	{}
+		named marginabove		ma	{}
+		named marginbelow		mb	{}
+		named rule			r	{}
+		named rulehorizontal		rh	{}
+		named ruleabove			ra	{}
+		named rulebelow			rb	{}
+		named rulevertical		rv	{}
+		named ruleleft			rl	{}
+		named ruleright			rr	{}
+		named rulewidth			rw	{}
+		named rulehorizontalwidth	rhw	{}
+		named ruleabovewidth		raw	{}
+		named rulebelowwidth		rbw	{}
+		named ruleverticalwidth		rvw	{}
+		named ruleleftwidth		rlw	{}
+		named rulerightwidth		rrw	{}
+		named rulegap			rg	{}
+		named rulehorizontalgap		rhg	{}
+		named ruleabovegap		rag	{}
+		named rulebelowgap		rbg	{}
+		named ruleverticalgap		rvg	{}
+		named ruleleftgap		rlg	{}
+		named rulerightgap		rrg	{}
+		named rulecolour rulecolor			rc	{}
+		named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+		named ruleabovecolour ruleabovecolor		rac	{}
+		named rulebelowcolour rulebelowcolor		rbc	{}
+		named ruleverticalcolour ruleverticalcolor	rvc	{}
+		named ruleleftcolour ruleleftcolor		rlc	{}
+		named rulerightcolour rulerightcolor		rrc	{}
+		named ruleplainchar		rpc	{}
+		right x
+	    {}
+	{}
+
+	# parameters for formatting @Rowb rows
+	named bpaint			bp	{}
+	named bbackground		bbg	{}
+	named bfont			bf	{}
+	named bbreak			bb	{}
+	named bwidth			bw	{}
+	named bheight			bh	{}
+	named bindent			bi	{}
+	named bindentvertical		biv	{}
+	named bstrut			bs	{}
+	named bstruthorizontal		bsh	{}
+	named bmargin			bm	{}
+	named bmarginhorizontal		bmh	{}
+	named bmarginleft		bml	{}
+	named bmarginright		bmr	{}
+	named bmarginvertical		bmv	{}
+	named bmarginabove		bma	{}
+	named bmarginbelow		bmb	{}
+	named brule			br	{}
+	named brulehorizontal		brh	{}
+	named bruleabove		bra	{}
+	named brulebelow		brb	{}
+	named brulevertical		brv	{}
+	named bruleleft			brl	{}
+	named bruleright		brr	{}
+	named brulewidth		brw	{}
+	named brulehorizontalwidth	brhw	{}
+	named bruleabovewidth		braw	{}
+	named brulebelowwidth		brbw	{}
+	named bruleverticalwidth	brvw	{}
+	named bruleleftwidth		brlw	{}
+	named brulerightwidth		brrw	{} 
+	named brulegap			brg	{}
+	named brulehorizontalgap	brhg	{}
+	named bruleabovegap		brag	{}
+	named brulebelowgap		brbg	{}
+	named bruleverticalgap		brvg	{}
+	named bruleleftgap		brlg	{}
+	named brulerightgap		brrg	{}
+	named brulecolour brulecolor			brc	{}
+	named brulehorizontalcolour brulehorizontalcolor brhc	{}
+	named bruleabovecolour bruleabovecolor		brac	{}
+	named brulebelowcolour brulebelowcolor		brbc	{}
+	named bruleverticalcolour bruleverticalcolor	brvc	{}
+	named bruleleftcolour bruleleftcolor		brlc	{}
+	named brulerightcolour brulerightcolor		brrc	{}
+	named bruleplainchar		brpc	{}
+	named bformat
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	    named @Cell
+		named paint			p	{}
+		named background		bg	{}
+		named font			f	{}
+		named break			b	{}
+		named width			w	{}
+		named height			h	{}
+		named indent			i	{}
+		named indentvertical		iv	{}
+		named strut			s	{}
+		named struthorizontal		sh	{}
+		named margin			m	{}
+		named marginhorizontal		mh	{}
+		named marginleft		ml	{}
+		named marginright		mr	{}
+		named marginvertical		mv	{}
+		named marginabove		ma	{}
+		named marginbelow		mb	{}
+		named rule			r	{}
+		named rulehorizontal		rh	{}
+		named ruleabove			ra	{}
+		named rulebelow			rb	{}
+		named rulevertical		rv	{}
+		named ruleleft			rl	{}
+		named ruleright			rr	{}
+		named rulewidth			rw	{}
+		named rulehorizontalwidth	rhw	{}
+		named ruleabovewidth		raw	{}
+		named rulebelowwidth		rbw	{}
+		named ruleverticalwidth		rvw	{}
+		named ruleleftwidth		rlw	{}
+		named rulerightwidth		rrw	{}
+		named rulegap			rg	{}
+		named rulehorizontalgap		rhg	{}
+		named ruleabovegap		rag	{}
+		named rulebelowgap		rbg	{}
+		named ruleverticalgap		rvg	{}
+		named ruleleftgap		rlg	{}
+		named rulerightgap		rrg	{}
+		named rulecolour rulecolor			rc	{}
+		named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+		named ruleabovecolour ruleabovecolor		rac	{}
+		named rulebelowcolour rulebelowcolor		rbc	{}
+		named ruleverticalcolour ruleverticalcolor	rvc	{}
+		named ruleleftcolour ruleleftcolor		rlc	{}
+		named rulerightcolour rulerightcolor		rrc	{}
+		named ruleplainchar		rpc	{}
+		right x
+	    {}
+	{}
+
+	# parameters for formatting @Rowc rows
+	named cpaint			cp	{}
+	named cbackground		cbg	{}
+	named cfont			cf	{}
+	named cbreak			cb	{}
+	named cwidth			cw	{}
+	named cheight			ch	{}
+	named cindent			ci	{}
+	named cindentvertical		civ	{}
+	named cstrut			cs	{}
+	named cstruthorizontal		csh	{}
+	named cmargin			cm	{}
+	named cmarginhorizontal		cmh	{}
+	named cmarginleft		cml	{}
+	named cmarginright		cmr	{}
+	named cmarginvertical		cmv	{}
+	named cmarginabove		cma	{}
+	named cmarginbelow		cmb	{}
+	named crule			cr	{}
+	named crulehorizontal		crh	{}
+	named cruleabove		cra	{}
+	named crulebelow		crb	{}
+	named crulevertical		crv	{}
+	named cruleleft			crl	{}
+	named cruleright		crr	{}
+	named crulewidth		crw	{}
+	named crulehorizontalwidth	crhw	{}
+	named cruleabovewidth		craw	{}
+	named crulebelowwidth		crbw	{}
+	named cruleverticalwidth	crvw	{}
+	named cruleleftwidth		crlw	{}
+	named crulerightwidth		crrw	{} 
+	named crulegap			crg	{}
+	named crulehorizontalgap	crhg	{}
+	named cruleabovegap		crag	{}
+	named crulebelowgap		crbg	{}
+	named cruleverticalgap		crvg	{}
+	named cruleleftgap		crlg	{}
+	named crulerightgap		crrg	{}
+	named crulecolour crulecolor			crc	{}
+	named crulehorizontalcolour crulehorizontalcolor crhc	{}
+	named cruleabovecolour cruleabovecolor		crac	{}
+	named crulebelowcolour crulebelowcolor		crbc	{}
+	named cruleverticalcolour cruleverticalcolor	crvc	{}
+	named cruleleftcolour cruleleftcolor		crlc	{}
+	named crulerightcolour crulerightcolor		crrc	{}
+	named cruleplainchar		crpc	{}
+	named cformat
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	    named @Cell
+		named paint			p	{}
+		named background		bg	{}
+		named font			f	{}
+		named break			b	{}
+		named width			w	{}
+		named height			h	{}
+		named indent			i	{}
+		named indentvertical		iv	{}
+		named strut			s	{}
+		named struthorizontal		sh	{}
+		named margin			m	{}
+		named marginhorizontal		mh	{}
+		named marginleft		ml	{}
+		named marginright		mr	{}
+		named marginvertical		mv	{}
+		named marginabove		ma	{}
+		named marginbelow		mb	{}
+		named rule			r	{}
+		named rulehorizontal		rh	{}
+		named ruleabove			ra	{}
+		named rulebelow			rb	{}
+		named rulevertical		rv	{}
+		named ruleleft			rl	{}
+		named ruleright			rr	{}
+		named rulewidth			rw	{}
+		named rulehorizontalwidth	rhw	{}
+		named ruleabovewidth		raw	{}
+		named rulebelowwidth		rbw	{}
+		named ruleverticalwidth		rvw	{}
+		named ruleleftwidth		rlw	{}
+		named rulerightwidth		rrw	{}
+		named rulegap			rg	{}
+		named rulehorizontalgap		rhg	{}
+		named ruleabovegap		rag	{}
+		named rulebelowgap		rbg	{}
+		named ruleverticalgap		rvg	{}
+		named ruleleftgap		rlg	{}
+		named rulerightgap		rrg	{}
+		named rulecolour rulecolor			rc	{}
+		named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+		named ruleabovecolour ruleabovecolor		rac	{}
+		named rulebelowcolour rulebelowcolor		rbc	{}
+		named ruleverticalcolour ruleverticalcolor	rvc	{}
+		named ruleleftcolour ruleleftcolor		rlc	{}
+		named rulerightcolour rulerightcolor		rrc	{}
+		named ruleplainchar		rpc	{}
+		right x
+	    {}
+	{}
+
+	# parameters for formatting @Rowd rows
+	named dpaint			dp	{}
+	named dbackground		dbg	{}
+	named dfont			df	{}
+	named dbreak			db	{}
+	named dwidth			dw	{}
+	named dheight			dh	{}
+	named dindent			di	{}
+	named dindentvertical		div	{}
+	named dstrut			ds	{}
+	named dstruthorizontal		dsh	{}
+	named dmargin			dm	{}
+	named dmarginhorizontal		dmh	{}
+	named dmarginleft		dml	{}
+	named dmarginright		dmr	{}
+	named dmarginvertical		dmv	{}
+	named dmarginabove		dma	{}
+	named dmarginbelow		dmb	{}
+	named drule			dr	{}
+	named drulehorizontal		drh	{}
+	named druleabove		dra	{}
+	named drulebelow		drb	{}
+	named drulevertical		drv	{}
+	named druleleft			drl	{}
+	named druleright		drr	{}
+	named drulewidth		drw	{}
+	named drulehorizontalwidth	drhw	{}
+	named druleabovewidth		draw	{}
+	named drulebelowwidth		drbw	{}
+	named druleverticalwidth	drvw	{}
+	named druleleftwidth		drlw	{}
+	named drulerightwidth		drrw	{} 
+	named drulegap			drg	{}
+	named drulehorizontalgap	drhg	{}
+	named druleabovegap		drag	{}
+	named drulebelowgap		drbg	{}
+	named druleverticalgap		drvg	{}
+	named druleleftgap		drlg	{}
+	named drulerightgap		drrg	{}
+	named drulecolour drulecolor			drc	{}
+	named drulehorizontalcolour drulehorizontalcolor drhc	{}
+	named druleabovecolour druleabovecolor		drac	{}
+	named drulebelowcolour drulebelowcolor		drbc	{}
+	named druleverticalcolour druleverticalcolor	drvc	{}
+	named druleleftcolour druleleftcolor		drlc	{}
+	named drulerightcolour drulerightcolor		drrc	{}
+	named druleplainchar		drpc	{}
+	named dformat
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	    named @Cell
+		named paint			p	{}
+		named background		bg	{}
+		named font			f	{}
+		named break			b	{}
+		named width			w	{}
+		named height			h	{}
+		named indent			i	{}
+		named indentvertical		iv	{}
+		named strut			s	{}
+		named struthorizontal		sh	{}
+		named margin			m	{}
+		named marginhorizontal		mh	{}
+		named marginleft		ml	{}
+		named marginright		mr	{}
+		named marginvertical		mv	{}
+		named marginabove		ma	{}
+		named marginbelow		mb	{}
+		named rule			r	{}
+		named rulehorizontal		rh	{}
+		named ruleabove			ra	{}
+		named rulebelow			rb	{}
+		named rulevertical		rv	{}
+		named ruleleft			rl	{}
+		named ruleright			rr	{}
+		named rulewidth			rw	{}
+		named rulehorizontalwidth	rhw	{}
+		named ruleabovewidth		raw	{}
+		named rulebelowwidth		rbw	{}
+		named ruleverticalwidth		rvw	{}
+		named ruleleftwidth		rlw	{}
+		named rulerightwidth		rrw	{}
+		named rulegap			rg	{}
+		named rulehorizontalgap		rhg	{}
+		named ruleabovegap		rag	{}
+		named rulebelowgap		rbg	{}
+		named ruleverticalgap		rvg	{}
+		named ruleleftgap		rlg	{}
+		named rulerightgap		rrg	{}
+		named rulecolour rulecolor			rc	{}
+		named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+		named ruleabovecolour ruleabovecolor		rac	{}
+		named rulebelowcolour rulebelowcolor		rbc	{}
+		named ruleverticalcolour ruleverticalcolor	rvc	{}
+		named ruleleftcolour ruleleftcolor		rlc	{}
+		named rulerightcolour rulerightcolor		rrc	{}
+		named ruleplainchar		rpc	{}
+		right x
+	    {}
+	{}
+
+	# parameters for formatting @Rowe rows
+	named epaint			ep	{}
+	named ebackground		ebg	{}
+	named efont			ef	{}
+	named ebreak			eb	{}
+	named ewidth			ew	{}
+	named eheight			eh	{}
+	named eindent			ei	{}
+	named eindentvertical		eiv	{}
+	named estrut			es	{}
+	named estruthorizontal		esh	{}
+	named emargin			em	{}
+	named emarginhorizontal		emh	{}
+	named emarginleft		eml	{}
+	named emarginright		emr	{}
+	named emarginvertical		emv	{}
+	named emarginabove		ema	{}
+	named emarginbelow		emb	{}
+	named erule			er	{}
+	named erulehorizontal		erh	{}
+	named eruleabove		era	{}
+	named erulebelow		erb	{}
+	named erulevertical		erv	{}
+	named eruleleft			erl	{}
+	named eruleright		err	{}
+	named erulewidth		erw	{}
+	named erulehorizontalwidth	erhw	{}
+	named eruleabovewidth		eraw	{}
+	named erulebelowwidth		erbw	{}
+	named eruleverticalwidth	ervw	{}
+	named eruleleftwidth		erlw	{}
+	named erulerightwidth		errw	{} 
+	named erulegap			erg	{}
+	named erulehorizontalgap	erhg	{}
+	named eruleabovegap		erag	{}
+	named erulebelowgap		erbg	{}
+	named eruleverticalgap		ervg	{}
+	named eruleleftgap		erlg	{}
+	named erulerightgap		errg	{}
+	named erulecolour erulecolor			erc	{}
+	named erulehorizontalcolour erulehorizontalcolor erhc	{}
+	named eruleabovecolour eruleabovecolor		erac	{}
+	named erulebelowcolour erulebelowcolor		erbc	{}
+	named eruleverticalcolour eruleverticalcolor	ervc	{}
+	named eruleleftcolour eruleleftcolor		erlc	{}
+	named erulerightcolour erulerightcolor		errc	{}
+	named eruleplainchar		erpc	{}
+	named eformat
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	    named @Cell
+		named paint			p	{}
+		named background		bg	{}
+		named font			f	{}
+		named break			b	{}
+		named width			w	{}
+		named height			h	{}
+		named indent			i	{}
+		named indentvertical		iv	{}
+		named strut			s	{}
+		named struthorizontal		sh	{}
+		named margin			m	{}
+		named marginhorizontal		mh	{}
+		named marginleft		ml	{}
+		named marginright		mr	{}
+		named marginvertical		mv	{}
+		named marginabove		ma	{}
+		named marginbelow		mb	{}
+		named rule			r	{}
+		named rulehorizontal		rh	{}
+		named ruleabove			ra	{}
+		named rulebelow			rb	{}
+		named rulevertical		rv	{}
+		named ruleleft			rl	{}
+		named ruleright			rr	{}
+		named rulewidth			rw	{}
+		named rulehorizontalwidth	rhw	{}
+		named ruleabovewidth		raw	{}
+		named rulebelowwidth		rbw	{}
+		named ruleverticalwidth		rvw	{}
+		named ruleleftwidth		rlw	{}
+		named rulerightwidth		rrw	{}
+		named rulegap			rg	{}
+		named rulehorizontalgap		rhg	{}
+		named ruleabovegap		rag	{}
+		named rulebelowgap		rbg	{}
+		named ruleverticalgap		rvg	{}
+		named ruleleftgap		rlg	{}
+		named rulerightgap		rrg	{}
+		named rulecolour rulecolor			rc	{}
+		named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+		named ruleabovecolour ruleabovecolor		rac	{}
+		named rulebelowcolour rulebelowcolor		rbc	{}
+		named ruleverticalcolour ruleverticalcolor	rvc	{}
+		named ruleleftcolour ruleleftcolor		rlc	{}
+		named rulerightcolour rulerightcolor		rrc	{}
+		named ruleplainchar		rpc	{}
+		right x
+	    {}
+	{}
+
+	# parameters for formatting @Rowf rows
+	named fpaint			fp	{}
+	named fbackground		fbg	{}
+	named ffont			ff	{}
+	named fbreak			fb	{}
+	named fwidth			fw	{}
+	named fheight			fh	{}
+	named findent			fi	{}
+	named findentvertical		fiv	{}
+	named fstrut			fs	{}
+	named fstruthorizontal		fsh	{}
+	named fmargin			fm	{}
+	named fmarginhorizontal		fmh	{}
+	named fmarginleft		fml	{}
+	named fmarginright		fmr	{}
+	named fmarginvertical		fmv	{}
+	named fmarginabove		fma	{}
+	named fmarginbelow		fmb	{}
+	named frule			fr	{}
+	named frulehorizontal		frh	{}
+	named fruleabove		fra	{}
+	named frulebelow		frb	{}
+	named frulevertical		frv	{}
+	named fruleleft			frl	{}
+	named fruleright		frr	{}
+	named frulewidth		frw	{}
+	named frulehorizontalwidth	frhw	{}
+	named fruleabovewidth		fraw	{}
+	named frulebelowwidth		frbw	{}
+	named fruleverticalwidth	frvw	{}
+	named fruleleftwidth		frlw	{}
+	named frulerightwidth		frrw	{} 
+	named frulegap			frg	{}
+	named frulehorizontalgap	frhg	{}
+	named fruleabovegap		frag	{}
+	named frulebelowgap		frbg	{}
+	named fruleverticalgap		frvg	{}
+	named fruleleftgap		frlg	{}
+	named frulerightgap		frrg	{}
+	named frulecolour frulecolor			frc	{}
+	named frulehorizontalcolour frulehorizontalcolor frhc	{}
+	named fruleabovecolour fruleabovecolor		frac	{}
+	named frulebelowcolour frulebelowcolor		frbc	{}
+	named fruleverticalcolour fruleverticalcolor	frvc	{}
+	named fruleleftcolour fruleleftcolor		frlc	{}
+	named frulerightcolour frulerightcolor		frrc	{}
+	named fruleplainchar		frpc	{}
+	named fformat
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	    named @Cell
+		named paint			p	{}
+		named background		bg	{}
+		named font			f	{}
+		named break			b	{}
+		named width			w	{}
+		named height			h	{}
+		named indent			i	{}
+		named indentvertical		iv	{}
+		named strut			s	{}
+		named struthorizontal		sh	{}
+		named margin			m	{}
+		named marginhorizontal		mh	{}
+		named marginleft		ml	{}
+		named marginright		mr	{}
+		named marginvertical		mv	{}
+		named marginabove		ma	{}
+		named marginbelow		mb	{}
+		named rule			r	{}
+		named rulehorizontal		rh	{}
+		named ruleabove			ra	{}
+		named rulebelow			rb	{}
+		named rulevertical		rv	{}
+		named ruleleft			rl	{}
+		named ruleright			rr	{}
+		named rulewidth			rw	{}
+		named rulehorizontalwidth	rhw	{}
+		named ruleabovewidth		raw	{}
+		named rulebelowwidth		rbw	{}
+		named ruleverticalwidth		rvw	{}
+		named ruleleftwidth		rlw	{}
+		named rulerightwidth		rrw	{}
+		named rulegap			rg	{}
+		named rulehorizontalgap		rhg	{}
+		named ruleabovegap		rag	{}
+		named rulebelowgap		rbg	{}
+		named ruleverticalgap		rvg	{}
+		named ruleleftgap		rlg	{}
+		named rulerightgap		rrg	{}
+		named rulecolour rulecolor			rc	{}
+		named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+		named ruleabovecolour ruleabovecolor		rac	{}
+		named rulebelowcolour rulebelowcolor		rbc	{}
+		named ruleverticalcolour ruleverticalcolor	rvc	{}
+		named ruleleftcolour ruleleftcolor		rlc	{}
+		named rulerightcolour rulerightcolor		rrc	{}
+		named ruleplainchar		rpc	{}
+		right x
+	    {}
+	{}
+
+	# parameters for formatting @Rowg rows
+	named gpaint			gp	{}
+	named gbackground		gbg	{}
+	named gfont			gf	{}
+	named gbreak			gb	{}
+	named gwidth			gw	{}
+	named gheight			gh	{}
+	named gindent			gi	{}
+	named gindentvertical		giv	{}
+	named gstrut			gs	{}
+	named gstruthorizontal		gsh	{}
+	named gmargin			gm	{}
+	named gmarginhorizontal		gmh	{}
+	named gmarginleft		gml	{}
+	named gmarginright		gmr	{}
+	named gmarginvertical		gmv	{}
+	named gmarginabove		gma	{}
+	named gmarginbelow		gmb	{}
+	named grule			gr	{}
+	named grulehorizontal		grh	{}
+	named gruleabove		gra	{}
+	named grulebelow		grb	{}
+	named grulevertical		grv	{}
+	named gruleleft			grl	{}
+	named gruleright		grr	{}
+	named grulewidth		grw	{}
+	named grulehorizontalwidth	grhw	{}
+	named gruleabovewidth		graw	{}
+	named grulebelowwidth		grbw	{}
+	named gruleverticalwidth	grvw	{}
+	named gruleleftwidth		grlw	{}
+	named grulerightwidth		grrw	{} 
+	named grulegap			grg	{}
+	named grulehorizontalgap	grhg	{}
+	named gruleabovegap		grag	{}
+	named grulebelowgap		grbg	{}
+	named gruleverticalgap		grvg	{}
+	named gruleleftgap		grlg	{}
+	named grulerightgap		grrg	{}
+	named grulecolour grulecolor			grc	{}
+	named grulehorizontalcolour grulehorizontalcolor grhc	{}
+	named gruleabovecolour gruleabovecolor		grac	{}
+	named grulebelowcolour grulebelowcolor		grbc	{}
+	named gruleverticalcolour gruleverticalcolor	grvc	{}
+	named gruleleftcolour gruleleftcolor		grlc	{}
+	named grulerightcolour grulerightcolor		grrc	{}
+	named gruleplainchar		grpc	{}
+	named gformat
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	    named @Cell
+		named paint			p	{}
+		named background		bg	{}
+		named font			f	{}
+		named break			b	{}
+		named width			w	{}
+		named height			h	{}
+		named indent			i	{}
+		named indentvertical		iv	{}
+		named strut			s	{}
+		named struthorizontal		sh	{}
+		named margin			m	{}
+		named marginhorizontal		mh	{}
+		named marginleft		ml	{}
+		named marginright		mr	{}
+		named marginvertical		mv	{}
+		named marginabove		ma	{}
+		named marginbelow		mb	{}
+		named rule			r	{}
+		named rulehorizontal		rh	{}
+		named ruleabove			ra	{}
+		named rulebelow			rb	{}
+		named rulevertical		rv	{}
+		named ruleleft			rl	{}
+		named ruleright			rr	{}
+		named rulewidth			rw	{}
+		named rulehorizontalwidth	rhw	{}
+		named ruleabovewidth		raw	{}
+		named rulebelowwidth		rbw	{}
+		named ruleverticalwidth		rvw	{}
+		named ruleleftwidth		rlw	{}
+		named rulerightwidth		rrw	{}
+		named rulegap			rg	{}
+		named rulehorizontalgap		rhg	{}
+		named ruleabovegap		rag	{}
+		named rulebelowgap		rbg	{}
+		named ruleverticalgap		rvg	{}
+		named ruleleftgap		rlg	{}
+		named rulerightgap		rrg	{}
+		named rulecolour rulecolor			rc	{}
+		named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+		named ruleabovecolour ruleabovecolor		rac	{}
+		named rulebelowcolour rulebelowcolor		rbc	{}
+		named ruleverticalcolour ruleverticalcolor	rvc	{}
+		named ruleleftcolour ruleleftcolor		rlc	{}
+		named rulerightcolour rulerightcolor		rrc	{}
+		named ruleplainchar		rpc	{}
+		right x
+	    {}
+	{}
+
+	# parameters for formatting @Rowh rows
+	named hpaint			hp	{}
+	named hbackground		hbg	{}
+	named hfont			hf	{}
+	named hbreak			hb	{}
+	named hwidth			hw	{}
+	named hheight			hh	{}
+	named hindent			hi	{}
+	named hindentvertical		hiv	{}
+	named hstrut			hs	{}
+	named hstruthorizontal		hsh	{}
+	named hmargin			hm	{}
+	named hmarginhorizontal		hmh	{}
+	named hmarginleft		hml	{}
+	named hmarginright		hmr	{}
+	named hmarginvertical		hmv	{}
+	named hmarginabove		hma	{}
+	named hmarginbelow		hmb	{}
+	named hrule			hr	{}
+	named hrulehorizontal		hrh	{}
+	named hruleabove		hra	{}
+	named hrulebelow		hrb	{}
+	named hrulevertical		hrv	{}
+	named hruleleft			hrl	{}
+	named hruleright		hrr	{}
+	named hrulewidth		hrw	{}
+	named hrulehorizontalwidth	hrhw	{}
+	named hruleabovewidth		hraw	{}
+	named hrulebelowwidth		hrbw	{}
+	named hruleverticalwidth	hrvw	{}
+	named hruleleftwidth		hrlw	{}
+	named hrulerightwidth		hrrw	{} 
+	named hrulegap			hrg	{}
+	named hrulehorizontalgap	hrhg	{}
+	named hruleabovegap		hrag	{}
+	named hrulebelowgap		hrbg	{}
+	named hruleverticalgap		hrvg	{}
+	named hruleleftgap		hrlg	{}
+	named hrulerightgap		hrrg	{}
+	named hrulecolour hrulecolor			hrc	{}
+	named hrulehorizontalcolour hrulehorizontalcolor hrhc	{}
+	named hruleabovecolour hruleabovecolor		hrac	{}
+	named hrulebelowcolour hrulebelowcolor		hrbc	{}
+	named hruleverticalcolour hruleverticalcolor	hrvc	{}
+	named hruleleftcolour hruleleftcolor		hrlc	{}
+	named hrulerightcolour hrulerightcolor		hrrc	{}
+	named hruleplainchar		hrpc	{}
+	named hformat
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	    named @Cell
+		named paint			p	{}
+		named background		bg	{}
+		named font			f	{}
+		named break			b	{}
+		named width			w	{}
+		named height			h	{}
+		named indent			i	{}
+		named indentvertical		iv	{}
+		named strut			s	{}
+		named struthorizontal		sh	{}
+		named margin			m	{}
+		named marginhorizontal		mh	{}
+		named marginleft		ml	{}
+		named marginright		mr	{}
+		named marginvertical		mv	{}
+		named marginabove		ma	{}
+		named marginbelow		mb	{}
+		named rule			r	{}
+		named rulehorizontal		rh	{}
+		named ruleabove			ra	{}
+		named rulebelow			rb	{}
+		named rulevertical		rv	{}
+		named ruleleft			rl	{}
+		named ruleright			rr	{}
+		named rulewidth			rw	{}
+		named rulehorizontalwidth	rhw	{}
+		named ruleabovewidth		raw	{}
+		named rulebelowwidth		rbw	{}
+		named ruleverticalwidth		rvw	{}
+		named ruleleftwidth		rlw	{}
+		named rulerightwidth		rrw	{}
+		named rulegap			rg	{}
+		named rulehorizontalgap		rhg	{}
+		named ruleabovegap		rag	{}
+		named rulebelowgap		rbg	{}
+		named ruleverticalgap		rvg	{}
+		named ruleleftgap		rlg	{}
+		named rulerightgap		rrg	{}
+		named rulecolour rulecolor			rc	{}
+		named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+		named ruleabovecolour ruleabovecolor		rac	{}
+		named rulebelowcolour rulebelowcolor		rbc	{}
+		named ruleverticalcolour ruleverticalcolor	rvc	{}
+		named ruleleftcolour ruleleftcolor		rlc	{}
+		named rulerightcolour rulerightcolor		rrc	{}
+		named ruleplainchar		rpc	{}
+		right x
+	    {}
+	{}
+
+	body @Body   # this is the right parameter of @Tbl
+
+    {
+
+	#######################################################################
+	#                                                                     #
+	#  Specific option values as @Tbl knows them (i.e. Level 2)           #
+	#                                                                     #
+	#######################################################################
+
+	def tblp    { p				@Else setupp   }
+	def tblbg   { bg			@Else setupbg  }
+	def tblf    { f				@Else setupf   }
+	def tblb    { b				@Else setupb   }
+	def tblw    { w				@Else setupw   }
+	def tblh    { h				@Else setuph   }
+	def tbli    { i				@Else setupi   }
+	def tbliv   { iv			@Else setupiv  }
+	def tbls    { s				@Else setups   }
+	def tblsh   { sh			@Else setupsh  }
+	def tblml   { ml  @Else mh  @Else m	@Else setupml  }
+	def tblmr   { mr  @Else mh  @Else m	@Else setupmr  }
+	def tblma   { ma  @Else mv  @Else m	@Else setupma  }
+	def tblmb   { mb  @Else mv  @Else m	@Else setupmb  }
+	def tblra   { ra  @Else rh  @Else r	@Else setupra  }
+	def tblrb   { rb  @Else rh  @Else r	@Else setuprb  }
+	def tblrl   { rl  @Else rv  @Else r	@Else setuprl  }
+	def tblrr   { rr  @Else rv  @Else r	@Else setuprr  }
+	def tblraw  { raw @Else rhw @Else rw	@Else setupraw }
+	def tblrbw  { rbw @Else rhw @Else rw	@Else setuprbw }
+	def tblrlw  { rlw @Else rvw @Else rw	@Else setuprlw }
+	def tblrrw  { rrw @Else rvw @Else rw	@Else setuprrw }
+	def tblrag  { rag @Else rhg @Else rg	@Else setuprag }
+	def tblrbg  { rbg @Else rhg @Else rg	@Else setuprbg }
+	def tblrlg  { rlg @Else rvg @Else rg	@Else setuprlg }
+	def tblrrg  { rrg @Else rvg @Else rg	@Else setuprrg }
+	def tblrac  { rac @Else rhc @Else rc	@Else setuprac }
+	def tblrbc  { rbc @Else rhc @Else rc	@Else setuprbc }
+	def tblrlc  { rlc @Else rvc @Else rc	@Else setuprlc }
+	def tblrrc  { rrc @Else rvc @Else rc	@Else setuprrc }
+	def tblrpc  { rpc			@Else setuprpc }
+
+
+	def @DoCell
+	    named compulsory p    {}
+	    named compulsory bg   {}
+	    named compulsory f    {}
+	    named compulsory b    {}
+	    named compulsory w    {}
+	    named compulsory h    {}
+	    named compulsory i    {}
+	    named compulsory iv   {}
+	    named compulsory s    {}
+	    named compulsory sh   {}
+	    named compulsory ml   {}
+	    named compulsory mr   {}
+	    named compulsory ma   {}
+	    named compulsory mb   {}
+	    named compulsory ra   {}
+	    named compulsory rb   {}
+	    named compulsory rl   {}
+	    named compulsory rr   {}
+	    named compulsory raw  {}
+	    named compulsory rbw  {}
+	    named compulsory rlw  {}
+	    named compulsory rrw  {}
+	    named compulsory rag  {}
+	    named compulsory rbg  {}
+	    named compulsory rlg  {}
+	    named compulsory rrg  {}
+	    named compulsory rac  {}
+	    named compulsory rbc  {}
+	    named compulsory rlc  {}
+	    named compulsory rrc  {}
+	    named compulsory rpc  {}
+	    right @Body
+	{
+
+	    def @ZeroWidth right x
+	    {
+		@OneCol { |0io x |0io }
+	    }
+
+	    def @ZeroHeight right x
+	    {
+		@OneRow { /0io x /0io }
+	    }
+
+	    def @PDFColourCommand right col
+	    {
+	        def @ColourCoords
+	        {
+	            col @Case {
+			nochange	@Yield  { nochange    }
+	                darkblue        @Yield  { 0.0 0.0 0.5 }
+	                blue            @Yield  { 0.0 0.0 1.0 }
+	                lightblue       @Yield  { 0.5 0.5 1.0 }
+	                darkgreen       @Yield  { 0.0 0.5 0.0 }
+	                green           @Yield  { 0.0 1.0 0.0 }
+	                lightgreen      @Yield  { 0.5 1.0 0.5 }
+	                darkred         @Yield  { 0.5 0.0 0.0 }
+	                red             @Yield  { 1.0 0.0 0.0 }
+	                lightred        @Yield  { 1.0 0.5 0.5 }
+	                darkcyan        @Yield  { 0.0 0.5 0.5 }
+	                cyan            @Yield  { 0.0 1.0 1.0 }
+	                lightcyan       @Yield  { 0.5 1.0 1.0 }
+	                darkmagenta     @Yield  { 0.5 0.0 0.5 }
+	                magenta         @Yield  { 1.0 0.0 1.0 }
+	                lightmagenta    @Yield  { 1.0 0.5 1.0 }
+	                darkyellow      @Yield  { 0.5 0.5 0.0 }
+	                yellow          @Yield  { 1.0 1.0 0.0 }
+	                lightyellow     @Yield  { 1.0 1.0 0.5 }
+	                darkgray        @Yield  { 0.2 0.2 0.2 }
+	                gray            @Yield  { 0.5 0.5 0.5 }
+	                lightgray       @Yield  { 0.8 0.8 0.8 }
+	                darkgrey        @Yield  { 0.2 0.2 0.2 }
+	                grey            @Yield  { 0.5 0.5 0.5 }
+	                lightgrey       @Yield  { 0.8 0.8 0.8 }
+	                black           @Yield  { 0.0 0.0 0.0 }
+                	white           @Yield  { 1.0 1.0 1.0 }
+		    }
+	        }
+
+		@ColourCoords "rg" @ColourCoords "RG"
+	    }
+
+	    def @PDFAddPaint right col
+	    {
+	        col @Case {
+	            none @Yield ""
+	            nochange @Yield "q f Q"
+	            else @Yield { "q" @PDFColourCommand col "f Q" }
+	        }
+	    }
+
+	    def @FillBox left col right x
+	    {
+	      @BackEnd @Case {
+		PostScript @Yield {{"LoutBox ltbl"col} @Graphic x}
+		PDF        @Yield {{
+				     "0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h"
+				     @PDFAddPaint col "S"
+				   } @Graphic x}
+		PlainText  @Yield { rpc @PlainGraphic x }
+	      }
+	    }
+
+	    def @PaintBox left col right x
+	    {
+	      @BackEnd @Case {
+		PostScript @Yield {{"LoutBox ltbl"col} @Graphic x}
+		PDF        @Yield {{
+				     "0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h"
+				     @PDFAddPaint col "S"
+				   } @Graphic x}
+		PlainText  @Yield { x }
+	      }
+	    }
+
+	    def @HRule left col right thick
+	    {
+		@ZeroHeight thick @High col @FillBox {}
+		# thick @High col @FillBox {}
+	    }
+
+	    def @VRule left col right thick
+	    {
+		@ZeroWidth thick @Wide col @FillBox {}
+		# thick @Wide col @FillBox {}
+	    }
+
+	    def @DoubleHRule
+		left col
+		named gap {}
+		right thick
+	    {
+		@OneCol { col @HRule thick /gap col @HRule thick }
+	    }
+
+	    def @DoubleVRule
+		left col
+		named gap {}
+		right thick
+	    {
+		@OneRow { col @VRule thick |gap col @VRule thick }
+	    }
+
+	    def @MakeHRule
+		left col
+		named thick {}
+		named gap {}
+		right type
+	    {
+		type @Case {
+		    { none "" no } @Yield {}
+		    { yes single } @Yield col @HRule thick
+		    { double } @Yield col @DoubleHRule gap { gap } thick
+		}
+	    }
+
+	    def @MakeVRule
+		left col
+		named thick {}
+		named gap {}
+		right type
+	    {
+		type @Case {
+		    { none "" no } @Yield {}
+		    { yes single } @Yield col @VRule thick
+		    { double } @Yield col @DoubleVRule gap { gap } thick
+		}
+	    }
+
+	    def @RuleBox
+		left col
+		named hthick {}
+		named vthick {}
+		named htype {}
+		named vtype {}
+	    {
+		htype @Case {
+		    { none "" no } @Yield {}
+		    else @Yield vtype @Case {
+			{ none "" no } @Yield {}
+			else @Yield {
+			    @ZeroWidth @ZeroHeight hthick @Wide vthick @High
+			    col @FillBox {}
+			}
+		    }
+		}
+	    }
+
+	    def @AddRules
+		right x
+	    {
+		{
+		  rlc @MakeVRule thick { rlw } gap { rlg } rl
+		  |0rt |1rt
+		  rrc @MakeVRule thick { rrw } gap { rrg } rr
+		} @Background
+		{ rac @MakeHRule thick { raw } gap { rag } ra
+		  /0rt
+		  /1rt
+		  rbc @MakeHRule thick { rbw } gap { rbg } rb
+		} @Background
+		{
+		  |1rt rac @RuleBox hthick { rrw } vthick { raw } htype { rr } vtype { ra }
+		  /0rt
+		  /1rt |1rt
+		  rbc @RuleBox hthick { rrw } vthick { rbw } htype { rr } vtype { rb }
+		} @Background x
+
+	    }
+
+	    def @AddMargins
+		right x
+	    {
+		@OneCol @OneRow {
+		          ^|ml    |mr
+		    ^/ma   |    x |
+		     /mb   |      |
+		}
+	    }
+
+	    def @AddPaint
+		right x
+	    {
+		p @Case {
+		    { none nopaint no } @Yield x
+		    else                @Yield { p @PaintBox x }
+		}
+	    }
+
+	    def @Strut right x
+	    {
+		def strutval right x
+		{
+		    x @Case {
+			{ no No "" } @Yield "0.0f"
+			{ yes Yes  } @Yield "1.0f"
+			else         @Yield x
+		    }
+		}
+
+		def vs { "0.5w" @VShift { { strutval s  } @High } }
+		def hs {                { strutval sh } @Wide   }
+
+		@OneCol @OneRow { ^| hs ^/ vs | x }
+	    }
+
+	    def @VSize right x
+	    {
+		h @Case {
+		    ""   @Yield x
+		    else @Yield { h @High x }
+		}
+	    }
+
+	    def @HSize right x
+	    {
+		w @Case {
+		    ""       @Yield x
+		    "expand" @Yield { "40c" @Wide x }
+		    else     @Yield { w @Wide x }
+		}
+	    }
+
+	    def @HIndent right x
+	    {
+		i @Case {
+		    left  @Yield @OneCol { | x }
+		    ctr   @Yield @OneCol { |"0.5rt" x }
+		    right @Yield @OneCol { |"1.0rt" x }
+		    mctr  @Yield @OneCol { |"0.5bx" x }
+		    align @Yield @OneCol x
+		    else  @Yield @OneCol { |i x }
+		}
+	    }
+
+	    def @VIndent right x
+	    {
+		# note: the default value "" gives top alignment,
+		# but that is not a problem because we are by
+		# default putting in a vertical strut
+
+		iv @Case {
+		    top   @Yield @OneRow { / x }
+		    ctr   @Yield @OneRow { /"0.5rt" x }
+		    foot  @Yield @OneRow { /"1.0rt" x }
+		    mctr  @Yield @OneRow { /"0.5bx" x }
+		    align @Yield @OneRow x
+		    else  @Yield @OneRow { /iv x }
+		}
+	    }
+
+	    @HSize @VSize @AddPaint bg @Background @AddRules
+	    @HIndent @VIndent @AddMargins f @Font b @Break @Strut @Body
+	}
+
+	# symbol for producing @Row rows
+	def @DoRow
+	    named paint			p	{}
+	    named background		bg	{}
+	    named font			f	{}
+	    named break			b	{}
+	    named width			w	{}
+	    named height		h	{}
+	    named indent		i	{}
+	    named indentvertical	iv	{}
+	    named strut			s	{}
+	    named struthorizontal	sh	{}
+	    named margin		m	{}
+	    named marginhorizontal	mh	{}
+	    named marginleft		ml	{}
+	    named marginright		mr	{}
+	    named marginvertical	mv	{}
+	    named marginabove		ma	{}
+	    named marginbelow		mb	{}
+	    named rule			r	{}
+	    named rulehorizontal	rh	{}
+	    named ruleabove		ra	{}
+	    named rulebelow		rb	{}
+	    named rulevertical		rv	{}
+	    named ruleleft		rl	{}
+	    named ruleright		rr	{}
+	    named rulewidth		rw	{}
+	    named rulehorizontalwidth	rhw	{}
+	    named ruleabovewidth	raw	{}
+	    named rulebelowwidth	rbw	{}
+	    named ruleverticalwidth	rvw	{}
+	    named ruleleftwidth		rlw	{}
+	    named rulerightwidth	rrw	{}
+	    named rulegap		rg	{}
+	    named rulehorizontalgap	rhg	{}
+	    named ruleabovegap		rag	{}
+	    named rulebelowgap		rbg	{}
+	    named ruleverticalgap	rvg	{}
+	    named ruleleftgap		rlg	{}
+	    named rulerightgap		rrg	{}
+	    named rulecolour rulecolor				rc	{}
+	    named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+	    named ruleabovecolour ruleabovecolor		rac	{}
+	    named rulebelowcolour rulebelowcolor		rbc	{}
+	    named ruleverticalcolour ruleverticalcolor		rvc	{}
+	    named ruleleftcolour ruleleftcolor			rlc	{}
+	    named rulerightcolour rulerightcolor		rrc	{}
+	    named ruleplainchar		rpc	{}
+	    named compulsory format
+		named A {} named B {} named C {} named D {} named E {}
+		named F {} named G {} named H {} named I {} named J {}
+		named K {} named L {} named M {} named N {} named O {}
+		named P {} named Q {} named R {} named S {} named T {}
+		named U {} named V {} named W {} named X {} named Y {}
+		named Z {}
+		named @Cell
+		    named paint			p	{}
+		    named background		bg	{}
+		    named font			f	{}
+		    named break			b	{}
+		    named width			w	{}
+		    named height		h	{}
+		    named indent		i	{}
+		    named indentvertical	iv	{}
+		    named strut			s	{}
+		    named struthorizontal	sh	{}
+		    named margin		m	{}
+		    named marginhorizontal	mh	{}
+		    named marginleft		ml	{}
+		    named marginright		mr	{}
+		    named marginvertical	mv	{}
+		    named marginabove		ma	{}
+		    named marginbelow		mb	{}
+		    named rule			r	{}
+		    named rulehorizontal	rh	{}
+		    named ruleabove		ra	{}
+		    named rulebelow		rb	{}
+		    named rulevertical		rv	{}
+		    named ruleleft		rl	{}
+		    named ruleright		rr	{}
+		    named rulewidth		rw	{}
+		    named rulehorizontalwidth	rhw	{}
+		    named ruleabovewidth	raw	{}
+		    named rulebelowwidth	rbw	{}
+		    named ruleverticalwidth	rvw	{}
+		    named ruleleftwidth		rlw	{}
+		    named rulerightwidth	rrw	{}
+		    named rulegap		rg	{}
+		    named rulehorizontalgap	rhg	{}
+		    named ruleabovegap		rag	{}
+		    named rulebelowgap		rbg	{}
+		    named ruleverticalgap	rvg	{}
+		    named ruleleftgap		rlg	{}
+		    named rulerightgap		rrg	{}
+		    named rulecolour rulecolor			rc	{}
+		    named rulehorizontalcolour rulehorizontalcolor rhc	{}
+		    named ruleabovecolour ruleabovecolor	rac	{}
+		    named rulebelowcolour rulebelowcolor	rbc	{}
+		    named ruleverticalcolour ruleverticalcolor	rvc	{}
+		    named ruleleftcolour ruleleftcolor		rlc	{}
+		    named rulerightcolour rulerightcolor	rrc	{}
+		    named ruleplainchar		rpc	{}
+		    right x
+		{}
+	    {}
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	{
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values as @Row knows them (i.e. Level 6)       #
+	    #                                                                 #
+	    ###################################################################
+
+	    def rowp    { p				@Else tblp   }
+	    def rowbg   { bg				@Else tblbg  }
+	    def rowf    { f				@Else tblf   }
+	    def rowb    { b				@Else tblb   }
+	    def roww    { w				@Else tblw   }
+	    def rowh    { h				@Else tblh   }
+	    def rowi    { i				@Else tbli   }
+	    def rowiv   { iv				@Else tbliv  }
+	    def rows    { s				@Else tbls   }
+	    def rowsh   { sh				@Else tblsh  }
+	    def rowml   { ml  @Else mh  @Else m		@Else tblml  }
+	    def rowmr   { mr  @Else mh  @Else m		@Else tblmr  }
+	    def rowma   { ma  @Else mv  @Else m		@Else tblma  }
+	    def rowmb   { mb  @Else mv  @Else m		@Else tblmb  }
+	    def rowra   { ra  @Else rh  @Else r		@Else tblra  }
+	    def rowrb   { rb  @Else rh  @Else r		@Else tblrb  }
+	    def rowrl   { rl  @Else rv  @Else r		@Else tblrl  }
+	    def rowrr   { rr  @Else rv  @Else r		@Else tblrr  }
+	    def rowraw  { raw @Else rhw @Else rw	@Else tblraw }
+	    def rowrbw  { rbw @Else rhw @Else rw	@Else tblrbw }
+	    def rowrlw  { rlw @Else rvw @Else rw	@Else tblrlw }
+	    def rowrrw  { rrw @Else rvw @Else rw	@Else tblrrw }
+	    def rowrag  { rag @Else rhg @Else rg	@Else tblrag }
+	    def rowrbg  { rbg @Else rhg @Else rg	@Else tblrbg }
+	    def rowrlg  { rlg @Else rvg @Else rg	@Else tblrlg }
+	    def rowrrg  { rrg @Else rvg @Else rg	@Else tblrrg }
+	    def rowrac  { rac @Else rhc @Else rc	@Else tblrac }
+	    def rowrbc  { rbc @Else rhc @Else rc	@Else tblrbc }
+	    def rowrlc  { rlc @Else rvc @Else rc	@Else tblrlc }
+	    def rowrrc  { rrc @Else rvc @Else rc	@Else tblrrc }
+	    def rowrpc  { rpc				@Else tblrpc }
+
+	    format
+		A { A } B { B } C { C } D { D } E { E } F { F }
+		G { G } H { H } I { I } J { J } K { K } L { L }
+		M { M } N { N } O { O } P { P } Q { Q } R { R }
+		S { S } T { T } U { U } V { V } W { W } X { X }
+		Y { Y } Z { Z }
+		@Cell {
+		
+		    @DoCell
+
+			#######################################################
+			#                                                     #
+			#  Specific option values to @Cell (i.e. Level 7)     #
+			#                                                     #
+			#######################################################
+
+			p    { p			@Else rowp   }
+			bg   { bg			@Else rowbg  }
+			f    { f			@Else rowf   }
+			b    { b			@Else rowb   }
+			w    { w			@Else roww   }
+			h    { h			@Else rowh   }
+			i    { i			@Else rowi   }
+			iv   { iv			@Else rowiv  }
+			s    { s			@Else rows   }
+			sh   { sh			@Else rowsh  }
+			ml   { ml  @Else mh  @Else m	@Else rowml  }
+			mr   { mr  @Else mh  @Else m	@Else rowmr  }
+			ma   { ma  @Else mv  @Else m	@Else rowma  }
+			mb   { mb  @Else mv  @Else m	@Else rowmb  }
+			ra   { ra  @Else rh  @Else r	@Else rowra  }
+			rb   { rb  @Else rh  @Else r	@Else rowrb  }
+			rl   { rl  @Else rv  @Else r	@Else rowrl  }
+			rr   { rr  @Else rv  @Else r	@Else rowrr  }
+			raw  { raw @Else rhw @Else rw	@Else rowraw }
+			rbw  { rbw @Else rhw @Else rw	@Else rowrbw }
+			rlw  { rlw @Else rvw @Else rw	@Else rowrlw }
+			rrw  { rrw @Else rvw @Else rw	@Else rowrrw }
+			rag  { rag @Else rhg @Else rg	@Else rowrag }
+			rbg  { rbg @Else rhg @Else rg	@Else rowrbg }
+			rlg  { rlg @Else rvg @Else rg	@Else rowrlg }
+			rrg  { rrg @Else rvg @Else rg	@Else rowrrg }
+			rac  { rac @Else rhc @Else rc	@Else rowrac }
+			rbc  { rbc @Else rhc @Else rc	@Else rowrbc }
+			rlc  { rlc @Else rvc @Else rc	@Else rowrlc }
+			rrc  { rrc @Else rvc @Else rc	@Else rowrrc }
+			rpc  { rpc			@Else rowrpc }
+
+			x
+		}
+	}
+
+	# symbol for producing @Rowa rows
+	def @DoRowa
+	    named paint			p	{}
+	    named background		bg	{}
+	    named font			f	{}
+	    named break			b	{}
+	    named width			w	{}
+	    named height		h	{}
+	    named indent		i	{}
+	    named indentvertical	iv	{}
+	    named strut			s	{}
+	    named struthorizontal	sh	{}
+	    named margin		m	{}
+	    named marginhorizontal	mh	{}
+	    named marginleft		ml	{}
+	    named marginright		mr	{}
+	    named marginvertical	mv	{}
+	    named marginabove		ma	{}
+	    named marginbelow		mb	{}
+	    named rule			r	{}
+	    named rulehorizontal	rh	{}
+	    named ruleabove		ra	{}
+	    named rulebelow		rb	{}
+	    named rulevertical		rv	{}
+	    named ruleleft		rl	{}
+	    named ruleright		rr	{}
+	    named rulewidth		rw	{}
+	    named rulehorizontalwidth	rhw	{}
+	    named ruleabovewidth	raw	{}
+	    named rulebelowwidth	rbw	{}
+	    named ruleverticalwidth	rvw	{}
+	    named ruleleftwidth		rlw	{}
+	    named rulerightwidth	rrw	{}
+	    named rulegap		rg	{}
+	    named rulehorizontalgap	rhg	{}
+	    named ruleabovegap		rag	{}
+	    named rulebelowgap		rbg	{}
+	    named ruleverticalgap	rvg	{}
+	    named ruleleftgap		rlg	{}
+	    named rulerightgap		rrg	{}
+	    named rulecolour rulecolor				rc	{}
+	    named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+	    named ruleabovecolour ruleabovecolor		rac	{}
+	    named rulebelowcolour rulebelowcolor		rbc	{}
+	    named ruleverticalcolour ruleverticalcolor		rvc	{}
+	    named ruleleftcolour ruleleftcolor			rlc	{}
+	    named rulerightcolour rulerightcolor		rrc	{}
+	    named ruleplainchar		rpc	{}
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	{
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at "aoption" level (i.e. Level 3)       #
+	    #                                                                 #
+	    ###################################################################
+
+	    def tbxp    { ap				@Else tblp   }
+	    def tbxbg   { abg				@Else tblbg  }
+	    def tbxf    { af				@Else tblf   }
+	    def tbxb    { ab				@Else tblb   }
+	    def tbxw    { aw				@Else tblw   }
+	    def tbxh    { ah				@Else tblh   }
+	    def tbxi    { ai				@Else tbli   }
+	    def tbxiv   { aiv				@Else tbliv  }
+	    def tbxs    { as				@Else tbls   }
+	    def tbxsh   { ash				@Else tblsh  }
+	    def tbxml   { aml  @Else amh  @Else am	@Else tblml  }
+	    def tbxmr   { amr  @Else amh  @Else am	@Else tblmr  }
+	    def tbxma   { ama  @Else amv  @Else am	@Else tblma  }
+	    def tbxmb   { amb  @Else amv  @Else am	@Else tblmb  }
+	    def tbxra   { ara  @Else arh  @Else ar	@Else tblra  }
+	    def tbxrb   { arb  @Else arh  @Else ar	@Else tblrb  }
+	    def tbxrl   { arl  @Else arv  @Else ar	@Else tblrl  }
+	    def tbxrr   { arr  @Else arv  @Else ar	@Else tblrr  }
+	    def tbxraw  { araw @Else arhw @Else arw	@Else tblraw }
+	    def tbxrbw  { arbw @Else arhw @Else arw	@Else tblrbw }
+	    def tbxrlw  { arlw @Else arvw @Else arw	@Else tblrlw }
+	    def tbxrrw  { arrw @Else arvw @Else arw	@Else tblrrw }
+	    def tbxrag  { arag @Else arhg @Else arg	@Else tblrag }
+	    def tbxrbg  { arbg @Else arhg @Else arg	@Else tblrbg }
+	    def tbxrlg  { arlg @Else arvg @Else arg	@Else tblrlg }
+	    def tbxrrg  { arrg @Else arvg @Else arg	@Else tblrrg }
+	    def tbxrac  { arac @Else arhc @Else arc	@Else tblrac }
+	    def tbxrbc  { arbc @Else arhc @Else arc	@Else tblrbc }
+	    def tbxrlc  { arlc @Else arvc @Else arc	@Else tblrlc }
+	    def tbxrrc  { arrc @Else arvc @Else arc	@Else tblrrc }
+	    def tbxrpc  { arpc				@Else tblrpc }
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at @Rowa level (i.e. Level 4)           #
+	    #                                                                 #
+	    ###################################################################
+
+	    def rowp    { p				@Else tbxp   }
+	    def rowbg   { bg				@Else tbxbg  }
+	    def rowf    { f				@Else tbxf   }
+	    def rowb    { b				@Else tbxb   }
+	    def roww    { w				@Else tbxw   }
+	    def rowh    { h				@Else tbxh   }
+	    def rowi    { i				@Else tbxi   }
+	    def rowiv   { iv				@Else tbxiv  }
+	    def rows    { s				@Else tbxs   }
+	    def rowsh   { sh				@Else tbxsh  }
+	    def rowml   { ml  @Else mh  @Else m		@Else tbxml  }
+	    def rowmr   { mr  @Else mh  @Else m		@Else tbxmr  }
+	    def rowma   { ma  @Else mv  @Else m		@Else tbxma  }
+	    def rowmb   { mb  @Else mv  @Else m		@Else tbxmb  }
+	    def rowra   { ra  @Else rh  @Else r		@Else tbxra  }
+	    def rowrb   { rb  @Else rh  @Else r		@Else tbxrb  }
+	    def rowrl   { rl  @Else rv  @Else r		@Else tbxrl  }
+	    def rowrr   { rr  @Else rv  @Else r		@Else tbxrr  }
+	    def rowraw  { raw @Else rhw @Else rw	@Else tbxraw }
+	    def rowrbw  { rbw @Else rhw @Else rw	@Else tbxrbw }
+	    def rowrlw  { rlw @Else rvw @Else rw	@Else tbxrlw }
+	    def rowrrw  { rrw @Else rvw @Else rw	@Else tbxrrw }
+	    def rowrag  { rag @Else rhg @Else rg	@Else tbxrag }
+	    def rowrbg  { rbg @Else rhg @Else rg	@Else tbxrbg }
+	    def rowrlg  { rlg @Else rvg @Else rg	@Else tbxrlg }
+	    def rowrrg  { rrg @Else rvg @Else rg	@Else tbxrrg }
+	    def rowrac  { rac @Else rhc @Else rc	@Else tbxrac }
+	    def rowrbc  { rbc @Else rhc @Else rc	@Else tbxrbc }
+	    def rowrlc  { rlc @Else rvc @Else rc	@Else tbxrlc }
+	    def rowrrc  { rrc @Else rvc @Else rc	@Else tbxrrc }
+	    def rowrpc  { rpc				@Else tbxrpc }
+
+	    aformat
+		A { A } B { B } C { C } D { D } E { E } F { F }
+		G { G } H { H } I { I } J { J } K { K } L { L }
+		M { M } N { N } O { O } P { P } Q { Q } R { R }
+		S { S } T { T } U { U } V { V } W { W } X { X }
+		Y { Y } Z { Z }
+		@Cell {
+		
+		    @DoCell
+
+			#######################################################
+			#                                                     #
+			#  Specific option values to @Cell (i.e. Level 5)     #
+			#                                                     #
+			#######################################################
+
+			p    { p			@Else rowp   }
+			bg   { bg			@Else rowbg  }
+			f    { f			@Else rowf   }
+			b    { b			@Else rowb   }
+			w    { w			@Else roww   }
+			h    { h			@Else rowh   }
+			i    { i			@Else rowi   }
+			iv   { iv			@Else rowiv  }
+			s    { s			@Else rows   }
+			sh   { sh			@Else rowsh  }
+			ml   { ml  @Else mh  @Else m	@Else rowml  }
+			mr   { mr  @Else mh  @Else m	@Else rowmr  }
+			ma   { ma  @Else mv  @Else m	@Else rowma  }
+			mb   { mb  @Else mv  @Else m	@Else rowmb  }
+			ra   { ra  @Else rh  @Else r	@Else rowra  }
+			rb   { rb  @Else rh  @Else r	@Else rowrb  }
+			rl   { rl  @Else rv  @Else r	@Else rowrl  }
+			rr   { rr  @Else rv  @Else r	@Else rowrr  }
+			raw  { raw @Else rhw @Else rw	@Else rowraw }
+			rbw  { rbw @Else rhw @Else rw	@Else rowrbw }
+			rlw  { rlw @Else rvw @Else rw	@Else rowrlw }
+			rrw  { rrw @Else rvw @Else rw	@Else rowrrw }
+			rag  { rag @Else rhg @Else rg	@Else rowrag }
+			rbg  { rbg @Else rhg @Else rg	@Else rowrbg }
+			rlg  { rlg @Else rvg @Else rg	@Else rowrlg }
+			rrg  { rrg @Else rvg @Else rg	@Else rowrrg }
+			rac  { rac @Else rhc @Else rc	@Else rowrac }
+			rbc  { rbc @Else rhc @Else rc	@Else rowrbc }
+			rlc  { rlc @Else rvc @Else rc	@Else rowrlc }
+			rrc  { rrc @Else rvc @Else rc	@Else rowrrc }
+			rpc  { rpc			@Else rowrpc }
+
+			x
+		}
+	}
+
+	# symbol for producing @Rowb rows
+	def @DoRowb
+	    named paint			p	{}
+	    named background		bg	{}
+	    named font			f	{}
+	    named break			b	{}
+	    named width			w	{}
+	    named height		h	{}
+	    named indent		i	{}
+	    named indentvertical	iv	{}
+	    named strut			s	{}
+	    named struthorizontal	sh	{}
+	    named margin		m	{}
+	    named marginhorizontal	mh	{}
+	    named marginleft		ml	{}
+	    named marginright		mr	{}
+	    named marginvertical	mv	{}
+	    named marginabove		ma	{}
+	    named marginbelow		mb	{}
+	    named rule			r	{}
+	    named rulehorizontal	rh	{}
+	    named ruleabove		ra	{}
+	    named rulebelow		rb	{}
+	    named rulevertical		rv	{}
+	    named ruleleft		rl	{}
+	    named ruleright		rr	{}
+	    named rulewidth		rw	{}
+	    named rulehorizontalwidth	rhw	{}
+	    named ruleabovewidth	raw	{}
+	    named rulebelowwidth	rbw	{}
+	    named ruleverticalwidth	rvw	{}
+	    named ruleleftwidth		rlw	{}
+	    named rulerightwidth	rrw	{}
+	    named rulegap		rg	{}
+	    named rulehorizontalgap	rhg	{}
+	    named ruleabovegap		rag	{}
+	    named rulebelowgap		rbg	{}
+	    named ruleverticalgap	rvg	{}
+	    named ruleleftgap		rlg	{}
+	    named rulerightgap		rrg	{}
+	    named rulecolour rulecolor				rc	{}
+	    named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+	    named ruleabovecolour ruleabovecolor		rac	{}
+	    named rulebelowcolour rulebelowcolor		rbc	{}
+	    named ruleverticalcolour ruleverticalcolor		rvc	{}
+	    named ruleleftcolour ruleleftcolor			rlc	{}
+	    named rulerightcolour rulerightcolor		rrc	{}
+	    named ruleplainchar		rpc	{}
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	{
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at "boption" level (i.e. Level 3)       #
+	    #                                                                 #
+	    ###################################################################
+
+	    def tbxp    { bp				@Else tblp   }
+	    def tbxbg   { bbg				@Else tblbg  }
+	    def tbxf    { bf				@Else tblf   }
+	    def tbxb    { bb				@Else tblb   }
+	    def tbxw    { bw				@Else tblw   }
+	    def tbxh    { bh				@Else tblh   }
+	    def tbxi    { bi				@Else tbli   }
+	    def tbxiv   { biv				@Else tbliv  }
+	    def tbxs    { bs				@Else tbls   }
+	    def tbxsh   { bsh				@Else tblsh  }
+	    def tbxml   { bml  @Else bmh  @Else bm	@Else tblml  }
+	    def tbxmr   { bmr  @Else bmh  @Else bm	@Else tblmr  }
+	    def tbxma   { bma  @Else bmv  @Else bm	@Else tblma  }
+	    def tbxmb   { bmb  @Else bmv  @Else bm	@Else tblmb  }
+	    def tbxra   { bra  @Else brh  @Else br	@Else tblra  }
+	    def tbxrb   { brb  @Else brh  @Else br	@Else tblrb  }
+	    def tbxrl   { brl  @Else brv  @Else br	@Else tblrl  }
+	    def tbxrr   { brr  @Else brv  @Else br	@Else tblrr  }
+	    def tbxraw  { braw @Else brhw @Else brw	@Else tblraw }
+	    def tbxrbw  { brbw @Else brhw @Else brw	@Else tblrbw }
+	    def tbxrlw  { brlw @Else brvw @Else brw	@Else tblrlw }
+	    def tbxrrw  { brrw @Else brvw @Else brw	@Else tblrrw }
+	    def tbxrag  { brag @Else brhg @Else brg	@Else tblrag }
+	    def tbxrbg  { brbg @Else brhg @Else brg	@Else tblrbg }
+	    def tbxrlg  { brlg @Else brvg @Else brg	@Else tblrlg }
+	    def tbxrrg  { brrg @Else brvg @Else brg	@Else tblrrg }
+	    def tbxrac  { brac @Else brhc @Else brc	@Else tblrac }
+	    def tbxrbc  { brbc @Else brhc @Else brc	@Else tblrbc }
+	    def tbxrlc  { brlc @Else brvc @Else brc	@Else tblrlc }
+	    def tbxrrc  { brrc @Else brvc @Else brc	@Else tblrrc }
+	    def tbxrpc  { brpc				@Else tblrpc }
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at @Rowb level (i.e. Level 4)           #
+	    #                                                                 #
+	    ###################################################################
+
+	    def rowp    { p				@Else tbxp   }
+	    def rowbg   { bg				@Else tbxbg  }
+	    def rowf    { f				@Else tbxf   }
+	    def rowb    { b				@Else tbxb   }
+	    def roww    { w				@Else tbxw   }
+	    def rowh    { h				@Else tbxh   }
+	    def rowi    { i				@Else tbxi   }
+	    def rowiv   { iv				@Else tbxiv  }
+	    def rows    { s				@Else tbxs   }
+	    def rowsh   { sh				@Else tbxsh  }
+	    def rowml   { ml  @Else mh  @Else m		@Else tbxml  }
+	    def rowmr   { mr  @Else mh  @Else m		@Else tbxmr  }
+	    def rowma   { ma  @Else mv  @Else m		@Else tbxma  }
+	    def rowmb   { mb  @Else mv  @Else m		@Else tbxmb  }
+	    def rowra   { ra  @Else rh  @Else r		@Else tbxra  }
+	    def rowrb   { rb  @Else rh  @Else r		@Else tbxrb  }
+	    def rowrl   { rl  @Else rv  @Else r		@Else tbxrl  }
+	    def rowrr   { rr  @Else rv  @Else r		@Else tbxrr  }
+	    def rowraw  { raw @Else rhw @Else rw	@Else tbxraw }
+	    def rowrbw  { rbw @Else rhw @Else rw	@Else tbxrbw }
+	    def rowrlw  { rlw @Else rvw @Else rw	@Else tbxrlw }
+	    def rowrrw  { rrw @Else rvw @Else rw	@Else tbxrrw }
+	    def rowrag  { rag @Else rhg @Else rg	@Else tbxrag }
+	    def rowrbg  { rbg @Else rhg @Else rg	@Else tbxrbg }
+	    def rowrlg  { rlg @Else rvg @Else rg	@Else tbxrlg }
+	    def rowrrg  { rrg @Else rvg @Else rg	@Else tbxrrg }
+	    def rowrac  { rac @Else rhc @Else rc	@Else tbxrac }
+	    def rowrbc  { rbc @Else rhc @Else rc	@Else tbxrbc }
+	    def rowrlc  { rlc @Else rvc @Else rc	@Else tbxrlc }
+	    def rowrrc  { rrc @Else rvc @Else rc	@Else tbxrrc }
+	    def rowrpc  { rpc				@Else tbxrpc }
+
+	    bformat
+		A { A } B { B } C { C } D { D } E { E } F { F }
+		G { G } H { H } I { I } J { J } K { K } L { L }
+		M { M } N { N } O { O } P { P } Q { Q } R { R }
+		S { S } T { T } U { U } V { V } W { W } X { X }
+		Y { Y } Z { Z }
+		@Cell {
+		
+		    @DoCell
+
+			#######################################################
+			#                                                     #
+			#  Specific option values to @Cell (i.e. Level 5)     #
+			#                                                     #
+			#######################################################
+
+			p    { p			@Else rowp   }
+			bg   { bg			@Else rowbg  }
+			f    { f			@Else rowf   }
+			b    { b			@Else rowb   }
+			w    { w			@Else roww   }
+			h    { h			@Else rowh   }
+			i    { i			@Else rowi   }
+			iv   { iv			@Else rowiv  }
+			s    { s			@Else rows   }
+			sh   { sh			@Else rowsh  }
+			ml   { ml  @Else mh  @Else m	@Else rowml  }
+			mr   { mr  @Else mh  @Else m	@Else rowmr  }
+			ma   { ma  @Else mv  @Else m	@Else rowma  }
+			mb   { mb  @Else mv  @Else m	@Else rowmb  }
+			ra   { ra  @Else rh  @Else r	@Else rowra  }
+			rb   { rb  @Else rh  @Else r	@Else rowrb  }
+			rl   { rl  @Else rv  @Else r	@Else rowrl  }
+			rr   { rr  @Else rv  @Else r	@Else rowrr  }
+			raw  { raw @Else rhw @Else rw	@Else rowraw }
+			rbw  { rbw @Else rhw @Else rw	@Else rowrbw }
+			rlw  { rlw @Else rvw @Else rw	@Else rowrlw }
+			rrw  { rrw @Else rvw @Else rw	@Else rowrrw }
+			rag  { rag @Else rhg @Else rg	@Else rowrag }
+			rbg  { rbg @Else rhg @Else rg	@Else rowrbg }
+			rlg  { rlg @Else rvg @Else rg	@Else rowrlg }
+			rrg  { rrg @Else rvg @Else rg	@Else rowrrg }
+			rac  { rac @Else rhc @Else rc	@Else rowrac }
+			rbc  { rbc @Else rhc @Else rc	@Else rowrbc }
+			rlc  { rlc @Else rvc @Else rc	@Else rowrlc }
+			rrc  { rrc @Else rvc @Else rc	@Else rowrrc }
+			rpc  { rpc			@Else rowrpc }
+
+			x
+		}
+	}
+
+	# symbol for producing @Rowc rows
+	def @DoRowc
+	    named paint			p	{}
+	    named background		bg	{}
+	    named font			f	{}
+	    named break			b	{}
+	    named width			w	{}
+	    named height		h	{}
+	    named indent		i	{}
+	    named indentvertical	iv	{}
+	    named strut			s	{}
+	    named struthorizontal	sh	{}
+	    named margin		m	{}
+	    named marginhorizontal	mh	{}
+	    named marginleft		ml	{}
+	    named marginright		mr	{}
+	    named marginvertical	mv	{}
+	    named marginabove		ma	{}
+	    named marginbelow		mb	{}
+	    named rule			r	{}
+	    named rulehorizontal	rh	{}
+	    named ruleabove		ra	{}
+	    named rulebelow		rb	{}
+	    named rulevertical		rv	{}
+	    named ruleleft		rl	{}
+	    named ruleright		rr	{}
+	    named rulewidth		rw	{}
+	    named rulehorizontalwidth	rhw	{}
+	    named ruleabovewidth	raw	{}
+	    named rulebelowwidth	rbw	{}
+	    named ruleverticalwidth	rvw	{}
+	    named ruleleftwidth		rlw	{}
+	    named rulerightwidth	rrw	{}
+	    named rulegap		rg	{}
+	    named rulehorizontalgap	rhg	{}
+	    named ruleabovegap		rag	{}
+	    named rulebelowgap		rbg	{}
+	    named ruleverticalgap	rvg	{}
+	    named ruleleftgap		rlg	{}
+	    named rulerightgap		rrg	{}
+	    named rulecolour rulecolor				rc	{}
+	    named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+	    named ruleabovecolour ruleabovecolor		rac	{}
+	    named rulebelowcolour rulebelowcolor		rbc	{}
+	    named ruleverticalcolour ruleverticalcolor		rvc	{}
+	    named ruleleftcolour ruleleftcolor			rlc	{}
+	    named rulerightcolour rulerightcolor		rrc	{}
+	    named ruleplainchar		rpc	{}
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	{
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at "coption" level (i.e. Level 3)       #
+	    #                                                                 #
+	    ###################################################################
+
+	    def tbxp    { cp				@Else tblp   }
+	    def tbxbg   { cbg				@Else tblbg  }
+	    def tbxf    { cf				@Else tblf   }
+	    def tbxb    { cb				@Else tblb   }
+	    def tbxw    { cw				@Else tblw   }
+	    def tbxh    { ch				@Else tblh   }
+	    def tbxi    { ci				@Else tbli   }
+	    def tbxiv   { civ				@Else tbliv  }
+	    def tbxs    { cs				@Else tbls   }
+	    def tbxsh   { csh				@Else tblsh  }
+	    def tbxml   { cml  @Else cmh  @Else cm	@Else tblml  }
+	    def tbxmr   { cmr  @Else cmh  @Else cm	@Else tblmr  }
+	    def tbxma   { cma  @Else cmv  @Else cm	@Else tblma  }
+	    def tbxmb   { cmb  @Else cmv  @Else cm	@Else tblmb  }
+	    def tbxra   { cra  @Else crh  @Else cr	@Else tblra  }
+	    def tbxrb   { crb  @Else crh  @Else cr	@Else tblrb  }
+	    def tbxrl   { crl  @Else crv  @Else cr	@Else tblrl  }
+	    def tbxrr   { crr  @Else crv  @Else cr	@Else tblrr  }
+	    def tbxraw  { craw @Else crhw @Else crw	@Else tblraw }
+	    def tbxrbw  { crbw @Else crhw @Else crw	@Else tblrbw }
+	    def tbxrlw  { crlw @Else crvw @Else crw	@Else tblrlw }
+	    def tbxrrw  { crrw @Else crvw @Else crw	@Else tblrrw }
+	    def tbxrag  { crag @Else crhg @Else crg	@Else tblrag }
+	    def tbxrbg  { crbg @Else crhg @Else crg	@Else tblrbg }
+	    def tbxrlg  { crlg @Else crvg @Else crg	@Else tblrlg }
+	    def tbxrrg  { crrg @Else crvg @Else crg	@Else tblrrg }
+	    def tbxrac  { crac @Else crhc @Else crc	@Else tblrac }
+	    def tbxrbc  { crbc @Else crhc @Else crc	@Else tblrbc }
+	    def tbxrlc  { crlc @Else crvc @Else crc	@Else tblrlc }
+	    def tbxrrc  { crrc @Else crvc @Else crc	@Else tblrrc }
+	    def tbxrpc  { crpc				@Else tblrpc }
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at @Rowc level (i.e. Level 4)           #
+	    #                                                                 #
+	    ###################################################################
+
+	    def rowp    { p				@Else tbxp   }
+	    def rowbg   { bg				@Else tbxbg  }
+	    def rowf    { f				@Else tbxf   }
+	    def rowb    { b				@Else tbxb   }
+	    def roww    { w				@Else tbxw   }
+	    def rowh    { h				@Else tbxh   }
+	    def rowi    { i				@Else tbxi   }
+	    def rowiv   { iv				@Else tbxiv  }
+	    def rows    { s				@Else tbxs   }
+	    def rowsh   { sh				@Else tbxsh  }
+	    def rowml   { ml  @Else mh  @Else m		@Else tbxml  }
+	    def rowmr   { mr  @Else mh  @Else m		@Else tbxmr  }
+	    def rowma   { ma  @Else mv  @Else m		@Else tbxma  }
+	    def rowmb   { mb  @Else mv  @Else m		@Else tbxmb  }
+	    def rowra   { ra  @Else rh  @Else r		@Else tbxra  }
+	    def rowrb   { rb  @Else rh  @Else r		@Else tbxrb  }
+	    def rowrl   { rl  @Else rv  @Else r		@Else tbxrl  }
+	    def rowrr   { rr  @Else rv  @Else r		@Else tbxrr  }
+	    def rowraw  { raw @Else rhw @Else rw	@Else tbxraw }
+	    def rowrbw  { rbw @Else rhw @Else rw	@Else tbxrbw }
+	    def rowrlw  { rlw @Else rvw @Else rw	@Else tbxrlw }
+	    def rowrrw  { rrw @Else rvw @Else rw	@Else tbxrrw }
+	    def rowrag  { rag @Else rhg @Else rg	@Else tbxrag }
+	    def rowrbg  { rbg @Else rhg @Else rg	@Else tbxrbg }
+	    def rowrlg  { rlg @Else rvg @Else rg	@Else tbxrlg }
+	    def rowrrg  { rrg @Else rvg @Else rg	@Else tbxrrg }
+	    def rowrac  { rac @Else rhc @Else rc	@Else tbxrac }
+	    def rowrbc  { rbc @Else rhc @Else rc	@Else tbxrbc }
+	    def rowrlc  { rlc @Else rvc @Else rc	@Else tbxrlc }
+	    def rowrrc  { rrc @Else rvc @Else rc	@Else tbxrrc }
+	    def rowrpc  { rpc				@Else tbxrpc }
+
+	    cformat
+		A { A } B { B } C { C } D { D } E { E } F { F }
+		G { G } H { H } I { I } J { J } K { K } L { L }
+		M { M } N { N } O { O } P { P } Q { Q } R { R }
+		S { S } T { T } U { U } V { V } W { W } X { X }
+		Y { Y } Z { Z }
+		@Cell {
+		
+		    @DoCell
+
+			#######################################################
+			#                                                     #
+			#  Specific option values to @Cell (i.e. Level 5)     #
+			#                                                     #
+			#######################################################
+
+			p    { p			@Else rowp   }
+			bg   { bg			@Else rowbg  }
+			f    { f			@Else rowf   }
+			b    { b			@Else rowb   }
+			w    { w			@Else roww   }
+			h    { h			@Else rowh   }
+			i    { i			@Else rowi   }
+			iv   { iv			@Else rowiv  }
+			s    { s			@Else rows   }
+			sh   { sh			@Else rowsh  }
+			ml   { ml  @Else mh  @Else m	@Else rowml  }
+			mr   { mr  @Else mh  @Else m	@Else rowmr  }
+			ma   { ma  @Else mv  @Else m	@Else rowma  }
+			mb   { mb  @Else mv  @Else m	@Else rowmb  }
+			ra   { ra  @Else rh  @Else r	@Else rowra  }
+			rb   { rb  @Else rh  @Else r	@Else rowrb  }
+			rl   { rl  @Else rv  @Else r	@Else rowrl  }
+			rr   { rr  @Else rv  @Else r	@Else rowrr  }
+			raw  { raw @Else rhw @Else rw	@Else rowraw }
+			rbw  { rbw @Else rhw @Else rw	@Else rowrbw }
+			rlw  { rlw @Else rvw @Else rw	@Else rowrlw }
+			rrw  { rrw @Else rvw @Else rw	@Else rowrrw }
+			rag  { rag @Else rhg @Else rg	@Else rowrag }
+			rbg  { rbg @Else rhg @Else rg	@Else rowrbg }
+			rlg  { rlg @Else rvg @Else rg	@Else rowrlg }
+			rrg  { rrg @Else rvg @Else rg	@Else rowrrg }
+			rac  { rac @Else rhc @Else rc	@Else rowrac }
+			rbc  { rbc @Else rhc @Else rc	@Else rowrbc }
+			rlc  { rlc @Else rvc @Else rc	@Else rowrlc }
+			rrc  { rrc @Else rvc @Else rc	@Else rowrrc }
+			rpc  { rpc			@Else rowrpc }
+
+			x
+		}
+	}
+
+	# symbol for producing @Rowd rows
+	def @DoRowd
+	    named paint			p	{}
+	    named background		bg	{}
+	    named font			f	{}
+	    named break			b	{}
+	    named width			w	{}
+	    named height		h	{}
+	    named indent		i	{}
+	    named indentvertical	iv	{}
+	    named strut			s	{}
+	    named struthorizontal	sh	{}
+	    named margin		m	{}
+	    named marginhorizontal	mh	{}
+	    named marginleft		ml	{}
+	    named marginright		mr	{}
+	    named marginvertical	mv	{}
+	    named marginabove		ma	{}
+	    named marginbelow		mb	{}
+	    named rule			r	{}
+	    named rulehorizontal	rh	{}
+	    named ruleabove		ra	{}
+	    named rulebelow		rb	{}
+	    named rulevertical		rv	{}
+	    named ruleleft		rl	{}
+	    named ruleright		rr	{}
+	    named rulewidth		rw	{}
+	    named rulehorizontalwidth	rhw	{}
+	    named ruleabovewidth	raw	{}
+	    named rulebelowwidth	rbw	{}
+	    named ruleverticalwidth	rvw	{}
+	    named ruleleftwidth		rlw	{}
+	    named rulerightwidth	rrw	{}
+	    named rulegap		rg	{}
+	    named rulehorizontalgap	rhg	{}
+	    named ruleabovegap		rag	{}
+	    named rulebelowgap		rbg	{}
+	    named ruleverticalgap	rvg	{}
+	    named ruleleftgap		rlg	{}
+	    named rulerightgap		rrg	{}
+	    named rulecolour rulecolor				rc	{}
+	    named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+	    named ruleabovecolour ruleabovecolor		rac	{}
+	    named rulebelowcolour rulebelowcolor		rbc	{}
+	    named ruleverticalcolour ruleverticalcolor		rvc	{}
+	    named ruleleftcolour ruleleftcolor			rlc	{}
+	    named rulerightcolour rulerightcolor		rrc	{}
+	    named ruleplainchar		rpc	{}
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	{
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at "doption" level (i.e. Level 3)       #
+	    #                                                                 #
+	    ###################################################################
+
+	    def tbxp    { dp				@Else tblp   }
+	    def tbxbg   { dbg				@Else tblbg  }
+	    def tbxf    { df				@Else tblf   }
+	    def tbxb    { db				@Else tblb   }
+	    def tbxw    { dw				@Else tblw   }
+	    def tbxh    { dh				@Else tblh   }
+	    def tbxi    { di				@Else tbli   }
+	    def tbxiv   { div				@Else tbliv  }
+	    def tbxs    { ds				@Else tbls   }
+	    def tbxsh   { dsh				@Else tblsh  }
+	    def tbxml   { dml  @Else dmh  @Else dm	@Else tblml  }
+	    def tbxmr   { dmr  @Else dmh  @Else dm	@Else tblmr  }
+	    def tbxma   { dma  @Else dmv  @Else dm	@Else tblma  }
+	    def tbxmb   { dmb  @Else dmv  @Else dm	@Else tblmb  }
+	    def tbxra   { dra  @Else drh  @Else dr	@Else tblra  }
+	    def tbxrb   { drb  @Else drh  @Else dr	@Else tblrb  }
+	    def tbxrl   { drl  @Else drv  @Else dr	@Else tblrl  }
+	    def tbxrr   { drr  @Else drv  @Else dr	@Else tblrr  }
+	    def tbxraw  { draw @Else drhw @Else drw	@Else tblraw }
+	    def tbxrbw  { drbw @Else drhw @Else drw	@Else tblrbw }
+	    def tbxrlw  { drlw @Else drvw @Else drw	@Else tblrlw }
+	    def tbxrrw  { drrw @Else drvw @Else drw	@Else tblrrw }
+	    def tbxrag  { drag @Else drhg @Else drg	@Else tblrag }
+	    def tbxrbg  { drbg @Else drhg @Else drg	@Else tblrbg }
+	    def tbxrlg  { drlg @Else drvg @Else drg	@Else tblrlg }
+	    def tbxrrg  { drrg @Else drvg @Else drg	@Else tblrrg }
+	    def tbxrac  { drac @Else drhc @Else drc	@Else tblrac }
+	    def tbxrbc  { drbc @Else drhc @Else drc	@Else tblrbc }
+	    def tbxrlc  { drlc @Else drvc @Else drc	@Else tblrlc }
+	    def tbxrrc  { drrc @Else drvc @Else drc	@Else tblrrc }
+	    def tbxrpc  { drpc				@Else tblrpc }
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at @Rowd level (i.e. Level 4)           #
+	    #                                                                 #
+	    ###################################################################
+
+	    def rowp    { p				@Else tbxp   }
+	    def rowbg   { bg				@Else tbxbg  }
+	    def rowf    { f				@Else tbxf   }
+	    def rowb    { b				@Else tbxb   }
+	    def roww    { w				@Else tbxw   }
+	    def rowh    { h				@Else tbxh   }
+	    def rowi    { i				@Else tbxi   }
+	    def rowiv   { iv				@Else tbxiv  }
+	    def rows    { s				@Else tbxs   }
+	    def rowsh   { sh				@Else tbxsh  }
+	    def rowml   { ml  @Else mh  @Else m		@Else tbxml  }
+	    def rowmr   { mr  @Else mh  @Else m		@Else tbxmr  }
+	    def rowma   { ma  @Else mv  @Else m		@Else tbxma  }
+	    def rowmb   { mb  @Else mv  @Else m		@Else tbxmb  }
+	    def rowra   { ra  @Else rh  @Else r		@Else tbxra  }
+	    def rowrb   { rb  @Else rh  @Else r		@Else tbxrb  }
+	    def rowrl   { rl  @Else rv  @Else r		@Else tbxrl  }
+	    def rowrr   { rr  @Else rv  @Else r		@Else tbxrr  }
+	    def rowraw  { raw @Else rhw @Else rw	@Else tbxraw }
+	    def rowrbw  { rbw @Else rhw @Else rw	@Else tbxrbw }
+	    def rowrlw  { rlw @Else rvw @Else rw	@Else tbxrlw }
+	    def rowrrw  { rrw @Else rvw @Else rw	@Else tbxrrw }
+	    def rowrag  { rag @Else rhg @Else rg	@Else tbxrag }
+	    def rowrbg  { rbg @Else rhg @Else rg	@Else tbxrbg }
+	    def rowrlg  { rlg @Else rvg @Else rg	@Else tbxrlg }
+	    def rowrrg  { rrg @Else rvg @Else rg	@Else tbxrrg }
+	    def rowrac  { rac @Else rhc @Else rc	@Else tbxrac }
+	    def rowrbc  { rbc @Else rhc @Else rc	@Else tbxrbc }
+	    def rowrlc  { rlc @Else rvc @Else rc	@Else tbxrlc }
+	    def rowrrc  { rrc @Else rvc @Else rc	@Else tbxrrc }
+	    def rowrpc  { rpc				@Else tbxrpc }
+
+	    dformat
+		A { A } B { B } C { C } D { D } E { E } F { F }
+		G { G } H { H } I { I } J { J } K { K } L { L }
+		M { M } N { N } O { O } P { P } Q { Q } R { R }
+		S { S } T { T } U { U } V { V } W { W } X { X }
+		Y { Y } Z { Z }
+		@Cell {
+		
+		    @DoCell
+
+			#######################################################
+			#                                                     #
+			#  Specific option values to @Cell (i.e. Level 5)     #
+			#                                                     #
+			#######################################################
+
+			p    { p			@Else rowp   }
+			bg   { bg			@Else rowbg  }
+			f    { f			@Else rowf   }
+			b    { b			@Else rowb   }
+			w    { w			@Else roww   }
+			h    { h			@Else rowh   }
+			i    { i			@Else rowi   }
+			iv   { iv			@Else rowiv  }
+			s    { s			@Else rows   }
+			sh   { sh			@Else rowsh  }
+			ml   { ml  @Else mh  @Else m	@Else rowml  }
+			mr   { mr  @Else mh  @Else m	@Else rowmr  }
+			ma   { ma  @Else mv  @Else m	@Else rowma  }
+			mb   { mb  @Else mv  @Else m	@Else rowmb  }
+			ra   { ra  @Else rh  @Else r	@Else rowra  }
+			rb   { rb  @Else rh  @Else r	@Else rowrb  }
+			rl   { rl  @Else rv  @Else r	@Else rowrl  }
+			rr   { rr  @Else rv  @Else r	@Else rowrr  }
+			raw  { raw @Else rhw @Else rw	@Else rowraw }
+			rbw  { rbw @Else rhw @Else rw	@Else rowrbw }
+			rlw  { rlw @Else rvw @Else rw	@Else rowrlw }
+			rrw  { rrw @Else rvw @Else rw	@Else rowrrw }
+			rag  { rag @Else rhg @Else rg	@Else rowrag }
+			rbg  { rbg @Else rhg @Else rg	@Else rowrbg }
+			rlg  { rlg @Else rvg @Else rg	@Else rowrlg }
+			rrg  { rrg @Else rvg @Else rg	@Else rowrrg }
+			rac  { rac @Else rhc @Else rc	@Else rowrac }
+			rbc  { rbc @Else rhc @Else rc	@Else rowrbc }
+			rlc  { rlc @Else rvc @Else rc	@Else rowrlc }
+			rrc  { rrc @Else rvc @Else rc	@Else rowrrc }
+			rpc  { rpc			@Else rowrpc }
+
+			x
+		}
+	}
+
+	# symbol for producing @Rowe rows
+	def @DoRowe
+	    named paint			p	{}
+	    named background		bg	{}
+	    named font			f	{}
+	    named break			b	{}
+	    named width			w	{}
+	    named height		h	{}
+	    named indent		i	{}
+	    named indentvertical	iv	{}
+	    named strut			s	{}
+	    named struthorizontal	sh	{}
+	    named margin		m	{}
+	    named marginhorizontal	mh	{}
+	    named marginleft		ml	{}
+	    named marginright		mr	{}
+	    named marginvertical	mv	{}
+	    named marginabove		ma	{}
+	    named marginbelow		mb	{}
+	    named rule			r	{}
+	    named rulehorizontal	rh	{}
+	    named ruleabove		ra	{}
+	    named rulebelow		rb	{}
+	    named rulevertical		rv	{}
+	    named ruleleft		rl	{}
+	    named ruleright		rr	{}
+	    named rulewidth		rw	{}
+	    named rulehorizontalwidth	rhw	{}
+	    named ruleabovewidth	raw	{}
+	    named rulebelowwidth	rbw	{}
+	    named ruleverticalwidth	rvw	{}
+	    named ruleleftwidth		rlw	{}
+	    named rulerightwidth	rrw	{}
+	    named rulegap		rg	{}
+	    named rulehorizontalgap	rhg	{}
+	    named ruleabovegap		rag	{}
+	    named rulebelowgap		rbg	{}
+	    named ruleverticalgap	rvg	{}
+	    named ruleleftgap		rlg	{}
+	    named rulerightgap		rrg	{}
+	    named rulecolour rulecolor				rc	{}
+	    named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+	    named ruleabovecolour ruleabovecolor		rac	{}
+	    named rulebelowcolour rulebelowcolor		rbc	{}
+	    named ruleverticalcolour ruleverticalcolor		rvc	{}
+	    named ruleleftcolour ruleleftcolor			rlc	{}
+	    named rulerightcolour rulerightcolor		rrc	{}
+	    named ruleplainchar		rpc	{}
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	{
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at "eoption" level (i.e. Level 3)       #
+	    #                                                                 #
+	    ###################################################################
+
+	    def tbxp    { ep				@Else tblp   }
+	    def tbxbg   { ebg				@Else tblbg  }
+	    def tbxf    { ef				@Else tblf   }
+	    def tbxb    { eb				@Else tblb   }
+	    def tbxw    { ew				@Else tblw   }
+	    def tbxh    { eh				@Else tblh   }
+	    def tbxi    { ei				@Else tbli   }
+	    def tbxiv   { eiv				@Else tbliv  }
+	    def tbxs    { es				@Else tbls   }
+	    def tbxsh   { esh				@Else tblsh  }
+	    def tbxml   { eml  @Else emh  @Else em	@Else tblml  }
+	    def tbxmr   { emr  @Else emh  @Else em	@Else tblmr  }
+	    def tbxma   { ema  @Else emv  @Else em	@Else tblma  }
+	    def tbxmb   { emb  @Else emv  @Else em	@Else tblmb  }
+	    def tbxra   { era  @Else erh  @Else er	@Else tblra  }
+	    def tbxrb   { erb  @Else erh  @Else er	@Else tblrb  }
+	    def tbxrl   { erl  @Else erv  @Else er	@Else tblrl  }
+	    def tbxrr   { err  @Else erv  @Else er	@Else tblrr  }
+	    def tbxraw  { eraw @Else erhw @Else erw	@Else tblraw }
+	    def tbxrbw  { erbw @Else erhw @Else erw	@Else tblrbw }
+	    def tbxrlw  { erlw @Else ervw @Else erw	@Else tblrlw }
+	    def tbxrrw  { errw @Else ervw @Else erw	@Else tblrrw }
+	    def tbxrag  { erag @Else erhg @Else erg	@Else tblrag }
+	    def tbxrbg  { erbg @Else erhg @Else erg	@Else tblrbg }
+	    def tbxrlg  { erlg @Else ervg @Else erg	@Else tblrlg }
+	    def tbxrrg  { errg @Else ervg @Else erg	@Else tblrrg }
+	    def tbxrac  { erac @Else erhc @Else erc	@Else tblrac }
+	    def tbxrbc  { erbc @Else erhc @Else erc	@Else tblrbc }
+	    def tbxrlc  { erlc @Else ervc @Else erc	@Else tblrlc }
+	    def tbxrrc  { errc @Else ervc @Else erc	@Else tblrrc }
+	    def tbxrpc  { erpc				@Else tblrpc }
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at @Rowe level (i.e. Level 4)           #
+	    #                                                                 #
+	    ###################################################################
+
+	    def rowp    { p				@Else tbxp   }
+	    def rowbg   { bg				@Else tbxbg  }
+	    def rowf    { f				@Else tbxf   }
+	    def rowb    { b				@Else tbxb   }
+	    def roww    { w				@Else tbxw   }
+	    def rowh    { h				@Else tbxh   }
+	    def rowi    { i				@Else tbxi   }
+	    def rowiv   { iv				@Else tbxiv  }
+	    def rows    { s				@Else tbxs   }
+	    def rowsh   { sh				@Else tbxsh  }
+	    def rowml   { ml  @Else mh  @Else m		@Else tbxml  }
+	    def rowmr   { mr  @Else mh  @Else m		@Else tbxmr  }
+	    def rowma   { ma  @Else mv  @Else m		@Else tbxma  }
+	    def rowmb   { mb  @Else mv  @Else m		@Else tbxmb  }
+	    def rowra   { ra  @Else rh  @Else r		@Else tbxra  }
+	    def rowrb   { rb  @Else rh  @Else r		@Else tbxrb  }
+	    def rowrl   { rl  @Else rv  @Else r		@Else tbxrl  }
+	    def rowrr   { rr  @Else rv  @Else r		@Else tbxrr  }
+	    def rowraw  { raw @Else rhw @Else rw	@Else tbxraw }
+	    def rowrbw  { rbw @Else rhw @Else rw	@Else tbxrbw }
+	    def rowrlw  { rlw @Else rvw @Else rw	@Else tbxrlw }
+	    def rowrrw  { rrw @Else rvw @Else rw	@Else tbxrrw }
+	    def rowrag  { rag @Else rhg @Else rg	@Else tbxrag }
+	    def rowrbg  { rbg @Else rhg @Else rg	@Else tbxrbg }
+	    def rowrlg  { rlg @Else rvg @Else rg	@Else tbxrlg }
+	    def rowrrg  { rrg @Else rvg @Else rg	@Else tbxrrg }
+	    def rowrac  { rac @Else rhc @Else rc	@Else tbxrac }
+	    def rowrbc  { rbc @Else rhc @Else rc	@Else tbxrbc }
+	    def rowrlc  { rlc @Else rvc @Else rc	@Else tbxrlc }
+	    def rowrrc  { rrc @Else rvc @Else rc	@Else tbxrrc }
+	    def rowrpc  { rpc				@Else tbxrpc }
+
+	    eformat
+		A { A } B { B } C { C } D { D } E { E } F { F }
+		G { G } H { H } I { I } J { J } K { K } L { L }
+		M { M } N { N } O { O } P { P } Q { Q } R { R }
+		S { S } T { T } U { U } V { V } W { W } X { X }
+		Y { Y } Z { Z }
+		@Cell {
+		
+		    @DoCell
+
+			#######################################################
+			#                                                     #
+			#  Specific option values to @Cell (i.e. Level 5)     #
+			#                                                     #
+			#######################################################
+
+			p    { p			@Else rowp   }
+			bg   { bg			@Else rowbg  }
+			f    { f			@Else rowf   }
+			b    { b			@Else rowb   }
+			w    { w			@Else roww   }
+			h    { h			@Else rowh   }
+			i    { i			@Else rowi   }
+			iv   { iv			@Else rowiv  }
+			s    { s			@Else rows   }
+			sh   { sh			@Else rowsh  }
+			ml   { ml  @Else mh  @Else m	@Else rowml  }
+			mr   { mr  @Else mh  @Else m	@Else rowmr  }
+			ma   { ma  @Else mv  @Else m	@Else rowma  }
+			mb   { mb  @Else mv  @Else m	@Else rowmb  }
+			ra   { ra  @Else rh  @Else r	@Else rowra  }
+			rb   { rb  @Else rh  @Else r	@Else rowrb  }
+			rl   { rl  @Else rv  @Else r	@Else rowrl  }
+			rr   { rr  @Else rv  @Else r	@Else rowrr  }
+			raw  { raw @Else rhw @Else rw	@Else rowraw }
+			rbw  { rbw @Else rhw @Else rw	@Else rowrbw }
+			rlw  { rlw @Else rvw @Else rw	@Else rowrlw }
+			rrw  { rrw @Else rvw @Else rw	@Else rowrrw }
+			rag  { rag @Else rhg @Else rg	@Else rowrag }
+			rbg  { rbg @Else rhg @Else rg	@Else rowrbg }
+			rlg  { rlg @Else rvg @Else rg	@Else rowrlg }
+			rrg  { rrg @Else rvg @Else rg	@Else rowrrg }
+			rac  { rac @Else rhc @Else rc	@Else rowrac }
+			rbc  { rbc @Else rhc @Else rc	@Else rowrbc }
+			rlc  { rlc @Else rvc @Else rc	@Else rowrlc }
+			rrc  { rrc @Else rvc @Else rc	@Else rowrrc }
+			rpc  { rpc			@Else rowrpc }
+
+			x
+		}
+	}
+
+	# symbol for producing @Rowf rows
+	def @DoRowf
+	    named paint			p	{}
+	    named background		bg	{}
+	    named font			f	{}
+	    named break			b	{}
+	    named width			w	{}
+	    named height		h	{}
+	    named indent		i	{}
+	    named indentvertical	iv	{}
+	    named strut			s	{}
+	    named struthorizontal	sh	{}
+	    named margin		m	{}
+	    named marginhorizontal	mh	{}
+	    named marginleft		ml	{}
+	    named marginright		mr	{}
+	    named marginvertical	mv	{}
+	    named marginabove		ma	{}
+	    named marginbelow		mb	{}
+	    named rule			r	{}
+	    named rulehorizontal	rh	{}
+	    named ruleabove		ra	{}
+	    named rulebelow		rb	{}
+	    named rulevertical		rv	{}
+	    named ruleleft		rl	{}
+	    named ruleright		rr	{}
+	    named rulewidth		rw	{}
+	    named rulehorizontalwidth	rhw	{}
+	    named ruleabovewidth	raw	{}
+	    named rulebelowwidth	rbw	{}
+	    named ruleverticalwidth	rvw	{}
+	    named ruleleftwidth		rlw	{}
+	    named rulerightwidth	rrw	{}
+	    named rulegap		rg	{}
+	    named rulehorizontalgap	rhg	{}
+	    named ruleabovegap		rag	{}
+	    named rulebelowgap		rbg	{}
+	    named ruleverticalgap	rvg	{}
+	    named ruleleftgap		rlg	{}
+	    named rulerightgap		rrg	{}
+	    named rulecolour rulecolor				rc	{}
+	    named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+	    named ruleabovecolour ruleabovecolor		rac	{}
+	    named rulebelowcolour rulebelowcolor		rbc	{}
+	    named ruleverticalcolour ruleverticalcolor		rvc	{}
+	    named ruleleftcolour ruleleftcolor			rlc	{}
+	    named rulerightcolour rulerightcolor		rrc	{}
+	    named ruleplainchar		rpc	{}
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	{
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at "foption" level (i.e. Level 3)       #
+	    #                                                                 #
+	    ###################################################################
+
+	    def tbxp    { fp				@Else tblp   }
+	    def tbxbg   { fbg				@Else tblbg  }
+	    def tbxf    { ff				@Else tblf   }
+	    def tbxb    { fb				@Else tblb   }
+	    def tbxw    { fw				@Else tblw   }
+	    def tbxh    { fh				@Else tblh   }
+	    def tbxi    { fi				@Else tbli   }
+	    def tbxiv   { fiv				@Else tbliv  }
+	    def tbxs    { fs				@Else tbls   }
+	    def tbxsh   { fsh				@Else tblsh  }
+	    def tbxml   { fml  @Else fmh  @Else fm	@Else tblml  }
+	    def tbxmr   { fmr  @Else fmh  @Else fm	@Else tblmr  }
+	    def tbxma   { fma  @Else fmv  @Else fm	@Else tblma  }
+	    def tbxmb   { fmb  @Else fmv  @Else fm	@Else tblmb  }
+	    def tbxra   { fra  @Else frh  @Else fr	@Else tblra  }
+	    def tbxrb   { frb  @Else frh  @Else fr	@Else tblrb  }
+	    def tbxrl   { frl  @Else frv  @Else fr	@Else tblrl  }
+	    def tbxrr   { frr  @Else frv  @Else fr	@Else tblrr  }
+	    def tbxraw  { fraw @Else frhw @Else frw	@Else tblraw }
+	    def tbxrbw  { frbw @Else frhw @Else frw	@Else tblrbw }
+	    def tbxrlw  { frlw @Else frvw @Else frw	@Else tblrlw }
+	    def tbxrrw  { frrw @Else frvw @Else frw	@Else tblrrw }
+	    def tbxrag  { frag @Else frhg @Else frg	@Else tblrag }
+	    def tbxrbg  { frbg @Else frhg @Else frg	@Else tblrbg }
+	    def tbxrlg  { frlg @Else frvg @Else frg	@Else tblrlg }
+	    def tbxrrg  { frrg @Else frvg @Else frg	@Else tblrrg }
+	    def tbxrac  { frac @Else frhc @Else frc	@Else tblrac }
+	    def tbxrbc  { frbc @Else frhc @Else frc	@Else tblrbc }
+	    def tbxrlc  { frlc @Else frvc @Else frc	@Else tblrlc }
+	    def tbxrrc  { frrc @Else frvc @Else frc	@Else tblrrc }
+	    def tbxrpc  { frpc				@Else tblrpc }
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at @Rowf level (i.e. Level 4)           #
+	    #                                                                 #
+	    ###################################################################
+
+	    def rowp    { p				@Else tbxp   }
+	    def rowbg   { bg				@Else tbxbg  }
+	    def rowf    { f				@Else tbxf   }
+	    def rowb    { b				@Else tbxb   }
+	    def roww    { w				@Else tbxw   }
+	    def rowh    { h				@Else tbxh   }
+	    def rowi    { i				@Else tbxi   }
+	    def rowiv   { iv				@Else tbxiv  }
+	    def rows    { s				@Else tbxs   }
+	    def rowsh   { sh				@Else tbxsh  }
+	    def rowml   { ml  @Else mh  @Else m		@Else tbxml  }
+	    def rowmr   { mr  @Else mh  @Else m		@Else tbxmr  }
+	    def rowma   { ma  @Else mv  @Else m		@Else tbxma  }
+	    def rowmb   { mb  @Else mv  @Else m		@Else tbxmb  }
+	    def rowra   { ra  @Else rh  @Else r		@Else tbxra  }
+	    def rowrb   { rb  @Else rh  @Else r		@Else tbxrb  }
+	    def rowrl   { rl  @Else rv  @Else r		@Else tbxrl  }
+	    def rowrr   { rr  @Else rv  @Else r		@Else tbxrr  }
+	    def rowraw  { raw @Else rhw @Else rw	@Else tbxraw }
+	    def rowrbw  { rbw @Else rhw @Else rw	@Else tbxrbw }
+	    def rowrlw  { rlw @Else rvw @Else rw	@Else tbxrlw }
+	    def rowrrw  { rrw @Else rvw @Else rw	@Else tbxrrw }
+	    def rowrag  { rag @Else rhg @Else rg	@Else tbxrag }
+	    def rowrbg  { rbg @Else rhg @Else rg	@Else tbxrbg }
+	    def rowrlg  { rlg @Else rvg @Else rg	@Else tbxrlg }
+	    def rowrrg  { rrg @Else rvg @Else rg	@Else tbxrrg }
+	    def rowrac  { rac @Else rhc @Else rc	@Else tbxrac }
+	    def rowrbc  { rbc @Else rhc @Else rc	@Else tbxrbc }
+	    def rowrlc  { rlc @Else rvc @Else rc	@Else tbxrlc }
+	    def rowrrc  { rrc @Else rvc @Else rc	@Else tbxrrc }
+	    def rowrpc  { rpc				@Else tbxrpc }
+
+	    fformat
+		A { A } B { B } C { C } D { D } E { E } F { F }
+		G { G } H { H } I { I } J { J } K { K } L { L }
+		M { M } N { N } O { O } P { P } Q { Q } R { R }
+		S { S } T { T } U { U } V { V } W { W } X { X }
+		Y { Y } Z { Z }
+		@Cell {
+		
+		    @DoCell
+
+			#######################################################
+			#                                                     #
+			#  Specific option values to @Cell (i.e. Level 5)     #
+			#                                                     #
+			#######################################################
+
+			p    { p			@Else rowp   }
+			bg   { bg			@Else rowbg  }
+			f    { f			@Else rowf   }
+			b    { b			@Else rowb   }
+			w    { w			@Else roww   }
+			h    { h			@Else rowh   }
+			i    { i			@Else rowi   }
+			iv   { iv			@Else rowiv  }
+			s    { s			@Else rows   }
+			sh   { sh			@Else rowsh  }
+			ml   { ml  @Else mh  @Else m	@Else rowml  }
+			mr   { mr  @Else mh  @Else m	@Else rowmr  }
+			ma   { ma  @Else mv  @Else m	@Else rowma  }
+			mb   { mb  @Else mv  @Else m	@Else rowmb  }
+			ra   { ra  @Else rh  @Else r	@Else rowra  }
+			rb   { rb  @Else rh  @Else r	@Else rowrb  }
+			rl   { rl  @Else rv  @Else r	@Else rowrl  }
+			rr   { rr  @Else rv  @Else r	@Else rowrr  }
+			raw  { raw @Else rhw @Else rw	@Else rowraw }
+			rbw  { rbw @Else rhw @Else rw	@Else rowrbw }
+			rlw  { rlw @Else rvw @Else rw	@Else rowrlw }
+			rrw  { rrw @Else rvw @Else rw	@Else rowrrw }
+			rag  { rag @Else rhg @Else rg	@Else rowrag }
+			rbg  { rbg @Else rhg @Else rg	@Else rowrbg }
+			rlg  { rlg @Else rvg @Else rg	@Else rowrlg }
+			rrg  { rrg @Else rvg @Else rg	@Else rowrrg }
+			rac  { rac @Else rhc @Else rc	@Else rowrac }
+			rbc  { rbc @Else rhc @Else rc	@Else rowrbc }
+			rlc  { rlc @Else rvc @Else rc	@Else rowrlc }
+			rrc  { rrc @Else rvc @Else rc	@Else rowrrc }
+			rpc  { rpc			@Else rowrpc }
+
+			x
+		}
+	}
+
+	# symbol for producing @Rowg rows
+	def @DoRowg
+	    named paint			p	{}
+	    named background		bg	{}
+	    named font			f	{}
+	    named break			b	{}
+	    named width			w	{}
+	    named height		h	{}
+	    named indent		i	{}
+	    named indentvertical	iv	{}
+	    named strut			s	{}
+	    named struthorizontal	sh	{}
+	    named margin		m	{}
+	    named marginhorizontal	mh	{}
+	    named marginleft		ml	{}
+	    named marginright		mr	{}
+	    named marginvertical	mv	{}
+	    named marginabove		ma	{}
+	    named marginbelow		mb	{}
+	    named rule			r	{}
+	    named rulehorizontal	rh	{}
+	    named ruleabove		ra	{}
+	    named rulebelow		rb	{}
+	    named rulevertical		rv	{}
+	    named ruleleft		rl	{}
+	    named ruleright		rr	{}
+	    named rulewidth		rw	{}
+	    named rulehorizontalwidth	rhw	{}
+	    named ruleabovewidth	raw	{}
+	    named rulebelowwidth	rbw	{}
+	    named ruleverticalwidth	rvw	{}
+	    named ruleleftwidth		rlw	{}
+	    named rulerightwidth	rrw	{}
+	    named rulegap		rg	{}
+	    named rulehorizontalgap	rhg	{}
+	    named ruleabovegap		rag	{}
+	    named rulebelowgap		rbg	{}
+	    named ruleverticalgap	rvg	{}
+	    named ruleleftgap		rlg	{}
+	    named rulerightgap		rrg	{}
+	    named rulecolour rulecolor				rc	{}
+	    named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+	    named ruleabovecolour ruleabovecolor		rac	{}
+	    named rulebelowcolour rulebelowcolor		rbc	{}
+	    named ruleverticalcolour ruleverticalcolor		rvc	{}
+	    named ruleleftcolour ruleleftcolor			rlc	{}
+	    named rulerightcolour rulerightcolor		rrc	{}
+	    named ruleplainchar		rpc	{}
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	{
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at "doption" level (i.e. Level 3)       #
+	    #                                                                 #
+	    ###################################################################
+
+	    def tbxp    { gp				@Else tblp   }
+	    def tbxbg   { gbg				@Else tblbg  }
+	    def tbxf    { gf				@Else tblf   }
+	    def tbxb    { gb				@Else tblb   }
+	    def tbxw    { gw				@Else tblw   }
+	    def tbxh    { gh				@Else tblh   }
+	    def tbxi    { gi				@Else tbli   }
+	    def tbxiv   { giv				@Else tbliv  }
+	    def tbxs    { gs				@Else tbls   }
+	    def tbxsh   { gsh				@Else tblsh  }
+	    def tbxml   { gml  @Else gmh  @Else gm	@Else tblml  }
+	    def tbxmr   { gmr  @Else gmh  @Else gm	@Else tblmr  }
+	    def tbxma   { gma  @Else gmv  @Else gm	@Else tblma  }
+	    def tbxmb   { gmb  @Else gmv  @Else gm	@Else tblmb  }
+	    def tbxra   { gra  @Else grh  @Else gr	@Else tblra  }
+	    def tbxrb   { grb  @Else grh  @Else gr	@Else tblrb  }
+	    def tbxrl   { grl  @Else grv  @Else gr	@Else tblrl  }
+	    def tbxrr   { grr  @Else grv  @Else gr	@Else tblrr  }
+	    def tbxraw  { graw @Else grhw @Else grw	@Else tblraw }
+	    def tbxrbw  { grbw @Else grhw @Else grw	@Else tblrbw }
+	    def tbxrlw  { grlw @Else grvw @Else grw	@Else tblrlw }
+	    def tbxrrw  { grrw @Else grvw @Else grw	@Else tblrrw }
+	    def tbxrag  { grag @Else grhg @Else grg	@Else tblrag }
+	    def tbxrbg  { grbg @Else grhg @Else grg	@Else tblrbg }
+	    def tbxrlg  { grlg @Else grvg @Else grg	@Else tblrlg }
+	    def tbxrrg  { grrg @Else grvg @Else grg	@Else tblrrg }
+	    def tbxrac  { grac @Else grhc @Else grc	@Else tblrac }
+	    def tbxrbc  { grbc @Else grhc @Else grc	@Else tblrbc }
+	    def tbxrlc  { grlc @Else grvc @Else grc	@Else tblrlc }
+	    def tbxrrc  { grrc @Else grvc @Else grc	@Else tblrrc }
+	    def tbxrpc  { grpc				@Else tblrpc }
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at @Rowg level (i.e. Level 4)           #
+	    #                                                                 #
+	    ###################################################################
+
+	    def rowp    { p				@Else tbxp   }
+	    def rowbg   { bg				@Else tbxbg  }
+	    def rowf    { f				@Else tbxf   }
+	    def rowb    { b				@Else tbxb   }
+	    def roww    { w				@Else tbxw   }
+	    def rowh    { h				@Else tbxh   }
+	    def rowi    { i				@Else tbxi   }
+	    def rowiv   { iv				@Else tbxiv  }
+	    def rows    { s				@Else tbxs   }
+	    def rowsh   { sh				@Else tbxsh  }
+	    def rowml   { ml  @Else mh  @Else m		@Else tbxml  }
+	    def rowmr   { mr  @Else mh  @Else m		@Else tbxmr  }
+	    def rowma   { ma  @Else mv  @Else m		@Else tbxma  }
+	    def rowmb   { mb  @Else mv  @Else m		@Else tbxmb  }
+	    def rowra   { ra  @Else rh  @Else r		@Else tbxra  }
+	    def rowrb   { rb  @Else rh  @Else r		@Else tbxrb  }
+	    def rowrl   { rl  @Else rv  @Else r		@Else tbxrl  }
+	    def rowrr   { rr  @Else rv  @Else r		@Else tbxrr  }
+	    def rowraw  { raw @Else rhw @Else rw	@Else tbxraw }
+	    def rowrbw  { rbw @Else rhw @Else rw	@Else tbxrbw }
+	    def rowrlw  { rlw @Else rvw @Else rw	@Else tbxrlw }
+	    def rowrrw  { rrw @Else rvw @Else rw	@Else tbxrrw }
+	    def rowrag  { rag @Else rhg @Else rg	@Else tbxrag }
+	    def rowrbg  { rbg @Else rhg @Else rg	@Else tbxrbg }
+	    def rowrlg  { rlg @Else rvg @Else rg	@Else tbxrlg }
+	    def rowrrg  { rrg @Else rvg @Else rg	@Else tbxrrg }
+	    def rowrac  { rac @Else rhc @Else rc	@Else tbxrac }
+	    def rowrbc  { rbc @Else rhc @Else rc	@Else tbxrbc }
+	    def rowrlc  { rlc @Else rvc @Else rc	@Else tbxrlc }
+	    def rowrrc  { rrc @Else rvc @Else rc	@Else tbxrrc }
+	    def rowrpc  { rpc				@Else tbxrpc }
+
+	    gformat
+		A { A } B { B } C { C } D { D } E { E } F { F }
+		G { G } H { H } I { I } J { J } K { K } L { L }
+		M { M } N { N } O { O } P { P } Q { Q } R { R }
+		S { S } T { T } U { U } V { V } W { W } X { X }
+		Y { Y } Z { Z }
+		@Cell {
+		
+		    @DoCell
+
+			#######################################################
+			#                                                     #
+			#  Specific option values to @Cell (i.e. Level 5)     #
+			#                                                     #
+			#######################################################
+
+			p    { p			@Else rowp   }
+			bg   { bg			@Else rowbg  }
+			f    { f			@Else rowf   }
+			b    { b			@Else rowb   }
+			w    { w			@Else roww   }
+			h    { h			@Else rowh   }
+			i    { i			@Else rowi   }
+			iv   { iv			@Else rowiv  }
+			s    { s			@Else rows   }
+			sh   { sh			@Else rowsh  }
+			ml   { ml  @Else mh  @Else m	@Else rowml  }
+			mr   { mr  @Else mh  @Else m	@Else rowmr  }
+			ma   { ma  @Else mv  @Else m	@Else rowma  }
+			mb   { mb  @Else mv  @Else m	@Else rowmb  }
+			ra   { ra  @Else rh  @Else r	@Else rowra  }
+			rb   { rb  @Else rh  @Else r	@Else rowrb  }
+			rl   { rl  @Else rv  @Else r	@Else rowrl  }
+			rr   { rr  @Else rv  @Else r	@Else rowrr  }
+			raw  { raw @Else rhw @Else rw	@Else rowraw }
+			rbw  { rbw @Else rhw @Else rw	@Else rowrbw }
+			rlw  { rlw @Else rvw @Else rw	@Else rowrlw }
+			rrw  { rrw @Else rvw @Else rw	@Else rowrrw }
+			rag  { rag @Else rhg @Else rg	@Else rowrag }
+			rbg  { rbg @Else rhg @Else rg	@Else rowrbg }
+			rlg  { rlg @Else rvg @Else rg	@Else rowrlg }
+			rrg  { rrg @Else rvg @Else rg	@Else rowrrg }
+			rac  { rac @Else rhc @Else rc	@Else rowrac }
+			rbc  { rbc @Else rhc @Else rc	@Else rowrbc }
+			rlc  { rlc @Else rvc @Else rc	@Else rowrlc }
+			rrc  { rrc @Else rvc @Else rc	@Else rowrrc }
+			rpc  { rpc			@Else rowrpc }
+
+			x
+		}
+	}
+
+	# symbol for producing @Rowh rows
+	def @DoRowh
+	    named paint			p	{}
+	    named background		bg	{}
+	    named font			f	{}
+	    named break			b	{}
+	    named width			w	{}
+	    named height		h	{}
+	    named indent		i	{}
+	    named indentvertical	iv	{}
+	    named strut			s	{}
+	    named struthorizontal	sh	{}
+	    named margin		m	{}
+	    named marginhorizontal	mh	{}
+	    named marginleft		ml	{}
+	    named marginright		mr	{}
+	    named marginvertical	mv	{}
+	    named marginabove		ma	{}
+	    named marginbelow		mb	{}
+	    named rule			r	{}
+	    named rulehorizontal	rh	{}
+	    named ruleabove		ra	{}
+	    named rulebelow		rb	{}
+	    named rulevertical		rv	{}
+	    named ruleleft		rl	{}
+	    named ruleright		rr	{}
+	    named rulewidth		rw	{}
+	    named rulehorizontalwidth	rhw	{}
+	    named ruleabovewidth	raw	{}
+	    named rulebelowwidth	rbw	{}
+	    named ruleverticalwidth	rvw	{}
+	    named ruleleftwidth		rlw	{}
+	    named rulerightwidth	rrw	{}
+	    named rulegap		rg	{}
+	    named rulehorizontalgap	rhg	{}
+	    named ruleabovegap		rag	{}
+	    named rulebelowgap		rbg	{}
+	    named ruleverticalgap	rvg	{}
+	    named ruleleftgap		rlg	{}
+	    named rulerightgap		rrg	{}
+	    named rulecolour rulecolor				rc	{}
+	    named rulehorizontalcolour rulehorizontalcolor	rhc	{}
+	    named ruleabovecolour ruleabovecolor		rac	{}
+	    named rulebelowcolour rulebelowcolor		rbc	{}
+	    named ruleverticalcolour ruleverticalcolor		rvc	{}
+	    named ruleleftcolour ruleleftcolor			rlc	{}
+	    named rulerightcolour rulerightcolor		rrc	{}
+	    named ruleplainchar		rpc	{}
+	    named A {} named B {} named C {} named D {} named E {}
+	    named F {} named G {} named H {} named I {} named J {}
+	    named K {} named L {} named M {} named N {} named O {}
+	    named P {} named Q {} named R {} named S {} named T {}
+	    named U {} named V {} named W {} named X {} named Y {}
+	    named Z {}
+	{
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at "hoption" level (i.e. Level 3)       #
+	    #                                                                 #
+	    ###################################################################
+
+	    def tbxp    { hp				@Else tblp   }
+	    def tbxbg   { hbg				@Else tblbg  }
+	    def tbxf    { hf				@Else tblf   }
+	    def tbxb    { hb				@Else tblb   }
+	    def tbxw    { hw				@Else tblw   }
+	    def tbxh    { hh				@Else tblh   }
+	    def tbxi    { hi				@Else tbli   }
+	    def tbxiv   { hiv				@Else tbliv  }
+	    def tbxs    { hs				@Else tbls   }
+	    def tbxsh   { hsh				@Else tblsh  }
+	    def tbxml   { hml  @Else hmh  @Else hm	@Else tblml  }
+	    def tbxmr   { hmr  @Else hmh  @Else hm	@Else tblmr  }
+	    def tbxma   { hma  @Else hmv  @Else hm	@Else tblma  }
+	    def tbxmb   { hmb  @Else hmv  @Else hm	@Else tblmb  }
+	    def tbxra   { hra  @Else hrh  @Else hr	@Else tblra  }
+	    def tbxrb   { hrb  @Else hrh  @Else hr	@Else tblrb  }
+	    def tbxrl   { hrl  @Else hrv  @Else hr	@Else tblrl  }
+	    def tbxrr   { hrr  @Else hrv  @Else hr	@Else tblrr  }
+	    def tbxraw  { hraw @Else hrhw @Else hrw	@Else tblraw }
+	    def tbxrbw  { hrbw @Else hrhw @Else hrw	@Else tblrbw }
+	    def tbxrlw  { hrlw @Else hrvw @Else hrw	@Else tblrlw }
+	    def tbxrrw  { hrrw @Else hrvw @Else hrw	@Else tblrrw }
+	    def tbxrag  { hrag @Else hrhg @Else hrg	@Else tblrag }
+	    def tbxrbg  { hrbg @Else hrhg @Else hrg	@Else tblrbg }
+	    def tbxrlg  { hrlg @Else hrvg @Else hrg	@Else tblrlg }
+	    def tbxrrg  { hrrg @Else hrvg @Else hrg	@Else tblrrg }
+	    def tbxrac  { hrac @Else hrhc @Else hrc	@Else tblrac }
+	    def tbxrbc  { hrbc @Else hrhc @Else hrc	@Else tblrbc }
+	    def tbxrlc  { hrlc @Else hrvc @Else hrc	@Else tblrlc }
+	    def tbxrrc  { hrrc @Else hrvc @Else hrc	@Else tblrrc }
+	    def tbxrpc  { hrpc				@Else tblrpc }
+
+	    ###################################################################
+	    #                                                                 #
+	    #  Specific option values at @Rowh level (i.e. Level 4)           #
+	    #                                                                 #
+	    ###################################################################
+
+	    def rowp    { p				@Else tbxp   }
+	    def rowbg   { bg				@Else tbxbg  }
+	    def rowf    { f				@Else tbxf   }
+	    def rowb    { b				@Else tbxb   }
+	    def roww    { w				@Else tbxw   }
+	    def rowh    { h				@Else tbxh   }
+	    def rowi    { i				@Else tbxi   }
+	    def rowiv   { iv				@Else tbxiv  }
+	    def rows    { s				@Else tbxs   }
+	    def rowsh   { sh				@Else tbxsh  }
+	    def rowml   { ml  @Else mh  @Else m		@Else tbxml  }
+	    def rowmr   { mr  @Else mh  @Else m		@Else tbxmr  }
+	    def rowma   { ma  @Else mv  @Else m		@Else tbxma  }
+	    def rowmb   { mb  @Else mv  @Else m		@Else tbxmb  }
+	    def rowra   { ra  @Else rh  @Else r		@Else tbxra  }
+	    def rowrb   { rb  @Else rh  @Else r		@Else tbxrb  }
+	    def rowrl   { rl  @Else rv  @Else r		@Else tbxrl  }
+	    def rowrr   { rr  @Else rv  @Else r		@Else tbxrr  }
+	    def rowraw  { raw @Else rhw @Else rw	@Else tbxraw }
+	    def rowrbw  { rbw @Else rhw @Else rw	@Else tbxrbw }
+	    def rowrlw  { rlw @Else rvw @Else rw	@Else tbxrlw }
+	    def rowrrw  { rrw @Else rvw @Else rw	@Else tbxrrw }
+	    def rowrag  { rag @Else rhg @Else rg	@Else tbxrag }
+	    def rowrbg  { rbg @Else rhg @Else rg	@Else tbxrbg }
+	    def rowrlg  { rlg @Else rvg @Else rg	@Else tbxrlg }
+	    def rowrrg  { rrg @Else rvg @Else rg	@Else tbxrrg }
+	    def rowrac  { rac @Else rhc @Else rc	@Else tbxrac }
+	    def rowrbc  { rbc @Else rhc @Else rc	@Else tbxrbc }
+	    def rowrlc  { rlc @Else rvc @Else rc	@Else tbxrlc }
+	    def rowrrc  { rrc @Else rvc @Else rc	@Else tbxrrc }
+	    def rowrpc  { rpc				@Else tbxrpc }
+
+	    hformat
+		A { A } B { B } C { C } D { D } E { E } F { F }
+		G { G } H { H } I { I } J { J } K { K } L { L }
+		M { M } N { N } O { O } P { P } Q { Q } R { R }
+		S { S } T { T } U { U } V { V } W { W } X { X }
+		Y { Y } Z { Z }
+		@Cell {
+		
+		    @DoCell
+
+			#######################################################
+			#                                                     #
+			#  Specific option values to @Cell (i.e. Level 5)     #
+			#                                                     #
+			#######################################################
+
+			p    { p			@Else rowp   }
+			bg   { bg			@Else rowbg  }
+			f    { f			@Else rowf   }
+			b    { b			@Else rowb   }
+			w    { w			@Else roww   }
+			h    { h			@Else rowh   }
+			i    { i			@Else rowi   }
+			iv   { iv			@Else rowiv  }
+			s    { s			@Else rows   }
+			sh   { sh			@Else rowsh  }
+			ml   { ml  @Else mh  @Else m	@Else rowml  }
+			mr   { mr  @Else mh  @Else m	@Else rowmr  }
+			ma   { ma  @Else mv  @Else m	@Else rowma  }
+			mb   { mb  @Else mv  @Else m	@Else rowmb  }
+			ra   { ra  @Else rh  @Else r	@Else rowra  }
+			rb   { rb  @Else rh  @Else r	@Else rowrb  }
+			rl   { rl  @Else rv  @Else r	@Else rowrl  }
+			rr   { rr  @Else rv  @Else r	@Else rowrr  }
+			raw  { raw @Else rhw @Else rw	@Else rowraw }
+			rbw  { rbw @Else rhw @Else rw	@Else rowrbw }
+			rlw  { rlw @Else rvw @Else rw	@Else rowrlw }
+			rrw  { rrw @Else rvw @Else rw	@Else rowrrw }
+			rag  { rag @Else rhg @Else rg	@Else rowrag }
+			rbg  { rbg @Else rhg @Else rg	@Else rowrbg }
+			rlg  { rlg @Else rvg @Else rg	@Else rowrlg }
+			rrg  { rrg @Else rvg @Else rg	@Else rowrrg }
+			rac  { rac @Else rhc @Else rc	@Else rowrac }
+			rbc  { rbc @Else rhc @Else rc	@Else rowrbc }
+			rlc  { rlc @Else rvc @Else rc	@Else rowrlc }
+			rrc  { rrc @Else rvc @Else rc	@Else rowrrc }
+			rpc  { rpc			@Else rowrpc }
+
+			x
+		}
+	}
+
+	macro @Row		{ /  @DoRow  }
+	macro @Rowa		{ /  @DoRowa }
+	macro @Rowb		{ /  @DoRowb }
+	macro @Rowc		{ /  @DoRowc }
+	macro @Rowd		{ /  @DoRowd }
+	macro @Rowe		{ /  @DoRowe }
+	macro @Rowf		{ /  @DoRowf }
+	macro @Rowg		{ /  @DoRowg }
+	macro @Rowh		{ /  @DoRowh }
+
+	macro @FirstRow		{    @DoRow  }
+	macro @FirstRowa	{    @DoRowa }
+	macro @FirstRowb	{    @DoRowb }
+	macro @FirstRowc	{    @DoRowc }
+	macro @FirstRowd	{    @DoRowd }
+	macro @FirstRowe	{    @DoRowe }
+	macro @FirstRowf	{    @DoRowf }
+	macro @FirstRowg	{    @DoRowg }
+	macro @FirstRowh	{    @DoRowh }
+
+	macro @MarkRow		{ ^/ @DoRow  }
+	macro @MarkRowa		{ ^/ @DoRowa }
+	macro @MarkRowb		{ ^/ @DoRowb }
+	macro @MarkRowc		{ ^/ @DoRowc }
+	macro @MarkRowd		{ ^/ @DoRowd }
+	macro @MarkRowe		{ ^/ @DoRowe }
+	macro @MarkRowf		{ ^/ @DoRowf }
+	macro @MarkRowg		{ ^/ @DoRowg }
+	macro @MarkRowh		{ ^/ @DoRowh }
+
+	macro @NoBreakRow	{ /0iu @DoRow  }
+	macro @NoBreakRowa	{ /0iu @DoRowa }
+	macro @NoBreakRowb	{ /0iu @DoRowb }
+	macro @NoBreakRowc	{ /0iu @DoRowc }
+	macro @NoBreakRowd	{ /0iu @DoRowd }
+	macro @NoBreakRowe	{ /0iu @DoRowe }
+	macro @NoBreakRowf	{ /0iu @DoRowf }
+	macro @NoBreakRowg	{ /0iu @DoRowg }
+	macro @NoBreakRowh	{ /0iu @DoRowh }
+
+	macro @HeaderRow	{ /  @BeginHeaderComponent @DoRow  }
+	macro @HeaderRowa	{ /  @BeginHeaderComponent @DoRowa }
+	macro @HeaderRowb	{ /  @BeginHeaderComponent @DoRowb }
+	macro @HeaderRowc	{ /  @BeginHeaderComponent @DoRowc }
+	macro @HeaderRowd	{ /  @BeginHeaderComponent @DoRowd }
+	macro @HeaderRowe	{ /  @BeginHeaderComponent @DoRowe }
+	macro @HeaderRowf	{ /  @BeginHeaderComponent @DoRowf }
+	macro @HeaderRowg	{ /  @BeginHeaderComponent @DoRowg }
+	macro @HeaderRowh	{ /  @BeginHeaderComponent @DoRowh }
+
+	macro @HeaderFirstRow	{    @BeginHeaderComponent @DoRow  }
+	macro @HeaderFirstRowa	{    @BeginHeaderComponent @DoRowa }
+	macro @HeaderFirstRowb	{    @BeginHeaderComponent @DoRowb }
+	macro @HeaderFirstRowc	{    @BeginHeaderComponent @DoRowc }
+	macro @HeaderFirstRowd	{    @BeginHeaderComponent @DoRowd }
+	macro @HeaderFirstRowe	{    @BeginHeaderComponent @DoRowe }
+	macro @HeaderFirstRowf	{    @BeginHeaderComponent @DoRowf }
+	macro @HeaderFirstRowg	{    @BeginHeaderComponent @DoRowg }
+	macro @HeaderFirstRowh	{    @BeginHeaderComponent @DoRowh }
+
+	macro @EndHeaderRow	{ / @EndHeaderComponent }
+
+	macro @NP               { /"1.1b" }
+
+	@Body
+    }
+
+@End @TblSetup

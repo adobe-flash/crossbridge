@@ -1,0 +1,2772 @@
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+NNNNAAAAMMMMEEEE
+     gcc, g++ -	GNU project C and C++ Compiler (v2 preliminary)
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+     gcc [[[[_o_p_t_i_o_n | _f_i_l_e_n_a_m_e ]...
+     g++ [[[[_o_p_t_i_o_n | _f_i_l_e_n_a_m_e ]...
+
+WWWWAAAARRRRNNNNIIIINNNNGGGG
+     The information in	this man page is an extract from the full
+     documentation  of	the GNU	C compiler, and	is limited to the
+     meaning of	the options.  This man page is	not  kept  up  to
+     date except when volunteers want to maintain it.
+
+     For complete and current documentation, refer  to	the  Info
+     file  `ggggcccccccc' or the	manual _U_s_i_n_g _a_n_d _P_o_r_t_i_n_g _G_N_U _C_C	(_f_o_r _v_e_r_-
+     _s_i_o_n _2._0).	 Both are  made	 from  the  Texinfo  source  file
+     ggggcccccccc....tttteeeexxxxiiiinnnnffffoooo.
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+     The C and C++ compilers are integrated.  Both process  input
+     files  through  one  or  more of four stages: preprocessing,
+     compilation, assembly, and	linking.   Source  filename  suf-
+     fixes  identify  the source language, but which name you use
+     for the compiler governs default assumptions:
+
+     ggggcccccccc  assumes preprocessed (....iiii) files are  C  and  assumes	C
+	  style	linking.
+
+     gggg++++++++  assumes preprocessed (....iiii) files are C++ and assumes C++
+	  style	linking.
+
+     Suffixes of source	file names indicate the	language and kind
+     of	processing to be done:
+
+     ....cccc	    C source; preprocess, compile, assemble
+     ....CCCC	    C++	source;	preprocess, compile, assemble
+     ....cccccccc     C++ source; preprocess, compile, assemble
+     ....ccccxxxxxxxx     C++ source; preprocess, compile, assemble
+     ....mmmm	    Objective-C	source;	preprocess, compile, assemble
+     ....iiii	    preprocessed C; compile, assemble
+     ....iiiiiiii     preprocessed C++; compile,	assemble
+     ....ssss	    Assembler source; assemble
+     ....SSSS	    Assembler source; preprocess, assemble
+     ....hhhh	    Preprocessor file; not usually named on command line
+
+     ??	    Other (unrecognized) files passed to linker.
+	  Common cases:
+     ....oooo	    Object file
+     ....aaaa	    Archive file
+
+     Linking is	always the last	stage unless you use one of the	----
+     cccc,	  ---- SSSS,	or  ----EEEE options to avoid	it (or unless compilation
+
+
+
+GNU Tools	     Last change: 28may1992			1
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+     errors stop the whole process).  For the link stage, all  ....oooo
+     files  corresponding to source files, ----llll libraries, unrecog-
+     nized filenames (including	named  ....oooo  object  files  and  ....aaaa
+     archives) are passed to the linker	in command-line	order.
+
+
+OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     Options must be separate: `----ddddrrrr' is	quite different	from `----	dddd
+     ----rrrr	'.
+
+     Most `----ffff' and `----WWWW'	options	have two contrary forms:  ---- ffff_n_a_m_e
+     and   ---- ffffnnnnoooo ---- _n_a_m_e	 (or ----WWWW_n_a_m_e and	----WWWWnnnnoooo----_n_a_m_e). Only the non-
+     default forms are shown here.
+
+     Here is a summary of  all	the  options,  grouped	by  type.
+     Explanations are in the following sections.
+
+
+     OOOOvvvveeeerrrraaaallllllll OOOOppppttttiiiioooonnnnssss
+	  -c -S	-E -o _f_i_l_e -pipe -v -x _l_a_n_g_u_a_g_e
+
+
+     LLLLaaaannnngggguuuuaaaaggggeeee OOOOppppttttiiiioooonnnnssss
+	  -ansi	-fall-virtual -fcond-mismatch -fdollars-in-
+	  identifiers -fenum-int-equiv -fno-asm	-fno-builtin -fno
+	  -strict-prototype -fsigned-bitfields -fsigned-char -
+	  fthis-is-variable -funsigned-bitfields -funsigned-char
+	  -fwritable-strings -traditional -traditional-cpp -
+	  trigraphs
+
+
+     WWWWaaaarrrrnnnniiiinnnngggg OOOOppppttttiiiioooonnnnssss
+	  -fsyntax-only	-pedantic -pedantic-errors -w -W -Wall -
+	  Waggregate-return -Wcast-align -Wcast-qual -Wcomment -
+	  Wconversion -Wenum-clash -Werror -Wformat -Wid-clash-
+	  _l_e_n -Wimplicit -Winline -Wmissing-prototypes -
+	  Wparentheses -Wpointer-arith -Wreturn-type -Wshadow -
+	  Wstrict-prototypes -Wswitch -Wtraditional -Wtrigraphs	-
+	  Wuninitialized -Wunused -Wwrite-strings
+
+
+     DDDDeeeebbbbuuuuggggggggiiiinnnngggg OOOOppppttttiiiioooonnnnssss
+	  -a -d_l_e_t_t_e_r_s -fpretend-float -g -gstabs -gdwarf -ggdb	-
+	  gsdb -p -pg -save-temps
+
+
+     OOOOppppttttiiiimmmmiiiizzzzaaaattttiiiioooonnnn OOOOppppttttiiiioooonnnnssss
+	  -fcaller-saves -fcse-follow-jumps -fdelayed-branch -
+	  felide-constructors -fexpensive-optimizations	-ffloat-
+	  store	-fforce-addr -fforce-mem -finline -finline-
+	  functions -fkeep-inline-functions -fmemoize-lookups -
+	  fno-default-inline -fno-defer-pop -fno-function-cse -
+
+
+
+GNU Tools	     Last change: 28may1992			2
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  fomit-frame-pointer -frerun-cse-after-loop -fschedule-
+	  insns	-fschedule-insns2 -fstrength-reduce -fthread-
+	  jumps	-funroll-all-loops -funroll-loops -O -O2
+
+
+     PPPPrrrreeeepppprrrroooocccceeeessssssssoooorrrr OOOOppppttttiiiioooonnnnssss
+	  -C -dD -dM -dN -D_m_a_c_r_o[=_d_e_f_n]	-E -H -i _f_i_l_e -M -MD -MM
+	  -MMD -nostdinc -P -U_m_a_c_r_o -undef
+
+
+     LLLLiiiinnnnkkkkeeeerrrr OOOOppppttttiiiioooonnnnssss
+	  -l_l_i_b_r_a_r_y -nostdlib -static
+
+
+     DDDDiiiirrrreeeeccccttttoooorrrryyyy OOOOppppttttiiiioooonnnnssss
+	  -B_p_r_e_f_i_x -I_d_i_r -I- -L_d_i_r
+
+
+     TTTTaaaarrrrggggeeeetttt OOOOppppttttiiiioooonnnnssss
+	  -b  _m_a_c_h_i_n_e -V _v_e_r_s_i_o_n
+
+
+     MMMMaaaacccchhhhiiiinnnneeee DDDDeeeeppppeeeennnnddddeeeennnntttt OOOOppppttttiiiioooonnnnssss
+	  _M_6_8_0_x_0 _O_p_t_i_o_n_s
+	  -m68000 -m68020 -m68881 -mbitfield -mc68000 -mc68020 -
+	  mfpa -mnobitfield -mrtd -mshort -msoft-float
+
+	  _V_A_X _O_p_t_i_o_n_s
+	  -mg -mgnu -munix
+
+	  _S_P_A_R_C	_O_p_t_i_o_n_s
+	  -mfpu	-mno-epilogue
+
+	  _C_o_n_v_e_x _O_p_t_i_o_n_s
+	  -margcount -mc1 -mc2 -mnoargcount
+
+	  _A_M_D_2_9_K _O_p_t_i_o_n_s
+	  -m29000 -m29050 -mbw -mdw -mkernel-registers -mlarge -
+	  mnbw -mnodw -msmall -mstack-check -muser-registers
+
+	  _M_8_8_K _O_p_t_i_o_n_s
+	  -mbig-pic -mcheck-zero-division -mhandle-large-shift -
+	  midentify-revision -mno-check-zero-division -mno-ocs-
+	  debug-info -mno-ocs-frame-position -mno-optimize-arg-
+	  area -mno-underscores	-mocs-debug-info -mocs-frame-
+	  position -moptimize-arg-area -mshort-data-_n_u_m	-msvr3 -
+	  msvr4	-mtrap-large-shift -muse-div-instruction -
+	  mversion-03.00 -mwarn-passed-structs
+
+	  _R_S_6_0_0_0 _O_p_t_i_o_n_s
+	  -mfp-in-toc -mno-fop-in-toc
+
+
+
+
+GNU Tools	     Last change: 28may1992			3
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  _R_T _O_p_t_i_o_n_s
+	  -mcall-lib-mul -mfp-arg-in-fpregs -mfp-arg-in-gregs -
+	  mfull-fp-blocks -mhc-struct-return -min-line-mul -
+	  mminimum-fp-blocks -mnohc-struct-return
+
+	  _M_I_P_S _O_p_t_i_o_n_s
+	  -mcpu=_c_p_u _t_y_p_e -mips2	-mips3 -mint64 -mlong64	-
+	  mlonglong128 -mmips-as -mgas -mrnames	-mno-rnames -
+	  mgpopt -mno-gpopt -mstats -mno-stats -mmemcpy	-mno-
+	  memcpy -mno-mips-tfile -mmips-tfile -msoft-float -mhard
+	  -float -mabicalls -mno-abicalls -mhalf-pic -mno-half-
+	  pic -G _n_u_m
+
+	  _i_3_8_6 _O_p_t_i_o_n_s
+	  -m486	-mno486	-msoft-float
+
+
+     CCCCooooddddeeee GGGGeeeennnneeeerrrraaaattttiiiioooonnnn OOOOppppttttiiiioooonnnnssss
+	  +e_N -fcall-saved-_r_e_g -fcall-used-_r_e_g -ffixed-_r_e_g -fno-
+	  common -fno-gnu-binutils -fnonnull-objects -fpcc-struct
+	  -return -fpic	-fPIC -fshared-data -fshort-enums -fshort
+	  -double -fvolatile
+
+
+OOOOVVVVEEEERRRRAAAALLLLLLLL	OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     ----xxxx	_l_a_n_g_u_a_g_e
+	  Specify explicitly the _l_a_n_g_u_a_g_e for the following input
+	  files	(rather	than choosing a	default	based on the file
+	  name suffix) .  This option applies  to  all	following
+	  input	 files	until  the  next  ` ----xxxx'	option.	 Possible
+	  values of _l_a_n_g_u_a_g_e are `cccc', `oooobbbbjjjjeeeeccccttttiiiivvvveeee----cccc', `cccc---- hhhheeeeaaaaddddeeeerrrr',
+	  `cccc++++++++',  `ccccpppppppp----oooouuuuttttppppuuuutttt',	`aaaasssssssseeeemmmmbbbblllleeeerrrr', and `aaaasssssssseeeemmmmbbbblllleeeerrrr----wwwwiiiitttthhhh----
+	  ccccpppppppp'.
+
+     ----xxxx	nnnnoooonnnneeee
+	  Turn off any specification of	a language, so that  sub-
+	  sequent  files are handled according to their	file name
+	  suffixes (as they are	if `----xxxx'	 has  not  been	 used  at
+	  all).
+
+     If	you want only some of the four stages  (preprocess,  com-
+     pile,  assemble,  link),  you can use `----xxxx'	(or filename suf-
+     fixes) to tell ggggcccccccc	where to start,	and one	of the options `----
+     cccc',  ` ---- SSSS', or `----EEEE' to say where ggggcccccccc is to stop.	Note that
+     some combinations (for example, `----xxxx ccccpppppppp----oooouuuuttttppppuuuutttt ----EEEE') instruct
+     ggggcccccccc to do nothing at all.
+
+     ----cccc	   Compile or assemble the source files, but do	not link.
+	  The  compiler	output is an object file corresponding to
+	  each source file.
+
+	  By default, GCC makes	the object file	name for a source
+
+
+
+GNU Tools	     Last change: 28may1992			4
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  file	by  replacing  the suffix `....cccc',	`....iiii', `....ssss', etc.,
+	  with `....oooo'.  Use ----oooo to	select another name.
+
+	  GCC ignores any unrecognized input files (those that do
+	  not  require	compilation  or	assembly) with the ----cccc op-
+	  tion.
+
+     ----SSSS	   Stop	after the stage	of compilation proper; do not as-
+	  semble.   The	output is an assembler code file for each
+	  non-assembler	input file specified.
+
+	  By default, GCC makes	the assembler  file  name  for	a
+	  source  file	by replacing the suffix	`....cccc', `....iiii', etc.,
+	  with `....ssss'.  Use ----oooo to	select another name.
+
+
+	  GCC ignores any input	files that don't require compila-
+	  tion.
+
+     ----EEEE	   Stop	after the preprocessing	stage;	do  not	 run  the
+	  compiler  proper.   The  output  is preprocessed source
+	  code,	which is sent to the standard output.
+
+	  GCC ignores input files which	don't require preprocess-
+	  ing.
+
+     ----oooo	_f_i_l_e
+	   Place output	in file	_f_i_l_e.  This applies regardless to
+	  whatever sort	of output GCC is producing, whether it be
+	  an executable	file, an object	file, an  assembler  file
+	  or preprocessed C code.
+
+	  Since	only one output	file can be  specified,	 it  does
+	  not make sense to use	`----oooo' when compiling more than one
+	  input	file, unless you are producing an executable file
+	  as output.
+
+	  If you do not	specify	`----oooo', the default is  to  put  an
+	  executable   file  in	 `aaaa....oooouuuutttt',  the	object	file  for
+	  `_s_o_u_r_c_e._s_u_f_f_i_x' in `_s_o_u_r_c_e.o', its  assembler	 file  in
+	  `_s_o_u_r_c_e.s',  and  all	preprocessed C source on standard
+	  output.
+
+     ----vvvv	   Print (on standard error output) the	commands executed
+	  to  run the stages of	compilation.  Also print the ver-
+	  sion number of the compiler driver program and  of  the
+	  preprocessor and the compiler	proper.
+
+     ----ppppiiiippppeeee
+	  Use pipes rather than	temporary files	for communication
+	  between  the various stages of compilation.  This fails
+	  to work on some systems where	the assembler cannot read
+
+
+
+GNU Tools	     Last change: 28may1992			5
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  from a pipe; but the GNU assembler has no trouble.
+
+LLLLAAAANNNNGGGGUUUUAAAAGGGGEEEE OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     The following options control the dialect of C that the com-
+     piler accepts:
+
+     ----aaaannnnssssiiii
+	  _S_u_p_p_o_r_t _a_l_l _A_N_S_I _s_t_a_n_d_a_r_d _C _p_r_o_g_r_a_m_s.
+
+	  _T_h_i_s _t_u_r_n_s _o_f_f _c_e_r_t_a_i_n _f_e_a_t_u_r_e_s _o_f _G_N_U _C _t_h_a_t	 _a_r_e  _i_n_-
+	  _c_o_m_p_a_t_i_b_l_e  _w_i_t_h  ANSI  C,  such as the aaaassssmmmm, iiiinnnnlllliiiinnnneeee and
+	  ttttyyyyppppeeeeooooffff keywords, and predefined macros such as uuuunnnniiiixxxx and
+	  vvvvaaaaxxxx that identify the	type of	system you are using.  It
+	  also enables the undesirable and rarely used ANSI  tri-
+	  graph	feature, and makes the preprocessor accept `$$$$' as
+	  part of identifiers.
+
+	  The alternate	keywords  ________aaaassssmmmm________,  ________eeeexxxxtttteeeennnnssssiiiioooonnnn________,  ________iiiinnnn----
+	  lllliiiinnnneeee________ and ________ttttyyyyppppeeeeooooffff________	continue to work despite `----aaaannnnssssiiii'.
+	  You would not	want to	use them in an ANSI C program, of
+	  course,  but	it  is useful to put them in header files
+	  that might be	included in compilations  done	with  `	----
+	  aaaannnnssssiiii'.   Alternate  predefined  macros such as ________uuuunnnniiiixxxx________
+	  and ________vvvvaaaaxxxx________ are also available,  with	 or  without  `	----
+	  aaaannnnssssiiii'.
+
+	  The `----aaaannnnssssiiii' option does not cause non-ANSI programs  to
+	  be rejected gratuitously.  For that, `----ppppeeeeddddaaaannnnttttiiiicccc' is re-
+	  quired in addition to	`----aaaannnnssssiiii'.
+
+	  The preprocessor  predefines	a  macro  ________SSSSTTTTRRRRIIIICCCCTTTT____AAAANNNNSSSSIIII________
+	  when you use the `----aaaannnnssssiiii' option.  Some header	files may
+	  notice this macro and	refrain	 from  declaring  certain
+	  functions  or	 defining  certain  macros  that the ANSI
+	  standard doesn't call	for; this is to	avoid interfering
+	  with	any programs that might	use these names	for other
+	  things.
+
+     ----ffffnnnnoooo----aaaassssmmmm
+	  Do not recognize aaaassssmmmm,	iiiinnnnlllliiiinnnneeee or ttttyyyyppppeeeeooooffff  as  a	 keyword.
+	  These	 words	may then be used as identifiers.  You can
+	  use ________aaaassssmmmm________, ________iiiinnnnlllliiiinnnneeee________ and  ________ttttyyyyppppeeeeooooffff________  instead.   `	----
+	  aaaannnnssssiiii'	implies	`----ffffnnnnoooo----aaaassssmmmm'.
+
+     ----ffffnnnnoooo----bbbbuuuuiiiillllttttiiiinnnn
+	  (_I_g_n_o_r_e_d _f_o_r _C++.) Don't  recognize  non-ANSI	 built-in
+	  functions.   ` ---- aaaannnnssssiiii' also has this effect. Currently,
+	  the only function affected is	aaaallllllllooooccccaaaa.
+
+     ----ffffnnnnoooo----ssssttttrrrriiiicccctttt----pppprrrroooottttoooottttyyyyppppeeee
+	  (_C++ _o_n_l_y.)  Consider	the declaration	iiiinnnntttt ffffoooooooo	(((())));;;;.   In
+	  C++,	this  means  that the function ffffoooooooo takes no argu-
+
+
+
+GNU Tools	     Last change: 28may1992			6
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  ments.
+	   In ANSI C, this is declared iiiinnnntttt ffffoooooooo((((vvvvooooiiiidddd))));;;;.	With  the
+	  flag	`----ffffnnnnoooo----ssssttttrrrriiiicccctttt----pppprrrroooottttoooottttyyyyppppeeee', declaring functions with
+	  no arguments is equivalent to	 declaring  its	 argument
+	  list	to be untyped, i.e., iiiinnnntttt ffffoooooooo (((())));;;; is equivalent to
+	  saying iiiinnnntttt ffffoooooooo ((((............))));;;;.
+
+     ----ttttrrrriiiiggggrrrraaaapppphhhhssss
+	  Support ANSI C trigraphs.  The `----aaaannnnssssiiii' option	implies	`
+	  ----ttttrrrriiiiggggrrrraaaapppphhhhssss'.
+
+     ----ttttrrrraaaaddddiiiittttiiiioooonnnnaaaallll
+	  Attempt to support some aspects of traditional  C  com-
+	  pilers.   For	details, see the GNU C Manual; the dupli-
+	  cate list here has been deleted so that  we  won't  get
+	  complaints when it is	out of date.
+
+	  But one note about C++ programs only (not C).	 `----ttttrrrraaaaddddiiii----
+	  ttttiiiioooonnnnaaaallll'  has	one additional effect for C++: assignment
+	  to tttthhhhiiiissss is permitted.	 This is the same as  the  effect
+	  of `----fffftttthhhhiiiissss----iiiissss----vvvvaaaarrrriiiiaaaabbbblllleeee'.
+
+     ----ttttrrrraaaaddddiiiittttiiiioooonnnnaaaallll----ccccpppppppp
+	  Attempt  to  support	some  aspects  of  traditional	C
+	  preprocessors.   This	 includes the items that specifi-
+	  cally	mention	the preprocessor above,	but none  of  the
+	  other	effects	of `----ttttrrrraaaaddddiiiittttiiiioooonnnnaaaallll'.
+
+     ----ffffddddoooollllllllaaaarrrrssss----iiiinnnn----iiiiddddeeeennnnttttiiiiffffiiiieeeerrrrssss
+	  (_C++ _o_n_l_y.)  Permit the  use	of  `$$$$'	 in  identifiers.
+	  (For	GNU C, this is the default, and	you can	forbid it
+	  with `----aaaannnnssssiiii'.)  Traditional C	allowed	the character `$$$$'
+	  to form part of identifiers; by default, GNU C also al-
+	  lows this.  However, ANSI C forbids `$$$$' in identifiers,
+	  and  GNU  C++	 also forbids it by default on most plat-
+	  forms	(though	on some	platforms it's enabled by default
+	  for GNU C++ as well).
+
+     ----ffffeeeennnnuuuummmm----iiiinnnntttt----eeeeqqqquuuuiiiivvvv
+	  (_C++ _o_n_l_y.)  Normally	GNU C++	allows conversion of eeeennnnuuuummmm
+	  to  iiiinnnntttt, but not the other way around.  Use this option
+	  if you want GNU C++ to allow conversion of iiiinnnntttt to  eeeennnnuuuummmm
+	  as well.
+
+     ----ffffaaaallllllll----vvvviiiirrrrttttuuuuaaaallll
+	  (_C++ _o_n_l_y.)  When you	use the	` ---- ffffaaaallllllll ---- vvvviiiirrrrttttuuuuaaaallll',  all
+	  member  functions (except for	constructor functions and
+	  new/delete member operators) declared	in the same class
+	  with	a  ``method-call'' operator method are treated as
+	  virtual functions of the given class.	 In  effect,  all
+	  of these methods become ``implicitly virtual.''
+
+
+
+
+GNU Tools	     Last change: 28may1992			7
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  This does _n_o_t	mean that all calls to these methods will
+	  be  made  through  the  internal table of virtual func-
+	  tions.  There	are some circumstances under which it  is
+	  obvious  that	a call to a given virtual function can be
+	  made directly, and in	these cases the	 calls	still  go
+	  direct.
+
+	  The effect of	making all methods of a	class with a  de-
+	  clared `ooooppppeeeerrrraaaattttoooorrrr---->>>>(((())))(((())))' implicitly virtual using `----ffffaaaallllllll
+	  ----vvvviiiirrrrttttuuuuaaaallll' extends also to all	 non-constructor  methods
+	  of any class derived from such a class.
+
+     ----ffffccccoooonnnndddd----mmmmiiiissssmmmmaaaattttcccchhhh
+	  Allow	conditional expressions	with mismatched	types  in
+	  the  second  and third arguments.  The value of such an
+	  expression is	void.
+
+     ----fffftttthhhhiiiissss----iiiissss----vvvvaaaarrrriiiiaaaabbbblllleeee
+	  (_C++ _o_n_l_y.)  The  incorporation  of  user-defined  free
+	  store	 management  into C++ has made assignment to tttthhhhiiiissss
+	  an anachronism.  Therefore, by default GNU  C++  treats
+	  the  type of tttthhhhiiiissss in a member	function of ccccllllaaaassssssss XXXX to be
+	  XXXX ****ccccoooonnnnsssstttt.  In	other words, it	is illegal to  assign  to
+	  tttthhhhiiiissss	within	a  class  member  function.  However, for
+	  backwards  compatibility,  you  can  invoke	the   old
+	  behavior by using `----fffftttthhhhiiiissss----iiiissss----vvvvaaaarrrriiiiaaaabbbblllleeee'.
+
+     ----ffffuuuunnnnssssiiiiggggnnnneeeedddd----cccchhhhaaaarrrr
+	  Let the type cccchhhhaaaarrrr be unsigned, like uuuunnnnssssiiiiggggnnnneeeedddd cccchhhhaaaarrrr.
+
+	  Each kind of machine has a default for what cccchhhhaaaarrrr should
+	  be.  It is either like uuuunnnnssssiiiiggggnnnneeeedddd cccchhhhaaaarrrr by default or like
+	  ssssiiiiggggnnnneeeedddd cccchhhhaaaarrrr by default.
+
+	  Ideally, a portable program should  always  use  ssssiiiiggggnnnneeeedddd
+	  cccchhhhaaaarrrr or uuuunnnnssssiiiiggggnnnneeeedddd cccchhhhaaaarrrr	when it	depends	on the signedness
+	  of an	object.	 But many programs have	been  written  to
+	  use plain cccchhhhaaaarrrr and expect it to be signed, or	expect it
+	  to be	unsigned, depending on	the  machines  they  were
+	  written  for.	  This	option,	 and its inverse, let you
+	  make such a program work with	the opposite default.
+
+	  The type cccchhhhaaaarrrr	is always a distinct type  from	 each  of
+	  ssssiiiiggggnnnneeeedddd cccchhhhaaaarrrr and uuuunnnnssssiiiiggggnnnneeeedddd cccchhhhaaaarrrr, even though its behavior
+	  is always just like one of those two.
+
+
+     ----ffffssssiiiiggggnnnneeeedddd----cccchhhhaaaarrrr
+	  Let the type cccchhhhaaaarrrr be signed, like ssssiiiiggggnnnneeeedddd cccchhhhaaaarrrr.
+
+	  Note that this is equivalent to `----ffffnnnnoooo----uuuunnnnssssiiiiggggnnnneeeedddd ---- cccchhhhaaaarrrr',
+	  which	is the negative	form of	`----ffffuuuunnnnssssiiiiggggnnnneeeedddd----cccchhhhaaaarrrr'.  Like-
+
+
+
+GNU Tools	     Last change: 28may1992			8
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  wise,	`----ffffnnnnoooo----ssssiiiiggggnnnneeeedddd----cccchhhhaaaarrrr' is equivalent to `----ffffuuuunnnnssssiiiiggggnnnneeeedddd	----
+	  cccchhhhaaaarrrr'.
+
+     ----ffffssssiiiiggggnnnneeeedddd----bbbbiiiittttffffiiiieeeellllddddssss
+
+     ----ffffuuuunnnnssssiiiiggggnnnneeeedddd----bbbbiiiittttffffiiiieeeellllddddssss
+
+     ----ffffnnnnoooo----ssssiiiiggggnnnneeeedddd----bbbbiiiittttffffiiiieeeellllddddssss
+
+     ----ffffnnnnoooo----uuuunnnnssssiiiiggggnnnneeeedddd----bbbbiiiittttffffiiiieeeellllddddssss
+	  These	options	control	whether	a bitfield is  signed  or
+	  unsigned,  when  declared  with no explicit `ssssiiiiggggnnnneeeedddd' or
+	  `uuuunnnnssssiiiiggggnnnneeeedddd' qualifier.	 By default, such a  bitfield  is
+	  signed,  because  this is consistent:	the basic integer
+	  types	such as	iiiinnnntttt are	signed types.
+
+	  However, when	you specify `----ttttrrrraaaaddddiiiittttiiiioooonnnnaaaallll', bitfields are
+	  all unsigned no matter what.
+
+     ----ffffwwwwrrrriiiittttaaaabbbblllleeee----ssssttttrrrriiiinnnnggggssss
+	  Store	string constants in the	writable data segment and
+	  don't	 uniquize  them.   This	is for compatibility with
+	  old programs which assume they can  write  into  string
+	  constants.  `----ttttrrrraaaaddddiiiittttiiiioooonnnnaaaallll' also has this effect.
+
+	  Writing into string  constants  is  a	 very  bad  idea;
+	  ``constants''	should be constant.
+
+PPPPRRRREEEEPPPPRRRROOOOCCCCEEEESSSSSSSSOOOORRRR OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     These options control the C preprocessor, which  is  run  on
+     each C source file	before actual compilation.
+
+     If	you use	the `----EEEE' option, GCC does nothing except  prepro-
+     cessing.	Some  of  these	 options make sense only together
+     with `----EEEE' because they cause the preprocessor output  to  be
+     unsuitable	for actual compilation.
+
+     ----iiii	_f_i_l_e
+	   Process _f_i_l_e	as input, discarding the  resulting  out-
+	  put, before processing the regular input file.  Because
+	  the output generated from _f_i_l_e is discarded,	the  only
+	  effect  of  `	----iiii _f_i_l_e' is to make the	macros defined in
+	  _f_i_l_e available for use in the	main input.  The  prepro-
+	  cessor  evaluates any	`----DDDD' and `----UUUU' options on the com-
+	  mand line before processing `----iiii' _f_i_l_e.
+
+     ----nnnnoooossssttttddddiiiinnnncccc
+	  Do not  search  the  standard	 system	 directories  for
+	  header  files.  Only the directories you have	specified
+	  with `----IIII' options (and the current  directory,  if  ap-
+	  propriate) are searched.
+
+
+
+
+GNU Tools	     Last change: 28may1992			9
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  By using both	`----nnnnoooossssttttddddiiiinnnncccc' and	`----IIII---- ',	you can	limit the
+	  include-file	search file to only those directories you
+	  specify explicitly.
+
+     ----uuuunnnnddddeeeeffff
+	  Do not predefine any	nonstandard  macros.   (Including
+	  architecture flags).
+
+     ----EEEE	   Run only the	C preprocessor.	  Preprocess  all  the	C
+	  source  files	specified and output the results to stan-
+	  dard output or to the	specified output file.
+
+     ----CCCC	   Tell	the preprocessor not to	discard	 comments.   Used
+	  with the `----EEEE'	option.
+
+     ----PPPP	   Tell	the preprocessor not  to  generate  `####lllliiiinnnneeee'  com-
+	  mands.  Used with the	`----EEEE' option.
+
+     ----MMMM	   Tell	the preprocessor to output a  rule  suitable  for
+	  mmmmaaaakkkkeeee	describing  the	dependencies of	each object file.
+	  For each source  file,  the  preprocessor  outputs  one
+	  mmmmaaaakkkkeeee-rule whose target is the	object file name for that
+	  source file and whose	dependencies are  all  the  files
+	  `####iiiinnnncccclllluuuuddddeeee'd  in  it.	This rule may be a single line or
+	  may be continued with	`\\\\'-newline if it is  long.   The
+	  list	of rules is printed on standard	output instead of
+	  the preprocessed C program.
+
+	  `----MMMM' implies `----EEEE'.
+
+     ----MMMMMMMM   Like	`----MMMM' but the output mentions only the user header
+	  files	 included  with	 `####iiiinnnncccclllluuuuddddeeee _f_i_l_e"'.  System header
+	  files	included with `####iiiinnnncccclllluuuuddddeeee	<<<<_f_i_l_e>'	are omitted.
+
+     ----MMMMDDDD   Like	`----MMMM' but the dependency	information is written to
+	  files	 with  names  made by replacing	`....cccc' with `....dddd' at
+	  the end of the input file names.  This is  in	 addition
+	  to compiling the file	as specified-`----MMMMDDDD' does	not inhi-
+	  bit ordinary compilation the way `----MMMM'	does.
+
+	  The Mach utility `mmmmdddd'	can be used  to	 merge	the  `....dddd'
+	  files	 into a	single dependency file suitable	for using
+	  with the `mmmmaaaakkkkeeee' command.
+
+     ----MMMMMMMMDDDD  Like	`----MMMMDDDD' except mention only user header files,  not
+	  system header	files.
+
+     ----HHHH	   Print the name of each header file used,  in	 addition
+	  to other normal activities.
+
+     ----DDDD_m_a_c_r_o
+	  Define macro _m_a_c_r_o with the string `1111' as  its  defini-
+
+
+
+GNU Tools	     Last change: 28may1992		       10
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  tion.
+
+     ----DDDD_m_a_c_r_o====_d_e_f_n
+	  Define macro _m_a_c_r_o as	_d_e_f_n.	 All instances of `----DDDD' on
+	  the  command line are	processed before any `----UUUU' or `----iiii'
+	  options.
+
+     ----UUUU_m_a_c_r_o
+	  Undefine macro _m_a_c_r_o.	 `----UUUU' options are evaluated after
+	  all `----DDDD' options, but	before any `----iiii'	options.
+
+     ----ddddMMMM   Tell	the preprocessor to output only	 a  list  of  the
+	  macro	 definitions  that  are	 in  effect at the end of
+	  preprocessing.  Used with the	`----EEEE' option.
+
+     ----ddddDDDD   Tell	the preprocessing to pass all  macro  definitions
+	  into	the  output, in	their proper sequence in the rest
+	  of the output.
+
+     ----ddddNNNN   Like	`----ddddDDDD' except that the macro  arguments	and  con-
+	  tents	 are omitted.  Only `####ddddeeeeffffiiiinnnneeee _n_a_m_e' is included in
+	  the output.
+
+LLLLIIIINNNNKKKKEEEERRRR OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     These options come	into play when the compiler links  object
+     files  into an executable output file.  They are meaningless
+     if	the compiler is	not doing a link step.
+
+     _o_b_j_e_c_t-_f_i_l_e-_n_a_m_e
+	  A file name that does	not end	in a  special  recognized
+	  suffix is considered to name an object file or library.
+	  (Object files	are distinguished from libraries  by  the
+	  linker  according to the file	contents.)  If GCC does	a
+	  link step, these object files	are used as input to  the
+	  linker.
+
+     ----llll_l_i_b_r_a_r_y
+	   Use the library named _l_i_b_r_a_r_y when linking.
+
+	  The linker searches a	standard list of directories  for
+	  the	library,   which   is	actually   a  file  named
+	  `lllliiiibbbb_l_i_b_r_a_r_y.a'.  The linker then uses	this file  as  if
+	  it had been specified	precisely by name.
+
+	  The directories searched include several standard  sys-
+	  tem directories plus any that	you specify with `----LLLL'.
+
+	  Normally the files found this	way are	 library  files	-
+	  archive  files  whose	 members  are  object files.  The
+	  linker handles an archive file by scanning  through  it
+	  for  members which define symbols that have so far been
+	  referenced but not defined.	However,  if  the  linker
+
+
+
+GNU Tools	     Last change: 28may1992		       11
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  finds	 an  ordinary  object file rather than a library,
+	  the object file is linked in the  usual  fashion.   The
+	  only difference between using	an `----llll'	option and speci-
+	  fying	a file name is that `----llll' surrounds  _l_i_b_r_a_r_y  with
+	  `lllliiiibbbb'	and `....aaaa' and searches several directories.
+
+     ----nnnnoooossssttttddddlllliiiibbbb
+	  Don't	use the	standard  system  libraries  and  startup
+	  files	when linking.  Only the	files you specify will be
+	  passed to the	linker.
+
+     ----ssssttttaaaattttiiiicccc
+	  On systems that support dynamic linking, this	 prevents
+	  linking  with	 the shared libraries.	On other systems,
+	  this option has no effect.
+
+DDDDIIIIRRRREEEECCCCTTTTOOOORRRRYYYY OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     These options  specify  directories  to  search  for  header
+     files, for	libraries and for parts	of the compiler:
+
+     ----IIII_d_i_r
+	   Append  directory  _d_i_r  to  the  list  of  directories
+	  searched for include files.
+
+     ----IIII----    Any	directories you	specify	with `----IIII' options  before
+	  the  ` ---- IIII ---- ' option	are searched only for the case of
+	  `####iiiinnnncccclllluuuuddddeeee """"_f_i_l_e""""'; they are not searched for	`####iiiinnnncccclllluuuuddddeeee
+	  <<<<_f_i_l_e>'.
+
+	  If additional	directories are	specified with `---- IIII'  op-
+	  tions	 after the `----IIII----	', these directories are searched
+	  for all `####iiiinnnncccclllluuuuddddeeee' directives.  (Ordinarily _a_l_l  ` ---- IIII'
+	  directories are used this way.)
+
+	  In addition, the `----IIII----	' option inhibits the use of  the
+	  current  directory  (where  the current input	file came
+	  from)	as  the	 first	search	directory  for	`####iiiinnnncccclllluuuuddddeeee
+	  """"_f_i_l_e""""'.  There is no	way to override	this effect of `----
+	  IIII---- '.	 With `----IIII....' you	can specify searching the  direc-
+	  tory	which  was current when	the compiler was invoked.
+	  That is not exactly the same as what	the  preprocessor
+	  does by default, but it is often satisfactory.
+
+	  `----IIII---- ' does not inhibit the use of the standard  system
+	  directories for header files.	 Thus, `----IIII---- ' and `----nnnnoooosssstttt----
+	  ddddiiiinnnncccc'	are independent.
+
+     ----LLLL_d_i_r
+	   Add directory _d_i_r to	the list  of  directories  to  be
+	  searched for `----llll'.
+
+     ----BBBB_p_r_e_f_i_x
+
+
+
+GNU Tools	     Last change: 28may1992		       12
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	   This	option specifies where to find	the  executables,
+	  libraries and	data files of the compiler itself.
+
+	  The compiler driver program runs one	or  more  of  the
+	  subprograms `ccccpppppppp', `cccccccc1111' (or,	for C++, `cccccccc1111pppplllluuuussss'), `aaaassss'
+	  and `lllldddd'.  It	tries _p_r_e_f_i_x as	a prefix for each program
+	  it	tries	 to    run,   both   with   and	  without
+	  `_m_a_c_h_i_n_e/_v_e_r_s_i_o_n/'.
+
+	  For each subprogram to  be  run,  the	 compiler  driver
+	  first	 tries	the `----BBBB' prefix, if any.  If that name is
+	  not found, or	if `----BBBB'	was  not  specified,  the  driver
+	  tries	 two standard prefixes,	which are `////uuuussssrrrr////lllliiiibbbb////ggggcccccccc////'
+	  and `////uuuussssrrrr////llllooooccccaaaallll////lllliiiibbbb////ggggcccccccc----lllliiiibbbb////'.   If  neither	of  those
+	  results  in  a  file	name  that is found, the compiler
+	  driver searches for the unmodified program name,  using
+	  the  directories  specified  in your `PPPPAAAATTTTHHHH' environment
+	  variable.
+
+	  The run-time support file `lllliiiibbbbggggcccccccc....aaaa' is  also	 searched
+	  for  using  the  ` ----BBBB' prefix, if needed.  If	it is not
+	  found	there, the two standard	prefixes above are tried,
+	  and  that  is	all.  The file is left out of the link if
+	  it is	not found by those means.  Most	of the	time,  on
+	  most machines, `lllliiiibbbbggggcccccccc....aaaa' is not actually necessary.
+
+	  You can get a	similar	result from the	environment vari-
+	  able	GGGGCCCCCCCC____EEEEXXXXEEEECCCC____PPPPRRRREEEEFFFFIIIIXXXX;  if  it is defined, its value is
+	  used as a prefix in the same way.  If	both the `----BBBB' op-
+	  tion	and the	GGGGCCCCCCCC____EEEEXXXXEEEECCCC____PPPPRRRREEEEFFFFIIIIXXXX	variable are present, the
+	  `----BBBB' option is used first and	the environment	 variable
+	  value	second.
+
+WWWWAAAARRRRNNNNIIIINNNNGGGG	OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     Warnings are diagnostic messages that  report  constructions
+     which  are	 not  inherently erroneous but which are risky or
+     suggest there may have been an error.
+
+     These options control the amount and kinds	of warnings  pro-
+     duced by GNU CC:
+
+     ----ffffssssyyyynnnnttttaaaaxxxx----oooonnnnllllyyyy
+	  Check	the code for syntax errors, but	 don't	emit  any
+	  output.
+
+     ----wwww	   Inhibit all warning messages.
+
+     ----ppppeeeeddddaaaannnnttttiiiicccc
+	  Issue	all the	warnings demanded by strict ANSI standard
+	  C; reject all	programs that use forbidden extensions.
+
+	  Valid	ANSI standard C	programs should	compile	 properly
+
+
+
+GNU Tools	     Last change: 28may1992		       13
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  with or without this option (though a	rare few will re-
+	  quire	`----aaaannnnssssiiii').  However, without this option,  certain
+	  GNU extensions and traditional C features are	supported
+	  as well.  With this option, they are	rejected.   There
+	  is  no  reason  to  _u_s_e  this	option;	it exists only to
+	  satisfy pedants.
+
+	  `----ppppeeeeddddaaaannnnttttiiiicccc' does not cause warning messages for use  of
+	  the  alternate  keywords whose names begin and end with
+	  `________'.	 Pedantic warnings are also disabled in	 the  ex-
+	  pression  that  follows  ________eeeexxxxtttteeeennnnssssiiiioooonnnn________.   However, only
+	  system header	files should use these escape routes; ap-
+	  plication programs should avoid them.
+
+     ----ppppeeeeddddaaaannnnttttiiiicccc----eeeerrrrrrrroooorrrrssss
+	  Like `----ppppeeeeddddaaaannnnttttiiiicccc', except that	errors are produced rath-
+	  er than warnings.
+
+     ----WWWW	   Print extra warning messages	for these events:
+
+	+o  A nonvolatile automatic variable might be changed by	a
+	  call	to  lllloooonnnnggggjjjjmmmmpppp.  These warnings are possible only in
+	  optimizing compilation.
+
+	  The compiler sees only the calls to sssseeeettttjjjjmmmmpppp.  It  cannot
+	  know	where  lllloooonnnnggggjjjjmmmmpppp	will be	called;	in fact, a signal
+	  handler could	call it	at any point in	the code.   As	a
+	  result,  you	may  get  a warning even when there is in
+	  fact no problem  because  lllloooonnnnggggjjjjmmmmpppp  cannot  in	 fact  be
+	  called at the	place which would cause	a problem.
+
+	+o  A function can return either	with or	without	a  value.
+	  (Falling off the end of the function body is considered
+	  returning without a value.)  For example, this function
+	  would	evoke such a warning:
+
+	  foo (a)
+	  {
+	    if (a > 0)
+	      return a;
+	  }
+
+
+	  Spurious warnings can	occur because  GNU  CC	does  not
+	  realize  that	 certain  functions  (including	aaaabbbboooorrrrtttt and
+	  lllloooonnnnggggjjjjmmmmpppp) will	never return.
+
+	+o  An expression-statement contains no side effects.
+
+	+o  An unsigned value is	compared against zero with `>>>>' or
+	  `<<<<===='.
+
+
+
+
+GNU Tools	     Last change: 28may1992		       14
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+     ----WWWWiiiimmmmpppplllliiiicccciiiitttt
+	  Warn whenever	a function or parameter	is implicitly de-
+	  clared.
+
+     ----WWWWrrrreeeettttuuuurrrrnnnn----ttttyyyyppppeeee
+	  Warn whenever	a function is defined with a  return-type
+	  that	defaults  to  iiiinnnntttt.   Also  warn	 about any rrrreeeettttuuuurrrrnnnn
+	  statement with no  return-value  in  a  function  whose
+	  return-type is not vvvvooooiiiidddd.
+
+     ----WWWWuuuunnnnuuuusssseeeedddd
+	  Warn whenever	a local	variable is unused aside from its
+	  declaration, whenever	a function is declared static but
+	  never	defined, and  whenever	a  statement  computes	a
+	  result that is explicitly not	used.
+
+     ----WWWWsssswwwwiiiittttcccchhhh
+	  Warn whenever	 a  sssswwwwiiiittttcccchhhh  statement  has  an	index  of
+	  enumeral  type  and lacks a ccccaaaasssseeee for one or more of the
+	  named	codes of that enumeration.  (The  presence  of	a
+	  ddddeeeeffffaaaauuuulllltttt label	prevents this warning.)	 ccccaaaasssseeee labels out-
+	  side the enumeration range also provoke  warnings  when
+	  this option is used.
+
+     ----WWWWccccoooommmmmmmmeeeennnntttt
+	  Warn whenever	a comment-start	sequence `////****' appears  in
+	  a comment.
+
+     ----WWWWttttrrrriiiiggggrrrraaaapppphhhhssss
+	  Warn if any trigraphs	are  encountered  (assuming  they
+	  are enabled).
+
+     ----WWWWffffoooorrrrmmmmaaaatttt
+	  Check	calls to pppprrrriiiinnnnttttffff	and ssssccccaaaannnnffff,  etc.,  to  make  sure
+	  that	the  arguments supplied	have types appropriate to
+	  the format string specified.
+
+     ----WWWWuuuunnnniiiinnnniiiittttiiiiaaaalllliiiizzzzeeeedddd
+	  An automatic variable	is used	without	first being  ini-
+	  tialized.
+
+	  These	warnings are possible only in optimizing compila-
+	  tion,	 because  they require data flow information that
+	  is computed only when	optimizing.  If	you don't specify
+	  `----OOOO',	you simply won't get these warnings.
+
+	  These	warnings occur only for	variables that are candi-
+	  dates	 for register allocation.  Therefore, they do not
+	  occur	for a variable	that  is  declared  vvvvoooollllaaaattttiiiilllleeee,  or
+	  whose	 address is taken, or whose size is other than 1,
+	  2, 4 or 8 bytes.  Also, they do not  occur  for  struc-
+	  tures,  unions  or arrays, even when they are	in regis-
+
+
+
+GNU Tools	     Last change: 28may1992		       15
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  ters.
+
+	  Note that there may be no warning about a variable that
+	  is  used  only  to compute a value that itself is never
+	  used,	because	such computations may be deleted by  data
+	  flow analysis	before the warnings are	printed.
+
+	  These	warnings are made optional because GNU CC is  not
+	  smart	 enough	to see all the reasons why the code might
+	  be correct despite appearing to have an error.  Here is
+	  one example of how this can happen:
+
+
+	  {
+	    int	x;
+	    switch (y)
+	      {
+	      case 1: x	= 1;
+		break;
+	      case 2: x	= 4;
+		break;
+	      case 3: x	= 5;
+	      }
+	    foo	(x);
+	  }
+
+
+
+	  If the value of yyyy is always 1, 2 or 3, then xxxx	is always
+	  initialized,	but  GNU  CC  doesn't know this.  Here is
+	  another common case:
+
+
+	  {
+	    int	save_y;
+	    if (change_y) save_y = y, y	= new_y;
+	    ...
+	    if (change_y) y = save_y;
+	  }
+
+
+
+	  This has no bug because ssssaaaavvvveeee____yyyy is used only  if  it  is
+	  set.
+
+	  Some spurious	warnings can be	avoided	if you declare as
+	  vvvvoooollllaaaattttiiiilllleeee all the functions you use that never	return.
+
+     ----WWWWppppaaaarrrreeeennnntttthhhheeeesssseeeessss
+	  Warn if parentheses are omitted in certain contexts.
+
+     ----WWWWaaaallllllll
+
+
+
+GNU Tools	     Last change: 28may1992		       16
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  All of the above `----WWWW'	options	combined.  These are  all
+	  the  options	which  pertain to usage	that we	recommend
+	  avoiding and that we believe is easy to avoid, even  in
+	  conjunction with macros.
+
+     The remaining `----WWWW............' options are not implied by `----WWWWaaaallllllll' be-
+     cause they	warn about constructions that we consider reason-
+     able to use, on occasion, in clean	programs.
+
+     ----WWWWttttrrrraaaaddddiiiittttiiiioooonnnnaaaallll
+	  Warn about certain constructs	that  behave  differently
+	  in traditional and ANSI C.
+
+	+o  Macro arguments occurring within string  constants  in
+	  the macro body.  These would substitute the argument in
+	  traditional C, but are part of the constant in ANSI C.
+
+	+o  A function declared external	in  one	 block	and  then
+	  used after the end of	the block.
+
+	+o  A sssswwwwiiiittttcccchhhh statement has an operand of	type lllloooonnnngggg.
+
+     ----WWWWsssshhhhaaaaddddoooowwww
+	  Warn whenever	a local	variable  shadows  another  local
+	  variable.
+
+     ----WWWWiiiidddd----ccccllllaaaasssshhhh----_l_e_n
+	   Warn	whenever two distinct identifiers  match  in  the
+	  first	_l_e_n characters.	 This may help you prepare a pro-
+	  gram that will compile with  certain	obsolete,  brain-
+	  damaged compilers.
+
+     ----WWWWppppooooiiiinnnntttteeeerrrr----aaaarrrriiiitttthhhh
+	  Warn about anything that depends on the ``size  of''	a
+	  function  type or of vvvvooooiiiidddd.  GNU C assigns these types	a
+	  size of 1, for convenience in	calculations with vvvvooooiiiidddd	****
+	  pointers and pointers	to functions.
+
+     ----WWWWccccaaaasssstttt----qqqquuuuaaaallll
+	  Warn whenever	a pointer is cast so as	to remove a  type
+	  qualifier from the target type.  For example,	warn if	a
+	  ccccoooonnnnsssstttt	cccchhhhaaaarrrr **** is cast to an ordinary cccchhhhaaaarrrr ****.
+
+     ----WWWWccccaaaasssstttt----aaaalllliiiiggggnnnn
+	  Warn whenever	a pointer is cast such that the	 required
+	  alignment  of	 the  target  is increased.  For example,
+	  warn if a cccchhhhaaaarrrr **** is cast to an iiiinnnntttt **** on machines  where
+	  integers  can	 only  be  accessed  at	two- or	four-byte
+	  boundaries.
+
+     ----WWWWwwwwrrrriiiitttteeee----ssssttttrrrriiiinnnnggggssss
+	  Give string constants	the type  ccccoooonnnnsssstttt	 cccchhhhaaaarrrr[[[[_l_e_n_g_t_h]  so
+
+
+
+GNU Tools	     Last change: 28may1992		       17
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  that copying the address of one into a non-ccccoooonnnnsssstttt cccchhhhaaaarrrr	****
+	  pointer will get a warning.  These warnings  will  help
+	  you  find  at	 compile  time code that can try to write
+	  into a string	constant, but only if you have been  very
+	  careful  about  using	 ccccoooonnnnsssstttt in declarations and proto-
+	  types.  Otherwise, it	will just be a nuisance; this  is
+	  why we did not make `----WWWWaaaallllllll' request these warnings.
+
+     ----WWWWccccoooonnnnvvvveeeerrrrssssiiiioooonnnn
+	  Warn if a prototype causes a type  conversion	 that  is
+	  different  from  what	would happen to	the same argument
+	  in the absence of a prototype.  This	includes  conver-
+	  sions	 of  fixed  point to floating and vice versa, and
+	  conversions changing the width or signedness of a fixed
+	  point	argument except	when the same as the default pro-
+	  motion.
+
+     ----WWWWaaaaggggggggrrrreeeeggggaaaatttteeee----rrrreeeettttuuuurrrrnnnn
+	  Warn if any functions	that return structures or  unions
+	  are defined or called.  (In languages	where you can re-
+	  turn an array, this also elicits a warning.)
+
+     ----WWWWssssttttrrrriiiicccctttt----pppprrrroooottttoooottttyyyyppppeeeessss
+	  Warn if a  function  is  declared  or	 defined  without
+	  specifying  the argument types.  (An old-style function
+	  definition is	permitted without a warning  if	 preceded
+	  by a declaration which specifies the argument	types.)
+
+     ----WWWWmmmmiiiissssssssiiiinnnngggg----pppprrrroooottttoooottttyyyyppppeeeessss
+	  Warn if a global function is defined without a previous
+	  prototype  declaration.  This	warning	is issued even if
+	  the definition itself	provides a prototype.  The aim is
+	  to  detect global functions that fail	to be declared in
+	  header files.
+
+     ----WWWWeeeennnnuuuummmm----ccccllllaaaasssshhhh
+	  (_C++ _o_n_l_y.)  Warn  when  converting  between	different
+	  enumeration types.
+
+     ----WWWWoooovvvveeeerrrrllllooooaaaaddddeeeedddd----vvvviiiirrrrttttuuuuaaaallll
+	  (_C++ _o_n_l_y.) In a derived class, the definitions of vir-
+	  tual	functions must match the type signature	of a vir-
+	  tual function	declared in the	base class.  Use this op-
+	  tion	to request warnings when a derived class declares
+	  a function that may be an erroneous attempt to define	a
+	  virtual  function:  that  is,	warn when a function with
+	  the same name	as a virtual function in the base  class,
+	  but with a type signature that doesn't match any virtu-
+	  al functions from the	base class.
+
+     ----WWWWiiiinnnnlllliiiinnnneeee
+	  Warn if a function can not be	inlined,  and  either  it
+
+
+
+GNU Tools	     Last change: 28may1992		       18
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  was  declared	as inline, or else the ----ffffiiiinnnnlllliiiinnnneeee----ffffuuuunnnnccccttttiiiioooonnnnssss
+	  option was given.
+
+     ----WWWWeeeerrrrrrrroooorrrr
+	  Treat	warnings as errors; abort compilation  after  any
+	  warning.
+
+DDDDEEEEBBBBUUUUGGGGGGGGIIIINNNNGGGG OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     GNU CC has	various	special	options	that are used for  debug-
+     ging either your program or GCC:
+
+      ----	gggg    Produce  debugging	 information  in  the	operating
+	  system's  native format (for DBX or SDB or DWARF).  GDB
+	  also can work	with this debugging information.  On most
+	  systems  that	use DBX	format,	`----gggg' enables use of extra
+	  debugging information	that only GDB  can  use;  if  you
+	  want	to  control  for certain whether to generate this
+	  information, use `----ggggggggddddbbbb' or `----ggggddddbbbbxxxx'.
+
+	  Unlike most other C compilers, GNU CC	allows you to use
+	  ` ----gggg'	with `----OOOO'.  The	shortcuts taken	by optimized code
+	  may occasionally produce surprising results: some vari-
+	  ables	 you  declared may not exist at	all; flow of con-
+	  trol may briefly move	where you did not expect it; some
+	  statements  may  not	be  executed because they compute
+	  constant results or their values were	already	at  hand;
+	  some statements may execute in different places because
+	  they were moved out of loops.
+
+	  Nevertheless it proves possible to debug optimized out-
+	  put.	This makes it reasonable to use	the optimizer for
+	  programs that	might have bugs.
+
+	  The following	options	are useful when	GNU CC is config-
+	  ured and compiled with the capability	for more than one
+	  debugging format.
+
+     ----ggggggggddddbbbb
+	  Produce debugging information	in DBX format (if that is
+	  supported), including	GDB extensions.
+
+     ----ggggddddbbbbxxxx
+	  Produce debugging information	in DBX format (if that is
+	  supported), without GDB extensions.
+
+     ----ggggssssddddbbbb
+	  Produce debugging information	in SDB format (if that is
+	  supported).
+
+     ----ggggddddwwwwaaaarrrrffff
+	  Produce debugging information	in DWARF format	(if  that
+	  is supported).
+
+
+
+GNU Tools	     Last change: 28may1992		       19
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+     ----gggg_l_e_v_e_l
+     ----ggggggggddddbbbb_l_e_v_e_l
+     ----ggggddddbbbbxxxx_l_e_v_e_l
+     ----ggggssssddddbbbb_l_e_v_e_l
+
+     ----ggggddddwwwwaaaarrrrffff_l_e_v_e_l
+	  Request debugging information	and  also  use	_l_e_v_e_l  to
+	  specify how much information.	 The default level is 2.
+
+	  Level	1 produces minimal information,	enough for making
+	  backtraces  in parts of the program that you don't plan
+	  to debug.  This includes descriptions	of functions  and
+	  external  variables,	but  no	 information  about local
+	  variables and	no line	numbers.
+
+     ----pppp	   Generate extra code to write	profile	information suit-
+	  able for the analysis	program	pppprrrrooooffff.
+
+     ----ppppgggg   Generate extra code to write	profile	information suit-
+	  able for the analysis	program	ggggpppprrrrooooffff.
+
+     ----aaaa	   Generate extra code to write	profile	 information  for
+	  basic	 blocks,  which	 will  record the number of times
+	  each basic block  is	executed.   This  data	could  be
+	  analyzed  by	a program like ttttccccoooovvvv.  Note, however, that
+	  the format of	the data is not	what ttttccccoooovvvv expects.  Even-
+	  tually  GNU  ggggpppprrrrooooffff  should  be extended to process this
+	  data.
+
+     ----dddd_l_e_t_t_e_r_s
+	   Says	to make	debugging  dumps  during  compilation  at
+	  times	specified by _l_e_t_t_e_r_s.  This is used for	debugging
+	  the compiler.	 The file names	for most of the	dumps are
+	  made	by appending a word to the source file name (e.g.
+	  `ffffoooooooo....cccc....rrrrttttllll' or `ffffoooooooo....cccc....jjjjuuuummmmpppp').
+
+     ----ddddMMMM   Dump	all macro definitions, at the end of  preprocess-
+	  ing, and write no output.
+
+     ----ddddNNNN   Dump	all macro names, at the	end of preprocessing.
+
+     ----ddddDDDD   Dump	all macro definitions, at the end of  preprocess-
+	  ing, in addition to normal output.
+
+     ----ddddyyyy   Dump	debugging information during parsing, to standard
+	  error.
+
+     ----ddddrrrr   Dump	after RTL generation, to `_f_i_l_e.rtl'.
+
+     ----ddddxxxx   Just	generate RTL for a function instead of	compiling
+	  it.  Usually used with `rrrr'.
+
+
+
+
+GNU Tools	     Last change: 28may1992		       20
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+     ----ddddjjjj   Dump	after first jump optimization, to `_f_i_l_e.jump'.
+
+     ----ddddssss   Dump	after CSE (including the jump  optimization  that
+	  sometimes follows CSE), to `_f_i_l_e.cse'.
+
+     ----ddddLLLL   Dump	after loop optimization, to `_f_i_l_e.loop'.
+
+     ----ddddtttt   Dump	after the second CSE pass (including the jump op-
+	  timization that sometimes follows CSE), to `_f_i_l_e.cse2'.
+
+     ----ddddffff   Dump	after flow analysis, to	`_f_i_l_e.flow'.
+
+     ----ddddcccc   Dump	after instruction combination, to `_f_i_l_e.combine'.
+
+     ----ddddSSSS   Dump	after the first	instruction scheduling	pass,  to
+	  `_f_i_l_e.sched'.
+
+     ----ddddllll   Dump	after local register allocation, to `_f_i_l_e.lreg'.
+
+     ----ddddgggg   Dump	after global register allocation, to `_f_i_l_e.greg'.
+
+     ----ddddRRRR   Dump	after the second instruction scheduling	pass,  to
+	  `_f_i_l_e.sched2'.
+
+     ----ddddJJJJ   Dump	after last jump	optimization, to `_f_i_l_e.jump2'.
+
+     ----dddddddd   Dump	after delayed branch scheduling, to `_f_i_l_e.dbr'.
+
+     ----ddddkkkk   Dump	after conversion  from	registers  to  stack,  to
+	  `_f_i_l_e.stack'.
+
+     ----ddddmmmm   Print statistics on memory usage, at	the  end  of  the
+	  run, to standard error.
+
+     ----ddddpppp   Annotate the	assembler output with a	comment	 indicat-
+	  ing which pattern and	alternative was	used.
+
+     ----ffffpppprrrreeeetttteeeennnndddd----ffffllllooooaaaatttt
+	  When running a cross-compiler, pretend that the  target
+	  machine uses the same	floating point format as the host
+	  machine.  This causes	incorrect output  of  the  actual
+	  floating constants, but the actual instruction sequence
+	  will probably	be the same as GNU  CC	would  make  when
+	  running on the target	machine.
+
+     ----ssssaaaavvvveeee----tttteeeemmmmppppssss
+	  Store	the usual ``temporary''	intermediate  files  per-
+	  manently;  place them	in the current directory and name
+	  them based on	the source file.  Thus,	compiling `ffffoooooooo....cccc'
+	  with `----cccc ----ssssaaaavvvveeee----tttteeeemmmmppppssss'	would produce files `ffffoooooooo....ccccpppppppp' and
+	  `ffffoooooooo....ssss', as well as `ffffoooooooo....oooo'.
+
+
+
+
+GNU Tools	     Last change: 28may1992		       21
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+OOOOPPPPTTTTIIIIMMMMIIIIZZZZAAAATTTTIIIIOOOONNNN OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     These options control various sorts of optimizations:
+
+     ----OOOO	   Optimize.  Optimizing compilation takes somewhat  more
+	  time,	and a lot more memory for a large function.
+
+	  Without `----OOOO',	the compiler's goal is to reduce the cost
+	  of  compilation  and	to make	debugging produce the ex-
+	  pected results.  Statements  are  independent:  if  you
+	  stop	the program with a breakpoint between statements,
+	  you can then assign a	new  value  to	any  variable  or
+	  change  the  program	counter	to any other statement in
+	  the function and get exactly the results you would  ex-
+	  pect from the	source code.
+
+	  Without `----OOOO',	only variables declared	rrrreeeeggggiiiisssstttteeeerrrr are  al-
+	  located in registers.	 The resulting compiled	code is	a
+	  little worse than produced by	PCC without `----OOOO'.
+
+	  With `----OOOO', the compiler tries	to reduce code	size  and
+	  execution time.
+
+	  When you specify `----OOOO', `----fffftttthhhhrrrreeeeaaaadddd----jjjjuuuummmmppppssss' and `----ffffddddeeeellllaaaayyyyeeeedddd----
+	  bbbbrrrraaaannnncccchhhh'  are	turned	on.  On	some machines other flags
+	  may also be turned on.
+
+     ----OOOO2222   Highly optimize.  As	compared to ` ----	OOOO',  this  option
+	  will increase	both compilation time and the performance
+	  of the generated code.
+
+	  All `----ffff_f_l_a_g'	options	 that  control	optimization  are
+	  turned  on  when  you	 specify `----OOOO2222',	except `----ffffuuuunnnnrrrroooollllllll----
+	  llllooooooooppppssss' and `----ffffuuuunnnnrrrroooollllllll----aaaallllllll----llllooooooooppppssss'.
+
+     Options of	the form ` ---- ffff_f_l_a_g'  specify  machine-independent
+     flags.   Most  flags  have	both positive and negative forms;
+     the negative form of `----ffffffffoooooooo' would	be `----ffffnnnnoooo----ffffoooooooo'.	The  fol-
+     lowing list shows only one	form-the one which is not the de-
+     fault.  You can figure out	the other form by either removing
+     `nnnnoooo---- ' or adding it.
+
+     ----ffffffffllllooooaaaatttt----ssssttttoooorrrreeee
+	  Do not store floating	 point	variables  in  registers.
+	  This	prevents undesirable excess precision on machines
+	  such as the 68000 where the floating registers (of  the
+	  68881) keep more precision than a ddddoooouuuubbbblllleeee is supposed to
+	  have.
+
+	  For most programs, the excess	precision does only good,
+	  but  a  few  programs	rely on	the precise definition of
+	  IEEE floating	point.	Use `----ffffffffllllooooaaaatttt----ssssttttoooorrrreeee' for	such pro-
+	  grams.
+
+
+
+GNU Tools	     Last change: 28may1992		       22
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+     ----ffffmmmmeeeemmmmooooiiiizzzzeeee----llllooooooookkkkuuuuppppssss
+
+     ----ffffssssaaaavvvveeee----mmmmeeeemmmmooooiiiizzzzeeeedddd
+	  (_C++ _o_n_l_y.)  These flags are used to get  the	 compiler
+	  to  compile programs faster using heuristics.	 They are
+	  not on by default since they are only	 effective  about
+	  half	the  time.   The  other	half of	the time programs
+	  compile more slowly (and take	more memory).
+
+	  The first time the compiler must  build  a  call  to	a
+	  member  function  (or	 reference  to a data member), it
+	  must (1) determine whether the class implements  member
+	  functions  of	that name; (2) resolve which member func-
+	  tion to call (which involves figuring	out what sorts of
+	  type	conversions  need  to be made);	and (3)	check the
+	  visibility of	the member function to the  caller.   All
+	  of  this  adds up to slower compilation.  Normally, the
+	  second time a	call is	made to	that member function  (or
+	  reference  to	that data member), it must go through the
+	  same lengthy process again.  This means that code  like
+	  this
+
+	    cout << "This " << p << " has " << n << " legs.\n";
+
+	  makes	six passes through all three steps.  By	 using	a
+	  software  cache,  a  ``hit'' significantly reduces this
+	  cost.	 Unfortunately,	using the cache	introduces anoth-
+	  er  layer  of	mechanisms which must be implemented, and
+	  so incurs its	own overhead.  `----ffffmmmmeeeemmmmooooiiiizzzzeeee ---- llllooooooookkkkuuuuppppssss'  en-
+	  ables	the software cache.
+
+	  Because access privileges (visibility) to  members  and
+	  member  functions  may differ	from one function context
+	  to the next, gggg++++++++ may need to flush the cache.	With  the
+	  ` ---- ffffmmmmeeeemmmmooooiiiizzzzeeee ----llllooooooookkkkuuuuppppssss' flag, the cache is flushed after
+	  every	function that is compiled.  The	`-fsave-memoized'
+	  flag enables the same	software cache,	but when the com-
+	  piler	determines that	the context of the last	 function
+	  compiled  would yield	the same access	privileges of the
+	  next function	to compile, it preserves the cache.  This
+	  is most helpful when defining	many member functions for
+	  the same class: with the exception of	member	functions
+	  which	 are  friends of other classes,	each member func-
+	  tion has exactly the same access  privileges	as  every
+	  other, and the cache need not	be flushed.
+
+     ----ffffnnnnoooo----ddddeeeeffffaaaauuuulllltttt----iiiinnnnlllliiiinnnneeee
+	  (_C++ _o_n_l_y.)  If `----ffffddddeeeeffffaaaauuuulllltttt ---- iiiinnnnlllliiiinnnneeee'	is  enabled  then
+	  member  functions  defined  inside class scope are com-
+	  piled	inline by default; i.e., you don't  need  to  add
+	  `iiiinnnnlllliiiinnnneeee'  in front of	the member function name.  By po-
+	  pular	demand,	this option is now the default.	 To  keep
+
+
+
+GNU Tools	     Last change: 28may1992		       23
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  GNU C++ from inlining	these member functions,	specify	`
+	  ----ffffnnnnoooo----ddddeeeeffffaaaauuuulllltttt----iiiinnnnlllliiiinnnneeee'.
+
+     ----ffffnnnnoooo----ddddeeeeffffeeeerrrr----ppppoooopppp
+	  Always pop the arguments to each function call as  soon
+	  as  that function returns.  For machines which must pop
+	  arguments after a function call, the compiler	 normally
+	  lets	arguments  accumulate  on  the	stack for several
+	  function calls and pops them all at once.
+
+     ----ffffffffoooorrrrcccceeee----mmmmeeeemmmm
+	  Force	memory operands	to be copied into  registers  be-
+	  fore doing arithmetic	on them.  This may produce better
+	  code by making all memory references	potential  common
+	  subexpressions.   When  they	are not	common subexpres-
+	  sions, instruction  combination  should  eliminate  the
+	  separate  register-load.   I	am  interested in hearing
+	  about	the difference this makes.
+
+     ----ffffffffoooorrrrcccceeee----aaaaddddddddrrrr
+	  Force	memory address constants to be copied into regis-
+	  ters before doing arithmetic on them.	 This may produce
+	  better code just as `----ffffffffoooorrrrcccceeee----mmmmeeeemmmm' may.  I am interested
+	  in hearing about the difference this makes.
+
+     ----ffffoooommmmiiiitttt----ffffrrrraaaammmmeeee----ppppooooiiiinnnntttteeeerrrr
+	  Don't	keep the frame pointer in a  register  for  func-
+	  tions	 that  don't  need one.	 This avoids the instruc-
+	  tions	to save, set up	and restore  frame  pointers;  it
+	  also	makes  an  extra register available in many func-
+	  tions.  _I_t _a_l_s_o  _m_a_k_e_s  _d_e_b_u_g_g_i_n_g  _i_m_p_o_s_s_i_b_l_e	 _o_n  most
+	  machines.
+
+	  On some machines, such as the	Vax, this flag has no ef-
+	  fect,	 because  the standard calling sequence	automati-
+	  cally	handles	the frame pointer and nothing is saved by
+	  pretending  it  doesn't exist.  The machine-description
+	  macro	FFFFRRRRAAAAMMMMEEEE____PPPPOOOOIIIINNNNTTTTEEEERRRR____RRRREEEEQQQQUUUUIIIIRRRREEEEDDDD controls	whether	a  target
+	  machine supports this	flag.
+
+     ----ffffiiiinnnnlllliiiinnnneeee
+	  Pay attention	the iiiinnnnlllliiiinnnneeee keyword.  Normally  the  nega-
+	  tion	of  this option	`----ffffnnnnoooo----iiiinnnnlllliiiinnnneeee' is used to keep the
+	  compiler from	expanding any functions	inline.	 However,
+	  the  opposite	 effect	 may  be desirable when	compiling
+	  with `----gggg', since `----gggg'	normally  turns	 off  all  inline
+	  function expansion.
+
+     ----ffffiiiinnnnlllliiiinnnneeee----ffffuuuunnnnccccttttiiiioooonnnnssss
+	  Integrate all	simple functions into their callers.  The
+	  compiler heuristically decides which functions are sim-
+	  ple enough to	be worth integrating in	this way.
+
+
+
+GNU Tools	     Last change: 28may1992		       24
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  If all calls to a given function  are	 integrated,  and
+	  the function is declared ssssttttaaaattttiiiicccc, then	GCC normally does
+	  not output the function as assembler code  in	 its  own
+	  right.
+
+     ----ffffccccaaaalllllllleeeerrrr----ssssaaaavvvveeeessss
+	  Enable values	to be allocated	in registers that will be
+	  clobbered by function	calls, by emitting extra instruc-
+	  tions	to save	and restore  the  registers  around  such
+	  calls.   Such	 allocation is done only when it seems to
+	  result in better code	than would otherwise be	produced.
+
+	  This option is enabled by default on certain	machines,
+	  usually those	which have no call-preserved registers to
+	  use instead.
+
+     ----ffffkkkkeeeeeeeepppp----iiiinnnnlllliiiinnnneeee----ffffuuuunnnnccccttttiiiioooonnnnssss
+	  Even if all calls to a given function	 are  integrated,
+	  and  the function is declared	ssssttttaaaattttiiiicccc,	nevertheless out-
+	  put a	separate run-time callable version of  the  func-
+	  tion.
+
+     ----ffffnnnnoooo----ffffuuuunnnnccccttttiiiioooonnnn----ccccsssseeee
+	  Do not put function addresses	in registers;  make  each
+	  instruction  that calls a constant function contain the
+	  function's address explicitly.
+
+	  This option results in less efficient	 code,	but  some
+	  strange  hacks  that	alter the assembler output may be
+	  confused by the optimizations	performed when	this  op-
+	  tion is not used.
+
+     The following options control specific optimizations.  The	`
+     ---- OOOO2222'  option  turns on all of these optimizations	except `----
+     ffffuuuunnnnrrrroooollllllll----llllooooooooppppssss' and	`----ffffuuuunnnnrrrroooollllllll----aaaallllllll----llllooooooooppppssss'.
+
+     The `----OOOO' option usually turns on the `----fffftttthhhhrrrreeeeaaaadddd----jjjjuuuummmmppppssss' and `----
+     ffffddddeeeellllaaaayyyyeeeedddd ----	bbbbrrrraaaannnncccchhhh'	options, but specific machines may change
+     the default optimizations.
+
+     You can use the following	flags  in  the	rare  cases  when
+     ``fine-tuning'' of	optimizations to be performed is desired.
+
+     ----ffffssssttttrrrreeeennnnggggtttthhhh----rrrreeeedddduuuucccceeee
+	  Perform the optimizations of	loop  strength	reduction
+	  and elimination of iteration variables.
+
+     ----fffftttthhhhrrrreeeeaaaadddd----jjjjuuuummmmppppssss
+	  Perform optimizations	where we check to see if  a  jump
+	  branches  to	a  location where another comparison sub-
+	  sumed	by the first is	found.	If so, the  first  branch
+	  is  redirected  to either the	destination of the second
+
+
+
+GNU Tools	     Last change: 28may1992		       25
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  branch or a point immediately	following  it,	depending
+	  on whether the condition is known to be true or false.
+
+     ----ffffuuuunnnnrrrroooollllllll----llllooooooooppppssss
+	  Perform the optimization of loop  unrolling.	 This  is
+	  only	done  for loops	whose number of	iterations can be
+	  determined at	compile	time or	run time.
+
+     ----ffffuuuunnnnrrrroooollllllll----aaaallllllll----llllooooooooppppssss
+	  Perform the optimization of loop  unrolling.	 This  is
+	  done	for  all  loops.  This usually makes programs run
+	  more slowly.
+
+     ----ffffccccsssseeee----ffffoooolllllllloooowwww----jjjjuuuummmmppppssss
+	  In common subexpression elimination, scan through  jump
+	  instructions in certain cases.  This is not as powerful
+	  as completely	global CSE, but	not as slow either.
+
+     ----ffffrrrreeeerrrruuuunnnn----ccccsssseeee----aaaafffftttteeeerrrr----lllloooooooopppp
+	  Re-run common	subexpression elimination after	loop  op-
+	  timizations has been performed.
+
+     ----ffffeeeelllliiiiddddeeee----ccccoooonnnnssssttttrrrruuuuccccttttoooorrrrssss
+	  (_C++ _o_n_l_y.)  Use this	option to instruct  the	 compiler
+	  to  be  smarter  about  when it can elide constructors.
+	  Without this flag, GNU C++ and cfront	both generate ef-
+	  fectively the	same code for:
+
+	  A foo	();
+	  A x (foo ());	  // x initialized by `foo ()',	no ctor	called
+	  A y =	foo ();	  // call to `foo ()' heads to temporary,
+			  // y is initialized from the temporary.
+
+	  Note the difference!	With this flag,	GNU C++	 initial-
+	  izes `yyyy' directly from the call to ffffoooooooo (((()))) without going
+	  through a temporary.
+
+     ----ffffeeeexxxxppppeeeennnnssssiiiivvvveeee----ooooppppttttiiiimmmmiiiizzzzaaaattttiiiioooonnnnssss
+	  Perform a number of minor optimizations that are  rela-
+	  tively expensive.
+
+     ----ffffddddeeeellllaaaayyyyeeeedddd----bbbbrrrraaaannnncccchhhh
+	  If supported for the target machine, attempt to reorder
+	  instructions	to  exploit  instruction  slots	available
+	  after	delayed	branch instructions.
+
+     ----ffffsssscccchhhheeeedddduuuulllleeee----iiiinnnnssssnnnnssss
+	  If supported for the target machine, attempt to reorder
+	  instructions	to  eliminate execution	stalls due to re-
+	  quired data being  unavailable.   This  helps	 machines
+	  that	have  slow floating point or memory load instruc-
+	  tions	by allowing other instructions to be issued until
+
+
+
+GNU Tools	     Last change: 28may1992		       26
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  the result of	the load or floating point instruction is
+	  required.
+
+     ----ffffsssscccchhhheeeedddduuuulllleeee----iiiinnnnssssnnnnssss2222
+	  Similar to `----ffffsssscccchhhheeeedddduuuulllleeee----iiiinnnnssssnnnnssss', but  requests	an  addi-
+	  tional  pass	of  instruction	scheduling after register
+	  allocation has been done.  This is especially	useful on
+	  machines  with  a  relatively	small number of	registers
+	  and where memory load	instructions take more	than  one
+	  cycle.
+
+TTTTAAAARRRRGGGGEEEETTTT OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     By	default, GNU CC	 compiles  code	 for  the  same	 type  of
+     machine  that  you	 are  using.  However, it can also be in-
+     stalled as	a cross-compiler, to compile for some other  type
+     of	 machine.   In	fact, several different	configurations of
+     GNU CC, for different target machines, can	be installed side
+     by	 side.	 Then  you specify which one to	use with the `----bbbb'
+     option.
+
+     In	addition, older	and newer versions of GNU CC can  be  in-
+     stalled  side  by	side.	One of them (probably the newest)
+     will be the default, but  you  may	 sometimes  wish  to  use
+     another.
+
+     ----bbbb	_m_a_c_h_i_n_e
+	   The argument	_m_a_c_h_i_n_e	specifies the target machine  for
+	  compilation.	 This  is  useful when you have	installed
+	  GNU CC as a cross-compiler.
+
+	  The value to use for _m_a_c_h_i_n_e is the same as was  speci-
+	  fied	as  the	machine	type when configuring GNU CC as	a
+	  cross-compiler.  For example,	if a  cross-compiler  was
+	  configured  with  `ccccoooonnnnffffiiiigggguuuurrrreeee i386v', meaning to compile
+	  for an 80386 running System V, then you would	specify	`
+	  ----bbbb iiii333388886666vvvv' to run that	cross compiler.
+
+	  When you do not specify `----bbbb',	it normally means to com-
+	  pile for the same type of machine that you are using.
+
+     ----VVVV	_v_e_r_s_i_o_n
+	   The argument	_v_e_r_s_i_o_n	specifies which	version	of GNU CC
+	  to  run.  This is useful when	multiple versions are in-
+	  stalled.  For	example, _v_e_r_s_i_o_n might be `2222....0000',  meaning
+	  to run GNU CC	version	2.0.
+
+	  The default version, when you	do not specify `---- VVVV',  is
+	  controlled  by  the way GNU CC is installed.	Normally,
+	  it will be a version that is	recommended  for  general
+	  use.
+
+
+
+
+
+GNU Tools	     Last change: 28may1992		       27
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+MMMMAAAACCCCHHHHIIIINNNNEEEE	DDDDEEEEPPPPEEEENNNNDDDDEEEENNNNTTTT OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     Each of the target	machine	types can have	its  own  special
+     options,  starting	 with  ` ---- mmmm',	to  choose  among various
+     hardware models or	configurations - for  example,	68010  vs
+     68020,  floating  coprocessor  or	none.  A single	installed
+     version of	the compiler can compile for any model or  confi-
+     guration, according to the	options	specified.
+
+     These are the `----mmmm'	options	defined	for the	68000 series:
+
+     ----mmmm66668888000022220000
+
+     ----mmmmcccc66668888000022220000
+	  Generate output for a	 68020	(rather	 than  a  68000).
+	  This is the default if you use the unmodified	sources.
+
+     ----mmmm66668888000000000000
+
+     ----mmmmcccc66668888000000000000
+	  Generate output for a	68000 (rather than a 68020).
+
+     ----mmmm66668888888888881111
+	  Generate  output  containing	68881  instructions   for
+	  floating point.  This	is the default if you use the un-
+	  modified sources.
+
+     ----mmmmffffppppaaaa
+	  Generate output containing  Sun  FPA	instructions  for
+	  floating point.
+
+     ----mmmmssssoooofffftttt----ffffllllooooaaaatttt
+	  Generate output containing library calls  for	 floating
+	  point.   _W_A_R_N_I_N_G:  the requisite libraries are not part
+	  of GNU CC.  Normally the facilities  of  the	machine's
+	  usual	 C  compiler  are  used,  but  this can't be done
+	  directly in cross-compilation.  You must make	your  own
+	  arrangements	to provide suitable library functions for
+	  cross-compilation.
+
+     ----mmmmsssshhhhoooorrrrtttt
+	  Consider type	iiiinnnntttt to be 16 bits wide,	like sssshhhhoooorrrrtttt iiiinnnntttt.
+
+     ----mmmmnnnnoooobbbbiiiittttffffiiiieeeelllldddd
+	  Do not use the bit-field instructions.  `---- mmmm66668888000000000000'  im-
+	  plies	`----mmmmnnnnoooobbbbiiiittttffffiiiieeeelllldddd'.
+
+     ----mmmmbbbbiiiittttffffiiiieeeelllldddd
+	  Do use the bit-field instructions.  `----mmmm66668888000022220000'	implies	`
+	  ---- mmmmbbbbiiiittttffffiiiieeeelllldddd'.	 This is the default if	you use	the unmo-
+	  dified sources.
+
+     ----mmmmrrrrttttdddd
+
+
+
+GNU Tools	     Last change: 28may1992		       28
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  Use a	different function-calling convention,	in  which
+	  functions  that take a fixed number of arguments return
+	  with the rrrrttttdddd instruction, which  pops	 their	arguments
+	  while	 returning.   This  saves  one instruction in the
+	  caller since there is	no  need  to  pop  the	arguments
+	  there.
+
+	  This calling convention is incompatible  with	 the  one
+	  normally used	on Unix, so you	cannot use it if you need
+	  to call libraries compiled with the Unix compiler.
+
+	  Also,	you must  provide  function  prototypes	 for  all
+	  functions  that take variable	numbers	of arguments (in-
+	  cluding pppprrrriiiinnnnttttffff); otherwise incorrect code will be  gen-
+	  erated for calls to those functions.
+
+	  In addition, seriously incorrect code	 will  result  if
+	  you  call a function with too	many arguments.	 (Normal-
+	  ly, extra arguments are harmlessly ignored.)
+
+	  The rrrrttttdddd instruction is supported by the 68010	and 68020
+	  processors, but not by the 68000.
+
+     These `----mmmm'	options	are defined for	the Vax:
+
+     ----mmmmuuuunnnniiiixxxx
+	  Do not output	certain	jump instructions (aaaaoooobbbblllleeeeqqqq and  so
+	  on)  that  the Unix assembler	for the	Vax cannot handle
+	  across long ranges.
+
+     ----mmmmggggnnnnuuuu
+	  Do output those jump instructions,  on  the  assumption
+	  that you will	assemble with the GNU assembler.
+
+     ----mmmmgggg   Output code for g-format floating  point  numbers  in-
+	  stead	of d-format.
+
+     These `----mmmm'	switches are supported on the Sparc:
+
+     ----mmmmffffppppuuuu
+	  Generate output containing floating point instructions.
+	  This is the default if you use the unmodified	sources.
+
+     ----mmmmnnnnoooo----eeeeppppiiiilllloooogggguuuueeee
+	  Generate separate return instructions	for rrrreeeettttuuuurrrrnnnn state-
+	  ments.   This	 has both advantages and disadvantages;	I
+	  don't	recall what they are.
+
+     These `----mmmm'	options	are defined for	the Convex:
+
+     ----mmmmcccc1111  Generate output for a C1.  This is  the  default  when
+	  the compiler is configured for a C1.
+
+
+
+GNU Tools	     Last change: 28may1992		       29
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+     ----mmmmcccc2222  Generate output for a C2.  This is  the  default  when
+	  the compiler is configured for a C2.
+
+     ----mmmmaaaarrrrggggccccoooouuuunnnntttt
+	  Generate code	which puts an argument count in	the  word
+	  preceding  each argument list.  Some nonportable Convex
+	  and Vax programs need	this word.  (Debuggers don't, ex-
+	  cept for functions with variable-length argument lists;
+	  this info is in the symbol table.)
+
+     ----mmmmnnnnooooaaaarrrrggggccccoooouuuunnnntttt
+	  Omit the argument count word.	 This is the  default  if
+	  you use the unmodified sources.
+
+     These `----mmmm'	options	are defined for	the AMD	Am29000:
+
+     ----mmmmddddwwww  Generate code that assumes the DW bit  is  set,  i.e.,
+	  that byte and	halfword operations are	directly support-
+	  ed by	the hardware.  This is the default.
+
+     ----mmmmnnnnooooddddwwww
+	  Generate code	that assumes the DW bit	is not set.
+
+     ----mmmmbbbbwwww  Generate code that assumes the  system  supports  byte
+	  and halfword write operations.  This is the default.
+
+     ----mmmmnnnnbbbbwwww
+	  Generate code	that assumes the systems does not support
+	  byte	and  halfword  write operations.  This implies `----
+	  mmmmnnnnooooddddwwww'.
+
+     ----mmmmssssmmmmaaaallllllll
+	  Use a	small memory model that	assumes	that all function
+	  addresses  are either	within a single	256 KB segment or
+	  at an	absolute address of less than 256K.  This  allows
+	  the  ccccaaaallllllll  instruction  to  be used instead of a ccccoooonnnnsssstttt,
+	  ccccoooonnnnsssstttthhhh, ccccaaaalllllllliiii	sequence.
+
+     ----mmmmllllaaaarrrrggggeeee
+	  Do not assume	that the ccccaaaallllllll instruction  can	be  used;
+	  this is the default.
+
+     ----mmmm22229999000055550000
+	  Generate code	for the	Am29050.
+
+     ----mmmm22229999000000000000
+	  Generate code	for the	Am29000.  This is the default.
+
+     ----mmmmkkkkeeeerrrrnnnneeeellll----rrrreeeeggggiiiisssstttteeeerrrrssss
+	  Generate references to registers ggggrrrr66664444----ggggrrrr99995555  instead  of
+	  ggggrrrr99996666----ggggrrrr111122227777.	This  option  can  be used when	compiling
+	  kernel code that wants a set of global  registers  dis-
+
+
+
+GNU Tools	     Last change: 28may1992		       30
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  joint	from that used by user-mode code.
+
+	  Note that when this option is	used, register names in	`
+	  ----ffff' flags must use the normal, user-mode, names.
+
+     ----mmmmuuuusssseeeerrrr----rrrreeeeggggiiiisssstttteeeerrrrssss
+	  Use the normal set  of  global  registers,  ggggrrrr99996666----ggggrrrr111122227777.
+	  This is the default.
+
+     ----mmmmssssttttaaaacccckkkk----cccchhhheeeecccckkkk
+	  Insert a call	to ________mmmmsssspppp____cccchhhheeeecccckkkk after each  stack  adjust-
+	  ment.	 This is often used for	kernel code.
+
+     These `----mmmm'	options	are defined for	 Motorola  88K	architec-
+     tures:
+
+     ----mmmmbbbbiiiigggg----ppppiiiicccc
+	  Emit position-independent code,  suitable  for  dynamic
+	  linking,  even  if  branches	need large displacements.
+	  Equivalent to	the general-use	 option	 ` ---- ffffPPPPIIIICCCC'.   The
+	  general-use  option  ` ---- ffffppppiiiicccc', by contrast, only emits
+	  valid	88k code if all	branches involve small	displace-
+	  ments.  GCC  does not	emit position-independent code by
+	  default.
+
+     ----mmmmiiiiddddeeeennnnttttiiiiffffyyyy----rrrreeeevvvviiiissssiiiioooonnnn
+	  Include an iiiiddddeeeennnntttt  directive  in  the	assembler  output
+	  recording  the source	file name, compiler name and ver-
+	  sion,	timestamp, and compilation flags used.
+
+     ----mmmmnnnnoooo----uuuunnnnddddeeeerrrrssssccccoooorrrreeeessss
+	  In assembler output, emit symbol names  without  adding
+	  an  underscore character at the beginning of each name.
+	  The default is to use	an underscore as prefix	 on  each
+	  name.
+
+     ----mmmmnnnnoooo----cccchhhheeeecccckkkk----zzzzeeeerrrroooo----ddddiiiivvvviiiissssiiiioooonnnn
+
+     ----mmmmcccchhhheeeecccckkkk----zzzzeeeerrrroooo----ddddiiiivvvviiiissssiiiioooonnnn
+	  Early	models of the 88K architecture had problems  with
+	  division  by	zero;  in particular, many of them didn't
+	  trap.	 Use these options to avoid including (or to  in-
+	  clude	explicitly) additional code to detect division by
+	  zero and signal an exception.	 All  GCC  configurations
+	  for the 88K use `----mmmmcccchhhheeeecccckkkk----zzzzeeeerrrroooo----ddddiiiivvvviiiissssiiiioooonnnn' by default.
+
+     ----mmmmooooccccssss----ddddeeeebbbbuuuugggg----iiiinnnnffffoooo
+
+     ----mmmmnnnnoooo----ooooccccssss----ddddeeeebbbbuuuugggg----iiiinnnnffffoooo
+	  Include  (or	omit)  additional  debugging  information
+	  (about registers used	in each	stack frame) as	specified
+	  in the 88Open	Object Compatibility  Standard,	 ``OCS''.
+
+
+
+GNU Tools	     Last change: 28may1992		       31
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  This	extra  information is not needed by GDB.  The de-
+	  fault	for DG/UX, SVr4, and Delta 88 SVr3.2  is  to  in-
+	  clude	 this  information; other 88k configurations omit
+	  this information by default.
+
+     ----mmmmooooccccssss----ffffrrrraaaammmmeeee----ppppoooossssiiiittttiiiioooonnnn
+
+     ----mmmmnnnnoooo----ooooccccssss----ffffrrrraaaammmmeeee----ppppoooossssiiiittttiiiioooonnnn
+	  Force	(or do not require) register values to be  stored
+	  in  a	particular place in stack frames, as specified in
+	  OCS.	The DG/UX, Delta88 SVr3.2, and BCS configurations
+	  use  ` ---- mmmmooooccccssss----ffffrrrraaaammmmeeee----ppppoooossssiiiittttiiiioooonnnn'; other 88k configurations
+	  have the default `----mmmmnnnnoooo----ooooccccssss----ffffrrrraaaammmmeeee----ppppoooossssiiiittttiiiioooonnnn'.
+
+     ----mmmmooooppppttttiiiimmmmiiiizzzzeeee----aaaarrrrgggg----aaaarrrreeeeaaaa
+
+     ----mmmmnnnnoooo----ooooppppttttiiiimmmmiiiizzzzeeee----aaaarrrrgggg----aaaarrrreeeeaaaa
+	  Control  how	to  store  function  arguments	in  stack
+	  frames.   ` ----	mmmmooooppppttttiiiimmmmiiiizzzzeeee ----aaaarrrrgggg----aaaarrrreeeeaaaa' saves space, but may
+	  break	some debuggers (not GDB).  `----mmmmnnnnoooo----ooooppppttttiiiimmmmiiiizzzzeeee ---- aaaarrrrgggg	----
+	  aaaarrrreeeeaaaa'	 conforms  better  to standards.   By default GCC
+	  does not optimize the	argument area.
+
+     ----mmmmsssshhhhoooorrrrtttt----ddddaaaattttaaaa----_n_u_m
+	   _n_u_m Generate	smaller	data references	 by  making  them
+	  relative  to	rrrr0000,  which allows loading a value using	a
+	  single instruction (rather than the  usual  two).   You
+	  control  which data references are affected by specify-
+	  ing _n_u_m with this option.  For example, if you  specify
+	  ` ---- mmmmsssshhhhoooorrrrtttt----ddddaaaattttaaaa----555511112222',	then the data references affected
+	  are those involving  displacements  of  less	than  512
+	  bytes.   ` ---- mmmmsssshhhhoooorrrrtttt----ddddaaaattttaaaa---- _n_u_m' is not	effective for _n_u_m
+	  greater than 64K.
+
+     ----mmmmssssvvvvrrrr4444
+
+     ----mmmmssssvvvvrrrr3333
+	  Turn on (`----mmmmssssvvvvrrrr4444') or	off (`----	mmmmssssvvvvrrrr3333')	 compiler  exten-
+	  sions	 related to System V release 4 (SVr4).	This con-
+	  trols	the following:
+
+	+o  Which variant of the	assembler syntax to  emit  (which
+	  you can select independently using `----mmmmvvvveeeerrrrssssiiiioooonnnn00003333....00000000').
+
+	+o  `----mmmmssssvvvvrrrr4444' makes the C	preprocessor  recognize	 `####pppprrrraaaaggggmmmmaaaa
+	  wwwweeeeaaaakkkk'
+
+	+o  `----mmmmssssvvvvrrrr4444' makes GCC issue additional declaration direc-
+	  tives	used in	SVr4.
+
+     `----mmmmssssvvvvrrrr3333' is the default for all m88K  configurations  except
+     the SVr4 configuration.
+
+
+
+GNU Tools	     Last change: 28may1992		       32
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+     ----mmmmttttrrrraaaapppp----llllaaaarrrrggggeeee----sssshhhhiiiifffftttt
+
+     ----mmmmhhhhaaaannnnddddlllleeee----llllaaaarrrrggggeeee----sssshhhhiiiifffftttt
+	  Include code to detect bit-shifts of more than 31 bits;
+	  respectively,	 trap  such shifts or emit code	to handle
+	  them properly.  By default GCC makes no special  provi-
+	  sion for large bit shifts.
+
+     ----mmmmuuuusssseeee----ddddiiiivvvv----iiiinnnnssssttttrrrruuuuccccttttiiiioooonnnn
+	  Very early models of the 88K architecture didn't have	a
+	  divide  instruction,	so GCC avoids that instruction by
+	  default.  Use	this option to specify that it's safe  to
+	  use the divide instruction.
+
+     ----mmmmvvvveeeerrrrssssiiiioooonnnn----00003333....00000000
+	  Use alternative assembler syntax for the assembler ver-
+	  sion	corresponding  to  SVr4, but without enabling the
+	  other	features triggered by `----ssssvvvvrrrr4444'.	This  is  implied
+	  by  `	----ssssvvvvrrrr4444',	is the default for the SVr4 configuration
+	  of GCC, and is permitted  by	the  DG/UX  configuration
+	  only if `----ssssvvvvrrrr4444' is also specified.  The Delta	88 SVr3.2
+	  configuration	ignores	this option.
+
+     ----mmmmwwwwaaaarrrrnnnn----ppppaaaasssssssseeeedddd----ssssttttrrrruuuuccccttttssss
+	  Warn when a function passes a	struct as an argument  or
+	  result.   Structure-passing  conventions  have  changed
+	  during the evolution of the C	language, and  are  often
+	  the  source  of  portability problems.  By default, GCC
+	  issues no such warning.
+
+     These options are defined for the IBM RS6000:
+
+
+     ----mmmmffffpppp----iiiinnnn----ttttoooocccc
+
+     ----mmmmnnnnoooo----ffffpppp----iiiinnnn----ttttoooocccc
+	  Control whether or not floating-point	constants  go  in
+	  the  Table  of  Contents  (TOC),  a table of all global
+	  variable and function	addresses.  By default	GCC  puts
+	  floating-point constants there; if the TOC overflows,	`
+	  ----mmmmnnnnoooo----ffffpppp----iiiinnnn----ttttoooocccc' will reduce the size of the TOC,  which
+	  may avoid the	overflow.
+
+
+     These `----mmmm'	options	are defined for	the IBM	RT PC:
+
+     ----mmmmiiiinnnn----lllliiiinnnneeee----mmmmuuuullll
+	  Use an in-line code sequence	for  integer  multiplies.
+	  This is the default.
+
+     ----mmmmccccaaaallllllll----lllliiiibbbb----mmmmuuuullll
+	  Call llllmmmmuuuullll$$$$$$$$ for integer multiples.
+
+
+
+GNU Tools	     Last change: 28may1992		       33
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+     ----mmmmffffuuuullllllll----ffffpppp----bbbblllloooocccckkkkssss
+	  Generate full-size floating point data blocks,  includ-
+	  ing  the minimum amount of scratch space recommended by
+	  IBM.	This is	the default.
+
+     ----mmmmmmmmiiiinnnniiiimmmmuuuummmm----ffffpppp----bbbblllloooocccckkkkssss
+	  Do not include extra scratch space  in  floating  point
+	  data	blocks.	 This results in smaller code, but slower
+	  execution, since scratch space must be allocated dynam-
+	  ically.
+
+     ----mmmmffffpppp----aaaarrrrgggg----iiiinnnn----ffffpppprrrreeeeggggssss
+	  Use a	calling	sequence incompatible with the	IBM  cal-
+	  ling	convention  in which floating point arguments are
+	  passed  in  floating	point	registers.    Note   that
+	  vvvvaaaarrrraaaarrrrggggssss....hhhh  and  ssssttttddddaaaarrrrggggssss....hhhh  will  not work with floating
+	  point	operands if this option	is specified.
+
+     ----mmmmffffpppp----aaaarrrrgggg----iiiinnnn----ggggrrrreeeeggggssss
+	  Use the normal calling convention  for  floating  point
+	  arguments.  This is the default.
+
+     ----mmmmhhhhcccc----ssssttttrrrruuuucccctttt----rrrreeeettttuuuurrrrnnnn
+	  Return structures of more  than  one	word  in  memory,
+	  rather than in a register.  This provides compatibility
+	  with the MetaWare HighC (hc) compiler.  Use  ` ---- ffffppppcccccccc	----
+	  ssssttttrrrruuuucccctttt ---- rrrreeeettttuuuurrrrnnnn'  for	compatibility with the Portable	C
+	  Compiler (pcc).
+
+     ----mmmmnnnnoooohhhhcccc----ssssttttrrrruuuucccctttt----rrrreeeettttuuuurrrrnnnn
+	  Return some structures of more than one word in  regis-
+	  ters,	 when convenient.  This	is the default.	 For com-
+	  patibility with the IBM-supplied compilers, use  either
+	  `----ffffppppcccccccc----ssssttttrrrruuuucccctttt----rrrreeeettttuuuurrrrnnnn'	or `----mmmmhhhhcccc----ssssttttrrrruuuucccctttt----rrrreeeettttuuuurrrrnnnn'.
+
+     These `----mmmm'	options	are defined for	the MIPS family	 of  com-
+     puters:
+
+     ----mmmmccccppppuuuu====_c_p_u-_t_y_p_e
+	  Assume the defaults for the machine type _c_p_u-_t_y_p_e  when
+	  scheduling  instructions.   The default _c_p_u-_t_y_p_e is ddddeeee----
+	  ffffaaaauuuulllltttt, which picks the longest cycles	times for any  of
+	  the  machines, in order that the code	run at reasonable
+	  rates	on all MIPS cpu's.  Other  choices  for	 _c_p_u-_t_y_p_e
+	  are  rrrr2222000000000000,  rrrr3333000000000000,  rrrr4444000000000000, and rrrr6666000000000000.  While	picking	a
+	  specific _c_p_u-_t_y_p_e will  schedule  things  appropriately
+	  for  that  particular	 chip, the compiler will not gen-
+	  erate	any code that does not meet level 1 of	the  MIPS
+	  ISA  (instruction  set architecture) without the ----mmmmiiiippppssss2222
+	  or ----mmmmiiiippppssss3333 switches being used.
+
+     ----mmmmiiiippppssss2222
+
+
+
+GNU Tools	     Last change: 28may1992		       34
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  Issue	instructions from level	2 of the MIPS ISA (branch
+	  likely, square root instructions).  The ----mmmmccccppppuuuu====rrrr4444000000000000 or
+	  ----mmmmccccppppuuuu====rrrr6666000000000000 switch must be used in conjunction with	----
+	  mmmmiiiippppssss2222.
+
+     ----mmmmiiiippppssss3333
+	  Issue	instructions from level	3 of the MIPS ISA (64 bit
+	  instructions).   The ----mmmmccccppppuuuu====rrrr4444000000000000 switch must be used in
+	  conjunction with ----mmmmiiiippppssss2222.
+
+     ----mmmmiiiinnnntttt66664444
+
+     ----mmmmlllloooonnnngggg66664444
+
+     ----mmmmlllloooonnnngggglllloooonnnngggg111122228888
+	  These	options	don't work at present.
+
+     ----mmmmmmmmiiiippppssss----aaaassss
+	  Generate code	for the	MIPS assembler,	and invoke mmmmiiiippppssss	----
+	  ttttffffiiiilllleeee	to add normal debug information.  This is the de-
+	  fault	for all	platforms except for the OSF/1	reference
+	  platform,  using the OSF/rose	object format.	If any of
+	  the ----ggggggggddddbbbb, ----ggggssssttttaaaabbbbssss, or ----ggggssssttttaaaabbbbssss++++ switches are used,  the
+	  mmmmiiiippppssss ---- ttttffffiiiilllleeee	program	will encapsulate the stabs within
+	  MIPS ECOFF.
+
+     ----mmmmggggaaaassss
+	  Generate code	for the	GNU assembler.	This is	 the  de-
+	  fault	 on  the  OSF/1	 reference  platform,  using  the
+	  OSF/rose object format.
+
+     ----mmmmrrrrnnnnaaaammmmeeeessss
+
+     ----mmmmnnnnoooo----rrrrnnnnaaaammmmeeeessss
+	  The ----mmmmrrrrnnnnaaaammmmeeeessss switch says to output code using	the  MIPS
+	  software  names  for	the  registers,	 instead  of  the
+	  hardware names (ie, aaaa0000 instead of $$$$4444).  The GNU  assem-
+	  bler does not	support	the ----mmmmrrrrnnnnaaaammmmeeeessss switch, and the MIPS
+	  assembler will be instructed to run the MIPS C  prepro-
+	  cessor over the source file.	The ----mmmmnnnnoooo----rrrrnnnnaaaammmmeeeessss	switch is
+	  default.
+
+     ----mmmmggggppppoooopppptttt
+
+     ----mmmmnnnnoooo----ggggppppoooopppptttt
+	  The ----mmmmggggppppoooopppptttt switch says to write all of  the	data  de-
+	  clarations before the	instructions in	the text section,
+	  to all the MIPS assembler to generate	one  word  memory
+	  references  instead of using two words for short global
+	  or static data items.	 This is on by default if optimi-
+	  zation is selected.
+
+
+
+
+GNU Tools	     Last change: 28may1992		       35
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+     ----mmmmssssttttaaaattttssss
+
+     ----mmmmnnnnoooo----ssssttttaaaattttssss
+	  For each non-inline function processed,  the	 ---- mmmmssssttttaaaattttssss
+	  switch  causes  the  compiler	 to  emit one line to the
+	  standard error file to print statistics about	the  pro-
+	  gram (number of registers saved, stack size, etc.).
+
+     ----mmmmmmmmeeeemmmmccccppppyyyy
+
+     ----mmmmnnnnoooo----mmmmeeeemmmmccccppppyyyy
+	  The ----mmmmmmmmeeeemmmmccccppppyyyy switch makes all	block moves call the  ap-
+	  propriate  string function (mmmmeeeemmmmccccppppyyyy or	bbbbccccooooppppyyyy) instead of
+	  possibly generating inline code.
+
+     ----mmmmmmmmiiiippppssss----ttttffffiiiilllleeee
+
+     ----mmmmnnnnoooo----mmmmiiiippppssss----ttttffffiiiilllleeee
+	  The ----mmmmnnnnoooo----mmmmiiiippppssss----ttttffffiiiilllleeee  switch  causes  the  compiler  not
+	  postprocess  the  object  file with the mmmmiiiippppssss----ttttffffiiiilllleeee pro-
+	  gram,	after the MIPS assembler has generated it to  add
+	  debug	support.  If mmmmiiiippppssss----ttttffffiiiilllleeee	is not run, then no local
+	  variables will be available to the debugger.	In  addi-
+	  tion,	ssssttttaaaaggggeeee2222 and ssssttttaaaaggggeeee3333 objects will have the	temporary
+	  file names passed to the assembler embedded in the  ob-
+	  ject file, which means the objects will not compare the
+	  same.
+
+     ----mmmmssssoooofffftttt----ffffllllooooaaaatttt
+	  Generate output containing library calls  for	 floating
+	  point.   _W_A_R_N_I_N_G:  the requisite libraries are not part
+	  of GNU CC.  Normally the facilities  of  the	machine's
+	  usual	 C  compiler  are  used,  but  this can't be done
+	  directly in cross-compilation.  You must make	your  own
+	  arrangements	to provide suitable library functions for
+	  cross-compilation.
+
+     ----mmmmhhhhaaaarrrrdddd----ffffllllooooaaaatttt
+	  Generate output containing floating point instructions.
+	  This is the default if you use the unmodified	sources.
+
+     ----mmmmffffpppp66664444
+	  Assume that the FFFFRRRR bit in the	status word  is	 on,  and
+	  that	there are 32 64-bit floating point registers, in-
+	  stead	of 32 32-bit floating point registers.	You  must
+	  also specify the ----mmmmccccppppuuuu====rrrr4444000000000000 and ----mmmmiiiippppssss3333 switches.
+
+     ----mmmmffffpppp33332222
+	  Assume that there are	32 32-bit floating  point  regis-
+	  ters.	 This is the default.
+
+     ----mmmmaaaabbbbiiiiccccaaaallllllllssss
+
+
+
+GNU Tools	     Last change: 28may1992		       36
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  The ----mmmmaaaabbbbiiiiccccaaaallllllllssss  switch  says	to  emit  the  ....aaaabbbbiiiiccccaaaallllllllssss,
+	  ....ccccppppllllooooaaaadddd,  and	 ....ccccpppprrrreeeessssttttoooorrrreeee  pseudo  operations	that some
+	  System V.4 ports use for position independent	code.
+
+     ----mmmmhhhhaaaallllffff----ppppiiiicccc
+
+     ----mmmmnnnnoooo----hhhhaaaallllffff----ppppiiiicccc
+	  The ----mmmmhhhhaaaallllffff----ppppiiiicccc switch	says to	put  pointers  to  extern
+	  references  into  the	 data  section	and load them up,
+	  rather than put the references  in  the  text	 section.
+	  This option does not work at present.	 ----GGGG_n_u_m Put global
+	  and static items less	than or	equal to _n_u_m  bytes  into
+	  the  small  data  or bss sections instead of the normal
+	  data or bss section.	This allows the	assembler to emit
+	  one  word  memory  reference	instructions based on the
+	  global pointer (ggggpppp or	$$$$22228888), instead of the  normal  two
+	  words	 used.	By default, _n_u_m	is 8 when the MIPS assem-
+	  bler is used,	and 0 when the	GNU  assembler	is  used.
+	  The	---- GGGG_n_u_m switch is also passed to	the assembler and
+	  linker.  All modules should be compiled with the same	----
+	  GGGG_n_u_m value.
+
+CCCCOOOODDDDEEEE GGGGEEEENNNNEEEERRRRAAAATTTTIIIIOOOONNNN	OOOOPPPPTTTTIIIIOOOONNNNSSSS
+     These machine-independent options control the interface con-
+     ventions used in code generation.
+
+     Most of them begin	with `-f'.  These options have both posi-
+     tive  and negative	forms; the negative form of `----ffffffffoooooooo' would
+     be	`----ffffnnnnoooo----ffffoooooooo'.  In	the table below, only one of the forms is
+     listed-the	one which is not the default.  You can figure out
+     the other form by either removing `nnnnoooo---- ' or adding	it.
+
+     ++++eeee_N  (_C++ _o_n_l_y.) control whether  virtual	function  defini-
+	  tions	 in classes are	used to	generate code, or only to
+	  define interfaces for	their callers.	These options are
+	  provided  for	 compatibility with cfront 1.x usage; the
+	  recommended GNU C++ usage is to use  ####pppprrrraaaaggggmmmmaaaa	iiiinnnntttteeeerrrrffffaaaacccceeee
+	  and ####pppprrrraaaaggggmmmmaaaa iiiimmmmpppplllleeeemmmmeeeennnnttttaaaattttiiiioooonnnn, instead.
+
+	  With `++++eeee0000', virtual function definitions in classes are
+	  declared extern; the declaration is used only	as an in-
+	  terface specification, not to	 generate  code	 for  the
+	  virtual functions (in	this compilation).
+
+	  With `++++eeee1111', gggg++++++++ actually generates the code  implement-
+	  ing  virtual	functions  defined in the code,	and makes
+	  them publicly	visible.
+
+     ----ffffnnnnoooonnnnnnnnuuuullllllll----oooobbbbjjjjeeeeccccttttssss
+	  (_C++ _o_n_l_y.)  Normally, GNU C++ makes	conservative  as-
+	  sumptions  about  objects  reached  through references.
+	  For example, the compiler must check that  `aaaa'  is  not
+
+
+
+GNU Tools	     Last change: 28may1992		       37
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  null in code like the	following:
+	      obj &a = g ();
+	      a.f (2);
+	  Checking that	references of  this  sort  have	 non-null
+	  values requires extra	code, however, and it is unneces-
+	  sary for many	programs.  You can use ` ---- ffffnnnnoooonnnnnnnnuuuullllllll ---- oooobbbb----
+	  jjjjeeeeccccttttssss'  to  omit  the	 checks	for null, if your program
+	  doesn't require the default checking.
+
+     ----ffffppppcccccccc----ssssttttrrrruuuucccctttt----rrrreeeettttuuuurrrrnnnn
+	  Use the same convention for returning	ssssttttrrrruuuucccctttt and  uuuunnnniiiioooonnnn
+	  values  that	is  used  by the usual C compiler on your
+	  system.  This	convention is less  efficient  for  small
+	  structures,  and  on many machines it	fails to be reen-
+	  trant; but it	has the	advantage of allowing intercalla-
+	  bility between GCC-compiled code and PCC-compiled code.
+
+     ----ffffsssshhhhoooorrrrtttt----eeeennnnuuuummmmssss
+	  Allocate to an eeeennnnuuuummmm type only	as many	bytes as it needs
+	  for the declared range of possible values.  Specifical-
+	  ly, the eeeennnnuuuummmm type will be equivalent	to  the	 smallest
+	  integer type which has enough	room.
+
+     ----ffffsssshhhhoooorrrrtttt----ddddoooouuuubbbblllleeee
+	  Use the same size for	ddddoooouuuubbbblllleeee as for ffffllllooooaaaatttt .
+
+     ----ffffsssshhhhaaaarrrreeeedddd----ddddaaaattttaaaa
+	  Requests that	the data and non-ccccoooonnnnsssstttt variables of  this
+	  compilation  be  shared  data	rather than private data.
+	  The distinction makes	sense only on  certain	operating
+	  systems,  where shared data is shared	between	processes
+	  running the same program, while private data exists  in
+	  one copy per process.
+
+     ----ffffnnnnoooo----ccccoooommmmmmmmoooonnnn
+	  Allocate even	uninitialized global variables in the bss
+	  section of the object	file, rather than generating them
+	  as common blocks.  This has the effect that if the same
+	  variable  is declared	(without eeeexxxxtttteeeerrrrnnnn) in two	different
+	  compilations,	you will get an	error when you link them.
+	  The  only reason this	might be useful	is if you wish to
+	  verify that the program  will	 work  on  other  systems
+	  which	always work this way.
+
+     ----ffffvvvvoooollllaaaattttiiiilllleeee
+	  Consider all memory references through pointers  to  be
+	  volatile.
+
+     ----ffffppppiiiicccc
+	  If  supported	 for  the   target   machines,	 generate
+	  position-independent code, suitable for use in a shared
+	  library.
+
+
+
+GNU Tools	     Last change: 28may1992		       38
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+     ----ffffPPPPIIIICCCC
+	  If supported for the	target	machine,  emit	position-
+	  independent code, suitable for dynamic linking, even if
+	  branches need	large displacements.
+
+     ----ffffffffiiiixxxxeeeedddd----_r_e_g
+	   Treat the register named _r_e_g	as a fixed register; gen-
+	  erated code should never refer to it (except perhaps as
+	  a stack pointer, frame pointer or in some  other  fixed
+	  role).
+
+	  _r_e_g must be the name of a register.  The register names
+	  accepted  are	 machine-specific  and are defined in the
+	  RRRREEEEGGGGIIIISSSSTTTTEEEERRRR____NNNNAAAAMMMMEEEESSSS macro in the machine  description  macro
+	  file.
+
+	  This flag does not have a  negative  form,  because  it
+	  specifies a three-way	choice.
+
+     ----ffffccccaaaallllllll----uuuusssseeeedddd----_r_e_g
+	   Treat the register named _r_e_g	as an allocatable  regis-
+	  ter that is clobbered	by function calls.  It may be al-
+	  located for temporaries or variables that do	not  live
+	  across  a  call.   Functions compiled	this way will not
+	  save and restore the register	_r_e_g.
+
+	  Use of this flag for a register that has a  fixed  per-
+	  vasive  role	in the machine's execution model, such as
+	  the stack pointer or frame pointer, will produce disas-
+	  trous	results.
+
+	  This flag does not have a  negative  form,  because  it
+	  specifies a three-way	choice.
+
+     ----ffffccccaaaallllllll----ssssaaaavvvveeeedddd----_r_e_g
+	   Treat the register named _r_e_g	as an allocatable  regis-
+	  ter  saved  by functions.  It	may be allocated even for
+	  temporaries or  variables  that  live	 across	 a  call.
+	  Functions  compiled  this way	will save and restore the
+	  register _r_e_g if they use it.
+
+	  Use of this flag for a register that has a  fixed  per-
+	  vasive  role	in the machine's execution model, such as
+	  the stack pointer or frame pointer, will produce disas-
+	  trous	results.
+
+	  A different sort of disaster will result from	 the  use
+	  of  this  flag  for a	register in which function values
+	  may be returned.
+
+	  This flag does not have a  negative  form,  because  it
+	  specifies a three-way	choice.
+
+
+
+GNU Tools	     Last change: 28may1992		       39
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+     ----ffffggggnnnnuuuu----bbbbiiiinnnnuuuuttttiiiillllssss
+
+     ----ffffnnnnoooo----ggggnnnnuuuu----bbbbiiiinnnnuuuuttttiiiillllssss
+	  (_C++ _o_n_l_y.)  `----ffffggggnnnnuuuu----bbbbiiiinnnnuuuuttttiiiillllssss ' (the default  for  most,
+	  but not all, platforms) makes	GNU C++	emit extra infor-
+	  mation  for  static  initialization  and  finalization.
+	  This information has to be passed from the assembler to
+	  the GNU linker.  Some	assemblers won't pass this infor-
+	  mation;  you	must either use	GNU aaaassss or specify the op-
+	  tion `----ffffnnnnoooo----ggggnnnnuuuu----bbbbiiiinnnnuuuuttttiiiillllssss'.
+
+	  With `----ffffnnnnoooo----ggggnnnnuuuu----bbbbiiiinnnnuuuuttttiiiillllssss', you	must use the program ccccoooollll----
+	  lllleeeecccctttt (part of	the GCC	distribution) for linking.
+
+PPPPRRRRAAAAGGGGMMMMAAAASSSS
+     Two `####pppprrrraaaaggggmmmmaaaa' directives are supported for	GNU C++, to  per-
+     mit using the same	header file for	two purposes: as a defin-
+     ition of interfaces to a given object class, and as the full
+     definition	of the contents	of that	object class.
+
+     ####pppprrrraaaaggggmmmmaaaa iiiinnnntttteeeerrrrffffaaaacccceeee
+	  (_C++ _o_n_l_y.) Use this directive in header files that de-
+	  fine	object	classes, to save space in most of the ob-
+	  ject files that use  those  classes.	 Normally,  local
+	  copies  of certain information (backup copies	of inline
+	  member functions, debugging information, and the inter-
+	  nal  tables  that  implement virtual functions) must be
+	  kept in each object file that	 includes  class  defini-
+	  tions.   You can use this pragma to avoid such duplica-
+	  tion.	 When a	header file  containing	 `####pppprrrraaaaggggmmmmaaaa  iiiinnnntttteeeerrrr----
+	  ffffaaaacccceeee'	 is included in	a compilation, this auxiliary in-
+	  formation will not be	generated (unless the main  input
+	  source file itself uses `####pppprrrraaaaggggmmmmaaaa iiiimmmmpppplllleeeemmmmeeeennnnttttaaaattttiiiioooonnnn').  In-
+	  stead, the object files will contain references  to  be
+	  resolved at link time.
+
+     ####pppprrrraaaaggggmmmmaaaa iiiimmmmpppplllleeeemmmmeeeennnnttttaaaattttiiiioooonnnn
+
+     ####pppprrrraaaaggggmmmmaaaa iiiimmmmpppplllleeeemmmmeeeennnnttttaaaattttiiiioooonnnn """"_o_b_j_e_c_t_s....hhhh""""
+	  (_C++ _o_n_l_y.) Use this pragma in a main	input file,  when
+	  you  want  full output from included header files to be
+	  generated (and made globally	visible).   The	 included
+	  header  file,	 in turn, should use `####pppprrrraaaaggggmmmmaaaa iiiinnnntttteeeerrrrffffaaaacccceeee'.
+	  Backup copies	of inline member functions, debugging in-
+	  formation,  and  the	internal tables	used to	implement
+	  virtual functions are	all generated  in  implementation
+	  files.
+
+	  If you use `####pppprrrraaaaggggmmmmaaaa iiiimmmmpppplllleeeemmmmeeeennnnttttaaaattttiiiioooonnnn' with  no	argument,
+	  it applies to	an include file	with the same basename as
+	  your	source	file;  for  example,  in   `aaaallllllllccccllllaaaassssssss....cccccccc',
+	  `####pppprrrraaaaggggmmmmaaaa  iiiimmmmpppplllleeeemmmmeeeennnnttttaaaattttiiiioooonnnn'  by	 itself	 is equivalent to
+
+
+
+GNU Tools	     Last change: 28may1992		       40
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+	  `####pppprrrraaaaggggmmmmaaaa iiiimmmmpppplllleeeemmmmeeeennnnttttaaaattttiiiioooonnnn """"aaaallllllllccccllllaaaassssssss....hhhh""""'.  Use the  string
+	  argument  if	you  want a single implementation file to
+	  include code from multiple header files.
+
+	  There	is no way to split up the contents  of	a  single
+	  header file into multiple implementation files.
+
+FFFFIIIILLLLEEEESSSS
+     file.c		C source file
+     file.h		C header (preprocessor)	file
+     file.i		preprocessed C source file
+     file.C		C++ source file
+     file.cc		C++ source file
+     file.cxx		C++ source file
+     file.m		Objective-C source file
+     file.s		assembly language file
+     file.o		object file
+     a.out		link edited output
+     _T_M_P_D_I_R/cc*		 temporary files
+     _L_I_B_D_I_R/cpp		preprocessor
+     _L_I_B_D_I_R/cc1		compiler for C
+     _L_I_B_D_I_R/cc1plus	compiler for C++
+     _L_I_B_D_I_R/collect	linker front end needed	on some	machines
+     _L_I_B_D_I_R/libgcc.a	GCC subroutine library
+     /lib/crt[01n].o	start-up routine
+     _L_I_B_D_I_R/ccrt0	additional start-up routine for	C++
+     /lib/libc.a	standard C library, see	_i_n_t_r_o(3)
+     /usr/include	standard directory for ####iiiinnnncccclllluuuuddddeeee	files
+     _L_I_B_D_I_R/include	standard gcc directory for ####iiiinnnncccclllluuuuddddeeee files
+     _L_I_B_D_I_R/g++-include	  additional g++ directory for ####iiiinnnncccclllluuuuddddeeee
+
+     _L_I_B_D_I_R is usually ////uuuussssrrrr////llllooooccccaaaallll////lllliiiibbbb////_m_a_c_h_i_n_e/_v_e_r_s_i_o_n.
+     _T_M_P_D_I_R comes from the environment variable	 TTTTMMMMPPPPDDDDIIIIRRRR	 (default
+     ////uuuussssrrrr////ttttmmmmpppp if available, else ////ttttmmmmpppp).
+
+SSSSEEEEEEEE AAAALLLLSSSSOOOO
+     cpp(1), as(1), ld(1), gdb(1), adb(1), dbx(1), sdb(1).
+     `ggggcccccccc', `ccccpppppppp', `aaaassss',````ld'''',,,, and `ggggddddbbbb'	entries	in iiiinnnnffffoooo.
+     _U_s_i_n_g _a_n_d _P_o_r_t_i_n_g _G_N_U  _C_C	(_f_o_r  _v_e_r_s_i_o_n  _2._0),  Richard  M.
+     Stallman,	November  1990;	 _T_h_e  _C	 _P_r_e_p_r_o_c_e_s_s_o_r, Richard M.
+     Stallman, July 1990; _U_s_i_n_g	_G_D_B: _A _G_u_i_d_e _t_o	_t_h_e  _G_N_U  _S_o_u_r_c_e-
+     _L_e_v_e_l _D_e_b_u_g_g_e_r, Richard M.	Stallman and Roland H. Pesch, De-
+     cember 1991; _U_s_i_n_g	_a_s: _t_h_e	_G_N_U _A_s_s_e_m_b_l_e_r, Dean  Elsner,  Jay
+     Fenlason  &  friends, March 1991; _g_l_d: _t_h_e	_G_N_U _l_i_n_k_e_r, Steve
+     Chamberlain and Roland Pesch, April 1991.
+
+
+BBBBUUUUGGGGSSSS
+     Report bugs to bbbbuuuugggg----ggggcccccccc@@@@pppprrrreeeepppp....aaaaiiii....mmmmiiiitttt....eeeedddduuuu.  Bugs tend	 actually
+     to	 be  fixed  if they can	be isolated, so	it is in your in-
+     terest to report them in such a way that they can be  easily
+     reproduced.
+
+
+
+GNU Tools	     Last change: 28may1992		       41
+
+
+
+
+
+
+GCC(1)			    GNU	Tools			   GCC(1)
+
+
+
+CCCCOOOOPPPPYYYYIIIINNNNGGGG
+     Copyright (c) 1991	Free Software Foundation, Inc.
+
+     Permission	is granted to make and distribute verbatim copies
+     of	 this  manual provided the copyright notice and	this per-
+     mission notice are	preserved on all copies.
+
+     Permission	is granted to copy and distribute  modified  ver-
+     sions of this manual under	the conditions for verbatim copy-
+     ing, provided that	the entire resulting derived work is dis-
+     tributed under the	terms of a permission notice identical to
+     this one.
+
+     Permission	is granted to copy and distribute translations of
+     this  manual  into	 another language, under the above condi-
+     tions for modified	versions, except that this permission no-
+     tice  may	be  included in	translations approved by the Free
+     Software Foundation instead of in the original English.
+
+AAAAUUUUTTTTHHHHOOOORRRRSSSS
+     See the GNU CC Manual for the contributors	to GNU CC.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GNU Tools	     Last change: 28may1992		       42
+
+
+

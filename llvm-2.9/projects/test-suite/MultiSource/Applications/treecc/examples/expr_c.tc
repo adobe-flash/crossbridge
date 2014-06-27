@@ -1,0 +1,447 @@
+/*
+ * expr_c.tc - Expression example treecc input file for C.
+ *
+ * Copyright (C) 2001  Southern Storm Software, Pty Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+/*
+ * Include the following declarations into the ".h" file.
+ */
+%decls %{
+
+/*
+ * Value that is computed by "eval_expr" below.
+ */
+typedef union
+{
+	int		int_value;
+	float	float_value;
+
+} eval_value;
+
+%}
+
+/*
+ * Include the following declarations into the ".c" file.
+ */
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+#include "expr_c.h"
+
+%}
+
+/*
+ * Define the type code that is associated with a node
+ * in the syntax tree.  We use "error_type" to indicate
+ * a failure during type inferencing.
+ */
+%enum type_code =
+{
+	error_type,
+    int_type,
+    float_type
+}
+
+/*
+ * Define the node types that make up the syntax.
+ */
+%node expression %abstract %typedef =
+{
+    %nocreate type_code type = {error_type};
+}
+
+%node binary expression %abstract =
+{
+    expression *expr1;
+    expression *expr2;
+}
+
+%node unary expression %abstract =
+{
+    expression *expr;
+}
+
+%node intnum expression =
+{
+    int num;
+}
+
+%node floatnum expression =
+{
+    float num;
+}
+
+%node plus binary
+%node minus binary
+%node multiply binary
+%node divide binary
+%node power binary
+%node negate unary
+
+%node cast expression =
+{
+	type_code new_type;
+	expression *expr;
+}
+
+/*
+ * Define the "infer_type" operation as a non-virtual.
+ */
+%operation void infer_type(expression *e)
+
+infer_type(binary)
+{
+    infer_type(e->expr1);
+    infer_type(e->expr2);
+
+    if(e->expr1->type == error_type || e->expr2->type == error_type)
+	{
+        e->type = error_type;
+	}
+    else if(e->expr1->type == float_type || e->expr2->type == float_type)
+    {
+        e->type = float_type;
+    }
+    else
+    {
+        e->type = int_type;
+    }
+}
+
+infer_type(unary)
+{
+    infer_type(e->expr);
+    e->type = e->expr->type;
+}
+
+infer_type(intnum)
+{
+    e->type = int_type;
+}
+
+infer_type(floatnum)
+{
+    e->type = float_type;
+}
+
+infer_type(power)
+{
+    infer_type(e->expr1);
+    infer_type(e->expr2);
+
+	if(e->expr1->type == error_type || e->expr2->type == error_type)
+	{
+		e->type = error_type;
+	}
+    else if(e->expr2->type != int_type)
+    {
+        fprintf(stderr, "%s:%ld: second argument to `^' is not an integer\n",
+                yygetfilename(e), yygetlinenum(e));
+		e->type = error_type;
+    }
+	else
+	{
+    	e->type = e->expr1->type;
+	}
+}
+
+infer_type(cast)
+{
+	infer_type(e->expr);
+
+	if(e->expr->type != error_type)
+	{
+		e->type = e->new_type;
+	}
+	else
+	{
+		e->type = error_type;
+	}
+}
+
+/*
+ * Define the "eval_expr" operation as a virtual.
+ */
+%operation %virtual eval_value eval_expr(expression *e)
+
+eval_expr(plus)
+{
+	/* Evaluate the sub-expressions */
+	eval_value value1 = eval_expr(e->expr1);
+	eval_value value2 = eval_expr(e->expr2);
+
+	/* Coerce to the common type */
+	coerce(&value1, e->expr1->type, e->type);
+	coerce(&value2, e->expr2->type, e->type);
+
+	/* Evaluate the operator */
+	if(e->type == int_type)
+	{
+		value1.int_value += value2.int_value;
+	}
+	else
+	{
+		value1.float_value += value2.float_value;
+	}
+
+	/* Return the result to the caller */
+	return value1;
+}
+
+eval_expr(minus)
+{
+	/* Evaluate the sub-expressions */
+	eval_value value1 = eval_expr(e->expr1);
+	eval_value value2 = eval_expr(e->expr2);
+
+	/* Coerce to the common type */
+	coerce(&value1, e->expr1->type, e->type);
+	coerce(&value2, e->expr2->type, e->type);
+
+	/* Evaluate the operator */
+	if(e->type == int_type)
+	{
+		value1.int_value -= value2.int_value;
+	}
+	else
+	{
+		value1.float_value -= value2.float_value;
+	}
+
+	/* Return the result to the caller */
+	return value1;
+}
+
+eval_expr(multiply)
+{
+	/* Evaluate the sub-expressions */
+	eval_value value1 = eval_expr(e->expr1);
+	eval_value value2 = eval_expr(e->expr2);
+
+	/* Coerce to the common type */
+	coerce(&value1, e->expr1->type, e->type);
+	coerce(&value2, e->expr2->type, e->type);
+
+	/* Evaluate the operator */
+	if(e->type == int_type)
+	{
+		value1.int_value *= value2.int_value;
+	}
+	else
+	{
+		value1.float_value *= value2.float_value;
+	}
+
+	/* Return the result to the caller */
+	return value1;
+}
+
+eval_expr(divide)
+{
+	/* Evaluate the sub-expressions */
+	eval_value value1 = eval_expr(e->expr1);
+	eval_value value2 = eval_expr(e->expr2);
+
+	/* Coerce to the common type */
+	coerce(&value1, e->expr1->type, e->type);
+	coerce(&value2, e->expr2->type, e->type);
+
+	/* Evaluate the operator */
+	if(e->type == int_type)
+	{
+		if(value2.int_value != 0)
+		{
+			value1.int_value /= value2.int_value;
+		}
+		else
+		{
+			fprintf(stderr, "%s:%ld: division by zero\n",
+					yygetfilename(e), yygetlinenum(e));
+			value1.int_value = 0;
+		}
+	}
+	else
+	{
+		value1.float_value /= value2.float_value;
+	}
+
+	/* Return the result to the caller */
+	return value1;
+}
+
+eval_expr(power)
+{
+	/* Evaluate the sub-expressions */
+	eval_value value1 = eval_expr(e->expr1);
+	eval_value value2 = eval_expr(e->expr2);
+
+	/* Evaluate the operator */
+	if(e->type == int_type)
+	{
+		value1.int_value = (int)(pow((double)(value1.int_value),
+		                             (double)(value2.int_value)));
+	}
+	else
+	{
+		value1.float_value = (float)(pow((double)(value1.float_value),
+		                                 (double)(value2.int_value)));
+	}
+
+	/* Return the result to the caller */
+	return value1;
+}
+
+eval_expr(negate)
+{
+	/* Evaluate the sub-expression */
+	eval_value value = eval_expr(e->expr);
+
+	/* Evaluate the operator */
+	if(e->type == int_type)
+	{
+		value.int_value = -(value.int_value);
+	}
+	else
+	{
+		value.float_value = -(value.float_value);
+	}
+
+	/* Return the result to the caller */
+	return value;
+}
+
+eval_expr(cast)
+{
+	/* Evaluate the sub-expression */
+	eval_value value = eval_expr(e->expr);
+
+	/* Cast to the final type */
+	coerce(&value, e->expr->type, e->type);
+
+	/* Return the result to the caller */
+	return value;
+}
+
+eval_expr(intnum)
+{
+	eval_value value;
+	value.int_value = e->num;
+	return value;
+}
+
+eval_expr(floatnum)
+{
+	eval_value value;
+	value.float_value = e->num;
+	return value;
+}
+
+/*
+ * Define the "coerce" operation as an inline non-virtual.
+ */
+%operation %inline void coerce
+				(eval_value *value, [type_code from], [type_code to])
+
+coerce(int_type, float_type)
+{
+	value->float_value = (float)(value->int_value);
+}
+
+coerce(float_type, int_type)
+{
+	value->int_value = (int)(value->float_value);
+}
+
+coerce(type_code, type_code)
+{
+	/* Nothing to do here */
+}
+
+/*
+ * Include the following code at the end of the ".c" file.
+ */
+%end %{
+
+/*
+ * Global data used by the expression parser.
+ */
+char *progname;
+char *filename;
+long linenum;
+
+/*
+ * Entry points that are imported from the yacc parser.
+ */
+extern void yyrestart(FILE *file);
+extern int yyparse(void);
+
+/*
+ * Main entry point for the expression parser and evaluator.
+ */
+int main(int argc, char *argv[])
+{
+	FILE *file;
+	progname = argv[0];
+	linenum = 1;
+	if(argc < 2)
+	{
+		filename = "stdin";
+		yyrestart(stdin);
+	}
+	else if((file = fopen(argv[1], "r")) == NULL)
+	{
+		perror(argv[1]);
+		return 1;
+	}
+	else
+	{
+		filename = argv[1];
+		yyrestart(file);
+	}
+	return yyparse();
+}
+
+/*
+ * Get the name of the current input file in use by the parser.
+ */
+char *yycurrfilename(void)
+{
+	return filename;
+}
+
+/*
+ * Get the line number for the current input line in use by the parser.
+ */
+long yycurrlinenum(void)
+{
+	return linenum;
+}
+
+/*
+ * Report memory failure and exit.
+ */
+void yynodefailed(void)
+{
+	fputs(progname, stderr);
+	fputs(": virtual memory exhausted\n", stderr);
+	exit(1);
+}
+
+%}

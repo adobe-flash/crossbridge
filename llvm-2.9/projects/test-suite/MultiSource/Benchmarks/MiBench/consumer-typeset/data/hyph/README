@@ -1,0 +1,124 @@
+Format of Lout hyphenation information files
+
+Jeffrey H. Kingston
+22 December 1992
+21 September 1994
+6 June 1995
+3 April 1996
+
+Basser Lout Version 3 incorporates automatic hyphenation using the
+method introduced by TeX (see Appendix H of the TeXBook by D. E. Knuth),
+with support for multilingual hyphenation.  No special action is required
+to install hyphenation unless it is desired to change the hyphenation
+information that controls it.
+
+There is one hyphenation information file for each language, and it is
+named in the langdef of that language.  For example:
+
+	langdef German Deutsch { german }
+
+(There will usually be other information between the hyphenation file
+name and the closing brace, not relevant here.)  This example means that
+unpacked Lout hyphenation file german.lh or its packed equivalent
+german.lp (see below) is to be used when hyphenating German words.  These
+files are kept in the Lout system hyphenation directory (this directory).  If
+a language is desired but no hyphenation information file is available, the
+file name may be replaced with -, and then the language will be defined but
+hyphenation in that language will never be attempted.  Another possibility
+is to include a placeholder file for the language (see below).
+
+The first time on any run that German hyphenation is required, Lout will
+search the directories of the hyphenation path for a binary file called
+german.lp, which contains a binary form of the hyphenation patterns in
+german.lh, modified so that the file may be shared by big-endian and
+little-endian machines.  If german.lp cannot be found, Lout then searches
+for the text file german.lh instead, and uses it to construct german.lp.
+To change the German hyphenation patterns, delete german.lp and modify
+german.lh; the rest is automatic.
+
+Alternatively, if lout is invoked with the -x flag and the langdef line
+above appears in its input, it will read german.lh and produce german.lp
+immediately.  This is intended for setting up: it is good to create all
+these packed files at setup time, since a subsequent lout run that needs them
+will not have write permission in the Lout system hyphenation directory.
+
+An unpacked Lout hyphenation information (.lh) file mainly contains a
+long list of TeX hyphenation patterns.  It must begin with either
+
+    Lout hyphenation information
+
+or
+    Lout hyphenation placeholder
+
+alone on the first line.  In the second case, it is understood that the
+file is a placeholder (i.e. a stub file which might be overwritten with
+a real file in the future), and Lout does not read any futher; the effect
+is that Lout will not hyphenate this language, but not complain about the
+absence of the file either.
+
+In the non-placeholder case, following the header line comes the "Classes:"
+heading followed by the character classes.  For example:
+
+    Classes:
+    @!$%^&*()_-+=~`{[}]:;'|<,.>?/0123456789
+    aA
+    bB
+    cC
+    ...
+    yY
+    zZ
+
+The hyphenation process treats the characters in each class as identical
+(so the classes above ensure that the distinction between upper and lower
+case is ignored).  By definition, the characters of the first class are
+"non-letters", and the characters of the remaining classes are "letters".
+Notice that these are actual characters, not character names:  hyphenation
+files are encoding-specific.
+
+Next comes the "Exceptions:" heading followed by the exceptions, which
+are words (composed of letters and "-" only) whose hyphenation is to be
+treated as a special case.  For example:
+
+    Exceptions:
+    ta-ble
+    phil-an-thropic
+
+These words may be hyphenated in the places shown by the "-" characters.
+Character classes are in effect here (Table will be hyphenated as Ta-ble).
+If there are no exceptions, "Exceptions:" may be omitted.
+
+Next comes an optional LengthLimit section, which tells Lout to ignore
+some patterns.  For example,
+
+    LengthLimit:
+    4
+
+means that patterns containing more than 4 letters (note that
+. counts as a letter) are to be ignored.  The purpose is to discard
+the least important patterns from files that are too large for Lout
+to handle otherwise.  None of the files actually use this at present,
+but hyphenation files seem to be getting larger and larger, and if
+any whoppers come along they might have to be trimmed in this way.
+
+Finally comes the "Patterns:" heading followed by the list of TeX
+hyphenation patterns.  Apart from the weighting digits, the patterns
+should contain only letters.  Lout understands some TeX escape sequences
+e.g. it will accept \^e anywhere in a hyphenation file as the ecircumflex
+character.
+
+The file may contain comments, which begin with % (either at the start
+of a line or after a white space character) and go to end of line.  The
+headings, classes, exceptions and patterns are separated by arbitrary
+white space.
+
+Briefly, hyphenation of a word works like this.  If the word contains a
+character not found in any character class, it will not be hyphenated.
+Otherwise the word is analysed into sequences of letters separated by
+sequences of non-letters.  Each sequence of five or more letters is
+then matched, either with an exception or else with the hyphenation
+patterns, and hyphenated.  The hyphen character "-" is treated specially.
+
+Extreme lengths were resorted to to compress the .lp file as much as
+possible.  Files significantly larger than german.lh are likely to cause
+Lout to abort with an error message.  Please contact jeff@cs.usyd.edu.au
+if you have problems with this or anything else.

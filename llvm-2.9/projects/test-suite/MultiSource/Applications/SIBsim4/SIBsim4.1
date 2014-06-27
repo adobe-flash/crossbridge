@@ -1,0 +1,142 @@
+.\" $Id: SIBsim4.1 34335 2007-02-15 23:46:09Z nicholas $
+.\" Christian Iseli, LICR ITO, Christian.Iseli@licr.org
+.\"
+.\" Copyright (c) 2004-2006 Swiss Institute of Bioinformatics.
+.\"
+.TH SIBsim4 1 "January 2006" Bioinformatics "User Manuals"
+.SH NAME
+SIBsim4 \- align RNA sequences with a DNA sequence, allowing for introns
+.SH SYNOPSIS
+.B SIBsim4 [
+.I options
+.B ]
+.I dna rna_db
+.SH DESCRIPTION
+.B SIBsim4
+is a similarity-based tool for aligning a collection of expressed
+sequences (EST, mRNA) with a genomic DNA sequence. 
+
+Launching
+.B SIBsim4
+without any arguments will print the options list, along with their
+default values.
+
+.B SIBsim4
+employs a blast-based technique to first determine the basic
+matching blocks representing the "exon cores".  In this first stage, it
+detects all possible exact matches of W-mers (i.e., DNA words of size
+W) between the two sequences and extends them to maximal scoring
+gap-free segments.  In the second stage, the exon cores are extended
+into the adjacent as-yet-unmatched fragments using greedy alignment
+algorithms, and heuristics are used to favor configurations that
+conform to the splice-site recognition signals (e.g., GT-AG). If
+necessary, the process is repeated with less stringent parameters on
+the unmatched fragments.
+
+By default,
+.B SIBsim4
+searches both strands and reports the best matches,
+measured by the number of matching nucleotides found in the alignment.
+The
+.B R
+command line option can be used to restrict the search to one
+orientation (strand) only.
+
+Currently, four major alignment display options are supported,
+controlled by the
+.B A
+option. By default, only the endpoints, overall similarity, and
+orientation of the introns are reported. An arrow sign ('->' or '<-')
+indicates the orientation of the intron.  The sign `==' marks the
+absence from the alignment of a cDNA fragment starting at that
+position.
+
+In the description below, the term
+.B MSP
+denotes a maximal scoring pair, that is, a pair of highly similar
+fragments in the two sequences, obtained during the blast-like
+procedure by extending a W-mer hit by matches and perhaps a few
+mismatches. 
+
+.SH OPTIONS
+.IP "-A <int>"
+output format
+  0: exon endpoints only
+  1: alignment text
+  3: both exon endpoints and alignment text
+  4: both exon endpoints and alignment text with polyA info
+
+Note that 2 is unimplemented.
+
+Default value is 0.
+.IP "-C <int>"
+MSP score threshold for the second pass.
+
+Default value is 12.
+.IP "-c <int>"
+minimum score cutoff value.  Alignments which have scores below this value
+are not reported.
+
+Default value is 50.
+.IP "-E <int>"
+cutoff value.
+
+Default value is 3.
+.IP "-f <int>"
+score filter in percent.  When multiple hits are detected for the same RNA
+element, only those having a score within this percentage of the maximal
+score for that RNA element are reported.  Setting this value to 0 disables
+filtering and all hits will be reported, provided their score is above the
+cutoff value specified through the
+.B c
+option.
+
+Default value is 75.
+.IP "-g <int>"
+join exons when gap on genomic and RNA have lengths which
+differ at most by this percentage.
+
+Default value is 10.
+.IP "-I <int>"
+window width in which to search for intron splicing.
+
+Default value is 6.
+.IP "-K <int>"
+MSP score threshold for the first pass.
+
+Default value is 16.
+.IP "-L <str>"
+a comma separated list of forward splice-types.
+
+Default value is "GTAG,GCAG,GTAC,ATAC".
+.IP "-M <int>"
+scoring splice sites, evaluate match within M nucleotides.
+
+Default value is 10.
+.IP "-o <int>"
+when printing results, offset nt positions in dna sequence by this amount.
+
+Default value is 0.
+.IP "-q <int>"
+penalty for a nucleotide mismatch.
+
+Default value is -5.
+.IP "-R <int>"
+direction of search
+  0: search the '+' (direct) strand only
+  1: search the '-' strand only
+  2: search both strands
+
+Default value is 2.
+.IP "-r <int>"
+reward for a nucleotide match.
+
+Default value is 1.
+.IP "-W <int>"
+word size.
+
+Default value is 12.
+.IP "-X <int>"
+value for terminating word extensions.
+
+Default value is 12.

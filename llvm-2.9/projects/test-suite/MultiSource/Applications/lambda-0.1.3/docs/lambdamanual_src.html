@@ -1,0 +1,1756 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Lambda</title>
+<style>
+@import url(user_manual_style.css);
+</style>
+</head>
+
+<body>
+<p align=center>
+<font face=helvetica size=+4><b>Lambda</b></font>
+<table class="copying"><tr><td>
+Permission is granted to copy, distribute and/or modify this
+document under the terms of the GNU Free Documentation License,
+Version 1.1 or any later version published by the Free Software
+Foundation; with all sections Invariant Sections, with no Front-Cover
+Texts, and with no Back-Cover Texts. A copy of the license is included
+in the file "fdl.txt" included in this distribution.
+<!--section entitled "GNU Free Documentation License".-->
+</td></tr></table>
+<p>
+<hr>
+<TOC>
+<hr>
+<h1>Commands</h1>
+<h2>load</h2>
+<div class="lambdacmd">load &lt;definition-filename&gt;</div>
+
+When lambda first starts it prints the current directory.
+If the definition file is in this directory,
+&lt;directory-filename&gt;
+can be just the filename
+(so long as the filename is just one word).
+Otherwise, the filename should be enclosed in double quotes.
+<p>
+For example:
+<p>
+<code><font size=+1>
+load definitions          <br>
+load "../share/definitions" <br>
+</font>
+</code>
+
+<h2>list</h2>
+<div class="lambdacmd">list</div>
+<p>
+List all current definitions in reverse order.
+That is, the more recent definitions are printed first.
+
+<h2>set</h2>
+<div class="lambdacmd">
+set [&lt;flag&gt;]...<br>
+&lt;flag&gt; = trace | step | thru | app | body | brief | sym | eta | xapp | full <br>
+</div>
+
+<p>
+Set or clear flags.
+The flags govern the way in which expressions are evaluated and printed.
+The set command used without any flags or with a flag
+which it doesn't recognize will print a list the flags and their current state, after executing the commands.
+The meaning of each flag is as follows:
+<table>
+<tr>
+<td valign=top>
+	trace
+</td>
+<td>
+	If set, prints a sub-expression just before it is reduced.
+	Default: not set.
+</td>
+</tr>
+<tr>
+<td valign=top>
+	step
+</td>
+<td>
+	if set, one reduction is done at a time, the result printed,
+	and the user prompted to continue or stop reduction of this expression.
+	Default: not set.
+</td>
+<tr>
+<td valign=top>
+	thru
+</td>
+<td>
+	Works the same as step,
+    except that the expression is reduced to normal form
+	without pausing between each reduction to print the expression
+	and prompt the user. 
+	Setting one of these flags (step or thru)
+	will cause the other to be cleared.
+	If neither flag is set, the expression is reduced using a
+	recursive descent method, which should be faster.
+	This method should result in the reductions being performed
+	in the same order as the one reduction at a time method used
+	when step or thru are set.
+	However, it may not always.
+	Default: not set.
+</td>
+</tr>
+<tr>
+<td valign=top>
+	app
+</td>
+<td>
+	If set, do the reductions in "applicative order,"
+	which means reduce the "rand" of an application
+	before reducing the application.
+	If not set, perform the reductions in "normal order",
+	which means, do the left-most reduction in the expression first.
+	Default: not set.
+</td>
+</tr>
+<tr>
+<td valign=top>
+	body
+</td>
+<td>
+	If set reduce the body of a <i>abstraction,</i>
+	even though it is not the <i>rator</i> of an application.
+	Default: not set.
+	Setting body is necessary in order to make arithmetic work
+	correctly: MUL 2 2 ==> 4.
+</td>
+</tr>
+<tr>
+<td valign=top>
+	brief
+</td>
+<td>
+	If set, use a more compact method of printing an expression,
+	in which unnecessary parenthesis or elided.
+	If not set, extra parenthesis are printed to indicate
+	the left-to-right association nature of applications.
+	Default: set.
+</td>
+</tr>
+<tr>
+<td valign=top>
+	sym
+</td>
+<td>
+	If set, causes sub-expressions to be matched to definitions
+	when printing an expression.
+	Whenever a match is found,
+	the name of the definition is printed in place
+	of the value, which result in a more compact representation.
+	No attempt is made to preform alpha conversions to match expression,
+	although this would be a good idea for future versions of this program.
+	(An "alpha" conversion allows the name of the argument of an abstraction
+	to be changed.)
+	Default: set.
+</td>
+</tr>
+<tr>
+	<td valign=top>eta</td>
+	<td>
+		If set:
+		<code>ext x f x ==&gt; f</code>.
+		If not set:
+		<code>ext x f x ==&gt; S(K f)I</code>.
+	</td>
+</tr>
+<tr>
+	<td valign=top>xapp</td>
+	<td>
+		If set:
+		<code>ext x f g ==&gt;S(K f)(K g)</code>.
+		If not set:
+		<code>ext x f g ==&gt;K(f g)</code>.
+		</td>
+</tr>
+<tr>
+<td valign=top>
+	full
+</td>
+<td>
+	If set, causes names to be completed expanded,
+    by looping over the definitions until no more expansions
+	can be done.
+	May result in recursive loops.
+	Default: set.
+</td>
+</tr>
+</table>
+
+<h2>def</h2>
+<div class="lambdacmd">
+def &lt;name&gt; &lt;lambda-exp&gt;
+</div>
+
+<p>
+Make a definition, associating
+<code><font size=+1>
+&lt;name&gt;
+</font>
+</code>
+with
+<code><font size=+1>
+&lt;lambda-exp&gt;
+</font>
+</code>
+in subsequent reductions.
+If the name is already in use in a previous definition,
+that definition is replaced with the new one.
+If the lambda expression contains unbound variables,
+they may be captured by arguments of abstractions
+when the lambda expression is substituted for the definition name
+in the reduction process.
+
+<h2>ext</h2>
+<div class="lambdacmd">
+ext &lt;var&gt; &lt;lambda-exp&gt;
+</div>
+<p>
+Extract the variable
+<code><font size=+1>&lt;var&gt;</font></code>
+from the lambda-exp
+<code><font size=+1>&lt;lambda-exp&gt;</font></code>
+so that
+<p>
+<code><font size=+1>
+	(ext &lt;var&gt; &lt;lambda-exp&gt;) &lt;var&gt;
+	== &lt;lambda-exp&gt;<br>
+</font></code>
+<p>
+If instead of a variable name
+<code><font size=+1>&lt;var&gt;</font></code>
+is the character
+<code><font size=+1>^</font></code>
+or <code><font size=+1>~</font></code>, 
+<p>
+<code><font size=+1>
+	(ext ^ &lt;lambda-exp&gt;) == &lt;lambda-exp&gt;<br>
+	(ext ~ &lt;lambda-exp&gt;) == &lt;lambda-exp&gt;<br>
+</font></code>
+<p>
+The
+&lt;lambda-exp&gt;
+is replaced by
+<code><font size=+1>S</font></code>,
+<code><font size=+1>K</font></code>,
+and <code><font size=+1>I</font></code>
+<i>combinators</i>, as follows:
+<p>
+<table border=1>
+	<tr>
+		<th>expression</th>
+		<th>result</th>
+		<th>remark</th>
+	</tr>
+	<tr>
+		<td valign="top"><code><font size=+1>ext x x</font></code></td>
+		<td valign="top"><code><font size=+1>I</font></code></td>
+		<td valign="top">&nbsp;</i></td>
+	</tr>
+	<tr>
+		<td valign="top"><code><font size=+1>ext x A</font></code></td>
+		<td valign="top"><code><font size=+1>K A</font></code></td>
+		<td valign="top">A is a single symbol other than x</td>
+	</tr>
+	<tr>
+		<td valign="top"><code><font size=+1>ext x A</font></code></td>
+		<td valign="top"><code><font size=+1>K (A)</font></code></td>
+		<td valign="top">A is free in A and A is an application expression
+		and xapp is off</td>
+	</tr>
+	<tr>
+		<td valign="top"><code><font size=+1>ext x lambda-exp</font></code></td>
+		<td valign="top"><code><font size=+1>ext x (ext lambda-exp.arg lambda-exp.body)</font></code></td>
+		<td valign="top">&nbsp;</i></td>
+	</tr>
+	<tr>
+		<td valign="top"><code><font size=+1>ext x exp1 exp2</font></code></td>
+		<td valign="top"><code><font size=+1>S (ext x exp1)(ext x exp2)</font></code></td>
+		<td valign="top">
+			exp1 and exp2 both constant and <i>xapp </i> is <i>on </i>
+			or<br>
+			exp1 and ext2 not both constant and exp2 is not <code>x </code>
+			or<br>
+			exp1 is x and <i>eta </i> is <i>off))</i></td>
+	</tr>
+	<tr>
+		<td valign="top"><code><font size=+1>ext x exp1 x</font></code></td>
+		<td valign="top"><code><font size=+1>S (ext x exp1)(ext x exp2)</font></code></td>
+		<td valign="top"><i>eta </i> is <i>on</i></td>
+	</tr>
+	<tr><td colspan="3"></td></tr>
+	<tr>
+		<td valign="top"><code><font size=+1>ext ^ x</font></code></td>
+		<td valign="top"><code><font size=+1>x<br></font></code></td>
+		<td valign="top">&nbsp;</i></td>
+	</tr>
+	<tr>
+		<td valign="top"><code><font size=+1>ext ^ lambda-exp</font></code></td>
+		<td valign="top"><code><font size=+1>ext lambda-exp.arg lambda-exp.body</font></code></td>
+		<td valign="top">&nbsp;</i></td>
+	</tr>
+	<tr>
+		<td valign="top"><code><font size=+1>ext ^ exp1 exp2</font></code></td>
+		<td valign="top"><code><font size=+1>(ext ^ exp1)(ext ^ exp2)</font></code></td>
+		<td valign="top">&nbsp;</i></td>
+	</tr>
+</table>
+<p>
+The definitions of S, K, and I are
+<p>
+<code><font size=+1>
+	I a  = a           <br>
+	K a b = a          <br>
+	S a b c = a c( b c)<br>
+</font></code>
+</P>
+<code><font size=+1>I</font></code> is often defined as
+<code><font size=+1>S K K</font></code>.
+<p>
+For example, 
+<div class="lx">
+<pre>
+&lt;&lt; set
+&gt;trace = 0
+&gt;step  = 0
+&gt;thru  = 0
+&gt;app   = 0
+&gt;body  = 0
+&gt;brief = 1
+&gt;sym   = 1
+&gt;eta   = 1
+&gt;xapp  = 0
+&gt;full  = 1
+&lt;&lt; ext x E x
+E
+&lt;&lt; set eta
+&lt;&lt; ext x E x
+S(K E)I
+&lt;&lt; ext x A B
+K(A B)
+&lt;&lt; set xapp
+&lt;&lt; ext x A B
+S(K A)(K B)
+&lt;&lt; ext x ^y.x y
+S(S(K S)(S(K K)I))(K I)
+&lt;&lt; set eta
+&lt;&lt; ext x ^y.x y
+I
+&lt;&lt; ext ^ ^x.^y.x y
+I
+&lt;&lt; ext ^ ^x.^y.y x
+S(S(K S)(K I))K
+&lt;&lt;
+</div>
+
+<h2>lambda-expression</h2>
+</pre>
+<div class="lambdacmd">
+&lt;lambda-exp&gt;
+</div>
+<p>
+Reduce the lambda-expression.
+However, if the lambda expression is just a single variable,
+print its definition.
+When a expression is reduced,
+it is first parsed into an internal expression tree form,
+printed (in the "non-brief" format),
+and reduced again as directed by the flags.
+The final result (and any intermediate results,
+if the step flag is set) is printed as directed by the brief and sym flags.
+When in the step mode, for each intermediate or final result,
+an "B" is incorporated into the result cue to indicate a "beta"
+reduction was performed, and an "H" is incorporated
+to indicated a "eta" reduction was performed.
+<p>
+A user cue of 
+<p>
+<code><font size=+1>
+		&lt&lt; 
+</font></code>
+<p>
+used to indicate input is needed.
+An a command is terminated by a new line.
+However, if a lambda-expression is being reduced and a new line
+is encountered with parentheses unbalanced,
+the user is prompted to supply the missing right parentheses.
+<p>
+Parsed results are printed after the cue:
+<p>
+<code><font size=+1>
+==&gt;
+</font></code>
+<p>
+In the step mode,
+intermediate and final results are printed after the cue:
+<p>
+<code><font size=+1>
+=B==&gt;
+</font></code>
+<p>
+which indicates an "beta" reduction was peformed, or
+<p>
+<code><font size=+1>
+=H==&gt;
+</font></code>
+<p>
+which means an "eta" reduction was performed. The cue
+<p>
+<code><font size=+1>
+===&gt;
+</font></code>
+is used for final results when not in the step mode.
+<p>
+
+<h2>quit</h2>
+<div class="lambdacmd">
+quit
+</div>
+Quit.
+
+<h1>Expressions</h1>
+
+<h2>Syntax</h2>
+<p>
+<code><font size=+1>
+&lt;lambda-exp&gt; = &lt;variable&gt;               <br>
+             | ^&lt;variable&gt;.&lt;lambda-exp&gt; <br>
+             | &lt;lambda-exp> &lt;lambda-exp&gt;   <br>
+             | (&lt;lambda-exp&gt;)                 <br>
+</font></code>
+
+<h2>Semantics</h2>
+<p>
+The form ^&lt;variable&gt;.&lt;lambda-exp&gt;
+is called an "abstraction."
+The variable after the ^ and before the period is called the
+<i>argument</i>,
+and the lambda expression after the period is called the
+<i>body</i>.
+The body extends until the end of the expression,
+or until a right parenthesis is encountered
+which is unmatched by a corresponding left parenthesis
+in the body expression.
+<p>
+
+The form
+<code><font size=+1>&lt;lambda-exp&gt; &lt;lambda-exp&gt;</font></code>
+is called an <i>application</i>.
+The first lambda expression is called the <i>operator</i>
+(or <i>rator</i> for short)
+and the second is called the <i>operand</i>
+(or  <i>rand</i> for short.)
+When an rator of an application is an abstraction,
+an application can be <i>reduced</i>
+by substituting the rand into the body of the abstraction
+in place of each occurrence of the abstraction's argument.
+This must be done in such a way
+as to avoid an name collisions
+with the arguments of other abstractions
+which might be embedded in the body of the abstraction.
+The application operation is <i>left-associative</i>,
+which means that the expression
+<p>
+<code><font size=+1>
+a b c d
+</font></code>
+<p>
+means
+<p>
+<code><font size=+1>
+((a b) c) d.
+</font></code>
+
+<h3>Definition of "free"</h3>
+Variable <i>x</i> occurs <b><i>free</i></b> in an expression:
+<br>
+1. <i>x</i> occurs free in <i>x</i> (but not in any other variable);
+<br>
+2. <i>x</i> occurs free in X Y if <i>x</i> occurs free in X or Y;
+<br>
+3. <i>x</i> occurs free in ^<i>y</i>.Y if <i>x</i> and <i>y</i>
+different and <i>x</i> occurs free in Y;
+<br>
+4. <i>x</i> occurs free in (X) if <i>x</i> occurs free in X.
+<br>
+<h3>Definition of "bound"</h3>
+Variable <i>x</i> occurs <b><i>bound</i></b> in an expression:
+<br>
+1. No variable occurs bound in an expression consisting of 
+just a single variable;
+<br>
+2. <i>x</i> occurs bound in ^<i>y</i>.Y if
+<i>x</i> and <i>y</i> are the same variable
+(and <i>x</i> occurs free in Y),
+or if <i>x</i> occurs bound in Y.
+<br>
+3. <i>x</i> occurs bound in X Y if it occurs bound in X or Y.
+<br>
+4. <i>x</i> occurs bound in (X) if it occurs bound in X.
+
+<h3>Substitution Rules</h3>
+<p>
+<b>Substitute expression M for variable <i>x</i> in expression X</b><br>
+<b> [M/<i>x</i>]X </b><br>
+<p>
+<table border=1>
+<tr>
+<th align=left>Case</th>
+<th align=left>Condition</th>
+<th align=left>Rule: [M/x]X ==&gt;</th>
+</tr>
+
+<tr>
+<td align=left valign=top><code><font size=+1><b>1</b></font></code></td>
+<td align=left valign=top colspan=2><code><font size=+1>
+			<b>X is a Variable</b></td>
+</font>
+</tr>
+
+<tr>
+<td align=left valign=top><code><font size=+1>1.1</font></code></td>
+<td align=left valign=top><code><font size=+1>X == <i>x</i></font></code></td>
+<td align=left valign=top><code><font size=+1>M</font></code></td>
+</tr>
+
+<tr>
+<td align=left valign=top><code><font size=+1>1.2</font></code></td>
+<td align=left valign=top><code><font size=+1>X != <i>x</i></font></code></td>
+<td align=left valign=top><code><font size=+1>X</font></code></td>
+</tr>
+
+<tr>
+<td align=left valign=top><code><font size=+1><b>2</b></font></code></td>
+<td align=left valign=top><code><font size=+1>
+			<b>X is a Application: Y Z</b></font></code></td>
+<td align=left valign=top><code><font size=+1>
+([M/<i>x</i>]Y)([M/<i>x</i>]Z)</font></code></td>
+</tr>
+
+<tr>
+<td align=left valign=top><code><font size=+1><b>3</b></font></code></td>
+<td align=left valign=top colspan=2><code><font size=+1>
+			<b>X is an Abstraction: ^<i>y</i>.Y</b></font></code></td>
+</tr>
+
+<tr>
+<td align=left valign=top><code><font size=+1>3.1</font></code></td>
+<td align=left valign=top><code><font size=+1>
+<i>y</i> == <i>x</i></font></code></td>
+<td align=left valign=top><code><font size=+1>X</font></code></td>
+</tr>
+
+<tr>
+<td align=left valign=top><code><font size=+1>3.2</font></code></td>
+<td align=left valign=top><code><font size=+1>
+<i>y</i> != <i>x</i></font></code></td>
+<td align=left valign=top><code><font size=+1>&nbsp;</font></code></td>
+</tr>
+
+<tr>
+<td align=left valign=top><code><font size=+1>3.2.1</font></code></td>
+<td align=left valign=top><code><font size=+1>
+<i>x</i> doesn't occur free in Y<br>
+or <i>y</i> doesn't occur free in M</font></code></td>
+<td align=left valign=top><code><font size=+1>
+^<i>y</i>.[M/<i>x</i>]Y</font></code></td>
+</tr>
+
+<tr>
+<td align=left valign=top><code><font size=+1>3.2.2</font></code></td>
+<td align=left valign=top><code><font size=+1>
+<i>x</i> does occur free in Y<br>
+and <i>y</i> does occur free in M
+(a&nbsp;<i>collision</i>)</font></code></td>
+<td align=left valign=top><code><font size=+1>
+^<i>z</i>.[M/<i>x</i>]([<i>z</i>/<i>y</i>]Y)<br>
+where <i>z</i> is the first variable
+in the sequence of variables
+such that <i>z</i> doesn't occur free in M or Y.
+<br>
+That is, change all free occurrences of <i>y</i> in Y to <i>z</i>,
+then replace occurrences of <i>x</i> in Y with M.
+The argument of the abstraction is changed from
+<i>y</i> to <i>z</i>.
+</font></code>
+</td>
+</tr>
+</table>
+<p>
+
+<h3>Conversion Definitions</h3>
+<table>
+<tr>
+<th align=left>Conversion</th>
+<th align=left>Definition</th>
+</tr>
+<tr>
+<td>&alpha;</td>
+<td>if <i>y</i> is not free in X,
+then ^<i>x</i>.X cnv(&alpha) ^<i>y</i>.[<i>y</i>/<i>x</i>]X</td>
+</tr>
+<tr>
+<td>&beta;</td>
+<td>(^<i>x</i>.M)N cnv(&beta;) [N/<i>x</i>]M</td>
+</tr>
+<tr>
+<td>&eta;</td>
+<td>if <i>x</i> is not free in M, then
+^<i>x</i>.M <i>x</i> cnv(&eta;) M.
+</td>
+</tr>
+</table>
+<p>
+A <i>reduction</i> means going from left to right with a &beta; or &eta; conversion; that is, getting rid of a ^.
+<i>Normal order</i> means getting rid of the left most ^ first.
+<i>Applicative order</i> means reducing the rand <i>before</i> the rator.
+
+<h3>Variable Name Prefixes</h3>
+<p>
+
+<table>
+<tr>
+<th align=left>Prefix</th>
+<th align=left>Meaning</th>
+</tr>
+<tr>
+<td>
+<code><font size=+1>$</font></font></code>
+</td>
+<td>
+If the argument of an abstraction has
+<code><font size=+1>$</font></font></code>
+as its first character,
+the abstraction,
+when it is being reduced as part of an application,
+will be reduced as though the step flag were off,
+and the body flag were on.
+</td>
+<tr>
+<td>
+<code><font size=+1>&amp;</font></font></code>
+</td>
+<td>
+If the argument of an abstraction has
+<code><font size=+1>&amp;</font></font></code>
+as its first character,
+the abstraction will be reduced as though the step
+and body flags are both off.
+</td>
+</tr>
+</table>
+
+<h1>Arithmetic</h1>
+
+<h2>Basic Definitions</h2>
+
+Let
+<table>
+
+<tr>
+<td>
+<code>[m]</code>
+</td>
+<td>
+represent the lambda expression for the postive integer m,
+</td>
+</tr>
+
+<tr>
+<td>
+<code>[0]</code>
+</td>
+<td>
+<code>^x.^y.y</code>
+</td>
+</tr>
+
+<tr>
+<td>
+<code>[n+1]</code>
+</td>
+<td>
+<code>^x.^y.x([n] x y)</code> for all n > 0
+</td>
+</tr>
+
+<tr>
+<td>
+<code>ADD</code>
+</td>
+<td>
+<code>^m.^n.^x.^y.m x(n x y)</code>
+</td>
+</tr>
+
+<tr>
+<td>
+<code>MUL</code>
+</td>
+<td>
+<code>^m.^n.^x.m(n x)</code>
+</td>
+</tr>
+
+<tr>
+<td>
+<code>EXP</code>
+</td>
+<td>
+<code>^n.^m.m n</code>
+</td>
+</tr>
+</table>
+
+<h2>Proposition for Addition</h2>
+<table>
+<tr>
+<td colspan=3 valign=top>
+<code>ADD [m][n] = [m+n]</code>
+</td>
+</tr>
+<tr>
+<td valign="top" align=left><div class="proof">Proof</div></td>
+<td colspan=2>By induction</td>
+</tr>
+<tr>
+<th valign=top align=left>1)</th>
+<td>
+<code>
+ADD [0] [n]<br>
+= ^x.^y.[0] x.([n] x y)<br>
+ = ^x.^y.[n] x y<br>
+ = [n] = [0+n]<br>
+</code>
+</td>
+</tr>
+<tr>
+<th valign=top align=left>2)</th>
+<td>
+Assume
+<code>
+ADD [m][n] = [m+n] <b><i>
+</code>
+</td>
+<td>
+<b><i>induction hypothesis</i></b>
+</td>
+</tr>
+<tr>
+<th valign=top align=left>3)</th>
+<td>
+<code>
+ADD [m+1][n]<br>
+   = ^x.^y.[m+1] x([n] x y)<br>
+   = ^x.^y.(^a.^b.a([m] a b)) x ([n] x y)<br>
+   = ^x.^y.x([m] x ([n] x y)<br>
+   = ^x.^y.x(ADD [m] [n] x y)<br>
+</code>
+</td>
+</tr>
+<tr>
+<th align=left valign=top>=&gt;</tn>
+<td>
+<code>
+   = ^x.^y.x([m+n] x y)<br>
+</code>
+</td>
+</td>
+<td valign=top>
+<b><i>by 2) induction hypothesis</i></b><br>
+</td>
+</tr>
+
+<tr>
+<td valign=top></td>
+<td valign=top>
+<code>
+   = [(m+1)+n]<br>
+</code>
+<td valign=top></td>
+</tr>
+</tr>
+</table>
+
+<h2>Proposition for Multiplication</h2>
+<table>
+<tr>
+<td colspan=3>
+<code>MUL [m][n] = [m*n]</code>
+</td>
+</tr>
+<tr>
+<td valign="top" align=left><div class="proof">Proof</div></td>
+<td colspan=2>By induction</td>
+</tr>
+
+<tr>
+<th valign=top align=left>1)</th>
+<td>
+<code>
+MUL [0] [n]<br>
+= ^x.[0]([n] x)<br>
+= ^x.(^a.^b.b)([n] x)<br>
+= ^x.^b.b<br>
+= ^x.^y.y<br>
+= [0]<br>
+</code>
+</td>
+<td valign=top></td>
+</tr>
+<tr>
+<th valign=top align=left>2)</th>
+<td valign=top>
+Assume
+<code>
+MUL [m][n] = [m*n]
+</code>
+<td valign=top>
+<b><i>induction hypothesis</i></b><br>
+</td>
+</tr>
+
+<tr>
+<th valign=top align=left>3)</th>
+<td valign=top>
+<code>
+MUL [m+1] [n]<br>
+= ^x.[m+1]([n] x)<br>
+= ^x.(^a.^b.a([m] a b))([n] x)<br>
+= ^x.^b.([n] x)([m] ([n] x) b)<br>
+= ^x.^b.([n] x)(MUL [m] [n] x b)<br>
+</code>
+<td>
+<td valign=top></td>
+</tr>
+
+<tr>
+<th align=left valign=top>=&gt;</th>
+<td valign=top>
+<code>
+= ^x.^b.([n] x)([m*n] x b)<br>
+</code>
+<td valign = top>
+<b><i>by 2) induction hypthesis</i></b><br>
+</td>
+</tr>
+
+<tr>
+<td valign=top</td>
+<td valign=top>
+<code>
+= ^x.^b.ADD [n] [m*n] x b<br>
+= ^x.^b.[n+m*n] x b<br>
+= [n+m*n]<br>
+= [(m+1)*n]<br>
+</code>
+</td>
+<td valign = top>
+</td>
+</tr>
+</table>
+
+<p>
+<h2>Proposition for Exponentiation.</h2>
+<table>
+<tr>
+<td colspan=3 align = top>
+<code>EXP [n][m] = [n**m]</code>
+</td>
+</tr>
+<tr>
+<td valign="top" align=left><div class="proof">Proof</div></td>
+<td colspan=2>By induction</td>
+</tr>
+<tr>
+<th valign=top align=left>1)</th>
+<td valign=top>
+<code>
+EXP [n] [0] <br>
+= [0] [n] <br>
+= (^x.^y.y)[n]<br>
+= ^y.y<br>
+= ^y.^z.y z<br>
+= [1]<br>
+</code>
+</td>
+<td valign=top> </td>
+</tr>
+<tr>
+<th valign=top align=left>2)</th>
+<td valign=top>
+Assume
+<code>
+EXP [n][m] = [n**m]
+</code>
+</td>
+<td valign=top>
+<b><i>induction hypothesis</i></b><br>
+</td>
+</tr>
+
+<tr>
+<th valign=top align=left>3)</th>
+<td valign=top>
+<code>
+EXP [n] [m+1]<br>
+= [m+1] [n]<br>
+= (^x.^y.x([m] x y))[n]<br>
+= ^y.[n]([m] [n] y)<br>
+= ^y.[n](EXP [n] [m] y)<br>
+</code>
+</td>
+</tr>
+<tr>
+<th align=left valign=top>=&gt;</th>
+<td valign=top>
+<code>
+= ^y.[n]([n**m] y)
+</code>
+</td>
+<td valign=top>
+<b><i>by 2) induction hypothesis</i></b><br>
+</td>
+</tr>
+
+<tr>
+<td valign=top> </td>
+<td valign=top>
+<code>
+= MUL [n] [n**m]<br>
+= [n*(n**m)]<br>
+= [n**(m+1)]<br>
+</code>
+<td valign=top>
+</td>
+</tr>
+
+</table>
+
+<p>
+<h2>Proposition for Predecessor</h2></th>
+
+<table>
+<tr>
+<td colspan=3 valign=top>
+	<code>
+	pred [n] = [n-1]
+	</code>
+	<table>
+
+	<tr>
+	<th align=left valign=top>
+	Let<br>
+	</th>
+	<td>
+	<code>
+	suc = ^n.^x.^y.x(n x y)<br>
+	pair = ^f.^s.^p.(p f s)<br>
+	false = ^f.^s.s<br>
+	true = ^f.^s.f<br>
+	</code>
+	</td>
+	</tr>
+
+	<tr>
+	<th align=left valign=top>
+	and<br>
+	</th>
+	<td>
+	<code>
+	bump = ^p.pair (suc(p true)) (p true)<br>
+	pred_pair = ^n.n bump (pair 0 0)<br>
+	pred = ^n.pred_pair n false<br>
+	</code>
+	</td>
+	</tr>
+
+	<tr>
+	<th align=left valign=top>
+	then
+	</th>
+	<td>
+	<code>
+	pred_pair [n] = pair [n] [n-1]<br>
+	</code>
+	</td>
+	</tr>
+
+	<tr>
+	<tr>
+	<th align=left valign=top>
+	hence<br>
+	</th>
+	<td>
+	<code>
+	pred [n] = [n-1]<br>
+	</code>
+	</td>
+	</tr>
+	</table>
+</td>
+</tr>
+<tr>
+<td valign = align=left><div class="proof">Proof</div></td>
+<td colspan=2>By induction</td>
+</tr>
+
+<tr>
+<th valign=top align=left>1)</th>
+<td valign=top>
+<code>
+pred_pair [1]<br>
+= 1 bump (pair 0 0)<br>
+= bump (pair 0 0)<br>
+= pair (suc((pair 0 0) true)) ((pair 0 0) true))<br>
+= pair 1 0<br>
+</code>
+</list>
+</td>
+<td valign=top> </td>
+</tr>
+
+<tr>
+<th valign=top align=left>2)</th>
+<td valign=top>
+Assume
+<code>
+pred_pair [n] = pair [n] [n-1]<br>
+</code>
+</td>
+<td valign=top>
+<b><i>induction hypothesis</i></b><br>
+</td>
+</tr>
+
+<tr>
+<th valign=top align=left>3)</th>
+<td valign=top>
+<code>
+pred_pair [n+1]<br>
+= ^n. (n bump (pair 0 0))[n+1]<br>
+= [n+1] bump (pair 0 0)<br>
+= bump ([n] bump (pair 0 0))<br>
+= bump (pred_pair [n])<br>
+</code>
+</td>
+</tr>
+
+<tr>
+<th align=left valign=top>=&gt;</th>
+<td valign=top>
+<code>
+= bump (pair [n] [n-1])<br>
+= pair [n+1] [n]<br>
+</code>
+</td>
+<td valign=top>
+<b><i>by 2) induction hypothesis</i></b><br>
+</td>
+</tr>
+
+<tr>
+<th valign=top align=left>4)</th>
+<td valign=top>
+<code>
+pred [n]<br>
+= pred_pair [n] false<br>
+= pair [n] [n-1] false<br>
+= false [n] [n-1]<br>
+= [n-1]<br>
+</code>
+</td>
+<td valign=top></td>
+</tr>
+
+</table>
+
+<h2>Examples</h2>
+
+<div class="lx">
+<pre>
+def 0 ^m.^n.n
+def true ^p.^q.p
+def def false ^p.^q.q
+def suc ^p.^m.^n.m(p m n)
+def pred ^$k.$k(^p.(mpair(suc(p true))(p true)))(mpair 0 0)false
+def mpair ^a.^b.^u.u a b
+def def iszero ^n. n (true false) true
+def ADD ^m.^n.^x.^y.m x(n x y)
+def MUL ^m.^n.^f.m(n f)
+def EXP ^m.^n.n m
+def GT ^m.^n.not(iszero (n pred m))
+def EQ ^m.^n.and (iszero (m pred n)) (iszero (n pred n))
+def LT ^m.^n.not(iszero(m pred n))
+def GE ^m.^n.not(LT m n)
+&lt;&lt; iszero 0
+==&gt; iszero 0
+====&gt;true
+&lt;&lt; iszero 5
+==&gt; iszero 5
+====&gt;false
+&lt;&lt; suc 0
+==&gt; suc 0
+====&gt;I
+&lt;&lt; suc 1
+==&gt; suc 1
+====&gt;2
+&lt;&lt; suc 2
+==&gt; suc 2
+====&gt;3
+&lt;&lt; pred 3
+==&gt; pred 3
+====&gt;2
+&lt;&lt; pred 2
+==&gt; pred 2
+====&gt;I
+&lt;&lt; pred 1
+==&gt; pred 1
+====&gt;0
+&lt;&lt; pred 0
+==&gt; pred 0
+====&gt;0
+&lt;&lt; ADD 1 2
+==&gt; (ADD 1) 2
+====&gt;3
+&lt;&lt; MUL 2 3
+==&gt; (MUL 2) 3
+====&gt;6
+&lt;&lt; EXP 2 3
+==&gt; (EXP 2) 3
+====&gt;8
+&lt;&lt; EXP 3 2
+==&gt; (EXP 3) 2
+====&gt;9
+&lt;&lt; GT 2 3
+==&gt; (GT 2) 3
+====&gt;false
+&lt;&lt; GT 3 2
+==&gt; (GT 3) 2
+====&gt;true
+&lt;&lt; EQ 4 (ADD 2 2)
+==&gt; (EQ 4)((ADD 2) 2)
+====&gt;true
+&lt;&lt; EQ 5 (ADD 3 3)
+==&gt; (EQ 5)((ADD 3) 3)
+====&gt;false
+&lt;&lt;
+</pre>
+</div>
+
+<h1>Lists</h1>
+<h2>Nodes</h2>
+The basis of a list is the <code>triple</code>:
+<div class="lx">
+<pre>
+def mtriple ^a.^b.^c.^u.u a b c
+def 1st ^a.^b.^c.a
+def 2nd ^a.^b.^c.b
+def 3rd ^a.^b.^c.c
+</pre>
+</div>
+So 
+<div class="lx">
+<pre>
+==&gt; abc 2nd
+====&gt;b
+&lt;&lt; abc 3rd
+==&gt; abc 3rd
+====&gt;c
+&lt;&lt;
+</pre>
+</div>
+A list node is a triple whose first component is the first
+element of the list, the second component is the rest of the
+list, and the third component is a boolean that is true if
+the triple is the last node of the list and false otherwise.
+<div class="lx">
+<pre>
+def true ^p.^q.p
+def false ^p.^q.q
+def mknode (^a.^b.^u.u a b false)
+def is_end (^n.n sel_3)
+</pre>
+</div>
+<h2>Empty List</h2>
+A special node, <code>end</code> is constructed to serve as the
+empty list, and to be the last node of a list.
+<div class="lx">
+<pre>
+def renda ^e.^&amp;u.&amp;u e e true
+def def rend (^x.renda(x x))(^x.renda(x x))
+def head (^n.n sel_1)
+def tail (^n.n sel_2)
+def end ^&amp;u.&amp;u rend rend true
+</pre>
+</div>
+We see that:
+<div class="lx">
+<pre>
+&lt;&lt; Y renda
+==&gt; Y renda
+====&gt;end
+&lt;&lt; renda rend
+==&gt; renda rend
+====&lt;end
+&lt;&lt; head end
+==&gt; head end
+====&gt;end
+&lt;&lt; tail end
+==&gt; tail end
+====&gt;end
+&lt;&lt; is_end end
+==&gt; is_end end
+====&gt;true
+&lt;&lt;
+</pre>
+</div>
+We define Y, the fixed-point operator,
+in the next section, "Function Complete of Curry Algebras."
+<p>
+So <code>end</code>
+<ul><li>is the fixed point of <code>renda</code>,</li>
+	<li>answers true to <code>is_end</code>, and</li>
+	<li>is its own head and tail.</li>
+</ul>
+<p>
+<h2>Appending</h2>
+The form <code>append</code> adds and element to the end of a list.
+<div class="lx">
+<pre>
+def Appenda ^h.^n.^list.(is_end list)(mknode n end)(mknode(head list)(h n(tail list)))
+def append (^x.Appenda(x x))(^x.Appenda(x x))
+</pre>
+</div>
+It is easy to see that
+<pre>
+	append = Y Appenda
+</pre>
+As an example of a list, we have:
+<div class="lx">
+<pre>
+&lt;&lt; def abc append c (append b (append a end)))
+&lt;&lt; head abc
+==&gt; head abc
+====&gt;a
+&lt;&lt; head (tail abc)
+==&gt; head(tail abc)
+====&gt;b
+&lt;&lt; head (tail (tail abc))
+==&gt; head(tail(tail abc))
+====&gt;c
+&lt;&lt; head (tail (tail (tail abc)))
+==&gt; head(tail(tail(tail abc)))
+====&gt;end
+&lt;&lt;
+</pre>
+</div>
+<h2>Mapping</h2>
+Finally define the form <code>map</code> which applies
+its first argument to each node of its second argument,
+if the second argument is a list, anyway.
+<div class="lx">
+<pre>
+def Mapa ^h.^f.^list.(is_end list)(end)(mknode(f (head list))(h f (tail list)))
+def map (^x.Mapa(x x))(^x.Mapa(x x))
+</pre>
+</div>
+So, for example,
+<div class="lx">
+<pre>
+&lt;&lt; def n01234 append 4 (append 3 (append 2 (append 1 (append 0 end))))
+&lt;&lt; head n01234
+==&gt; head n01234
+====&gt;0
+&lt;&lt; head (tail n01234)
+==&gt; head(tail n01234)
+====&gt;I
+&lt;&lt; head (tail (tail n01234))
+==&gt; head(tail(tail n01234))
+====&gt;2
+&lt;&lt; head (tail (tail (tail n01234)))
+==&gt; head(tail(tail(tail n01234)))
+====&gt;3
+&lt;&lt; head(tail(tail(tail(tail n01234))))
+==&gt; head(tail(tail(tail(tail n01234))))
+====&gt;4
+&lt;&lt; head(tail(tail(tail(tail(tail n01234)))))
+==&gt; head(tail(tail(tail(tail(tail n01234)))))
+====&gt;end
+&lt;&lt; def s01234 map suc n01234
+&lt;&lt; head s01234
+==&gt; head s01234
+====&gt;I
+&lt;&lt; head (tail s01234)
+==&gt; head(tail s01234)
+====&gt;2
+&lt;&lt; head (tail (tail s01234))
+==&gt; head(tail(tail s01234))
+====&gt;3
+&lt;&lt; head(tail(tail(tail s01234)))
+==&gt; head(tail(tail(tail s01234)))
+====&gt;4
+&lt;&lt; head(tail(tail(tail(tail s01234))))
+==&gt; head(tail(tail(tail(tail s01234))))
+====&gt;5
+&lt;&lt; head(tail(tail(tail(tail(tail s01234)))))
+==&gt; head(tail(tail(tail(tail(tail s01234)))))
+====&gt;end
+&lt;&lt;
+</pre>
+</div>
+
+<h1>Functional Completeness of Curry Algebras</h1>
+The course of reasoning followed here is adapted from
+"FROM &lambda;-CALCULUS TO CARTESIAN CLOSED CATEGORIES",
+J Lambek, McGill University, Montreal, P.Q. H3A 2K6, Canada.
+<p>
+[Note: To read this section your browser must be able to render
+the greek character entities:
+&amp;alpha;(&alpha;),
+&amp;beta;(&beta;),
+...,
+&amp;equiv;(&equiv;),
+&amp;isin;(&isin;),
+&amp;forall;(&forall;),
+&amp;deg;(&deg;).]
+<p>
+A Sch&ouml;nfinkel Algebra
+<code>A</code> consists of a set of <i>symbols </i>
+<code>|A|</code>,
+a left associative binary operation <code>|A|x|A|-&gt;|A|</code>
+(denoted here by juxtaposition),
+and three constants in <code>|A|</code>:
+<code>I</code>,
+<code> K</code>, and
+<code>S</code> such that:
+<pre>
+for all a, b, c, f, and g in |A|
+(1)	I a = a
+(2)	K a b = a
+(3)	S f g c = (f c)(g c)
+</pre>
+
+We call <code>(a b) </code> a <i>combination</i>.
+So we can form expressions of combinations of the symbols in 
+<code>|A|</code>, and these will correspond to other symbols
+in <code>|A|</code>. Mostly, we are interested in just those
+symbols that can be expressed by combinations of
+<code>S</code>, <code>K</code> and <code>I</code>.
+<p>
+We can say that a polynomial in <code>A </code>
+with unknown <code>x </code> is an element of
+the Sch&ouml;nfinkel Algebra <code>A[x]</code>, (which is
+<code>A </code> with an extra element <code>x</code>
+attached to
+<code>|A|</code>)
+and a mapping <pre>
+	h<sub>x</sub>: A -&gt; A[x]
+</pre> such for all
+algebra's <code>B </code> and mappings
+<code>A-&gt;B </code> and 
+<code>b &isin; |B|</code>,
+there is an <code>f' </code> such that
+<pre>
+	f = f'&deg;h<sub>x</sub>
+</pre>
+and 
+<pre>
+	f'(x) = b. 
+</pre>
+If
+<pre>
+	B = A and
+	f is the identity morphism,
+</pre>
+then
+<code>f' </code> is the <i>substitution </i> map that
+replaces <code>x </code> with <code>b=a&isin;A</code>.
+<p>
+If
+<pre>
+	B =  A[x], and
+	f = h<sub>x</sub>
+</pre>
+then <code>f' </code> is the <i>substitution </i> map that
+replaces <code>x </code> with <code>b=&psi;(x)&isin;A[x]</code>.
+
+<h2>Proposition 1 Abstractions in Sch&ouml;nfinkel Algebras.</h2>
+Every polynomial &phi;(x) over a
+Sch&ouml;nfinkel Algebra <code>A </code> can be written in the form
+<pre>
+	f x
+</pre>
+where
+<pre>
+	f &isin; |A|
+</pre>
+
+Polynomials in <code>A </code> are formed as words in an indeterminate
+x and satisfy the same three identities.
+In particular equality =<sub>x</sub> between polynomials is the
+smallest equivalence relation &equiv; that satisfies:
+<pre>
+(0<sub>x</sub>)	&phi;(x) &quiv; psi;(x) and &alpha;(x) &equiv; &beta;(x) implies &phi;(x)&psi;(x) &equiv; &alpha;(x) &beta;(x)
+(1<sub>x</sub>)	I(&alpha;(x)) &equiv; &alpha;(x)
+(2<sub>x</sub>)	K(&alpha;(x))(&beta;(x)) &equiv; &alpha;(x)
+(3<sub>x</sub>)	S(&alpha;(x))(&beta;(x))(&gamma;(x)) &equiv; (&alpha;(x))(&gamma;(x))((&beta;(x))(&gamma;(x))
+</pre>
+
+</pre>
+<div class="proof">Proof:</div>
+By induction a the length of the word &phi;(x),
+which must be one of
+<pre>
+	x,
+	some constant expression (without x), or
+	&psi;(x) &chi;(x)
+</pre>
+We have for these three cases:
+<pre>
+	&phi;(x) =<sub>x</sub> I x
+	&phi;(x) =<sub>x</sub> (K a ) x,
+	&phi;(x) =<sub>x</sub> (g x) (h x) = (S g h x)
+</pre>
+
+This proof yields an algorithm for converting every polynomial
+into the form <code>f x</code>, where the word <code>f </code>
+is free of any occurrence of <code>x</code>. This is equivalent
+to the
+<span class="lambda">lambda </span>
+command
+<pre>
+	ext x &phi;(x)
+</pre>
+with the flag <i>eta </i> toggled off (1) and <i>xapp </i> toggle on,
+With <i>eta </i> on, we still can make <code>ext x </code>work
+like this algorithm if we replace all occurrences of x
+not already in the combination <code>(I x) </code>
+with <code>(I x)</code>.
+<p>
+Starting with <i>eta </i> on, such a
+<span class="lambda">lambda </span>
+session might look like:
+<div class="lx">
+<PRE>
+&lt;&lt; ext x x
+I
+&lt;&lt; ext x I x
+I
+&lt;&lt; ext x A
+K A
+&lt;&lt; ext x A B
+K(A B)
+&lt;&lt; ext x (A x)(B x)
+S A B
+&lt;&lt; ext x A x
+A
+&lt;&lt; ext x A (I x)
+S(K A)I
+&lt;&lt; ext x x A
+S I(K A)
+&lt;&lt; ext x I x A
+S I(K A)
+&lt;&lt;
+</PRE>
+</div>
+
+<p>
+A Curry Algebra is a Sch&ouml;nfinkel Algebra subject to certain
+additional equations or identities whose conjunction is equivalent
+to the following statement:
+<pre>
+(4)	If f x =<sub>x</sub> g x in A[x] then f = g in A.
+</pre>
+For example,
+<pre>
+	S K I x =<sub>x</sub> (K x)(I x) =<sub>x</sub> I x,
+</pre>
+so, (4) implies
+<pre>
+	S K I = I
+</pre>
+a result that can't be obtained from (1) through (3) alone.
+<p>
+
+<h2>Proposition 2. Existence of Curry Algebras.</h2>
+It is possible to add a finite collection of equations or identities to
+the definition of a Sch&ouml;nfinkel Algebra to form a Curry Algebra:
+Every polynomial <code>&phi;(x)</code>
+over a Curry Algebra <code>A </code> may be 
+written uniquely in the form <code>(f x)</code>
+with <code>f &isin; |A|</code>.
+<div class="proof">Proof</div>
+We need to demonstate a collection of (universally quantified)
+equations, or better, identities, in <code>|A|</code> whose conjunction,
+together with <code>(1)</code>, <code>(2)</code>, and <code>(3)</code>,
+imply <code>(4)</code>.
+<p>
+Define the function &lambda;<sub>x</sub> by induction on the length
+of the word representing the polynomial, &phi;(x).
+<pre>
+(i)	&lambda;<sub>x</sub>x = I;
+(ii)	&lambda;<sub>x</sub>x = K a, when a is a constant; and
+(iii)	&lambda;<sub>x</sub>(&phi;(x))(&psi;(x)) = S(&lambda;<sub>x</sub>&phi;(x))(&lambda;<sub>x</sub>&psi;(x)), when &phi;(x) and &psi;(x) are not both constant.
+</pre>
+<p>
+The restriction on <code>(iii)</code> is necessary so that &lambda;<sub>x</sub> is not ambiguous:
+if both parts of a combination are constant then <code>(ii)</code> applies.
+The <span class="lambda">lambda </span> command <code>ext x </code>works
+like &lambda;<sub>x</sub> if the both the flags <i>eta </i>
+and <i>xapp </i> are off.
+With <i>xapp </i> on, constant applications will be extracted by
+<code>(iii) </code> instead of <code>(ii)</code>.
+<p>
+&lambda;<sub>x</sub> maps every polynomial &phi;(x) in <code>A[x]</code>
+to an element of <code>f</code> of <code>A </code> such that <code>(f x)</code> =<sub>x</sub> &phi;(x).
+So the existence of <code>f</code> is assured.
+<p>
+We must now show that <code>f</code> is unique. We first prove that
+<pre>
+(*)		&phi;(x) =<sub>x</sub> &psi;(x) implies &lambda;<sub>x</sub>(&phi;(x)) = &lambda;<sub>x</sub>(&psi;(x)).
+</pre>
+That is, if two polynomials are equal in <code>A[x]</code>, their lambda abstractions are equal in <code>A </code>.
+<p>
+To prove this assertion, we show that the equality
+<pre>
+	&lambda;<sub>x</sub>(&phi;(x)) = &lambda;<sub>x</sub>(&psi;(x))
+</pre>
+defines an equivalence relation over the polynomials in
+<code>A[x]</code> that satisfies&nbsp;
+<code>(i<sub>x</sub>)</code>,
+<code>(ii<sub>x</sub>)</code>, and
+<code>(iii<sub>x</sub>)</code> above,
+when certain additional universally quantified equations in
+<code>A </code>&nbsp;are assumed.
+Since =<sub>x</sub> is assumed to be the smallest (finest grained)
+such equivalence, the assertion must hold.
+<p>
+(Adding such equations can only unify partitions of an equivalence
+relation, but never divide.
+That is, two members of <code>|A[x]|</code> (or <code>|A|</code>)
+that were equal without the additional equations will still be equal
+with them. So if =<sub>x</sub> was the finest equivalence relation
+satisfying 
+<code>(i<sub>x</sub>)</code>,
+<code>(ii<sub>x</sub>)</code>, and
+<code>(iii<sub>x</sub>)</code>
+before the addition, it will remain such after the addition.)
+<p>
+So we must have, for all polynomials
+<code>&alpha;(x), &beta;(x), &gamma;(x)</code> in <code>A[x]</code>:
+<pre>
+(1''')	&lambda;<sub>x</sub>I(&alpha;(x)) = &lambda;&alpha;(x)
+(2''')	&lambda;<sub>x</sub>K(&alpha;(x))(&beta;(x)) = &lambda;<sub>x</sub>(&alpha;(x))
+(3''')	&lambda;<sub>x</sub>S(&alpha;(x))(&beta;(x))(&gamma;(x)) = &lambda;<sub>x</sub>(&alpha;(x))(&gamma;(x))((&beta;(x))(&gamma;(x))
+</pre>
+For uniqueness of <code>f</code>, suppose we have
+<pre>
+	(g x) =<sub>x</sub> &phi;(x).
+</pre>
+By (*)  this implies that for all <code>g</code>&isin;<code>A </code>
+<pre>
+	&lambda;<sub>x</sub>(g x) = &lambda;<sub>x</sub>&phi;(x) = f.
+</pre>
+So we impose the condition, for all <code>g</code>&isin;<code>A </code>
+<pre>
+(4''')	&lambda;<sub>x</sub>(g x) = g.
+</pre>
+We would like to remove the restriction on <code>(iii)</code> above.
+That is, for all <code>f</code>, and <code>g</code>&isin;<code>A </code>,
+<code>&lambda;<sub>x</sub>(f g)&nbsp;</code> using (iii)
+must equal <code>&lambda;<sub>x</sub>(f g)&nbsp;</code> using (ii).
+So we have:
+<pre>
+(5''')	S(K f)(K g) = K(f g)
+</pre>
+Let
+<pre>
+	a = &lambda;<sub>x</sub>&alpha;(x)
+	b = &lambda;<sub>x</sub>&beta;(x)
+	c = &lambda;<sub>x</sub>&gamma;(x)
+</pre>
+If we replace
+<code>&alpha;(x)</code>,
+<code>&beta;(x)</code>,
+and <code>&gamma;(x)</code>
+in (1'''), (2'''), and (3''') above with:
+<code>(a x)</code>, <code>(b x)</code>, and <code>(c x)</code>
+then we can use the
+<span class="lambda">lambda&nbsp;</span>
+command <code>ext x&nbsp;</code>
+to calculate the corresponding equations in <code>A </code>
+<pre>
+(1'')	S(K I)a = a
+(2'')	S(S(K K)a)b = a
+(3'')	S(S(S(K S)a)b)c = S(S a c)(S b c)
+(4'')	S(K g)I = g
+(5'')	S(K f)(K g) = K(f g)
+</pre>
+Such a
+<span class="lambda">lambda&nbsp;</span>
+session might look like:
+<div class="lx">
+<pre>
+&lt;&lt; ext x I(a x)
+S(K I)a
+&lt;&lt; ext x (a x)
+a
+&lt;&lt; ext x K(a x)(b x)
+S(S(K K)a)b
+&lt;&lt; ext x (a x)
+a
+&lt;&lt; ext x S(a x)(b x)(c x)
+S(S(S(K S)a)b)c
+&lt;&lt; ext x (a x)(c x)((b x)(c x))
+S(S a c)(S b c)
+&lt;&lt; ext x g (I x)
+S(K g)I
+&lt;&lt;
+</pre>
+</div>
+These equations are universally quantified in
+<code>&alpha;(x)</code>,
+<code>&beta;(x)</code>,
+<code>&gamma;(x)</code>,
+<code>f</code>, and
+<code>g</code>.
+Because every occurrence of the polynomials are bound by
+<code>&lambda;<sub>x</sub></code>, and 
+in light of <code>(4''')</code>, every expression
+<code>a</code>&isin;<code>A </code>
+has a corresponding polynomial in <code>A[x]</code>:
+<code>(a x)</code>.
+So instead of qualifying the equations in terms of polynomials
+in <code>|A[x]|</code>, we can qualify them in terms of 
+elements in <code>|A|</code>.
+So we have
+<pre>
+(1')	&forall;a.S(K I)a = a
+(2')	&forall;a.&forall;b.S(S(K K)a)b = a
+(3')	&forall;a.&forall;b.&forall;c.S(S(S(K S)a)b)c = S(S a c)(S b c)
+(4')	&forall;g.S(K g)I = g
+(5')	&forall;f.&forall;g.S(K f)(K g) = K(f g)
+</pre>
+Using the
+<span class="lambda">lambda&nbsp;</span>
+<code>ext ^&nbsp;</code> command, we can turn these equations
+into identities in <code>A</code>
+<pre>
+(1i)	S(K I) = I
+(2i)	S(K S)(S(K K)) = K
+(3i)	S(K(S(K S)))(S(K S)(S(K S))) = S(S(K S)(S(K K)(S(K S)(S(K(S(K S)))S))))(K S)
+(4i)	S(S(K S)K)(K I) = I
+(5i)	S(S(K S)(S(K K)(S(K S)K)))(K K) = S(K K)
+</pre>
+Such a
+<span class="lambda">lambda&nbsp;</span>
+session might look like:
+<div class="lx">
+<pre>
+&lt;&lt; ext ^ ^a.^x.I(a x)
+S(K I)
+&lt;&lt; ext ^ ^a.^x.a x
+I
+&lt;&lt; ext ^ ^a.^b.^x.K(a x)(b x)
+S(K S)(S(K K))
+&lt;&lt; ext ^ ^a.^b.^x.a x
+K
+&lt;&lt; ext ^ ^a.^b.^c.^x.S(a x)(b x)(c x)
+S(K(S(K S)))(S(K S)(S(K S)))
+&lt;&lt; ext ^ ^a.^b.^c.^x.(a x)(c x)((b x)(c x))
+S(S(K S)(S(K K)(S(K S)(S(K(S(K S)))S))))(K S)
+&lt;&lt; ext ^ ^g.S(K g)I
+S(S(K S)K)(K I)
+&lt;&lt; ext ^ ^g.g
+I
+&lt;&lt; ext ^ ^f.^g.S(K f)(K g)
+S(S(K S)(S(K K)(S(K S)K)))(K K)
+&lt;&lt; ext ^ ^f.^g.K(f g)
+S(K K)
+&lt;&lt;
+</pre>
+</div>
+Let's check our work:
+<div class="lx">
+<pre>
+&lt;&lt; load definitions
+&lt;&lt; S(K I) a x
+==&gt; ((S(K I)) a) x
+====&gt;a x
+&lt;&lt; I a x
+==&gt; (I a) x
+====&gt;a x
+&lt;&lt; S(K S)(S(K K)) a b x
+==&gt; ((((S(K S))(S(K K))) a) b) x
+====&gt;a x
+&lt;&lt; K a b x
+==&gt; ((K a) b) x
+====&gt;a x
+&lt;&lt; S(K(S(K S)))(S(K S)(S(K S))) a b c x
+==&gt; (((((S(K(S(K S))))((S(K S))(S(K S)))) a) b) c) x
+====&gt;a x(c x)(b x(c x))
+&lt;&lt; S(S(K S)(S(K K)(S(K S)(S(K(S(K S)))S))))(K S) a b c x
+==&gt; (((((S((S(K S))((S(K K))((S(K S))((S(K(S(K S)))) S)))))(K S)) a) b) c) x
+====&gt;a x(c x)(b x(c x))
+&lt;&lt; S(S(K S)K)(K I) g x
+==&gt; (((S((S(K S)) K))(K I)) g) x
+====&gt;g x
+&lt;&lt; I g x
+==&gt; (I g) x
+====&gt;g x
+&lt;&lt; S(S(K S)(S(K K)(S(K S)K)))(K K) f g x
+==&gt; ((((S((S(K S))((S(K K))((S(K S)) K))))(K K)) f) g) x
+====&gt;f g
+&lt;&lt; S(K K) f g x
+==&gt; (((S(K K)) f) g) x
+====&gt;f g
+&lt;&lt;
+
+</pre>
+</div>
+<h2>Proposition 3 Curry Algebras &equiv; Lambda Calculus.</h2>
+A Curry Algebra is equivalent to the lambda calculus.
+<div class="proof">Proof</div>
+We have the following equations:
+<pre>
+(1) I = &lambda;<sub>x</sub>x
+(2) K = &lambda;<sub>x</sub>&lambda;<sub>y</sub>x
+(3) S = &lambda;<sub>x</sub>&lambda;<sub>y</sub>&lambda;<sub>z</sub>x z(y z)
+(4) &forall;f.f = &lambda;<sub>x</sub>f x = f
+(5) &forall;&phi;(x).&forall;a.&phi;(a) = (&lambda;<sub>x</sub>&phi;(x))a
+</pre>
+Condition (5) is true because we have by Proposition 2,
+<pre>
+	 (&lambda;<sub>x</sub>&phi;(x))x = &phi;(x)
+</pre>
+and by the substitution property, we can substitute <code>a&isin;A </code> for the unbound occurrences of <code>x </code> on both sides of the equation.
+<h2>Proposition 4 Fixed Points in Curry Algebras.</h2>
+Every element of a Curry Algebra has a fixed point.
+<div class="proof">Proof</div>
+The fixed point is
+<pre>
+	Y g,
+</pre>
+where
+<pre>
+	Y = &lambda;<sub>g</sub>((&lambda;<sub>x</sub>g(x x))(&lambda;<sub>x</sub>g(x x))).
+</pre>
+We have
+<pre>
+	Y f
+	= (&lambda;<sub>x</sub>f(x x))(&lambda;<sub>x</sub>f(x x))
+	= f((&lambda;<sub>x</sub>f(x x))(&lambda;<sub>x</sub>f(x x)))
+	= f(Y f)
+</pre>
+so <code>(Y f) </code> is indeed a fixed point of f.
+</body>
+</html>

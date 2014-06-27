@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.1.2//EN"
+                      "file:///usr/share/sgml/docbook/dtd/xml/4.1.2/docbookx.dtd" [
+<!-- <!ATTLIST book  xml:lang NMTOKEN 'en'> -->
+<!-- <!ATTLIST book  xml:lang NMTOKEN 'de'> -->
+<!ENTITY kpp-intro SYSTEM "kpp-intro.xml">
+<!ENTITY kpp-manual SYSTEM "kpp-manual.xml">
+<!ENTITY kpp-cook SYSTEM "kpp-cook.xml">
+<!ENTITY app-fdl SYSTEM "fdl.xml">
+<!ENTITY app-rpn SYSTEM "kpp-rpn.xml">
+<!ENTITY kpp "<application>Kimwitu++</application>">
+<!ENTITY cpp "<application>C++</application>">
+<!ENTITY yacc "<application>Yacc</application>">
+<!ENTITY bison "<application>Bison</application>">
+<!ENTITY with "<constant>with</constant>">
+<!ENTITY foreach "<constant>foreach</constant>">
+<!ENTITY aritherm "<classname>aritherm</classname>">
+<!ENTITY simpleterm "<classname>simpleterm</classname>">
+<!ENTITY kind "kind">
+<!ENTITY Kind "Kind">
+]>
+
+<!-- This is the documentation for the term processor Kimwitu++ -->
+
+<book xml:lang="en">
+<?latex \begin{titlepage}\noindent\vspace*{\fill}\begin{flushright}
+\fontsize{48}{56}\fontshape{sl}\selectfont Kimwitu++\\
+\fontsize{24}{28}\selectfont A Term Processor\\
+\vfill\fontsize{12}{28}\selectfont Toby Neumann, Michael Piefel
+\end{flushright}\vfill\end{titlepage}
+\thispagestyle{empty}\cleardoublepage\lstset{language=C++}?>
+<bookinfo>
+  <title>&kpp;</title>
+  <subtitle>A Term Processor</subtitle>
+  <author>
+    <firstname>Toby</firstname>
+    <surname>Neumann</surname>
+    <affiliation>
+      <orgname>Humboldt-Universität zu Berlin</orgname>
+      <orgdiv>Institute for Informatics</orgdiv>
+    </affiliation>
+  </author>
+  <author>
+    <firstname>Michael</firstname>
+    <surname>Piefel</surname>
+    <affiliation>
+      <orgname>Humboldt-Universität zu Berlin</orgname>
+      <orgdiv>Institute for Informatics</orgdiv>
+    </affiliation>
+  </author>
+  <edition>User's guide 1.01</edition>
+  <pubdate>2002</pubdate>
+  <printhistory>
+    <para>Initial version in December 2001</para>
+    <para>First draft in February 2002</para>
+    <para>Unamended version missing part III in May 2002</para>
+    <para>Amended version missing part III in July 2002</para>
+  </printhistory>
+  <releaseinfo>This document is still missing its third part.</releaseinfo>
+  <publisher>
+    <publishername>Humboldt-Universität zu Berlin</publishername>
+    <address>
+      <street>Unter den Linden 6</street>
+      <postcode>10099</postcode> <city>Berlin</city>
+      <country>Germany</country>
+    </address>
+  </publisher>
+  <copyright>
+    <year>2001</year>
+    <year>2002</year>
+    <holder>Toby Neumann, Institut für Informatik, Humboldt-Universität zu Berlin</holder>
+  </copyright>
+  <legalnotice>
+    <para>This document describes the term processor &kpp;. &kpp; is free software;
+      you can redistribute it and/or modify it under the terms of the GNU General Public
+      License as published by the Free Software Foundation; either version 2 of the Licence,
+      or (at your option) any later version.</para>
+    <para>Likewise this documentation is free.  Permission is granted to copy, distribute
+      and/or modify this document under the terms of the GNU Free Documentation License,
+      Version 1.1 or any later version published by the Free Software Foundation; with no
+      Invariant Sections, with no Front-Cover Texts, and with no Back-Cover Texts.  A copy of
+      the license is included in the section entitled &lsquo;GNU Free Documentation
+      License&rsquo;.</para>
+  </legalnotice>
+  <legalnotice>
+    <para>The program &kpp; is based on Kimwitu (with its own <ulink
+        url="http://purl.oclc.org/net/kimwitu">web site</ulink>), written by
+      Axel Belinfante (<email>belinfan@utwente.nl</email>). Kimwitu is also free software,
+      licensed under the GPL, since its 4.6.1 release.</para>
+  </legalnotice>
+</bookinfo>
+
+<!-- Table of contents -->
+<toc />
+
+<!-- Begin the document -->
+
+<part><title>Introduction to &kpp;</title>
+  <partintro>
+    <para>This part explains what essentially &kpp; is and what advantages it
+      provides. It gives an overview of the functionality of
+      &kpp;, which is demonstrated with example. Detailed discussion of concepts
+      is left to the reference part later in this book.</para>
+  </partintro>
+  &kpp-intro;
+</part>
+
+
+<part><title>Reference Manual</title>
+  <partintro>
+    <para>This part lists all concepts of &kpp; and explains them in detail.
+      It is meant as a complete documentation of all features and contains
+      advices of do's and don'ts. To the advanced user it should serve as
+      a programming reference.</para>
+  </partintro>
+  &kpp-manual;
+</part>
+
+<!--part><title>Cook Book</title>
+  <partintro>
+    <para>This part is not written yet. It should contain a bunch of examples
+      demonstrating the abilities of &kpp; applied to problems actually occurred.
+      Dear experienced <application>Kimwitu</application>/&kpp; users, please make suggestions to which
+      interesting or useful solutions should appear here!</para>
+  </partintro>
+  &kpp-cook;
+</part-->
+
+<!-- Appendix -->
+
+&app-rpn;
+&app-fdl;
+
+</book>
+
+<!-- vim:set sw=2 ts=8 tw=80: -->

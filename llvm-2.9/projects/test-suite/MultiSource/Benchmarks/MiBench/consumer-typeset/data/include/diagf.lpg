@@ -1,0 +1,2706 @@
+%%BeginResource: procset LoutFigPrependGraphic
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                    %
+%  PostScript @SysPrependGraphic file for @Diag Jeffrey H. Kingston  %
+%  Version 2.0 (includes CIRCUM label)                September 1996 %
+%                                                                    %
+%  To assist in avoiding name clashes, the names of all symbols      %
+%  defined here begin with "ldiag".  However, this is not feasible   %
+%  with user-defined labels and some labels used by users.           %
+%                                                                    %
+%  <point>      is two numbers, a point.                             %
+%  <length>     is one number, a length                              %
+%  <angle>      is one number, an angle in degrees                   %
+%  <dashlength> is one number, the preferred length of a dash        %
+%                                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+errordict begin
+   /handleerror
+   {
+      {  /Times-Roman findfont 8 pt scalefont setfont
+	 0 setgray 4 pt 4 pt moveto
+	 $error /errorname get
+	 dup ldiagdict exch known
+	 { ldiagdict exch get }
+	 { 50 string cvs } ifelse
+	 show
+	 (  Command: ) show
+	 $error /command get 50 string cvs show
+      } stopped {} if
+      showpage stop
+   } def
+end
+
+% begin diagram: <maxlabels> ldiagbegin -
+% must be defined outside ldiagdict since it loads it
+/ldiagbegin
+{ xsize 0 0 ysize ldiagdict begin
+  5 -1 roll /ldiagmaxlabels exch def
+  (@Diag) ldiagpushtagdict
+  /OOY ldiagpointdef /OOX ldiagpointdef 0 0 /OOO ldiagpointdef
+} def
+
+% end diagram: - ldiagend -
+/ldiagend
+{ ldiagpoptagdict end
+} def
+
+% concat strings: <string> <string> ldiagconcat <string>
+% must be defined outside ldiagdict since used in ldiagpromotelabels
+/ldiagconcat
+{ 2 copy length exch length add string
+  dup 0 4 index putinterval
+  dup 3 index length 3 index putinterval
+  3 1 roll pop pop
+} def
+
+/ldiagdebugposy 432 def
+/ldiagdebugposx 72 def
+
+% <string> <int> ldiagdebugprint -
+% must be defined outside ldiagdict since used in arbitrary places
+% print count or <int> stack entries, which ever is the smaller
+/ldiagdebugprint
+{
+  exch
+  gsave
+  initgraphics
+  ldiagdebugposy 72 lt
+  { /ldiagdebugposx ldiagdebugposx 144 add store
+    /ldiagdebugposy 432 store
+  }
+  {
+    /ldiagdebugposy ldiagdebugposy 12 sub store
+  } ifelse
+  ldiagdebugposx ldiagdebugposy moveto
+  /Times-Roman findfont 10 scalefont setfont
+  0 setgray show
+  count 1 sub 2 copy lt { pop } { exch pop } ifelse 1 sub
+  0 exch 1 exch
+  {
+    /ldiagdebugposy ldiagdebugposy 12 sub store
+    ldiagdebugposx 12 add ldiagdebugposy moveto
+    index 50 string cvs show
+  } for
+  grestore
+} def
+
+/ldiagdict 200 dict def
+ldiagdict begin
+
+% error messages
+/dictfull (dictfull error:  too many labels?) def
+/dictstackoverflow (dictstackoverflow error:  labels nested too deeply?) def
+/execstackoverflow (execstackoverflow error:  figure nested too deeply?) def
+/limitcheck (limitcheck error:  figure nested too deeply or too large?) def
+/syntaxerror (syntaxerror error:  syntax error in text of figure?) def
+/typecheck (typecheck error:  syntax error in text of figure?) def
+/undefined (undefined error:  unknown or misspelt label?) def
+/VMError (VMError error:  run out of memory?) def
+
+% push pi onto stack:  - ldiagpi <num>
+/ldiagpi 3.14159 def
+
+% push e onto stack:  - ldiage <num>
+/ldiage 2.71828 def
+
+% arc directions
+/clockwise     false def
+/anticlockwise true  def
+
+% test equality between two angles:  <angle> <angle> ldiagangleeq <bool>
+/ldiagangleeq { ldiagfixangle exch ldiagfixangle eq } def
+
+% test inequality between two angles:  <angle> <angle> ldiaganglene <bool>
+/ldiaganglene { ldiagangleeq not } def
+
+% maximum of two numbers:  <num> <num> ldiagmax <num>
+/ldiagmax { 2 copy gt { pop } { exch pop } ifelse } def
+
+% minimum of two numbers:  <num> <num> ldiagmin <num>
+/ldiagmin { 2 copy lt { pop } { exch pop } ifelse } def
+
+% add two points:  <point> <point> ldiagpadd <point>
+/ldiagpadd
+{
+  % (Entering padd) 4 ldiagdebugprint
+  exch 3 1 roll add 3 1 roll add exch
+  % (Leaving padd) 2 ldiagdebugprint
+} def
+
+% subtract first point from second:  <point> <point> ldiagpsub <point>
+/ldiagpsub { 3 2 roll sub 3 1 roll exch sub exch } def
+
+% max two points:  <point> <point> ldiagpmax <point>
+/ldiagpmax { exch 3 1 roll ldiagmax 3 1 roll ldiagmax exch } def
+
+% min two points:  <point> <point> ldiagpmin <point>
+/ldiagpmin { exch 3 1 roll ldiagmin 3 1 roll ldiagmin exch } def
+
+% scalar multiplication: <point> <num> ldiagpmul <point>
+/ldiagpmul { dup 3 1 roll mul 3 1 roll mul exch } def
+
+% point at angle and distance:  <point> <length> <angle> ldiagatangle <point>
+/ldiagatangle { 2 copy cos mul 3 1 roll sin mul ldiagpadd } def
+
+% angle from one point to another:  <point> <point> ldiagangleto <angle>
+/ldiagangleto { ldiagpsub 2 copy 0 eq exch 0 eq and {pop} {exch atan} ifelse } def
+
+% distance between two points:  <point> <point> ldiagdistance <length>
+/ldiagdistance { ldiagpsub dup mul exch dup mul add sqrt } def
+
+% stroke a solid line:  <length> <dashlength> ldiagsolid -
+/ldiagsolid
+{  pop pop [] 0 setdash 1 setlinecap stroke
+} def
+
+% stroke a dashed line:   <length> <dashlength> ldiagdashed -
+/ldiagdashed
+{  2 copy div 2 le 1 index 0 le or
+   {  exch pop 1 pt ldiagmax [ exch dup ] 0 setdash }
+   {  dup [ exch 4 2 roll 2 copy div
+      1 sub 2 div ceiling dup 4 1 roll
+      1 add mul sub exch div ] 0 setdash
+   } ifelse 0 setlinecap stroke
+} def
+
+% stroke a cdashed line:  <length> <dashlength> ldiagcdashed -
+/ldiagcdashed
+{  % (Entering ldiagcdashed) 2 ldiagdebugprint
+   2 copy le 1 index 0 le or
+   { exch pop 1 pt ldiagmax [ exch dup ] dup 0 get 2 div setdash }
+   { dup [ 4 2 roll exch 2 copy exch div
+     2 div ceiling div 1 index sub
+     ] exch 2 div setdash
+   } ifelse 0 setlinecap stroke
+   % (Leaving ldiagcdashed) 0 ldiagdebugprint
+} def
+
+% stroke a dotted line:  <length> <dashlength> ldiagdotted -
+/ldiagdotted
+{  2 copy le 1 index 0 le or
+   { exch pop 1 pt ldiagmax [ exch 0 exch ] 0 setdash }
+   { 1 index exch div ceiling div
+     [ 0 3 2 roll ] 0 setdash
+   } ifelse 1 setlinecap stroke
+} def
+
+% stroke a noline line:  <length> <dashlength> ldiagnoline -
+/ldiagnoline
+{ pop pop
+} def
+
+% painting (i.e. filling): - ldiagwhite - (etc.)
+/ldiagnopaint		{			       } def
+/ldiagnochange		{ 			  fill } def
+/ldiagdarkblue		{ 0.0 0.0 0.5 setrgbcolor fill } def
+/ldiagblue		{ 0.0 0.0 1.0 setrgbcolor fill } def
+/ldiaglightblue		{ 0.5 0.5 1.0 setrgbcolor fill } def
+/ldiagdarkgreen		{ 0.0 0.5 0.0 setrgbcolor fill } def
+/ldiaggreen		{ 0.0 1.0 0.0 setrgbcolor fill } def
+/ldiaglightgreen	{ 0.5 1.0 0.5 setrgbcolor fill } def
+/ldiagdarkred		{ 0.5 0.0 0.0 setrgbcolor fill } def
+/ldiagred		{ 1.0 0.0 0.0 setrgbcolor fill } def
+/ldiaglightred		{ 1.0 0.5 0.5 setrgbcolor fill } def
+/ldiagdarkcyan		{ 0.0 0.5 0.5 setrgbcolor fill } def
+/ldiagcyan		{ 0.0 1.0 1.0 setrgbcolor fill } def
+/ldiaglightcyan		{ 0.5 1.0 1.0 setrgbcolor fill } def
+/ldiagdarkmagenta	{ 0.5 0.0 0.5 setrgbcolor fill } def
+/ldiagmagenta		{ 1.0 0.0 1.0 setrgbcolor fill } def
+/ldiaglightmagenta	{ 1.0 0.5 1.0 setrgbcolor fill } def
+/ldiagdarkyellow	{ 0.5 0.5 0.0 setrgbcolor fill } def
+/ldiagyellow		{ 1.0 1.0 0.0 setrgbcolor fill } def
+/ldiaglightyellow	{ 1.0 1.0 0.5 setrgbcolor fill } def
+/ldiagdarkgray		{ 0.2 0.2 0.2 setrgbcolor fill } def
+/ldiaggray		{ 0.5 0.5 0.5 setrgbcolor fill } def
+/ldiaglightgray		{ 0.8 0.8 0.8 setrgbcolor fill } def
+/ldiagdarkgrey		{ 0.2 0.2 0.2 setrgbcolor fill } def
+/ldiaggrey		{ 0.5 0.5 0.5 setrgbcolor fill } def
+/ldiaglightgrey		{ 0.8 0.8 0.8 setrgbcolor fill } def
+/ldiagblack		{ 0.0 0.0 0.0 setrgbcolor fill } def
+/ldiagwhite		{ 1.0 1.0 1.0 setrgbcolor fill } def
+
+% shape and labels of the @Box symbol
+/ldiagbox
+{
+   0     0         /SW  ldiagpointdef
+   xsize 0         /SE  ldiagpointdef
+   xsize ysize     /NE  ldiagpointdef
+   0     ysize     /NW  ldiagpointdef
+   SE 0.5 ldiagpmul /S   ldiagpointdef
+   NW 0.5 ldiagpmul /W   ldiagpointdef
+   W SE ldiagpadd   /E   ldiagpointdef
+   S NW ldiagpadd   /N   ldiagpointdef
+   NE 0.5 ldiagpmul /CTR ldiagpointdef
+
+     0 dg /S@ANGLE  ldiagangledef
+    45 dg /SE@ANGLE ldiagangledef
+    90 dg /E@ANGLE  ldiagangledef
+   135 dg /NE@ANGLE ldiagangledef
+   180 dg /N@ANGLE  ldiagangledef
+   225 dg /NW@ANGLE ldiagangledef
+   270 dg /W@ANGLE  ldiagangledef
+   315 dg /SW@ANGLE ldiagangledef
+
+   [ CTR NE ldiagpsub /ldiagboxcircum cvx ] ldiagcircumdef
+   SW SE NE NW SW
+} def
+
+% shape and labels of the @CurveBox symbol
+% <margin> ldiagcurvebox <shape>
+/ldiagcurvebox
+{  
+
+   % (Entering ldiagcurvebox) 1 ldiagdebugprint
+   ldiagdecodelength /cbmgn exch def
+
+   xsize 0.5 mul	ysize 0.5 mul	/CTR ldiagpointdef
+   xsize 0.5 mul	0		/S   ldiagpointdef
+   xsize		ysize 0.5 mul	/E   ldiagpointdef
+   xsize 0.5 mul	ysize		/N   ldiagpointdef
+   0			ysize 0.5 mul	/W   ldiagpointdef
+
+   cbmgn 0.293 mul		cbmgn 0.293 mul		  /SW  ldiagpointdef
+   xsize cbmgn 0.293 mul sub	cbmgn 0.293 mul		  /SE  ldiagpointdef
+   xsize cbmgn 0.293 mul sub	ysize cbmgn 0.293 mul sub /NE  ldiagpointdef
+   cbmgn 0.293 mul		ysize cbmgn 0.293 mul sub /NW  ldiagpointdef
+
+     0 dg /S@ANGLE  ldiagangledef
+    45 dg /SE@ANGLE ldiagangledef
+    90 dg /E@ANGLE  ldiagangledef
+   135 dg /NE@ANGLE ldiagangledef
+   180 dg /N@ANGLE  ldiagangledef
+   225 dg /NW@ANGLE ldiagangledef
+   270 dg /W@ANGLE  ldiagangledef
+   315 dg /SW@ANGLE ldiagangledef
+
+   [ xsize ysize 0.5 ldiagpmul cbmgn /ldiagcurveboxcircum cvx ] ldiagcircumdef
+
+   cbmgn		0
+   xsize cbmgn sub	0
+   [ xsize cbmgn sub	cbmgn		]
+   xsize		cbmgn
+   xsize		ysize cbmgn sub
+   [ xsize cbmgn sub	ysize cbmgn sub	]
+   xsize cbmgn sub	ysize
+   cbmgn		ysize
+   [ cbmgn		ysize cbmgn sub	]
+   0			ysize cbmgn sub
+   0			cbmgn
+   [ cbmgn		cbmgn		]
+   cbmgn		0
+
+   % (Leaving ldiagcurvebox) 0 ldiagdebugprint
+} def
+
+% shadow of the @ShadowBox symbol
+% its shape and labels are done, somewhat inaccurately, with ldiagbox
+% <shadowmargin> ldiagshadow -
+/ldiagshadow
+{ 
+  /lfshm exch def
+  
+  lfshm 0 moveto
+  0 lfshm neg rlineto
+  xsize 0 rlineto
+  0 ysize rlineto
+  lfshm neg 0 rlineto
+  xsize 0 lineto
+  closepath fill
+
+} def
+
+% shape and labels of the @Square symbol
+/ldiagsquare
+{
+   xsize ysize 0.5 ldiagpmul /CTR ldiagpointdef
+   CTR xsize xsize ysize ysize ldiagpmax 0.5 ldiagpmul ldiagpadd /NE ldiagpointdef
+   CTR 0 0 CTR NE ldiagdistance 135 ldiagatangle ldiagpadd /NW ldiagpointdef
+   CTR 0 0 CTR NE ldiagdistance 225 ldiagatangle ldiagpadd /SW ldiagpointdef
+   CTR 0 0 CTR NE ldiagdistance 315 ldiagatangle ldiagpadd /SE ldiagpointdef
+   SW 0.5 ldiagpmul SE 0.5 ldiagpmul ldiagpadd /S ldiagpointdef
+   NW 0.5 ldiagpmul NE 0.5 ldiagpmul ldiagpadd /N ldiagpointdef
+   SW 0.5 ldiagpmul NW 0.5 ldiagpmul ldiagpadd /W ldiagpointdef
+   SE 0.5 ldiagpmul NE 0.5 ldiagpmul ldiagpadd /E ldiagpointdef
+
+     0 dg /S@ANGLE  ldiagangledef
+    45 dg /SE@ANGLE ldiagangledef
+    90 dg /E@ANGLE  ldiagangledef
+   135 dg /NE@ANGLE ldiagangledef
+   180 dg /N@ANGLE  ldiagangledef
+   225 dg /NW@ANGLE ldiagangledef
+   270 dg /W@ANGLE  ldiagangledef
+   315 dg /SW@ANGLE ldiagangledef
+
+   [ CTR NE ldiagpsub /ldiagboxcircum cvx ] ldiagcircumdef
+   SW SE NE NW SW
+} def
+
+% shape and labels of the @Diamond symbol
+/ldiagdiamond
+{
+   xsize 0 0.5 ldiagpmul /S   ldiagpointdef
+   0 ysize 0.5 ldiagpmul /W   ldiagpointdef
+   S W         ldiagpadd /CTR ldiagpointdef
+   CTR W       ldiagpadd /N   ldiagpointdef
+   CTR S       ldiagpadd /E   ldiagpointdef
+   E N ldiagpadd 0.5 ldiagpmul /NE ldiagpointdef
+   N W ldiagpadd 0.5 ldiagpmul /NW ldiagpointdef
+   S W ldiagpadd 0.5 ldiagpmul /SW ldiagpointdef
+   S E ldiagpadd 0.5 ldiagpmul /SE ldiagpointdef
+
+     0 dg        /S@ANGLE  ldiagangledef
+    90 dg        /E@ANGLE  ldiagangledef
+   180 dg        /N@ANGLE  ldiagangledef
+   270 dg        /W@ANGLE  ldiagangledef
+   S E ldiagangleto /SE@ANGLE ldiagangledef
+   E N ldiagangleto /NE@ANGLE ldiagangledef
+   N W ldiagangleto /NW@ANGLE ldiagangledef
+   W S ldiagangleto /SW@ANGLE ldiagangledef
+
+   [ xsize ysize 0.5 ldiagpmul /ldiagdiamondcircum cvx ] ldiagcircumdef
+   S E N W S
+} def
+
+% shape and labels of the @Ellipse symbol
+/ldiagellipse
+{
+   xsize 0 0.5 ldiagpmul /S   ldiagpointdef
+   0 ysize 0.5 ldiagpmul /W   ldiagpointdef
+   S W         ldiagpadd /CTR ldiagpointdef
+   CTR W       ldiagpadd /N   ldiagpointdef
+   CTR S       ldiagpadd /E   ldiagpointdef
+   CTR xsize 0 0.3536 ldiagpmul ldiagpadd 0 ysize 0.3536 ldiagpmul ldiagpadd /NE ldiagpointdef
+   0 ysize 0.3536 ldiagpmul CTR xsize 0 0.3536 ldiagpmul ldiagpadd ldiagpsub /SE ldiagpointdef
+   xsize 0 0.3536 ldiagpmul CTR ldiagpsub 0 ysize 0.3536 ldiagpmul ldiagpadd /NW ldiagpointdef
+   0 ysize 0.3536 ldiagpmul xsize 0 0.3536 ldiagpmul CTR ldiagpsub ldiagpsub /SW ldiagpointdef
+   [ xsize ysize 0.5 ldiagpmul /ldiagellipsecircum cvx ] ldiagcircumdef
+
+     0 dg /S@ANGLE  ldiagangledef
+    90 dg /E@ANGLE  ldiagangledef
+   180 dg /N@ANGLE  ldiagangledef
+   270 dg /W@ANGLE  ldiagangledef
+
+   S E ldiagangleto /SE@ANGLE ldiagangledef
+   E N ldiagangleto /NE@ANGLE ldiagangledef
+   N W ldiagangleto /NW@ANGLE ldiagangledef
+   W S ldiagangleto /SW@ANGLE ldiagangledef
+
+   S [ CTR ] E [ CTR ] N [ CTR ] W [ CTR ] S
+} def
+
+% shape and labels of the @Circle symbol
+/ldiagcircle
+{
+   xsize ysize 0.5 ldiagpmul /CTR ldiagpointdef
+   CTR xsize 0 ysize 0 ldiagpmax 0.5 ldiagpmul ldiagpadd /E ldiagpointdef
+   CTR 0 0 CTR E ldiagdistance 45 ldiagatangle ldiagpadd /NE ldiagpointdef
+   CTR 0 0 CTR E ldiagdistance 90 ldiagatangle ldiagpadd /N ldiagpointdef
+   CTR 0 0 CTR E ldiagdistance 135 ldiagatangle ldiagpadd /NW ldiagpointdef
+   CTR 0 0 CTR E ldiagdistance 180 ldiagatangle ldiagpadd /W ldiagpointdef
+   CTR 0 0 CTR E ldiagdistance 225 ldiagatangle ldiagpadd /SW ldiagpointdef
+   CTR 0 0 CTR E ldiagdistance 270 ldiagatangle ldiagpadd /S ldiagpointdef
+   CTR 0 0 CTR E ldiagdistance 315 ldiagatangle ldiagpadd /SE ldiagpointdef
+   [ S E ldiagpsub /ldiagellipsecircum cvx ] ldiagcircumdef
+
+     0 dg /S@ANGLE  ldiagangledef
+    45 dg /SE@ANGLE ldiagangledef
+    90 dg /E@ANGLE  ldiagangledef
+   135 dg /NE@ANGLE ldiagangledef
+   180 dg /N@ANGLE  ldiagangledef
+   225 dg /NW@ANGLE ldiagangledef
+   270 dg /W@ANGLE  ldiagangledef
+   315 dg /SW@ANGLE ldiagangledef
+
+   S [ CTR ] E [ CTR ] N [ CTR ] W [ CTR ] S
+} def
+
+% shape and labels of the @VLine and @VArrow symbols
+/ldiagvline
+{
+   xmark ysize ldiagprevious /FROM ldiagpointdef
+   xmark 0 ldiagprevious /TO ldiagpointdef
+} def
+
+% points of a polygon around base with given no of sides, vert init angle:
+% <sides> <angle> ldiagpolygon <point> ... <point>
+/ldiagpolygon
+{  exch round cvi exch
+   xsize ysize 0.5 ldiagpmul /CTR ldiagpointdef
+   90 sub CTR 2 copy ldiagmax 5 3 roll
+   [ 4 copy pop /ldiagpolycircum cvx ] ldiagcircumdef
+   exch dup 360 exch div exch
+   1 1  3 2 roll
+   {  4 string cvs (P) exch ldiagconcat
+      3 copy exch pop (@ANGLE) ldiagconcat cvn exch 90 add exch ldiagangledef
+      cvn 6 copy pop pop ldiagatangle 2 copy 10 2 roll
+      3 2 roll ldiagpointdef
+      dup 3 1 roll add exch
+   }  for
+   pop ldiagatangle
+} def
+
+% shape and labels of the @Isosceles triangle symbol
+/ldiagisosceles
+{
+   xsize ysize 0.5 ldiagpmul /CTR ldiagpointdef
+   0     0                   /SW  ldiagpointdef
+   xsize 0                   /SE  ldiagpointdef
+   xsize 0.5 mul ysize       /N   ldiagpointdef
+   xsize 0.5 mul 0           /S   ldiagpointdef
+   SE 0.5 ldiagpmul N 0.5 ldiagpmul ldiagpadd /NE ldiagpointdef
+   SW 0.5 ldiagpmul N 0.5 ldiagpmul ldiagpadd /NW ldiagpointdef
+
+   [ xsize ysize /ldiagisoscelescircum cvx ] ldiagcircumdef
+
+     0 dg              /SW@ANGLE ldiagangledef
+     0 dg              /SE@ANGLE ldiagangledef
+   180 dg              /N@ANGLE  ldiagangledef
+     0 dg              /S@ANGLE  ldiagangledef
+     SE N ldiagangleto /NE@ANGLE ldiagangledef
+     N SW ldiagangleto /NW@ANGLE ldiagangledef
+
+   SW SE N SW
+} def
+
+% next array element:  <array> <index> ldiaggetnext <array> <index> <any> true
+%                                               or <array> <index> false
+/ldiaggetnext
+{  2 copy exch length ge
+   { false }
+   { 2 copy get exch 1 add exch true } ifelse
+} def
+
+% check whether thing is number:  <any> ldiagisnumbertype <any> <bool>
+/ldiagisnumbertype
+{  dup type dup
+   /integertype eq exch /realtype eq or
+} def
+
+% check whether thing is an array:  <any> ldiagisarraytype <any> <bool>
+/ldiagisarraytype { dup type /arraytype eq } def
+
+% check whether thing is an array:  <any> ldiagisnametype <any> <bool>
+/ldiagisnametype { dup type /nametype eq } def
+
+% get next item:  <array> <index> ldiaggetnextitem <array> <index> 0
+%                                              or <array> <index> <array> 1
+%                                              or <array> <index> <point> 2
+/ldiaggetnextitem
+{   ldiaggetnext
+    {	ldiagisarraytype
+	{   1
+	}
+	{   ldiagisnumbertype
+	    {	3 1 roll
+		ldiaggetnext
+		{   ldiagisnumbertype
+		    {	4 3 roll exch  2
+		    }
+		    {	pop 3 2 roll pop  0
+		    } ifelse
+		}
+		{   3 2 roll pop  0
+		} ifelse
+	    }
+	    {	pop 0
+	    } ifelse
+	} ifelse
+    }
+    {	0
+    } ifelse
+} def
+
+% approximate equality: num1 num2  approxeq  <boolean>
+/approxeq
+{ dup 0 eq
+  { pop 0 eq
+  }
+  { dup 3 1 roll sub exch div abs 0.001 lt
+  } ifelse
+} def
+
+% set arc path:  bool x1 y1  x2 y2  x0 y0  ldiagsetarc  <angle> <angle> <dist>
+% the path goes from x1 y1 to x2 y2 about centre x0 y0,
+% anticlockwise if bool is true else clockwise.
+% The orientations of backwards pointing and forwards pointing
+% arrowheads are returned in the two angles, and
+% the length of the arc is returned in <dist>.
+/ldiagsetarc
+{
+  % (Entering ldiagsetarc) 7 ldiagdebugprint
+  20 dict begin
+     matrix currentmatrix 8 1 roll
+     2 copy translate 2 copy 8 2 roll
+     4 2 roll ldiagpsub 6 2 roll ldiagpsub
+     dup /y1 exch def dup mul /y1s exch def
+     dup /x1 exch def dup mul /x1s exch def
+     dup /y2 exch def dup mul /y2s exch def
+     dup /x2 exch def dup mul /x2s exch def
+     /dist1 0 0 x1 y1 ldiagdistance def
+     /dist2 0 0 x2 y2 ldiagdistance def
+
+     y1s y2s approxeq
+     {	-1
+     }
+     {	y1s x2s mul y2s x1s mul sub y1s y2s sub div
+     } ifelse
+     /da exch def
+
+     x1s x2s approxeq
+     {	-1
+     }
+     {	x1s y2s mul x2s y1s mul sub x1s x2s sub div
+     } ifelse
+     /db exch def
+
+     da 0 gt db 0 gt and
+     {
+	% (  case 1, ellipse) 0 ldiagdebugprint
+	/LMax da sqrt db sqrt ldiagmax def
+	/scalex da sqrt LMax div def
+	/scaley db sqrt LMax div def
+	scalex scaley scale
+	0 0 LMax
+	0 0 x1 scalex mul y1 scaley mul ldiagangleto
+	0 0 x2 scalex mul y2 scaley mul ldiagangleto
+	2 copy eq { 360 add } if
+	2 copy 8 2 roll
+	5 index { arc } { arcn } ifelse
+	2 index 1 index
+	{ 90 sub } { 90 add } ifelse
+	dup sin scaley mul exch cos scalex mul atan
+	2 index 2 index
+	{ 90 add } { 90 sub } ifelse
+	dup sin scaley mul exch cos scalex mul atan
+	5 2 roll  % res1 res2 ang1 ang2 anticlockwise
+	{ exch sub } { sub } ifelse
+	dup 0 le { 360 add } if  ldiagpi mul LMax mul 180 div
+     }
+     {
+	dist1 dist2 approxeq
+	% x1 y1 dist1 (  x1 y1, d) 3 ldiagdebugprint pop pop pop
+	% x2 y2 dist2 (  x2 y2, d) 3 ldiagdebugprint pop pop pop
+	{
+		% (  case 2, circle) 0 ldiagdebugprint
+		0 0
+		dist1
+		0 0 x1 y1 ldiagangleto
+		0 0 x2 y2 ldiagangleto
+		2 copy eq { 360 add } if
+		2 copy 8 2 roll
+		5 index { arc } { arcn } ifelse
+		2 index 1 index
+		{ 90 sub } { 90 add } ifelse
+		2 index 2 index
+		{ 90 add } { 90 sub } ifelse
+		5 2 roll % res1 res2 ang1 ang2 clockwise
+		{ exch sub } { sub } ifelse
+		dup 0 le { 360 add } if
+		ldiagpi mul dist1 mul 180 div
+	}
+	{
+		% (  case 3, line) 0 ldiagdebugprint
+		x2 y2 lineto pop
+		x2 y2 x1 y1 ldiagangleto
+		x1 y1 x2 y2 ldiagangleto
+		x1 y1 x2 y2 ldiagdistance
+	} ifelse
+     } ifelse
+     4 -1 roll setmatrix
+     end
+  % (Leaving ldiagsetarc) 3 ldiagdebugprint
+} def
+
+% ldiagsetcurve: set up a Bezier curve from x0 y0 to x3 y3
+% and return arrowhead angles and length of curve (actually 0)
+% x0 y0 x1 y1 x2 y2 x3 y3 ldiagsetcurve <angle> <angle> <length>
+/ldiagsetcurve
+{ 8 copy curveto pop pop
+  ldiagangleto
+  5 1 roll
+  4 2 roll ldiagangleto
+  exch
+  0
+} def
+
+% ldiagsetpath: convert a Diag path into a PostScript path
+% [ shape ] ldiagsetpath 
+/ldiagsetpath
+{
+  10 dict begin
+    0 newpath
+    /prevseen false def
+    /curveseen false def
+    { ldiaggetnextitem
+      dup 0 eq { pop exit }
+      { 1 eq
+        { /curveseen true def
+	  /curve exch def
+	  curve length 0 eq { /curveseen false def } if
+        }
+        { /ycurr exch def
+	  /xcurr exch def
+	  prevseen
+	  { curveseen
+	    { curve length 4 eq
+	      { xprev yprev
+		curve 0 get curve 1 get
+		curve 2 get curve 3 get
+		xcurr ycurr
+		ldiagsetcurve pop pop pop
+	      }
+	      { xprev yprev xcurr ycurr
+	        curve length 1 ge { curve 0 get } { 0 } ifelse
+	        curve length 2 ge { curve 1 get } { 0 } ifelse
+	        curve length 3 ge { curve 2 get } { true } ifelse
+	        7 1 roll
+	        ldiagsetarc pop pop pop
+	      } ifelse
+	    }
+	    { xcurr ycurr lineto
+	    } ifelse
+	  }
+	  { xcurr ycurr moveto
+	  } ifelse
+	  /xprev xcurr def
+	  /yprev ycurr def
+	  /prevseen true def
+	  /curveseen false def
+        } ifelse
+      } ifelse
+    } loop pop pop
+  end
+} def
+
+% ldiagpaintpath: paint a path of the given shape
+% /paint [ shape ] ldiagpaintpath -
+/ldiagpaintpath
+{
+  ldiagsetpath cvx exec
+} def
+
+% stroke a path of the given shape in the given linestyle and dash length.
+% Return the origin and angle of the backward and forward arrow heads.
+% dashlength /linestyle [shape] ldiagdopath  [<point> <angle>] [<point> <angle>] 
+/ldiagdopath
+{
+  10 dict begin
+    0
+    /prevseen  false def
+    /curveseen false def
+    /backarrow []    def
+    /fwdarrow  []    def
+    {
+	ldiaggetnextitem
+	dup 0 eq { pop exit }
+	{
+	    1 eq
+	    {	/curveseen true def
+		/curve exch def
+		curve length 0 eq { /prevseen false def } if
+	    }
+	    {	/ycurr exch def
+		/xcurr exch def
+		prevseen
+		{   newpath xprev yprev moveto
+		    curveseen
+		    {	curve length 4 eq
+			{   xprev yprev
+			    curve 0 get curve 1 get
+			    curve 2 get curve 3 get
+			    xcurr ycurr ldiagsetcurve
+			}
+			{   xprev yprev xcurr ycurr
+			    curve length 1 ge { curve 0 get } { 0 } ifelse
+			    curve length 2 ge { curve 1 get } { 0 } ifelse
+			    curve length 3 ge { curve 2 get } { true } ifelse
+			    7 1 roll
+			    ldiagsetarc
+			} ifelse
+		    }
+		    {	xcurr ycurr lineto
+			xcurr ycurr xprev yprev ldiagangleto dup 180 sub
+			xprev yprev xcurr ycurr ldiagdistance
+		    } ifelse
+		    6 index 6 index cvx exec
+		    [ xprev yprev 5 -1 roll ]
+		    backarrow length 0 eq
+		    { /backarrow exch def }
+		    { pop } ifelse
+		    [ xcurr ycurr 4 -1 roll ] /fwdarrow exch def
+		} if
+		/xprev xcurr def
+		/yprev ycurr def
+		/prevseen true def
+		/curveseen false def
+	    } ifelse
+	} ifelse
+    } loop
+    pop pop pop pop
+    backarrow length 0 eq { [ 0 0 0 ] } { backarrow } ifelse
+    fwdarrow  length 0 eq { [ 0 0 0 ] } { fwdarrow  } ifelse
+  end
+} def
+
+
+% stroke a path of the given shape in the given linestyle and dash length.
+% dashlength [ /linestyle ] [shape] ldiagdosegpath  -
+/ldiagdosegpath
+{
+  12 dict begin
+    1 index /seg exch def
+    1 index length /seglength exch def
+    0 /segcount exch def
+    0
+    /prevseen  false def
+    /curveseen false def
+    /backarrow []    def
+    /fwdarrow  []    def
+    {
+	ldiaggetnextitem
+	dup 0 eq { pop exit }
+	{
+	    1 eq
+	    {	/curveseen true def
+		/curve exch def
+		curve length 0 eq { /prevseen false def } if
+	    }
+	    {	/ycurr exch def
+		/xcurr exch def
+		prevseen
+		{   newpath xprev yprev moveto
+		    curveseen
+		    {	curve length 4 eq
+			{   xprev yprev
+			    curve 0 get curve 1 get
+			    curve 2 get curve 3 get
+			    xcurr ycurr ldiagsetcurve
+			}
+			{   xprev yprev xcurr ycurr
+			    curve length 1 ge { curve 0 get } { 0 } ifelse
+			    curve length 2 ge { curve 1 get } { 0 } ifelse
+			    curve length 3 ge { curve 2 get } { true } ifelse
+			    7 1 roll
+			    ldiagsetarc
+			} ifelse
+		    }
+		    {	xcurr ycurr lineto
+			xcurr ycurr xprev yprev ldiagangleto dup 180 sub
+			xprev yprev xcurr ycurr ldiagdistance
+		    } ifelse
+		    6 index seg segcount seglength mod get cvx exec
+		    /segcount segcount 1 add def
+		    [ xprev yprev 5 -1 roll ]
+		    backarrow length 0 eq
+		    { /backarrow exch def }
+		    { pop } ifelse
+		    [ xcurr ycurr 4 -1 roll ] /fwdarrow exch def
+		} if
+		/xprev xcurr def
+		/yprev ycurr def
+		/prevseen true def
+		/curveseen false def
+	    } ifelse
+	} ifelse
+    } loop
+    pop pop pop pop
+  end
+} def
+
+% ldiagnodebegin: start of node parameters
+% ldiagnodebegin -
+/ldiagnodebegin
+{ % (Entering ldiagnodebegin) 0 ldiagdebugprint
+  ldiagmaxlabels dict begin 
+} def
+
+% ldiagnodeend: end of node parameters (so do the node)
+% <outline> <dashlength> <style> <linewidth> <paint> ldiagnodeend -
+/ldiagnodeend
+{
+  % (Entering ldiagnodeend) 0 ldiagdebugprint
+  end % matches begin in ldiagnodebegin
+  4 index gsave ldiagpaintpath grestore
+  3 index ldiagsetpath clip newpath
+  2 mul setlinewidth
+  3 -1 roll ldiagdosegpath
+  % (Leaving ldiagnodeend) 0 ldiagdebugprint
+} def
+
+% ldiaglinkbegin: start of link parameters
+% <direct> ldiaglinkbegin -
+/ldiaglinkbegin
+{ ldiagmaxlabels dict begin 
+  1 eq /direct exch def
+} def
+
+% ldiaglinkend: end of link parameters (so do the link)
+% <outline> <dashlength> <style> <linewidth> ldiaglinkend -
+/ldiaglinkend
+{
+  end % matches begin in ldiaglinkbegin
+  setlinewidth
+  3 -1 roll ldiagdosegpath
+} def
+
+% ldiagdoarrow: draw an arrow head of given form
+% dashlength /lstyle /pstyle hfrac height width [ <point> <angle> ] ldiagdoarrow -
+/ldiagdoarrow
+{  matrix currentmatrix 8 1 roll
+   dup 0 get 1 index 1 get translate
+   2 get rotate
+   [ 2 index neg 2 index 0 0
+     3 index 3 index neg
+     1 index 10 index mul 0
+     7 index 7 index ]
+   4 1 roll pop pop pop
+   dup 3 1 roll
+   gsave ldiagpaintpath grestore ldiagdopath pop pop
+   setmatrix
+} def
+
+% arrow head styles
+/ldiagopen     0.0 def
+/ldiaghalfopen 0.5 def
+/ldiagclosed   1.0 def
+
+% stroke no arrows, forward, back, and both
+/ldiagnoarrow { pop pop pop pop pop pop pop pop                        } def
+/ldiagforward { 7 -1 roll ldiagdoarrow pop                              } def
+/ldiagback    { 8 -2 roll pop ldiagdoarrow                              } def
+/ldiagboth    { 8 -1 roll 7 copy ldiagdoarrow pop 7 -1 roll ldiagdoarrow } def
+
+% ldiagprevious: return previous point on path
+/ldiagprevious
+{ ldiagisnumbertype
+  { 2 copy }
+  { ldiagisarraytype
+    { 2 index 2 index }
+    { 0 0 }
+    ifelse
+  } ifelse
+} def
+
+% Tag dictionary operators
+%
+% Diag's tag dictionaries are kept on the same stack as other dictionaries,
+% since there is nowhere else to put them.  However, they are managed like
+% a separate stack using the following operators:
+%
+%  <tag>  ldiagpushtagdict  -      Push a new, empty tag dictionary
+%         ldiagtoptagdict   dict   Find the top tag dictionary
+%         ldiagpoptagdict   -      Pop and destroy the top tag dictionary
+%         ldiagpopuptagdict -      Pop top tag dict and promote its entries
+%         ldiagdebugtagdict -      Debug print of dictionary stack
+%
+% They are distinguished from other dictionaries by containing /ldiagtagdict,
+% whose value is the <tag> which is used by ldiagpopuptagdict,
+% and they are hopefully never the target of any non-tag definition because
+% they are never the top dictionary, since push places the new dict second.
+
+/ldiagpushtagdict
+{ ldiagmaxlabels dict dup
+  currentdict end exch begin begin
+  exch /ldiagtagdict exch put
+} def
+
+/ldiagtoptagdict
+{ /ldiagtagdict where not
+  { (Diag internal error: no tag dictionary) show stop
+  } if
+} def
+
+/ldiagpoptagdict
+{
+  % (Entering poptagdict) 0 ldiagdebugprint
+  % ldiagdebugtagdict
+  mark
+  { currentdict end
+    dup /ldiagtagdict known
+    { exit
+    } if
+  } loop
+  pop
+  counttomark
+  { begin
+  } repeat
+  pop
+  % (Leaving poptagdict) 0 ldiagdebugprint
+  % ldiagdebugtagdict
+} def
+
+% promote labels from top tag dictionary to second top tag dictionary
+% each prefixed by <string>@ if <string> (value of /ldiagtagdict) is not empty
+% - ldiagpopuptagdict -
+/ldiagpopuptagdict
+{
+  ldiagtagdict
+  % (Entering ldiagpopuptagdict) 1 ldiagdebugprint
+  % ldiagdebugtagdict
+  ldiagtoptagdict ldiagpoptagdict ldiagtoptagdict exch
+  { exch 50 string cvs 3 index
+    dup length 0 ne
+    { (@) ldiagconcat
+    } if
+    exch ldiagconcat cvn exch 2 index 3 1 roll put
+  } forall
+  pop pop
+  % (Leaving ldiagpopuptagdict) 0 ldiagdebugprint
+  % ldiagdebugtagdict
+} def
+
+% debug tag dictionary stack
+/ldiagdebugtagdict
+{ (Entering ldiagdebugtagdict) 0 ldiagdebugprint
+  30 array dictstack
+  { dup /ldiagtagdict known
+    { dup /ldiagtagdict get 0 ldiagdebugprint
+      { pop 50 string cvs (   ) exch ldiagconcat
+	dup 0 ldiagdebugprint
+	pop
+      }
+      forall
+    }
+    { pop (other) 0 ldiagdebugprint
+    } ifelse
+  } forall
+  (Leaving ldiagdebugtagdict) 0 ldiagdebugprint
+} def
+
+% label a point in top tag dictionary:  <point> /name ldiagpointdef -
+/ldiagpointdef
+{
+  % (Entering ldiagpointdef) 3 ldiagdebugprint
+  [ 4 2 roll transform /itransform cvx ] cvx
+  ldiagtoptagdict 3 1 roll put
+  % (Leaving ldiagpointdef) 0 ldiagdebugprint
+} def
+
+% label an angle in top tag dictionary:  <angle> /name ldiagangledef -
+/ldiagangledef
+{
+  % (Entering ldiagangledef) 2 ldiagdebugprint
+  exch ldiagfixangle ldiagtoptagdict 3 1 roll put
+  % (Leaving ldiagangledef) 0 ldiagdebugprint
+} def
+
+% add CIRCUM operator with this body:  <array> ldiagcircumdef -
+/ldiagcircumdef
+{   % (Entering ldiagcircumdef) 1 ldiagdebugprint
+    /CIRCUM exch cvx
+    ldiagtoptagdict 3 1 roll put
+    % currentdict end
+    % 3 1 roll
+    % def
+    % begin
+    % (Leaving ldiagcircumdef) 0 ldiagdebugprint
+} def
+
+% show points (except CIRCUM and ANGLE): - ldiagshowpoints -
+/ldiagshowpoints
+{
+  % (Entering ldiagshowpoints) 0 ldiagdebugprint
+  ldiagtoptagdict
+  { 1 index 50 string cvs
+    (ldiagdebugpos) search
+    { pop pop pop pop pop }
+    {
+      (CIRCUM) search % if CIRCUM in key
+      { pop pop pop pop pop }
+      { 
+        (ANGLE) search % if ANGLE in key
+        {
+          pop pop pop pop pop
+        }
+        {
+          (ldiagtagdict) search
+          {
+            pop pop pop pop pop
+          }
+          {
+	    pop cvx exec
+	    newpath 2.0 pt 0 360 arc 0 setgray fill pop
+          } ifelse
+        } ifelse
+      } ifelse
+    } ifelse
+  } forall
+  % (Leaving ldiagshowpoints) 0 ldiagdebugprint
+} def
+
+
+/ldiagshowtags
+{
+  % (Entering ldiagshowtags) 0 ldiagdebugprint
+  ldiagtoptagdict
+  { 1 index 50 string cvs
+    % dup 0 ldiagdebugprint
+    (ldiagdebugpos) search
+    { pop pop pop pop pop }
+    {
+      (CIRCUM) search % if CIRCUM in key
+      { pop pop pop pop pop }
+      { 
+        (ANGLE) search % if ANGLE in key
+        {
+          pop pop pop pop pop
+        }
+        {
+          (ldiagtagdict) search
+          {
+            pop pop pop pop pop
+          }
+          {
+	    pop cvx exec 2 copy
+	    gsave
+	    newpath 2.0 pt 0 360 arc 0 setgray fill
+            /Times-Roman findfont 8 pt scalefont setfont
+            translate 40 rotate 0.2 cm 0.1 cm moveto 20 string cvs show
+	    grestore
+          } ifelse
+        } ifelse
+      } ifelse
+    } ifelse
+  } forall
+  % (Leaving ldiagshowtags) 0 ldiagdebugprint
+} def
+
+
+% show angles: - ldiagshowangles -
+/ldiagshowangles
+{
+  % (Entering ldiagshowangles) 0 ldiagdebugprint
+  ldiagtoptagdict
+  { 1 index 20 string cvs
+    % dup 0 ldiagdebugprint
+    (ldiagdebugpos) search
+    { pop pop pop pop pop }
+    {
+      (ldiagtagdict) search
+      {
+        pop pop pop pop pop
+      }
+      {
+        (CIRCUM) search % if CIRCUM in key
+        { pop pop pop pop pop }
+        { 
+          (@ANGLE) search % if ANGLE in key, draw the angle at the point
+          {
+            % (showing ANGLE) 5 ldiagdebugprint
+            gsave exch pop exch pop cvx
+            % (about to execute) 1 ldiagdebugprint
+            exec translate rotate 0.8 0.8 scale pop
+            newpath 0 0 2.0 pt 0 360 arc 0 setgray fill
+            newpath 4 pt 0 moveto 9 pt 0 lineto
+            9 pt 1.5 pt lineto 11 pt 0 lineto 9 pt -1.5 pt lineto
+            9 pt 0 lineto [] 0 setdash 4 pt setlinewidth 0 setlinejoin
+	    stroke grestore
+            % (finished ANGLE) 5 ldiagdebugprint
+          }
+          {
+            % else must be a point, we aren't showing those
+            pop pop pop
+          } ifelse
+        } ifelse
+      } ifelse
+    } ifelse
+  } forall
+  % (Leaving ldiagshowangles) 0 ldiagdebugprint
+} def
+
+% fix an angle to 0 <= res < 360:  <angle> ldiagfixangle <angle>
+/ldiagfixangle
+{
+  % (Entering ldiagfixangle) 1 ldiagdebugprint
+  { dup 0 ge { exit } if
+    360 add
+  } loop
+  { dup 360 lt { exit } if
+    360 sub
+  } loop
+  % (Leaving ldiagfixangle) 1 ldiagdebugprint
+} def
+
+% find point on circumference of box:  alpha a b ldiagboxcircum x y
+/ldiagboxcircum
+{
+  % (Entering ldiagboxcircum) 3 ldiagdebugprint
+  4 dict begin
+    /b exch def
+    /a exch def
+    ldiagfixangle /alpha exch def
+    0 0 a b ldiagangleto /theta exch def
+
+    % if alpha <= theta, return (a, a*tan(alpha))
+    alpha theta le
+    { a  a alpha sin mul alpha cos div }
+    {
+      % else if alpha <= 180 - theta, return (b*cot(alpha), b)
+      alpha 180 theta sub le
+      { b alpha cos mul alpha sin div  b }
+      {
+        % else if alpha <= 180 + theta, return (-a, -a*tan(alpha))
+        alpha 180 theta add le
+        { a neg  a neg alpha sin mul alpha cos div }
+        {
+	  % else if alpha <= 360 - theta, return (-b*cot(alpha), -b)
+	  alpha 360 theta sub le
+          { b neg alpha cos mul alpha sin div  b neg }
+	  {
+	    % else 360 - theta <= alpha, return (a, a*tan(alpha))
+	    a  a alpha sin mul alpha cos div
+	  } ifelse
+        } ifelse
+      } ifelse
+    } ifelse
+  end
+  % (Leaving ldiagboxcircum) 2 ldiagdebugprint
+} def
+
+% find quadratic roots (assume a != 0): a b c ldiagqroots x1 x2 2
+%                                                     or    x2 1
+%                                                     or       0
+/ldiagqroots
+{
+  4 dict begin
+    /c exch def
+    /b exch def
+    /a exch def
+    /disc b b mul 4 a c mul mul sub def
+    disc 0 lt
+    { 0
+    }
+    { disc 0 eq
+      { b neg 2 a mul div
+	1
+      }
+      { b neg disc sqrt add 2 a mul div
+        b neg disc sqrt sub 2 a mul div
+	2
+      }
+      ifelse
+    }
+    ifelse
+  end
+} def
+
+% work our which quadrant: <angle> ldiagquadrant <0-3>
+/ldiagquadrant
+{ dup 90 lt
+  { pop 0
+  }
+  { dup 180 lt
+    { pop 1
+    }
+    { 270 lt
+      { 2
+      }
+      { 3
+      } ifelse
+    } ifelse
+  } ifelse
+} def
+
+% find curvebox circum, assuming upper right quadrant: alpha a b xmk ldiagcb x y
+/ldiagcb
+{
+  6 dict begin
+    /xmk exch def
+    /b exch def
+    /a exch def
+    /alpha exch def
+    /theta1 0 0 a b xmk sub ldiagangleto def
+    /theta2 0 0 a xmk sub b ldiagangleto def
+    alpha theta1 le
+    { % if alpha <= theta1, return (a, a*tan(alpha))
+      a  a alpha sin mul alpha cos div
+    }
+    { alpha theta2 ge
+      { % else if alpha > theta2, return (b*cot(alpha), b)
+	b alpha cos mul alpha sin div  b
+      }
+      {
+	% else, return the intersection of line and circle
+	a xmk sub b xmk sub xmk  0 0 alpha ldiagcircleintersect
+	dup 0 eq
+	{ % should never happen, just return any reasonable point
+	  pop
+	  a b 0.5 ldiagpmul
+	}
+	{ 1 eq
+	  { % should never happen, just return the point on top of stack
+	  }
+	  { % the usual case, two points on stack, return the larger
+	    ldiagpmax
+	  } ifelse
+	} ifelse
+      } ifelse
+    } ifelse
+  end
+} def
+
+% find point on circumference of curvebox: alpha a b xmk ldiagcurveboxcircum x y
+/ldiagcurveboxcircum
+{
+  % (Entering ldiagcurveboxcircum) 4 ldiagdebugprint
+  5 dict begin
+    /xmk exch def
+    /b exch def
+    /a exch def
+    ldiagfixangle /alpha exch def
+
+    % work out which quadrant we are in, and reflect accordingly
+    /quad alpha ldiagquadrant def
+    quad 0 eq
+    { alpha a b xmk ldiagcb
+    }
+    { quad 1 eq
+      { 180 alpha sub a b xmk ldiagcb exch neg exch
+      }
+      { quad 2 eq
+	{ alpha 180 sub a b xmk ldiagcb neg exch neg exch
+	}
+	{ 360 alpha sub a b xmk ldiagcb neg
+	} ifelse
+      } ifelse
+    } ifelse
+  end
+  % (Leaving ldiagcurveboxcircum) 2 ldiagdebugprint
+} def
+
+% find point on circumference of diamond:  alpha a b ldiagdiamondcircum x y
+/ldiagdiamondcircum
+{
+  % (Entering ldiagdiamondcircum) 3 ldiagdebugprint
+  4 dict begin
+    /b exch def
+    /a exch def
+    ldiagfixangle /alpha exch def
+    b alpha cos abs mul  a alpha sin abs mul  add  /denom exch def
+    a b mul alpha cos mul denom div
+    a b mul alpha sin mul denom div
+  end
+  % (Leaving ldiagdiamondcircum) 2 ldiagdebugprint
+} def
+
+% find point on circumference of ellipse:  alpha a b ldiagellipsecircum x y
+/ldiagellipsecircum
+{
+  % (Entering ldiagellipsecircum) 3 ldiagdebugprint
+  4 dict begin
+    /b exch def
+    /a exch def
+    ldiagfixangle /alpha exch def
+    b alpha cos mul dup mul  a alpha sin mul dup mul  add sqrt /denom exch def
+    a b mul alpha cos mul denom div
+    a b mul alpha sin mul denom div
+  end
+  % (Leaving ldiagellipsecircum) 2 ldiagdebugprint
+} def
+
+% find point on circumference of isosceles:  alpha a b ldiagisoscelescircum x y
+/ldiagisoscelescircum
+{
+  % (Entering ldiagisoscelescircum) 3 ldiagdebugprint
+  7 dict begin
+    /b exch def
+    /a exch def
+    /alpha exch ldiagfixangle def
+    /theta1 90 def
+    /theta2 a b 0.5 ldiagpmul 0 0 ldiagangleto def
+    /theta3 a b 0.5 ldiagpmul a 0 ldiagangleto def
+    alpha theta1 ge alpha theta2 le and
+    { 0 0 a 2 div b
+    }
+    { alpha theta2 ge alpha theta3 le and
+      { 0 0 a 0
+      }
+      { a 0 a 2 div b
+      } ifelse
+    } ifelse
+    a 2 div b 2 div 2 copy 1 ft alpha ldiagatangle ldiaglineintersect
+    a 2 div b 2 div 4 2 roll ldiagpsub
+  end
+  % (Leaving ldiagisoscelescircum) 2 ldiagdebugprint
+} def
+
+% find point of intersection of two lines each defined by two points
+% x1 y1 x2 y2  x3 y3 x4 y4  ldiaglineintersect x y
+/ldiaglineintersect
+{
+  % (Entering ldiaglineintersect) 8 ldiagdebugprint
+  13 dict begin
+    /y4 exch def
+    /x4 exch def
+    /y3 exch def
+    /x3 exch def
+    /y2 exch def
+    /x2 exch def
+    /y1 exch def
+    /x1 exch def
+    x2 x1 sub /x21 exch def
+    x4 x3 sub /x43 exch def
+    y2 y1 sub /y21 exch def
+    y4 y3 sub /y43 exch def
+    y21 x43 mul y43 x21 mul sub /det exch def
+  
+    % calculate x 
+    y21 x43 mul x1 mul
+    y43 x21 mul x3 mul sub
+    y3 y1 sub x21 mul x43 mul add
+    det div
+
+    % calculate y
+    x21 y43 mul y1 mul
+    x43 y21 mul y3 mul sub
+    x3 x1 sub y21 mul y43 mul add
+    det neg div
+
+  end
+  % (Leaving ldiaglineintersect) 2 ldiagdebugprint
+} def
+
+% find point on circumference of polygon
+% alpha radius num theta ldiagpolycircum x y
+/ldiagpolycircum
+{
+  % (Entering ldiagpolycircum) 4 ldiagdebugprint
+  13 dict begin
+    /theta exch def
+    /num exch def
+    /radius exch def
+    /alpha exch def
+
+    % calculate delta, the angle from theta to alpha
+    alpha theta sub ldiagfixangle
+
+    % calculate the angle which is the multiple of 360/num closest to delta
+    360 num div div truncate 360 num div mul theta add /anglea exch def
+
+    % calculate the next multiple of 360/num after anglea
+    anglea 360 num div add /angleb exch def
+
+    % intersect the line through these two points with the alpha line
+    anglea cos anglea sin  angleb cos angleb sin
+    0 0  alpha cos 2 mul alpha sin 2 mul
+    ldiaglineintersect radius ldiagpmul
+
+  end
+  % (Leaving ldiagpolycircum) 2 ldiagdebugprint
+} def
+
+% find point of intersection of a line and a circle
+% x0 y0 r  x1 y1 theta  ldiagcircleintersect xa ya xb yb 2
+%                                        or       xb yb 1
+%                                        or             0
+/ldiagcircleintersect
+{
+  % (Entering ldiagcircleintersect) 6 ldiagdebugprint
+  15 dict begin
+    /theta exch def
+    /y1    exch def
+    /x1    exch def
+    /r     exch def
+    /y0    exch def
+    /x0    exch def
+
+    % if sin(theta) = 0 then line is horizontal and y must be y1
+    theta sin abs 0.00001 lt
+    { 
+      /a 1 def
+      /b -2 x0 mul def
+      /c x0 dup mul y1 y0 sub dup mul add r dup mul sub def
+      a b c ldiagqroots dup
+      0 eq
+      { pop
+	0
+      }
+      { 1 eq
+	{ y1 1
+	}
+	{ y1 exch y1 2
+	} ifelse
+      } ifelse
+    }
+    {
+      /ct theta cos theta sin div def
+      /a ct ct mul 1 add def
+      /b ct x1 x0 sub mul y1 add y0 sub 2 mul def
+      /c x1 x0 sub dup mul y1 y0 sub dup mul add r dup mul sub def
+      a b c ldiagqroots dup
+      0 eq
+      { pop
+	0
+      }
+      { 1 eq
+	{ y1 add /yb exch def
+	  yb y1 sub ct mul x1 add /xb exch def
+	  xb yb 1
+	}
+	{ y1 add /ya exch def
+	  ya y1 sub ct mul x1 add /xa exch def
+	  y1 add /yb exch def
+	  yb y1 sub ct mul x1 add /xb exch def
+	  xa ya xb yb 2
+	} ifelse
+      } ifelse
+    } ifelse
+  end
+  % (Leaving ldiagcircleintersect) 1 ldiagdebugprint
+} def
+
+% find line which is the perpendicular bisector of two points, defined
+% by two points
+% x1 y1 x2 y2 ldiaglinebetween x3 y3 x4 y4
+/ldiaglinebetween
+{ % (Entering ldiaglinebetween) 4 ldiagdebugprint
+  /y2 exch def /x2 exch def
+  /y1 exch def /x1 exch def
+
+  % let x3, y3 be the point halfway between the two points
+  x1 y1 x2 y2 ldiagpadd 0.5 ldiagpmul
+  /y3 exch def /x3 exch def
+
+  % find a point perpendicular to x3, y3
+  x3 y3 50 x1 y1 x2 y2 ldiagangleto 90 dg add ldiagatangle
+
+  % plus x3 y3 gives the two points
+  x3 y3
+
+  % (Leaving ldiaglinebetween) 4 ldiagdebugprint
+} def
+
+% find <proc>@<string>:  <proc> <string> ldiagfindlabel <any> true
+%                                                      <proc> <string> false
+/ldiagfindlabel
+{
+  % (Entering ldiagfindlabel) 2 ldiagdebugprint
+  exch dup length 1 ne
+  { exch false
+    % (Leaving ldiagfindabel (length not 1)) 3 ldiagdebugprint
+  }
+  { dup 0 get type /nametype ne
+    { exch false
+      % (Leaving ldiagfindabel (not a name)) 3 ldiagdebugprint
+    }
+    { dup 0 get 50 string cvs (@) ldiagconcat 2 index ldiagconcat dup where
+      { exch get exch pop exch pop cvx exec true
+	% (Leaving ldiagfindlabel with success) 100 ldiagdebugprint
+      }
+      {
+	pop exch false
+	% (Leaving ldiagfindabel (concat not sensible)) 3 ldiagdebugprint
+      } ifelse
+    } ifelse
+  } ifelse
+} bind def
+
+% execute <proc>@<string> or else default:  <proc> <string> ldiagdolabel <various>
+/ldiagdolabel
+{
+  % (Entering ldiagdolabel) 2 ldiagdebugprint
+  ldiagfindlabel not
+  {
+    dup (CIRCUM) eq
+    { pop pop pop 0 0
+    }
+    {
+      dup (ANGLE) eq
+      { pop pop 0
+      }
+      { pop cvx exec
+      } ifelse
+    } ifelse
+  } if
+  % (Leaving ldiagdolabel) 2 ldiagdebugprint
+} bind def
+
+% execute a proc depending on whether number is negative, zero, or positive
+% procneg proczero procpos number ldiagsigncase <anything>
+/ldiagsigncase
+{
+  % (Entering ldiagsigncase) 4 ldiagdebugprint
+  dup 0 lt
+  { pop pop pop exec
+  }
+  { 0 gt
+    { exch pop exch pop exec
+    }
+    { pop exch pop exec
+    } ifelse
+  } ifelse
+  % (Leaving ldiagsigncase) 0 ldiagdebugprint
+} bind def
+
+% execute proci if angle is in ith quadrant
+% proc45 proc270 proc180 proc90 proc0 proc315 proc225 proc135 angle ldiagquadcase <anything>
+/ldiagquadcase
+{
+  % (Entering ldiagquadcase) 9 ldiagdebugprint
+  round ldiagfixangle cvi dup 90 mod 0 eq
+  { 90 idiv 4 add } { 90 idiv } ifelse
+  8 exch roll pop pop pop pop pop pop pop exec
+  % (Leaving ldiagquadcase) 0 ldiagdebugprint
+} bind def
+
+% decode Lout length into PostScript length
+% <string> ldiagdecodelength <number>
+/ldiagdecodelength
+{
+  % (Entering ldiagdecodelength) 1 ldiagdebugprint
+  (f) search
+  { exch pop exch pop cvr ft
+  }
+  { (c) search
+    { exch pop exch pop cvr cm
+    }
+    { (p) search
+      { exch pop exch pop cvr pt
+      }
+      { (m) search
+	{ exch pop exch pop cvr em
+	}
+	{ (s) search
+	  { exch pop exch pop cvr sp
+	  }
+	  { (v) search
+	    { exch pop exch pop cvr vs
+	    }
+	    { (i) search
+	      { exch pop exch pop cvr in
+	      }
+	      { pop 0
+	      } ifelse
+	    } ifelse
+	  } ifelse
+	} ifelse
+      } ifelse
+    } ifelse
+  } ifelse
+  % (Leaving ldiagdecodelength) 1 ldiagdebugprint
+} def
+
+% implement aabout function
+% logical form:  <circum> <extra> <centre> aabout <point>
+% actual form:   { <labelorpoint> } cvlit <length> [ <point> ] cvx aabout <point>
+/ldiagaabout
+{
+  /centre exch def
+  /extra exch def
+  /circum exch def
+
+  /ZXCTR [ centre ] cvx def
+  /ZFCTR [ circum (CTR) ldiagdolabel ] cvx def
+  /ZAREF ZFCTR ZXCTR ldiagangleto def
+  /ZAMIN 0 dg def
+  /ZPMIN [ circum (CTR) ldiagdolabel ZAREF ZAMIN sub
+	 circum (CIRCUM) ldiagdolabel ldiagpadd
+	 0 0 extra ZAREF ZAMIN sub ldiagatangle
+	 ldiagpadd ] cvx def
+
+  /ZAMAX 90 dg def
+  /ZPMAX [ circum (CTR) ldiagdolabel ZAREF ZAMAX sub
+	 circum (CIRCUM) ldiagdolabel ldiagpadd
+	 0 0 extra ZAREF ZAMAX sub ldiagatangle
+	 ldiagpadd ] cvx def
+
+  1 1 20
+  { /xval exch def
+    /ZAMID ZAMIN ZAMAX add 0.5 mul def
+    /ZPMID [ circum (CTR) ldiagdolabel ZAREF ZAMID sub
+	   circum (CIRCUM) ldiagdolabel ldiagpadd
+	   0 0 extra ZAREF ZAMID sub ldiagatangle
+	   ldiagpadd ] cvx def
+    ZPMID ZXCTR ldiagdistance ZFCTR ZXCTR ldiagdistance gt
+    {
+      /ZAMAX [ ZAMID ] cvx def
+      /ZPMAX [ ZPMID ] cvx def
+    }
+    {
+      /ZAMIN [ ZAMID ] cvx def
+      /ZPMIN [ ZPMID ] cvx def
+    } ifelse
+  } for
+  ZPMID
+} def
+
+% implement cabout function
+% logical form:  <circum> <extra> <centre> cabout <point>
+% actual form:   { <labelorpoint> } cvlit <length> [ <point> ] cvx cabout <point>
+/ldiagcabout
+{
+  /centre exch def
+  /extra exch def
+  /circum exch def
+
+  /ZXCTR [ centre ] cvx def
+  /ZFCTR [ circum (CTR) ldiagdolabel ] cvx def
+  /ZAREF ZFCTR ZXCTR ldiagangleto def
+  /ZAMIN 0 dg def
+  /ZPMIN [ circum (CTR) ldiagdolabel ZAREF ZAMIN add
+	 circum (CIRCUM) ldiagdolabel ldiagpadd
+	 0 0 extra ZAREF ZAMIN add ldiagatangle
+	 ldiagpadd ] cvx def
+
+  /ZAMAX 90 dg def
+  /ZPMAX [ circum (CTR) ldiagdolabel ZAREF ZAMAX add
+	 circum (CIRCUM) ldiagdolabel ldiagpadd
+	 0 0 extra ZAREF ZAMAX add ldiagatangle
+	 ldiagpadd ] cvx def
+
+  1 1 20
+  { /xval exch def
+    /ZAMID ZAMIN ZAMAX add 0.5 mul def
+    /ZPMID [ circum (CTR) ldiagdolabel ZAREF ZAMID add
+	   circum (CIRCUM) ldiagdolabel ldiagpadd
+	   0 0 extra ZAREF ZAMID add ldiagatangle
+	   ldiagpadd ] cvx def
+    ZPMID ZXCTR ldiagdistance ZFCTR ZXCTR ldiagdistance gt
+    {
+      /ZAMAX [ ZAMID ] cvx def
+      /ZPMAX [ ZPMID ] cvx def
+    }
+    {
+      /ZAMIN [ ZAMID ] cvx def
+      /ZPMIN [ ZPMID ] cvx def
+    } ifelse
+  } for
+  ZPMID
+} def
+
+% fromarrowlength toarrowlength { from } { to } xindent zindent ldiaglinepath -
+/ldiaglinepath
+{
+  % (entering ldiaglinepath) 0 ldiagdebugprint
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel to (CTR) ldiagdolabel ldiagangleto
+  /FROM@ANGLE ldiagangledef 
+  from (CTR) ldiagdolabel FROM@ANGLE from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength FROM@ANGLE ldiagatangle ldiagpadd
+  /FROM ldiagpointdef
+
+  FROM@ANGLE /TO@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel TO@ANGLE 180 dg sub to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength TO@ANGLE 180 dg sub ldiagatangle ldiagpadd /TO ldiagpointdef
+
+  FROM 0.5 ldiagpmul TO 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  FROM@ANGLE /LMID@ANGLE ldiagangledef
+
+  /XINDENT xindent FROM LMID ldiagdistance ldiagmin def
+  FROM 0 0 XINDENT FROM@ANGLE ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+
+  /ZINDENT zindent TO LMID ldiagdistance ldiagmin def
+  0 0 ZINDENT FROM@ANGLE ldiagatangle TO ldiagpsub /LTO ldiagpointdef
+  FROM@ANGLE /LTO@ANGLE ldiagangledef
+
+  direct { FROM TO } { FROM LFROM LMID LTO TO } ifelse
+
+  % (leaving ldiaglinepath) 0 ldiagdebugprint
+} def
+
+% fromarrowlength toarrowlength { from } { to } xindent zindent pathgap ldiagdoublelinepath -
+/ldiagdoublelinepath
+{
+  % (entering ldiagdoublelinepath) 0 ldiagdebugprint
+  /pathgap exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel to (CTR) ldiagdolabel ldiagangleto
+  /FROM@ANGLE ldiagangledef 
+  from (CTR) ldiagdolabel FROM@ANGLE from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength FROM@ANGLE ldiagatangle ldiagpadd
+  /FROM ldiagpointdef
+
+  FROM@ANGLE /TO@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel TO@ANGLE 180 dg sub to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength TO@ANGLE 180 dg sub ldiagatangle ldiagpadd /TO ldiagpointdef
+
+  FROM 0.5 ldiagpmul TO 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  FROM@ANGLE /LMID@ANGLE ldiagangledef
+
+  /XINDENT xindent FROM LMID ldiagdistance ldiagmin def
+  FROM 0 0 XINDENT FROM@ANGLE ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+
+  /ZINDENT zindent TO LMID ldiagdistance ldiagmin def
+  0 0 ZINDENT FROM@ANGLE ldiagatangle TO ldiagpsub /LTO ldiagpointdef
+  FROM@ANGLE /LTO@ANGLE ldiagangledef
+
+  direct {
+    FROM pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    TO   pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    []
+    FROM pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+    TO   pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+  }
+  {
+    FROM  pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    LFROM pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    LMID  pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    LTO   pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    TO    pathgap 2 div FROM@ANGLE 90 dg sub ldiagatangle
+    []
+    FROM  pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+    LFROM pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+    LMID  pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+    LTO   pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+    TO    pathgap 2 div FROM@ANGLE 90 dg add ldiagatangle
+  } ifelse
+
+  % (leaving ldiagdoublelinepath) 0 ldiagdebugprint
+} def
+
+% fromarrowlen toarrowlen { from } { to } xindent zindent bias ldiagacurvepath -
+/ldiagacurvepath
+{
+  % (entering ldiagacurvepath) 0 ldiagdebugprint
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  %/B1 bias 0.02 ft ldiagmax def
+  %/B2 from (CTR) ldiagdolabel to (CTR) ldiagdolabel ldiagdistance 0.5 mul def
+  %/BIAS B1 B2 ldiagmin def
+  /BIAS bias 0.02 ft ldiagmax def
+  /XMID [ from (CTR) ldiagdolabel 0.5 ldiagpmul
+	  to   (CTR) ldiagdolabel 0.5 ldiagpmul ldiagpadd ] cvx def
+  /XTOP [ XMID 0 0 BIAS from (CTR) ldiagdolabel to (CTR) ldiagdolabel
+	  ldiagangleto 90 dg sub ldiagatangle ldiagpadd ] cvx def
+  /CTR [ from (CTR) ldiagdolabel XTOP ldiaglinebetween
+	 to   (CTR) ldiagdolabel XTOP ldiaglinebetween
+	 ldiaglineintersect ] cvx def
+
+  from fromarrowlength [ CTR ] cvx ldiagaabout /FROM ldiagpointdef
+  from (CTR) ldiagdolabel FROM ldiagdistance 0 gt
+  { from (CTR) ldiagdolabel FROM ldiagangleto
+  }
+  { CTR FROM ldiagangleto 90 dg add
+  } ifelse /FROM@ANGLE ldiagangledef
+
+  to toarrowlength [ CTR ] cvx ldiagcabout /TO ldiagpointdef
+  TO to (CTR) ldiagdolabel ldiagdistance 0 gt
+  { TO to (CTR) ldiagdolabel ldiagangleto
+  }
+  { CTR TO ldiagangleto 90 dg add
+  } ifelse /TO@ANGLE ldiagangledef
+
+  /RADIUS CTR FROM ldiagdistance def
+  CTR 0 0 RADIUS CTR FROM ldiagangleto 360 dg CTR TO ldiagangleto
+  add CTR FROM ldiagangleto sub cvi 360 mod 0.5 mul add
+  ldiagatangle ldiagpadd /LMID ldiagpointdef
+  CTR LMID ldiagangleto 90 dg add /LMID@ANGLE ldiagangledef
+
+  /XINDENT xindent FROM LMID ldiagdistance ldiagmin def
+  CTR 0 0 RADIUS CTR FROM 0 0 XINDENT FROM@ANGLE ldiagatangle
+  ldiagpadd ldiagangleto ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  CTR LFROM ldiagangleto 90 dg add /LFROM@ANGLE ldiagangledef
+
+  /ZINDENT zindent TO LMID ldiagdistance ldiagmin def
+  CTR 0 0 RADIUS CTR TO 0 0 ZINDENT TO@ANGLE 180 dg add
+  ldiagatangle ldiagpadd ldiagangleto ldiagatangle ldiagpadd /LTO ldiagpointdef
+  CTR LTO ldiagangleto 90 dg add /LTO@ANGLE ldiagangledef
+
+  direct
+  { FROM [CTR] TO }
+  { FROM [CTR] LFROM [CTR] LMID [CTR] LTO [CTR] TO }
+  ifelse
+
+  % (leaving ldiagacurvepath) 0 ldiagdebugprint
+} def
+
+% fromarrowlen toarrowlen { from } { to } xindent zindent bias ldiagccurvepath -
+/ldiagccurvepath
+{
+  % (entering ldiagccurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  %/B1 bias 0.02 ft ldiagmax def
+  %/B2 from (CTR) ldiagdolabel to (CTR) ldiagdolabel ldiagdistance 0.5 mul def
+  %/BIAS B1 B2 ldiagmin def
+  /BIAS bias 0.02 ft ldiagmax def
+  /XMID [ from (CTR) ldiagdolabel 0.5 ldiagpmul
+	to (CTR) ldiagdolabel 0.5 ldiagpmul ldiagpadd ] cvx def
+  /XTOP [ XMID 0 0 BIAS from (CTR) ldiagdolabel to (CTR) ldiagdolabel
+	ldiagangleto 90 dg add ldiagatangle ldiagpadd ] cvx def
+  /CTR [ from (CTR) ldiagdolabel XTOP ldiaglinebetween
+         to (CTR) ldiagdolabel XTOP ldiaglinebetween ldiaglineintersect ] cvx def
+
+  from fromarrowlength [ CTR ] cvx ldiagcabout /FROM ldiagpointdef
+  from (CTR) ldiagdolabel FROM ldiagdistance 0 gt
+  { from (CTR) ldiagdolabel FROM ldiagangleto }
+  { CTR FROM ldiagangleto 90 dg sub }
+  ifelse /FROM@ANGLE ldiagangledef
+
+  to toarrowlength [ CTR ] cvx ldiagaabout /TO ldiagpointdef
+  TO to (CTR) ldiagdolabel ldiagdistance 0 gt
+  { TO to (CTR) ldiagdolabel ldiagangleto }
+  { CTR TO ldiagangleto 90 dg sub }
+  ifelse /TO@ANGLE ldiagangledef
+
+  /RADIUS [ CTR FROM ldiagdistance ] cvx def
+  CTR 0 0 RADIUS CTR TO ldiagangleto 360 dg CTR FROM ldiagangleto add
+  CTR TO ldiagangleto sub cvi 360 cvi mod 2 div add ldiagatangle
+  ldiagpadd /LMID ldiagpointdef
+  CTR LMID ldiagangleto 90 dg sub /LMID@ANGLE ldiagangledef
+
+  /XINDENT [ xindent FROM LMID ldiagdistance ldiagmin ] cvx def
+  CTR 0 0 RADIUS CTR FROM 0 0 XINDENT FROM@ANGLE ldiagatangle ldiagpadd
+  ldiagangleto ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  CTR LFROM ldiagangleto 90 dg sub /LFROM@ANGLE ldiagangledef
+
+  /ZINDENT [ zindent TO LMID ldiagdistance ldiagmin ] cvx def
+  CTR 0 0 RADIUS CTR TO 0 0 ZINDENT TO@ANGLE 180 dg add ldiagatangle
+  ldiagpadd ldiagangleto ldiagatangle ldiagpadd /LTO ldiagpointdef
+  CTR LTO ldiagangleto 90 dg sub /LTO@ANGLE ldiagangledef
+
+  direct
+  { FROM [CTR clockwise] TO }
+  { FROM [CTR clockwise] LFROM [CTR clockwise]
+  LMID [CTR clockwise] LTO [CTR clockwise] TO }
+  ifelse
+  % (leaving ldiagccurvepath) 0 ldiagdebugprint
+} def
+
+
+% farr tarr { from } { to } xindent zindent [frompt] [topt] ldiagbezierpath -
+/ldiagbezierpath
+{
+  % (entering ldiagbezierpath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  cvx /topt exch def
+  cvx /frompt exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel frompt ldiagangleto /FROM@ANGLE ldiagangledef
+  from (CTR) ldiagdolabel FROM@ANGLE from (CIRCUM) ldiagdolabel
+  ldiagpadd 0 0 fromarrowlength FROM@ANGLE ldiagatangle ldiagpadd
+  /FROM ldiagpointdef
+
+  topt to (CTR) ldiagdolabel ldiagangleto /TO@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel TO@ANGLE 180 dg add to (CIRCUM) ldiagdolabel
+  ldiagpadd 0 0 toarrowlength TO@ANGLE 180 dg add ldiagatangle ldiagpadd
+  /TO ldiagpointdef
+
+  FROM 0 0 xindent FROM@ANGLE ldiagatangle ldiagpadd
+  /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+
+  TO 0 0 zindent TO@ANGLE 180 dg add ldiagatangle ldiagpadd
+  /LTO ldiagpointdef
+  TO@ANGLE /LTO@ANGLE ldiagangledef
+
+  FROM TO ldiagpadd frompt ldiagpadd topt ldiagpadd 0.25 ldiagpmul
+  /LMID ldiagpointdef
+
+  FROM [frompt topt] TO
+
+  % (leaving ldiagbezierpath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+
+% farr tarr { from } { to } xindent zindent ldiagvhlinepath -
+/ldiagvhlinepath
+{
+  % (entering ldiagvhlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /CTR [ from (CTR) ldiagdolabel pop to (CTR) ldiagdolabel exch pop ] cvx def
+  /FANG [ from (CTR) ldiagdolabel CTR ldiagangleto ] cvx def
+  /TANG [ to (CTR) ldiagdolabel CTR ldiagangleto ] cvx def
+
+  from (CTR) ldiagdolabel FANG from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength FANG ldiagatangle ldiagpadd /FROM ldiagpointdef
+  FANG /FROM@ANGLE ldiagangledef
+
+  to (CTR) ldiagdolabel TANG to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength TANG ldiagatangle ldiagpadd /TO ldiagpointdef
+  TANG 180 dg add /TO@ANGLE ldiagangledef
+
+  /FDIST [ FROM CTR ldiagdistance ] cvx def
+  /TDIST [ TO CTR ldiagdistance ] cvx def
+  /XINDENT [ xindent FDIST ldiagmin ] cvx def
+  /ZINDENT [ zindent TDIST ldiagmin ] cvx def
+  FROM 0 0 XINDENT FANG ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+  TO 0 0 ZINDENT TANG ldiagatangle ldiagpadd /LTO ldiagpointdef
+  TO@ANGLE /LTO@ANGLE ldiagangledef
+
+  CTR /LMID ldiagpointdef
+  0 0 1 ft FANG 180 dg add ldiagatangle
+  0 0 1 ft TANG 180 dg add ldiagatangle
+  ldiagangleto /LMID@ANGLE ldiagangledef
+
+  FROM LFROM LMID LTO TO
+
+  % (leaving ldiagvhlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent radius ldiagvhcurvepath -
+/ldiagvhcurvepath
+{
+  % (entering ldiagvhcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /radius exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /CTR [ from (CTR) ldiagdolabel pop to (CTR) ldiagdolabel exch pop ] cvx def
+  /FANG [ from (CTR) ldiagdolabel CTR ldiagangleto ] cvx def
+  /TANG [ to (CTR) ldiagdolabel CTR ldiagangleto ] cvx def
+
+  from (CTR) ldiagdolabel FANG from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength FANG ldiagatangle ldiagpadd /FROM ldiagpointdef
+  FANG /FROM@ANGLE ldiagangledef
+
+  to (CTR) ldiagdolabel TANG to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength TANG ldiagatangle ldiagpadd /TO ldiagpointdef
+  TANG 180 dg add /TO@ANGLE ldiagangledef
+
+  /FDIST [ FROM CTR ldiagdistance ] cvx def
+  /TDIST [ TO CTR ldiagdistance ] cvx def
+  /RADIUS [ radius FDIST TDIST ldiagmin ldiagmin ] cvx def
+  /XINDENT [ xindent FDIST RADIUS sub ldiagmin ] cvx def
+  /ZINDENT [ zindent TDIST RADIUS sub ldiagmin ] cvx def
+
+  FROM 0 0 XINDENT FANG ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+  TO 0 0 ZINDENT TANG ldiagatangle ldiagpadd /LTO ldiagpointdef
+  TO@ANGLE /LTO@ANGLE ldiagangledef
+
+  /FCTR [ CTR 0 0 RADIUS FROM@ANGLE 180 dg add ldiagatangle ldiagpadd ] cvx def
+  /TCTR [ CTR 0 0 RADIUS TO@ANGLE ldiagatangle ldiagpadd ] cvx def
+  /XCTR [ CTR 0 0 RADIUS FROM@ANGLE 180 dg add ldiagatangle ldiagpadd
+              0 0 RADIUS TO@ANGLE ldiagatangle ldiagpadd ] cvx def
+  XCTR 0 0 RADIUS XCTR CTR ldiagangleto ldiagatangle ldiagpadd
+  /LMID ldiagpointdef
+  FCTR TCTR ldiagangleto /LMID@ANGLE ldiagangledef
+
+  FROM LFROM FCTR
+  {[XCTR clockwise]} {} {} {} {} {[XCTR]} {[XCTR clockwise]} {[XCTR]}
+  FCTR TCTR ldiagangleto ldiagquadcase
+  TCTR LTO TO
+
+  % (leaving ldiagvhcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent ldiaghvlinepath -
+/ldiaghvlinepath
+{
+  % (entering ldiaghvlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /CTR [ to (CTR) ldiagdolabel pop from (CTR) ldiagdolabel exch pop ] cvx def
+  /FANG [ from (CTR) ldiagdolabel CTR ldiagangleto ] cvx def
+  /TANG [ to (CTR) ldiagdolabel CTR ldiagangleto ] cvx def
+
+  from (CTR) ldiagdolabel FANG from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength FANG ldiagatangle ldiagpadd /FROM ldiagpointdef
+  FANG /FROM@ANGLE ldiagangledef
+
+  to (CTR) ldiagdolabel TANG to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength TANG ldiagatangle ldiagpadd /TO ldiagpointdef
+  TANG 180 dg add /TO@ANGLE ldiagangledef
+
+  /FDIST [ FROM CTR ldiagdistance ] cvx def
+  /TDIST [ TO CTR ldiagdistance ] cvx def
+  /XINDENT [ xindent FDIST ldiagmin ] cvx def
+  /ZINDENT [ zindent TDIST ldiagmin ] cvx def
+
+  FROM 0 0 XINDENT FANG ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+  TO 0 0 ZINDENT TANG ldiagatangle ldiagpadd /LTO ldiagpointdef
+  TO@ANGLE /LTO@ANGLE ldiagangledef
+
+  CTR /LMID ldiagpointdef
+  0 0 1 ft FANG 180 dg add ldiagatangle
+  0 0 1 ft TANG 180 dg add ldiagatangle ldiagangleto
+  /LMID@ANGLE ldiagangledef
+
+  FROM LFROM LMID LTO TO
+
+  % (leaving ldiaghvlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent radius ldiaghvcurvepath -
+/ldiaghvcurvepath
+{
+  % (entering ldiaghvcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /radius exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /CTR [ to (CTR) ldiagdolabel pop from (CTR) ldiagdolabel exch pop ] cvx def
+  /FANG [ from (CTR) ldiagdolabel CTR ldiagangleto ] cvx def
+  /TANG [ to (CTR) ldiagdolabel CTR ldiagangleto ] cvx def
+
+  from (CTR) ldiagdolabel FANG from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength FANG ldiagatangle ldiagpadd /FROM ldiagpointdef
+  FANG /FROM@ANGLE ldiagangledef
+
+  to (CTR) ldiagdolabel TANG to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength TANG ldiagatangle ldiagpadd /TO ldiagpointdef
+  TANG 180 dg add /TO@ANGLE ldiagangledef
+
+  /FDIST [ FROM CTR ldiagdistance ] cvx def
+  /TDIST [ TO CTR ldiagdistance ] cvx def
+  /RADIUS [ radius FDIST TDIST ldiagmin ldiagmin ] cvx def
+  /XINDENT [ xindent FDIST RADIUS sub ldiagmin ] cvx def
+  /ZINDENT [ zindent TDIST RADIUS sub ldiagmin ] cvx def
+  FROM 0 0 XINDENT FANG ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+  TO 0 0 ZINDENT TANG ldiagatangle ldiagpadd /LTO ldiagpointdef
+  TO@ANGLE /LTO@ANGLE ldiagangledef
+
+  /FCTR [ CTR 0 0 RADIUS FROM@ANGLE 180 dg add ldiagatangle ldiagpadd ] cvx def
+  /TCTR [ CTR 0 0 RADIUS TO@ANGLE ldiagatangle ldiagpadd ] cvx def
+  /XCTR [ CTR 0 0 RADIUS FROM@ANGLE 180 dg add ldiagatangle ldiagpadd
+	      0 0 RADIUS TO@ANGLE ldiagatangle ldiagpadd ] cvx def
+  XCTR 0 0 RADIUS XCTR CTR ldiagangleto ldiagatangle ldiagpadd
+  /LMID ldiagpointdef
+  FCTR TCTR ldiagangleto /LMID@ANGLE ldiagangledef
+
+  FROM LFROM FCTR
+  {[XCTR]} {} {} {} {} {[XCTR clockwise]} {[XCTR]} {[XCTR clockwise]}
+  FCTR TCTR ldiagangleto ldiagquadcase
+  TCTR LTO TO
+
+  % (leaving ldiaghvcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent bias ldiaglvrlinepath -
+/ldiaglvrlinepath
+{
+  % (entering ldiaglvrlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel 180 dg from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength 180 dg ldiagatangle ldiagpadd /FROM ldiagpointdef
+  180 dg /FROM@ANGLE ldiagangledef
+
+  to (CTR) ldiagdolabel 180 dg to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength 180 dg ldiagatangle ldiagpadd /TO ldiagpointdef
+  0 dg /TO@ANGLE ldiagangledef
+
+  /XLEFT [ FROM pop TO pop ldiagmin bias sub ] cvx def
+  XLEFT FROM exch pop /P1 ldiagpointdef
+  XLEFT TO exch pop /P2 ldiagpointdef
+  /VERT [ P1 P2 ldiagangleto ] cvx def
+  P1 P1 0 0 1 ft 180 dg ldiagatangle ldiagpadd 0 0 1 ft VERT ldiagatangle
+  ldiagpadd ldiagangleto /P1@ANGLE ldiagangledef
+  P2 P2 0 0 1 ft 0 dg ldiagatangle ldiagpadd 0 0 1 ft VERT ldiagatangle
+  ldiagpadd ldiagangleto /P2@ANGLE ldiagangledef
+
+  P1 0.5 ldiagpmul P2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  VERT /LMID@ANGLE ldiagangledef
+
+  /XINDENT [ xindent FROM P1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent P2 TO ldiagdistance ldiagmin ] cvx def
+  XINDENT 0 FROM ldiagpsub /LFROM ldiagpointdef
+  180 dg /LFROM@ANGLE ldiagangledef
+  ZINDENT 0 TO ldiagpsub /LTO ldiagpointdef
+  0 dg /LTO@ANGLE ldiagangledef
+
+  FROM LFROM P1 LMID P2 LTO TO
+
+  % (leaving ldiaglvrlinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent bias radius ldiaglvrcurvepath -
+/ldiaglvrcurvepath
+{
+  % (entering ldiaglvrcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /radius exch def
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel 180 dg from (CIRCUM) ldiagdolabel ldiagpadd 0 0
+  fromarrowlength 180 dg ldiagatangle ldiagpadd /FROM ldiagpointdef
+  180 dg /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel 180 dg to (CIRCUM) ldiagdolabel ldiagpadd 0 0
+  toarrowlength 180 dg ldiagatangle ldiagpadd /TO ldiagpointdef
+  0 dg /TO@ANGLE ldiagangledef
+  /XLEFT [ FROM pop TO pop ldiagmin bias sub ] cvx def
+  /XP1 [ XLEFT FROM exch pop ] cvx def
+  /XP2 [ XLEFT TO exch pop ] cvx def
+  /VERT [ XP1 XP2 ldiagangleto ] cvx def
+  XP1 0.5 ldiagpmul XP2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  VERT /LMID@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM XP1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent XP2 TO ldiagdistance ldiagmin ] cvx def
+  XINDENT 0 FROM ldiagpsub /LFROM ldiagpointdef
+  180 dg /LFROM@ANGLE ldiagangledef
+  ZINDENT 0 TO ldiagpsub /LTO ldiagpointdef
+  0 dg /LTO@ANGLE ldiagangledef
+  /RADIUS [ radius XP1 XP2 ldiagdistance 2 div ldiagmin ] cvx def
+  /XP1PRE [ XP1 0 0 RADIUS 0 dg ldiagatangle ldiagpadd ] cvx def
+  /XP1POST [ XP1 0 0 RADIUS VERT ldiagatangle ldiagpadd ] cvx def
+  /XP1CTR [ XP1PRE 0 0 RADIUS VERT ldiagatangle ldiagpadd ] cvx def
+  XP1CTR 0 0 RADIUS XP1CTR XP1 ldiagangleto ldiagatangle ldiagpadd
+  /P1 ldiagpointdef
+  XP1PRE XP1POST ldiagangleto /P1@ANGLE ldiagangledef
+  /XP2PRE [ 0 0 RADIUS VERT ldiagatangle XP2 ldiagpsub ] cvx def
+  /XP2POST [ XP2 0 0 RADIUS 0 dg ldiagatangle ldiagpadd ] cvx def
+  /XP2CTR [ XP2PRE 0 0 RADIUS 0 dg ldiagatangle ldiagpadd ] cvx def
+  XP2CTR 0 0 RADIUS XP2CTR XP2 ldiagangleto ldiagatangle ldiagpadd
+  /P2 ldiagpointdef
+  XP2PRE XP2POST ldiagangleto /P2@ANGLE ldiagangledef
+  FROM LFROM XP1PRE
+  {  } { [XP1CTR] P1 [XP1CTR] } {  } { [XP1CTR clockwise] P1 [XP1CTR clockwise] }
+  {  } {  } {  } {  } VERT round ldiagquadcase
+  XP1POST LMID XP2PRE
+  {  } { [XP2CTR] P2 [XP2CTR] } {  } { [XP2CTR clockwise] P2 [XP2CTR clockwise] }
+  {  } {  } {  } {  } VERT round ldiagquadcase
+  XP2POST LTO TO
+
+  % (leaving ldiaglvrcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent bias ldiagrvllinepath -
+/ldiagrvllinepath
+{
+  % (entering ldiagrvllinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel 0 dg from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength 0 dg ldiagatangle ldiagpadd /FROM ldiagpointdef
+  0 dg /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel 0 dg to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength 0 dg ldiagatangle ldiagpadd /TO ldiagpointdef
+  180 dg /TO@ANGLE ldiagangledef
+  /XRIGHT [ FROM pop TO pop ldiagmax bias add ] cvx def
+  XRIGHT FROM exch pop /P1 ldiagpointdef
+  XRIGHT TO exch pop /P2 ldiagpointdef
+  /VERT [ P1 P2 ldiagangleto ] cvx def
+  P1 P1 0 0 1 ft 0 dg ldiagatangle ldiagpadd 0 0 1 ft VERT ldiagatangle
+  ldiagpadd ldiagangleto /P1@ANGLE ldiagangledef
+  P2 P2 0 0 1 ft 180 dg ldiagatangle ldiagpadd 0 0 1 ft VERT ldiagatangle
+  ldiagpadd ldiagangleto /P2@ANGLE ldiagangledef
+  P1 0.5 ldiagpmul P2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  VERT /LMID@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM P1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent P2 TO ldiagdistance ldiagmin ] cvx def
+  FROM XINDENT 0 ldiagpadd /LFROM ldiagpointdef
+  0 dg /LFROM@ANGLE ldiagangledef
+  TO ZINDENT 0 ldiagpadd /LTO ldiagpointdef
+  180 dg /LTO@ANGLE ldiagangledef
+  FROM LFROM P1 LMID P2 LTO TO
+
+  % (leaving ldiagrvllinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+
+% farr tarr { from } { to } xindent zindent bias radius ldiagrvlcurvepath -
+/ldiagrvlcurvepath
+{
+  % (entering ldiagrvlcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /radius exch def
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  from (CTR) ldiagdolabel 0 dg from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength 0 dg ldiagatangle ldiagpadd /FROM ldiagpointdef
+  0 dg /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel 0 dg to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength 0 dg ldiagatangle ldiagpadd /TO ldiagpointdef
+  180 dg /TO@ANGLE ldiagangledef
+  /XRIGHT [ FROM pop TO pop ldiagmax bias add ] cvx def
+  /XP1 [ XRIGHT FROM exch pop ] cvx def
+  /XP2 [ XRIGHT TO exch pop ] cvx def
+  /VERT [ XP1 XP2 ldiagangleto ] cvx def
+  XP1 0.5 ldiagpmul XP2 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  VERT /LMID@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM XP1 ldiagdistance ldiagmin ] cvx def
+  /ZINDENT [ zindent XP2 TO ldiagdistance ldiagmin ] cvx def
+  FROM XINDENT 0 ldiagpadd /LFROM ldiagpointdef
+  0 dg /LFROM@ANGLE ldiagangledef
+  TO ZINDENT 0 ldiagpadd /LTO ldiagpointdef
+  180 dg /LTO@ANGLE ldiagangledef
+  /RADIUS [ radius XP1 XP2 ldiagdistance 0.5 mul ldiagmin ] cvx def
+  /XP1PRE [ XP1 0 0 RADIUS 180 dg ldiagatangle ldiagpadd ] cvx def
+  /XP1POST [ XP1 0 0 RADIUS VERT ldiagatangle ldiagpadd ] cvx def
+  /XP1CTR [ XP1PRE 0 0 RADIUS VERT ldiagatangle ldiagpadd ] cvx def
+  XP1CTR 0 0 RADIUS XP1CTR XP1 ldiagangleto ldiagatangle ldiagpadd
+  /P1 ldiagpointdef
+  XP1PRE XP1POST ldiagangleto /P1@ANGLE ldiagangledef
+  /XP2PRE [ 0 0 RADIUS VERT ldiagatangle XP2 ldiagpsub ] cvx def
+  /XP2POST [ XP2 0 0 RADIUS 180 dg ldiagatangle ldiagpadd ] cvx def
+  /XP2CTR [ XP2PRE 0 0 RADIUS 180 dg ldiagatangle ldiagpadd ] cvx def
+  XP2CTR 0 0 RADIUS XP2CTR XP2 ldiagangleto ldiagatangle ldiagpadd
+  /P2 ldiagpointdef
+  XP2PRE XP2POST ldiagangleto /P2@ANGLE ldiagangledef
+  FROM LFROM XP1PRE
+  {} {[XP1CTR clockwise] P1 [XP1CTR clockwise]} {} {[XP1CTR] P1 [XP1CTR]}
+  {} {} {} {} VERT round ldiagquadcase
+  XP1POST LMID XP2PRE
+  {} {[XP2CTR clockwise] P2 [XP2CTR clockwise]} {} {[XP2CTR] P2 [XP2CTR]}
+  {} {} {} {} VERT round ldiagquadcase
+  XP2POST LTO TO
+
+  % (leaving ldiagrvlcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent bias fbias tbias ldiagdwraplinepath -
+/ldiagdwraplinepath
+{
+  % (entering ldiagdwraplinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /tbias exch def
+  /fbias exch def
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /DIRN [ from (CTR) ldiagdolabel pop to (CTR) ldiagdolabel pop
+  lt { 180 dg } { 0 dg } ifelse ] cvx def
+  from (CTR) ldiagdolabel DIRN from (CIRCUM) ldiagdolabel ldiagpadd 0 0
+  fromarrowlength DIRN ldiagatangle ldiagpadd /FROM ldiagpointdef
+  DIRN /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel DIRN 180 dg add to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength DIRN 180 dg add ldiagatangle ldiagpadd /TO ldiagpointdef
+  DIRN /TO@ANGLE ldiagangledef
+  FROM 0 0 fbias 0 ldiagmax DIRN ldiagatangle ldiagpadd /P1 ldiagpointdef
+  DIRN 180 dg eq { 225 dg } { -45 dg } ifelse /P1@ANGLE ldiagangledef
+  TO 0 0 tbias 0 ldiagmax DIRN 180 dg add ldiagatangle ldiagpadd
+  /P4 ldiagpointdef
+  DIRN 180 dg eq { 135 dg } { 45 dg } ifelse /P4@ANGLE ldiagangledef
+  /YC [ from (CTR) ldiagdolabel 270 dg from (CIRCUM) ldiagdolabel ldiagpadd
+  exch pop to (CTR) ldiagdolabel 270 dg to (CIRCUM) ldiagdolabel ldiagpadd
+  exch pop ldiagmin bias 0 ldiagmax sub ] cvx def
+  P1 pop YC /P2 ldiagpointdef
+  P4@ANGLE 180 dg sub /P2@ANGLE ldiagangledef
+  P4 pop YC /P3 ldiagpointdef
+  P1@ANGLE 180 dg sub /P3@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM P1 ldiagdistance ldiagmin ] cvx def
+  FROM 0 0 XINDENT DIRN ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+  /ZINDENT [ zindent TO P4 ldiagdistance ldiagmin ] cvx def
+  TO 0 0 ZINDENT DIRN 180 dg add ldiagatangle ldiagpadd /LTO ldiagpointdef
+  TO@ANGLE /LTO@ANGLE ldiagangledef
+  P2 0.5 ldiagpmul P3 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  DIRN 180 dg sub /LMID@ANGLE ldiagangledef
+  FROM P1 P2 P3 P4 TO
+
+  % (leaving ldiagdwraplinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent bias fbias tbias radius
+% ldiagdwrapcurvepath -
+/ldiagdwrapcurvepath
+{
+  % (entering ldiagdwrapcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /radius exch def
+  /tbias exch def
+  /fbias exch def
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /DIRN [ from (CTR) ldiagdolabel pop to (CTR) ldiagdolabel pop lt
+  { 180 dg } { 0 dg } ifelse ] cvx def
+  /CLOCK [ from (CTR) ldiagdolabel pop to (CTR) ldiagdolabel pop lt
+  { anticlockwise } { clockwise } ifelse ] cvx def
+  from (CTR) ldiagdolabel DIRN from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength DIRN ldiagatangle ldiagpadd /FROM ldiagpointdef
+  DIRN /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel DIRN 180 dg add to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength DIRN 180 dg add ldiagatangle ldiagpadd /TO ldiagpointdef
+  DIRN /TO@ANGLE ldiagangledef
+  /XP1 [ FROM 0 0 fbias 0 ldiagmax DIRN ldiagatangle ldiagpadd ] cvx def
+  /XP4 [ TO 0 0 tbias 0 ldiagmax DIRN 180 dg add ldiagatangle ldiagpadd ] cvx def
+  /YC [ from (CTR) ldiagdolabel 270 dg from (CIRCUM) ldiagdolabel ldiagpadd
+  exch pop to (CTR) ldiagdolabel 270 dg to (CIRCUM) ldiagdolabel ldiagpadd
+  exch pop ldiagmin bias 0 ldiagmax sub ] cvx def
+  /XP2 [ XP1 pop YC ] cvx def
+  /XP3 [ XP4 pop YC ] cvx def
+  /RP1 [ radius XP1 FROM ldiagdistance XP1 XP2 ldiagdistance 2 div
+  ldiagmin ldiagmin ] cvx def
+  /XP1PRE [ XP1 0 0 RP1 XP1 FROM ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP1POST [ XP1 0 0 RP1 XP1 XP2 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP1CTR [ XP1PRE 0 0 RP1 XP1 XP2 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  XP1CTR 0 0 RP1 XP1CTR XP1 ldiagangleto ldiagatangle ldiagpadd /P1 ldiagpointdef
+  XP1CTR P1 ldiagangleto DIRN add 90 dg sub /P1@ANGLE ldiagangledef
+  /RP2 [ radius XP1 XP2 ldiagdistance 2 div XP2 XP3 ldiagdistance 2 div
+  ldiagmin ldiagmin ] cvx def
+  /XP2PRE [ XP2 0 0 RP2 XP2 XP1 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP2POST [ XP2 0 0 RP2 XP2 XP3 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP2CTR [ XP2PRE 0 0 RP2 XP2 XP3 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  XP2CTR 0 0 RP2 XP2CTR XP2 ldiagangleto ldiagatangle ldiagpadd /P2 ldiagpointdef
+  XP2CTR P2 ldiagangleto DIRN add 90 dg sub /P2@ANGLE ldiagangledef
+  /RP3 [ radius XP2 XP3 ldiagdistance 2 div XP3 XP4 ldiagdistance 2 div
+  ldiagmin ldiagmin ] cvx def
+  /XP3PRE [ XP3 0 0 RP3 XP3 XP2 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP3POST [ XP3 0 0 RP3 XP3 XP4 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP3CTR [ XP3PRE 0 0 RP3 XP3 XP4 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  XP3CTR 0 0 RP3 XP3CTR XP3 ldiagangleto ldiagatangle ldiagpadd /P3 ldiagpointdef
+  XP3CTR P3 ldiagangleto DIRN add 90 dg sub /P3@ANGLE ldiagangledef
+  /RP4 [ radius XP4 XP3 ldiagdistance 2 div XP4 TO ldiagdistance
+  ldiagmin ldiagmin ] cvx def
+  /XP4PRE [ XP4 0 0 RP4 XP4 XP3 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP4POST [ XP4 0 0 RP4 XP4 TO ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP4CTR [ XP4PRE 0 0 RP4 XP4 TO ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  XP4CTR 0 0 RP4 XP4CTR XP4 ldiagangleto ldiagatangle ldiagpadd /P4 ldiagpointdef
+  XP4CTR P4 ldiagangleto DIRN add 90 dg sub /P4@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM XP1PRE ldiagdistance ldiagmin ] cvx def
+  FROM 0 0 XINDENT DIRN ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+  XP2 0.5 ldiagpmul XP3 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  DIRN 180 dg sub /LMID@ANGLE ldiagangledef
+  /ZINDENT [ zindent TO XP4POST ldiagdistance ldiagmin ] cvx def
+  TO 0 0 ZINDENT DIRN 180 dg add ldiagatangle ldiagpadd /LTO ldiagpointdef
+  TO@ANGLE /LTO@ANGLE ldiagangledef
+  FROM LFROM
+  XP1PRE [XP1CTR CLOCK] XP1POST
+  XP2PRE [XP2CTR CLOCK] XP2POST
+  LMID
+  XP3PRE [XP3CTR CLOCK] XP3POST
+  XP4PRE [XP4CTR CLOCK] XP4POST
+  LTO TO
+
+  % (leaving ldiagdwrapcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent bias fbias tbias ldiaguwraplinepath -
+/ldiaguwraplinepath
+{
+  % (entering ldiaguwraplinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /tbias exch def
+  /fbias exch def
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /DIRN [ from (CTR) ldiagdolabel pop to (CTR) ldiagdolabel pop lt
+  { 180 dg } { 0 dg } ifelse ] cvx def
+  from (CTR) ldiagdolabel DIRN from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength DIRN ldiagatangle ldiagpadd /FROM ldiagpointdef
+  DIRN /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel DIRN 180 dg add to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength DIRN 180 dg add ldiagatangle ldiagpadd /TO ldiagpointdef
+  DIRN /TO@ANGLE ldiagangledef
+  FROM 0 0 fbias 0 ldiagmax DIRN ldiagatangle ldiagpadd /P1 ldiagpointdef
+  DIRN 180 dg eq { 135 dg } { 45 dg } ifelse /P1@ANGLE ldiagangledef
+  TO 0 0 tbias 0 ldiagmax DIRN 180 dg add ldiagatangle ldiagpadd
+  /P4 ldiagpointdef
+  DIRN 180 dg eq { 225 dg } { -45 dg } ifelse /P4@ANGLE ldiagangledef
+  /YC [ from (CTR) ldiagdolabel 90 dg from (CIRCUM) ldiagdolabel ldiagpadd
+  exch pop to (CTR) ldiagdolabel 90 dg to (CIRCUM) ldiagdolabel ldiagpadd
+  exch pop ldiagmax bias 0 ldiagmax add ] cvx def
+  P1 pop YC /P2 ldiagpointdef
+  P4@ANGLE 180 dg sub /P2@ANGLE ldiagangledef
+  P4 pop YC /P3 ldiagpointdef
+  P1@ANGLE 180 dg sub /P3@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM P1 ldiagdistance ldiagmin ] cvx def
+  FROM 0 0 XINDENT DIRN ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+  /ZINDENT [ zindent TO P4 ldiagdistance ldiagmin ] cvx def
+  TO 0 0 ZINDENT DIRN 180 dg add ldiagatangle ldiagpadd /LTO ldiagpointdef
+  TO@ANGLE /LTO@ANGLE ldiagangledef
+  P2 0.5 ldiagpmul P3 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  DIRN 180 dg sub /LMID@ANGLE ldiagangledef
+  FROM P1 P2 P3 P4 TO
+
+  % (leaving ldiaguwraplinepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% farr tarr { from } { to } xindent zindent bias fbias tbias radius
+% ldiaguwrapcurvepath -
+/ldiaguwrapcurvepath
+{
+  % (entering ldiaguwrapcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+  /radius exch def
+  /tbias exch def
+  /fbias exch def
+  /bias exch def
+  /zindent exch def
+  /xindent exch def
+  cvlit /to exch def
+  cvlit /from exch def
+  /toarrowlength exch def
+  /fromarrowlength exch def
+
+  /DIRN [ from (CTR) ldiagdolabel pop to (CTR) ldiagdolabel pop lt
+  { 180 dg } { 0 dg } ifelse ] cvx def
+  /CLOCK [ from (CTR) ldiagdolabel pop to (CTR) ldiagdolabel pop lt
+  { clockwise } { anticlockwise } ifelse ] cvx def
+  from (CTR) ldiagdolabel DIRN from (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 fromarrowlength DIRN ldiagatangle ldiagpadd /FROM ldiagpointdef
+  DIRN /FROM@ANGLE ldiagangledef
+  to (CTR) ldiagdolabel DIRN 180 dg add to (CIRCUM) ldiagdolabel ldiagpadd
+  0 0 toarrowlength DIRN 180 dg add ldiagatangle ldiagpadd /TO ldiagpointdef
+  DIRN /TO@ANGLE ldiagangledef
+  /XP1 [ FROM 0 0 fbias 0 ldiagmax DIRN ldiagatangle ldiagpadd ] cvx def
+  /XP4 [ TO 0 0 tbias 0 ldiagmax DIRN 180 dg add ldiagatangle ldiagpadd ] cvx def
+  /YC [ from (CTR) ldiagdolabel 90 dg from (CIRCUM) ldiagdolabel ldiagpadd
+  exch pop to (CTR) ldiagdolabel 90 dg to (CIRCUM) ldiagdolabel ldiagpadd
+  exch pop ldiagmax bias 0 ldiagmax add ] cvx def
+  /XP2 [ XP1 pop YC ] cvx def
+  /XP3 [ XP4 pop YC ] cvx def
+  /RP1 [ radius XP1 FROM ldiagdistance XP1 XP2 ldiagdistance 2 div
+  ldiagmin ldiagmin ] cvx def
+  /XP1PRE [ XP1 0 0 RP1 XP1 FROM ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP1POST [ XP1 0 0 RP1 XP1 XP2 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP1CTR [ XP1PRE 0 0 RP1 XP1 XP2 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  XP1CTR 0 0 RP1 XP1CTR XP1 ldiagangleto ldiagatangle ldiagpadd /P1 ldiagpointdef
+  XP1CTR P1 ldiagangleto DIRN add 90 dg add /P1@ANGLE ldiagangledef
+  /RP2 [ radius XP1 XP2 ldiagdistance 2 div XP2 XP3 ldiagdistance 2 div
+  ldiagmin ldiagmin ] cvx def
+  /XP2PRE [ XP2 0 0 RP2 XP2 XP1 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP2POST [ XP2 0 0 RP2 XP2 XP3 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP2CTR [ XP2PRE 0 0 RP2 XP2 XP3 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  XP2CTR 0 0 RP2 XP2CTR XP2 ldiagangleto ldiagatangle ldiagpadd /P2 ldiagpointdef
+  XP2CTR P2 ldiagangleto DIRN add 90 dg add /P2@ANGLE ldiagangledef
+  /RP3 [ radius XP2 XP3 ldiagdistance 2 div XP3 XP4 ldiagdistance 2 div
+  ldiagmin ldiagmin ] cvx def
+  /XP3PRE [ XP3 0 0 RP3 XP3 XP2 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP3POST [ XP3 0 0 RP3 XP3 XP4 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP3CTR [ XP3PRE 0 0 RP3 XP3 XP4 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  XP3CTR 0 0 RP3 XP3CTR XP3 ldiagangleto ldiagatangle ldiagpadd /P3 ldiagpointdef
+  XP3CTR P3 ldiagangleto DIRN add 90 dg add /P3@ANGLE ldiagangledef
+  /RP4 [ radius XP4 XP3 ldiagdistance 2 div XP4 TO ldiagdistance
+  ldiagmin ldiagmin ] cvx def
+  /XP4PRE [ XP4 0 0 RP4 XP4 XP3 ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP4POST [ XP4 0 0 RP4 XP4 TO ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  /XP4CTR [ XP4PRE 0 0 RP4 XP4 TO ldiagangleto ldiagatangle ldiagpadd ] cvx def
+  XP4CTR 0 0 RP4 XP4CTR XP4 ldiagangleto ldiagatangle ldiagpadd /P4 ldiagpointdef
+  XP4CTR P4 ldiagangleto DIRN add 90 dg add /P4@ANGLE ldiagangledef
+  /XINDENT [ xindent FROM XP1PRE ldiagdistance ldiagmin ] cvx def
+  FROM 0 0 XINDENT DIRN ldiagatangle ldiagpadd /LFROM ldiagpointdef
+  FROM@ANGLE /LFROM@ANGLE ldiagangledef
+  XP2 0.5 ldiagpmul XP3 0.5 ldiagpmul ldiagpadd /LMID ldiagpointdef
+  DIRN 180 dg sub /LMID@ANGLE ldiagangledef
+  /ZINDENT [ zindent TO XP4POST ldiagdistance ldiagmin ] cvx def
+  TO 0 0 ZINDENT DIRN 180 dg add ldiagatangle ldiagpadd /LTO ldiagpointdef
+  TO@ANGLE /LTO@ANGLE ldiagangledef
+  FROM LFROM
+  XP1PRE [XP1CTR CLOCK] XP1POST
+  XP2PRE [XP2CTR CLOCK] XP2POST
+  LMID
+  XP3PRE [XP3CTR CLOCK] XP3POST
+  XP4PRE [XP4CTR CLOCK] XP4POST
+  LTO TO
+
+  % (leaving ldiaguwrapcurvepath) 0 ldiagdebugprint
+  % count (  stack size is) 1 ldiagdebugprint pop
+} def
+
+% shape and labels of the @SolidArrowHead symbol
+% - ldiagsolidarrowhead -
+/ldiagsolidarrowhead
+{
+  0 0 xsize ysize 0.5 mul 0 ysize
+} def
+
+% shape and labels of the @OpenArrowHead symbol
+% <pathwidth> ldiagopenarrowhead -
+/ldiagopenarrowhead
+{
+  /pathwidth exch def
+  /PSW [ 0 0 ] cvx def
+  /PNW [ 0 ysize ] cvx def
+  /PE  [ xsize ysize 0.5 mul ] cvx def
+  /REL [ 0 0 pathwidth PE PNW ldiagangleto 90 add ldiagatangle ] cvx def
+  /PNA [ 0 ysize 0.5 mul pathwidth 0.5 mul add ] cvx def
+  /PSA [ 0 ysize 0.5 mul pathwidth 0.5 mul sub ] cvx def
+  /PNI [ PNA PNA xsize 0 ldiagpadd PNW REL ldiagpadd
+	 PE REL ldiagpadd ldiaglineintersect ] cvx def
+  /PSI [ 0 pathwidth PNI ldiagpsub ] cvx def
+
+  PSW PE PNW PNI PNA PSA PSI PSW
+} def
+
+% shape and labels of the @HalfOpenArrowHead symbol
+% <pathwidth> ldiaghalfopenarrowhead -
+/ldiaghalfopenarrowhead
+{
+  /pathwidth exch def
+  0 0
+  xsize ysize 0.5 mul
+  0 ysize
+  xsize 0.3 mul ysize 0.5 mul pathwidth 0.5 mul add
+  0             ysize 0.5 mul pathwidth 0.5 mul add
+  0             ysize 0.5 mul pathwidth 0.5 mul sub
+  xsize 0.3 mul ysize 0.5 mul pathwidth 0.5 mul sub
+  0 0
+} def
+
+% shape and labels of the @SolidCurvedArrowHead symbol
+% - ldiagsolidcurvedarrowhead -
+/ldiagsolidcurvedarrowhead
+{
+  0 0
+  [0 0 xsize ysize 0.5 mul ldiaglinebetween
+   xsize 0 xsize ysize ldiaglineintersect clockwise]
+  xsize ysize 0.5 mul
+  [xsize ysize 0.5 mul 0 ysize ldiaglinebetween
+   xsize 0 xsize ysize ldiaglineintersect clockwise]
+  0 ysize
+} def
+
+% shape and labels of the @OpenCurvedArrowHead symbol
+% <pathwidth> ldiagopencurvedarrowhead -
+/ldiagopencurvedarrowhead
+{
+  /pathwidth exch def
+  /LR [ 0 0 xsize ysize 0.5 mul ldiaglinebetween
+	xsize 0 xsize ysize ldiaglineintersect
+      ] cvx def
+  /UR [ xsize ysize 0.5 mul 0 ysize ldiaglinebetween
+	xsize 0 xsize ysize ldiaglineintersect
+      ] cvx def
+  /PW2 [ pathwidth 0.5 mul ] cvx def
+  /UMID [
+      0 ysize 0.5 mul PW2 add
+      xsize ysize 0.5 mul PW2 add
+      0 ysize 0 0 1 ft UR 0 ysize ldiagangleto 90 add ldiagatangle
+      ldiagpadd 0 ysize ldiaglineintersect
+      ] cvx def
+  /LMID [ 0 pathwidth UMID ldiagpsub ] cvx def
+  0 0
+  [LR clockwise]
+  xsize ysize 0.5 mul
+  [UR clockwise]
+  0 ysize
+  UMID
+  0 ysize 0.5 mul PW2 add
+  0 ysize 0.5 mul PW2 sub
+  LMID
+  0 0
+} def
+
+% shape and labels of the @HalfOpenCurvedArrowHead symbol
+% <pathwidth> ldiaghalfopencurvedarrowhead -
+/ldiaghalfopencurvedarrowhead
+{
+  /pathwidth exch def
+  /LR [ 0 0 xsize ysize 0.5 mul ldiaglinebetween
+	xsize 0 xsize ysize ldiaglineintersect
+      ] cvx def
+  /UR [ xsize ysize 0.5 mul 0 ysize ldiaglinebetween
+	xsize 0 xsize ysize ldiaglineintersect
+      ] cvx def
+  /BR [ 0 0 LR 0 ysize UR ldiaglineintersect ] cvx def
+  /BRAD [ 0 0 BR ldiagdistance ] cvx def
+  /PW2 [ pathwidth 0.5 mul ] cvx def
+  /XDIST [ BRAD dup mul PW2 dup mul sub sqrt ] cvx def
+  /UMID [ BR XDIST PW2 ldiagpadd ] cvx def
+  /LMID [ BR XDIST 0 PW2 sub ldiagpadd ] cvx def
+  0 0
+  [LR clockwise]
+  xsize ysize 0.5 mul
+  [UR clockwise]
+  0 ysize
+  [BR clockwise]
+  UMID
+  0 ysize 0.5 mul PW2 add
+  0 ysize 0.5 mul PW2 sub
+  LMID
+  [BR clockwise]
+  0 0
+} def
+
+end
+%%EndResource

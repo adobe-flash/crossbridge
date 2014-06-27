@@ -1,0 +1,53 @@
+1c1
+< spiffword rem this file should be named Sample.3
+---
+> spiffword rem this file should be named Sample.4
+3c3
+< spiffword rem it should be compared with a file named Sample.4, to use it
+---
+> spiffword rem it should be compared with a file named Sample.3, to use it
+10c10
+< no difference --> 0.0           different --> 0.0
+---
+> no difference --> 0.0000000001  different --> 0.00000000011
+12c12
+< no difference --> 10.           different --> 10.00000
+---
+> no difference --> 10.000000001  different --> 10.0000000011
+13c13
+< spiffword rem Note that spiff said that the differences were on lines 2 and 4
+---
+> spiffword rem Note that spiff said that the differences were on lines 1 and 3
+13c13
+< spiffword rem Note that spiff said that the differences were on lines 2 and 4
+---
+> spiffword rem Note that spiff said that the differences were on lines 1 and 3
+24c24
+< there should be NO differences on this line !!!! # Nah, Nah, can't see me !!
+---
+> there should be NO differences on this line !!!! # No difference here !!
+28c28
+< no difference --> 0.0           NO difference --> 0.0
+---
+> no difference --> 0.0000000001  NO difference --> 0.00000000011
+29c29
+< no difference --> 10.           NO difference --> 10.00000
+---
+> no difference --> 10.000000001  NO difference --> 10.0000000011
+34c34
+< not different --> 0.0    different --> 0.0    not different --> 0.0
+---
+> not different --> 0.011  different --> 0.011  not different --> 0.011  
+34c34
+< not different --> 0.0    different --> 0.0    not different --> 0.0
+---
+> not different --> 0.011  different --> 0.011  not different --> 0.011  
+34c34
+< not different --> 0.0    different --> 0.0    not different --> 0.0
+---
+> not different --> 0.011  different --> 0.011  not different --> 0.011  
+36c36
+< Bye, Bye.
+---
+> All done.
+exit 1

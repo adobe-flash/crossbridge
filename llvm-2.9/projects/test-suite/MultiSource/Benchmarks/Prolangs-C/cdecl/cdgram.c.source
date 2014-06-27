@@ -1,0 +1,1157 @@
+# line 2 "cdgram.y"
+/* Yacc grammar for ANSI and C++ cdecl. */
+/* The output of this file is included */
+/* into the C file cdecl.c. */
+char cdgramsccsid[] = "@(#)cdgram.y	2.2 3/30/88";
+
+extern char prev;
+
+# line 8 "cdgram.y"
+typedef union  {
+	char *dynstr;
+	struct {
+		char *left;
+		char *right;
+		char *type;
+	} halves;
+} YYSTYPE;
+# define ARRAY 257
+# define AS 258
+# define CAST 259
+# define COMMA 260
+# define DECLARE 261
+# define DOUBLECOLON 262
+# define EXPLAIN 263
+# define FUNCTION 264
+# define HELP 265
+# define INTO 266
+# define OF 267
+# define MEMBER 268
+# define POINTER 269
+# define REFERENCE 270
+# define RETURNING 271
+# define SET 272
+# define TO 273
+# define CHAR 274
+# define CLASS 275
+# define CONSTVOLATILE 276
+# define DOUBLE 277
+# define ENUM 278
+# define FLOAT 279
+# define INT 280
+# define LONG 281
+# define NAME 282
+# define NUMBER 283
+# define SHORT 284
+# define SIGNED 285
+# define STRUCT 286
+# define UNION 287
+# define UNSIGNED 288
+# define VOID 289
+# define AUTO 290
+# define EXTERN 291
+# define REGISTER 292
+# define STATIC 293
+#define yyclearin yychar = -1
+#define yyerrok yyerrflag = 0
+extern int yychar;
+extern short yyerrflag;
+#ifndef YYMAXDEPTH
+#define YYMAXDEPTH 150
+#endif
+YYSTYPE yylval, yyval;
+# define YYERRCODE 256
+
+# line 855 "cdgram.y"
+
+short yyexca[] ={
+-1, 1,
+	0, -1,
+	-2, 0,
+-1, 27,
+	282, 81,
+	40, 81,
+	42, 81,
+	38, 81,
+	-2, 87,
+-1, 37,
+	260, 31,
+	41, 31,
+	-2, 81,
+-1, 87,
+	282, 82,
+	40, 82,
+	42, 82,
+	38, 82,
+	-2, 80,
+-1, 92,
+	260, 31,
+	41, 31,
+	-2, 81,
+	};
+# define YYNPROD 89
+# define YYLAST 322
+short yyact[]={
+
+  67,  79,  28,  69,  72,  68,  66,  76, 159,  13,
+  77,  75,  78,  73,  74,  70,  79,  16,  17,  18,
+  19,  16,  17,  18,  19,  67, 129,  78,  69, 103,
+  68,  66, 125,  25,  76,  39,  23,  77,  75, 128,
+  70,  74, 118,  22, 115, 137, 117, 118,  85, 115,
+  86, 117,  83,  23, 152,  25,  30, 100,  23,  10,
+  22,  56,  25,  23,  47,  22,  60,  59,  37,  97,
+  22, 121,  25,  40,  41, 123,  58,  25,  20,  34,
+ 139, 110,  25, 161, 144,  93, 145,  92,  94,  32,
+  24,  57, 147,  71, 126,  29,  81,  21,  42,  55,
+   8, 136, 108, 150,  12, 135,  33, 106,  11, 114,
+  31,  10,  62, 151, 132, 134,  44,  45,  48,  49,
+ 156,  43,  35,   2,  63,  15,  53,   1,  54,  14,
+  50,  64,  27,  65,  52, 101,  26,  46,  87,  82,
+  61,  38,   0,  90,  80,  88,   0,   0,  89,   0,
+  95,  96,  98, 108,  91, 108,   0,   0, 108,   0,
+  11,   0,  51,   0,   0,   0,   0,   0,   0,   0,
+   0,   0,   0,   0, 109,   0, 111, 104, 102,   0,
+   0,   0, 105, 112, 107,   0, 122,  99,   0, 113,
+   0, 119, 120,   0,   0,   0,   0, 127,   0,   0,
+   0,   0,   0,   0,   0, 124, 131,   0, 133,   0,
+   0,   0,   0, 142,   0,   0, 130, 143,   0,   0,
+   0,   0,   0,   0,   0, 138, 146, 140, 141, 148,
+   0, 149,   0,   0,   0,   0, 127,   0,   0,   0,
+ 153,   0,   0,  25, 158,   0,   0, 127,   0, 128,
+ 155, 160,  16,  17,  18,  19, 154,   0,   0,   0,
+   0, 157,   0,   0,   0,   0,   0,  25,   0,   0,
+   0,   0,   0, 128,   0,   0,   0,   0,   0,   0,
+   0,   0,   0,   0,   0,   0, 116,   0,   0,   0,
+   0, 116,  84,   0,   0,   0,   0,   0,   0,  36,
+   0,   0, 145, 145,  92,   9,   0,   0,   5,   0,
+   4,   0,   6,   0,   3,   0,   0,   0,   0,   0,
+   0,   7 };
+short yypact[]={
+
+-1000,  49,-1000, 101,-273,-204, -38,-226,-1000, 101,
+-1000,-1000,-1000,-169,-194,-1000,-1000,-1000,-1000,-1000,
+-187, 101,  28,-248,-196,-214,-212,-214,-214, 101,
+-1000,-1000,-269, 101,-194,-1000,-194,-221,-191,-1000,
+-206,-207,-1000,-274,-1000,-1000,  10,-214,  10,-1000,
+-1000,-194,-1000, 101,-1000,  44,-170,-1000,-194,-199,
+-194,-1000,-249,-1000,-225,-247,-1000,-1000,-1000,-1000,
+-1000,-1000,-1000,-1000,-1000,-1000,-1000,-1000,-1000,-1000,
+  10, 101,  67,-214,-181,-214,  10,-1000, 101,   9,
+ 101,-1000,-221,-200,-194,-1000,-1000,-192,-1000,-1000,
+-1000,-1000,-1000,-1000, 101,-1000,  -9,-1000, -67,  10,
+  72,  10,  74,-1000,  64,   4,-182,   9,   9,-1000,
+-173,-194,-1000,-259,-1000,-1000,  43,-1000,-1000,-1000,
+  -1,-1000,  10,-1000,-1000,-226,-1000,-1000,  62,  71,
+  11,  11,-1000,-228,-1000,-243,   9,-1000,-1000, 101,
+  80,   9,-194,-174,  11,-1000, -33,  11,-1000,-1000,
+  42,-1000 };
+short yypgo[]={
+
+   0,  99, 141, 140, 109,  94,  96, 139, 101, 137,
+  93, 112, 135, 133,  90,  95, 129, 125, 131, 124,
+  98,  91, 127, 123, 100, 121 };
+short yyr1[]={
+
+   0,  22,  22,  23,  23,  23,  23,  23,  23,  23,
+  23,  23,  23,  23,  23,  24,  24,  15,  15,   6,
+   6,   6,   6,   7,   7,   7,   7,   7,   5,   5,
+   5,   1,   1,   1,   1,   1,   4,   4,   4,   4,
+   4,   4,   4,   4,   4,   8,   8,  21,  21,  21,
+  21,  21,  21,  21,   2,   2,  20,  25,   3,   3,
+   3,   3,  18,  18,  18,  10,  10,  19,  19,  19,
+  19,  19,  11,  11,  12,  12,  13,  13,  13,  13,
+  14,  14,   9,  17,  17,  17,  17,  16,  16 };
+short yyr2[]={
+
+   0,   0,   2,   2,   6,   4,   5,   3,   6,   5,
+   5,   8,   3,   1,   2,   1,   1,   1,   0,   1,
+   3,   4,   3,   3,   4,   2,   3,   1,   3,   3,
+   1,   0,   3,   1,   1,   3,   0,   2,   5,   6,
+   3,   4,   2,   2,   2,   2,   3,   3,   6,   4,
+   4,   8,   4,   2,   0,   1,   2,   0,   1,   1,
+   2,   2,   1,   1,   1,   1,   1,   1,   1,   1,
+   1,   1,   2,   1,   1,   1,   1,   1,   1,   1,
+   2,   0,   2,   1,   1,   1,   1,   1,   0 };
+short yychk[]={
+
+-1000, -22, -23, 265, 261, 259, 263, 272, -24, 256,
+  10,  59, -24, 282, -16, -17, 290, 291, 292, 293,
+ 282, -21, 264, 257, -14, 276, -16, -17,  40, -15,
+ 282, -24, 258, -21, 266, -24, 271,  40,  -2, 283,
+ 269, 270, -20, -25, -14, -14,  -9, 276, -14, -14,
+ -24, -16, -24, -21, -21,  -1, 282, -21, 267, 273,
+ 273,  -3, -11, -19, -18, -13, 280, 274, 279, 277,
+ 289, -10, 278, 287, 288, 285, 281, 284, 286, 275,
+ -20,  -6,  -7,  42, 282,  38,  40, -14,  -6, -20,
+ -21, -24, 260,  41, 258, -21, -21, 268, -21, -19,
+ 282, -12, -11, 276,  -6, -24,  40,  -8,  91, -14,
+ 262, -14,  -6, -24,  -4,  40, 282,  42,  38, -24,
+  -1, 271, -21, 267, -24,  41,  -5, -14, 282,  93,
+ 283,  -6,  42,  -6,  41,  41,  -8,  41,  -4, 262,
+  -4,  -4, -21, -10,  41, 260, -20,  93,  -6, -15,
+  41,  42, 282,  -5,  -4, -24,  40,  -4, -21,  41,
+  -5,  41 };
+short yydef[]={
+
+   1,  -2,   2,   0,  88,  81,  88,  18,  13,   0,
+  15,  16,   3,   0,  81,  87,  83,  84,  85,  86,
+   0,   0,   0,  54,  57,  81,  81,  -2,  81,   0,
+  17,  14,  88,   0,  81,   7,  81,  -2,   0,  55,
+   0,   0,  53,   0,  80,  57,   0,  81,   0,  57,
+  12,  81,   5,   0,  47,   0,  33,  34,  81,  81,
+  81,  56,  58,  59,   0,  73,  67,  68,  69,  70,
+  71,  62,  63,  64,  76,  77,  78,  79,  65,  66,
+   0,   0,  19,  81,  27,  81,   0,  -2,   0,  36,
+   0,   6,  -2,   0,  81,  49,  50,   0,  52,  60,
+  61,  72,  74,  75,   0,  10,  81,  25,   0,   0,
+   0,   0,   0,   9,   0,  36,   0,  36,  36,   4,
+  32,  81,  35,   0,   8,  23,   0,  57,  30,  45,
+   0,  20,   0,  22,  26,  18,  44,  37,   0,   0,
+  42,  43,  48,   0,  24,  81,  36,  46,  21,   0,
+  40,  36,  81,  28,  29,  11,  81,  41,  51,  38,
+   0,  39 };
+#ifndef lint
+static	char yaccpar_sccsid[] = "@(#)yaccpar 1.6 88/02/08 SMI"; /* from UCB 4.1 83/02/11 */
+#endif
+
+#
+# define YYFLAG -1000
+# define YYERROR goto yyerrlab
+# define YYACCEPT return(0)
+# define YYABORT return(1)
+
+/*	parser for yacc output	*/
+
+#ifdef YYDEBUG
+int yydebug = 0; /* 1 for debugging */
+#endif
+YYSTYPE yyv[YYMAXDEPTH]; /* where the values are stored */
+int yychar = -1; /* current input token number */
+int yynerrs = 0;  /* number of errors */
+short yyerrflag = 0;  /* error recovery flag */
+
+yyparse() {
+
+	short yys[YYMAXDEPTH];
+	short yyj, yym;
+	register YYSTYPE *yypvt;
+	register short yystate, *yyps, yyn;
+	register YYSTYPE *yypv;
+	register short *yyxi;
+
+	yystate = 0;
+	yychar = -1;
+	yynerrs = 0;
+	yyerrflag = 0;
+	yyps= &yys[-1];
+	yypv= &yyv[-1];
+
+ yystack:    /* put a state and value onto the stack */
+
+#ifdef YYDEBUG
+	if( yydebug  ) printf( "state %d, char 0%o\n", yystate, yychar );
+#endif
+		if( ++yyps>= &yys[YYMAXDEPTH] ) { yyerror( "yacc stack overflow" ); return(1); }
+		*yyps = yystate;
+		++yypv;
+		*yypv = yyval;
+
+ yynewstate:
+
+	yyn = yypact[yystate];
+
+	if( yyn<= YYFLAG ) goto yydefault; /* simple state */
+
+	if( yychar<0 ) if( (yychar=yylex())<0 ) yychar=0;
+	if( (yyn += yychar)<0 || yyn >= YYLAST ) goto yydefault;
+
+	if( yychk[ yyn=yyact[ yyn ] ] == yychar ){ /* valid shift */
+		yychar = -1;
+		yyval = yylval;
+		yystate = yyn;
+		if( yyerrflag > 0 ) --yyerrflag;
+		goto yystack;
+		}
+
+ yydefault:
+	/* default state action */
+
+	if( (yyn=yydef[yystate]) == -2 ) {
+		if( yychar<0 ) if( (yychar=yylex())<0 ) yychar = 0;
+		/* look through exception table */
+
+		for( yyxi=yyexca; (*yyxi!= (-1)) || (yyxi[1]!=yystate) ; yyxi += 2 ) ; /* VOID */
+
+		while( *(yyxi+=2) >= 0 ){
+			if( *yyxi == yychar ) break;
+			}
+		if( (yyn = yyxi[1]) < 0 ) return(0);   /* accept */
+		}
+
+	if( yyn == 0 ){ /* error */
+		/* error ... attempt to resume parsing */
+
+		switch( yyerrflag ){
+
+		case 0:   /* brand new error */
+
+			yyerror( "syntax error" );
+		yyerrlab:
+			++yynerrs;
+
+		case 1:
+		case 2: /* incompletely recovered error ... try again */
+
+			yyerrflag = 3;
+
+			/* find a state where "error" is a legal shift action */
+
+			while ( yyps >= yys ) {
+			   yyn = yypact[*yyps] + YYERRCODE;
+			   if( yyn>= 0 && yyn < YYLAST && yychk[yyact[yyn]] == YYERRCODE ){
+			      yystate = yyact[yyn];  /* simulate a shift of "error" */
+			      goto yystack;
+			      }
+			   yyn = yypact[*yyps];
+
+			   /* the current yyps has no shift onn "error", pop stack */
+
+#ifdef YYDEBUG
+			   if( yydebug ) printf( "error recovery pops state %d, uncovers %d\n", *yyps, yyps[-1] );
+#endif
+			   --yyps;
+			   --yypv;
+			   }
+
+			/* there is no state on the stack with an error shift ... abort */
+
+	yyabort:
+			return(1);
+
+
+		case 3:  /* no shift yet; clobber input char */
+
+#ifdef YYDEBUG
+			if( yydebug ) printf( "error recovery discards char %d\n", yychar );
+#endif
+
+			if( yychar == 0 ) goto yyabort; /* don't discard EOF, quit */
+			yychar = -1;
+			goto yynewstate;   /* try again in the same state */
+
+			}
+
+		}
+
+	/* reduction by production yyn */
+
+#ifdef YYDEBUG
+		if( yydebug ) printf("reduce %d\n",yyn);
+#endif
+		yyps -= yyr2[yyn];
+		yypvt = yypv;
+		yypv -= yyr2[yyn];
+		yyval = yypv[1];
+		yym=yyn;
+			/* consult goto table to find next state */
+		yyn = yyr1[yyn];
+		yyj = yypgo[yyn] + *yyps + 1;
+		if( yyj>=YYLAST || yychk[ yystate = yyact[yyj] ] != -yyn ) yystate = yyact[yypgo[yyn]];
+		switch(yym){
+			
+case 2:
+# line 33 "cdgram.y"
+{
+			prompt();
+			prev = 0;
+			} break;
+case 3:
+# line 40 "cdgram.y"
+{
+			Debug((stderr, "stmt: help\n"));
+			dohelp();
+			} break;
+case 4:
+# line 46 "cdgram.y"
+{
+			Debug((stderr, "stmt: DECLARE NAME AS opt_storage adecl\n"));
+			Debug((stderr, "\tNAME='%s'\n", yypvt[-4].dynstr));
+			Debug((stderr, "\topt_storage='%s'\n", yypvt[-2].dynstr));
+			Debug((stderr, "\tacdecl.left='%s'\n", yypvt[-1].halves.left));
+			Debug((stderr, "\tacdecl.right='%s'\n", yypvt[-1].halves.right));
+			Debug((stderr, "\tacdecl.type='%s'\n", yypvt[-1].halves.type));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			dodeclare(yypvt[-4].dynstr, yypvt[-2].dynstr, yypvt[-1].halves.left, yypvt[-1].halves.right, yypvt[-1].halves.type);
+			} break;
+case 5:
+# line 58 "cdgram.y"
+{
+			Debug((stderr, "stmt: DECLARE opt_storage adecl\n"));
+			Debug((stderr, "\topt_storage='%s'\n", yypvt[-2].dynstr));
+			Debug((stderr, "\tacdecl.left='%s'\n", yypvt[-1].halves.left));
+			Debug((stderr, "\tacdecl.right='%s'\n", yypvt[-1].halves.right));
+			Debug((stderr, "\tacdecl.type='%s'\n", yypvt[-1].halves.type));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			dodeclare(NullCP, yypvt[-2].dynstr, yypvt[-1].halves.left, yypvt[-1].halves.right, yypvt[-1].halves.type);
+			} break;
+case 6:
+# line 69 "cdgram.y"
+{
+			Debug((stderr, "stmt: CAST NAME AS adecl\n"));
+			Debug((stderr, "\tNAME='%s'\n", yypvt[-3].dynstr));
+			Debug((stderr, "\tacdecl.left='%s'\n", yypvt[-1].halves.left));
+			Debug((stderr, "\tacdecl.right='%s'\n", yypvt[-1].halves.right));
+			Debug((stderr, "\tacdecl.type='%s'\n", yypvt[-1].halves.type));
+			docast(yypvt[-3].dynstr, yypvt[-1].halves.left, yypvt[-1].halves.right, yypvt[-1].halves.type);
+			} break;
+case 7:
+# line 79 "cdgram.y"
+{
+			Debug((stderr, "stmt: CAST adecl\n"));
+			Debug((stderr, "\tacdecl.left='%s'\n", yypvt[-1].halves.left));
+			Debug((stderr, "\tacdecl.right='%s'\n", yypvt[-1].halves.right));
+			Debug((stderr, "\tacdecl.type='%s'\n", yypvt[-1].halves.type));
+			docast(NullCP, yypvt[-1].halves.left, yypvt[-1].halves.right, yypvt[-1].halves.type);
+			} break;
+case 8:
+# line 88 "cdgram.y"
+{
+			Debug((stderr, "stmt: EXPLAIN opt_storage opt_constvol_list type cdecl\n"));
+			Debug((stderr, "\topt_storage='%s'\n", yypvt[-4].dynstr));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-3].dynstr));
+			Debug((stderr, "\ttype='%s'\n", yypvt[-2].dynstr));
+			Debug((stderr, "\tcdecl='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			dodexplain(yypvt[-4].dynstr, yypvt[-3].dynstr, yypvt[-2].dynstr, yypvt[-1].dynstr);
+			} break;
+case 9:
+# line 99 "cdgram.y"
+{
+			Debug((stderr, "stmt: EXPLAIN storage opt_constvol_list cdecl\n"));
+			Debug((stderr, "\tstorage='%s'\n", yypvt[-3].dynstr));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-2].dynstr));
+			Debug((stderr, "\tcdecl='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			dodexplain(yypvt[-3].dynstr, yypvt[-2].dynstr, NullCP, yypvt[-1].dynstr);
+			} break;
+case 10:
+# line 109 "cdgram.y"
+{
+			Debug((stderr, "stmt: EXPLAIN opt_storage constvol_list cdecl\n"));
+			Debug((stderr, "\topt_storage='%s'\n", yypvt[-3].dynstr));
+			Debug((stderr, "\tconstvol_list='%s'\n", yypvt[-2].dynstr));
+			Debug((stderr, "\tcdecl='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			dodexplain(yypvt[-3].dynstr, yypvt[-2].dynstr, NullCP, yypvt[-1].dynstr);
+			} break;
+case 11:
+# line 119 "cdgram.y"
+{
+			Debug((stderr, "stmt: EXPLAIN ( opt_constvol_list type cast ) optNAME\n"));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-5].dynstr));
+			Debug((stderr, "\ttype='%s'\n", yypvt[-4].dynstr));
+			Debug((stderr, "\tcast='%s'\n", yypvt[-3].dynstr));
+			Debug((stderr, "\tNAME='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			docexplain(yypvt[-5].dynstr, yypvt[-4].dynstr, yypvt[-3].dynstr, yypvt[-1].dynstr);
+			} break;
+case 12:
+# line 130 "cdgram.y"
+{
+			Debug((stderr, "stmt: SET optNAME\n"));
+			Debug((stderr, "\toptNAME='%s'\n", yypvt[-1].dynstr));
+			doset(yypvt[-1].dynstr);
+			} break;
+case 14:
+# line 138 "cdgram.y"
+{
+			yyerrok;
+			} break;
+case 15:
+# line 144 "cdgram.y"
+{
+			doprompt();
+			} break;
+case 16:
+# line 148 "cdgram.y"
+{
+			noprompt();
+			} break;
+case 17:
+# line 154 "cdgram.y"
+{
+			Debug((stderr, "optNAME: NAME\n"));
+			Debug((stderr, "\tNAME='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 18:
+# line 161 "cdgram.y"
+{
+			Debug((stderr, "optNAME: EMPTY\n"));
+			yyval.dynstr = ds(unknown_name);
+			} break;
+case 20:
+# line 169 "cdgram.y"
+{
+			Debug((stderr, "cdecl: * opt_constvol_list cdecl\n"));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tcdecl='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = cat(yypvt[-0].dynstr,yypvt[-1].dynstr,ds(strlen(yypvt[-1].dynstr)?" pointer to ":"pointer to "),NullCP);
+			prev = 'p';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 21:
+# line 179 "cdgram.y"
+{
+			Debug((stderr, "cdecl: NAME DOUBLECOLON '*' cdecl\n"));
+			Debug((stderr, "\tNAME='%s'\n", yypvt[-3].dynstr));
+			Debug((stderr, "\tcdecl='%s'\n", yypvt[-0].dynstr));
+			if (!CplusplusFlag)
+				unsupp("pointer to member of class", NullCP);
+			yyval.dynstr = cat(yypvt[-0].dynstr,ds("pointer to member of class "),yypvt[-3].dynstr,ds(" "),NullCP);
+			prev = 'p';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 22:
+# line 191 "cdgram.y"
+{
+			Debug((stderr, "cdecl: & opt_constvol_list cdecl\n"));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tcdecl='%s'\n", yypvt[-0].dynstr));
+			if (!CplusplusFlag)
+				unsupp("reference", NullCP);
+			yyval.dynstr = cat(yypvt[-0].dynstr,yypvt[-1].dynstr,ds(strlen(yypvt[-1].dynstr)?" reference to ":"reference to "),NullCP);
+			prev = 'r';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 23:
+# line 204 "cdgram.y"
+{
+			Debug((stderr, "cdecl1: cdecl1()\n"));
+			Debug((stderr, "\tcdecl1='%s'\n", yypvt[-2].dynstr));
+			yyval.dynstr = cat(yypvt[-2].dynstr,ds("function returning "),NullCP);
+			prev = 'f';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 24:
+# line 213 "cdgram.y"
+{
+			Debug((stderr, "cdecl1: cdecl1(castlist)\n"));
+			Debug((stderr, "\tcdecl1='%s'\n", yypvt[-3].dynstr));
+			Debug((stderr, "\tcastlist='%s'\n", yypvt[-1].dynstr));
+			yyval.dynstr = cat(yypvt[-3].dynstr, ds("function ("),
+				  yypvt[-1].dynstr, ds(") returning "), NullCP);
+			prev = 'f';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 25:
+# line 224 "cdgram.y"
+{
+			Debug((stderr, "cdecl1: cdecl1 cdims\n"));
+			Debug((stderr, "\tcdecl1='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tcdims='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = cat(yypvt[-1].dynstr,ds("array "),yypvt[-0].dynstr,NullCP);
+			prev = 'a';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 26:
+# line 234 "cdgram.y"
+{
+			Debug((stderr, "cdecl1: (cdecl)\n"));
+			Debug((stderr, "\tcdecl='%s'\n", yypvt[-1].dynstr));
+			yyval.dynstr = yypvt[-1].dynstr;
+			/* prev = prev; */
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 27:
+# line 243 "cdgram.y"
+{
+			Debug((stderr, "cdecl1: NAME\n"));
+			Debug((stderr, "\tNAME='%s'\n", yypvt[-0].dynstr));
+			savedname = yypvt[-0].dynstr;
+			yyval.dynstr = ds("");
+			prev = 'n';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 28:
+# line 254 "cdgram.y"
+{
+			Debug((stderr, "castlist: castlist1, castlist2\n"));
+			Debug((stderr, "\tcastlist1='%s'\n", yypvt[-2].dynstr));
+			Debug((stderr, "\tcastlist2='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = cat(yypvt[-2].dynstr, ds(", "), yypvt[-0].dynstr, NullCP);
+			} break;
+case 29:
+# line 262 "cdgram.y"
+{
+			Debug((stderr, "castlist: opt_constvol_list type cast\n"));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-2].dynstr));
+			Debug((stderr, "\ttype='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tcast='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = cat(yypvt[-0].dynstr, yypvt[-2].dynstr, ds(strlen(yypvt[-2].dynstr) ? " " : ""), yypvt[-1].dynstr, NullCP);
+			} break;
+case 30:
+# line 271 "cdgram.y"
+{
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 31:
+# line 277 "cdgram.y"
+{
+			Debug((stderr, "adecllist: EMPTY\n"));
+			yyval.dynstr = ds("");
+			} break;
+case 32:
+# line 283 "cdgram.y"
+{
+			Debug((stderr, "adecllist: adecllist1, adecllist2\n"));
+			Debug((stderr, "\tadecllist1='%s'\n", yypvt[-2].dynstr));
+			Debug((stderr, "\tadecllist2='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = cat(yypvt[-2].dynstr, ds(", "), yypvt[-0].dynstr, NullCP);
+			} break;
+case 33:
+# line 291 "cdgram.y"
+{
+			Debug((stderr, "adecllist: NAME\n"));
+			Debug((stderr, "\tNAME='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 34:
+# line 298 "cdgram.y"
+{
+			Debug((stderr, "adecllist: adecl\n"));
+			Debug((stderr, "\tadecl.left='%s'\n", yypvt[-0].halves.left));
+			Debug((stderr, "\tadecl.right='%s'\n", yypvt[-0].halves.right));
+			Debug((stderr, "\tadecl.type='%s'\n", yypvt[-0].halves.type));
+			yyval.dynstr = cat(yypvt[-0].halves.type, ds(" "), yypvt[-0].halves.left, yypvt[-0].halves.right, NullCP);
+			} break;
+case 35:
+# line 307 "cdgram.y"
+{
+			Debug((stderr, "adecllist: NAME AS adecl\n"));
+			Debug((stderr, "\tNAME='%s'\n", yypvt[-2].dynstr));
+			Debug((stderr, "\tadecl.left='%s'\n", yypvt[-0].halves.left));
+			Debug((stderr, "\tadecl.right='%s'\n", yypvt[-0].halves.right));
+			Debug((stderr, "\tadecl.type='%s'\n", yypvt[-0].halves.type));
+			yyval.dynstr = cat(yypvt[-0].halves.type, ds(" "), yypvt[-0].halves.left, yypvt[-2].dynstr, yypvt[-0].halves.right, NullCP);
+			} break;
+case 36:
+# line 318 "cdgram.y"
+{
+			Debug((stderr, "cast: EMPTY\n"));
+			yyval.dynstr = ds("");
+			/* prev = prev; */
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 37:
+# line 326 "cdgram.y"
+{
+			Debug((stderr, "cast: ()\n"));
+			yyval.dynstr = ds("function returning ");
+			prev = 'f';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 38:
+# line 334 "cdgram.y"
+{
+			Debug((stderr, "cast: (cast)()\n"));
+			Debug((stderr, "\tcast='%s'\n", yypvt[-3].dynstr));
+			yyval.dynstr = cat(yypvt[-3].dynstr,ds("function returning "),NullCP);
+			prev = 'f';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 39:
+# line 343 "cdgram.y"
+{
+			Debug((stderr, "cast: (cast)(castlist)\n"));
+			Debug((stderr, "\tcast='%s'\n", yypvt[-4].dynstr));
+			Debug((stderr, "\tcastlist='%s'\n", yypvt[-1].dynstr));
+			yyval.dynstr = cat(yypvt[-4].dynstr,ds("function ("),yypvt[-1].dynstr,ds(") returning "),NullCP);
+			prev = 'f';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 40:
+# line 353 "cdgram.y"
+{
+			Debug((stderr, "cast: (cast)\n"));
+			Debug((stderr, "\tcast='%s'\n", yypvt[-1].dynstr));
+			yyval.dynstr = yypvt[-1].dynstr;
+			/* prev = prev; */
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 41:
+# line 362 "cdgram.y"
+{
+			Debug((stderr, "cast: NAME::*cast\n"));
+			Debug((stderr, "\tcast='%s'\n", yypvt[-0].dynstr));
+			if (!CplusplusFlag)
+				unsupp("pointer to member of class", NullCP);
+			yyval.dynstr = cat(yypvt[-0].dynstr,ds("pointer to member of class "),yypvt[-3].dynstr,ds(" "),NullCP);
+			prev = 'p';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 42:
+# line 373 "cdgram.y"
+{
+			Debug((stderr, "cast: *cast\n"));
+			Debug((stderr, "\tcast='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = cat(yypvt[-0].dynstr,ds("pointer to "),NullCP);
+			prev = 'p';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 43:
+# line 382 "cdgram.y"
+{
+			Debug((stderr, "cast: &cast\n"));
+			Debug((stderr, "\tcast='%s'\n", yypvt[-0].dynstr));
+			if (!CplusplusFlag)
+				unsupp("reference", NullCP);
+			yyval.dynstr = cat(yypvt[-0].dynstr,ds("reference to "),NullCP);
+			prev = 'r';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 44:
+# line 393 "cdgram.y"
+{
+			Debug((stderr, "cast: cast cdims\n"));
+			Debug((stderr, "\tcast='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tcdims='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = cat(yypvt[-1].dynstr,ds("array "),yypvt[-0].dynstr,NullCP);
+			prev = 'a';
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 45:
+# line 404 "cdgram.y"
+{
+			Debug((stderr, "cdims: []\n"));
+			yyval.dynstr = ds("of ");
+			} break;
+case 46:
+# line 410 "cdgram.y"
+{
+			Debug((stderr, "cdims: [NUMBER]\n"));
+			Debug((stderr, "\tNUMBER='%s'\n", yypvt[-1].dynstr));
+			yyval.dynstr = cat(yypvt[-1].dynstr,ds(" of "),NullCP);
+			} break;
+case 47:
+# line 418 "cdgram.y"
+{
+			Debug((stderr, "adecl: FUNCTION RETURNING adecl\n"));
+			Debug((stderr, "\tadecl.left='%s'\n", yypvt[-0].halves.left));
+			Debug((stderr, "\tadecl.right='%s'\n", yypvt[-0].halves.right));
+			Debug((stderr, "\tadecl.type='%s'\n", yypvt[-0].halves.type));
+			if (prev == 'f')
+				unsupp("Function returning function",
+				       "function returning pointer to function");
+			else if (prev=='A' || prev=='a')
+				unsupp("Function returning array",
+				       "function returning pointer");
+			yyval.halves.left = yypvt[-0].halves.left;
+			yyval.halves.right = cat(ds("()"),yypvt[-0].halves.right,NullCP);
+			yyval.halves.type = yypvt[-0].halves.type;
+			prev = 'f';
+			Debug((stderr, "\n\tadecl now =\n"));
+			Debug((stderr, "\t\tadecl.left='%s'\n", yyval.halves.left));
+			Debug((stderr, "\t\tadecl.right='%s'\n", yyval.halves.right));
+			Debug((stderr, "\t\tadecl.type='%s'\n", yyval.halves.type));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 48:
+# line 441 "cdgram.y"
+{
+			Debug((stderr, "adecl: FUNCTION (adecllist) RETURNING adecl\n"));
+			Debug((stderr, "\tadecllist='%s'\n", yypvt[-3].dynstr));
+			Debug((stderr, "\tadecl.left='%s'\n", yypvt[-0].halves.left));
+			Debug((stderr, "\tadecl.right='%s'\n", yypvt[-0].halves.right));
+			Debug((stderr, "\tadecl.type='%s'\n", yypvt[-0].halves.type));
+			if (prev == 'f')
+				unsupp("Function returning function",
+				       "function returning pointer to function");
+			else if (prev=='A' || prev=='a')
+				unsupp("Function returning array",
+				       "function returning pointer");
+			yyval.halves.left = yypvt[-0].halves.left;
+			yyval.halves.right = cat(ds("("),yypvt[-3].dynstr,ds(")"),yypvt[-0].halves.right,NullCP);
+			yyval.halves.type = yypvt[-0].halves.type;
+			prev = 'f';
+			Debug((stderr, "\n\tadecl now =\n"));
+			Debug((stderr, "\t\tadecl.left='%s'\n", yyval.halves.left));
+			Debug((stderr, "\t\tadecl.right='%s'\n", yyval.halves.right));
+			Debug((stderr, "\t\tadecl.type='%s'\n", yyval.halves.type));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 49:
+# line 465 "cdgram.y"
+{
+			Debug((stderr, "adecl: ARRAY adims OF adecl\n"));
+			Debug((stderr, "\tadims='%s'\n", yypvt[-2].dynstr));
+			Debug((stderr, "\tadecl.left='%s'\n", yypvt[-0].halves.left));
+			Debug((stderr, "\tadecl.right='%s'\n", yypvt[-0].halves.right));
+			Debug((stderr, "\tadecl.type='%s'\n", yypvt[-0].halves.type));
+			if (prev == 'f')
+				unsupp("Array of function",
+				       "array of pointer to function");
+			else if (prev == 'a')
+				unsupp("Inner array of unspecified size",
+				       "array of pointer");
+			else if (prev == 'v')
+				unsupp("Array of void",
+				       "pointer to void");
+			if (arbdims)
+				prev = 'a';
+			else
+				prev = 'A';
+			yyval.halves.left = yypvt[-0].halves.left;
+			yyval.halves.right = cat(yypvt[-2].dynstr,yypvt[-0].halves.right,NullCP);
+			yyval.halves.type = yypvt[-0].halves.type;
+			Debug((stderr, "\n\tadecl now =\n"));
+			Debug((stderr, "\t\tadecl.left='%s'\n", yyval.halves.left));
+			Debug((stderr, "\t\tadecl.right='%s'\n", yyval.halves.right));
+			Debug((stderr, "\t\tadecl.type='%s'\n", yyval.halves.type));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 50:
+# line 495 "cdgram.y"
+{
+			char *op = "", *cp = "", *sp = "";
+
+			Debug((stderr, "adecl: opt_constvol_list POINTER TO adecl\n"));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-3].dynstr));
+			Debug((stderr, "\tadecl.left='%s'\n", yypvt[-0].halves.left));
+			Debug((stderr, "\tadecl.right='%s'\n", yypvt[-0].halves.right));
+			Debug((stderr, "\tadecl.type='%s'\n", yypvt[-0].halves.type));
+			if (prev == 'a')
+				unsupp("Pointer to array of unspecified dimension",
+				       "pointer to object");
+			if (prev=='a' || prev=='A' || prev=='f') {
+				op = "(";
+				cp = ")";
+			}
+			if (strlen(yypvt[-3].dynstr) != 0)
+				sp = " ";
+			yyval.halves.left = cat(yypvt[-0].halves.left,ds(op),ds("*"),
+				       ds(sp),yypvt[-3].dynstr,ds(sp),NullCP);
+			yyval.halves.right = cat(ds(cp),yypvt[-0].halves.right,NullCP);
+			yyval.halves.type = yypvt[-0].halves.type;
+			prev = 'p';
+			Debug((stderr, "\n\tadecl now =\n"));
+			Debug((stderr, "\t\tadecl.left='%s'\n", yyval.halves.left));
+			Debug((stderr, "\t\tadecl.right='%s'\n", yyval.halves.right));
+			Debug((stderr, "\t\tadecl.type='%s'\n", yyval.halves.type));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 51:
+# line 525 "cdgram.y"
+{
+			char *op = "", *cp = "", *sp = "";
+
+			Debug((stderr, "adecl: opt_constvol_list POINTER TO MEMBER OF ClassStruct NAME adecl\n"));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-7].dynstr));
+			Debug((stderr, "\tClassStruct='%s'\n", yypvt[-2].dynstr));
+			Debug((stderr, "\tNAME='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tadecl.left='%s'\n", yypvt[-0].halves.left));
+			Debug((stderr, "\tadecl.right='%s'\n", yypvt[-0].halves.right));
+			Debug((stderr, "\tadecl.type='%s'\n", yypvt[-0].halves.type));
+			if (!CplusplusFlag)
+				unsupp("pointer to member of class", NullCP);
+			if (prev == 'a')
+				unsupp("Pointer to array of unspecified dimension",
+				       "pointer to object");
+			if (prev=='a' || prev=='A' || prev=='f') {
+				op = "(";
+				cp = ")";
+			}
+			if (strlen(yypvt[-7].dynstr) != 0)
+				sp = " ";
+			yyval.halves.left = cat(yypvt[-0].halves.left,ds(op),yypvt[-1].dynstr,ds("::*"),
+				      ds(sp),yypvt[-7].dynstr,ds(sp),NullCP);
+			yyval.halves.right = cat(ds(cp),yypvt[-0].halves.right,NullCP);
+			yyval.halves.type = yypvt[-0].halves.type;
+			prev = 'p';
+			Debug((stderr, "\n\tadecl now =\n"));
+			Debug((stderr, "\t\tadecl.left='%s'\n", yyval.halves.left));
+			Debug((stderr, "\t\tadecl.right='%s'\n", yyval.halves.right));
+			Debug((stderr, "\t\tadecl.type='%s'\n", yyval.halves.type));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 52:
+# line 559 "cdgram.y"
+{
+			char *op = "", *cp = "", *sp = "";
+
+			Debug((stderr, "adecl: opt_constvol_list REFERENCE TO adecl\n"));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-3].dynstr));
+			Debug((stderr, "\tadecl.left='%s'\n", yypvt[-0].halves.left));
+			Debug((stderr, "\tadecl.right='%s'\n", yypvt[-0].halves.right));
+			Debug((stderr, "\tadecl.type='%s'\n", yypvt[-0].halves.type));
+			if (!CplusplusFlag)
+				unsupp("reference", NullCP);
+			if (prev == 'v')
+				unsupp("Reference to void",
+				       "pointer to void");
+			else if (prev == 'a')
+				unsupp("Reference to array of unspecified dimension",
+				       "reference to object");
+			if (prev=='a' || prev=='A' || prev=='f') {
+				op = "(";
+				cp = ")";
+			}
+			if (strlen(yypvt[-3].dynstr) != 0)
+				sp = " ";
+			yyval.halves.left = cat(yypvt[-0].halves.left,ds(op),ds("&"),
+				       ds(sp),yypvt[-3].dynstr,ds(sp),NullCP);
+			yyval.halves.right = cat(ds(cp),yypvt[-0].halves.right,NullCP);
+			yyval.halves.type = yypvt[-0].halves.type;
+			prev = 'r';
+			Debug((stderr, "\n\tadecl now =\n"));
+			Debug((stderr, "\t\tadecl.left='%s'\n", yyval.halves.left));
+			Debug((stderr, "\t\tadecl.right='%s'\n", yyval.halves.right));
+			Debug((stderr, "\t\tadecl.type='%s'\n", yyval.halves.type));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 53:
+# line 594 "cdgram.y"
+{
+			Debug((stderr, "adecl: opt_constvol_list type\n"));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\ttype='%s'\n", yypvt[-0].dynstr));
+			yyval.halves.left = ds("");
+			yyval.halves.right = ds("");
+			if (strcmp(yypvt[-0].dynstr, "void") == 0)
+			    prev = 'v';
+			else if ((strncmp(yypvt[-0].dynstr, "struct", 6) == 0) ||
+			         (strncmp(yypvt[-0].dynstr, "class", 5) == 0))
+			    prev = 's';
+			else
+			    prev = 't';
+			yyval.halves.type = cat(yypvt[-1].dynstr,ds(strlen(yypvt[-1].dynstr)?" ":""),yypvt[-0].dynstr,NullCP);
+			Debug((stderr, "\n\tadecl now =\n"));
+			Debug((stderr, "\t\tadecl.left='%s'\n", yyval.halves.left));
+			Debug((stderr, "\t\tadecl.right='%s'\n", yyval.halves.right));
+			Debug((stderr, "\t\tadecl.type='%s'\n", yyval.halves.type));
+			Debug((stderr, "\tprev = '%s'\n", visible(prev)));
+			} break;
+case 54:
+# line 617 "cdgram.y"
+{
+			Debug((stderr, "adims: EMPTY\n"));
+			arbdims = 1;
+			yyval.dynstr = ds("[]");
+			} break;
+case 55:
+# line 624 "cdgram.y"
+{
+			Debug((stderr, "adims: NUMBER\n"));
+			Debug((stderr, "\tNUMBER='%s'\n", yypvt[-0].dynstr));
+			arbdims = 0;
+			yyval.dynstr = cat(ds("["),yypvt[-0].dynstr,ds("]"),NullCP);
+			} break;
+case 56:
+# line 633 "cdgram.y"
+{
+			Debug((stderr, "type: tinit c_type\n"));
+			Debug((stderr, "\ttinit=''\n"));
+			Debug((stderr, "\tc_type='%s'\n", yypvt[-0].dynstr));
+			mbcheck();
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 57:
+# line 643 "cdgram.y"
+{
+			Debug((stderr, "tinit: EMPTY\n"));
+			modbits = 0;
+			} break;
+case 58:
+# line 650 "cdgram.y"
+{
+			Debug((stderr, "c_type: mod_list\n"));
+			Debug((stderr, "\tmod_list='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 59:
+# line 657 "cdgram.y"
+{
+			Debug((stderr, "c_type: tname\n"));
+			Debug((stderr, "\ttname='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 60:
+# line 664 "cdgram.y"
+{
+			Debug((stderr, "c_type: mod_list tname\n"));
+			Debug((stderr, "\tmod_list='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\ttname='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = cat(yypvt[-1].dynstr,ds(" "),yypvt[-0].dynstr,NullCP);
+			} break;
+case 61:
+# line 672 "cdgram.y"
+{
+			Debug((stderr, "c_type: StrClaUniEnum NAME\n"));
+			Debug((stderr, "\tStrClaUniEnum='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tNAME='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = cat(yypvt[-1].dynstr,ds(" "),yypvt[-0].dynstr,NullCP);
+			} break;
+case 64:
+# line 683 "cdgram.y"
+{
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 66:
+# line 690 "cdgram.y"
+{
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 67:
+# line 696 "cdgram.y"
+{
+			Debug((stderr, "tname: INT\n"));
+			Debug((stderr, "\tINT='%s'\n", yypvt[-0].dynstr));
+			modbits |= MB_INT; yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 68:
+# line 703 "cdgram.y"
+{
+			Debug((stderr, "tname: CHAR\n"));
+			Debug((stderr, "\tCHAR='%s'\n", yypvt[-0].dynstr));
+			modbits |= MB_CHAR; yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 69:
+# line 710 "cdgram.y"
+{
+			Debug((stderr, "tname: FLOAT\n"));
+			Debug((stderr, "\tFLOAT='%s'\n", yypvt[-0].dynstr));
+			modbits |= MB_FLOAT; yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 70:
+# line 717 "cdgram.y"
+{
+			Debug((stderr, "tname: DOUBLE\n"));
+			Debug((stderr, "\tDOUBLE='%s'\n", yypvt[-0].dynstr));
+			modbits |= MB_DOUBLE; yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 71:
+# line 724 "cdgram.y"
+{
+			Debug((stderr, "tname: VOID\n"));
+			Debug((stderr, "\tVOID='%s'\n", yypvt[-0].dynstr));
+			modbits |= MB_VOID; yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 72:
+# line 732 "cdgram.y"
+{
+			Debug((stderr, "mod_list: modifier mod_list1\n"));
+			Debug((stderr, "\tmodifier='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\tmod_list1='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = cat(yypvt[-1].dynstr,ds(" "),yypvt[-0].dynstr,NullCP);
+			} break;
+case 73:
+# line 740 "cdgram.y"
+{
+			Debug((stderr, "mod_list: modifier\n"));
+			Debug((stderr, "\tmodifier='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 74:
+# line 748 "cdgram.y"
+{
+			Debug((stderr, "mod_list1: mod_list\n"));
+			Debug((stderr, "\tmod_list='%s'\n", yypvt[-0].dynstr));
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 75:
+# line 755 "cdgram.y"
+{
+			Debug((stderr, "mod_list1: CONSTVOLATILE\n"));
+			Debug((stderr, "\tCONSTVOLATILE='%s'\n", yypvt[-0].dynstr));
+			if (PreANSIFlag)
+				notsupported(" (Pre-ANSI Compiler)", yypvt[-0].dynstr, NullCP);
+			else if (RitchieFlag)
+				notsupported(" (Ritchie Compiler)", yypvt[-0].dynstr, NullCP);
+			else if ((strcmp(yypvt[-0].dynstr, "noalias") == 0) && CplusplusFlag)
+				unsupp(yypvt[-0].dynstr, NullCP);
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 76:
+# line 769 "cdgram.y"
+{
+			Debug((stderr, "modifier: UNSIGNED\n"));
+			Debug((stderr, "\tUNSIGNED='%s'\n", yypvt[-0].dynstr));
+			modbits |= MB_UNSIGNED; yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 77:
+# line 776 "cdgram.y"
+{
+			Debug((stderr, "modifier: SIGNED\n"));
+			Debug((stderr, "\tSIGNED='%s'\n", yypvt[-0].dynstr));
+			modbits |= MB_SIGNED; yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 78:
+# line 783 "cdgram.y"
+{
+			Debug((stderr, "modifier: LONG\n"));
+			Debug((stderr, "\tLONG='%s'\n", yypvt[-0].dynstr));
+			modbits |= MB_LONG; yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 79:
+# line 790 "cdgram.y"
+{
+			Debug((stderr, "modifier: SHORT\n"));
+			Debug((stderr, "\tSHORT='%s'\n", yypvt[-0].dynstr));
+			modbits |= MB_SHORT; yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 80:
+# line 798 "cdgram.y"
+{
+			Debug((stderr, "opt_constvol_list: CONSTVOLATILE opt_constvol_list\n"));
+			Debug((stderr, "\tCONSTVOLATILE='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-0].dynstr));
+			if (PreANSIFlag)
+				notsupported(" (Pre-ANSI Compiler)", yypvt[-1].dynstr, NullCP);
+			else if (RitchieFlag)
+				notsupported(" (Ritchie Compiler)", yypvt[-1].dynstr, NullCP);
+			else if ((strcmp(yypvt[-1].dynstr, "noalias") == 0) && CplusplusFlag)
+				unsupp(yypvt[-1].dynstr, NullCP);
+			yyval.dynstr = cat(yypvt[-1].dynstr,ds(strlen(yypvt[-0].dynstr) ? " " : ""),yypvt[-0].dynstr,NullCP);
+			} break;
+case 81:
+# line 812 "cdgram.y"
+{
+			Debug((stderr, "opt_constvol_list: EMPTY\n"));
+			yyval.dynstr = ds("");
+			} break;
+case 82:
+# line 819 "cdgram.y"
+{
+			Debug((stderr, "constvol_list: CONSTVOLATILE opt_constvol_list\n"));
+			Debug((stderr, "\tCONSTVOLATILE='%s'\n", yypvt[-1].dynstr));
+			Debug((stderr, "\topt_constvol_list='%s'\n", yypvt[-0].dynstr));
+			if (PreANSIFlag)
+				notsupported(" (Pre-ANSI Compiler)", yypvt[-1].dynstr, NullCP);
+			else if (RitchieFlag)
+				notsupported(" (Ritchie Compiler)", yypvt[-1].dynstr, NullCP);
+			else if ((strcmp(yypvt[-1].dynstr, "noalias") == 0) && CplusplusFlag)
+				unsupp(yypvt[-1].dynstr, NullCP);
+			yyval.dynstr = cat(yypvt[-1].dynstr,ds(strlen(yypvt[-0].dynstr) ? " " : ""),yypvt[-0].dynstr,NullCP);
+			} break;
+case 86:
+# line 837 "cdgram.y"
+{
+			Debug((stderr, "storage: AUTO,EXTERN,STATIC,REGISTER (%s)\n", yypvt[-0].dynstr));
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 87:
+# line 844 "cdgram.y"
+{
+			Debug((stderr, "opt_storage: storage=%s\n", yypvt[-0].dynstr));
+			yyval.dynstr = yypvt[-0].dynstr;
+			} break;
+case 88:
+# line 850 "cdgram.y"
+{
+			Debug((stderr, "opt_storage: EMPTY\n"));
+			yyval.dynstr = ds("");
+			} break;
+		}
+		goto yystack;  /* stack new state and value */
+
+	}
