@@ -180,7 +180,7 @@ $?CXXFLAGS=-O4
 # LLVM and Clang options
 # ====================================================================================
 $?LLVMASSERTIONS=OFF
-$?LLVMTESTS=OFF
+$?LLVMTESTS=ON
 $?LLVMCMAKEOPTS= 
 $?LLVMLDFLAGS=
 $?LLVMCFLAGS=
@@ -243,19 +243,26 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 # ALL TARGETS
 # ====================================================================================
 
+EXTRALIBORDER= zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv libvgl libjpeg libpng libgif libtiff libwebp
+EXTRALIBORDER+= libogg libvorbis libflac libsndfile libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image libphysfs
+
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
 TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols test_gdb 
 #TESTORDER+= gcctests swigtests llvmtests checkasm 
 
 BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
-BUILDORDER+= sdkcleanup tr trd swig genfs gdb pkgconfig libtool extralibs finalcleanup 
-#BUILDORDER+= all_tests
+BUILDORDER+= sdkcleanup tr trd swig genfs gdb pkgconfig libtool   
+BUILDORDER+= $(EXTRALIBORDER)
+BUILDORDER+= finalcleanup
 BUILDORDER+= $(TESTORDER)
 BUILDORDER+= samples
 BUILDORDER+= examples
 
 # All Tests
 all_tests: $(TESTORDER)
+
+# All Libs
+all_libs: $(EXTRALIBORDER)
 
 # All Targets
 all:
@@ -693,6 +700,7 @@ llvmtests:
 	rm -rf $(BUILD)/llvm-tests
 	mkdir -p $(BUILD)/llvm-tests
 	cp -f $(SDK)/usr/bin/avmshell-release-debugger $(SDK)/usr/bin/avmshell
+	#cp -f $(BUILD)/llvm-install/llvm-lit $(SDK)/usr/bin/llvm-lit
 	cd $(BUILD)/llvm-tests && $(SRCROOT)/$(DEPENDENCY_LLVM)/configure --with-llvmgcc=$(SDK)/usr/bin/gcc --with-llvmgxx=$(SDK)/usr/bin/g++ --without-f2c --without-f95 --disable-clang --enable-jit=no --target=$(TRIPLE) --prefix=$(BUILD)/llvm-install
 	cd $(BUILD)/llvm-tests && $(LN) $(SDK)/usr Release
 	cd $(BUILD)/llvm-tests/projects/test-suite/MultiSource && (LANG=C && $(MAKE) TEST=nightly TARGET_LLCFLAGS=-jvm="$(JAVA)" -j$(THREADS) FPCMP=$(FPCMP) DISABLE_CBE=1)
@@ -1137,10 +1145,6 @@ endif
 # ====================================================================================
 # EXTRA LIBS
 # ====================================================================================
-# TBD
-extralibs:
-	$(MAKE) zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv libvgl libjpeg libpng libgif libtiff libwebp \
-		libogg libvorbis libflac libsndfile libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image libphysfs
 
 # A Massively Spiffy Yet Delicately Unobtrusive Compression Library
 zlib:
