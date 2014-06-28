@@ -214,7 +214,7 @@ $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -I/usr/local/Cellar/app
 # ASC1 Tool
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
 # ASC2 Tool
-$?SCOMPFALCON=java -jar $(call nativepath,$(SRCROOT)/tools/lib/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+$?SCOMPFALCON=java -jar $(call nativepath,$(SRCROOT)/tools/lib-air/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
 # ASC2 configuration definitions
 $?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true -config CONFIG::debug=true
 # AVMShell link
@@ -325,7 +325,7 @@ all_dev:
 
 # Development target
 all_dev2:
-	@$(SDK_MAKE) abclibs_asdocs
+	@$(SDK_MAKE) alctool alcdb
 
 # Clean build outputs
 clean:
@@ -651,12 +651,11 @@ avm2-as:
 alctool:
 	rm -rf $(BUILD)/alctool
 	mkdir -p $(BUILD)/alctool/flascc
-	cp -f $(SRCROOT)/tools/lib/*.jar $(SDK)/usr/lib/
-#	cp -f $(SRCROOT)/tools/lib/falcon.txt $(SDK)/usr/lib/.
-#	rm -f $(SDK)/usr/lib/mxmlc.jar
+	cp -f $(SRCROOT)/tools/lib-air/*.jar $(SDK)/usr/lib/
+	cp -f $(SRCROOT)/tools/lib-air/legacy/*.jar $(SDK)/usr/lib/
 	cp -f $(SRCROOT)/tools/aet/*.java $(BUILD)/alctool/flascc/.
 	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/alctool/flascc/.
-	cd $(BUILD)/alctool && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib/compiler.jar)
+	cd $(BUILD)/alctool && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib-air/compiler.jar)
 	cd $(BUILD)/alctool && echo "Main-Class: flascc.AlcTool" > MANIFEST.MF
 	cd $(BUILD)/alctool && echo "Class-Path: compiler.jar" >> MANIFEST.MF
 	cd $(BUILD)/alctool && jar cmf MANIFEST.MF alctool.jar flascc/*.class
@@ -668,7 +667,7 @@ alcdb:
 	mkdir -p $(BUILD)/alcdb/flascc
 	cp -f $(SRCROOT)/tools/alcdb/*.java $(BUILD)/alcdb/flascc/.
 	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/alcdb/flascc/.
-	cd $(BUILD)/alcdb && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib/fdb.jar)
+	cd $(BUILD)/alcdb && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib-air/legacy/fdb.jar)
 	cd $(BUILD)/alcdb && echo "Main-Class: flascc.AlcDB" > MANIFEST.MF
 	cd $(BUILD)/alcdb && echo "Class-Path: fdb.jar" >> MANIFEST.MF
 	cd $(BUILD)/alcdb && jar cmf MANIFEST.MF alcdb.jar flascc/*.class 
