@@ -203,9 +203,7 @@ else ifneq "$(wildcard $(FLEX_HOME)/lib/flex-compiler-oem.jar)" ""
  $?FLEX_SDK_HOME=$(FLEX_HOME)
  $?FLEX_ASDOC=java -classpath "$(call nativepath,$(FLEX_SDK_HOME)/lib/asdoc.jar)" -Dflexlib=$(call nativepath,$(FLEX_SDK_HOME)/frameworks) flex2.tools.ASDoc
 else 
- $?FLEX_SDK_TYPE=AdobeFlex
- $?FLEX_SDK_HOME=$(SRCROOT)/tools/flexsdk
- $?FLEX_ASDOC=java -classpath "$(call nativepath,$(FLEX_SDK_HOME)/lib/asdoc.jar)" -Dflexlib=$(call nativepath,$(FLEX_SDK_HOME)/frameworks) flex2.tools.ASDoc
+ $(error Adobe AIR SDK or Apache Flex SDK is missing - setting the 'AIR_HOME' or 'FLEX_HOME' environment variable is essential to build the CrossBridge SDK)
 endif
 
 # ====================================================================================
@@ -324,6 +322,10 @@ diagnostics:
 all_dev:
 	@$(SDK_MAKE) abclibs_compile
 	cd samples/09_Pthreads && $(SDK_MAKE) T09_3 T09_4 T09_5
+
+# Development target
+all_dev2:
+	@$(SDK_MAKE) abclibs_asdocs
 
 # Clean build outputs
 clean:

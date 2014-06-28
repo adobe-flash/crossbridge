@@ -65,6 +65,8 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 
 ## Notes
 
+* Adobe AIR SDK is essential to build the CrossBridge SDK (Please set *AIR_HOME* environment variable pointing to the location)
+
 * It's recommended to set \_JAVA\_OPTIONS environment variable according to your system memory:
   
 > Example (Windows): set \_JAVA\_OPTIONS=-Xms512m -Xmx4096m
