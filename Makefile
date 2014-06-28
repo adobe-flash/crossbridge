@@ -250,11 +250,15 @@ TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh 
 
 BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
 BUILDORDER+= sdkcleanup tr trd swig genfs gdb pkgconfig libtool   
+ifeq (,$(findstring 1,$(LIGHTSDK)))
 BUILDORDER+= $(EXTRALIBORDER)
+endif
 BUILDORDER+= finalcleanup
 BUILDORDER+= $(TESTORDER)
 BUILDORDER+= samples
+ifeq (,$(findstring 1,$(LIGHTSDK)))
 BUILDORDER+= examples
+endif
 
 # All Tests
 all_tests: $(TESTORDER)
@@ -322,10 +326,6 @@ diagnostics:
 all_dev:
 	@$(SDK_MAKE) abclibs_compile
 	cd samples/09_Pthreads && $(SDK_MAKE) T09_3 T09_4 T09_5
-
-# Development target
-all_dev2:
-	@$(SDK_MAKE) alctool alcdb
 
 # Clean build outputs
 clean:
