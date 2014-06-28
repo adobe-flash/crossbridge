@@ -1815,40 +1815,38 @@ ieeetests_basicops:
 # ====================================================================================
 # Deploy SDK 
 deploy:
-	$(MAKE) staging
-	$(MAKE) flattensymlinks
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-		$(MAKE) zip
-else
-		$(MAKE) dmg
-endif
-
-# Staging
-staging:
 	rm -rf $(BUILDROOT)/staging
 	mkdir -p $(BUILDROOT)/staging
+	#Deploying SDK
 	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
+	#Deploying Samples
 	$(RSYNC) --exclude '*.PAK' --exclude '*.pak' $(SRCROOT)/samples $(BUILDROOT)/staging/
+	#Deploying Docs
 	$(RSYNC) $(SRCROOT)/README.html $(BUILDROOT)/staging/
 	$(RSYNC) $(SRCROOT)/docs $(BUILDROOT)/staging/
 	$(RSYNC) $(BUILDROOT)/apidocs $(BUILDROOT)/staging/docs/
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	#Deploying Cygwin
+	$(RSYNC) $(SRCROOT)/tools/cygwinx/ $(BUILDROOT)/staging/
+endif
+	#Cleaning up temp files
 	rm -f $(BUILDROOT)/staging/sdk/usr/bin/gccbug*
-	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
-	echo $(FLASCC_VERSION_BUILD) > $(BUILDROOT)/staging/sdk/ver.txt
-
-# Flatten Symbolic Links
-flattensymlinks:
+	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f
+	#Emitting SDK descriptor
+	@echo  "<?xml version=\"1.0\"?>" > $(BUILDROOT)/staging/crossbridge-sdk-description.xml
+	@echo  "<crossbridge-sdk-description>" >> $(BUILDROOT)/staging/crossbridge-sdk-description.xml
+	@echo  "<name>$(SDKNAME)</name>" >> $(BUILDROOT)/staging/crossbridge-sdk-description.xml
+	@echo  "<version>$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH)</version>" >> $(BUILDROOT)/staging/crossbridge-sdk-description.xml
+	@echo  "<build>$(FLASCC_VERSION_BUILD)</build>" >> $(BUILDROOT)/staging/crossbridge-sdk-description.xml
+	@echo  "</crossbridge-sdk-description>" >> $(BUILDROOT)/staging/crossbridge-sdk-description.xml
+	#Flattening symbolic links
 	find $(BUILDROOT)/staging/sdk -type l | xargs rm
 	$(RSYNC) $(BUILDROOT)/staging/sdk/usr/platform/*/ $(BUILDROOT)/staging/sdk/usr
 	rm -rf $(BUILDROOT)/staging/sdk/usr/platform
-
-# Assemble ZIP
-zip:
-	cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
-	find $(BUILDROOT)/staging > $(BUILDROOT)/zipcontents.txt
-
-# Assemble DMG
-dmg:
+	#Packaging
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+		cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
+else
 	mkdir -p $(BUILDROOT)/dmgmount
 	rm -f $(BUILDROOT)/$(SDKNAME).dmg $(BUILDROOT)/$(SDKNAME)-tmp.dmg
 	cp -f $(SRCROOT)/tools/Base.dmg $(BUILDROOT)/$(SDKNAME)-tmp.dmg
@@ -1861,6 +1859,6 @@ dmg:
 	hdiutil detach $(BUILDROOT)/dmgmount
 	hdiutil convert $(BUILDROOT)/$(SDKNAME)-tmp.dmg -format UDZO -imagekey zlib-level=9 -o $(BUILDROOT)/$(SDKNAME).dmg
 	rm -f $(BUILDROOT)/$(SDKNAME)-tmp.dmg
-	find $(BUILDROOT)/staging > $(BUILDROOT)/dmgcontents.txt
+endif
 
 .PHONY: bmake posix binutils docs gcc samples
