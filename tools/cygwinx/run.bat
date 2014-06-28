@@ -30,37 +30,43 @@
 :: Purpose: CrossBridge Cygwin Launch Helper Script 
 :: Author: Andras Csizmadia
 
-::
-:: Disable some variables
-::
+:: Initialize
+@ECHO OFF
+
+:: Check for Cygwin
+IF NOT EXIST cygwin GOTO NOCYGWIN
+
+:: Bootstrap Cygwin
+:RUNCYGWIN
+
+:: Disable 3rd party C/C++ compiler variables
 set MINGW_HOME=
 set MSYS_HOME=
 set MSVC_HOME=
-::
-:: Convert some variables to unix style path
-::
+
+:: Convert some paths to Unix style
 set JAVA_HOME=%JAVA_HOME:\=/%
 set AIR_HOME=%AIR_HOME:\=/%
 set FLEX_HOME=%FLEX_HOME:\=/%
 set FLASH_PLAYER_EXE=%FLASH_PLAYER_EXE:\=/%
 set FLASCC_ROOT=%CD:\=/%
-::
+
 :: Disable system path
-::
 :: set PATH=
-::
+
 :: Trigger Cygwin Bash
-::
 C:
-::
-:: !!!Important!!! Edit with your location!
-::
-chdir C:\cygwin\bin
-::
-:: to support automation
-::
+
+:: !!!Important!!! For custom Cygwin installations edit the location!
+chdir %CD%\cygwin\bin
+
+:: Cygwin with automation support 
 if [%1] == [] (
 bash --login -i
 ) else (
 bash --login %*
 )
+
+:: Install Cygwin and additional packages using CLI
+:NOCYGWIN
+setup-x86 --arch x86 --quiet-mode --no-admin --no-startmenu --no-desktop --no-shortcuts --root %CD%\cygwin --site http://cygwin.mirror.constant.com && setup-x86 --arch x86 --quiet-mode --no-admin --no-startmenu --no-desktop --no-shortcuts --root %CD%\cygwin --site http://cygwin.mirror.constant.com --packages libuuid1,libuuid-devel && run
