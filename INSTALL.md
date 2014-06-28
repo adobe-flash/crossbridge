@@ -75,6 +75,8 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 
 * Disable anti-virus software for faster builds
 
+* To build a Light SDK without extra libraries use: *make all LIGHTSDK=1*
+
 # Hacking
 
 * To discover CrossBridge related changes/patches in 3rd party sources, search for keywords: 'crossbridge', 'flascc', 'alchemy', 'avm2', 'as3'

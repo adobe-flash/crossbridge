@@ -1004,8 +1004,10 @@ sdkcleanup:
 
 # TBD
 finalcleanup:
+ifeq (,$(findstring 1,$(LIGHTSDK)))
 	perl -p -i -e 's~$(SRCROOT)/sdk~\$$\{flascc_sdk_root\}~g' `grep -ril $(SRCROOT) $(SDK)/usr/lib/pkgconfig`
 	rm -f $(SDK)/usr/lib/pkgconfig/*.bak
+endif
 	rm -f $(SDK)/usr/lib/*.la
 	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/man $(SDK)/usr/share/info
 	@$(LN) ../../share $(SDK)/usr/platform/$(PLATFORM)/share
@@ -1084,11 +1086,6 @@ swigtests:
 	cp $(SRCROOT)/$(DEPENDENCY_SWIG)/Lib/*.swg $(BUILD)/swig/Lib
 	cd $(BUILD)/swig && $(MAKE) check-as3-examples
 
-# Run SWIG Automation Tests (Legacy / Deprecated)
-swigtestsautomation:
-	cd $(SRCROOT)/qa/swig/framework && $(MAKE) SWIG_SOURCE=$(SRCROOT)/$(DEPENDENCY_SWIG)
-
-# 04.06. Removed -Werror after -Wall from $CC for Maverick compatibility
 # Generate Virtual File System ZLib Dependency
 genfs:
 	rm -rf $(BUILD)/zlib-native
