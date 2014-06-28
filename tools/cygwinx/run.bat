@@ -51,8 +51,8 @@ set FLEX_HOME=%FLEX_HOME:\=/%
 set FLASH_PLAYER_EXE=%FLASH_PLAYER_EXE:\=/%
 set FLASCC_ROOT=%CD:\=/%
 
-:: Disable system path
-:: set PATH=
+:: Setup basic path
+set PATH=%FLASCC_ROOT%/sdk/usr/bin;%JAVA_HOME%/bin
 
 :: Trigger Cygwin Bash
 C:
