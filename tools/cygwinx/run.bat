@@ -43,7 +43,7 @@ set JAVA_HOME=%JAVA_HOME:\=/%
 set AIR_HOME=%AIR_HOME:\=/%
 set FLEX_HOME=%FLEX_HOME:\=/%
 set FLASH_PLAYER_EXE=%FLASH_PLAYER_EXE:\=/%
-set FLASCC_ROOT=%CD%
+set FLASCC_ROOT=%CD:\=/%
 ::
 :: Disable system path
 ::
