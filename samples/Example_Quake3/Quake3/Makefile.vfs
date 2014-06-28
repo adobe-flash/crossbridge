@@ -1,8 +1,0 @@
-include q3vfs.rules
-include ../../Makefile.common
-
-%.abc: %.as
-	java -XX:MaxPermSize=1G -Xmx4G -classpath $(call nativepath,$(ALCHEMY)/usr/lib/asc.jar) macromedia.asc.embedding.ScriptCompiler -import $(call nativepath,$(ALCHEMY)/usr/lib/builtin.abc) -import $(call nativepath,$(ALCHEMY)/usr/lib/playerglobal.abc) -import $(call nativepath,$(ALCHEMY)/usr/lib/BinaryData.abc) $<
-
-vfs: $(VFS_ABCS)
-	echo "VFS built"
