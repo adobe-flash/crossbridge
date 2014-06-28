@@ -105,5 +105,3 @@ clean:
 	@cd Example_Pathfinder && make clean
 	@cd Example_Threads && make clean
 	@cd Example_libqrencode && make clean
-	@cd Example_SDL && make clean
-	@cd Example_GLSL && make clean
