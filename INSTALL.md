@@ -30,13 +30,6 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 1. make all
 1. make deploy
 
-## Linux
-
-### Build a Linux only SDK
-
-1. make clean
-1. make all
-
 # Core Dependencies
 
 * autoconf

@@ -1820,7 +1820,7 @@ deploy:
 	#Deploying SDK
 	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
 	#Deploying Samples
-	$(RSYNC) --exclude '*.PAK' --exclude '*.pak' $(SRCROOT)/samples $(BUILDROOT)/staging/
+	$(RSYNC) $(SRCROOT)/samples $(BUILDROOT)/staging/
 	#Deploying Docs
 	$(RSYNC) $(SRCROOT)/README.html $(BUILDROOT)/staging/
 	$(RSYNC) $(SRCROOT)/docs $(BUILDROOT)/staging/
