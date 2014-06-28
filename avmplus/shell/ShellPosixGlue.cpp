@@ -13,7 +13,6 @@
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <sys/sem.h>
-#include <sys/dirent.h>
 #include <sys/uio.h>
 #include <dirent.h>
 #include <sys/msg.h>
@@ -26,11 +25,11 @@
 #include "SetAlchemySDKLocation.c"
 
 #endif
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(__linux__)
 #define st_atimespec st_atim
 #define st_mtimespec st_mtim
 #define st_ctimespec st_ctim
-#endif /* __CYGWIN__ */
+#endif /* __CYGWIN__ || __linux__ */
 
 namespace avmplus {
 	static void *domainMemoryPtr(ScriptObject *obj, int offset) {
