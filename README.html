@@ -59,13 +59,13 @@
           <li>Extract the contents of the ZIP file onto your hard drive. This can be extracted to anywhere on your hard drive, but this readme will assume it is located at C:\crossbridge\</li>
           <li>Ensure <a href="http://www.java.com/getjava" target="_blank">64-bit Java</a> is installed</li>
           <li>Ensure <a href="http://www.java.com/en/download/help/path.xml" target="_blank">Java is on your PATH</a></li>
-          <li>Download the <a href="http://www.adobe.com/devnet/flex/flex-sdk-download-all.html">Flex SDK</a> (some of the samples require Flex 4.6 or higher in order to be compiled.) This can be extracted to anywhere on your hard drive, but this readme will assume it is located at C:\flex_sdk\</li>
+          <li>Download the <a href="https://www.adobe.com/devnet/air/air-sdk-download.html">AIR SDK</a> (some of the samples require it in order to be compiled.) This can be extracted to anywhere on your hard drive, but this readme will assume it is located at C:\flex_sdk\</li>
           <li>Download a debugger version of the <a href="http://www.adobe.com/support/flashplayer/downloads.html">Flash Player</a> (only needed if you want to use GDB to debug your code)</li>
           <li>Double click the run.bat file</li>
           <li>Check that CrossBridge is working by compiling the first sample:
             <ol>
               <li>cd 01_HelloWorld</li>
-              <li>make FLASCC=/cygdrive/c/crossbridge/sdk FLEX=/cygdrive/c/flex_sdk</li>
+              <li>make FLASCC=/cygdrive/c/crossbridge/sdk FLEX=/cygdrive/c/air_sdk</li>
               <li>Launch the hello.swf file</li>
             </ol>
           </li>
@@ -75,10 +75,8 @@
 
         <p>If you don't want to use the installation of Cygwin that is bundled with CrossBridge you can use a separate Cygwin installation as long as it is up to date and has at least these packages:</p>
         <ul>
-          <li>make</li>
           <li>libuuid1</li>
           <li>python</li>
-          <li>cmake</li>
         </ul>
       </div>
     </section>
@@ -91,12 +89,12 @@
         <ol>
           <li>Extract the contents of the DMG file onto your hard drive. This can be extracted to anywhere on your hard drive, but this readme will assume it is located at ~/crossbridge/</li>
           <li>Ensure 64-bit Java is installed (Mac users should already have Java installed, but make sure to run Software Update to ensure you have the latest version)</li>
-          <li>Download the <a href="http://www.adobe.com/devnet/flex/flex-sdk-download-all.html">Flex SDK</a> (some of the samples require Flex 4.6 or higher in order to be compiled.) This can be extracted to anywhere on your hard drive, but this readme will assume it is located at ~/flex_sdk/</li>
+          <li>Download the <a href="https://www.adobe.com/devnet/air/air-sdk-download.html">AIR SDK</a> (some of the samples require it in order to be compiled.) This can be extracted to anywhere on your hard drive, but this readme will assume it is located at ~/air_sdk/</li>
           <li>Download a debugger version of the <a href="http://www.adobe.com/support/flashplayer/downloads.html">Flash Player</a> (only needed if you want to use GDB to debug your code)</li>
           <li>Check that CrossBridge is working by compiling the first sample:
               <ol>
                 <li>cd ~/crossbridge/sample/01_HelloWorld</li>
-                <li>PATH=~/crossbridge/sdk/usr/bin:$PATH make FLASCC=~/crossbridge/sdk FLEX=~/flex_sdk</li>
+                <li>PATH=~/crossbridge/sdk/usr/bin:$PATH make FLASCC=~/crossbridge/sdk FLEX=~/air_sdk</li>
                 <li>Launch the hello.swf file </li>
               </ol>
           </li>
