@@ -203,7 +203,7 @@ else ifneq "$(wildcard $(FLEX_HOME)/lib/flex-compiler-oem.jar)" ""
  $?FLEX_SDK_HOME=$(FLEX_HOME)
  $?FLEX_ASDOC=java -classpath "$(call nativepath,$(FLEX_SDK_HOME)/lib/asdoc.jar)" -Dflexlib=$(call nativepath,$(FLEX_SDK_HOME)/frameworks) flex2.tools.ASDoc
 else 
- $(error Adobe AIR SDK or Apache Flex SDK is missing - setting the 'AIR_HOME' or 'FLEX_HOME' environment variable is essential to build the CrossBridge SDK)
+ $(error Adobe AIR SDK and Apache Flex SDK are missing - setting the 'AIR_HOME' or 'FLEX_HOME' environment variable is essential to build the CrossBridge SDK)
 endif
 
 # ====================================================================================
