@@ -453,14 +453,14 @@ base:
 	mkdir -p $(SDK)/usr/lib
 	mkdir -p $(SDK)/usr/lib/bfd-plugins
 	mkdir -p $(SDK)/usr/share
-	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/bin
 	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/libexec/gcc/$(TRIPLE)
 
 	$(LN) ../usr $(SDK)/usr/$(TRIPLE)
 	$(LN) $(PLATFORM) $(SDK)/usr/platform/current
-	$(LN) platform/current/bin $(SDK)/usr/bin
-	$(LN) ../ $(SDK)/usr/platform/usr 
-	$(LN) ../../lib $(SDK)/usr/platform/current/lib 
+	$(LN) ../ $(SDK)/usr/platform/usr
+	$(LN) ../../bin $(SDK)/usr/platform/current/bin
+	$(LN) ../../lib $(SDK)/usr/platform/current/lib
+	$(LN) ../../share $(SDK)/usr/platform/current/share
 	$(LN) platform/current/libexec $(SDK)/usr/libexec
 	$(LN) ../../../../../lib $(SDK)/usr/platform/current/libexec/gcc/$(TRIPLE)/lib
 
@@ -1013,7 +1013,6 @@ ifeq (,$(findstring 1,$(LIGHTSDK)))
 endif
 	rm -f $(SDK)/usr/lib/*.la
 	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/man $(SDK)/usr/share/info
-	@$(LN) ../../share $(SDK)/usr/platform/$(PLATFORM)/share
 	$(RSYNC) $(SRCROOT)/posix/avm2_tramp.cpp $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/vgl.c $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/Console.as $(SDK)/usr/share/

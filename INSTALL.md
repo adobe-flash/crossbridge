@@ -21,14 +21,15 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 
 ### Bootstrap Cygwin
 
-1. cygwin-dev.bat
-1. cd $FLASCC_ROOT
+1. Download [Cygwin for SDK developers](http://sourceforge.net/projects/crossbridge-community/files/cygwin-for-sdk-devs.zip/download)
+1. Launch *cygwin-dev.bat* from DOS prompt
+1. Launch *cd $FLASCC_ROOT* from shell
 
 ### Build a Windows only SDK and package as ZIP
 
-1. make clean
-1. make all
-1. make deploy
+1. *make clean*
+1. *make all*
+1. *make deploy*
 
 # Core Dependencies
 
