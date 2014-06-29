@@ -268,11 +268,14 @@ all_libs: $(EXTRALIBORDER)
 
 # All Targets
 all:
-	@echo "Building $(SDKNAME) ..."
+	@echo "Building $(SDKNAME) - Please be patient, may take a few hours ..."
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
+	@echo "-  install_libs"
 	@$(MAKE) install_libs &> $(BUILD)/logs/install_libs.txt 2>&1
+	@echo "-  base"
 	@$(MAKE) base &> $(BUILD)/logs/base.txt 2>&1
+	@echo "-  make"
 	@$(MAKE) make &> $(BUILD)/logs/make.txt 2>&1
 	@$(SDK_MAKE) -s all_with_local_make
 

@@ -29,3 +29,6 @@ CHANGES
 * Updated PlayerGlobal to v14.0.0
 * Updated ASC2 Compiler to v14.0.0
 * Deprecated ObjectiveC support
+* Deprecated Legacy ASC support
+* Enabled ASC2 parallel compilation and inlining
+* Improved AS3 logging for threads

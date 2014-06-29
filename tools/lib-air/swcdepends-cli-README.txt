@@ -1,0 +1,147 @@
+SWC Dependency utility (swcdepends)
+Version 2.0.0 build 354131
+Copyright 2012 Adobe Systems Incorporated. All rights reserved.
+
+-advanced-telemetry
+-advanced-telemetry-password <string>
+-compiler.accessible
+-compiler.actionscript-file-encoding <string>
+-compiler.allow-source-path-overlap
+-compiler.as3
+-compiler.compress
+-compiler.context-root <context-path>
+-compiler.debug
+-compiler.defaults-css-files [filename] [...]
+-compiler.defaults-css-url <string>
+-compiler.define <name> <value>
+-compiler.enable-runtime-design-layers
+-compiler.es
+-compiler.external-library-path [path-element] [...]
+-compiler.fonts.advanced-anti-aliasing
+-compiler.fonts.languages.language-range <lang> <range>
+-compiler.fonts.local-font-paths [path-element] [...]
+-compiler.fonts.local-fonts-snapshot <string>
+-compiler.fonts.managers [manager-class] [...]
+-compiler.fonts.max-cached-fonts <string>
+-compiler.fonts.max-glyphs-per-face <string>
+-compiler.headless-server
+-compiler.include-libraries [library] [...]
+-compiler.inline
+-compiler.isolate-styles
+-compiler.keep-all-type-selectors
+-compiler.keep-as3-metadata [name] [...]
+-compiler.library-path [path-element] [...]
+-compiler.locale [locale-element] [...]
+-compiler.minimum-supported-version <string>
+-compiler.mobile
+-compiler.mxml.compatibility-version <version>
+-compiler.mxml.minimum-supported-version <string>
+-compiler.namespaces.namespace [uri] [manifest] [...]
+-compiler.omit-trace-statements
+-compiler.optimize
+-compiler.preloader <string>
+-compiler.remove-dead-code
+-compiler.report-invalid-styles-as-warnings
+-compiler.report-missing-required-skin-parts-as-warnings
+-compiler.services <filename>
+-compiler.show-actionscript-warnings
+-compiler.show-binding-warnings
+-compiler.show-invalid-css-property-warnings
+-compiler.show-multiple-definition-warnings
+-compiler.show-shadowed-device-font-warnings
+-compiler.show-unused-type-selector-warnings
+-compiler.source-path [path-element] [...]
+-compiler.strict
+-compiler.theme [filename] [...]
+-compiler.verbose-stacktraces
+-compiler.warn-array-tostring-changes
+-compiler.warn-assignment-within-conditional
+-compiler.warn-bad-array-cast
+-compiler.warn-bad-bool-assignment
+-compiler.warn-bad-date-cast
+-compiler.warn-bad-es3-type-method
+-compiler.warn-bad-es3-type-prop
+-compiler.warn-bad-nan-comparison
+-compiler.warn-bad-null-assignment
+-compiler.warn-bad-null-comparison
+-compiler.warn-bad-undefined-comparison
+-compiler.warn-boolean-constructor-with-no-args
+-compiler.warn-changes-in-resolve
+-compiler.warn-class-is-sealed
+-compiler.warn-const-not-initialized
+-compiler.warn-constructor-returns-value
+-compiler.warn-deprecated-event-handler-error
+-compiler.warn-deprecated-function-error
+-compiler.warn-deprecated-property-error
+-compiler.warn-duplicate-argument-names
+-compiler.warn-duplicate-variable-def
+-compiler.warn-for-var-in-changes
+-compiler.warn-import-hides-class
+-compiler.warn-instance-of-changes
+-compiler.warn-internal-error
+-compiler.warn-level-not-supported
+-compiler.warn-missing-namespace-decl
+-compiler.warn-negative-uint-literal
+-compiler.warn-no-constructor
+-compiler.warn-no-explicit-super-call-in-constructor
+-compiler.warn-no-type-decl
+-compiler.warn-number-from-string-changes
+-compiler.warn-scoping-change-in-this
+-compiler.warn-slow-text-field-addition
+-compiler.warn-unlikely-function-value
+-compiler.warn-xml-class-has-changed
+-debug-password <string>
+-default-background-color <int>
+-default-frame-rate <int>
+-default-script-limits <max-recursion-depth> <max-execution-time>
+-default-size <width> <height>
+-dependency-graph <filename>
+-dependency.dependency-report <filename>
+-dependency.show-dependency-list
+-dependency.show-dependent-swcs [swc-name] [...]
+-dependency.show-external-classes
+-dependency.show-swcs [swc-name] [...]
+-dependency.show-types
+-dependency.types [type] [...]
+-dump-config <filename>
+-error-problems [class] [...]
+-externs [symbol] [...]
+-frames.frame [label] [classname] [...]
+-help [keyword] [...]
+-ignore-problems [class] [...]
+-include-inheritance-dependencies-only
+-include-resource-bundles [bundle] [...]
+-includes [symbol] [...]
+-link-report <filename>
+-load-config <filename>
+-load-externs <filename>
+-metadata.contributor <name>
+-metadata.creator <name>
+-metadata.date <text>
+-metadata.description <text>
+-metadata.language <code>
+-metadata.localized-description <text> <lang>
+-metadata.localized-title <title> <lang>
+-metadata.publisher <name>
+-metadata.title <text>
+-output <filename>
+-raw-metadata <text>
+-remove-unused-rsls
+-resource-bundle-list <filename>
+-runtime-shared-libraries [url] [...]
+-runtime-shared-library-path [path-element] [rsl-url] [policy-file-url] [rsl-url] [policy-file-url]
+-runtime-shared-library-settings.application-domain [path-element] [application-domain-target] [...]
+-runtime-shared-library-settings.force-rsls [path-element] [...]
+-size-report <filename>
+-static-link-runtime-shared-libraries
+-swf-version <int>
+-target-player <version>
+-tools-locale <string>
+-use-direct-blit
+-use-gpu
+-use-network
+-verify-digests
+-version
+-warning-problems [class] [...]
+-warnings
+
