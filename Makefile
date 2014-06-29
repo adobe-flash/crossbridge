@@ -214,9 +214,25 @@ $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -I/usr/local/Cellar/app
 # ASC1 Tool
 $?ASC=$(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar)
 # ASC2 Tool
-$?SCOMPFALCON=java -jar $(call nativepath,$(SRCROOT)/tools/lib-air/asc2.jar) -merge -md -abcfuture -AS3 -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc)  -import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
+# 1. merge the compiled source into a single output file
+# 2. emit metadata information into the bytecode
+# 3. future abc
+# 4. use the AS3 class based object model for greater performance and better error reporting
+# 5. turn on 'parallel generation of method bodies' feature for Alchemy
+# 6. turn on the inlining of functions
+# 7. make the packages in the abc file available for import
+$?ASC2=java -jar $(call nativepath,$(SRCROOT)/tools/lib-air/asc2.jar) -merge -md -abcfuture -AS3 -parallel -inline \
+		-import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/builtin.abc) \
+		-import $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/generated/shell_toplevel.abc)
 # ASC2 configuration definitions
-$?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true -config CONFIG::debug=true
+# 1. as3 source is for asdocs
+# 2. as3 source is for distribution
+# 3. as3 source is including trace commands
+$?ASC2OPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true -config CONFIG::debug=true
+# 1. treat undeclared variable and method access as errors
+# 2. produce an optimized abc file
+# 3. remove dead code when -optimize is set
+$?ASC2EXTRAOPTS=-strict -optimize -removedeadcode
 # AVMShell link
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
 
@@ -279,13 +295,6 @@ all:
 	@$(MAKE) make &> $(BUILD)/logs/make.txt 2>&1
 	@$(SDK_MAKE) -s all_with_local_make
 
-# Helper for 'all_with_local_make' logging
-ifneq (,$(PRINT_LOGS_ON_ERROR))
-	$?PRINT_LOGS_CMD=tail +1
-else
-	$?PRINT_LOGS_CMD=true
-endif
-
 # Macro for Targets with local Make
 all_with_local_make:
 	@for target in $(BUILDORDER) ; do \
@@ -306,7 +315,7 @@ all_with_local_make:
 		done ; \
 		if [ $$mret -ne 0 ] ; then \
 			echo "Failed to build: $$target" ;\
-			$(PRINT_LOGS_CMD) $$logs ;\
+			tail +1 $$logs ;\
 			exit 1 ; \
 		fi ; \
 	done 
@@ -494,9 +503,9 @@ base:
 
 	$(RSYNC) --exclude '*iconv.h' avm2_env/usr/include/ $(SDK)/usr/include
 	$(RSYNC) avm2_env/usr/lib/ $(SDK)/usr/lib
-	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/swfmake.as) -outdir . -out swfmake
-	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/projectormake.as) -outdir . -out projectormake
-	cd $(BUILD) && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/abcdump.as) -outdir . -out abcdump
+	cd $(BUILD) && $(ASC2) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/swfmake.as) -outdir . -out swfmake
+	cd $(BUILD) && $(ASC2) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/projectormake.as) -outdir . -out projectormake
+	cd $(BUILD) && $(ASC2) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/abcdump.as) -outdir . -out abcdump
 
 # ====================================================================================
 # MAKE
@@ -578,26 +587,26 @@ abclibs_compile:
 	# Rebuild AVMPlus ABCs
 	#$(MAKE) builtinabcs
 	# Generating DefaultPreloader
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/DefaultPreloader.as) -swf com.adobe.flascc.preloader.DefaultPreloader,800,600,60 -outdir . -out DefaultPreloader
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/DefaultPreloader.as) -swf com.adobe.flascc.preloader.DefaultPreloader,800,600,60 -outdir . -out DefaultPreloader
 	# Generating ABC Libs
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/ELF.as) -outdir . -out ELF
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/Exit.as) -outdir . -out Exit
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/LongJmp.as) -outdir . -out LongJmp
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -import Exit.abc $(call nativepath,$(SRCROOT)/posix/C_Run.as) -outdir . -out C_Run
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/vfs/ISpecialFile.as) -outdir . -out ISpecialFile
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize $(call nativepath,$(SRCROOT)/posix/vfs/IBackingStore.as) -outdir . -out IBackingStore
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import IBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/InMemoryBackingStore.as) -outdir . -out InMemoryBackingStore
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import IBackingStore.abc -import ISpecialFile.abc $(call nativepath,$(SRCROOT)/posix/vfs/IVFS.as) -outdir . -out IVFS
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import ISpecialFile.abc -import IBackingStore.abc -import IVFS.abc -import InMemoryBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/DefaultVFS.as) -outdir . -out DefaultVFS
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath, `find $(SRCROOT)/posix/vfs/nochump -name "*.as"`) -outdir . -out AlcVFSZip
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -import Exit.abc -import C_Run.abc -import IBackingStore.abc -import ISpecialFile.abc -import IVFS.abc -import LongJmp.abc $(call nativepath,$(SRCROOT)/posix/CModule.as) -outdir . -out CModule
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import ELF.abc $(call nativepath,$(SRCROOT)/posix/AlcDbgHelper.as) -d -outdir . -out AlcDbgHelper
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/BinaryData.as) -outdir . -out BinaryData
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/Console.as) -outdir . -out Console
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import ELF.abc $(call nativepath,$(SRCROOT)/posix/startHack.as) -outdir . -out startHack
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc $(call nativepath,$(SRCROOT)/posix/ShellCreateWorker.as) -outdir . -out ShellCreateWorker
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/PlayerCreateWorker.as) -outdir . -out PlayerCreateWorker
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(ABCLIBOPTS) -strict -optimize -import CModule.abc -import C_Run.abc -import Exit.abc -import IBackingStore.abc -import ISpecialFile.abc -import IVFS.abc -import DefaultVFS.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/PlayerKernel.as) -outdir . -out PlayerKernel
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) $(call nativepath,$(SRCROOT)/posix/ELF.as) -outdir . -out ELF
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) $(call nativepath,$(SRCROOT)/posix/Exit.as) -outdir . -out Exit
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) $(call nativepath,$(SRCROOT)/posix/LongJmp.as) -outdir . -out LongJmp
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) -import Exit.abc $(call nativepath,$(SRCROOT)/posix/C_Run.as) -outdir . -out C_Run
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) $(call nativepath,$(SRCROOT)/posix/vfs/ISpecialFile.as) -outdir . -out ISpecialFile
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) $(call nativepath,$(SRCROOT)/posix/vfs/IBackingStore.as) -outdir . -out IBackingStore
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import IBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/InMemoryBackingStore.as) -outdir . -out InMemoryBackingStore
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import IBackingStore.abc -import ISpecialFile.abc $(call nativepath,$(SRCROOT)/posix/vfs/IVFS.as) -outdir . -out IVFS
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import ISpecialFile.abc -import IBackingStore.abc -import IVFS.abc -import InMemoryBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/DefaultVFS.as) -outdir . -out DefaultVFS
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath, `find $(SRCROOT)/posix/vfs/nochump -name "*.as"`) -outdir . -out AlcVFSZip
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) -import Exit.abc -import C_Run.abc -import IBackingStore.abc -import ISpecialFile.abc -import IVFS.abc -import LongJmp.abc $(call nativepath,$(SRCROOT)/posix/CModule.as) -outdir . -out CModule
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import ELF.abc $(call nativepath,$(SRCROOT)/posix/AlcDbgHelper.as) -d -outdir . -out AlcDbgHelper
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/BinaryData.as) -outdir . -out BinaryData
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/Console.as) -outdir . -out Console
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import ELF.abc $(call nativepath,$(SRCROOT)/posix/startHack.as) -outdir . -out startHack
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc $(call nativepath,$(SRCROOT)/posix/ShellCreateWorker.as) -outdir . -out ShellCreateWorker
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/PlayerCreateWorker.as) -outdir . -out PlayerCreateWorker
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import CModule.abc -import C_Run.abc -import Exit.abc -import IBackingStore.abc -import ISpecialFile.abc -import IVFS.abc -import DefaultVFS.abc -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath,$(SRCROOT)/posix/PlayerKernel.as) -outdir . -out PlayerKernel
 	cp $(BUILD)/abclibs/*.abc $(SDK)/usr/lib
 	cp $(BUILD)/abclibs/*.swf $(SDK)/usr/lib
 
@@ -1004,15 +1013,6 @@ sdkcleanup:
 	mv $(SDK)/usr/share_cmake $(SDK)/usr/share/$(DEPENDENCY_CMAKE)
 	rm -f $(SDK)/usr/lib/*.la
 	rm -f $(SDK)/usr/lib/crt1.o $(SDK)/usr/lib/crtbegin.o $(SDK)/usr/lib/crtbeginS.o $(SDK)/usr/lib/crtbeginT.o $(SDK)/usr/lib/crtend.o $(SDK)/usr/lib/crtendS.o $(SDK)/usr/lib/crti.o $(SDK)/usr/lib/crtn.o
-
-# TBD
-finalcleanup:
-ifeq (,$(findstring 1,$(LIGHTSDK)))
-	perl -p -i -e 's~$(SRCROOT)/sdk~\$$\{flascc_sdk_root\}~g' `grep -ril $(SRCROOT) $(SDK)/usr/lib/pkgconfig`
-	rm -f $(SDK)/usr/lib/pkgconfig/*.bak
-endif
-	rm -f $(SDK)/usr/lib/*.la
-	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/man $(SDK)/usr/share/info
 	$(RSYNC) $(SRCROOT)/posix/avm2_tramp.cpp $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/vgl.c $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/Console.as $(SDK)/usr/share/
@@ -1026,6 +1026,15 @@ endif
 	$(RSYNC) $(SRCROOT)/posix/vfs/LSOBackingStore.as $(SDK)/usr/share/
 	$(RSYNC) --exclude "*.xslt" --exclude "*.html" --exclude ASDoc_Config.xml --exclude overviews.xml $(BUILDROOT)/tempdita/ $(SDK)/usr/share/asdocs
 
+# TBD
+finalcleanup:
+ifeq (,$(findstring 1,$(LIGHTSDK)))
+	perl -p -i -e 's~$(SRCROOT)/sdk~\$$\{flascc_sdk_root\}~g' `grep -ril $(SRCROOT) $(SDK)/usr/lib/pkgconfig`
+	rm -f $(SDK)/usr/lib/pkgconfig/*.bak
+endif
+	rm -f $(SDK)/usr/lib/*.la
+	rm -rf $(SDK)/usr/share/aclocal $(SDK)/usr/share/doc $(SDK)/usr/share/man $(SDK)/usr/man $(SDK)/usr/share/info
+
 # ====================================================================================
 # EXTRA TOOLS
 # ====================================================================================
@@ -1038,7 +1047,7 @@ tr:
 	cd $(BUILD)/tr && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cp -f $(BUILD)/tr/shell/avmshell $(SDK)/usr/bin/avmshell
 	cd $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils && curdir=$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils ASC=$(ASC) $(MAKE) -f manifest.mk utils
-	cd $(BUILD)/abclibs && $(SCOMPFALCON) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/projectormake.as) -outdir . -out projectormake
+	cd $(BUILD)/abclibs && $(ASC2) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/projectormake.as) -outdir . -out projectormake
 ifneq (,$(findstring cygwin,$(PLATFORM)))
 	$(SDK)/usr/bin/avmshell $(BUILD)/abclibs/projectormake.abc -- -o $(SDK)/usr/bin/abcdump$(EXEEXT) $(SDK)/usr/bin/avmshell $(BUILD)/abcdump.abc -- -Djitordie
 	chmod a+x $(SDK)/usr/bin/abcdump$(EXEEXT)
@@ -1556,7 +1565,7 @@ test_posix:
 	# Assembling VFS
 	$(SDK)/usr/bin/genfs --name my.test.BackingStore $(SRCROOT)/test/zipfsroot $(BUILD)/test_posix/alcfs
 	# Assembling ABC
-	cd $(BUILD)/test_posix && $(SCOMPFALCON) \
+	cd $(BUILD)/test_posix && $(ASC2) \
 		-import $(call nativepath,$(SDK)/usr/lib/BinaryData.abc) \
 		-import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) \
 		-import $(call nativepath,$(SDK)/usr/lib/ISpecialFile.abc) \
