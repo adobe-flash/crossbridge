@@ -286,9 +286,9 @@ static std::string basename(const std::string &s)
 int main(int argc, char **argv)
 {
   static const char *defOutput = "a.out";
-
+  // TODO: option for verbose mode, logging (VPMedia)
   bool targetPlayer = false;
-  bool useLegacyAsc = false;
+  //bool useLegacyAsc = false;
   FILE *input = NULL;
   FILE *output = NULL;
 
@@ -313,8 +313,8 @@ int main(int argc, char **argv)
     }
     else if(arg == "--target-player")
       targetPlayer = true;
-    else if(arg == "--use-legacy-asc")
-      useLegacyAsc = true;
+    //else if(arg == "--use-legacy-asc")
+    //  useLegacyAsc = true;
     else
     {
       if(input)
@@ -401,22 +401,30 @@ int main(int argc, char **argv)
   jargs.push_back("-Xms512M");
   jargs.push_back("-Xmx2048M");
   jargs.push_back("-ea");
-  if(useLegacyAsc)
-  {
-    jargs.push_back("-classpath");
-    jargs.push_back(libPath + "/asc.jar");
-    jargs.push_back("macromedia.asc.embedding.ScriptCompiler");
-  }
-  else
-  {
+  //if(useLegacyAsc)
+  //{
+  //  jargs.push_back("-classpath");
+  //  jargs.push_back(libPath + "/asc.jar");
+  //  jargs.push_back("macromedia.asc.embedding.ScriptCompiler");
+  //}
+  //else
+  //{
     jargs.push_back("-jar");
     jargs.push_back(libPath + "/asc2.jar");
+    // merge the compiled source into a single output
     jargs.push_back("-merge");
+    // emit metadata information into the bytecode
     jargs.push_back("-md");
-  }
+    // turn on parallel generation of method bodies feature
+    jargs.push_back("-parallel");
+    // turn on the inlining of functions
+    jargs.push_back("-inline");
+  //}
+  // future abc (?)
   jargs.push_back("-abcfuture");
+  // use the AS3 class based object model
   jargs.push_back("-AS3");
-
+  // make packages available for import
   jargs.push_back("-import");
   jargs.push_back(libPath + "/builtin.abc");
   jargs.push_back("-import");
@@ -445,13 +453,13 @@ int main(int argc, char **argv)
   jargs.push_back("-import");
   jargs.push_back(libPath + "/CModule.abc");
 
-  if(useLegacyAsc) {
-    jargs.push_back(unipath(tmp1Path));
+  //if(useLegacyAsc) {
+  //  jargs.push_back(unipath(tmp1Path));
+  //  jargs.push_back(unipath(tmp2Path));
+  //} else {
     jargs.push_back(unipath(tmp2Path));
-  } else {
-    jargs.push_back(unipath(tmp2Path));
     jargs.push_back(unipath(tmp1Path));
-  }
+  //}
 
   jargs.push_back("-outdir");
   jargs.push_back(unipath(dirname(outTmpPath)));

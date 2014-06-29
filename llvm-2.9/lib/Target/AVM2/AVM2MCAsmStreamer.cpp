@@ -529,14 +529,21 @@ public:
         } else {
             args.push_back("-jar");
             args.push_back(nativepath(sdk + "/usr/lib/asc2.jar"));
+            // merge the compiled source into a single output
             args.push_back("-merge");
+            // emit metadata information into the bytecode
             args.push_back("-md");
-            if(FalconParallel)
+            // turn on the inlining of functions
+            args.push_back("-inline");
+            // turn on parallel generation of method bodies feature
+            //if(FalconParallel)
                 args.push_back("-parallel");
         }
-        
+        // future ABC
         args.push_back("-abcfuture");
+        // use the AS3 class based object model
         args.push_back("-AS3");
+        // make packages available for import
         args.push_back("-import");
         args.push_back(nativepath(sdk + "/usr/lib/builtin.abc"));
         args.push_back("-import");
