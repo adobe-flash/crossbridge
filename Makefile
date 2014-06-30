@@ -13,7 +13,8 @@ $?LINUX_BUILD=$(BUILDROOT)/linux
 # ====================================================================================
 # DEPENDENCIES
 # ====================================================================================
-$?DEPENDENCY_AVMPLUS=avmplus
+#$?DEPENDENCY_AVMPLUS=avmplus
+$?DEPENDENCY_AVMPLUS=avmplus-master
 $?DEPENDENCY_BINUTILS=binutils
 $?DEPENDENCY_BMAKE=bmake
 $?DEPENDENCY_CMAKE=cmake-2.8.12.2
@@ -331,10 +332,20 @@ diagnostics:
 	@echo "FLEX_SDK_TYPE: $(FLEX_SDK_TYPE)"
 	@echo "FLEX_SDK_HOME: $(FLEX_SDK_HOME)"
 
-# Development target
+# Development target (posix as3)
 all_dev:
 	@$(SDK_MAKE) abclibs_compile
 	cd samples/09_Pthreads && $(SDK_MAKE) T09_3 T09_4 T09_5
+
+# Development target (avmplus-master)
+all_dev2:
+	@$(SDK_MAKE) builtinabcs
+	cd $(BUILD) && $(ASC2) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/swfmake.as) -outdir . -out swfmake
+	cd $(BUILD) && $(ASC2) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/projectormake.as) -outdir . -out projectormake
+	cd $(BUILD) && $(ASC2) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/abcdump.as) -outdir . -out abcdump
+	@$(SDK_MAKE) tr
+	@$(SDK_MAKE) trd
+	@$(SDK_MAKE) all_dev
 
 # Clean build outputs
 clean:
@@ -351,6 +362,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_CMAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_DEJAGNU).tar.gz
 	tar xf packages/$(DEPENDENCY_DMALLOC).tar.gz
+	tar xf packages/$(DEPENDENCY_GDB).tar.gz
 	tar xf packages/$(DEPENDENCY_JPEG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBAA).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBBZIP).tar.gz
@@ -390,6 +402,7 @@ install_libs:
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
 	cp -r ./patches/$(DEPENDENCY_DMALLOC) .
+	cp -r ./patches/$(DEPENDENCY_GDB) .
 	cp -r ./patches/$(DEPENDENCY_LIBPHYSFS) .
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_LIBSDL) .
@@ -407,6 +420,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_CMAKE)
 	rm -rf $(DEPENDENCY_DEJAGNU)
 	rm -rf $(DEPENDENCY_DMALLOC)
+	rm -rf $(DEPENDENCY_GDB)
 	rm -rf $(DEPENDENCY_JPEG)
 	rm -rf $(DEPENDENCY_LIBAA)
 	rm -rf $(DEPENDENCY_LIBBZIP)
@@ -482,9 +496,12 @@ base:
 	$(RSYNC) $(SRCROOT)/tools/utils-py/swfdink.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/utils-py/swf-info.py $(SDK)/usr/bin/
 
+	$(MAKE) builtinabcs
 	$(RSYNC) tools/playerglobal/14.0/playerglobal.abc $(SDK)/usr/lib/
 	$(RSYNC) tools/playerglobal/14.0/playerglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
+	rm -rf $(DEPENDENCY_AVMPLUS)/generated/builtin.abc
+	$(RSYNC) tools/playerglobal/14.0/builtin.abc $(DEPENDENCY_AVMPLUS)/generated/
 	cp -f $(DEPENDENCY_AVMPLUS)/generated/*.abc $(SDK)/usr/lib/
 
 	$(RSYNC) --exclude '*iconv.h' avm2_env/usr/include/ $(SDK)/usr/include
@@ -528,6 +545,9 @@ cmake:
 # Assemble builtin ABCs
 # Use it if Tamarin AS3 code is modified
 builtinabcs:
+	mkdir -p $(BUILD)/abclibsposix
+	cd $(BUILD)/abclibsposix && $(PYTHON) $(SRCROOT)/posix/gensyscalls.py $(SRCROOT)/posix/syscalls.changed
+	cat $(BUILD)/abclibsposix/IKernel.as | sed '1,1d' | sed '$$d' > $(SRCROOT)/posix/IKernel.as
 	cp $(BUILD)/abclibsposix/IKernel.as $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
 	cp $(BUILD)/abclibsposix/ShellPosix.as $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
 	cp $(BUILD)/abclibsposix/ShellPosixGlue.cpp $(SRCROOT)/$(DEPENDENCY_AVMPLUS)/shell
