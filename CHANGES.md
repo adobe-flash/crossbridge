@@ -30,5 +30,9 @@ CHANGES
 * Updated ASC2 Compiler to v14.0.0
 * Deprecated ObjectiveC support
 * Deprecated Legacy ASC support
-* Enabled ASC2 parallel compilation and inlining
+* Enabled ASC2 parallel compilation
 * Improved AS3 logging for threads
+
+### 1.0.4
+
+#### TBA

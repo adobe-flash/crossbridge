@@ -44,9 +44,15 @@ SET LAUNCH_DIR=%~dp0
 :: Check for Cygwin
 IF NOT EXIST %LAUNCH_DIR%\cygwin IF NOT DEFINED BUILD_NUMBER GOTO NOCYGWIN
 
-:: Bootstrap Cygwin
-:RUNCYGWIN
+:: Check for hardcoded Cygwin temp folder
+IF NOT EXIST "c:\cygwin\tmp\" GOTO INIT
 
+GOTO RUN
+
+:INIT
+md C:\cygwin\tmp
+
+:RUN
 :: Disable 3rd party C/C++ compiler variables
 set MINGW_HOME=
 set MSYS_HOME=
@@ -74,12 +80,11 @@ bash --login -i
 ) else (
 bash --login %*
 )
-
 GOTO EXIT
 
 :: Install Cygwin and additional packages using CLI
 :NOCYGWIN
-md C:\cygwin\tmp && setup-x86 --arch x86 --quiet-mode --no-admin --no-startmenu --no-desktop --no-shortcuts --root %LAUNCH_DIR%\cygwin --site http://cygwin.mirror.constant.com && setup-x86 --arch x86 --quiet-mode --no-admin --no-startmenu --no-desktop --no-shortcuts --root %CD%\cygwin --site http://cygwin.mirror.constant.com --packages libuuid1,libuuid-devel && run
+setup-x86 --arch x86 --quiet-mode --no-admin --no-startmenu --no-desktop --no-shortcuts --root %LAUNCH_DIR%\cygwin --site http://cygwin.mirror.constant.com && setup-x86 --arch x86 --quiet-mode --no-admin --no-startmenu --no-desktop --no-shortcuts --root %CD%\cygwin --site http://cygwin.mirror.constant.com --packages libuuid1,libuuid-devel && run
 GOTO EXIT
 
 :: Exit hook
