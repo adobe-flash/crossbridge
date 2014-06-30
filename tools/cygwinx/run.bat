@@ -30,11 +30,19 @@
 :: Purpose: CrossBridge Cygwin Launch Helper Script 
 :: Author: Andras Csizmadia
 
-:: Initialize
-@ECHO OFF
+:: Echo off and begin localisation of Environment Variables
+@ECHO OFF & SETLOCAL
+
+:: Prepare the Command Processor
+VERIFY errors 2>nul
+SETLOCAL ENABLEEXTENSIONS
+IF ERRORLEVEL 1 ECHO Warning: Unable to enable extensions.
+SETLOCAL ENABLEDELAYEDEXPANSION
+
+SET LAUNCH_DIR=%~dp0
 
 :: Check for Cygwin
-IF NOT EXIST cygwin GOTO NOCYGWIN
+IF NOT EXIST %LAUNCH_DIR%\cygwin IF NOT DEFINED BUILD_NUMBER GOTO NOCYGWIN
 
 :: Bootstrap Cygwin
 :RUNCYGWIN
@@ -49,7 +57,7 @@ set JAVA_HOME=%JAVA_HOME:\=/%
 set AIR_HOME=%AIR_HOME:\=/%
 set FLEX_HOME=%FLEX_HOME:\=/%
 set FLASH_PLAYER_EXE=%FLASH_PLAYER_EXE:\=/%
-set FLASCC_ROOT=%CD:\=/%
+set FLASCC_ROOT=%LAUNCH_DIR:\=/%
 
 :: Setup basic path
 set PATH=%FLASCC_ROOT%/sdk/usr/bin;%JAVA_HOME%/bin
@@ -58,7 +66,7 @@ set PATH=%FLASCC_ROOT%/sdk/usr/bin;%JAVA_HOME%/bin
 C:
 
 :: !!!Important!!! For custom Cygwin installations edit the location!
-chdir %CD%\cygwin\bin
+chdir %LAUNCH_DIR%\cygwin\bin
 
 :: Cygwin with automation support 
 if [%1] == [] (
@@ -67,6 +75,12 @@ bash --login -i
 bash --login %*
 )
 
+GOTO EXIT
+
 :: Install Cygwin and additional packages using CLI
 :NOCYGWIN
-setup-x86 --arch x86 --quiet-mode --no-admin --no-startmenu --no-desktop --no-shortcuts --root %CD%\cygwin --site http://cygwin.mirror.constant.com && setup-x86 --arch x86 --quiet-mode --no-admin --no-startmenu --no-desktop --no-shortcuts --root %CD%\cygwin --site http://cygwin.mirror.constant.com --packages libuuid1,libuuid-devel && run
+md C:\cygwin\tmp && setup-x86 --arch x86 --quiet-mode --no-admin --no-startmenu --no-desktop --no-shortcuts --root %LAUNCH_DIR%\cygwin --site http://cygwin.mirror.constant.com && setup-x86 --arch x86 --quiet-mode --no-admin --no-startmenu --no-desktop --no-shortcuts --root %CD%\cygwin --site http://cygwin.mirror.constant.com --packages libuuid1,libuuid-devel && run
+GOTO EXIT
+
+:: Exit hook
+:EXIT
