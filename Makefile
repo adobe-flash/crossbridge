@@ -119,7 +119,6 @@ ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?BUILD=$(MAC_BUILD)
 	$?PLATFORM_NAME=mac
 	$?HOST_TRIPLE=x86_64-apple-darwin10
-	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
 # Linux
 ifneq (,$(findstring linux,$(PLATFORM)))
@@ -134,7 +133,6 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 	$?BUILD=$(LINUX_BUILD)
 	$?PLATFORM_NAME=linux
 	$?HOST_TRIPLE=x86_64-unknown-linux
-	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
 
 # Cross-Compile Options
@@ -149,7 +147,6 @@ $?TRIPLE=avm2-unknown-freebsd8
 #$?CC_FOR_BUILD=gcc
 export CC:=$(CC)
 export CXX:=$(CXX)
-export CCACHE_DIR=$(SRCROOT)/ccache
 # linker tool (symbolic force no-dereference)
 $?LN=ln -sfn
 # sync tool
@@ -342,10 +339,8 @@ all_dev:
 # Clean build outputs
 clean:
 	@echo "Cleaning ..."
-	@rm -rf $(CCACHE_DIR)
 	@rm -rf $(BUILDROOT)
 	@rm -rf $(SDK)
-	@rm -rf $(SRCROOT)/.redo
 	@$(MAKE) -s clean_libs
 	@cd samples && $(MAKE) -s clean
 	@echo "Done."
@@ -482,15 +477,6 @@ base:
 	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) gcc-4.2$(EXEEXT)
 	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) g++-4.2$(EXEEXT)
 
-	mkdir -p $(BUILD)/ccachebin
-	mkdir -p ccache
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CC)
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CXX)
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CYGTRIPLE)-gcc
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CYGTRIPLE)-g++
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-gcc
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-g++
-
 	$(RSYNC) $(SRCROOT)/tools/utils-py/add-opt-in.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/utils-py/projector-dis.py $(SDK)/usr/bin/
 	$(RSYNC) $(SRCROOT)/tools/utils-py/swfdink.py $(SDK)/usr/bin/
@@ -517,7 +503,7 @@ make:
 	cp -r $(SRCROOT)/$(DEPENDENCY_MAKE)/* $(BUILD)/make/
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --program-prefix="" \
                 --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE)
-	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
+	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE)
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) $(MAKE) install
 
 # ====================================================================================
@@ -532,7 +518,7 @@ cmake:
 	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/share/$(DEPENDENCY_CMAKE)/
 	cp -r $(SRCROOT)/$(DEPENDENCY_CMAKE)/* $(BUILD)/cmake/
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --datadir=share/$(DEPENDENCY_CMAKE) --docdir=cmake_junk --mandir=cmake_junk
-	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
+	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE)
 	cd $(BUILD)/cmake && CC=$(CC) CXX=$(CXX) $(MAKE) install
 	#cp -r $(SDK)/usr/share/$(DEPENDENCY_CMAKE) $(SDK)/usr/platform/$(PLATFORM)/share/
 

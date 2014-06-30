@@ -36,7 +36,6 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 * autoconf
 * automake
 * bison
-* ccache
 * cmbzip2
 * cmake
 * expat
