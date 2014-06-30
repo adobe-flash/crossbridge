@@ -35,4 +35,4 @@ CHANGES
 
 ### 1.0.4
 
-#### TBA
+* Updated AVMPlus from https://github.com/adobe-flash/avmplus
