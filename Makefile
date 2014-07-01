@@ -241,7 +241,7 @@ $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
 $?FLASCC_VERSION_MAJOR:=1
 $?FLASCC_VERSION_MINOR:=0
 $?FLASCC_VERSION_PATCH:=4
-$?FLASCC_VERSION_BUILD:=1
+$?FLASCC_VERSION_BUILD:=2
 $?SDKNAME=CrossBridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH).$(FLASCC_VERSION_BUILD)
 BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_MINOR=$(FLASCC_VERSION_MINOR) -DFLASCC_VERSION_PATCH=$(FLASCC_VERSION_PATCH) -DFLASCC_VERSION_BUILD=$(FLASCC_VERSION_BUILD)"
 
@@ -256,8 +256,8 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 # ALL TARGETS
 # ====================================================================================
 
-EXTRALIBORDER= zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv libvgl libjpeg libpng libgif libtiff libwebp
-EXTRALIBORDER+= libogg libvorbis libflac libsndfile libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image libphysfs
+EXTRALIBORDER= zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv libxml2 libvgl libjpeg libpng libgif libtiff libwebp
+EXTRALIBORDER+= libogg libvorbis libflac libsndfile libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image libphysfs libncurses libopenssl
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
 TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols test_gdb 
@@ -340,7 +340,7 @@ all_dev:
 
 # Development target (libs)
 all_dev2:
-	@$(SDK_MAKE) libxml2
+	@$(SDK_MAKE) libreadline
 
 # Clean build outputs
 clean:
@@ -1236,32 +1236,14 @@ libiconv:
 		--disable-dependency-tracking
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# The Ncurses (new curses) library is a free software emulation of curses in System V Release 4.0, and more (GPL). 
-libncurses:
-	rm -rf $(BUILD)/libncurses
-	mkdir -p $(BUILD)/libncurses
-	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBNCURSES)/configure \
-		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
-		--disable-pthread --without-shared --without-debug --without-tests \
-		--without-progs --without-dlsym
-	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-# The GNU Readline library provides a set of functions for use by applications that allow users to edit command lines as they are typed in (GPL). 
-libreadline:
-	rm -rf $(BUILD)/libreadline
-	mkdir -p $(BUILD)/libreadline
-	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBREADLINE)/configure \
-		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared --with-curses 
-	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
 # Libxml2 is the XML C parser and toolkit developed for the Gnome project (MIT).
 # Dependencies: zlib, iconv, readline
 libxml2:
 	rm -rf $(BUILD)/libxml2
 	mkdir -p $(BUILD)/libxml2
 	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBXML)/configure \
-		--prefix=$(SDK)/usr --enable-static --disable-shared --without-ftp --without-http --without-html --without-python --without-history --with-minimum
-	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+		--prefix=$(SDK)/usr --enable-static --disable-shared --without-ftp --without-http --without-html --without-python --without-history
+	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -i install
 
 # OpenGL-based programs must link with the libGL library. libGL implements the GLX interface as well as the main OpenGL API entrypoints. 
 libvgl:
@@ -1429,24 +1411,45 @@ libsndfile:
 		--disable-dependency-tracking
 	cd $(BUILD)/libsndfile && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# AAlib is an portable ascii art GFX library.
-# TODO: add to build chain
-libaa:
-	rm -rf $(BUILD)/libaa
-	mkdir -p $(BUILD)/libaa
-	cd $(BUILD)/libaa && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBAA)/configure \
-		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared \
-		--without-x --with-curses-driver=no
-	cd $(BUILD)/libaa && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+# Physics FS
+libphysfs:
+	rm -rf $(BUILD)/libphysfs
+	mkdir -p $(BUILD)/libphysfs
+	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(SDK_CMAKE) -G "Unix Makefiles" \
+		$(SRCROOT)/$(DEPENDENCY_LIBPHYSFS) -DCMAKE_INSTALL_PREFIX="$(SDK)/usr" \
+		-DPHYSFS_BUILD_TEST=0 -DPHYSFS_HAVE_THREAD_SUPPORT=0 -DPHYSFS_HAVE_CDROM_SUPPORT=0 -DPHYSFS_BUILD_STATIC=1 -DPHYSFS_BUILD_SHARED=0 -DOTHER_LDFLAGS=-lz -DCMAKE_INCLUDE_PATH="$(SDK)/usr/include" \
+		-DCMAKE_LIBRARY_PATH="$(SDK)/usr/lib"
+	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# The Ncurses (new curses) library is a free software emulation of curses in System V Release 4.0, and more (GPL).
+libncurses:
+	rm -rf $(BUILD)/libncurses
+	mkdir -p $(BUILD)/libncurses
+	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBNCURSES)/configure \
+		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
+		--disable-pthread --without-shared --without-debug --without-tests \
+		--without-progs --without-dlsym
+	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Cryptography library.
-# TODO: add to build chain
 libopenssl:
 	rm -rf $(BUILD)/libopenssl
 	mkdir -p $(BUILD)/libopenssl
 	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./config \
 		no-hw no-asm no-threads no-shared no-dso --prefix=$(SDK)/usr 
-	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) depend 
+	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) build_crypto
+	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) openssl.pc libssl.pc libcrypto.pc 
+	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install_sw
+
+# The GNU Readline library provides a set of functions for use by applications that allow users to edit command lines as they are typed in (GPL). 
+# TODO: add to build chain
+libreadline:
+	rm -rf $(BUILD)/libreadline
+	mkdir -p $(BUILD)/libreadline
+	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBREADLINE)/configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared --with-curses 
+	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Protocol Buffers are a way of encoding structured data in an efficient yet extensible format. 
 # Google uses Protocol Buffers for almost all of its internal RPC protocols and file formats. 
@@ -1458,15 +1461,15 @@ libprotobuf:
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-shared
 	cd $(BUILD)/libprotobuf && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# Physics FS
-libphysfs:
-	rm -rf $(BUILD)/libphysfs
-	mkdir -p $(BUILD)/libphysfs
-	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(SDK_CMAKE) -G "Unix Makefiles" \
-		$(SRCROOT)/$(DEPENDENCY_LIBPHYSFS) -DCMAKE_INSTALL_PREFIX="$(SDK)/usr" \
-		-DPHYSFS_BUILD_TEST=0 -DPHYSFS_HAVE_THREAD_SUPPORT=0 -DPHYSFS_HAVE_CDROM_SUPPORT=0 -DPHYSFS_BUILD_STATIC=1 -DPHYSFS_BUILD_SHARED=0 -DOTHER_LDFLAGS=-lz -DCMAKE_INCLUDE_PATH="$(SDK)/usr/include" \
-		-DCMAKE_LIBRARY_PATH="$(SDK)/usr/lib"
-	cd $(BUILD)/libphysfs && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+# AAlib is an portable ascii art GFX library.
+# TODO: add to build chain
+libaa:
+	rm -rf $(BUILD)/libaa
+	mkdir -p $(BUILD)/libaa
+	cd $(BUILD)/libaa && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBAA)/configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared \
+		--without-x --with-curses-driver=no
+	cd $(BUILD)/libaa && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # ====================================================================================
 # Submit tests
