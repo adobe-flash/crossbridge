@@ -50,6 +50,7 @@ $?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.4
 $?DEPENDENCY_LIBWEBP=libwebp-0.4.0
 $?DEPENDENCY_LIBXZ=xz-5.0.5
+$?DEPENDENCY_LIBXML=libxml2-2.9.1
 $?DEPENDENCY_LLVM=llvm-2.9
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-4.0
@@ -336,6 +337,10 @@ diagnostics:
 all_dev:
 	@$(SDK_MAKE) abclibs_compile
 	cd samples/09_Pthreads && $(SDK_MAKE) T09_3 T09_4 T09_5
+    
+# Development target (gdb)
+all_dev3:
+	@$(SDK_MAKE) gdb
 
 # Development target (avmplus-master)
 all_dev2:
@@ -392,6 +397,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBVORBIS).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBWEBP).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBXZ).tar.gz
+	tar xf packages/$(DEPENDENCY_LIBXML).tar.gz
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
@@ -451,6 +457,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBVORBIS)
 	rm -rf $(DEPENDENCY_LIBWEBP)
 	rm -rf $(DEPENDENCY_LIBXZ)
+	rm -rf $(DEPENDENCY_LIBXML)
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_PKG_CFG)
@@ -1173,6 +1180,14 @@ endif
 # EXTRA LIBS
 # ====================================================================================
 
+# libxml2
+libxml2:
+	rm -rf $(BUILD)/libxml2
+	cp -r $(SRCROOT)/$(DEPENDENCY_LIBXML) $(BUILD)/libxml2
+	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure \
+		--prefix=$(SDK)/usr --enable-static --disable-shared
+	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
 # A Massively Spiffy Yet Delicately Unobtrusive Compression Library
 zlib:
 	rm -rf $(BUILD)/zlib
@@ -1222,9 +1237,6 @@ libffi:
 	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure \
 		--prefix=$(SDK)/usr --enable-static --disable-shared
 	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-# TBD
-libfficheck:
 	cd $(BUILD)/libffi/testsuite && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) check
 
 # GMP is a free library for arbitrary precision arithmetic, operating on signed integers, rational numbers, and floating-point numbers. 
