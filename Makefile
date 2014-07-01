@@ -340,7 +340,7 @@ all_dev:
     
 # Development target (gdb)
 all_dev3:
-	@$(SDK_MAKE) gdb
+	@$(SDK_MAKE) libxml2
 
 # Development target (avmplus-master)
 all_dev2:
@@ -1180,14 +1180,6 @@ endif
 # EXTRA LIBS
 # ====================================================================================
 
-# libxml2
-libxml2:
-	rm -rf $(BUILD)/libxml2
-	cp -r $(SRCROOT)/$(DEPENDENCY_LIBXML) $(BUILD)/libxml2
-	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure \
-		--prefix=$(SDK)/usr --enable-static --disable-shared
-	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
 # A Massively Spiffy Yet Delicately Unobtrusive Compression Library
 zlib:
 	rm -rf $(BUILD)/zlib
@@ -1210,6 +1202,14 @@ libxz:
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared \
 		--enable-encoders=lzma1,lzma2,delta --enable-decoders=lzma1,lzma2,delta 
 	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# libxml2
+libxml2:
+	rm -rf $(BUILD)/libxml2
+	mkdir -p $(BUILD)/libxml2
+	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBXML)/configure \
+		--prefix=$(SDK)/usr --enable-static --disable-shared
+	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Eigen is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms.
 libeigen:
