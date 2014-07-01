@@ -1476,8 +1476,9 @@ public class CModule
   * @param args A vector of Strings that are used to fill the argv array given to main. The first String is typically used to specify the name of the application.
   * @param env A vector of Strings that are used to populate the environment variables accesible by <code>getenv()</code>. There should be an even number of Strings in this Vector as they are treated as name/value pairs.
   * @param preserveStack Inidcates whether the C stack should be preserved after the call to <code>__start1</code>. If this is set to false the stack depth will return to the value when start() was called upon return.
+  * @param isAutoSetRealThreadId Inidcates whether the module should auto-set its real thread id. Use false when using multi-threaded SWCs.
   */
-  public static function startAsync(console:Object = null, args:Vector.<String> = null, env:Vector.<String> = null, preserveStack:Boolean = true):void
+  public static function startAsync(console:Object = null, args:Vector.<String> = null, env:Vector.<String> = null, preserveStack:Boolean = true, isAutoSetRealThreadId:Boolean = true):void
   {
     CONFIG::debug { trace("CModule::startAsync: " + arguments); }
     
@@ -1491,9 +1492,11 @@ public class CModule
       env = new Vector.<String>
 
     // try to set us as the ui thread
-    /*try {
-      C_Run.workerClass["current"].setSharedProperty("flascc.uiThread.threadId", realThreadId);
-    } catch(e:*) {}*/
+    if(isAutoSetRealThreadId) {
+        try {
+          C_Run.workerClass["current"].setSharedProperty("flascc.uiThread.threadId", realThreadId);
+        } catch(e:*) {}    
+    }
     try {
       CModule.start(console, args, env, preserveStack);
     } catch(e:GoingAsync) {
@@ -1582,7 +1585,7 @@ public class CModule
   // set up worker init stuff
   workerInits.push(function(worker:*):void
   {
-    CONFIG::debug { trace("CModule::workerInit: " + threadId); }
+    CONFIG::debug { trace("CModule::workerInit: " + threadId + " / " + realThreadId); }
     prepForThreadedExec();
 
     var v:Vector.<CModule> = getModuleVector();

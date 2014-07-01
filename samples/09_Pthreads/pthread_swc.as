@@ -105,7 +105,7 @@ package
         if(runMainBg && CModule.canUseWorkers) // start in bg if we have workers
           CModule.startBackground(this, new <String>[], new <String>[])
         else
-          CModule.startAsync(this)
+          CModule.startAsync(this, null, null, true, false)
       }
       catch(e:*)
       {
