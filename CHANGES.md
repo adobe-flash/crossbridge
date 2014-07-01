@@ -19,7 +19,8 @@ CHANGES
 * Updated Make to v4.0
 * Updated SWIG to v3.0.0
 * Updated PlayerGlobal to v13.0.0
-* Merged libs from https://github.com/alexmac/alcextra
+* Updated GNU libraries
+* Merged libraries from https://github.com/alexmac/alcextra
 * Merged examples from https://github.com/alexmac/alcexamples
 * Improved cross-platform compatibility of sources
 * Created SourceForge project: http://sourceforge.net/projects/crossbridge-community/
@@ -36,3 +37,4 @@ CHANGES
 ### 1.0.4
 
 * Updated AVMPlus from https://github.com/adobe-flash/avmplus
+* Updated GNU libraries

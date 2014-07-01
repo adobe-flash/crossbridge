@@ -1170,7 +1170,7 @@ endif
 # EXTRA LIBS
 # ====================================================================================
 
-# A Massively Spiffy Yet Delicately Unobtrusive Compression Library
+# A Massively Spiffy Yet Delicately Unobtrusive Compression Library (GPL).
 zlib:
 	rm -rf $(BUILD)/zlib
 	cp -r $(SRCROOT)/$(DEPENDENCY_ZLIB) $(BUILD)/zlib
@@ -1178,13 +1178,13 @@ zlib:
 	$(RSYNC) $(BUILD)/zlib/zlib.h $(SDK)/usr/include/
 	$(RSYNC) $(BUILD)/zlib/libz.a $(SDK)/usr/lib/
 
-# BZip data compression
+# BZip data compression (GPL).
 libbzip:
 	cd $(SRCROOT)/$(DEPENDENCY_LIBBZIP) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(MAKE) PREFIX=$(SDK)/usr install
 	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_LIBBZIP)/bzlib.h $(SDK)/usr/include/
 	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_LIBBZIP)/libbz2.a $(SDK)/usr/lib/
 
-# XZ data compression
+# XZ data compression (GPL).
 libxz:
 	rm -rf $(BUILD)/libxz
 	mkdir -p $(BUILD)/libxz
@@ -1193,15 +1193,7 @@ libxz:
 		--enable-encoders=lzma1,lzma2,delta --enable-decoders=lzma1,lzma2,delta 
 	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# libxml2
-libxml2:
-	rm -rf $(BUILD)/libxml2
-	mkdir -p $(BUILD)/libxml2
-	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBXML)/configure \
-		--prefix=$(SDK)/usr --enable-static --disable-shared
-	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-
-# Eigen is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms.
+# Eigen is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms (GPL).
 libeigen:
 	rm -rf $(BUILD)/libeigen
 	mkdir -p $(BUILD)/libeigen
@@ -1209,8 +1201,7 @@ libeigen:
 		$(SRCROOT)/eigen-eigen-5097c01bcdc4 -DCMAKE_INSTALL_PREFIX="$(SDK)/usr"
 	cd $(BUILD)/libeigen && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# The debug memory allocation or dmalloc library has been designed as a drop in replacement for the system's malloc, realloc, calloc, free and other memory management routines while providing powerful debugging facilities configurable at runtime. 
-# These facilities include such things as memory-leak tracking, fence-post write detection, file/line number reporting, and general logging of statistics. 
+# The debug memory allocation or dmalloc provides powerful debugging facilities configurable at runtime (GPL). 
 dmalloc:
 	rm -rf $(BUILD)/dmalloc
 	mkdir -p $(BUILD)/dmalloc
@@ -1220,8 +1211,7 @@ dmalloc:
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 installcxx installth
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j1 heavy
 
-# Compilers for high level languages generate code that follows certain conventions. 
-# These conventions are necessary, in part, for separate compilation to work. 
+# Compilers for high level languages generate code that follows certain conventions (MIT). 
 libffi:
 	mkdir -p $(BUILD)/libffi
 	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_FFI)/configure \
@@ -1229,7 +1219,7 @@ libffi:
 	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 	cd $(BUILD)/libffi/testsuite && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) check
 
-# GMP is a free library for arbitrary precision arithmetic, operating on signed integers, rational numbers, and floating-point numbers. 
+# GMP is a free library for arbitrary precision arithmetic, operating on signed integers, rational numbers, and floating-point numbers (GPL). 
 libgmp:
 	rm -rf $(BUILD)/libgmp
 	mkdir -p $(BUILD)/libgmp
@@ -1237,7 +1227,7 @@ libgmp:
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared 
 	cd $(BUILD)/libgmp && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# For historical reasons, international text is often encoded using a language or country dependent character encoding. 
+# For historical reasons, international text is often encoded using a language or country dependent character encoding (GPL). 
 libiconv:
 	rm -rf $(BUILD)/libiconv
 	mkdir -p $(BUILD)/libiconv
@@ -1246,7 +1236,7 @@ libiconv:
 		--disable-dependency-tracking
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# The Ncurses (new curses) library is a free software emulation of curses in System V Release 4.0, and more. 
+# The Ncurses (new curses) library is a free software emulation of curses in System V Release 4.0, and more (GPL). 
 libncurses:
 	rm -rf $(BUILD)/libncurses
 	mkdir -p $(BUILD)/libncurses
@@ -1256,13 +1246,22 @@ libncurses:
 		--without-progs --without-dlsym
 	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# The GNU Readline library provides a set of functions for use by applications that allow users to edit command lines as they are typed in. 
+# The GNU Readline library provides a set of functions for use by applications that allow users to edit command lines as they are typed in (GPL). 
 libreadline:
 	rm -rf $(BUILD)/libreadline
 	mkdir -p $(BUILD)/libreadline
 	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBREADLINE)/configure \
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared --with-curses 
 	cd $(BUILD)/libreadline && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# Libxml2 is the XML C parser and toolkit developed for the Gnome project (MIT).
+# Dependencies: zlib, iconv, readline
+libxml2:
+	rm -rf $(BUILD)/libxml2
+	mkdir -p $(BUILD)/libxml2
+	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBXML)/configure \
+		--prefix=$(SDK)/usr --enable-static --disable-shared --without-ftp --without-http --without-html
+	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # OpenGL-based programs must link with the libGL library. libGL implements the GLX interface as well as the main OpenGL API entrypoints. 
 libvgl:
@@ -1271,7 +1270,7 @@ libvgl:
 	rm -f $(SDK)/usr/lib/libvgl.a
 	$(AR) $(SDK)/usr/lib/libvgl.a $(BUILD)/lib/src/lib/libvgl/*.o
 
-# JPEG image format library. 
+# JPEG image format library (GPL). 
 libjpeg:
 	rm -rf $(BUILD)/libjpeg
 	mkdir -p $(BUILD)/libjpeg
@@ -1287,7 +1286,7 @@ libjpeg:
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-cjpeg
 	rm -f $(SDK)/usr/bin/avm2-unknown-freebsd8-djpeg
 
-# PNG image format library. 
+# PNG image format library (GPL). 
 libpng:
 	rm -rf $(BUILD)/libpng
 	mkdir -p $(BUILD)/libpng
@@ -1300,7 +1299,7 @@ libpng:
 	rm -f $(SDK)/usr/lib/libpng.a
 	cp -f $(SDK)/usr/lib/libpng15.a $(SDK)/usr/lib/libpng.a
 
-# GIF image format library.
+# GIF image format library (MIT).
 libgif:
 	rm -rf $(BUILD)/libgif
 	mkdir -p $(BUILD)/libgif
@@ -1309,7 +1308,7 @@ libgif:
 		--disable-dependency-tracking 
 	cd $(BUILD)/libgif && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# TIFF image format library.
+# TIFF image format library (BSD).
 libtiff:
 	rm -rf $(BUILD)/libtiff
 	mkdir -p $(BUILD)/libtiff
@@ -1337,7 +1336,7 @@ libfreetype:
 	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE)
 	cd $(BUILD)/libfreetype && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# Simple DirectMedia Layer provide low level access to audio, keyboard, mouse, joystick, and graphics hardware. 
+# Simple DirectMedia Layer provide low level access to audio, keyboard, mouse, joystick, and graphics hardware (ZLib). 
 libsdl:
 	rm -rf $(BUILD)/libsdl
 	mkdir -p $(BUILD)/libsdl
@@ -1349,15 +1348,11 @@ libsdl:
 	rm $(BUILD)/libsdl/config.status
 	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-	$(MAKE) libsdl_install
-	rm $(SDK)/usr/include/SDL/SDL_opengl.h
-
-# Install SDL with our custom sdl-config
-libsdl_install:
 	cp $(SRCROOT)/tools/sdl-config $(SDK)/usr/bin/.
 	chmod a+x $(SDK)/usr/bin/sdl-config
+	rm $(SDK)/usr/include/SDL/SDL_opengl.h
 
-# SDL Image Extension
+# SDL Image Extension (ZLib).
 libsdl_image:
 	mkdir -p $(BUILD)/libsdlimage
 	cd $(BUILD)/libsdlimage && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLIMAGE)/configure \
@@ -1365,7 +1360,7 @@ libsdl_image:
 		--disable-dependency-tracking --disable-sdltest --without-x
 	cd $(BUILD)/libsdlimage && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# SDL Mixer Extension
+# SDL Mixer Extension (ZLib).
 libsdl_mixer:
 	mkdir -p $(BUILD)/libsdlmixer
 	cd $(BUILD)/libsdlmixer && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLMIXER)/configure \
@@ -1373,7 +1368,7 @@ libsdl_mixer:
 		--disable-dependency-tracking --disable-sdltest --without-x
 	cd $(BUILD)/libsdlmixer && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# SDL TTF Extension
+# SDL TTF Extension (ZLib).
 libsdl_ttf:
 	mkdir -p $(BUILD)/libsdlttf
 	cd $(BUILD)/libsdlttf && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLTTF)/configure \
@@ -1381,7 +1376,7 @@ libsdl_ttf:
 		--disable-dependency-tracking --disable-sdltest --without-x
 	cd $(BUILD)/libsdlttf && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# Assemble SDL2 core
+# Assemble SDL2 core (ZLib).
 libsdl2:
 	rm -rf $(BUILD)/libsdl2
 	mkdir -p $(BUILD)/libsdl2
@@ -1393,15 +1388,11 @@ libsdl2:
 	rm $(BUILD)/libsdl2/config.status
 	cd $(BUILD)/libsdl2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS)
 	cd $(BUILD)/libsdl2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
-	$(MAKE) libsdl2_install
-	rm $(SDK)/usr/include/SDL2/SDL_opengl.h
-
-# Install SDL2 with our custom sdl2-config
-libsdl2_install:
 	cp $(SRCROOT)/tools/sdl2-config $(SDK)/usr/bin/.
 	chmod a+x $(SDK)/usr/bin/sdl2-config
+	rm $(SDK)/usr/include/SDL2/SDL_opengl.h
 
-# Ogg is a multimedia container format, and the native file and stream format for the Xiph.org multimedia codecs. 
+# Ogg is a multimedia container format, and the native file and stream format for the Xiph.org multimedia codecs (BSD). 
 libogg:
 	rm -rf $(BUILD)/libogg
 	mkdir -p $(BUILD)/libogg
@@ -1410,7 +1401,7 @@ libogg:
 		--disable-dependency-tracking
 	cd $(BUILD)/libogg && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# Ogg Vorbis is a completely open, patent-free, professional audio encoding and streaming technology with all the benefits of Open Source.
+# Ogg Vorbis is a completely open, patent-free, professional audio encoding and streaming technology with all the benefits of Open Source (BSD).
 libvorbis:
 	rm -rf $(BUILD)/libvorbis
 	mkdir -p $(BUILD)/libvorbis
