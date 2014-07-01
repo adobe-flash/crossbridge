@@ -337,20 +337,10 @@ diagnostics:
 all_dev:
 	@$(SDK_MAKE) abclibs_compile
 	cd samples/09_Pthreads && $(SDK_MAKE) T09_3 T09_4 T09_5
-    
-# Development target (gdb)
-all_dev3:
-	@$(SDK_MAKE) libxml2
 
-# Development target (avmplus-master)
+# Development target (libs)
 all_dev2:
-	@$(SDK_MAKE) builtinabcs
-	cd $(BUILD) && $(ASC2) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/swfmake.as) -outdir . -out swfmake
-	cd $(BUILD) && $(ASC2) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/projectormake.as) -outdir . -out projectormake
-	cd $(BUILD) && $(ASC2) $(call nativepath,$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/abcdump.as) -outdir . -out abcdump
-	@$(SDK_MAKE) tr
-	@$(SDK_MAKE) trd
-	@$(SDK_MAKE) all_dev
+	@$(SDK_MAKE) libxml2
 
 # Clean build outputs
 clean:
