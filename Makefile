@@ -1260,7 +1260,7 @@ libxml2:
 	rm -rf $(BUILD)/libxml2
 	mkdir -p $(BUILD)/libxml2
 	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBXML)/configure \
-		--prefix=$(SDK)/usr --enable-static --disable-shared --without-ftp --without-http --without-html
+		--prefix=$(SDK)/usr --enable-static --disable-shared --without-ftp --without-http --without-html --without-python --without-history --with-minimum
 	cd $(BUILD)/libxml2 && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # OpenGL-based programs must link with the libGL library. libGL implements the GLX interface as well as the main OpenGL API entrypoints. 
