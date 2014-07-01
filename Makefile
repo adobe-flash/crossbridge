@@ -338,10 +338,6 @@ all_dev:
 	@$(SDK_MAKE) abclibs_compile
 	cd samples/09_Pthreads && $(SDK_MAKE) T09_3 T09_4 T09_5
 
-# Development target (libs)
-all_dev2:
-	@$(SDK_MAKE) libreadline
-
 # Clean build outputs
 clean:
 	@echo "Cleaning ..."
@@ -1336,6 +1332,7 @@ libsdl:
 
 # SDL Image Extension (ZLib).
 libsdl_image:
+	rm -rf $(BUILD)/libsdlimage
 	mkdir -p $(BUILD)/libsdlimage
 	cd $(BUILD)/libsdlimage && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLIMAGE)/configure \
 		--prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
@@ -1344,6 +1341,7 @@ libsdl_image:
 
 # SDL Mixer Extension (ZLib).
 libsdl_mixer:
+	rm -rf $(BUILD)/libsdlmixer
 	mkdir -p $(BUILD)/libsdlmixer
 	cd $(BUILD)/libsdlmixer && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLMIXER)/configure \
 		--prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
@@ -1352,17 +1350,19 @@ libsdl_mixer:
 
 # SDL TTF Extension (ZLib).
 libsdl_ttf:
+	rm -rf $(BUILD)/libsdlttf
 	mkdir -p $(BUILD)/libsdlttf
 	cd $(BUILD)/libsdlttf && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDLTTF)/configure \
 		--prefix=$(SDK)/usr --with-sdl-prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
 		--disable-dependency-tracking --disable-sdltest --without-x
 	cd $(BUILD)/libsdlttf && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
-# Assemble SDL2 core (ZLib).
+# Assemble SDL2 (ZLib).
 libsdl2:
+	# Building SDL2-Core
 	rm -rf $(BUILD)/libsdl2
 	mkdir -p $(BUILD)/libsdl2
-	cd $(BUILD)/libsdl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBSDL2)/configure \
+	cd $(BUILD)/libsdl2 && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBSDL2)/configure \
 		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
 		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
 		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
@@ -1373,6 +1373,27 @@ libsdl2:
 	cp $(SRCROOT)/tools/sdl2-config $(SDK)/usr/bin/.
 	chmod a+x $(SDK)/usr/bin/sdl2-config
 	rm $(SDK)/usr/include/SDL2/SDL_opengl.h
+	# Building SDL2-Image
+	rm -rf $(BUILD)/libsdl2image
+	mkdir -p $(BUILD)/libsdl2image
+	cd $(BUILD)/libsdl2image && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDL2IMAGE)/configure \
+		--prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
+		--disable-dependency-tracking --disable-sdltest --without-x
+	cd $(BUILD)/libsdl2image && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+	# Building SDL2-Mixer
+	rm -rf $(BUILD)/libsdl2mixer
+	mkdir -p $(BUILD)/libsdl2mixer
+	cd $(BUILD)/libsdl2mixer && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDL2MIXER)/configure \
+		--prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
+		--disable-dependency-tracking --disable-sdltest --without-x
+	cd $(BUILD)/libsdl2mixer && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+	# Building SDL2-TTF
+	rm -rf $(BUILD)/libsdl2ttf
+	mkdir -p $(BUILD)/libsdl2ttf
+	cd $(BUILD)/libsdl2ttf && PATH=$(SDK)/usr/bin:$(PATH) $(SRCROOT)/$(DEPENDENCY_LIBSDL2TTF)/configure \
+		--prefix=$(SDK)/usr --with-sdl-prefix=$(SDK)/usr --with-freetype-prefix=$(SDK)/usr --enable-static --disable-shared \
+		--disable-dependency-tracking --disable-sdltest --without-x
+	cd $(BUILD)/libsdl2ttf && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Ogg is a multimedia container format, and the native file and stream format for the Xiph.org multimedia codecs (BSD). 
 libogg:

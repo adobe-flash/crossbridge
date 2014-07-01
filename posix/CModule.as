@@ -1491,9 +1491,9 @@ public class CModule
       env = new Vector.<String>
 
     // try to set us as the ui thread
-    try {
+    /*try {
       C_Run.workerClass["current"].setSharedProperty("flascc.uiThread.threadId", realThreadId);
-    } catch(e:*) {}
+    } catch(e:*) {}*/
     try {
       CModule.start(console, args, env, preserveStack);
     } catch(e:GoingAsync) {
