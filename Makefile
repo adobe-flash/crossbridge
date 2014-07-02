@@ -13,7 +13,6 @@ $?LINUX_BUILD=$(BUILDROOT)/linux
 # ====================================================================================
 # DEPENDENCIES
 # ====================================================================================
-#$?DEPENDENCY_AVMPLUS=avmplus
 $?DEPENDENCY_AVMPLUS=avmplus-master
 $?DEPENDENCY_BINUTILS=binutils
 $?DEPENDENCY_BMAKE=bmake
@@ -333,7 +332,7 @@ diagnostics:
 	@echo "FLEX_SDK_TYPE: $(FLEX_SDK_TYPE)"
 	@echo "FLEX_SDK_HOME: $(FLEX_SDK_HOME)"
 
-# Development target (posix as3)
+# Development target (#26)
 all_dev:
 	@$(SDK_MAKE) abclibs_compile
 	cd samples/09_Pthreads && $(SDK_MAKE) T09_3 T09_4 T09_5
@@ -389,7 +388,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	tar xf packages/$(DEPENDENCY_SWIG).tar.gz
 	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
-	unzip -q packages/avmplus-master.zip
+	unzip -q packages/$(DEPENDENCY_AVMPLUS).zip
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
@@ -404,7 +403,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
 	cp -r ./patches/$(DEPENDENCY_SWIG) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
-	cp -r ./patches/avmplus-master .
+	cp -r ./patches/$(DEPENDENCY_AVMPLUS) .
 
 # Clear depdendency libraries
 clean_libs:
@@ -450,7 +449,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_SCIMARK)
 	rm -rf $(DEPENDENCY_SWIG)
 	rm -rf $(DEPENDENCY_ZLIB)
-	rm -rf avmplus-master
+	rm -rf $(DEPENDENCY_AVMPLUS)
 
 # ====================================================================================
 # BASE
@@ -556,7 +555,7 @@ builtinsyscalls:
 	print_stat_info.o $(SDK)/usr/lib/crt1_c.o $(SDK)/usr/lib/libgcc.a \
 	$(SDK)/usr/lib/libc.a $(SDK)/usr/lib/libm.a -o print_stat_info-linked
 	perl $(SRCROOT)/llvm-2.9/lib/Target/AVM2/build.pl $(SDK)/usr print_stat_info-linked.bc \
-	$(SRCROOT)/avmplus/utils/asc.jar $(SRCROOT)/llvm-2.9/lib/Target/AVM2 print_stat_info
+	$(SRCROOT)/$(DEPENDENCY_AVMPLUS)/utils/asc.jar $(SRCROOT)/llvm-2.9/lib/Target/AVM2 print_stat_info
 	$(AVMSHELL) $(BUILD)/swfmake.abc -- -o print_stat_info.swf \
 	$(SDK)/usr/lib/C_Run.abc \
 	$(SDK)/usr/lib/Exit.abc $(SDK)/usr/lib/LongJmp.abc \
