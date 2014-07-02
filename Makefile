@@ -219,7 +219,8 @@ BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk
 # ====================================================================================
 BUILDORDER= cmake abclibs basictools llvm binutils plugins bmake stdlibs as3xx as3wig abcstdlibs
 BUILDORDER+= sdkcleanup tr trd genfs swig gdb pkgconfig libtool 
-BUILDORDER+= extralibs finalcleanup submittests
+BUILDORDER+= zlib libvgl libjpeg libpng dejagnu #TODO: libsdl dmalloc libffi libiconv 
+BUILDORDER+= finalcleanup submittests
 
 all:
 	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
@@ -902,9 +903,6 @@ trd:
 # ====================================================================================
 # EXTRA LIBS
 # ====================================================================================
-# Extra Libraries
-extralibs:
-	$(MAKE) -j$(THREADS) zlib libvgl libjpeg libpng dejagnu #TODO libsdl dmalloc libffi libiconv
 
 # Library ZLib
 zlib:
