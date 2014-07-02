@@ -186,7 +186,7 @@ $?CYGTRIPLE=i686-pc-cygwin
 $?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
-$?AR=$(SDK)/usr/bin/ar scru -v
+$?AR=$(SDK)/usr/bin/llvm-ar scru
 $?CMAKE=$(SDK)/usr/bin/cmake
 
 # ====================================================================================
@@ -212,12 +212,12 @@ BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -I $(SDK)/usr/include -emit-llvm -fno-bu
 BMAKE+= CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -I $(SDK)/usr/include -emit-llvm -fno-builtin -D__IEEE_LITTLE_ENDIAN -DSTRIP_FBSDID "
 BMAKE+= MAKEFLAGS="" MFLAGS="" MK_ICONV= WITHOUT_PROFILE=
 BMAKE+= MACHINE_ARCH=avm2 MACHINE_CPUARCH=AVM2 NO_WERROR=true SSP_CFLAGS=
-BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
+BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk
 
 # ====================================================================================
 # ALL TARGET
 # ====================================================================================
-BUILDORDER= cmake abclibs basictools llvm binutils plugins bmake stdlibs as3xx as3wig abcstdlibs
+BUILDORDER= cmake abclibs uname noenv avm2-as alctool alcdb llvm binutils plugins bmake stdlibs as3xx as3wig abcstdlibs
 BUILDORDER+= sdkcleanup tr trd genfs swig gdb pkgconfig libtool 
 BUILDORDER+= zlib libvgl libjpeg libpng dejagnu #TODO: libsdl dmalloc libffi libiconv 
 BUILDORDER+= finalcleanup submittests
@@ -260,7 +260,16 @@ all_with_local_make:
 
 # Development
 all_dev:
-	@$(SDK)/usr/bin/make swig
+	# find bitcode (and ignore non-bitcode genned from .s files) and put
+	# it in our lib
+	rm -f $(BUILD)/lib/src/lib/libc/tmp/*
+	$(AR) $(SDK)/usr/lib/libssp.a $(BUILD)/lib/src/lib/libc/stack_protector.o && cp $(SDK)/usr/lib/libssp.a $(SDK)/usr/lib/libssp_nonshared.a
+	# we override these in thrStubs.c but leave them weak
+	cd $(BUILD)/lib/src/lib/libc && $(SDK)/usr/bin/llvm-dis -o=_pthread_stubs.ll _pthread_stubs.o && sed -E 's/@pthread_(key_create|key_delete|getspecific|setspecific|once) =/@_d_u_m_m_y_\1 =/g' _pthread_stubs.ll | $(SDK)/usr/bin/llvm-as -o _pthread_stubs.o
+	cd $(BUILD)/lib/src/lib/libc && rm -f libc.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libc.a
+	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -I $(SRCROOT)/avm2_env/usr/src/lib/libc/include/ -fexceptions -c $(SRCROOT)/posix/libcHack.c
+	cp -f $(BUILD)/lib/src/lib/libc/libc.a $(BUILD)/posix/libcHack.o $(SDK)/usr/lib/.
+
 
 # ====================================================================================
 # CORE
@@ -340,12 +349,13 @@ base:
 	$(LN) platform/current/libexec $(SDK)/usr/libexec
 	$(LN) ../../../../../lib $(SDK)/usr/platform/current/libexec/gcc/$(TRIPLE)/lib
 
-	cd $(SDK)/usr/platform/current/bin && $(LN) ar$(EXEEXT) avm2-unknown-freebsd8-ar$(EXEEXT)
-	cd $(SDK)/usr/platform/current/bin && $(LN) nm$(EXEEXT) avm2-unknown-freebsd8-nm$(EXEEXT)
-	cd $(SDK)/usr/platform/current/bin && $(LN) strip$(EXEEXT) avm2-unknown-freebsd8-strip$(EXEEXT)
-	cd $(SDK)/usr/platform/current/bin && $(LN) ranlib$(EXEEXT) avm2-unknown-freebsd8-ranlib$(EXEEXT)
-	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) avm2-unknown-freebsd8-gcc$(EXEEXT)
-	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) avm2-unknown-freebsd8-g++$(EXEEXT)
+	#cd $(SDK)/usr/platform/current/bin && $(LN) llvm-ar$(EXEEXT) avm2-unknown-freebsd8-ar$(EXEEXT)
+	#cd $(SDK)/usr/platform/current/bin && $(LN) llvm-nm$(EXEEXT) avm2-unknown-freebsd8-nm$(EXEEXT)
+	#cd $(SDK)/usr/platform/current/bin && $(LN) llvm-strip$(EXEEXT) avm2-unknown-freebsd8-strip$(EXEEXT)
+	#cd $(SDK)/usr/platform/current/bin && $(LN) llvm-ranlib$(EXEEXT) avm2-unknown-freebsd8-ranlib$(EXEEXT)
+	#cd $(SDK)/usr/platform/current/bin && $(LN) clang$(EXEEXT) avm2-unknown-freebsd8-gcc$(EXEEXT)
+	#cd $(SDK)/usr/platform/current/bin && $(LN) clang++$(EXEEXT) avm2-unknown-freebsd8-g++$(EXEEXT)
+
 	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) gcc-4.2$(EXEEXT)
 	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) g++-4.2$(EXEEXT)
 
@@ -395,7 +405,7 @@ cmake:
 #TBD
 #TODO: cannot find copy_docs target
 abclibs:
-	$(MAKE) -j$(THREADS) abclibs_compile abclibs_asdocs
+	$(MAKE) abclibs_compile abclibs_asdocs
 ifeq ($(COPY_DOCS), true)
 	$(MAKE) copy_docs
 endif
@@ -459,10 +469,6 @@ abclibs_asdocs:
 # ====================================================================================
 # BASIC TOOLS
 # ====================================================================================
-
-#TBD
-basictools:
-	$(MAKE) -j$(THREADS) uname noenv avm2-as alctool alcdb
 
 #TBD
 uname:
@@ -618,10 +624,12 @@ bmake:
 # ====================================================================================
 # TBD
 stdlibs:
-	$(MAKE) -j$(THREADS) csu libc libthr libm libBlocksRuntime libcxx libunwind libcxxrt
+	$(MAKE) csu libc libthr libm libBlocksRuntime libcxx libunwind libcxxrt
 
 # TBD
 csu:
+	rm -f $(BUILD)/lib/*
+	mkdir -p $(BUILD)/lib/
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE) crt1_c.o
 	mv -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
