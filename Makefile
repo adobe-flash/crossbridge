@@ -260,7 +260,7 @@ all_with_local_make:
 
 # Development
 all_dev:
-	@$(SDK)/usr/bin/make -s all_with_local_make
+	@$(SDK)/usr/bin/make swig
 
 
 # ====================================================================================
@@ -395,12 +395,8 @@ cmake:
 # ABC LIBS
 # ====================================================================================
 #TBD
-#TODO: cannot find copy_docs target
 abclibs:
 	$(MAKE) abclibs_compile abclibs_asdocs
-ifeq ($(COPY_DOCS), true)
-	$(MAKE) copy_docs
-endif
 
 #TBD
 abclibs_compile:
@@ -569,9 +565,9 @@ llvmtests:
 # ====================================================================================
 binutils:
 ifneq (,$(findstring cygwin,$(PLATFORM)))
-	$(SDK_MAKE) -i binutils_build
+	$(MAKE) -i binutils_build
 else
-	$(SDK_MAKE) binutils_build
+	$(MAKE) binutils_build
 endif
 
 # Assemble LLVM BinUtils
@@ -798,7 +794,7 @@ as3wig:
 # ====================================================================================
 # TBD
 abcstdlibs:
-	$(MAKE) -j$(THREADS) abcflashpp abcstdlibs_more
+	$(MAKE) abcflashpp abcstdlibs_more
 
 # TBD
 abcflashpp:
@@ -1275,7 +1271,7 @@ hellocpp_shell:
 hellocpp_swf:
 	@rm -rf $(BUILD)/hellocpp_swf
 	@mkdir -p $(BUILD)/hellocpp_swf
-	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/$(FLASCC_CXX) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
+	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/$(FLASCC_CXX) -v -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
 
 # TBD
 hellocpp_swf_opt:
