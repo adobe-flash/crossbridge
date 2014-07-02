@@ -27,6 +27,9 @@
 :: =END MIT LICENSE
 ::
 
+:: Purpose: Cygwin Launch Helper Script 
+:: Author: Andras Csizmadia
+
 :: Java Home short format is important to build the SDK
 set JAVA_HOME=/cygdrive/c/Progra~1/Java/jdk
 :: Only include Java in inherited path
@@ -37,10 +40,12 @@ set PYTHONHOME=
 set PYTHONPATH=
 set MINGW_HOME=
 set MSYS_HOME=
+:: Convert some paths
+set AIR_HOME=%AIR_HOME:\=/%
+set FLEX_HOME=%FLEX_HOME:\=/%
+set FLASH_PLAYER_EXE=%FLASH_PLAYER_EXE:\=/%
 :: Set CrossBridge Home
-set FLASCC_ROOT=%CD%
-:: Line endings compatibility fix (Can make errors in scripts)
-:: set SHELLOPTS=igncr
+set FLASCC_ROOT=%CD:\=/%
 :: Trigger Cygwin Bash
 C:
 chdir C:\cygwin\bin
