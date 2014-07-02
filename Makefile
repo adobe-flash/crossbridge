@@ -319,12 +319,15 @@ clean_libs:
 # ====================================================================================
 # BASE
 # ====================================================================================
+# Initialize the build
 base:
 	mkdir -p $(BUILDROOT)/extra
 	mkdir -p $(BUILD)/abclibs
+	mkdir -p $(SDK)/usr
+	mkdir -p $(SDK)/usr/bin
+	mkdir -p $(SDK)/usr/lib
 	mkdir -p $(SDK)/usr/lib/bfd-plugins
 	mkdir -p $(SDK)/usr/share
-	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/bin
 	mkdir -p $(SDK)/usr/platform/$(PLATFORM)/libexec/gcc/$(TRIPLE)
 
 	$(LN) ../usr $(SDK)/usr/$(TRIPLE)
@@ -332,6 +335,7 @@ base:
 	$(LN) ../ $(SDK)/usr/platform/usr 
 	$(LN) ../../bin $(SDK)/usr/platform/current/bin
 	$(LN) ../../lib $(SDK)/usr/platform/current/lib 
+	$(LN) ../../share $(SDK)/usr/platform/current/share
 	$(LN) platform/current/libexec $(SDK)/usr/libexec
 	$(LN) ../../../../../lib $(SDK)/usr/platform/current/libexec/gcc/$(TRIPLE)/lib
 
@@ -344,8 +348,8 @@ base:
 	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) gcc-4.2$(EXEEXT)
 	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) g++-4.2$(EXEEXT)
 
-	$(RSYNC) tools/playerglobal/13.0/playerglobal.abc $(SDK)/usr/lib/
-	$(RSYNC) tools/playerglobal/13.0/playerglobal.swc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/14.0/playerglobal.abc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/14.0/playerglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
 	cp -f avmplus/generated/*.abc $(SDK)/usr/lib/
 
