@@ -200,20 +200,6 @@ $?SDKNAME=Crossbridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_V
 BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_MINOR=$(FLASCC_VERSION_MINOR) -DFLASCC_VERSION_PATCH=$(FLASCC_VERSION_PATCH) -DFLASCC_VERSION_BUILD=$(FLASCC_VERSION_BUILD)"
 
 # ====================================================================================
-# LOGGING
-# ====================================================================================
-ifneq (,$(PRINT_LOGS_ON_ERROR))
-	$?PRINT_LOGS_CMD=tail +1
-else
-	$?PRINT_LOGS_CMD=true
-endif
-
-# ====================================================================================
-# CACHING
-# ====================================================================================
-export CCACHE_DIR=$(SRCROOT)/ccache
-
-# ====================================================================================
 # BMAKE
 # ====================================================================================
 
@@ -232,7 +218,8 @@ BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk
 # ALL TARGET
 # ====================================================================================
 BUILDORDER= cmake abclibs basictools llvm binutils plugins bmake stdlibs as3xx as3wig abcstdlibs
-BUILDORDER+= sdkcleanup tr trd extratools extralibs finalcleanup submittests
+BUILDORDER+= sdkcleanup tr trd genfs swig gdb pkgconfig libtool 
+BUILDORDER+= extralibs finalcleanup submittests
 
 all:
 	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
@@ -265,51 +252,10 @@ all_with_local_make:
 		done ; \
 		if [ $$mret -ne 0 ] ; then \
 			echo "Failed to build: $$target" ;\
-			$(PRINT_LOGS_CMD) $$logs ;\
+			tail +1 $$logs ;\
 			exit 1 ; \
 		fi ; \
 	done
-
-# Build using CI
-all_ci:
-	rm -rf $(CCACHE_DIR)
-	$(MAKE) all COPY_DOCS=true
-	$(MAKE) examples neverball
-	cd samples && $(MAKE) clean
-	@$(SDK)/usr/bin/make llvmtests
-	@$(SDK)/usr/bin/make swigtests
-	#$(SDK)/usr/bin/make checkasm
-
-# Build using Windows Cygwin
-# We are ignoring some target errors because of issues with documentation generation
-all_win:
-	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
-	@echo "User: $(UNAME)"
-	@echo "Platform: $(PLATFORM)"
-	@echo "Build: $(BUILD)"
-	@$(MAKE) clean
-	@mkdir -p $(BUILD)/logs
-	@$(MAKE) install_libs > $(BUILD)/logs/install_libs.txt 2>&1
-	@$(MAKE) base > $(BUILD)/logs/base.txt 2>&1
-	@$(MAKE) make > $(BUILD)/logs/make.txt 2>&1
-	@$(SDK)/usr/bin/make cmake > $(BUILD)/logs/cmake.txt 2>&1
-	@$(SDK)/usr/bin/make abclibs > $(BUILD)/logs/abclibs.txt 2>&1
-	@$(SDK)/usr/bin/make basictools > $(BUILD)/logs/basictools.txt 2>&1
-	@$(SDK)/usr/bin/make llvm > $(BUILD)/logs/llvm.txt 2>&1
-	@$(SDK)/usr/bin/make -i binutils > $(BUILD)/logs/binutils.txt 2>&1
-	@$(SDK)/usr/bin/make plugins > $(BUILD)/logs/plugins.txt 2>&1
-	@$(SDK)/usr/bin/make bmake > $(BUILD)/logs/bmake.txt 2>&1
-	@$(SDK)/usr/bin/make stdlibs > $(BUILD)/logs/stdlibs.txt 2>&1
-	@$(SDK)/usr/bin/make as3xx > $(BUILD)/logs/as3xx.txt 2>&1
-	@$(SDK)/usr/bin/make as3wig > $(BUILD)/logs/as3wig.txt 2>&1
-	@$(SDK)/usr/bin/make abcstdlibs > $(BUILD)/logs/abcstdlibs.txt 2>&1
-	@$(SDK)/usr/bin/make sdkcleanup > $(BUILD)/logs/sdkcleanup.txt 2>&1
-	@$(SDK)/usr/bin/make tr > $(BUILD)/logs/tr.txt 2>&1
-	@$(SDK)/usr/bin/make trd > $(BUILD)/logs/trd.txt 2>&1
-	@$(SDK)/usr/bin/make extratools > $(BUILD)/logs/extratools.txt 2>&1
-	@$(SDK)/usr/bin/make extralibs > $(BUILD)/logs/extralibs.txt 2>&1
-	@$(SDK)/usr/bin/make finalcleanup > $(BUILD)/logs/finalcleanup.txt 2>&1
-	@$(SDK)/usr/bin/make submittests > $(BUILD)/logs/submittests.txt 2>&1
 
 # Development
 all_dev:
@@ -619,6 +565,14 @@ llvmtests:
 # BINUTILS
 # ====================================================================================
 binutils:
+ifneq (,$(findstring cygwin,$(PLATFORM)))
+	$(SDK_MAKE) -i binutils_build
+else
+	$(SDK_MAKE) binutils_build
+endif
+
+# Assemble LLVM BinUtils
+binutils_build:
 	rm -rf $(BUILD)/binutils
 	mkdir -p $(BUILD)/binutils
 	mkdir -p $(SDK)/usr
@@ -1083,9 +1037,6 @@ builtinabcs:
 # ====================================================================================
 # EXTRA TOOLS
 # ====================================================================================
-# TBD
-extratools:
-	$(MAKE) -j$(THREADS) genfs swig gdb pkgconfig libtool
 
 # TBD
 genfs:
@@ -1532,11 +1483,6 @@ ifneq (,$(findstring cygwin,$(PLATFORM)))
 		$(MAKE) zip
 else
 		$(MAKE) dmg
-		$(MAKE) staging
-		$(MAKE) winstaging
-		$(MAKE) flattensymlinks
-		$(MAKE) zip
-#		$(MAKE) diffdeliverables
 endif
 
 dmg:
@@ -1565,36 +1511,6 @@ staging:
 	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
 	echo $(FLASCC_VERSION_BUILD) > $(BUILDROOT)/staging/sdk/ver.txt
 
-winstaging:
-	$(LN) cygwin $(BUILDROOT)/staging/sdk/usr/platform/current
-	# temporarily $(MAKE) sdk cygwin-ish
-	$(LN) cygwin $(SDK)/usr/platform/current
-	mkdir -p $(SDK)/usr/platform/cygwin/bin
-	$(MAKE) libsdl-install
-	# copy some parts of the mac bin dir which are actually xplatform
-	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libtool* $(SDK)/usr/platform/cygwin/bin/
-	cp -f $(BUILDROOT)/staging/sdk/usr/platform/darwin/bin/libpng* $(SDK)/usr/platform/cygwin/bin/
-	# clean-up
-	$(MAKE) sdkcleanup
-	$(MAKE) finalcleanup
-	@rm -rf $(SDK)/usr/platform/darwin/share
-	$(RSYNC) $(SRCROOT)/tools/run.bat $(BUILDROOT)/staging/
-	$(RSYNC) $(SRCROOT)/cygwin $(BUILDROOT)/staging/
-	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
-	rm -rf $(BUILDROOT)/staging/sdk/usr/libexec
-	rm -rf $(BUILDROOT)/staging/sdk/usr/share/$(DEPENDENCY_CMAKE)
-	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/platform/cygwin $(BUILDROOT)/staging/sdk/usr/platform/
-	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/*.dll $(BUILDROOT)/staging/sdk/usr/lib/
-	$(RSYNC) $(WIN_BUILD)/sdkoverlay/usr/lib/bfd-plugins/*.dll $(BUILDROOT)/staging/sdk/usr/lib/bfd-plugins/
-	rm -rf $(BUILDROOT)/staging/sdk/usr/platform/darwin
-	rm -f $(BUILDROOT)/staging/sdk/usr/lib/*.dylib
-	rm -f $(BUILDROOT)/staging/sdk/usr/lib/*.la
-	rm -f $(BUILDROOT)/staging/sdk/usr/lib/bfd-plugins/*.dylib
-	$(LN) darwin $(SDK)/usr/platform/current
-	# nuke cygwin from sdk
-	rm -rf $(SDK)/usr/platform/cygwin
-	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
-
 flattensymlinks:
 	find $(BUILDROOT)/staging/sdk -type l | xargs rm
 	$(RSYNC) $(BUILDROOT)/staging/sdk/usr/platform/*/ $(BUILDROOT)/staging/sdk/usr
@@ -1604,11 +1520,6 @@ zip:
 	cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
 	find $(BUILDROOT)/staging > $(BUILDROOT)/zipcontents.txt
 
-diffdeliverables:
-		cat $(BUILDROOT)/zipcontents.txt | grep -v staging/cygwin | grep -v "run.bat" | sed -e 's/\.exe//g' -e 's/\.dll/\.~SO~/g' -e 's/\/cygwin/\/~PLAT~/g' | sort > $(BUILDROOT)/zipcontents_munge.txt
-		cat $(BUILDROOT)/dmgcontents.txt | grep -v "share/cmake" | grep -v "bin/cmake" | grep -v "bin/ctest" | grep -v "bin/cpack" | grep -v "bin/ccmake" | sed -e 's/\.exe//g' -e 's/\.dylib/\.~SO~/g' -e 's/\/darwin/\/~PLAT~/g' | sort > $(BUILDROOT)/dmgcontents_munge.txt	
-		diff $(BUILDROOT)/dmgcontents_munge.txt $(BUILDROOT)/zipcontents_munge.txt
-
 # ====================================================================================
 # Examples
 # ====================================================================================
@@ -1616,41 +1527,5 @@ diffdeliverables:
 examples:
 	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) FLASCC=$(SDK) FLEX=$(FLEX) -j$(THREADS) PAK0FILE=$(SRCROOT)/samples/Example_Quake1/sdlquake-1.0.9/ID1/PAK0.PAK examples
 	mkdir -p $(BUILDROOT)/extra
-	find samples -iname "*.swf" -exec cp -f '{}' $(BUILDROOT)/extra/ \;
-
-neverball: sync_alcextra sync_alcexamples sync_gls3d
-	$(MAKE) alcexample_neverball 
-
-sync_alcextra:
-	rm -rf $(BUILD)/github/alcextra
-	mkdir -p $(BUILD)/github/alcextra
-	cd $(BUILD)/github && git clone --depth 1 https://github.com/alexmac/alcextra.git alcextra
-
-sync_alcexamples:
-	rm -rf $(BUILD)/github/alcexamples
-	mkdir -p $(BUILD)/github/alcexamples
-	cd $(BUILD)/github && git clone --depth 1 https://github.com/alexmac/alcexamples.git alcexamples
-
-sync_gls3d:
-	rm -rf $(BUILD)/github/GLS3D
-	mkdir -p $(BUILD)/github/GLS3D
-	cd $(BUILD)/github && git clone --depth 1 https://github.com/adobe/GLS3D.git GLS3D
-
-alcexamples: sync_alcextra sync_alcexamples sync_gls3d
-	mkdir -p $(BUILDROOT)/extra
-	$(MAKE) alcexample_neverball
-	$(MAKE) alcexample_dosbox
-
-alcexample_neverball:
-	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra neverball
-	mkdir -p $(BUILDROOT)/extra/neverball
-	cp -f $(BUILD)/github/alcexamples/build/neverball/neverball.swf $(BUILDROOT)/extra/neverball/
-	cp -f $(BUILD)/github/alcexamples/build/neverball/neverputt.swf $(BUILDROOT)/extra/neverball/
-	cp -f $(BUILD)/github/alcexamples/build/neverball/*.zip $(BUILDROOT)/extra/neverball/
-
-alcexample_dosbox:
-	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra dosbox
-	mkdir -p $(BUILDROOT)/extra/neverball
-	cp -f $(BUILD)/github/alcexamples/build/dosbox/dosbox.swf $(BUILDROOT)/extra/
 
 .PHONY: bmake posix binutils docs gcc samples libcxx libcxxrt libxxabi libunwind libgcceh
