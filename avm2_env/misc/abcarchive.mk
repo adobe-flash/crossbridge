@@ -6,4 +6,4 @@ LLCOPTS:=
 OBJS := $(wildcard *.o)
 
 all: $(OBJS:.o=.abc)
-	$(SDK)/usr/bin/llvm-ar r test.a *.abc
+	$(SDK)/usr/bin/ar r test.a *.abc
