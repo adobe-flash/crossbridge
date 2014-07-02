@@ -122,7 +122,6 @@ ifneq (,$(findstring darwin,$(PLATFORM)))
 	$?BUILD=$(MAC_BUILD)
 	$?PLATFORM_NAME=mac
 	$?HOST_TRIPLE=x86_64-apple-darwin10
-	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
 
 ifneq (,$(findstring linux,$(PLATFORM)))
@@ -136,7 +135,6 @@ ifneq (,$(findstring linux,$(PLATFORM)))
 	$?BUILD=$(LINUX_BUILD)
 	$?PLATFORM_NAME=linux
 	$?HOST_TRIPLE=x86_64-unknown-linux
-	export PATH:=$(BUILD)/ccachebin:$(PATH)
 endif
 
 ESCAPED_SRCROOT=$(shell echo $(SRCROOT) | sed -e 's/[\/&]/\\&/g')
@@ -385,8 +383,8 @@ base:
 
 	$(LN) ../usr $(SDK)/usr/$(TRIPLE)
 	$(LN) $(PLATFORM) $(SDK)/usr/platform/current
-	$(LN) platform/current/bin $(SDK)/usr/bin
 	$(LN) ../ $(SDK)/usr/platform/usr 
+	$(LN) ../../bin $(SDK)/usr/platform/current/bin
 	$(LN) ../../lib $(SDK)/usr/platform/current/lib 
 	$(LN) platform/current/libexec $(SDK)/usr/libexec
 	$(LN) ../../../../../lib $(SDK)/usr/platform/current/libexec/gcc/$(TRIPLE)/lib
@@ -399,15 +397,6 @@ base:
 	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) avm2-unknown-freebsd8-g++$(EXEEXT)
 	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) gcc-4.2$(EXEEXT)
 	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) g++-4.2$(EXEEXT)
-
-	mkdir -p $(BUILD)/ccachebin
-	mkdir -p ccache
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CC)
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CXX)
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CYGTRIPLE)-gcc
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(CYGTRIPLE)-g++
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-gcc
-	$(LN) `which ccache` $(BUILD)/ccachebin/$(MINGTRIPLE)-g++
 
 	$(RSYNC) tools/playerglobal/13.0/playerglobal.abc $(SDK)/usr/lib/
 	$(RSYNC) tools/playerglobal/13.0/playerglobal.swc $(SDK)/usr/lib/
@@ -1057,33 +1046,6 @@ dejagnu:
 	cd $(BUILD)/dejagnu && $(MAKE) install
 
 # TBD
-# TODO: Not in build
-libobjc_configure:
-	cd $(BUILD)/llvm-gcc-42 \
-		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' TARGET-target-libobjc="all OBJC_THREAD_FILE=thr-posix" all-target-libobjc > $(SRCROOT)/cached_build/libobjc/compile.log
-	cd $(BUILD)/llvm-gcc-42 \
-		&& $(MAKE) -j1 FLASCC_INTERNAL_SDK_ROOT=$(SDK) CFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' CXXFLAGS_FOR_TARGET='-O2 -emit-llvm -DSJLJ_EXCEPTIONS=1 ' install-target-libobjc > $(SRCROOT)/cached_build/libobjc/install.log
-	perl -p -i -e 's~$(SRCROOT)~FLASCC_SRC_DIR~g' `grep -ril $(SRCROOT) cached_build/libobjc`
-
-# TBD
-# TODO: Not in build
-libobjc:
-	rm -rf $(BUILD)/libobjc
-	mkdir -p $(BUILD)/libobjc
-	$(PYTHON) $(SRCROOT)/tools/build-objc.py $(SRCROOT)/cached_build/libobjc/compile.log $(SRCROOT)/cached_build/libobjc/install.log $(SRCROOT) > $(BUILD)/libobjc/build.sh
-	cd $(BUILD)/libobjc && PATH=$(SDK)/usr/bin:$(PATH) bash -x build.sh
-	# link bitcode
-	cd $(BUILD)/libobjc && rm -f libobjc.a && mkdir NXConstStr && mv NXConstStr.o NXConstStr/. && $(SDK)/usr/bin/llvm-link -o libobjc.o *.o && $(AR) libobjc.a libobjc.o NXConstStr/*.o && cp libobjc.a $(SDK)/usr/lib/.
-
-# TBD
-# TODO: Not in build
-abclibobjc:
-	mkdir -p $(BUILD)/libobjc_abc
-	cd $(BUILD)/libobjc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libobjc.a
-	cd $(BUILD)/libobjc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS=-jvm="$(JAVA)" -j$(THREADS)
-	mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
-
-# TBD
 cxxfiltmingw:
 	# install the version of mingw for osx from ere: http://crossgcc.rts-software.org/doku.php
 	rm -rf $(BUILD)/cxxfiltmingw
@@ -1690,72 +1652,5 @@ alcexample_dosbox:
 	cd $(BUILD)/github/alcexamples && $(MAKE) FLASCC=$(SDK) GLS3D=$(BUILD)/github/GLS3D ALCEXTRA=$(BUILD)/github/alcextra dosbox
 	mkdir -p $(BUILDROOT)/extra/neverball
 	cp -f $(BUILD)/github/alcexamples/build/dosbox/dosbox.swf $(BUILDROOT)/extra/
-
-# ====================================================================================
-# CROSS COMPILE UNDER MAC
-# ====================================================================================
-CROSS=PATH="$(BUILD)/ccachebin:$(CYGWINMAC):$(PATH):$(SDK)/usr/bin" $(MAKE) SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin LLVMINSTALLPREFIX=$(WIN_BUILD) NATIVE_AR=$(CYGTRIPLE)-ar CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ RANLIB=$(CYGTRIPLE)-ranlib
-
-win:
-	@if [ -d $(CYGWINMAC) ] ; then true ; \
-		else echo "Couldn't locate cygwin mac directory, please invoke $(MAKE) with \"$(MAKE) CYGWINMAC=/path/to/cygwinmac/sdk/usr/bin ...\"" ; exit 1; \
-	fi
-	@mkdir -p $(WIN_BUILD)/logs
-	@echo "-  base (win)"
-	@$(CROSS) base  &> $(WIN_BUILD)/logs/base_win.txt
-	@echo "-  make (win)"
-	@$(CROSS) make &> $(WIN_BUILD)/logs/make_win.txt
-	@echo "-  uname (win)"
-	@$(CROSS) uname  &> $(WIN_BUILD)/logs/uname_win.txt
-	@echo "-  noenv (win)"
-	@$(CROSS) noenv &> $(WIN_BUILD)/logs/noenv_win.txt
-	@echo "-  avm2-as (win)"
-	@$(CROSS) avm2-as &> $(WIN_BUILD)/logs/avm2-as_win.txt
-	@echo "-  pkgconfig (win)"
-	@$(CROSS) GLIB_CFLAGS="-I$(CYGWINMAC)/../include/glib-2.0/ -I$(CYGWINMAC)/../lib/glib-2.0/include/" GLIB_LIBS="$(CYGWINMAC)/../lib/libglib-2.0.a -lintl -liconv" pkgconfig -j1 &> $(WIN_BUILD)/logs/pkgconfig_win.txt
-	@echo "-  llvm (win/cygwin)"
-	@$(MAKE) cross_llvm_cygwin &> $(WIN_BUILD)/logs/llvm_win_cygwin.txt
-	@echo "-  binutils (win)"
-	@$(CROSS) binutils &> $(WIN_BUILD)/logs/binutils_win.txt
-	@echo "-  plugins (win)"
-	@$(CROSS) plugins &> $(WIN_BUILD)/logs/plugins_win.txt
-	#@echo "-  gcc (win)"
-	#@$(CROSS) gcc &> $(WIN_BUILD)/logs/gcc_win.txt
-	@echo "-  swig (win)"
-	@$(CROSS) swig &> $(WIN_BUILD)/logs/swig_win.txt
-	@echo "-  llvm (win/mingw)"
-	@$(MAKE) cross_llvm_mingw &> $(WIN_BUILD)/logs/llvm_win_mingw.txt
-	@echo "-  tr (win)"
-	@$(CROSS) tr &> $(WIN_BUILD)/logs/tr_win.txt
-	@echo "-  trd (win)"
-	@$(CROSS) trd &> $(WIN_BUILD)/logs/trd_win.txt
-	@echo "-  gdb (win)"
-	@$(CROSS) gdb &> $(WIN_BUILD)/logs/gdb_win.txt
-	@echo "-  genfs (win)"
-	@$(CROSS) genfs &> $(WIN_BUILD)/logs/genfs_win.txt
-
-cross_llvm_mingw:
-	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_RC_COMPILER $(MINGWTRIPLE)-gcc)" >> $(BUILD)/llvmcross.toolchain
-
-	PATH="$(BUILD)/ccachebin:$(SRCROOT)/mingwmac/sdk/usr/bin:$(PATH)" $(MAKE) \
-		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(MINGWTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
-		CC=$(MINGWTRIPLE)-gcc CXX=$(MINGWTRIPLE)-g++ \
-		LLVMCFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" \
-		LLVMCXXFLAGS="-march=pentium4 -mfpmath=sse -D_GLIBCXX_HAVE_FENV_H=1" LLVMLDFLAGS="-lrpcrt4 -Wl,--stack,16000000" \
-		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
-		llvm LLVMTESTS=OFF LLVM_ONLYLLC=true CLANG=OFF
-
-cross_llvm_cygwin:
-	echo "# Cmake Toolchain file:" > $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_SYSTEM_NAME Windows)" >> $(BUILD)/llvmcross.toolchain
-	echo  "set(CMAKE_RC_COMPILER $(CC))" >> $(BUILD)/llvmcross.toolchain
-
-	PATH="$(BUILD)/ccachebin:$(CYGWINMAC)/../altbin:$(CYGWINMAC):$(PATH)" $(MAKE) \
-		SDK=$(WIN_BUILD)/sdkoverlay PLATFORM=cygwin NATIVE_AR=$(CYGTRIPLE)-ar LLVMINSTALLPREFIX=$(WIN_BUILD) \
-		CC=$(CYGTRIPLE)-gcc CXX=$(CYGTRIPLE)-g++ LLVMLDFLAGS="-Wl,--stack,16000000" \
-		LLVMCMAKEOPTS="-DCMAKE_TOOLCHAIN_FILE=$(BUILD)/llvmcross.toolchain -DLLVM_TABLEGEN=$(MAC_BUILD)/llvm-install/bin/tblgen" \
-		llvm LLVMTESTS=OFF
 
 .PHONY: bmake posix binutils docs gcc samples libcxx libcxxrt libxxabi libunwind libgcceh
