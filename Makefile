@@ -143,7 +143,6 @@ $?JAVAFLAGS=
 $?PYTHON=$(call nativepath,$(shell which python))
 $?TAMARINCONFIG=CFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc -DVMCFG_ALCHEMY_SDK_BUILD " CXXFLAGS=" -m32 -I$(SRCROOT)/avm2_env/misc $(TAMARINOPTFLAGS) -DVMCFG_ALCHEMY_SDK_BUILD " LDFLAGS=$(TAMARINLDFLAGS) $(SRCROOT)/avmplus/configure.py --enable-shell --enable-alchemy-posix $(TAMARIN_CONFIG_FLAGS)
 $?LN=ln -sfn
-$?COPY_DOCS=false
 
 # ====================================================================================
 # LLVM
@@ -186,7 +185,7 @@ $?CYGTRIPLE=i686-pc-cygwin
 $?MINGWTRIPLE=i686-mingw32
 $?TRIPLE=avm2-unknown-freebsd8
 $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
-$?AR=$(SDK)/usr/bin/llvm-ar scru
+$?AR=$(SDK)/usr/bin/ar scru -v
 $?CMAKE=$(SDK)/usr/bin/cmake
 
 # ====================================================================================
@@ -212,7 +211,7 @@ BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -I $(SDK)/usr/include -emit-llvm -fno-bu
 BMAKE+= CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -I $(SDK)/usr/include -emit-llvm -fno-builtin -D__IEEE_LITTLE_ENDIAN -DSTRIP_FBSDID "
 BMAKE+= MAKEFLAGS="" MFLAGS="" MK_ICONV= WITHOUT_PROFILE=
 BMAKE+= MACHINE_ARCH=avm2 MACHINE_CPUARCH=AVM2 NO_WERROR=true SSP_CFLAGS=
-BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk
+BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
 
 # ====================================================================================
 # ALL TARGET
@@ -261,7 +260,6 @@ all_with_local_make:
 # Development
 all_dev:
 	@$(SDK)/usr/bin/make swig
-
 
 # ====================================================================================
 # CORE
@@ -341,13 +339,12 @@ base:
 	$(LN) platform/current/libexec $(SDK)/usr/libexec
 	$(LN) ../../../../../lib $(SDK)/usr/platform/current/libexec/gcc/$(TRIPLE)/lib
 
-	#cd $(SDK)/usr/platform/current/bin && $(LN) llvm-ar$(EXEEXT) avm2-unknown-freebsd8-ar$(EXEEXT)
-	#cd $(SDK)/usr/platform/current/bin && $(LN) llvm-nm$(EXEEXT) avm2-unknown-freebsd8-nm$(EXEEXT)
-	#cd $(SDK)/usr/platform/current/bin && $(LN) llvm-strip$(EXEEXT) avm2-unknown-freebsd8-strip$(EXEEXT)
-	#cd $(SDK)/usr/platform/current/bin && $(LN) llvm-ranlib$(EXEEXT) avm2-unknown-freebsd8-ranlib$(EXEEXT)
-	#cd $(SDK)/usr/platform/current/bin && $(LN) clang$(EXEEXT) avm2-unknown-freebsd8-gcc$(EXEEXT)
-	#cd $(SDK)/usr/platform/current/bin && $(LN) clang++$(EXEEXT) avm2-unknown-freebsd8-g++$(EXEEXT)
-
+	cd $(SDK)/usr/platform/current/bin && $(LN) ar$(EXEEXT) avm2-unknown-freebsd8-ar$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) nm$(EXEEXT) avm2-unknown-freebsd8-nm$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) strip$(EXEEXT) avm2-unknown-freebsd8-strip$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) ranlib$(EXEEXT) avm2-unknown-freebsd8-ranlib$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) avm2-unknown-freebsd8-gcc$(EXEEXT)
+	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) avm2-unknown-freebsd8-g++$(EXEEXT)
 	cd $(SDK)/usr/platform/current/bin && $(LN) gcc$(EXEEXT) gcc-4.2$(EXEEXT)
 	cd $(SDK)/usr/platform/current/bin && $(LN) g++$(EXEEXT) g++-4.2$(EXEEXT)
 
@@ -395,6 +392,7 @@ cmake:
 # ABC LIBS
 # ====================================================================================
 #TBD
+#TODO: cannot find copy_docs target
 abclibs:
 	$(MAKE) abclibs_compile abclibs_asdocs
 
@@ -612,12 +610,10 @@ bmake:
 # ====================================================================================
 # TBD
 stdlibs:
-	$(MAKE) csu libc libthr libm libBlocksRuntime libcxx libunwind libcxxrt
+	$(MAKE) -j$(THREADS) csu libc libthr libm libBlocksRuntime libcxx libunwind libcxxrt
 
 # TBD
 csu:
-	rm -rf $(BUILD)/lib
-	mkdir -p $(BUILD)/lib/
 	$(RSYNC) avm2_env/usr/ $(BUILD)/lib/
 	cd $(BUILD)/lib/src/lib/csu/avm2 && $(BMAKE) crt1_c.o
 	mv -f $(BUILD)/lib/src/lib/csu/avm2/crt1_c.o $(SDK)/usr/lib/.
@@ -653,7 +649,7 @@ libc:
 
 libc.abc:
 	mkdir -p $(BUILD)/libc_abc
-	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/llvm-ar x $(SDK)/usr/lib/libc.a
+	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc.a
 	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
 
@@ -673,15 +669,15 @@ libthr:
 # Threads
 libthr.abc:
 	mkdir -p $(BUILD)/libthr_abc
-	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/llvm-ar x $(SDK)/usr/lib/libthr.a
+	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
 	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
 
 # Math
 libm:
-	cd compiler_rt && $(MAKE) clean && $(MAKE) avm2 CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm" RANLIB=$(SDK)/usr/bin/llvm-ranlib AR=$(SDK)/usr/bin/llvm-ar VERBOSE=1
+	cd compiler_rt && $(MAKE) clean && $(MAKE) avm2 CC="$(SDK)/usr/bin/$(FLASCC_CC) -emit-llvm" RANLIB=$(SDK)/usr/bin/ranlib AR=$(SDK)/usr/bin/ar VERBOSE=1
 	$(SDK)/usr/bin/llvm-link -o $(BUILD)/libcompiler_rt.o compiler_rt/avm2/avm2/avm2/SubDir.lib/*.o
-	$(SDK)/usr/bin/llvm-nm $(BUILD)/libcompiler_rt.o  | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/compiler_rt.txt
+	$(SDK)/usr/bin/nm $(BUILD)/libcompiler_rt.o  | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/compiler_rt.txt
 	cat $(BUILD)/compiler_rt.txt >> $(SDK)/public-api.txt
 	cat $(SRCROOT)/$(DEPENDENCY_LLVM)/lib/CodeGen/SelectionDAG/TargetLowering.cpp | grep "Names\[RTLIB::" | awk '{print $$3}' | sed 's/"//g' | sed 's/;//' | sort | uniq > $(BUILD)/rtlib.txt
 	cat avm2_env/rtlib-extras.txt >> $(BUILD)/rtlib.txt
@@ -694,14 +690,14 @@ libm:
 	# it in our lib
 	cd $(BUILD)/msun/msun && rm -f libm.a && find . -name '*.o' -exec sh -c 'file {} | grep -v 86 > /dev/null' \; -print | xargs $(AR) libm.a
 	# remove symbols for sin, cos, other things we support as intrinsics
-	cd $(BUILD)/msun/msun && $(SDK)/usr/bin/llvm-ar sd libm.a s_cos.o s_sin.o e_pow.o e_sqrt.o
-	$(SDK)/usr/bin/llvm-ar r $(SDK)/usr/lib/libm.a
+	cd $(BUILD)/msun/msun && $(SDK)/usr/bin/ar sd libm.a s_cos.o s_sin.o e_pow.o e_sqrt.o
+	$(SDK)/usr/bin/ar r $(SDK)/usr/lib/libm.a
 	mkdir -p $(BUILD)/libmbc
-	cd $(BUILD)/libmbc && $(SDK)/usr/bin/llvm-ar x $(BUILD)/msun/msun/libm.a
+	cd $(BUILD)/libmbc && $(SDK)/usr/bin/ar x $(BUILD)/msun/msun/libm.a
 	cd $(BUILD)/libmbc && $(SDK)/usr/bin/llvm-link -o $(BUILD)/libmbc/libm.o $(BUILD)/libcompiler_rt.o *.o
 	cp -f $(BUILD)/libmbc/libm.o $(SDK)/usr/lib/libm.o
 	$(SDK)/usr/bin/opt -O3 -o $(SDK)/usr/lib/libm.o $(BUILD)/libmbc/libm.o
-	$(SDK)/usr/bin/llvm-nm $(SDK)/usr/lib/libm.o | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/libm.bc.txt
+	$(SDK)/usr/bin/nm $(SDK)/usr/lib/libm.o | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/libm.bc.txt
 
 # Math
 libm.abc:
@@ -723,7 +719,7 @@ libcxx: libsupcxx libgcceh
 
 libcxx.abc:
 	mkdir -p $(BUILD)/libcxx_abc
-	cd $(BUILD)/libcxx_abc && $(SDK)/usr/bin/llvm-ar x $(SDK)/usr/lib/libc++.a
+	cd $(BUILD)/libcxx_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc++.a
 	cd $(BUILD)/libcxx_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libcxx_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc++.a
 
@@ -763,8 +759,8 @@ as3xx:
 	mkdir -p $(SDK)/usr/lib/stdlibs_abc
 	cd $(BUILD)/posix && $(SDK)/usr/bin/$(FLASCC_CXX) -emit-llvm -fno-stack-protector $(LIBHELPEROPTFLAGS) -c $(SRCROOT)/posix/AS3++.cpp
 	cd $(BUILD)/posix && $(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj AS3++.o -o AS3++.abc
-	cd $(BUILD)/posix && $(SDK)/usr/bin/llvm-ar crus $(SDK)/usr/lib/libAS3++.a AS3++.o
-	cd $(BUILD)/posix && $(SDK)/usr/bin/llvm-ar crus $(SDK)/usr/lib/stdlibs_abc/libAS3++.a AS3++.abc
+	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libAS3++.a AS3++.o
+	cd $(BUILD)/posix && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libAS3++.a AS3++.abc
 
 # ====================================================================================
 # AS3WIG
@@ -787,7 +783,7 @@ as3wig:
 	echo "#include <AS3++/builtin.h>\n" > $(BUILD)/as3wig/AS3WigIncludes.h
 	echo "#include <AS3++/playerglobal.h>\n" >> $(BUILD)/as3wig/AS3WigIncludes.h
 	cd $(BUILD)/as3wig && $(SDK)/usr/bin/$(FLASCC_CXX) -c -emit-llvm -I. AS3Wig.cpp -o Flash++.o
-	cd $(BUILD)/as3wig && $(SDK)/usr/bin/llvm-ar crus $(SDK)/usr/lib/libFlash++.a Flash++.o
+	cd $(BUILD)/as3wig && $(SDK)/usr/bin/ar crus $(SDK)/usr/lib/libFlash++.a Flash++.o
 
 # ====================================================================================
 # ABCSTDLIBS
@@ -799,7 +795,7 @@ abcstdlibs:
 # TBD
 abcflashpp:
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvmopt=-Xmx4G -jvm="$(JAVA)" -falcon-parallel -target-player -filetype=obj $(BUILD)/as3wig/Flash++.o -o $(BUILD)/as3wig/Flash++.abc
-	$(SDK)/usr/bin/llvm-ar crus $(SDK)/usr/lib/stdlibs_abc/libFlash++.a $(BUILD)/as3wig/Flash++.abc
+	$(SDK)/usr/bin/ar crus $(SDK)/usr/lib/stdlibs_abc/libFlash++.a $(BUILD)/as3wig/Flash++.abc
 
 # TBD
 # TODO: Not in build
@@ -817,12 +813,12 @@ abcstdlibs_more:
 	$(SDK)/usr/bin/llc -gendbgsymtable -jvm="$(JAVA)" -falcon-parallel -filetype=obj $(SDK)/usr/lib/libcHack.o -o $(SDK)/usr/lib/stdlibs_abc/libcHack.o
 
 	mkdir -p $(BUILD)/libc_abc
-	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/llvm-ar x $(SDK)/usr/lib/libc.a
+	cd $(BUILD)/libc_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc.a
 	cd $(BUILD)/libc_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc.a
 
 	mkdir -p $(BUILD)/libthr_abc
-	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/llvm-ar x $(SDK)/usr/lib/libthr.a
+	cd $(BUILD)/libthr_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libthr.a
 	cd $(BUILD)/libthr_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libthr_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libthr.a
 #ifneq (,$(findstring 2.9,$(LLVMVERSION)))
@@ -844,12 +840,12 @@ abcstdlibs_more:
 	#mv $(BUILD)/libobjc_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libobjc.a
 #endif
 	mkdir -p $(BUILD)/libBlocksRuntime_abc
-	cd $(BUILD)/libBlocksRuntime_abc && $(SDK)/usr/bin/llvm-ar x $(SDK)/usr/lib/libBlocksRuntime.a
+	cd $(BUILD)/libBlocksRuntime_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libBlocksRuntime.a
 	cd $(BUILD)/libBlocksRuntime_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libBlocksRuntime_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libBlocksRuntime.a
 
 	mkdir -p $(BUILD)/libcxx_abc
-	cd $(BUILD)/libcxx_abc && $(SDK)/usr/bin/llvm-ar x $(SDK)/usr/lib/libc++.a
+	cd $(BUILD)/libcxx_abc && $(SDK)/usr/bin/ar x $(SDK)/usr/lib/libc++.a
 	cd $(BUILD)/libcxx_abc && cp -f $(SRCROOT)/avm2_env/misc/abcarchive.mk Makefile && SDK=$(SDK) $(MAKE) LLCOPTS='-jvm="$(JAVA)"' -j$(THREADS)
 	mv $(BUILD)/libcxx_abc/test.a $(SDK)/usr/lib/stdlibs_abc/libc++.a
 
@@ -1020,7 +1016,7 @@ cxxfiltmingw:
 # TBD
 libtoabc:
 	mkdir -p $(BUILD)/libtoabc/`basename $(LIB)`
-	cd $(BUILD)/libtoabc/`basename $(LIB)` && $(SDK)/usr/bin/llvm-ar x $(LIB)
+	cd $(BUILD)/libtoabc/`basename $(LIB)` && $(SDK)/usr/bin/ar x $(LIB)
 	@abcdir=$(BUILD)/libtoabc/`basename $(LIB)` ; \
 	numos=`find $$abcdir -maxdepth 1 -name '*.o' | wc -l` ; \
 	if [$$numos -gt 0 ] ; then \
@@ -1271,7 +1267,7 @@ hellocpp_shell:
 hellocpp_swf:
 	@rm -rf $(BUILD)/hellocpp_swf
 	@mkdir -p $(BUILD)/hellocpp_swf
-	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/$(FLASCC_CXX) -v -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
+	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/$(FLASCC_CXX) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
 
 # TBD
 hellocpp_swf_opt:
@@ -1383,8 +1379,8 @@ symboltest:
 	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=asm -o symboltest.s
 	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llc -jvm=$(JAVA) symboltest.bc -filetype=obj -o symboltest.abc
 
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llvm-nm symboltest.abc | grep symbolTest > syms.abc.txt
-	cd $(BUILD)/symboltest && $(SDK)/usr/bin/llvm-nm symboltest.bc | grep symbolTest > syms.bc.txt
+	cd $(BUILD)/symboltest && $(SDK)/usr/bin/nm symboltest.abc | grep symbolTest > syms.abc.txt
+	cd $(BUILD)/symboltest && $(SDK)/usr/bin/nm symboltest.bc | grep symbolTest > syms.bc.txt
 	diff --strip-trailing-cr $(BUILD)/symboltest/*.txt
 
 # TBD
