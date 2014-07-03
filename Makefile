@@ -1044,9 +1044,7 @@ SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/
 SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/include -I$(BUILD)/llvm-debug/include 
 SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include
 SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/lib
-SWIG_CXXFLAGS+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long -v
-# Post Process
-SWIG_DIRS_TO_DELETE=allegrocl chicken clisp csharp d gcj go guile java lua modula3 mzscheme ocaml octave perl5 php pike python r ruby tcl
+SWIG_CXXFLAGS+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long 
 
 # SWIG Phase 1
 swig-clean:
@@ -1068,27 +1066,14 @@ swig-configure:
 swig-build:
 	rm -rf $(SDK)/usr/lib/clang
 	cp -R $(BUILD)/llvm-debug/lib/clang $(SDK)/usr/lib/clang
-	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j$(THREADS) && $(MAKE) install
-	#$(foreach var, $(SWIG_DIRS_TO_DELETE), rm -rf $(SDK)/usr/share/swig/2.0.4/$(var);)
+	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) && $(MAKE) install
 
 # SWIG All
 swig:
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	peflags --cygwin-heap=4096 $(SDK)/usr/bin/llc$(EXEEXT)
-	peflags --cygwin-heap=4096 $(SDK)/usr/bin/avm2-as$(EXEEXT)
-	peflags --cygwin-heap=4096 $(SDK)/usr/bin/clang$(EXEEXT)
-	peflags --cygwin-heap=4096 $(SDK)/usr/bin/clang++$(EXEEXT)
-endif
 	$(MAKE) swig-clean
 	$(MAKE) swig-pcre
 	$(MAKE) swig-configure
 	$(MAKE) swig-build
-ifneq (,$(findstring cygwin,$(PLATFORM)))
-	peflags --cygwin-heap=0 $(SDK)/usr/bin/llc$(EXEEXT)
-	peflags --cygwin-heap=0 $(SDK)/usr/bin/avm2-as$(EXEEXT)
-	peflags --cygwin-heap=0 $(SDK)/usr/bin/clang$(EXEEXT)
-	peflags --cygwin-heap=0 $(SDK)/usr/bin/clang++$(EXEEXT)
-endif
 
 # SWIG Tests
 swigtests:
@@ -1237,7 +1222,7 @@ helloswf:
 	cd $(BUILD)/helloswf && $(SDK)/usr/bin/$(FLASCC_CC) -D__IEEE_LITTLE_ENDIAN -c -g -O0 $(SRCROOT)/test/hello.c -emit-llvm -o hello.bc
 	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.abc -filetype=obj
 	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.as -filetype=asm
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/$(FLASCC_CC) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O0 -g -v hello.abc -o hello.swf
+	cd $(BUILD)/helloswf && $(SDK)/usr/bin/$(FLASCC_CC) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O0 -g hello.abc -o hello.swf
 
 # TBD
 helloswf_opt:
@@ -1318,7 +1303,7 @@ parse_scimark_log:
 # TBD
 sjljtest:
 	@mkdir -p $(BUILD)/sjljtest
-	cd $(BUILD)/sjljtest && $(SDK)/usr/bin/$(FLASCC_CXX) -O0 $(SRCROOT)/test/sjljtest.c -v -o sjljtest -save-temps
+	cd $(BUILD)/sjljtest && $(SDK)/usr/bin/$(FLASCC_CXX) -O0 $(SRCROOT)/test/sjljtest.c -o sjljtest -save-temps
 	$(BUILD)/sjljtest/sjljtest &> $(BUILD)/sjljtest/result.txt
 	diff --strip-trailing-cr $(BUILD)/sjljtest/result.txt $(SRCROOT)/test/sjljtest.expected.txt
 
