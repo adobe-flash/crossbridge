@@ -54,7 +54,7 @@ $?DEPENDENCY_ZLIB=zlib-1.2.5
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
-	$?THREADS=1
+	$?THREADS=2
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
@@ -216,7 +216,9 @@ BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk
 # ====================================================================================
 # ALL TARGET
 # ====================================================================================
-BUILDORDER= cmake abclibs uname noenv avm2-as alctool alcdb llvm binutils plugins bmake stdlibs as3xx as3wig abcstdlibs
+BUILDORDER= cmake abclibs uname noenv avm2-as alctool alcdb llvm binutils plugins bmake 
+BUILDORDER+= csu libc libthr libm libBlocksRuntime libcxx libunwind libcxxrt
+BUILDORDER+= as3xx as3wig abcflashpp abcstdlibs_more
 BUILDORDER+= sdkcleanup tr trd genfs swig gdb pkgconfig libtool 
 BUILDORDER+= zlib libvgl libjpeg libpng dejagnu #TODO: libsdl dmalloc libffi libiconv 
 BUILDORDER+= finalcleanup submittests
@@ -226,7 +228,6 @@ all:
 	@echo "User: $(UNAME)"
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
-	@$(MAKE) clean
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) install_libs > $(BUILD)/logs/install_libs.txt 2>&1
 	@$(MAKE) base > $(BUILD)/logs/base.txt 2>&1
@@ -364,7 +365,6 @@ base:
 # ====================================================================================
 make:
 	rm -rf $(BUILD)/make
-	mkdir -p $(SDK)/usr/bin
 	mkdir -p $(BUILD)/make
 	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_MAKE)/ $(BUILD)/make/
 	cd $(BUILD)/make && CC=$(CC) CXX=$(CXX) ./configure --prefix=$(SDK)/usr --program-prefix="" \
@@ -379,7 +379,6 @@ make:
 cmake:
 	rm -rf $(BUILD)/cmake
 	rm -rf $(SDK)/usr/cmake_junk
-	mkdir -p $(SDK)/usr/bin
 	mkdir -p $(BUILD)/cmake
 	mkdir -p $(SDK)/usr/cmake_junk
 	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_CMAKE)/ $(BUILD)/cmake/
@@ -458,17 +457,14 @@ abclibs_asdocs:
 
 #TBD
 uname:
-	mkdir -p $(SDK)/usr/bin
 	$(CC) $(SRCROOT)/tools/uname/uname.c -o $(SDK)/usr/bin/uname$(EXEEXT)
 
 #TBD
 noenv:
-	mkdir -p $(SDK)/usr/bin
 	$(CC) $(SRCROOT)/tools/noenv/noenv.c -o $(SDK)/usr/bin/noenv$(EXEEXT)
 
 #TBD
 avm2-as:
-	mkdir -p $(SDK)/usr/bin
 	$(CXX) $(SRCROOT)/avm2_env/misc/SetAlchemySDKLocation.c $(SRCROOT)/tools/as/as.cpp -o $(SDK)/usr/bin/avm2-as$(EXEEXT)
 
 #TBD
@@ -608,9 +604,6 @@ bmake:
 # ====================================================================================
 # STD LIBS
 # ====================================================================================
-# TBD
-stdlibs:
-	$(MAKE) -j$(THREADS) csu libc libthr libm libBlocksRuntime libcxx libunwind libcxxrt
 
 # TBD
 csu:
@@ -788,9 +781,6 @@ as3wig:
 # ====================================================================================
 # ABCSTDLIBS
 # ====================================================================================
-# TBD
-abcstdlibs:
-	$(MAKE) abcflashpp abcstdlibs_more
 
 # TBD
 abcflashpp:
@@ -869,7 +859,6 @@ sdkcleanup:
 tr:
 	rm -rf $(BUILD)/tr
 	mkdir -p $(BUILD)/tr
-	mkdir -p $(SDK)/usr/bin
 	cd $(BUILD)/tr && rm -f Makefile && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(TAMARINCONFIG) --disable-debugger
 	cd $(BUILD)/tr && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cp -f $(BUILD)/tr/shell/avmshell $(SDK)/usr/bin/avmshell
@@ -887,7 +876,6 @@ tr:
 trd:
 	rm -rf $(BUILD)/trd
 	mkdir -p $(BUILD)/trd
-	mkdir -p $(SDK)/usr/bin
 	cd $(BUILD)/trd && rm -f Makefile && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(TAMARINCONFIG) --enable-debugger
 	cd $(BUILD)/trd && AR=$(NATIVE_AR) CC=$(CC) CXX=$(CXX) $(MAKE) -j$(THREADS)
 	cp -f $(BUILD)/trd/shell/avmshell $(SDK)/usr/bin/avmshell-release-debugger
