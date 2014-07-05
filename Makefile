@@ -265,7 +265,7 @@ all_with_local_make:
 
 # Development
 all_dev:
-	@$(SDK)/usr/bin/make dmalloc
+	@$(SDK)/usr/bin/make swig
 
 # ====================================================================================
 # CORE
@@ -956,7 +956,7 @@ libsdl-install:
 dmalloc:
 	rm -rf $(BUILD)/dmalloc
 	mkdir -p $(BUILD)/dmalloc
-	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_DMALLOC)/configure \
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CFLAGS=" -g -O4 " CXXFLAGS=" -g -O4 " CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_DMALLOC)/configure \
 		--prefix=$(SDK)/usr --disable-shared --enable-static --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j1 threads cxx
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j1 installcxx installth
@@ -1050,7 +1050,8 @@ SWIG_CXXFLAGS=-I$(SRCROOT)/avm2_env/misc/
 SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/include -I$(BUILD)/llvm-debug/include 
 SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include
 SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/lib
-SWIG_CXXFLAGS+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -g -Wno-long-long 
+SWIG_CXXFLAGS+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -Wno-long-long 
+#SWIG_CXXFLAGS+= -g
 
 # SWIG Phase 1
 swig-clean:
@@ -1079,7 +1080,7 @@ swig:
 	$(MAKE) swig-clean
 	$(MAKE) swig-pcre
 	$(MAKE) swig-configure
-	$(MAKE) -i swig-build
+	$(MAKE) swig-build
 
 # SWIG Tests
 swigtests:

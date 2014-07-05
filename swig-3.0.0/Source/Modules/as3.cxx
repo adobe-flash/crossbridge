@@ -1210,14 +1210,14 @@ public:
   }
   
   virtual int top(Node *n) {
-    // TODO: detect language type 
-    /*if (!CPlusPlus) {
+    // TODO: Solve crash (#17)
+    if (!CPlusPlus) {
       mem_layout = new CMemoryLayout(input_file);
       // Always C for the time being
       CMemoryLayout::Language lang =
       CPlusPlus ? CMemoryLayout::CXX : CMemoryLayout::C;
       mem_layout->init(lang);
-    }*/
+    }
     
     is_variable = false;
     is_static = false;
