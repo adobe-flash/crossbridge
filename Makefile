@@ -219,9 +219,14 @@ BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk
 BUILDORDER= cmake abclibs uname noenv avm2-as alctool alcdb llvm binutils plugins bmake 
 BUILDORDER+= csu libc libthr libm libBlocksRuntime libcxx libunwind libcxxrt
 BUILDORDER+= as3xx as3wig abcflashpp abcstdlibs_more
-BUILDORDER+= sdkcleanup tr trd genfs swig gdb pkgconfig libtool 
-BUILDORDER+= zlib libvgl libjpeg libpng dejagnu #TODO: libsdl dmalloc libffi libiconv 
-BUILDORDER+= finalcleanup submittests
+BUILDORDER+= sdkcleanup 
+BUILDORDER+= tr trd genfs swig gdb pkgconfig libtool 
+BUILDORDER+= zlib libvgl libjpeg libpng dejagnu libsdl dmalloc libffi libiconv 
+BUILDORDER+= finalcleanup
+BUILDORDER+= helloswf helloswf_opt hellocpp_shell hellocpp_swf hellocpp_swf_opt 
+BUILDORDER+= scimark scimark_swf aliastest pthreadsubmittests_shell pthreadsubmittests_swf 
+BUILDORDER+= sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest posixtest symboltest
+BUILDORDER+= samples
 
 all:
 	@echo "~~~ Crossbridge $(SDKNAME) ~~~"
@@ -260,7 +265,7 @@ all_with_local_make:
 
 # Development
 all_dev:
-	@$(SDK)/usr/bin/make swig
+	@$(SDK)/usr/bin/make dmalloc
 
 # ====================================================================================
 # CORE
@@ -297,6 +302,7 @@ install_libs:
 	cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
+	cp -r ./patches/$(DEPENDENCY_DMALLOC) .
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
@@ -1073,7 +1079,7 @@ swig:
 	$(MAKE) swig-clean
 	$(MAKE) swig-pcre
 	$(MAKE) swig-configure
-	$(MAKE) swig-build
+	$(MAKE) -i swig-build
 
 # SWIG Tests
 swigtests:
@@ -1151,14 +1157,7 @@ endif
 # ====================================================================================
 # Submit tests
 # ====================================================================================
-
-# TBD
-submittests: aliastest pthreadsubmittests_shell pthreadsubmittests_swf helloswf helloswf_opt \
-			hellocpp_shell hellocpp_swf hellocpp_swf_opt posixtest scimark scimark_swf \
-			sjljtest sjljtest_opt ehtest ehtest_opt as3interoptest symboltest samples
-	cd samples && $(MAKE) clean
-	cat $(BUILD)/scimark/result.txt
-
+    
 # TBD
 aliastest:
 	mkdir -p $(BUILD)/aliastest
@@ -1444,19 +1443,28 @@ ieeetests_basicops:
 # ====================================================================================
 
 deliverables:
-	$(MAKE) staging
-	$(MAKE) flattensymlinks
+	rm -rf $(BUILDROOT)/staging
+	mkdir -p $(BUILDROOT)/staging
+	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
+	$(RSYNC) $(SRCROOT)/samples $(BUILDROOT)/staging/
+	$(RSYNC) $(SRCROOT)/README.html $(BUILDROOT)/staging/
+	$(RSYNC) $(SRCROOT)/docs $(BUILDROOT)/staging/
+	$(RSYNC) $(BUILDROOT)/apidocs $(BUILDROOT)/staging/docs/
+	rm -f $(BUILDROOT)/staging/sdk/usr/bin/gccbug*
+	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
+	echo $(FLASCC_VERSION_BUILD) > $(BUILDROOT)/staging/sdk/ver.txt
+# Flatten symlinks
+	find $(BUILDROOT)/staging/sdk -type l | xargs rm
+	$(RSYNC) $(BUILDROOT)/staging/sdk/usr/platform/*/ $(BUILDROOT)/staging/sdk/usr
+	rm -rf $(BUILDROOT)/staging/sdk/usr/platform
 ifneq (,$(findstring cygwin,$(PLATFORM)))
-		$(MAKE) zip
+	cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
+	find $(BUILDROOT)/staging > $(BUILDROOT)/zipcontents.txt
 else
-		$(MAKE) dmg
-endif
-
-dmg:
 	rm -f $(BUILDROOT)/$(SDKNAME).*.dmg 
 	cp -f $(SRCROOT)/tools/Base.dmg $(BUILDROOT)/$(SDKNAME).tmp.dmg
 	chmod u+rw $(BUILDROOT)/$(SDKNAME).tmp.dmg
-	hdiutil resize -size 2G $(BUILDROOT)/$(SDKNAME).tmp.dmg
+	hdiutil resize -size 1G $(BUILDROOT)/$(SDKNAME).tmp.dmg
 	hdiutil attach $(BUILDROOT)/$(SDKNAME).tmp.dmg -readwrite -mountpoint $(BUILDROOT)/dmgmount
 	rm -f $(BUILDROOT)/staging/.DS_Store
 	$(RSYNC) $(BUILDROOT)/staging/ $(BUILDROOT)/dmgmount/
@@ -1465,27 +1473,7 @@ dmg:
 	hdiutil convert $(BUILDROOT)/$(SDKNAME).tmp.dmg -format UDZO -imagekey zlib-level=9 -o $(BUILDROOT)/$(SDKNAME).dmg
 	rm -f $(BUILDROOT)/$(SDKNAME).tmp.dmg
 	find $(BUILDROOT)/staging > $(BUILDROOT)/dmgcontents.txt
-
-staging:
-	rm -rf $(BUILDROOT)/staging
-	mkdir -p $(BUILDROOT)/staging
-	$(RSYNC) $(SDK) $(BUILDROOT)/staging/
-	$(RSYNC) --exclude '*.PAK' --exclude '*.pak' --exclude 13_ObjectiveC --exclude Example_Sound --exclude 13_Example_Neverball --exclude demobaseq2 --exclude 15_Example_Quake3 --exclude 14_Example_Quake2 $(SRCROOT)/samples $(BUILDROOT)/staging/
-	$(RSYNC) $(SRCROOT)/README.html $(BUILDROOT)/staging/
-	$(RSYNC) $(SRCROOT)/docs $(BUILDROOT)/staging/
-	$(RSYNC) $(BUILDROOT)/apidocs $(BUILDROOT)/staging/docs/
-	rm -f $(BUILDROOT)/staging/sdk/usr/bin/gccbug*
-	find $(BUILDROOT)/staging/ | grep "\.DS_Store$$" | xargs rm -f 
-	echo $(FLASCC_VERSION_BUILD) > $(BUILDROOT)/staging/sdk/ver.txt
-
-flattensymlinks:
-	find $(BUILDROOT)/staging/sdk -type l | xargs rm
-	$(RSYNC) $(BUILDROOT)/staging/sdk/usr/platform/*/ $(BUILDROOT)/staging/sdk/usr
-	rm -rf $(BUILDROOT)/staging/sdk/usr/platform
-
-zip:
-	cd $(BUILDROOT)/staging/ && zip -qr $(BUILDROOT)/$(SDKNAME).zip *
-	find $(BUILDROOT)/staging > $(BUILDROOT)/zipcontents.txt
+endif
 
 # ====================================================================================
 # Examples
