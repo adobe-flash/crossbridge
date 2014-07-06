@@ -265,7 +265,7 @@ all_with_local_make:
 
 # Development
 all_dev:
-	@$(SDK)/usr/bin/make swig
+	@$(SDK)/usr/bin/make libffi
 
 # ====================================================================================
 # CORE
@@ -962,10 +962,11 @@ dmalloc:
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j1 installcxx installth
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j1 heavy
 
-# TODO: FFI_TRAMPOLINE_SIZE undeclared here
+# Foreign Function Interface
+# TODO: error: no member names 'trampoline_table_entry' in 'ffi_closure'
 libffi:
 	mkdir -p $(BUILD)/libffi
-	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS="-I$(SDK)/usr/include" CXXFLAGS="-I$(SDK)/usr/include" $(SRCROOT)/$(DEPENDENCY_FFI)/configure \
+	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS="-I$(SDK)/usr/include" CXXFLAGS="-I$(SDK)/usr/include" $(SRCROOT)/$(DEPENDENCY_FFI)/configure \
 		--prefix=$(SDK)/usr --disable-shared --enable-static --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
 	cd $(BUILD)/libffi && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
