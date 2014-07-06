@@ -265,7 +265,7 @@ all_with_local_make:
 
 # Development
 all_dev:
-	@$(SDK)/usr/bin/make libffi
+	@$(SDK)/usr/bin/make libiconv
 
 # ====================================================================================
 # CORE
@@ -952,7 +952,7 @@ libsdl-install:
 	cp $(SRCROOT)/tools/sdl-config $(SDK)/usr/bin/. # install our custom sdl-config
 	chmod a+x $(SDK)/usr/bin/sdl-config
 
-# TODO: Solve error: cannot run test program while cross compiling 
+# Debug Memory Allocations
 dmalloc:
 	rm -rf $(BUILD)/dmalloc
 	mkdir -p $(BUILD)/dmalloc
@@ -977,7 +977,7 @@ libfficheck:
 # TBD
 libiconv:
 	mkdir -p $(BUILD)/libiconv
-	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_ICONV)/configure \
+	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) CFLAGS=" -O3 " CXXFLAGS=" -O3 " CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_ICONV)/configure \
 		--prefix=$(SDK)/usr
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
