@@ -45,7 +45,8 @@ set AIR_HOME=%AIR_HOME:\=/%
 set FLEX_HOME=%FLEX_HOME:\=/%
 set FLASH_PLAYER_EXE=%FLASH_PLAYER_EXE:\=/%
 :: Set CrossBridge Home
-set FLASCC_ROOT=%CD:\=/%
+set FCWD=%~dp0 
+set FLASCC_ROOT=%FCWD:\=/%
 :: Trigger Cygwin Bash
 C:
 chdir C:\cygwin\bin
