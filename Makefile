@@ -67,7 +67,11 @@ $?DEPENDENCY_DEJAGNU=dejagnu-1.5
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
-	$?THREADS=2
+	ifdef NUMBER_OF_PROCESSORS
+		$?THREADS=$(NUMBER_OF_PROCESSORS)
+	else
+		$?THREADS=2
+	endif
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?NOPIE=
@@ -1714,7 +1718,7 @@ test_gdb:
 
 # Run Virtual File System (VFS) tests
 test_vfs:
-	@cd qa/vfs/framework && $(MAKE) FLASCC=$(SDK)
+	@cd test/vfs/framework && $(MAKE) FLASCC=$(SDK)
 
 # ====================================================================================
 # Samples and Examples
