@@ -54,7 +54,11 @@ $?DEPENDENCY_ZLIB=zlib-1.2.5
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?PLATFORM="cygwin"
 	$?RAWPLAT=cygwin
-	$?THREADS=2
+	ifdef NUMBER_OF_PROCESSORS
+		$?THREADS=$(NUMBER_OF_PROCESSORS)
+	else
+		$?THREADS=2
+	endif
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?BUILD_TRIPLE=i686-pc-cygwin
 	$?PLAYER=$(SRCROOT)/qa/runtimes/player/Debug/FlashPlayerDebugger.exe
@@ -234,6 +238,7 @@ all:
 	@echo "Platform: $(PLATFORM)"
 	@echo "Build: $(BUILD)"
 	@mkdir -p $(BUILD)/logs
+	@$(MAKE) diagnostics > $(BUILD)/logs/diagnostics.txt 2>&1
 	@$(MAKE) install_libs > $(BUILD)/logs/install_libs.txt 2>&1
 	@$(MAKE) base > $(BUILD)/logs/base.txt 2>&1
 	@$(MAKE) make > $(BUILD)/logs/make.txt 2>&1
@@ -262,6 +267,21 @@ all_with_local_make:
 			exit 1 ; \
 		fi ; \
 	done
+
+# Print debug information
+diagnostics:
+	@echo "~~~ $(SDKNAME) ~~~"
+	@echo "Threads: $(THREADS)"
+	@echo "User: $(UNAME)"
+	@echo "Platform: $(PLATFORM)"
+	@echo "Build: $(BUILD)"
+	@echo "Triple: $(TRIPLE)"
+	@echo "Host Triple: $(HOST_TRIPLE)"
+	@echo "Build Triple: $(BUILD_TRIPLE)"
+	@echo "CC: $(shell $(CC) --version)"
+	@echo "CXX: $(shell $(CXX) --version)"
+	@echo "FLEX_SDK_TYPE: $(FLEX_SDK_TYPE)"
+	@echo "FLEX_SDK_HOME: $(FLEX_SDK_HOME)"
 
 # Development
 all_dev:
