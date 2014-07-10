@@ -1311,8 +1311,8 @@ scimark_swf:
 # TBD
 scimark_asc:
 	@mkdir -p $(BUILD)/scimark_asc
-	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/$(FLASCC_CC) -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
-	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/$(FLASCC_CC) -muse-legacy-asc -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
+	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/$(FLASCC_CC) -O4 $(SRCROOT)/scimark2_1c/*.c -o scimark2 -save-temps
+	cd $(BUILD)/scimark_asc && $(SDK)/usr/bin/$(FLASCC_CC) -O4 $(SRCROOT)/scimark2_1c/*.c -emit-swf -swf-size=400x400 -o scimark2.swf
 	$(BUILD)/scimark_asc/scimark2 &> $(BUILD)/scimark_asc/result.txt
 
 # TBD
@@ -1352,11 +1352,11 @@ ehtest_opt:
 # TODO: Not in build
 ehtest_asc:
 	@mkdir -p $(BUILD)/ehtest_asc
-	cd $(BUILD)/ehtest_asc && $(SDK)/usr/bin/$(FLASCC_CXX) -muse-legacy-asc -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	cd $(BUILD)/ehtest_asc && $(SDK)/usr/bin/$(FLASCC_CXX) -O0 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
 	-$(BUILD)/ehtest_asc/ehtest &> $(BUILD)/ehtest_asc/result.txt
 	diff --strip-trailing-cr $(BUILD)/ehtest_asc/result.txt $(SRCROOT)/test/ehtest.expected.txt
 
-	cd $(BUILD)/ehtest_asc && $(SDK)/usr/bin/$(FLASCC_CXX) -muse-legacy-asc -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
+	cd $(BUILD)/ehtest_asc && $(SDK)/usr/bin/$(FLASCC_CXX) -O4 $(SRCROOT)/test/ehtest.cpp -o ehtest -save-temps
 	-$(BUILD)/ehtest_asc/ehtest &> $(BUILD)/ehtest_asc/result.txt
 	diff --strip-trailing-cr $(BUILD)/ehtest_asc/result.txt $(SRCROOT)/test/ehtest.expected.txt
 
