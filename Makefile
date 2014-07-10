@@ -211,8 +211,8 @@ BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_M
 
 #BMake Tool (Add -v flag to CC and CXX to verbose mode for debugging)
 BMAKE= AR="$(BIN_TRUE) ||" GENCAT=$(BIN_TRUE) RANLIB=$(BIN_TRUE)
-BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -I $(SDK)/usr/include -emit-llvm -fno-builtin -D__IEEE_LITTLE_ENDIAN -DSTRIP_FBSDID " 
-BMAKE+= CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -I $(SDK)/usr/include -emit-llvm -fno-builtin -D__IEEE_LITTLE_ENDIAN -DSTRIP_FBSDID "
+BMAKE+= CC="$(SDK)/usr/bin/$(FLASCC_CC) -I $(SDK)/usr/include -emit-llvm -fno-builtin -DSTRIP_FBSDID " 
+BMAKE+= CXX="$(SDK)/usr/bin/$(FLASCC_CXX) -I $(SDK)/usr/include -emit-llvm -fno-builtin -DSTRIP_FBSDID "
 BMAKE+= MAKEFLAGS="" MFLAGS="" MK_ICONV= WITHOUT_PROFILE=
 BMAKE+= MACHINE_ARCH=avm2 MACHINE_CPUARCH=AVM2 NO_WERROR=true SSP_CFLAGS=
 BMAKE+= $(BUILD)/bmake/bmake -m $(BUILD)/lib/share/mk 
@@ -1240,34 +1240,34 @@ conctests:
 helloswf:
 	@rm -rf $(BUILD)/helloswf
 	@mkdir -p $(BUILD)/helloswf
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/$(FLASCC_CC) -D__IEEE_LITTLE_ENDIAN -c -g -O0 $(SRCROOT)/test/hello.c -emit-llvm -o hello.bc
+	cd $(BUILD)/helloswf && $(SDK)/usr/bin/$(FLASCC_CC) -c -g -O0 $(SRCROOT)/test/hello.c -emit-llvm -o hello.bc
 	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.abc -filetype=obj
 	cd $(BUILD)/helloswf && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.as -filetype=asm
-	cd $(BUILD)/helloswf && $(SDK)/usr/bin/$(FLASCC_CC) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O0 -g hello.abc -o hello.swf
+	cd $(BUILD)/helloswf && $(SDK)/usr/bin/$(FLASCC_CC) -emit-swf -swf-size=200x200 -O0 -g hello.abc -o hello.swf
 
 # TBD
 helloswf_opt:
 	@rm -rf $(BUILD)/helloswf_opt
 	@mkdir -p $(BUILD)/helloswf_opt
-	cd $(BUILD)/helloswf_opt && $(SDK)/usr/bin/$(FLASCC_CC) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
+	cd $(BUILD)/helloswf_opt && $(SDK)/usr/bin/$(FLASCC_CC) -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
 
 # TBD
 hellocpp_shell:
 	@rm -rf $(BUILD)/hellocpp_shell
 	@mkdir -p $(BUILD)/hellocpp_shell
-	cd $(BUILD)/hellocpp_shell && $(SDK)/usr/bin/$(FLASCC_CXX) -D__IEEE_LITTLE_ENDIAN -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
+	cd $(BUILD)/hellocpp_shell && $(SDK)/usr/bin/$(FLASCC_CXX) -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
 
 # TBD
 hellocpp_swf:
 	@rm -rf $(BUILD)/hellocpp_swf
 	@mkdir -p $(BUILD)/hellocpp_swf
-	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/$(FLASCC_CXX) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
+	cd $(BUILD)/hellocpp_swf && $(SDK)/usr/bin/$(FLASCC_CXX) -emit-swf -swf-size=200x200 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
 
 # TBD
 hellocpp_swf_opt:
 	@rm -rf $(BUILD)/hellocpp_swf_opt
 	@mkdir -p $(BUILD)/hellocpp_swf_opt
-	cd $(BUILD)/hellocpp_swf_opt && $(SDK)/usr/bin/$(FLASCC_CXX) -D__IEEE_LITTLE_ENDIAN -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
+	cd $(BUILD)/hellocpp_swf_opt && $(SDK)/usr/bin/$(FLASCC_CXX) -emit-swf -swf-size=200x200 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
 
 # TBD
 as3++tests:
