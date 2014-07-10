@@ -33,6 +33,11 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 
 # Core Dependencies
 
+* Java JDK x64
+* Adobe AIR SDK
+
+# Cygwin Dependencies
+
 * autoconf
 * automake
 * bison
@@ -45,7 +50,7 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 * gettext
 * glib
 * help2man
-* java-jdk
+* libarchive
 * libiconv
 * libmpfr
 * libgmp
@@ -55,6 +60,7 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 * libzip
 * libzip2
 * make
+* ncurses
 * pkg-config
 * python
 * rsync
@@ -65,7 +71,7 @@ In order to compile the Master branch you will need Apple GCC 4.2:
 
 ## Notes
 
-* Adobe AIR SDK is essential to build the CrossBridge SDK (Please set *AIR_HOME* environment variable pointing to the location)
+* Please set *AIR_HOME* environment variable pointing to the SDK location
 
 * It's recommended to set \_JAVA\_OPTIONS environment variable according to your system memory:
   

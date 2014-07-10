@@ -317,7 +317,6 @@ all_with_local_make:
 		done ; \
 		if [ $$mret -ne 0 ] ; then \
 			echo "Failed to build: $$target" ;\
-			tail +1 $$logs ;\
 			exit 1 ; \
 		fi ; \
 	done 
@@ -340,6 +339,10 @@ diagnostics:
 all_dev:
 	@$(SDK_MAKE) abclibs_compile
 	cd samples/09_Pthreads && $(SDK_MAKE) T09_3 T09_4 T09_5
+
+# Development target (x64)
+all_dev2:
+	@$(SDK_MAKE) -s all_with_local_make
 
 # Clean build outputs
 clean:
