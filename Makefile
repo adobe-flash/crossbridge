@@ -340,10 +340,6 @@ all_dev:
 	@$(SDK_MAKE) abclibs_compile
 	cd samples/09_Pthreads && $(SDK_MAKE) T09_3 T09_4 T09_5
 
-# Development target (x64)
-all_dev2:
-	@$(SDK_MAKE) -s all_with_local_make
-
 # Clean build outputs
 clean:
 	@echo "Cleaning ..."
