@@ -1731,6 +1731,10 @@ samples:
 examples:
 	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) examples
 
+# Examples used to clean the samples
+clean_samples:
+	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) clean
+
 # ====================================================================================
 # Extra Tests
 # ====================================================================================
@@ -1849,6 +1853,7 @@ ieeetests_basicops:
 # ====================================================================================
 # Deploy SDK 
 deploy:
+	$(MAKE) clean_samples
 	rm -rf $(BUILDROOT)/staging
 	mkdir -p $(BUILDROOT)/staging
 	#Deploying SDK
