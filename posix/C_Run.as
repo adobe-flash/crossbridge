@@ -83,21 +83,18 @@ package C_Run
   {
     try
     {
-      var flashconcNS:Namespace = new Namespace("flash.concurrent");
-      return flashconcNS::["Mutex"];    
-      
-      // 2014.06.26. Disabled, newer AIR distributions are x-platform (VPMedia)
-      
-      //var mc:Class = flashconcNS::["Mutex"];      
+      var flashconcNS:Namespace = new Namespace("flash.concurrent");  
+            
+      var mc:Class = flashconcNS::["Mutex"];      
       //AIR 3.5 for mobile exposes the Worker Class, but does not
       //provide a working implementation. This can only be detected
       //by attempting to construct one to see if it throws an
       //exception      
-      //var m:Object = new mc();
-      //m.lock();
-      //m.unlock();
+      var m:Object = new mc();
+      m.lock();
+      m.unlock();
       // If the Mutex was useable, we can safely claim to support the Mutex class
-      //return mc;
+      return mc;
     }
     catch(e:*) {}
 
