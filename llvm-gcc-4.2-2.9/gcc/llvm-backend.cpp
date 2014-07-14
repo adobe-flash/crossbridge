@@ -917,7 +917,7 @@ inline std::string winfriendlypath(std::string str)
 #if defined(__CYGWIN__) || defined(__MINGW32__)
     std::vector<std::string> args;
     args.push_back("-at");
-    args.push_back("windows");
+    args.push_back("mixed");
     args.push_back(str);
     return runcmd("cygpath", args);
 #else

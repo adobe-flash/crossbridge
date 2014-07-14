@@ -1,2 +1,0 @@
-#undef SIZEOF_LONG
-#undef SIZEOF_VOID_P

@@ -54,8 +54,28 @@ static void llog(const char *fmt, ...)
 #endif
 
 #include <memory>
-#include <tr1/unordered_set>
-#include <tr1/unordered_map>
+
+// To avoid problem with non-clang compilers not having this macro.
+#if defined(__has_include)
+	#if __has_include(<unordered_map>)
+		#include <unordered_map>
+		#include <unordered_set>
+	#else
+		#include <tr1/unordered_map>
+		#include <tr1/unordered_set>
+		namespace std {
+			using tr1::unordered_map;
+			using tr1::unordered_set;
+		}
+	#endif
+#else
+	#include <tr1/unordered_map>
+	#include <tr1/unordered_set>
+	namespace std {
+		using tr1::unordered_map;
+		using tr1::unordered_set;
+	}
+#endif
 
 using namespace llvm;
 
@@ -110,13 +130,13 @@ bool VirtRegReduction::runOnMachineFunction(MachineFunction &MF)
   llog("starting vrr... %s (%d)\n", FN.c_str(), (int)time(NULL));
   llog("starting immRegs finder... (%d)\n", (int)time(NULL));
 #endif
-  std::auto_ptr<std::tr1::unordered_set<unsigned> > immRegsHolder;
-  std::tr1::unordered_set<unsigned> *immRegs = NULL;
+  std::auto_ptr<std::unordered_set<unsigned> > immRegsHolder;
+  std::unordered_set<unsigned> *immRegs = NULL;
   
   // single-def regs defined by a MoveImm shouldn't coalesce as we may be
   // able to fold them later
   {
-    std::tr1::unordered_map<unsigned, const MachineInstr *> singleDef;
+    std::unordered_map<unsigned, const MachineInstr *> singleDef;
 
     MachineFunction::const_iterator I = MF.begin(), E = MF.end();
 
@@ -134,7 +154,7 @@ bool VirtRegReduction::runOnMachineFunction(MachineFunction &MF)
          if(II->isReg() && II->isDef())
          {
            unsigned R = II->getReg();
-           std::tr1::unordered_map<unsigned, const MachineInstr *>::iterator SI = singleDef.find(R);
+           std::unordered_map<unsigned, const MachineInstr *>::iterator SI = singleDef.find(R);
 
            if(SI == singleDef.end())
              singleDef[R] = BI; // first seen! insert
@@ -144,14 +164,14 @@ bool VirtRegReduction::runOnMachineFunction(MachineFunction &MF)
       }
     }
 
-    std::tr1::unordered_map<unsigned, const MachineInstr *>::const_iterator SI = singleDef.begin(), SE = singleDef.end();
+    std::unordered_map<unsigned, const MachineInstr *>::const_iterator SI = singleDef.begin(), SE = singleDef.end();
 
     for(; SI != SE; SI++)
     {
       if(SI->second && SI->second->getDesc().isMoveImmediate()) // single def imm?
       {
         if(!immRegs)
-          immRegsHolder.reset(immRegs = new std::tr1::unordered_set<unsigned>);
+          immRegsHolder.reset(immRegs = new std::unordered_set<unsigned>);
         immRegs->insert(SI->first); // don't coalesce
       }
     }
@@ -161,15 +181,15 @@ bool VirtRegReduction::runOnMachineFunction(MachineFunction &MF)
   llog("starting tdkRegs finder... (%d)\n", (int)time(NULL));
 #endif
 
-  std::auto_ptr<std::tr1::unordered_set<unsigned> > tdkRegsHolder;
-  std::tr1::unordered_set<unsigned> *tdkRegs = NULL;
+  std::auto_ptr<std::unordered_set<unsigned> > tdkRegsHolder;
+  std::unordered_set<unsigned> *tdkRegs = NULL;
   
   bool setjmpSafe = !MF.callsSetJmp() && MF.getFunction()->doesNotThrow();
 
   {
-    tdkRegsHolder.reset(tdkRegs = new std::tr1::unordered_set<unsigned>);
+    tdkRegsHolder.reset(tdkRegs = new std::unordered_set<unsigned>);
 
-    std::tr1::unordered_map<unsigned, unsigned> trivialDefKills;
+    std::unordered_map<unsigned, unsigned> trivialDefKills;
 
     MachineFunction::const_iterator I = MF.begin(), E = MF.end();
 
@@ -177,7 +197,7 @@ bool VirtRegReduction::runOnMachineFunction(MachineFunction &MF)
     // unsafe (due to setjmp) calls + side-effecty operations
     for(; I != E; I++)
     {
-      std::tr1::unordered_set<unsigned> defs;
+      std::unordered_set<unsigned> defs;
 
       MachineBasicBlock::const_iterator BI = I->begin(), BE = I->end();
 
@@ -198,7 +218,7 @@ bool VirtRegReduction::runOnMachineFunction(MachineFunction &MF)
          if(II->isReg() && II->isUse())
          {
            unsigned R = II->getReg();
-           std::tr1::unordered_set<unsigned>::const_iterator DI = defs.find(R);
+           std::unordered_set<unsigned>::const_iterator DI = defs.find(R);
 
            if(DI == defs.end())
              trivialDefKills[R] = 100;
@@ -210,7 +230,7 @@ bool VirtRegReduction::runOnMachineFunction(MachineFunction &MF)
          if(II->isReg() && II->isKill())
          {
            unsigned R = II->getReg();
-           std::tr1::unordered_set<unsigned>::const_iterator DI = defs.find(R);
+           std::unordered_set<unsigned>::const_iterator DI = defs.find(R);
 
            if(DI != defs.end())
            {
@@ -229,7 +249,7 @@ bool VirtRegReduction::runOnMachineFunction(MachineFunction &MF)
       }
     }
 
-    std::tr1::unordered_map<unsigned, unsigned>::const_iterator DKI = trivialDefKills.begin(),
+    std::unordered_map<unsigned, unsigned>::const_iterator DKI = trivialDefKills.begin(),
         DKE = trivialDefKills.end();
 
     for(; DKI != DKE; DKI++)
@@ -241,9 +261,9 @@ bool VirtRegReduction::runOnMachineFunction(MachineFunction &MF)
   llog("starting conflict graph construction... (%d)\n", (int)time(NULL));
 #endif
 
-  std::tr1::unordered_set<unsigned>::const_iterator tdkE = tdkRegs->end();
+  std::unordered_set<unsigned>::const_iterator tdkE = tdkRegs->end();
 
-  std::tr1::unordered_set<unsigned> *okRegs = NULL;
+  std::unordered_set<unsigned> *okRegs = NULL;
 
   if(!setjmpSafe)
     okRegs = tdkRegs;
@@ -324,12 +344,12 @@ bool VirtRegReduction::runOnMachineFunction(MachineFunction &MF)
   llog("starting vreg=>vreg construction... (%d)\n", (int)time(NULL));
 #endif
 
-	typedef std::tr1::unordered_map<unsigned, unsigned> VRegMap;
+	typedef std::unordered_map<unsigned, unsigned> VRegMap;
 	VRegMap Regs;
 
 	// build up map of vreg=>vreg
 	{
-		std::tr1::unordered_map<const TargetRegisterClass *, std::tr1::unordered_map<unsigned, unsigned> > RCColor2VReg;
+		std::unordered_map<const TargetRegisterClass *, std::unordered_map<unsigned, unsigned> > RCColor2VReg;
 
 		ConflictGraph::Coloring::const_iterator I = coloring.begin(), E = coloring.end();
 
@@ -338,7 +358,7 @@ bool VirtRegReduction::runOnMachineFunction(MachineFunction &MF)
 			unsigned R = I->first;
 			unsigned Color = I->second;
 			const TargetRegisterClass *RC = RI->getRegClass(R);
-			std::tr1::unordered_map<unsigned, unsigned> &Color2VReg = RCColor2VReg[RC];
+			std::unordered_map<unsigned, unsigned> &Color2VReg = RCColor2VReg[RC];
 
 			VRegMap::const_iterator CI = Color2VReg.find(Color);
 

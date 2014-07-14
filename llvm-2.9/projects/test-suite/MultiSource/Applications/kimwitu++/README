@@ -1,0 +1,105 @@
+ =--------------
+ =
+ =  The Term Processor Kimwitu++
+ =
+ =--------------
+
+
+Kimwitu++ is a system that supports the construction of programs that use
+trees or terms as their main data structure.
+For the Kimwitu++ web site (including newest version) have a look at
+its homepage on http://site.informatik.hu-berlin.de/kimwitu++. 
+Kimwitu++ is derived from Kimwitu 4.4, see http://purl.oclc.org/net/kimwitu.
+
+
+
+How is this distribution structured?
+
+  Sources:
+	src/*
+	src/Gen.boot/*
+
+    The Term Processor was made using itself.
+    The src directory contains the `real' *.k (Kimwitu++ input) sources.
+    The src/Gen.boot directory contains the *.{h,cc} kc++-generated files
+    that you need to bootstrap it.
+    A src/Gen.* directory, where * is your target architecture, will be
+    created while kc++ is being made. It will contain (links to) the
+    kc-generated files used for boot-strapping, the compiled .o files
+    and the linked binary executable kc++.
+
+  Manual:
+	man/man/kc++.1
+
+    Tells you all you need to know to invoke kc++ (Kimwitu++).
+
+  Documentation:
+	doc/*
+
+    The documentation is not yet avaiable. You can use the documentation
+    for Kimwitu instead, using a short kc->kc++ transition guide.
+
+
+How do I install Kimwitu?
+
+  Please refer to INSTALL.
+
+
+Which architectures are supported?
+
+  Kimwitu++ just reads and writes text files, in principle it should run
+  on any architecture you can think of.
+  Development is done mainly on Solaris and GNU/Linux, these will be supported
+  best. Probably also Windows NT.
+
+
+Do I need a running Kimwitu++ to install Kimwitu++?
+
+  No, you don't. src directory contains everything needed to bootstrap
+  Kimwitu++.
+
+
+Why do you bother me with all this non-sense about bootstrapping and all?
+
+  If you ever need to apply a patch, you will need to know how to change
+  Kimwitu++, and you will need the `real' *.k sources of Kimwitu++, not the
+  generated *.{h,cc} stuff in src.
+
+
+How do I make changes in Kimwitu++?
+
+  You don't want to. You ask us to change Kimwitu++ if you find anything that
+  needs to be changed.
+
+  But, if you need to change anything in the sources of Kimwitu++, you should
+  make your change in the src directory, *not* in the Gen.* directory, because
+  the contents of that directory will be overwritten during the making of the
+  new Kimwitu++.
+  Note that in this case you will *need* a running Kimwitu++ to build the new
+  one. After making your changes, execute `make' or `make s1' in the src
+  directory. If everything is ok, you will find a new binary src/Gen.*/kc++_s1.
+
+
+Who should I contact if I find anything that needs to be changed?
+(Or have other questions related to Kimwitu++.)
+
+  For original Kimwitu it is:
+    Axel Belinfante <belinfan@cs.utwente.nl> tel.  +31/53 4893774
+    You can contact me for any question related to Kimwitu.
+
+  For Kimwitu++, please contact:
+    Martin von Löwis <loewis@informatik.hu-berlin.de> or
+    Michael Piefel <piefel@informatik.hu-berlin.de>,
+    both from Humboldt-University, Berlin
+
+
+What is the licence?
+  
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the Licence, or
+  (at your option) any later version.
+  Please refer to the file GPL containing the GNU General Public License in
+  version 2. The terms of the licence allow the development of commercial
+  software with Kimwitu++.
+

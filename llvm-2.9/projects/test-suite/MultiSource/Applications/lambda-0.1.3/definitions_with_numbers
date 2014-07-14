@@ -1,0 +1,104 @@
+def LIST map suc(append 2(append 1 end))
+def mknode (^a.^b.^u.u a b false)
+def head (^n.n sel_1)
+def tail (^n.n sel_2)
+def is_end (^n.n sel_3)
+def sel_1 (^p.^q.^r.p)
+def sel_2 (^p.^q.^r.q)
+def sel_3 (^p.^q.^r.r)
+def nth ^n.^list.head((pred n) tail list)
+def renda ^e.^&u.&u e e true
+def rend (^x.renda(x x))(^x.renda(x x))
+def nend ^u.u 0 0 true
+def end ^&u.&u rend rend true
+def Appenda ^h.^n.^list.(is_end list)(mknode n end)(mknode(head list)(h n(tail list)))
+def append (^x.Appenda(x x))(^x.Appenda(x x))
+def Mapa ^h.^f.^list.(is_end list)(end)(mknode(f (head list))(h f (tail list)))
+def map (^x.Mapa(x x))(^x.Mapa(x x))
+def mtriple ^a.^b.^c.^u.u a b c
+def 1st ^a.^b.^c.a
+def 2nd ^a.^b.^c.b
+def 3rd ^a.^b.^c.c
+def div_cond ^p.GE(p 1st)(p 2nd)
+def div_body ^t.mtriple(sub (t 1st)(t 2nd))(t 2nd)(suc(t 3rd))
+def div ^m.^n.while div_cond div_body (mtriple m n 0)3rd
+def sub ^m.^n.n pred m
+def force ^$.$
+def pred_body ^p.mpair (suc(p true))(p true)
+def do ^n.^b.^x.n b x
+def c1 ^p.not(iszero(p true))
+def btri ^p.mpair(pred(p true))(add(p true)(p false))
+def tri ^k.while c1 btri(mpair k 0)false
+def Wh ^f.^c.^b.^x.(c x) (f c b (b x)) x
+def while (^x.Wh(x x))(^x.Wh(x x))
+def G ^g.^f.f(g f)
+def Y2d Y G
+def Y2 (^x.G(x x))(^x.G(x x))
+def Y3 Y2 G
+def Y4 Y3 G
+def Y5 Y4 G
+def YC S(S(K PHI)I)(S(K PHI)I)
+def PHI  S(K W)(S(K B)I)
+def W ^f.^x.f x x
+def S ^x.^y.^z.x z(y z)
+def B ^x.^y.^z.x(y z)
+def K ^x.^y.x
+def I ^x.x
+def true ^p.^q.p
+def false ^p.^q.q
+def and ^a.^b.a b false
+def or ^a.^b.a true b
+def not ^r.^p.^q.r q p
+def mpair ^a.^b.^u.u a b
+def iszero ^n. n (true false) true
+def pred ^$k.$k(^p.(mpair(suc(p true))(p true)))(mpair 0 0)false
+def add ^m.^n.m suc n
+def mul ^m.^n.m(add n)0
+def exp ^m.^n.n(mul m)1
+def Y ^f.(^x.f(x x))(^x.f(x x))
+def F ^h.^n.(iszero n) 1 (mul n (h(pred n)))
+def fact (^x.F(x x))(^x.F(x x))
+def H ^h.or(not h)A
+def ADD ^m.^n.^x.^y.m x(n x y)
+def MUL ^m.^n.^f.m(n f)
+def EXP ^m.^n.n m
+def GT ^m.^n.not(iszero (n pred m))
+def EQ ^m.^n.and (iszero (m pred n)) (iszero (n pred n))
+def LT ^m.^n.not(iszero(m pred n))
+def GE ^m.^n.not(LT m n)
+def YH ^f.(^x.f(^h.x x h))(^x.f(^h.x x h))
+def YG ^f.(^x.^g.f(x x)g)(^x.^g.f(x x)g)
+def S ^x.^y.^z.x z(y z)
+def K ^x.^y.x
+def I ^x.x
+def triple ^x.^y.^z.^p.p x y z
+def sel1 ^x.^y.^z.x
+def sel2 ^x.^y.^z.y
+def sel3 ^x.^y.^z.z
+def isend ^t.t sel3
+def lpair ^a.^b.triple a b false
+def B ^x.^y.^z.x(y z)
+def W ^f.^x.f x x
+def 0 ^m.^n.n
+def suc ^p.^m.^n.m(p m n)
+def 1 ^m.^n.m n
+def 2 ^m.^n.m(m n)
+def 3 ^m.^n.m(m(m n))
+def 4 ^m.^n.m(m(m(m n)))
+def 5 ^m.^n.m(m(m(m(m n))))
+def 6 ^m.^n.m(m(m(m(m(m n)))))
+def 7 ^m.^n.m(m(m(m(m(m(m n))))))
+def 8 ^m.^n.m(m(m(m(m(m(m(m n)))))))
+def 9 ^m.^n.m(m(m(m(m(m(m(m(m n))))))))
+def 10 ^m.^n.m(m(m(m(m(m(m(m(m(m n)))))))))
+def 11 ^m.^n.m(m(m(m(m(m(m(m(m(m(m n))))))))))
+def 12 ^m.^n.m(m(m(m(m(m(m(m(m(m(m(m n)))))))))))
+def 13 ^m.^n.m(m(m(m(m(m(m(m(m(m(m(m(m n))))))))))))
+def 14 ^m.^n.m(m(m(m(m(m(m(m(m(m(m(m(m(m n)))))))))))))
+def 15 ^m.^n.m(m(m(m(m(m(m(m(m(m(m(m(m(m(m n))))))))))))))
+def 16 ^m.^n.m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m n)))))))))))))))
+def 17 ^m.^n.m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m n))))))))))))))))
+def 18 ^m.^n.m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m n)))))))))))))))))
+def 19 ^m.^n.m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m n))))))))))))))))))
+def 20 ^m.^n.m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m(m n)))))))))))))))))))
+

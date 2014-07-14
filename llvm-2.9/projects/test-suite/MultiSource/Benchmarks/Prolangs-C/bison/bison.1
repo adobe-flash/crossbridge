@@ -1,0 +1,96 @@
+.TH BISON 1 local
+.SH NAME
+bison \- GNU Project parser generator (yacc replacement)
+.SH SYNOPSIS
+.B bison
+[
+.B \-dlvty
+] file
+.SH DESCRIPTION
+.I Bison
+is a parser generator in the style of
+.IR yacc (1).
+It should be upwardly compatible with input files designed
+for
+.IR yacc .
+.PP
+Input files should follow the
+.I yacc
+convention of ending in ``.y''.
+Unlike
+.IR yacc ,
+the generated files do not have fixed names, but instead use the prefix
+of the input file.
+For instance, a grammar description file named
+.B parse.y
+would produce the generated parser in a file named
+.BR parse.tab.c ,
+instead of
+.IR yacc 's
+.BR y.tab.c .
+.PP
+.I Bison
+takes five optional flags.
+.TP
+.B \-d
+Produce a
+.B .tab.h
+file, similar to
+.IR yacc 's
+.B y.tab.h
+file.
+.TP
+.B \-l
+Omit
+.B #line
+lines in the parser output file. Error messages from the C compiler will
+then be associated with lines in the parser output file, instead of lines
+in the original grammar file.
+.TP
+.B \-t
+Turn on debugging. This option causes the
+.I bison
+output to have debugging code made available via the C pre-processor.
+The external variable
+.B yydebug
+should be made non-zero to have the debugging code actually
+produce output.
+.TP
+.B \-v
+Be verbose. Analogous to the same flag for
+.IR yacc .
+.TP
+.B \-y
+Use fixed output file names. I.e., force the output to be in files
+.BR y.tab.c ,
+.BR y.tab.h ,
+and so on. This is for full
+.I yacc
+compatibility.
+.PP
+If
+.I bison
+is invoked with the name
+.IR yacc ,
+it will behave like
+.I yacc
+does. This is equivalent to simply supplying the
+.B \-y
+flag.
+.SH FILES
+/usr/local/lib/bison.simple	simple parser
+.br
+/usr/local/lib/bison.hairy	complicated parser
+.SH SEE ALSO
+.IR yacc (1)
+.br
+The
+.IR "Bison Reference Manual" ,
+included as the file
+.B bison.texinfo
+in the
+.I bison
+source distribution.
+.SH DIAGNOSTICS
+``Self explanatory.''
+... ha!

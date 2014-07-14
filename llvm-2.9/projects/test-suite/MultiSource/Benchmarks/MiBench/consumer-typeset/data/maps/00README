@@ -1,0 +1,105 @@
+Directory lout/maps - Lout Character Mapping (LCM) files
+
+Jeffrey H. Kingston
+14 March 1996
+
+This directory contains Lout Character Mapping (LCM) files, which define
+the names and codes of all characters known to Lout, plus various mappings.
+Lout works with all characters via their codes, so it is not possible to
+have an unencoded character.
+
+LCM files replace the CEV and CMA files of previous versions of Lout.  The
+format has changed but the information in the files is consistent with the
+old CEV and CMA files (no changes to the encodings, etc.).  The format
+change was needed to implement kerning of accented characters.
+
+LCM files may contain blank lines and comment lines (which begin with #).
+Each of the remaining lines defines one character, and must contain the
+following entries, in order, separated by white space:
+
+(1) Decimal character code, which must be unique in this file.  These codes
+    must appear sorted into increasing order.  Codes not mentioned in this
+    file have no associated character.
+
+(2) Octal value of the decimal code, written in ASCII.
+
+(3) Character name.  Width and height information for a character with this
+    name must exist in every PostScript font metrics file that shares a Lout
+    fontdef with this file, but the character name need not be encoded in the
+    font metrics file, nor need any character code there agree with the
+    character code here.  Lout will ensure (by including encoding vectors
+    in its output) that the character codes defined in this file apply, not
+    the codes in font metrics files.
+    
+    The character name may be -none-, and this is equivalent to omitting the
+    line.  There must be no subsequent entries on the line in this case.
+
+    If the character has entry UA below, and there is no kerning information
+    for the character in the font metrics file, Lout will apply the kerning
+    information for the corresponding unaccented character to the accented
+    character.  This is always a good thing to do.
+
+    If the character has entry UA below, and there is no entry in some
+    font metrics file for the character, then (contrary to the above)
+    instead of complaining that the character is missing from the font
+    metrics file, Lout will silently apply the size information for
+    the corresponding unaccented character to the accented character.
+    Lout will still print the character code for the accented character,
+    however.  This is always good horizontally but occasionally not
+    enough space is allowed for the character vertically.
+
+(4) Zero or more functions, each beginning with a string identifying which
+    function it is, and followed by function-dependent information ending
+    in a semicolon.  Functions may appear in any order; omitting a function
+    is fine and means that the function does not apply to that character.
+    At present the functions are
+    
+	UC <charname>;   Corresponding upper-case character (must be the
+			 name of a character appearing elsewhere in the
+			 same file).  This entry is used by Lout when
+			 producing small capitals.
+
+        LC <charname>;   Corresponding lower-case character (must be the
+			 name of a character appearing elsewhere in the
+			 same file).  This entry is not currently used.
+
+        UA <charname>;   Corresponding unaccented character (must be the
+			 name of a character appearing elsewhere in the
+			 same file).  This entry is used by Lout to
+			 guess size and kerning information for accented
+			 characters (when this information is missing from
+			 some font metrics file) by using the size and
+			 kerning information of the corresponding unaccented
+			 character.
+
+	AC <charname>;   Name of the accent character (acute, ogonek, etc.)
+			 that forms the accent of this character (must be the
+			 name of a character appearing elsewhere in the
+			 same file).  This entry is not currently used.
+
+The particular LCM files in this directory are:
+
+    Std.LCM       The StandardEncoding encoding vector, exactly as on page
+                  598 of the PostScript LRM 2nd Ed., plus the mappings.
+
+    Latin1.LCM    The ISOLatin1Encoding encoding vector, exactly as on page
+                  599 of the PostScript LRM 2nd Ed., plus the mappings.
+                  This is not usable with Lout as is because the ligature
+                  characters fi and fl have no encoding, and because the
+                  standard packages use characters not in this encoding.
+
+    LtLatin1.LCM  Equal to Latin1.LCM augmented with some other characters
+		  used by Lout and its standard packages.  See the header
+		  in the file for the details.
+
+    LtLatin2.LCM  Similar to LtLatin1.LCM but uses the Latin2 character set.
+
+    koi8r.LCM     For Russian
+
+    Symb.LCM      The Symbol encoding vector, exactly as on page 606 of the
+		  PostScript LRM 2nd Ed., plus mappings.
+
+    Ding.LCM      The Zapf Dingbats encoding vector, taken from the Zapf
+		  Dingbats font metrics file, plus mappings.
+
+    null.LCM      Useful skeleton file for building LCM files.

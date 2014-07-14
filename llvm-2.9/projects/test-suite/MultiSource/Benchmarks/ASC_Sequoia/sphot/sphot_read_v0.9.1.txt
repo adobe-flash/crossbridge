@@ -1,0 +1,468 @@
+
+  SPhot - Monte Carlo Transport Code
+
+*Privacy & Legal Notice* <http://www.llnl.gov/disclaimer.html>
+------------------------------------------------------------------------
+
+
+    Contents
+
+    * Code Description 
+    * Files in this Distribution 
+    * Building the Code 
+    * Running the Code 
+    * Timing Issues 
+    * Expected Results  
+
+------------------------------------------------------------------------
+
+
+    Code Description
+
+
+      A. General Description
+
+SPhot is a 2D photon transport code. Photons are born in hot matter and
+tracked through a spherical domain that is cylindrically symmetric on a
+logically rectilinear, 2D mesh. Many application codes at LLNL implement
+some form of this basic algorithm. The version implemented here exploits
+both MPI and OpenMP parallelism. The code is written in Fortran77.
+
+Monte Carlo transport solves the Boltzmann transport equation by
+directly mimicking the behavior of photons as they are born in hot
+matter, move through and scatter in different materials, are absorbed or
+escape from the problem domain.
+
+The logically rectilinear, 2D mesh in which particles are tracked, is
+internally generated. The mesh is small enough that a complete copy of
+the mesh will not only fit on each node in a parallel machine, but also
+fit into cache memory in most modern CPUs. Thus, this benchmark does not
+stress memory access.
+
+Particles are born with an energy and direction that are determined by
+using random numbers to sample from appropriate distributions. Likewise,
+scattering and absorption are also modeled by randomly sampling cross
+sections. The random number generator used is implemented in the code
+using integer arithmetic in a way that makes the resulting pseudo-random
+number sequence portably reproducible across different machines.
+
+The use of random numbers makes the code's output (edit variables)
+"noisy." This noise is a direct result of the discrete nature of the
+simulation. The level of the noise can be reduced by increasing the
+number of particles that are used in the simulation. Unfortunately, the
+level of noise in the answer decreases only very slowly with increasing
+computational effort. The noise is inversely proportional to the square
+root of the number of particles. If the noise is to be reduced to 1% of
+the value in a given simulation, it is necessary to run 10,000 times as
+many particles. Thus, high-quality (low-noise) simulations can become
+very computationally expensive. Parallelism is an obvious way to
+increase the number of particles.
+
+
+      B. Coding
+
+With the exception of a single routine (rdinput.f) that includes
+Fortran90 derived type usage, SPhot is coded entirely in Fortran77.
+Parallelism is implemented through the use of both MPI and OpenMP
+libraries.
+
+
+      C. Parallelization
+
+SPhot falls into the category of "embarrassingly parallel" applications.
+Every CPU that is employed in the computation works on a local copy of
+the 2D mesh (most likely stored in cache), generates its own random
+numbers and performs its own particle trackings. For the most part,
+tasks do not exchange data with each other. The minimal communications
+that do occur take place between the "master" MPI task and all other MPI
+tasks for the purposes of distributing input data, updating global
+variables and collecting timing statistics. Additionally, several
+synchronization constructs are necessitated at both the MPI and OpenMP
+level.
+
+Parallelism in SPhot is implemented as a mixed-mode/hybrid model. It is
+required that both MPI and OpenMP be used during execution, however
+there is much flexibility for the user to choose how many MPI tasks and
+OpenMP threads are used. In the most general sense, the MPI parallelism
+is designed to provide communication between separate, distributed
+memory machines, which may or may not be SMPs. Each machine hosts an MPI
+task that oversees the OpenMP threaded execution of SPhot on that
+machine, and facilitates required communications with MPI tasks on other
+machines. However, having only one MPI task per machine is entirely up
+to the user. Multiple MPI tasks can be run on a machine if this is
+desired. Or, if the machine architecture employs global address space,
+only a single MPI task may be required for the entire execution.
+
+The OpenMP parallelism is strictly "on-node" (shared memory) execution
+for SMP machines. Every OpenMP thread is "owned" by a single MPI task
+with a ratio of /n:1/, where /n/ varies with the user-specified number
+of OpenMP tasks. As with the number of MPI tasks, there is no explicit
+specification within SPhot for the number of OpenMP threads which must
+be used. Instead, these are specified by the user through the use of
+environment variables or command line flags at run time. In this manner,
+the same code can adapt to a diverse set of architectures and conditions.
+
+------------------------------------------------------------------------
+
+
+    Files in This Distribution
+
+The following files are included in this distribution of SPhot:
+
+      Subdirectory 	Files 	Comments
+        	Makefile 	Main makefile for SPhot
+      opac.txt 	Required opacity library
+      input.dat 	Input file
+      bin 	(none) 	Initially empty - used to keep objects after
+      compilations
+      includes 	geomz.inc
+      globals.inc
+      params.inc
+      pranf.inc
+      randseed.inc
+      shared.inc
+      times.inc 	Required include files
+      src 	Makefile.src
+      allocdyn.f
+      copyglob.f
+      copypriv.f
+      copyseed.f
+      execute.f
+      genmesh.f
+      genstats.f
+      genxsec.f
+      interp.f
+      iranfeven.f
+      iranfodd.f
+      plnkut.f
+      pranf.f
+      ranf.f
+      ranfatok.f
+      ranfk.f
+      ranfkbinary.f
+      ranfmodmult.f
+      rans.f
+      rdinput.f
+      rdopac.f
+      second.f
+      seedranf.f
+      sphot.f
+      thom.f
+      writeout.f
+      wroutput.f
+      zonevols.f 	All Fortran source files and required makefile
+
+------------------------------------------------------------------------
+
+
+    Building the Code
+
+Building SPhot is fairly simple and straightforward:
+
+   1. *Perform Makefile Modifications*
+
+      Two makefiles are used to build the code:
+
+      Makefile
+      src/Makefile.src
+
+      Both of these makefiles will require manual modifications to
+      several parameters prior to attempting to build the code. The
+      parameters which require manual modification are clearly marked
+      with a "***Modifications Required*** notice, and include such
+      things as choice of compiler, compiler flags, library directories
+      and libraries. Note that with the exception of the rdinput.f file,
+      all source files are Fortran77. The rdinput.f routine uses Fortran
+      90 derived data type syntax and will therefore require a compiler
+      that can handle such.
+
+      It is important to mention that this code is implemented with both
+      MPI and OpenMP. Specifying the necessary platform dependent
+      parameters to enable both of these is essential.
+
+      Additionally, both makefiles permit the specification of C
+      language parameters, even though SPhot itself does not use any C
+      files. The reason for this is merely convenience in case there is
+      a desire to introduce C language profilers, timing tools or
+      something similar.
+
+   2. *Modify Global Parameters*
+
+      SPhot has a number of parameters which are "hardcoded" in its
+      various include files. In most cases, these do not require
+      modification. However, it is quite possible that for larger runs,
+      several of these parameters may be too small and require
+      modification. Each of these is discussed in the table below.
+
+      Parameter 	Where Located 	Instructions
+      *maxruns* 	includes/params.inc 	Establishes the maximum value for
+      the Nruns input file parameter. Must be at least equal to (Number
+      of MPI tasks * Number of OpenMP threads). Default value is 65537.
+      Requires source code to be recompiled if modified.
+      *MaxStreams* 	includes/pranf.inc 	Must be equal to or greater than
+      the previous maxruns parameter. Must always be an odd number.
+      Default value is 65537. Requires source code to be recompiled if
+      modified.
+      *maxMPItasks* 	includes/times.inc 	Establishes the maximum number
+      of MPI tasks. Default value is 16384. Requires source code to be
+      recompiled if modified.
+      *maxThreadsPerMPItask* 	includes/times.inc 	Establishes the
+      maximum number of OpenMP threads per MPI task. Default value is
+      128. Requires source code to be recompiled if modified.
+
+   3. *Make*
+
+      In the main directory, simply issue the make command. This will
+      invoke the primary Makefile, which in turn will invoke the
+      src/Makefile.src makefile. The files in the src subdirectory will
+      then be compiled and their objects copied to the bin directory.
+      The sphot executable will be created and copied into the main
+      directory.
+
+   4. *Cleanup*
+
+      Invoking the command make clean in the main directory will remove
+      all object files in the bin subdirectory and the sphot executable.
+
+------------------------------------------------------------------------
+
+
+    Running the Code
+
+Several steps are required to execute SPhot. These are listed below.
+
+   1. *Set the Nruns Input File Parameter*
+
+      The distribution input file input.dat specifies a number of
+      parameters that control the execution of SPhot. It is usually
+      necessary to change only one of these - the Nruns parameter. Nruns
+      represents the "number of runs" that should be conducted. It must
+      be evenly divisible by the (Number of MPI tasks * Number of OpenMP
+      threads). To change Nruns, simply edit the input.dat file. Nruns
+      appears as the single integer value on the first line of the file.
+
+      Note that the default maximum value for Nruns is 65537. If this
+      value is too small and must be increased, then an include file
+      must be modified and the source recompiled. See the Building the
+      Code  section for additional instructions.
+
+      The three tables below show:
+
+          * The raw format of input.dat upon distribution
+          * A description of each input.dat parameter
+          * Examples of how the Nruns parameter may be changed. 
+
+      *Raw format of input.dat file* (Nruns parameter in blue)
+
+
+
+        *16*
+
+BENCHMARK CASE NO THOMS, NO RR/SPLIT: 49X40, BWGT=3.12e+14
+
+         1         0
+
+      4000         0         0         0         0         0         0
+
+        49        40         2
+
+  1.00e-10  7.50e-01  1.00e-12  1.05e+00
+
+  1.80e+02  1.00e-03  5.00e-01  3.12e+12
+
+         1       980
+
+       981      1960
+
+         3 4.000e-01 1.000e+03 2.000e+04
+
+         2 5.000e-01 1.000e+02 1.000e+03
+      
+         0
+
+      *Description of input.dat parameters*
+      *
+
+Field    Format   Comments
+
+Name
+
+      *
+
+
+
+Nruns     i4     Number of runs. Should be evenly divided by the 
+
+                 number of MPI tasks and OpenMP threads.
+
+title     20a4   Title information
+
+ilib      i10    opacity library format: 0=binary 1=formatted
+
+illib     i10    bin library usage:    
+
+                 0=use old bin.lib 1=form new bin.lib
+
+npart     i10    # of particles
+
+igroup    i10    energy bins (0=12, 1-12=1, 13=ross.mean)
+
+ixopec    i10    opacity (0=library, 1=input,2=data)
+
+isorst    i10    source (1=uniform in sphere, 2=plankian)
+
+irr       i10    r-roulette/split (0=none, 1=impt, 2=size)
+
+ithom     i10    thomson scattering (0=not used, 1=used)
+
+icross    i10    print cross sections (0= no, 1= yes)
+
+naxl      i10    number of axial meshes
+
+nradl     i10    number of radial meshes
+
+nreg      i10    number of material regions
+
+dtol      e10.2  tolerance to cell boundaries (cm)
+
+wcut      e10.2  low weight cutoff
+
+tcen      e10.2  time to census (sec)
+
+xmult     e10.2  weight mult. for russian roulette
+
+axl       e10.2  portion of sphere analyzed (degrees)
+
+radl      e10.2  sphere radius (cm)
+
+opec      e10.2  input opacity (1/cm)
+
+bwgt      e10.2  bundle weight (kev)
+
+matb,mat  i10    material region begin/end pair.  One pair for each of 
+
+                 nreg materials
+
+mtl       i10    Material - one value for each of nreg materials. 
+
+                 1=h 2=sio2 3=dt 4=c
+
+atrat     e10.3  Atomic Ratio - one value for each of nreg materials
+
+dns       e10.3  Density - one value for each of nreg materials
+
+tmp       e10.3  Temperature - one value for each of nreg materials
+
+prtflg    i5     Print flag to select level of output( see summary page for detail)
+
+      *Examples of how the Nruns parameter might be modified*
+      Number of MPI Tasks 	Number of OpenMP
+      Threads per MPI task 	Possible Values for NRuns
+      1 	1 	1, 2, 3...
+      1 	16 	16, 32, 64...
+      1 	1000 	1000, 2000, 3000...
+      16 	4 	64, 128, 256...
+      256 	4 	1024, 2048, 3072...
+      1000 	1 	1000, 2000, 3000...
+
+   2. *Specify the Number of MPI Tasks*
+
+      The method for doing this will vary from platform to platform but
+      will be typical for a given platform. For example, an IBM RS/6000
+      SP platform may use POE environment variables, such as MP_PROCS,
+      MP_NODES or MP_TASKS_PER_NODE. Alternately, the Compaq Tru64 Alpha
+      platform may use the prun -n command.
+
+      Note that the optimal number of MPI tasks to use on a platform
+      will also vary, a determination which is left up to the user. In
+      no case should the number of MPI tasks exceed the total number of
+      processors/cpus available.
+
+      The default maximum number of MPI tasks is 1024. If this value is
+      too small, then an include file must be modified and the source
+      recomplied. See the Building the Code section for additional instructions.
+
+   3. *Specify the Number of OpenMP Threads per MPI Task*
+
+      Specifying the number of OpenMP threads is done according to the
+      OpenMP standard by using either the platform default (usually the
+      number of cpus on a machine), or explicitly with the
+      OMP_NUM_THREADS environment variable. As with the number of MPI
+      tasks, determining the optimal number of OpenMP threads is left up
+      to the user, and will vary from platform to platform.
+
+      The default maximum number of OpenMP threads per MPI task is 128.
+      If this value is too small, then an include file must be modified
+      and the source recomplied. See the Building the Code
+      section for additional instructions.
+
+   4. *Invoke the Executable*
+
+      This will vary from platform to platform also, especially if a
+      "batch scheduling" system is used to run jobs. In the most simple
+      case, issuing a command similar to that shown below would work:
+
+        prompt> sphot <cr> 
+
+        where:
+
+      sphot is the executable
+
+      It is assumed that the input.dat file and opac.txt file are in the
+      same directory where sphot is invoked.
+
+------------------------------------------------------------------------
+
+
+    Timing Issues
+
+All timings are obtained through the use of the portable MPI wall clock
+timing routine, MPI_Wtime(). Instrumentation occurs in several locations
+within the code, most importantly around the computational loop. Some
+instrumentations are trivial and one is actually unnecessary (the timing
+of the allocdyn.f routine).
+
+The execution time for one "run" of SPhot is platform dependent, but in
+any case does not require much time--usually only "seconds", and
+certainly much less than a minute on all current architectures tested.
+Most architectures tested demonstrated execution times of 10-20 seconds
+per run. Compiler optimization should improve execution times in most
+cases.
+
+Every task/thread maintains its own timings, which are collected and
+maintained globally by the "master" MPI task (rank=0). In this sense,
+the instrumentation of SPhot actually imposes some overhead. As the
+number of MPI tasks increases, so does the ratio of communication time
+to execution time. Since SPhot requires so little execution time per run
+to begin with, MPI overhead may gradually reduce the application's
+scalability for many-task runs. The associated MPI_Barrier calls
+required for synchronization (most notably in copypriv.f) will also
+incur additional overhead as the number of MPI tasks increase.
+
+The most important timing parameters are the loop speedup, program
+speedup and efficiency computations that appear at the end of the
+application's output (example output is available in the "Expected
+Results" section). These values reflect the scalability of the
+application on a given platform.
+
+Please see the Summary writeup for information about timing data to be
+reported.
+
+------------------------------------------------------------------------
+
+Expected Results
+
+Please see the Summary writeup for information about expected results and
+reporting of data.
+
+
+Version 0.9.1
+
+For more information about this page, contact:
+Tom Spelce, spelce1@llnl.gov
+
+<http://www.llnl.gov/>
+
+*UCRL-MI-144211*
+September 19, 2001
+

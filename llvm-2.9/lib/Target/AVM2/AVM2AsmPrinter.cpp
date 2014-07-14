@@ -72,7 +72,7 @@ cl::opt<bool> InstrumentFlasccFunctions(
   cl::desc("INERNAL flascc opt"),
   cl::Hidden);
 
-#ifndef __CYGWIN__
+#if !defined(__CYGWIN__) && !defined(__linux__)
 extern "C" char* __dtoa(double d, int mode, int ndigits, int *decpt,
             int *sign, char **rve);
 extern "C" void __freedtoa (char*);
@@ -477,12 +477,21 @@ public:
     }
 
     void printFloatImm(const MachineInstr *MI, int opNum, raw_ostream &OS) {
+        //union {
+        //    double d;
+        //    struct dword {
+        //        uint32_t hi, lo;
+        //    } dw;
+        //};
+        // 06.05.14. VPMedia
+        struct dword {
+            uint32_t hi, lo;
+        };
         union {
             double d;
-            struct dword {
-                uint32_t hi, lo;
-            } dw;
+            dword dw;
         };
+        
         dw.hi = MI->getOperand(opNum).getImm();
         dw.lo = MI->getOperand(opNum+1).getImm();
         char buf[512];
@@ -496,7 +505,7 @@ public:
             sprintf(&buf[0], "-%s.inf", getPackageName(*CurModule).c_str());
         } else {
             
-            #ifdef __CYGWIN__
+            #if defined(__CYGWIN__) || defined(__linux__)
             sprintf(&buf[0], "%.17e", d);
             #else
             // (s)printf is no good on mingw, it lacks the precision we need
@@ -1743,7 +1752,7 @@ extern "C" void LLVMInitializeAVM2AsmPrinter()
     RegisterAsmPrinter<AVM2AsmPrinter> X(TheAVM2Target);
 }
 
-#ifndef __CYGWIN__
+#if !defined(__CYGWIN__) && !defined(__linux__)
 extern "C" {
 #ifdef MULTIPLE_THREADS
     #undef MULTIPLE_THREADS

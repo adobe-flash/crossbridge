@@ -401,7 +401,7 @@ void dumpKanji(DataChunk *chunk)
 	outbuf = (char *)malloc(inbytes * 4 + 1);
 	outp = outbuf;
 	ret = iconv(conv, &inbuf, &inbytes, &outp, &outbytes);
-	if(ret < 0) { perror(NULL); }
+	if(ret == (size_t) -1) { perror(NULL); }
 	*outp = '\0';
 
 	printf("%s\n", outbuf);
@@ -558,7 +558,7 @@ void QRdata_dump(QRdata *data)
 	dumpChunks(data);
 }
 
-unsigned int QRcode_decodeVersion(QRcode *code)
+int QRcode_decodeVersion(QRcode *code)
 {
 	unsigned int v1, v2;
 	int x, y, width;

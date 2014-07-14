@@ -53,6 +53,9 @@ package com.adobe.flascc.vfs.zip {
 			}
 			return crcTable;
 		}
+        /* Constructor */
+        public function CRC32() {
+		}
 		
 		/**
 		 * Returns the CRC32 data checksum computed so far.

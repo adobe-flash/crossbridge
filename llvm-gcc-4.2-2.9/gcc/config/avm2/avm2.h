@@ -155,7 +155,7 @@ extern int avm2_regparm;
 #define SWFOPTS "--plugin-opt disableprojector --plugin-opt llc-opt --plugin-opt -target-player %{disable-telemetry: --plugin-opt disable-telemetry} %{!nostdlib: ISpecialFile.abc%s IBackingStore.abc%s IVFS.abc%s DefaultVFS.abc%s InMemoryBackingStore.abc%s PlayerKernel.abc%s --plugin-opt appendabc --plugin-opt PlayerCreateWorker.abc%s } "
 
 #undef CC1_SPEC
-#define CC1_SPEC "%{pthread: -pthread} -swf-version-internal=%{!swf-version=*:18}%{swf-version=*:%*} %{jvmopt=*:-jvmopt=%*} %{!jvmopt=*:-jvmopt=-Xmx1500M} %{ascopt=*:-ascopt=%*} %{emit-swf|emit-swc=*: -target-player } "
+#define CC1_SPEC "%{pthread: -pthread} -swf-version-internal=%{!swf-version=*:18}%{swf-version=*:%*} %{jvmopt=*:-jvmopt=%*} %{ascopt=*:-ascopt=%*} %{emit-swf|emit-swc=*: -target-player } "
 
 /*
 ** TODO: re-enable once falcon is thread-safe!
@@ -172,12 +172,13 @@ extern int avm2_regparm;
         %{O4|emit-llvm|flto: ;: %:useabcstdlibs() } \
         %{pthread: --plugin-opt pthread} \
         %{muse-legacy-asc:--plugin-opt llc-opt --plugin-opt -use-legacy-as3-asm } \
+        %{!muse-legacy-asc: %{!disable-falcon-parallel: -plugin-opt llc-opt --plugin-opt -falcon-parallel} } \
         %{!emit-swc=*: %{!emit-swf: %{!nostdlib: ISpecialFile.abc%s IBackingStore.abc%s IVFS.abc%s --plugin-opt appendabc --plugin-opt startHack.abc%s --plugin-opt appendabc --plugin-opt ShellCreateWorker.abc%s } } } \
         %{emit-swf: %<emit-swf " SWFOPTS " --plugin-opt symbolclass=%{!symbol-class=*:0:com.adobe.flascc::Console}%{symbol-class=*:%*} --plugin-opt appendabc --plugin-opt %{!symbol-abc=*:Console.abc%s}%{symbol-abc=*:%*} %{!no-swf-preloader: --plugin-opt swfpreloader --plugin-opt %{swf-preloader=*:%*;:DefaultPreloader.swf%s} \ } } \
         %{emit-swc=*: %<emit-swc=* " SWFOPTS " --plugin-opt emit-swc=%* } \
         %{enable-debugger: %<enable-debugger --plugin-opt enabledebugger } \
         %{swf-ns=*:--plugin-opt swf-ns=%*} \
-        %{jvmopt=*:--plugin-opt jvmopt=%*} %{!jvmopt=*:--plugin-opt jvmopt=-Xmx1500M} \
+        %{jvmopt=*:--plugin-opt jvmopt=%*} \
         %{g: --plugin-opt llc-opt --plugin-opt -gendbgsymtable --plugin-opt enabledebugger AlcDbgHelper.abc%s ELF.abc%s --plugin-opt codegen-opt --plugin-opt -disable-inlining} \
         %{!g:--plugin-opt codegen-opt --plugin-opt -strip-debug} \
         %{v:--plugin-opt verbose} \

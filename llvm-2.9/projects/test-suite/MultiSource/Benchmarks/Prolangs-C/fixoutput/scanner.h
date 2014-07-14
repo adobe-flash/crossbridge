@@ -1,0 +1,57 @@
+
+/*         USEFUL MACRO DEFINITIONS    */
+
+#define ERRORMSG_1               0
+#define LINE_1                   1
+#define ADDOP_1                  2
+#define PLUS_1                   '+'
+#define MINUS_1                  '-'
+#define OR_1                     260
+#define MULOP_1                  3
+#define TIMES_1                  '*'
+#define SLASH_1                  '/'
+#define AND_1                    259
+#define DIV_1                    261
+#define RELOP_1                  4
+#define EQUAL_1                  '='
+#define NOTEQUAL_1               256
+#define LESSTHANOREQUAL_1        257
+#define LESSTHAN_1               '<'
+#define GREATERTHANOREQUAL_1     258
+#define GREATERTHAN_1            '>'
+#define ASSIGN_1                 5
+#define COLON_1                  6
+#define DOTDOT_1                 7
+#define DOT_1                    8
+#define INTEGER_NUMBER_1         9
+#define ILLEGAL_1                0
+#define VALID_1                  1
+#define REAL_NUMBER_1            10
+#define PROGRAM_1                11
+#define VAR_1                    12
+#define INTEGER_1                13
+#define REAL_1                   14
+#define ARRAY_1                  15
+#define OF_1                     16
+#define FORWARD_1                17
+#define PROCEDURE_1              18
+#define FUNCTION_1               19
+#define BEGIN_1                  20
+#define END_1                    21
+#define READ_1                   22
+#define WRITE_1                  23
+#define WRITELN_1                24
+#define IF_1                     25
+#define THEN_1                   26
+#define ELSE_1                   27
+#define WHILE_1                  28
+#define DO_1                     29
+#define NOT_1                    30
+#define ID_1                     31
+#define LEFT_PAREN_1             32
+#define RIGHT_PAREN_1            33
+#define LEFT_BRACKET_1           34
+#define RIGHT_BRACKET_1          35
+#define COMMA_1                  36
+#define SEMICOLON_1              37
+

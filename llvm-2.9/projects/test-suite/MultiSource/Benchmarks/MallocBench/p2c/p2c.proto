@@ -1,0 +1,426 @@
+
+/* Declarations created by "makeproto" on Mon Feb 16 16:39:12 2004 */
+
+
+
+/* Declarations from trans.c */
+#ifdef PROTO_TRANS_C
+Static void     initrc             PV();
+Static int      readrc             PP( (char *rcname, int need) );
+Static void     postrc             PV();
+Static void     openlogfile        PV();
+#endif /*PROTO_TRANS_C*/
+
+/* Declarations from stuff.c */
+#ifdef PROTO_STUFF_C
+Static void     cvcase             PP( (char *buf, int flags) );
+#endif /*PROTO_STUFF_C*/
+
+/* Declarations from out.c */
+#ifdef PROTO_OUT_C
+Static void     leading_tab        PP( (int col) );
+Static void     flush_outbuf       PP( (int numbreaks, int *breakpos,
+                                        int *breakindent, int numedits,
+                                        int *editpos, char *editold,
+                                        char *editnew) );
+Static int      readquotes         PP( (int *posp, int err) );
+Static int      readparens         PP( (int *posp, int err) );
+Static int      measurechars       PP( (int first, int last) );
+Static void     makeedit           PP( (int pos, int ch) );
+Static void     unedit             PV();
+Static int      parencount         PP( (Paren *par) );
+Static int      trybreakline       PP( (int pos, int count, int indent,
+                                        double badness, int flags, Paren *parens) );
+#endif /*PROTO_OUT_C*/
+
+/* Declarations from comment.c */
+#ifdef PROTO_COMMENT_C
+Static void     attach_mark        PP( (Stmt *sp) );
+#endif /*PROTO_COMMENT_C*/
+
+/* Declarations from lex.c */
+#ifdef PROTO_LEX_C
+Static void     makekeyword        PP( (char *name) );
+Static void     makeglobword       PP( (char *name) );
+Static void     makekeywords       PV();
+Static Symbol  *Pkeyword           PP( (char *name, Token tok) );
+Static Symbol  *Pkeywordposs       PP( (char *name, Token tok) );
+Static void     makePascalwords    PV();
+Static void     deterministic      PP( (char *name) );
+Static void     nosideeff          PP( (char *name) );
+Static void     recordsideeffects  PV();
+Static void     push_input         PV();
+Static int      parsecomment       PP( (int p2c_only, int starparen) );
+Static void     comment            PP( (int starparen) );
+Static int      getflag            PV();
+#endif /*PROTO_LEX_C*/
+
+/* Declarations from parse.c */
+#ifdef PROTO_PARSE_C
+Static void     forward_decl       PP( (Meaning *func, int isextern) );
+Static Stmt    *p_stmt             PP( (Stmt *slist, int sflags) );
+Static int      usebraces          PP( (Stmt *sp, int opts) );
+Static void     outnl              PP( (int serial) );
+Static void     out_block          PP( (Stmt *spbase, int opts, int serial) );
+Static int      checkreturns       PP( (Stmt **spp, int nearret) );
+Static int      isescape           PP( (Expr *ex) );
+Static int      deadendblock       PP( (Stmt *sp) );
+Static int      checkcomma_expr    PP( (Stmt **spp, Expr **exp) );
+Static void     checkcommas        PP( (Stmt **spp) );
+Static int      checkvarchangeable PP( (Expr *ex, Meaning *mp) );
+Static Stmt    *p_body             PV();
+Static void     out_function       PP( (Meaning *func) );
+Static void     scanfwdparams      PP( (Meaning *mp) );
+Static void     p_function         PP( (int isfunc) );
+Static void     out_include        PP( (char *name, int quoted) );
+Static void     cleanheadername    PP( (char *dest, char *name) );
+Static int      tryimport          PP( (Symbol *sym, char *fname, char *ext,
+                                        int need) );
+Static void     p_import           PP( (int inheader) );
+Static void     skipunitheader     PV();
+Static void     skiptomodule       PV();
+Static void     p_moduleinit       PP( (Meaning *mod) );
+Static void     p_nested_module    PV();
+Static int      p_module           PP( (int ignoreit, int isdefn) );
+#endif /*PROTO_PARSE_C*/
+
+/* Declarations from decl.c */
+#ifdef PROTO_DECL_C
+Static Meaning *findstandardmeaning PP( (enum meaningkind kind, char *name) );
+Static Meaning *makestandardmeaning PP( (enum meaningkind kind, char *name) );
+Static Type    *makestandardtype   PP( (enum typekind kind, Meaning *mp) );
+Static Stmt    *nullspecialproc    PP( (Meaning *mp) );
+Static Stmt    *nullstandardproc   PP( (Expr *ex) );
+Static Expr    *nullspecialfunc    PP( (Meaning *mp) );
+Static Expr    *nullstandardfunc   PP( (Expr *ex) );
+Static Expr    *nullspecialvar     PP( (Meaning *mp) );
+Static void     initmeaning        PP( (Meaning *mp) );
+Static void     declare_args       PP( (Type *type, int isheader, int isforward) );
+Static int      checkstructconst   PP( (Meaning *mp) );
+Static int      mixable            PP( (Meaning *mp1, Meaning *mp2, int args,
+                                        int flags) );
+Static int      checkvarmacdef     PP( (Expr *ex, Meaning *mp) );
+Static void     fielddecl          PP( (Meaning *mp, Type **type, Type **tp2,
+                                        long *val, int ispacked, int *aligned) );
+Static void     realignfields      PP( (Meaning *firstmp, Meaning *stopmp) );
+static void     tryrealignfields   PP( (Meaning *firstmp) );
+Static void     p_fieldlist        PP( (Type *tp, Meaning **flast, int ispacked,
+                                        Meaning *tname) );
+Static Type    *p_arraydecl        PP( (char *tname, int ispacked,
+                                        Meaning ***confp) );
+Static Type    *p_conformant_array PP( (char *tname, Meaning ***confp) );
+Static void     nameexternalvar    PP( (Meaning *mp, char *name) );
+Static void     handlebrackets     PP( (Meaning *mp, int skip, int wasaliased) );
+Static void     handleabsolute     PP( (Meaning *mp, int skip) );
+#endif /*PROTO_DECL_C*/
+
+/* Declarations from expr.c */
+#ifdef PROTO_EXPR_C
+Static Expr    *docast             PP( (Expr *a, Type *type) );
+Static Expr    *dolongcast         PP( (Expr *a, int tolong) );
+Static Expr    *commute            PP( (Expr *a, Expr *b, enum exprkind kind) );
+Static Value    eval_expr_either   PP( (Expr *ex, int pasc) );
+#endif /*PROTO_EXPR_C*/
+
+/* Declarations from pexpr.c */
+#ifdef PROTO_PEXPR_C
+Static void     bindnames          PP( (Expr *ex) );
+Static Expr    *p_variable         PP( (Type *target) );
+Static Expr    *makesmallsetconst  PP( (long bits, Type *type) );
+Static Expr    *p_factor           PP( (Type *target) );
+Static Expr    *p_powterm          PP( (Type *target) );
+Static Expr    *p_term             PP( (Type *target) );
+Static Expr    *p_sexpr            PP( (Type *target) );
+Static int      incompat           PP( (Expr *ex, int num, int prec) );
+Static void     outop3             PP( (int breakbefore, char *name) );
+Static void     out_ctx            PP( (Meaning *ctx, int address) );
+Static int      scanfield          PP( (Meaning **variants, short *unions,
+                                        int lev, Meaning *mp, Meaning *field) );
+Static void     wrexpr             PP( (Expr *ex, int prec) );
+#endif /*PROTO_PEXPR_C*/
+
+/* Declarations from funcs.c */
+#ifdef PROTO_FUNCS_C
+Static Expr    *func_abs           PV();
+Static Expr    *func_addr          PV();
+Static Expr    *func_iaddress      PV();
+Static Expr    *func_addtopointer  PV();
+Static Expr    *checkfilename      PP( (Expr *nex) );
+Static Stmt    *assignfilename     PP( (Expr *fex, Expr *nex) );
+Static Stmt    *proc_assign        PV();
+Static Stmt    *handleopen         PP( (int code) );
+Static Stmt    *proc_append        PV();
+Static Expr    *func_arccos        PP( (Expr *ex) );
+Static Expr    *func_arcsin        PP( (Expr *ex) );
+Static Expr    *func_arctan        PP( (Expr *ex) );
+Static Expr    *func_arctanh       PP( (Expr *ex) );
+Static Stmt    *proc_argv          PV();
+Static Expr    *func_asr           PV();
+Static Expr    *func_lsl           PV();
+Static Expr    *func_lsr           PV();
+Static Expr    *func_bin           PV();
+Static Expr    *func_binary        PP( (Expr *ex) );
+Static Expr    *handle_bitsize     PP( (int next) );
+Static Expr    *func_bitsize       PV();
+Static Expr    *func_bitnext       PV();
+Static Expr    *func_blockread     PV();
+Static Expr    *func_blockwrite    PV();
+Static Stmt    *proc_blockread     PV();
+Static Stmt    *proc_blockwrite    PV();
+Static Stmt    *proc_bclr          PV();
+Static Stmt    *proc_bset          PV();
+Static Expr    *func_bsl           PV();
+Static Expr    *func_bsr           PV();
+Static Expr    *func_btst          PV();
+Static Expr    *func_byteread      PV();
+Static Expr    *func_bytewrite     PV();
+Static Expr    *func_byte_offset   PV();
+Static Stmt    *proc_call          PV();
+Static Expr    *func_chr           PV();
+Static Stmt    *proc_close         PV();
+Static Expr    *func_concat        PV();
+Static Expr    *func_copy          PP( (Expr *ex) );
+Static Expr    *func_cos           PP( (Expr *ex) );
+Static Expr    *func_cosh          PP( (Expr *ex) );
+Static Stmt    *proc_cycle         PV();
+Static Stmt    *proc_date          PV();
+Static Stmt    *proc_dec           PV();
+Static Expr    *func_dec           PV();
+Static Stmt    *proc_delete        PP( (Expr *ex) );
+Static char    *choose_free_func   PP( (Expr *ex) );
+Static Stmt    *proc_dispose       PV();
+Static Expr    *func_exp           PP( (Expr *ex) );
+Static Expr    *func_expo          PP( (Expr *ex) );
+Static Expr    *iofunc             PP( (Expr *ex, int code) );
+Static Expr    *func_eof           PV();
+Static Expr    *func_eoln          PV();
+Static Stmt    *proc_escape        PV();
+Static Stmt    *proc_excl          PV();
+Static Expr    *file_iofunc        PP( (int code, long base) );
+Static Expr    *func_fcall         PV();
+Static Expr    *func_filepos       PV();
+Static Expr    *func_filesize      PV();
+Static Stmt    *proc_fillchar      PV();
+Static Expr    *func_sngl          PV();
+Static Expr    *func_float         PV();
+Static Stmt    *proc_flush         PV();
+Static Expr    *func_frac          PP( (Expr *ex) );
+Static Stmt    *proc_freemem       PP( (Expr *ex) );
+Static Stmt    *proc_get           PV();
+Static Stmt    *proc_getmem        PP( (Expr *ex) );
+Static Stmt    *proc_gotoxy        PP( (Expr *ex) );
+Static Expr    *handle_vax_hex     PP( (Expr *ex, char *fmt, int scale) );
+Static Expr    *func_hex           PV();
+Static Expr    *func_hi            PV();
+Static Expr    *func_high          PV();
+Static Expr    *func_hiword        PV();
+Static Stmt    *proc_inc           PV();
+Static Stmt    *proc_incl          PV();
+Static Stmt    *proc_insert        PP( (Expr *ex) );
+Static Expr    *func_int           PV();
+Static Expr    *func_uint          PV();
+Static Stmt    *proc_leave         PV();
+Static Expr    *func_lo            PV();
+Static Expr    *func_loophole      PV();
+Static Expr    *func_lower         PV();
+Static Expr    *func_loword        PV();
+Static Expr    *func_ln            PP( (Expr *ex) );
+Static Expr    *func_log           PP( (Expr *ex) );
+Static Expr    *func_max           PV();
+Static Expr    *func_maxavail      PP( (Expr *ex) );
+Static Expr    *func_maxpos        PV();
+Static Expr    *func_memavail      PP( (Expr *ex) );
+Static Expr    *var_mem            PV();
+Static Expr    *var_memw           PV();
+Static Expr    *var_meml           PV();
+Static Expr    *func_min           PV();
+Static Stmt    *proc_move          PP( (Expr *ex) );
+Static Stmt    *proc_move_fast     PV();
+Static Stmt    *proc_new           PV();
+Static Expr    *func_oct           PV();
+Static Expr    *func_octal         PP( (Expr *ex) );
+Static Expr    *func_odd           PP( (Expr *ex) );
+Static Stmt    *proc_open          PV();
+Static Expr    *func_ord           PV();
+Static Expr    *func_ord4          PV();
+Static Stmt    *proc_pack          PV();
+Static Expr    *func_pad           PP( (Expr *ex) );
+Static Stmt    *proc_page          PV();
+Static Expr    *func_paramcount    PP( (Expr *ex) );
+Static Expr    *func_paramstr      PP( (Expr *ex) );
+Static Expr    *func_pi            PV();
+Static Expr    *var_port           PV();
+Static Expr    *var_portw          PV();
+Static Expr    *func_pos           PP( (Expr *ex) );
+Static Expr    *func_ptr           PP( (Expr *ex) );
+Static Expr    *func_position      PV();
+Static Expr    *func_pred          PV();
+Static Stmt    *proc_put           PV();
+Static Expr    *func_pwroften      PP( (Expr *ex) );
+Static Stmt    *proc_reset         PV();
+Static Stmt    *proc_rewrite       PV();
+Static Expr    *makegetchar        PP( (Expr *fex) );
+Static Stmt    *fixscanf           PP( (Stmt *sp, Expr *fex) );
+Static Expr    *makefgets          PP( (Expr *vex, Expr *lex, Expr *fex) );
+Static Stmt    *skipeoln           PP( (Expr *fex) );
+Static Stmt    *handleread_text    PP( (Expr *fex, Expr *var, int isreadln) );
+Static Stmt    *handleread_bin     PP( (Expr *fex, Expr *var) );
+Static Stmt    *proc_read          PV();
+Static Stmt    *proc_readdir       PV();
+Static Stmt    *proc_readln        PV();
+Static Stmt    *proc_readv         PV();
+Static Stmt    *proc_strread       PV();
+Static Expr    *func_random        PV();
+Static Stmt    *proc_randomize     PV();
+Static Expr    *func_round         PP( (Expr *ex) );
+Static Stmt    *proc_unpack        PV();
+Static Expr    *func_uround        PP( (Expr *ex) );
+Static Expr    *func_scan          PV();
+Static Expr    *func_scaneq        PP( (Expr *ex) );
+Static Expr    *func_scanne        PP( (Expr *ex) );
+Static Stmt    *proc_seek          PV();
+Static Expr    *func_seekeof       PV();
+Static Expr    *func_seekeoln      PV();
+Static Stmt    *proc_setstrlen     PV();
+Static Stmt    *proc_settextbuf    PV();
+Static Expr    *func_sin           PP( (Expr *ex) );
+Static Expr    *func_sinh          PP( (Expr *ex) );
+Static Expr    *func_sizeof        PV();
+Static Expr    *func_statusv       PV();
+Static Expr    *func_str_hp        PP( (Expr *ex) );
+Static Stmt    *proc_strappend     PV();
+Static Stmt    *proc_strdelete     PV();
+Static Stmt    *proc_strinsert     PV();
+Static Stmt    *proc_strmove       PV();
+Static Expr    *func_strlen        PP( (Expr *ex) );
+Static Expr    *func_strltrim      PP( (Expr *ex) );
+Static Expr    *func_strmax        PP( (Expr *ex) );
+Static Expr    *func_strpos        PP( (Expr *ex) );
+Static Expr    *func_strrpt        PP( (Expr *ex) );
+Static Expr    *func_strrtrim      PP( (Expr *ex) );
+Static Expr    *func_succ          PV();
+Static Expr    *func_sqr           PV();
+Static Expr    *func_sqrt          PP( (Expr *ex) );
+Static Expr    *func_swap          PP( (Expr *ex) );
+Static Expr    *func_tan           PP( (Expr *ex) );
+Static Expr    *func_tanh          PP( (Expr *ex) );
+Static Expr    *func_trunc         PP( (Expr *ex) );
+Static Expr    *func_utrunc        PP( (Expr *ex) );
+Static Expr    *func_uand          PV();
+Static Expr    *func_udec          PV();
+Static Expr    *func_unot          PV();
+Static Expr    *func_uor           PV();
+Static Expr    *func_upcase        PP( (Expr *ex) );
+Static Expr    *func_upper         PV();
+Static Expr    *func_uxor          PV();
+Static Expr    *func_val_modula    PV();
+Static Stmt    *proc_val_turbo     PV();
+Static Expr    *writestrelement    PP( (Expr *ex, Expr *wid, Expr *vex, int code,
+                                        int needboth) );
+Static char    *makeenumnames      PP( (Type *tp) );
+Static Stmt    *handlewrite_text   PP( (Expr *fex, Expr *ex, int iswriteln) );
+Static Stmt    *handlewrite_bin    PP( (Expr *fex, Expr *ex) );
+Static Stmt    *proc_write         PV();
+Static Stmt    *handle_modula_write PP( (char *fmt) );
+Static Stmt    *proc_writecard     PV();
+Static Stmt    *proc_writeint      PV();
+Static Stmt    *proc_writehex      PV();
+Static Stmt    *proc_writeoct      PV();
+Static Stmt    *proc_writereal     PV();
+Static Stmt    *proc_writedir      PV();
+Static Stmt    *handlewriteln      PP( (int iswriteln) );
+Static Stmt    *proc_overprint     PV();
+Static Stmt    *proc_prompt        PV();
+Static Stmt    *proc_writeln       PV();
+Static Stmt    *proc_message       PV();
+Static Stmt    *proc_writev        PV();
+Static Stmt    *proc_strwrite      PP( (Meaning *mp_x, Stmt *spbase) );
+Static Stmt    *proc_str_turbo     PV();
+Static Stmt    *proc_time          PV();
+Static Expr    *func_xor           PV();
+#endif /*PROTO_FUNCS_C*/
+
+/* Declarations from dir.c */
+#ifdef PROTO_DIR_C
+Static void     _setup             PP( (char *name, int defn) );
+#endif /*PROTO_DIR_C*/
+
+/* Declarations from hpmods.c */
+#ifdef PROTO_HPMODS_C
+Static Stmt    *proc_freadbytes    PV();
+Static Stmt    *proc_fwritebytes   PV();
+Static void     setup_sysglobals   PV();
+#endif /*PROTO_HPMODS_C*/
+
+/* Declarations from citmods.c */
+#ifdef PROTO_CITMODS_C
+Static Stmt    *proc_na_fillbyte   PP( (Expr *ex) );
+Static Stmt    *proc_na_fill       PP( (Expr *ex) );
+Static Stmt    *proc_na_move       PP( (Expr *ex) );
+Static Stmt    *proc_na_exch       PP( (Expr *ex) );
+Static Expr    *func_na_comp       PP( (Expr *ex) );
+Static Expr    *func_na_scaneq     PP( (Expr *ex) );
+Static Expr    *func_na_scanne     PP( (Expr *ex) );
+Static Stmt    *proc_na_new        PP( (Expr *ex) );
+Static Stmt    *proc_na_dispose    PP( (Expr *ex) );
+Static Stmt    *proc_na_alloc      PP( (Expr *ex) );
+Static Stmt    *proc_na_outeralloc PP( (Expr *ex) );
+Static Stmt    *proc_na_free       PP( (Expr *ex) );
+Static Expr    *func_na_memavail   PP( (Expr *ex) );
+Static Expr    *func_na_and        PP( (Expr *ex) );
+Static Expr    *func_na_bic        PP( (Expr *ex) );
+Static Expr    *func_na_or         PP( (Expr *ex) );
+Static Expr    *func_na_xor        PP( (Expr *ex) );
+Static Expr    *func_na_not        PP( (Expr *ex) );
+Static Expr    *func_na_mask       PP( (Expr *ex) );
+Static int      check0_31          PP( (Expr *ex) );
+Static Expr    *func_na_test       PP( (Expr *ex) );
+Static Stmt    *proc_na_set        PP( (Expr *ex) );
+Static Stmt    *proc_na_clear      PP( (Expr *ex) );
+Static Expr    *func_na_po2        PP( (Expr *ex) );
+Static Expr    *func_na_lobits     PP( (Expr *ex) );
+Static Expr    *func_na_hibits     PP( (Expr *ex) );
+Static Expr    *func_na_asl        PP( (Expr *ex) );
+Static Expr    *func_na_lsl        PP( (Expr *ex) );
+Static Stmt    *proc_na_bfand      PP( (Expr *ex) );
+Static Stmt    *proc_na_bfbic      PP( (Expr *ex) );
+Static Stmt    *proc_na_bfor       PP( (Expr *ex) );
+Static Stmt    *proc_na_bfxor      PP( (Expr *ex) );
+Static Expr    *func_imin          PP( (Expr *ex) );
+Static Expr    *func_imax          PP( (Expr *ex) );
+Static Expr    *func_na_add        PP( (Expr *ex) );
+Static Expr    *func_na_sub        PP( (Expr *ex) );
+Static Stmt    *proc_return        PV();
+Static Expr    *func_charupper     PP( (Expr *ex) );
+Static Expr    *func_charlower     PP( (Expr *ex) );
+Static Expr    *func_strint        PP( (Expr *ex) );
+Static Expr    *func_strint2       PP( (Expr *ex) );
+Static Expr    *func_strhex        PP( (Expr *ex) );
+Static Expr    *func_strreal       PP( (Expr *ex) );
+Static Expr    *func_strchar       PP( (Expr *ex) );
+Static Expr    *func_strreadint    PP( (Expr *ex) );
+Static Expr    *func_strreadreal   PP( (Expr *ex) );
+Static Stmt    *proc_strappendc    PP( (Expr *ex) );
+Static Expr    *func_strbegins     PP( (Expr *ex) );
+Static Expr    *func_strcontains   PP( (Expr *ex) );
+Static Expr    *func_strsub        PP( (Expr *ex) );
+Static Expr    *func_strpart       PP( (Expr *ex) );
+Static Expr    *func_strequal      PP( (Expr *ex) );
+Static Expr    *func_strcmp        PP( (Expr *ex) );
+Static Expr    *func_strljust      PP( (Expr *ex) );
+Static Expr    *func_strrjust      PP( (Expr *ex) );
+Static Stmt    *proc_strnew        PP( (Expr *ex) );
+Static Stmt    *proc_strlist_add   PP( (Expr *ex) );
+Static Stmt    *proc_strlist_append PP( (Expr *ex) );
+Static Stmt    *proc_strlist_insert PP( (Expr *ex) );
+Static Stmt    *proc_fixfname      PP( (Expr *ex) );
+Static Stmt    *proc_forcefname    PP( (Expr *ex) );
+Static Expr    *func_stdin         PV();
+Static Expr    *func_stdout        PV();
+Static Expr    *func_stderr        PV();
+Static Stmt    *proc_m_color       PP( (Expr *ex) );
+#endif /*PROTO_CITMODS_C*/
+
+
+/* End. */
+

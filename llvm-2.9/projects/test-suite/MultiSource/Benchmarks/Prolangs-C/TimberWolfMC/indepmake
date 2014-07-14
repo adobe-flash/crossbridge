@@ -1,0 +1,220 @@
+#
+#  Octtools 3.0 Makefile
+#
+#  TimberWolfMC - Macro-Cell place and route program
+#
+#  Makefile created on Tue Jan 24 16:06:52 PST 1989 by octtools (using 'create-octtools-makefile')
+#
+#  Copyright (c) 1988, 1989, Regents of the University of California
+#
+#
+# Description of the 'targets':
+#
+#  all:			create the tags file, run lint, build the tool/package
+#  install:		build the tool/package and install all the necessary files
+#  uninstall:		remove the files that would be installed with 'make install'
+#  debug:		build and install the debug versions of the package
+#				(for tools, build the debug versions and leave in the
+#				source directories; note: debug versions of tools
+#				MUST be built using 'make debug' or 'make debug-*')
+#  header:		install the exported header files for the package
+#  lint:		run lint
+#  clean:		remove the binary, object files, and temporary files
+#  require:		echo a list of packages used in the compilation of the tool/package
+#  toolrequire:		echo a list of tools used in the running of the tool
+#  test:		run a simple test on the tool/package
+#  tags:		build the 'tags' file (for 'vi')
+#  TAGS:		build the 'TAGS' file (for 'emacs')
+#  info:		echo a one-line description of the tool/package
+#  print:		print out the man page or doc file for the tool/package
+#  dist:		dist the tool/package
+#  test-dist:		tell what would be disted in 'make dist' were run
+#  depend:		generate the dependency information
+#  strip-depend:	remove the dependency information
+#
+#
+# Description of the 'variables':
+#
+#  BUILD:		name of the program that builds a 'Makefile' from
+#				'Makefile.template'
+#  CAD:			location of the CAD tools (for installation)
+#  CADROOT:		run-time location of the CAD libraries (can have '~')
+#  CC:			name of the C-compiler
+#  COMPFLAG:		compilation level (usually nothing, -g, -pg, or -O)
+#  CP:			name of the program used for installation ('cp' for installing
+#				the file each time, 'ln -s' for installing a link)
+#  LDFLAGS:		flags used for linking (e.g., -lXMenu -lX -lm)
+#  LINTCREATEFLAG:	flag used by 'lint' for creating lint libraries
+#				(-C for BSD, ULTRIX 2.2; -o for IBM RT/PC, ULTRIX 3.0)
+#  PRINTER:		name of the printer
+#  SHELL:		shell used by 'make' (should always be the bourne shell)
+#
+#
+#------------------------------------------------------------------------------
+
+# for HPUX
+SHELL	= /bin/sh
+
+CAD	= /net/shambhala/users/octtools-3.0
+CADROOT	= ~octtools
+UTILS	= /net/shambhala/users/octtools-3.0/utils
+
+LINTCREATEFLAG = -C
+COMPFLAG=
+CP = cp
+BUILD = ${UTILS}/bin/create-octtools-makefile
+
+NAME	= TimberWolfMC
+
+# packages required for this package/tool
+REQUIRE	= mm port
+
+# tools required for this tool
+TOOLREQUIRE = 
+
+SRCS1 = 23tree.c addpins.c analyze.c bellman.c buster.c changraph.c checkpen.c config1.c config2.c config3.c density.c doborder.c doublecheck.c finalout.c finalpin.c
+OBJS1 = 23tree.o addpins.o analyze.o bellman.o buster.o changraph.o checkpen.o config1.o config2.o config3.o density.o doborder.o doublecheck.o finalout.o finalpin.o
+
+SRC	= ${SRCS1} findcheck.c findcost.c findloc.c findnodes.c findside.c fixpenal.c fulllink.c fuloop.c genorient.c gentwf.c ggenorien.c gglobals.c globals.c gmain.c goverlap.c goverlapf.c goverlapx.c gpass2.c grdcell.c grepair.c hash.c hprobes.c initbb.c loadbins.c loadpg.c main.c makebins.c makelink.c makesite.c move.c mshortest.c mt.c neworient.c outbig.c outgeo.c outpin.c output.c outsmall.c parser.c pass2.c perimeter.c placepads.c placepin.c prboard.c prepair.c prestrict.c printgph.c printnets.c procesnet.c readcells.c readgeo.c readgraph.c readnets.c readpar.c readpnode.c rebin.c reduceg.c rglobals.c rmain.c routenet.c savewolf.c scrapnet.c scrappin.c selectpin.c setpwates.c shortpath.c test2loop.c testloop.c twstats.c uaspect.c ufixnet.c ufixpin.c uloop.c unbust.c upin.c upinswap.c usite0.c usite1.c usite2.c usiteo1.c usiteo2.c usoftnet.c usoftpin.c utemp.c vprobes.c watesides.c wirecosts.c wireest.c wireratio.c woverlap.c woverlapf.c woverlapx.c xgraph.c ygraph.c
+LSRC	= ${SRCS1} findcheck.c findcost.c findloc.c findnodes.c findside.c fixpenal.c fulllink.c fuloop.c genorient.c gentwf.c ggenorien.c gglobals.c globals.c gmain.c goverlap.c goverlapf.c goverlapx.c gpass2.c grdcell.c grepair.c hash.c hprobes.c initbb.c loadbins.c loadpg.c main.c makebins.c makelink.c makesite.c move.c mshortest.c mt.c neworient.c outbig.c outgeo.c outpin.c output.c outsmall.c parser.c pass2.c perimeter.c placepads.c placepin.c prboard.c prepair.c prestrict.c printgph.c printnets.c procesnet.c readcells.c readgeo.c readgraph.c readnets.c readpar.c readpnode.c rebin.c reduceg.c rglobals.c rmain.c routenet.c savewolf.c scrapnet.c scrappin.c selectpin.c setpwates.c shortpath.c test2loop.c testloop.c twstats.c uaspect.c ufixnet.c ufixpin.c uloop.c unbust.c upin.c upinswap.c usite0.c usite1.c usite2.c usiteo1.c usiteo2.c usoftnet.c usoftpin.c utemp.c vprobes.c watesides.c wirecosts.c wireest.c wireratio.c woverlap.c woverlapf.c woverlapx.c xgraph.c ygraph.c
+OBJ	= ${OBJS1} findcheck.o findcost.o findloc.o findnodes.o findside.o fixpenal.o fulllink.o fuloop.o genorient.o gentwf.o ggenorien.o gglobals.o globals.o gmain.o goverlap.o goverlapf.o goverlapx.o gpass2.o grdcell.o grepair.o hash.o hprobes.o initbb.o loadbins.o loadpg.o main.o makebins.o makelink.o makesite.o move.o mshortest.o mt.o neworient.o outbig.o outgeo.o outpin.o output.o outsmall.o parser.o pass2.o perimeter.o placepads.o placepin.o prboard.o prepair.o prestrict.o printgph.o printnets.o procesnet.o readcells.o readgeo.o readgraph.o readnets.o readpar.o readpnode.o rebin.o reduceg.o rglobals.o rmain.o routenet.o savewolf.o scrapnet.o scrappin.o selectpin.o setpwates.o shortpath.o test2loop.o testloop.o twstats.o uaspect.o ufixnet.o ufixpin.o uloop.o unbust.o upin.o upinswap.o usite0.o usite1.o usite2.o usiteo1.o usiteo2.o usoftnet.o usoftpin.o utemp.o vprobes.o watesides.o wirecosts.o wireest.o wireratio.o woverlap.o woverlapf.o woverlapx.o xgraph.o ygraph.o
+HDR	= 23tree.h custom.h geo.h kenk.h lists.h mt.h route.h
+
+TOOLINSTALL= ${CAD}/bin/${TARGET} ${CAD}/man/man1/${MAN}
+INSTALL	= ${PKGINSTALL} ${TOOLINSTALL} 
+
+DISTDEST= ${CAD}/src/${NAME}
+DISTHOST= octtools@shambhala
+MISC	= Makefile Makefile.template 
+
+LIBS	= $(CAD)/lib/libmm$(COMPFLAG).a $(CAD)/lib/liberrtrap$(COMPFLAG).a $(CAD)/lib/libuprintf$(COMPFLAG).a $(CAD)/lib/libport$(COMPFLAG).a
+LINTLIBS= $(CAD)/lib/llib-lmm.ln $(CAD)/lib/llib-lport.ln
+
+TARGET	= ${NAME}
+TARGETG	= ${NAME}-g
+TARGETPG	= ${NAME}-pg
+MAN	= ${NAME}.1
+
+PRINTER	= lps40
+MACROS	= -man.4.3
+PRINT	= enscript
+TROFF	= ptroff
+TBL	= tbl
+
+MAKEVARS =	\
+		"CAD=${CAD}" \
+		"CADROOT=${CADROOT}" \
+		"CC=${CC}" \
+		"CP=${CP}" \
+		"COMPFLAG=${COMPFLAG}" \
+		"LINTCREATEFLAG=${LINTCREATEFLAG}" \
+		"MAKE=$(MAKE)" \
+		"MACROS=${MACROS}" \
+		"P=${P}" \
+		"PRINT=${PRINT}" \
+		"PRINTER=${PRINTER}" \
+		"TBL=${TBL}" \
+		"TROFF=${TROFF}" \
+		"UTILS=${UTILS}" \
+		"VPATH=${VPATH}"
+
+INCLUDE	= -I${CAD}/include 
+CFLAGS	= ${COMPFLAG} ${INCLUDE} '-DCADROOT="${CADROOT}"'
+VERSION	= "-DCUR_DATE=\"`date | awk '{print $$2, $$3, $$6}'`\"" \
+	  "-DCUR_TIME=\"`date | awk '{print $$4}'`\""
+LINTFLAGS= ${INCLUDE} '-DCADROOT="${CADROOT}"'
+LDFLAGS	= -lm
+
+#-----------------------------------------------------------------------
+
+all: ${SRC}
+	indep-frend -I. -I../include ${SRC} -lmm -lerrtrap -luprintf -lport ${LDFLAGS} ; rm database
+
+
+#all: tags lint ${TARGET}
+
+#build: Makefile.template
+#	${BUILD} Makefile.template
+build:
+
+install: ${INSTALL}
+
+uninstall:
+	rm -f ${INSTALL}
+
+version.o: version.c
+	${CC} ${CFLAGS} ${VERSION} -c version.c
+	touch version.c
+
+debug: debug-g debug-pg
+
+
+debug-g:
+	rm -f ${OBJ}
+	$(MAKE) COMPFLAG=-g ${MFLAGS} ${MAKEVARS} ${TARGETG}
+
+debug-pg:
+	rm -f ${OBJ}
+	$(MAKE) COMPFLAG=-pg ${MFLAGS} ${MAKEVARS} ${TARGETPG}
+
+
+${TARGET} ${TARGETG} ${TARGETPG}: ${OBJ} ${LIBS}
+	${CC} ${COMPFLAG} -o $@ ${OBJ} ${LIBS} ${LDFLAGS}
+
+header::
+
+${CAD}/bin/${TARGET}: ${TARGET}
+	rm -f $@
+	${CP} $? $@
+	strip $@
+
+${CAD}/man/man1/${MAN}: ${MAN}
+	${TBL} < $? > $@
+
+lint: ${LSRC} ${DRVRSRC} ${HDR} ${LINTLIBS}
+	lint ${LINTFLAGS} ${LSRC} ${DRVRSRC} ${LINTLIBS} ${LDFLAGS} | tee lint
+
+clean::
+	rm -f ${OBJ} ${DRVROBJ} ${TARGET} ${TARGETG} ${TARGETPG} ${DRIVER} tags TAGS ${LIB} ${LIBG} ${LIBPG} ${LINTLIB} lint make.out mktemp
+
+require:
+	@echo ${REQUIRE}
+
+toolrequire:
+	@echo ${TOOLREQUIRE}
+
+test::
+	@test -f ${CAD}/bin/${TARGET}
+
+tags: ${LSRC} ${DRVRSRC} ${HDR}
+	ctags ${LSRC} ${DRVRSRC} ${HDR}
+
+TAGS: ${LSRC} ${DRVRSRC} ${HDR}
+	etags ${LSRC} ${DRVRSRC} ${HDR}
+
+info:
+	@echo '${NAME}:  Macro-Cell place and route program'
+
+print: ${DOC} ${MAN}
+	${TBL} < ${MAN} | ${TROFF} -P${PRINTER} ${MACROS}
+
+dist: ${SRC} ${DRVRSRC} ${HDR} ${DOC} ${MAN}
+	rdist -Rich ${SRC} ${DRVRSRC} ${HDR} ${DOC} ${MAN} ${MISC} ${DISTHOST}:${DISTDEST}
+
+test-dist: ${SRC} ${DRVRSRC} ${HDR} ${DOC} ${MAN}
+	rdist -Richv ${SRC} ${DRVRSRC} ${HDR} ${DOC} ${MAN} ${MISC} ${DISTHOST}:${DISTDEST}
+
+depend: ${SRC} ${DRVRSRC} ${HDR}
+	@rm -f mktemp
+	@sed '/^#--DO NOT CHANGE ANYTHING AFTER THIS LINE/,$$d' Makefile > mktemp
+	@echo '#--DO NOT CHANGE ANYTHING AFTER THIS LINE' >> mktemp
+	@${UTILS}/bin/cc-M ${INCLUDE} ${SRC} ${DRVRSRC} | sed 's|${CAD}|$${CAD}|g' >>mktemp
+	@mv mktemp Makefile
+
+strip-depend:
+	@rm -f mktemp
+	@sed '/^#--DO NOT CHANGE ANYTHING AFTER THIS LINE/,$$d' Makefile > mktemp
+	@mv mktemp Makefile
+
+#--EXTRA TARGETS
+

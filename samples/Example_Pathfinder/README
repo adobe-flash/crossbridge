@@ -1,0 +1,40 @@
+Read the following before using the files within this archive.
+
+1. This archive contains files that belong to the "aaaaaaa" source files posted on the Adobe Game Developer Center:
+http://www.adobe.com/devnet/...
+
+2.  This is an example of using FlasCC to create SWC from C++ path finder class.
+
+#############################
+####  Content Structure  ####
+#############################
+
+/as3api.cpp			- FlasCC interface file to expose C functions to AS3
+/main.cpp			- stub C main class to setup GoSync() SWC to still run
+/Makefile			- make file used to compile abc and swc
+/micropather.*			- The C++ path finder class
+/pathfinder.*			- The specific implementation of micropather for my game
+/PathFinderAS3Project		- Flash Builder 4.7 ActionScript project of the game
+/PathFinderWrapper.as		- An AS3 class that calls the C interface functions in as3api.cpp to make it easier to use in AS3.
+/Step1				- FlasCC hello world example
+/Step2				- FlasCC simple C++ class example
+/Step3				- FlasCC C++ into SWC example
+/Step4				- Test application to test PathFinder.swc from Step 4
+/Step5				- ActionScript 3 wrapper class for SWC
+/Step6				- Path finding C++ implementation code
+/Step7				- Test of the new PathFinder.swc from Step 6
+/Step8				- Chasing game ActionScript 3 implementation classes
+/Step9				- Debugging commands
+/Step10				- Optimizing the size of the PathFinder.swc
+/SWIG				- Example files used to compile abc and swc using the SWIG method, this is not complete as it creates a slightly different as3 api interface which causes breaks the app. Here for an example. If you want to try, then move the files in SWIG folder to the root and run make on it.
+
+
+################################
+####  make command example  ####
+################################
+
+make FLASCC=/Adobe/flascc/sdk FLEX=/Code/FlexSDKs/4.6.0/
+
+FLASCC and FLEX parameters are to be changed to your local setup. The FLEX is not required for this article but the make files will error if you do not give it some value.
+
+Most of the Step folder contain ./compile.sh files that can be used in the command-line shell or viewed to know the exact commands instead of using the Makefile.

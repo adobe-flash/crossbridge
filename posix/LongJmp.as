@@ -24,11 +24,17 @@ package C_Run
   * throw on longjmp
   * @private
   */
-  [ExcludeClass] public class LongJmp
+  [ExcludeClass] 
+  public class LongJmp
   {
-    public var esp:int // esp at setjmp time
-    public var sjid:int // setjmp id
-    public var retval:int // value for setjmp to return
+    // esp at setjmp time
+    public var esp:int;
+    
+    // setjmp id
+    public var sjid:int;
+    
+    // value for setjmp to return
+    public var retval:int; 
 
     public function LongJmp(esp:int, sjid:int, retval:int)
     {

@@ -1,0 +1,49 @@
+Building ClamAV (www.clamav.net) for llvm's testsuite.
+
+To get sources from clamav's repository 
+(currently from 0.92 stable version, you can edit the tag in prepare.sh)
+
+$ ./prepare.sh checkout
+$ ./prepare.sh copy
+$ ./prepare.sh getdb
+
+Provided files:
+prepare.sh
+rename.sh: used by prepare.sh
+header_rename.sh: used by prepare.sh
+clamav-config.h: minimal config header, so we don't have to run autoconf
+Makefile: integrate ClamAV into LLVM-testsuite's build-system
+filterdiff.sh: compare --debug output to test code generation correctness
+
+Important to know:
+
+The directory inputs/ contains files (or symlinks to) to be scanned during the test.
+These can be any files, but they must be the same each time you run
+the test, to ensure consistency of results.
+
+The directory dbdir/ contains the virus database. You get an initial copy with the
+prepare.sh.
+Note, that the recommended way to update is via freshclam(1). Updating the database
+is not important for the test-suite.
+When you import a new version of ClamAV into the testsuite it is recommended to
+use latest DB however.
+
+When execute clamscan creates files in the system tmp directory (usually /tmp).
+Watch disk space!
+
+
+
+BUGREPORTS
+----------
+If you encounter problems with ClamAV itself, please try to reproduce the problem with
+clamav built from latest stable available on www.clamav.net.
+
+You can report bugs on http://bugs.clamav.net
+
+If you haven't tried to reproduce problem with the original clamav,
+please add a reference to the LLVM bugreport, and a descriptive text in subject stating
+it is related to LLVM testsuite. 
+
+For bugs opened on LLVM bugzilla regarding ClamAV testsuite failures 
+(that are not due to bugs in LLVM), please CC: edwin at clamav dot net
+

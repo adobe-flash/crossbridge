@@ -1,0 +1,683 @@
+<!--
+<!DOCTYPE DocBook>
+
+< kimwitu++ part I: introduction >
+-->
+
+<chapter><title>What is &kpp;?</title>
+  <para>This chapter sketches out the field on which &kpp; is usefully employed and
+    explains important terms. It develops an example to outline the advantages
+    of this tool compared to conventional techniques. The example will be used
+    throughout the following chapters to introduce concept by concept. The
+    complete code to make it work can be found in appendix <xref
+      linkend="app:rpn"/>.</para>
+
+  <sect1><title>What for is &kpp; used?</title>
+    <para>To illustratively explain what we can do with the help of &kpp; we
+      call upon an example. Let us imagine we want to write a computer game.
+      Neat example. Respectable programmers as we are we calculate
+      the overall costs of the new project in advance. It will take us, say, 30
+      days, on each we need to have a pizza at 7 &euro; and 3 beer at 2 &euro;
+      each, but luckily meanwhile our grandma supports us with 100 &euro;. We
+      get the expression <inlineequation><alt>30*(8+3*2)-100</alt>
+	<inlinemediaobject><imageobject><imagedata
+	      fileref="figures/equation3.png"
+	      format="PNG"/></imageobject>
+      </inlinemediaobject> <?latex \(30 ( 8 + 3 \times 2) - 100\)?>
+      </inlineequation> and type it in postfix notation into our
+      <acronym>RPN</acronym><indexterm><primary>rpn</primary></indexterm>-calculator.
+      You know, one of the antiquated devices knowing nothing about precedence
+      nor parentheses and expecting input in Reverse Polish Notation, where
+      operands precede their operator.</para>
+    <para>So we type <userinput>30 8 3 2 * + * 100 -</userinput>. Er, we cannot.
+      I remember. The calculator gave up the ghost last week. But don't
+      despair. We quickly program a new one.</para>
+  </sect1>
+
+  <sect1><title>A Simple Example</title>
+    <para>What exactly should the new calculator be able to do? Anyhow, it
+      better
+      would accept also variables. Why? Just imagine a drastic shortage of pizza
+      and beer what would urge us to setup a new expression again. We better use
+      a flexible one which can be seen in example <xref
+      linkend="exa:expression"/>, in which <varname>x</varname> is the price of
+      a beer and we know the price of a pizza always to be 4 times a beer.
+      </para>
+    <example id="exa:expression"><title>Sample Expression</title>
+      <informalequation><alt>30*(4*x+3*x)-100</alt>
+	<mediaobject><imageobject><imagedata fileref="figures/equation4.png"
+	      format="PNG"/></imageobject>
+	</mediaobject><?latex \[30 ( 4 \times x + 3 \times x) - 100\]?>
+      </informalequation>
+      <para>(and resulting input in <acronym>RPN</acronym>: 
+	<userinput>30 4 x * 3 x * + * 100 -</userinput>)
+      </para>
+    </example>
+    <para>We now list the requirements on the calculator in proper order.
+      <orderedlist numeration="arabic" spacing="compact">
+	<listitem><para>We want it to analyse an input expression (term) of
+	  digits, arithmetical operators, and variables.</para></listitem>
+	<listitem><para>It should calculate the expression if possible or
+	  simplify it at least.</para></listitem>
+	<listitem><para>It then should output a result.</para></listitem>
+      </orderedlist>
+    </para>
+
+    <para>We assume the existence of a code component (a scanner) providing
+      us with syntactical tokens like operators, numbers and identifiers
+      (variables). We then need a description of
+      correct input, a grammar<indexterm><primary>grammar</primary></indexterm>.
+      Our example demands a valid arithmetical term
+      only to consist of numbers, identifiers, and the four arithmetical operators.
+      A formal notation as used by the parser generator &yacc; (see <xref
+      linkend="sec:yacc"/>) would look like in example <xref
+      linkend="exa:gramyacc"/>.</para>
+    <example id="exa:gramyacc"><title>&yacc; Grammar for Sample</title>
+      <programlisting>
+  aritherm:     simpleterm
+	      | aritherm aritherm '+'
+	      | aritherm aritherm '-'
+	      | aritherm aritherm '*'
+	      | aritherm aritherm '/';
+	      
+  simpleterm:   NUMBER
+	      | IDENT;
+      </programlisting>
+    </example>
+    <para>Such a grammar is made up of rules, each having two sides separated by
+      a colon. These rules describe how the left-hand side called
+      nonterminal<indexterm><primary>nonterminal</primary></indexterm> can be
+      composed of syntactical tokens called
+      terminals<indexterm><primary>terminal</primary></indexterm>, which
+      are typed in upper
+      case letters or as single quoted characters. Different alternatives are
+      separated by bar. The right-hand side may also contain nonterminals which
+      there can be regarded to be an application of their respective composition
+      rule.</para>
+    <para>The first rule of this grammar defines an &aritherm;
+      to be a &simpleterm; or a composition of two &aritherm;s and an operator
+      sign. These &aritherm;s in turn may be composed according to the
+      &aritherm; rule. The second rule describes what an &aritherm; looks
+      like, if it is a &simpleterm;.</para>
+    <para>A common way to hold an input term internally is to
+      keep it as a syntax
+      tree<indexterm><primary>tree</primary><secondary>syntax
+	  tree</secondary></indexterm>, that is a hierarchical structure of
+      nodes<indexterm><primary>node</primary></indexterm> (upside
+      down tree). A nonterminal can be regarded as a node
+      type<indexterm><primary>node type</primary></indexterm> and every
+      alternative of the assigned right-hand side as one
+      &kind;<indexterm><primary>&kind;</primary></indexterm> of that type.
+      Every actual node thus is a &kind; of a node type with a specific number
+      of child nodes, which depends on the &kind;. For example
+      <constant>'+'</constant> is a &kind; of &aritherm; and it has 2 child
+      nodes, while <constant>NUMBER</constant> is a &kind; of &simpleterm; and
+      it has none. Figure <xref linkend="fig:syntaxtreex"/> shows a syntax tree
+      for our sample input term. Since every node is a
+      term<indexterm><primary>term</primary></indexterm> itself such a tree is
+      more generally called a term
+      tree<indexterm><primary>tree</primary><secondary>term tree</secondary></indexterm>.</para>
+    <figure id="fig:syntaxtreex">
+      <title>Syntax tree representing sample term</title>
+      <mediaobject><imageobject><imagedata
+	    fileref="imagesgen/syntaxtreex.png" align="center" format="PNG"/>
+	</imageobject>
+	<imageobject><imagedata
+	    fileref="imagesgen/syntaxtreex" align="center" format="TEX"/>
+	</imageobject>
+      </mediaobject>
+    </figure>
+    <para>To summarise the task identified: we want to build a tree from the
+      term
+      which has been typed in, walk over the tree nodes, and perform appropriate
+      actions like calculating, simplifying or printing some results.</para>
+  </sect1>
+      
+  <sect1><title>Conventional Approach</title>
+    <para>In a programming language a node type is usually represented as
+      a structured data type, that is, as a class in object oriented languages
+      and as a sort of record in others.
+      A &kind;, then, may be a class
+      variant or a subclass, and a variant record respectively. The
+      code fragment in example <xref linkend="exa:cppclass"/> illustrates a
+      possible implementation in &cpp; (the &kind; as a subclass). The classes
+      left out are to define similar.</para>
+    <example id="exa:cppclass"><title>Node Types as Classes with &cpp;</title>
+      <programlisting>
+  class Aritherm			{ /* ... */ };
+  class Simpleterm : Aritherm           { /* ... */ };
+	
+  class Plus	      : public Aritherm
+  {
+    public :
+      Plus( Aritherm *a, Aritherm *b ) : t1 ( a ), t2 ( b )
+      { /* ... */ };
+    private:
+      Aritherm *t1, *t2;
+  };
+
+  class Number	      : public Simpleterm
+  {
+    public :
+      Number( int a ) : n ( a )
+      { /* ... */ };
+    private:
+      int n;
+  };
+      </programlisting>
+    </example>
+    <para>From these classes we can instantiate &cpp; objects to represent our
+      sample tree. We can navigate through it by accessing the child nodes of
+      nodes. Not really yet, if you look closely at it. The child nodes are
+      private members and thus they can not be accessed. We have to make them
+      public or to add methods for their access. But what about the next step,
+      simplifying parts of the tree? The subtree
+    <inlineequation><alt>4*x+3*x</alt> <?latex \(4 \times x + 3 \times x\)?>
+      <inlinemediaobject><imageobject><imagedata fileref="figures/equation1.png" format="PNG"/></imageobject>
+      </inlinemediaobject>
+    </inlineequation> could be transformed to, right, 
+    <inlineequation><alt>(4+3)*x</alt><?latex \(( 4 + 3 ) \times x\)?>
+      <inlinemediaobject><imageobject><imagedata fileref="figures/equation2.png"
+	    format="PNG"/></imageobject>
+      </inlinemediaobject>
+    </inlineequation>, by putting <varname>x</varname> outside the parentheses,
+    as illustrated in figure <xref linkend="fig:simplify"/>.
+    For &cpp; this may look like listed in example <xref linkend="exa:cpp"/>.
+    </para>
+    <figure id="fig:simplify">
+      <title>Simplification of a samples subtree</title>
+      <mediaobject><imageobject><imagedata
+	    align="center" fileref="imagesgen/simplify.png" format="PNG"/>
+	</imageobject>
+	<imageobject><imagedata
+	    align="center" fileref="imagesgen/simplify" format="TEX"/>
+	</imageobject>
+      </mediaobject>
+    </figure>
+
+    <example id="exa:cpp"><title>Term Substitution with &cpp;</title>
+      <programlisting>
+	<![CDATA[
+  if( dynamic_cast<Sum> ( A ) !=0 &&
+      dynamic_cast<Mul> ( dynamic_cast<Sum>( A ) -> t1 ) !=0 &&
+      dynamic_cast<Mul> ( dynamic_cast<Sum>( A ) -> t2 ) !=0 &&
+      dynamic_cast<Mul> ( dynamic_cast<Sum>( A ) -> t1 ) -> t2 == 
+      dynamic_cast<Mul> ( dynamic_cast<Sum>( A ) -> t2 ) -> t2 )
+  {
+
+     A = new Mul ( new Sum (
+      dynamic_cast<Mul> ( dynamic_cast<Sum>( A ) -> t1 ) -> t1,
+      dynamic_cast<Mul> ( dynamic_cast<Sum>( A ) -> t2 ) -> t1 ),
+      dynamic_cast<Mul> ( dynamic_cast<Sum>( A ) -> t1 ) -> t2 );
+  };
+	]]>
+      </programlisting>
+    </example>
+    <para>That seems quite complicated and it is even more so! Not only have we
+      to cast for every child node access, to avoid memory leaks we had to free
+      memory of unused nodes as old <varname>A</varname> and its child nodes.
+      Furthermore the equality check between <varname>t1</varname> and
+      <varname>t2</varname> will merely compare pointer values, instead of
+      checking whether the subtrees are structurally equal. Thus we additionally
+      need to overload the equality operators. What a lot of trouble for such
+      a simple example!</para>
+  </sect1>
+  
+  <sect1><title>&kpp; Approach</title>
+    <para>&kpp;'s<indexterm><primary>&kpp;</primary></indexterm> name
+      is formed after Swahili while the &lsquo;++&rsquo;
+      reminds on &cpp;. </para>
+    <informaltable frame="none" pgwide="1">
+      <tgroup cols="3">
+	<?latex-table-head lcl?>
+	<tbody>
+	  <row><entry>witu</entry>
+	    <entry>:</entry>
+	    <entry>&lsquo;tree&rsquo;</entry>
+	  </row>
+	  <row><entry>m-</entry>
+	    <entry>:</entry>
+	    <entry>plural prefix</entry>
+	  </row>
+	  <row><entry>ki-</entry>
+	    <entry>:</entry>
+	    <entry>adjectival prefix: &lsquo;being like&rsquo;</entry>
+	  </row>
+	  <row><entry>kimwitu</entry>
+	    <entry>=</entry>
+	    <entry>&lsquo;tree-s-ish&rsquo;</entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </informaltable>
+    <para>Thus the name indicates affiliation to trees and to &cpp;. You
+      guessed it before, didn't you? More strictly spoken &kpp; is a tool which
+      allows to describe in an easy way how to manipulate and to evaluate a
+      given term tree. From these descriptions &cpp; code is
+      generated and compiled to a program which processes terms. That is why
+      &kpp; itself is called a term processor.</para>
+    <para>The code for building a tree, we have to write ourselves, or
+      we let preferably other tools generate it.
+      We use &yacc; to call term
+      creation routines which are generated from a &kpp; abstract grammar.
+      This we have to specify first. It is similar to the &yacc; grammar, but
+      its right-hand side alternatives are operators applied to nonterminals. An
+      abstract grammar for our sample can be seen in example <xref
+      linkend="exa:gramkpp"/>. The nonterminals <classname>integer</classname>
+      and <classname>casestring</classname> are predefined in &kpp;.</para>
+    <example id="exa:gramkpp"><title>Abstract Grammar for Sample</title>
+      <programlisting>
+  aritherm:	SimpleTerm  ( simpleterm )
+	      | Plus	    ( aritherm aritherm )
+	      | Minus	    ( aritherm aritherm )
+	      | Mul	    ( aritherm aritherm )
+	      | Div	    ( aritherm aritherm );
+
+  simpleterm:   Number	    ( integer )
+	      | Ident	    ( casestring );
+      </programlisting>
+    </example>
+    <para>Next we have to complete the &yacc; grammar by adding
+      semantic actions in braces to every alternative. These recursively
+      create a term tree which has its root element assigned to the variable
+      <varname>root_term</varname>. Example <xref linkend="exa:gramyaccp"/>
+      shows this grammar, in which <varname>$$</varname> denotes the term
+      under construction and <varname>$1</varname> and <varname>$2</varname>
+      its first and its second subterm<indexterm 
+	significance="preferred"><primary>subterm</primary></indexterm> (child
+      node).</para>
+    <example id="exa:gramyaccp">
+      <title>Completed &yacc; Grammar for Sample</title>
+      <programlisting>
+  aritherm:    simpleterm
+		{ root_term = $$ = SimpleTerm( $1 ); }
+	      | aritherm aritherm '+'
+		{ root_term = $$ = Plus( $1, $2 ); }
+	      | aritherm aritherm '-'
+		{ root_term = $$ = Minus( $1, $2 ); }
+	      | aritherm aritherm '*'
+		{ root_term = $$ = Mul( $1, $2 ); }
+	      | aritherm aritherm '/'
+		{ root_term = $$ = Div( $1, $2 ); };
+
+  simpleterm:   NUMBER
+		{ $$ = Number( $1 ); }
+	      | IDENT
+		{ $$ = Ident( $1 ); };
+      </programlisting>
+    </example>
+    <para>That is it for building a tree. Everything else is left to the
+      automatic code generation. Modifying or evaluating the tree
+      needs its own rules (see chapter <xref linkend="cha:modify"/>).
+    </para>
+  </sect1>
+  <sect1 id="ch:summary"><title>Summary</title>
+    <para>The language &kpp; is an extension of &cpp; for handling of term trees.
+      It allows the definition of term types<indexterm><primary>term
+	  type</primary><see>node type</see></indexterm>, creation of terms, and provides
+    mechanisms for transforming and traversing trees as well as saving and
+    restoring them. Besides creating it in static code a tree can dynamically
+    be obtained by interfacing with compiler generator &cpp; code (as from
+    &yacc;/&bison;). The &kpp; processor generates &cpp; code from the contents
+    of &kpp; input (<filename>.k</filename>-files). Compilation of that code
+    yields the term processing program.</para>
+</sect1>
+</chapter>
+
+<chapter><title>How to Define Term Types</title>
+  <para>This chapter describes possibilities to define term types, which make up
+    the &kpp; input. In &kpp; they are called
+    phyla<indexterm><primary>phyla</primary><see>phylum</see></indexterm> (singular
+    phylum)<indexterm><primary>phylum</primary></indexterm>, and that
+    is what we will call them from now on. A phylum instance is called a
+    term<indexterm significance="preferred"><primary>term</primary></indexterm>.
+  </para>
+  <sect1><title>Definition</title>
+    <indexterm><primary>phylum</primary><secondary>definition</secondary></indexterm>
+    <para>How are phyla defined? Example <xref linkend="exa:gramkpp"/> shows
+      that each phylum is defined as an enumeration of its &kind;s, each being
+      an operator applied to a number of phyla, maybe zero. So the operator
+      <constant>SimpleTerm</constant> takes one &simpleterm; phylum,
+      <constant>Plus</constant> takes two &aritherm; phyla. There are several
+      predefined phyla, of which <constant>integer</constant> and
+      <constant>casestring</constant> already have been mentioned. The latter
+      denotes a case sensitive character string. If a phylum is
+      defined more than once, all occurrences contribute to the first one. For
+      each phylum, a &cpp; class is generated.</para>
+  </sect1>
+  <sect1><title>Lists<indexterm><primary>list</primary></indexterm></title>
+    <indexterm id="idx:list" class="startofrange"><primary>list</primary></indexterm>
+    <para>We may want to define a phylum as a list of phyla. Imagine we wanted
+      not only to type one expression into our calculator but several ones at
+      once, separated in input by, say, a semicolon. The main phylum,
+      representing whole the input, would be a list of
+      &aritherm;s. This is a right-recursive definition of a list which may be a
+      nil (empty) list. The name of the list phylum prefixed by
+      <constant>Nil</constant><indexterm><primary>Nil</primary></indexterm> and
+      <constant>Cons</constant><indexterm><primary>Cons</primary></indexterm> make up
+      common names for the two list operators. The other way to define a list
+      phylum is to use the built-in
+      <constant>list</constant> operator. This not
+      only looks more simple but causes the generation of additional list
+      functions.
+      Example <xref linkend="exa:lists"/> shows both definitions. </para>
+    <example id="exa:lists">
+      <title>Recursive and built-in List Definition</title>
+      <programlisting>
+  arithermlist:	    Nilarithermlist ( )
+		  | Consarithermlist( aritherm arithermlist );
+
+  arithermlist: list aritherm;
+      </programlisting>
+    </example>
+    <indexterm class="endofrange" startref="idx:list"/>
+  </sect1>
+  <sect1><title>Attributes<indexterm id="intro_attributes"
+	class="startofrange"><primary>attributes</primary></indexterm>
+    </title>
+    <para>Each phylum definition can contain declarations of attributes of
+      phylum or arbitrary &cpp; types. They follow the operator
+      enumeration as a block enclosed in braces. What purpose do they serve?
+      With them, we can attach additional information to nodes, which otherwise
+      could only unfavourably be represented in the tree. In our example, we may
+      take advantage of attributes by saving intermediate results to support
+      the calculation. Therefore we extend the definition of &aritherm; from
+      example
+      <xref linkend="exa:gramkpp"/> to example <xref
+      linkend="exa:gramattr1"/>.</para>
+    <example id="exa:gramattr1"><title>Phylum Definition with Attributes</title>
+      <programlisting>
+  aritherm:     SimpleTerm    ( simpleterm )
+	      | Plus	      ( aritherm aritherm )
+	      | Minus	      ( aritherm aritherm )
+	      | Mul	      ( aritherm aritherm )
+	      | Div	      ( aritherm aritherm )
+	      { int result	  = 0;
+                bool evaluated    = false;
+                bool computable   = true;
+	      };
+      </programlisting>
+    </example>
+    <para>Attribute <varname>result</varname> should hold the intermediate
+      result of an &aritherm;, if it already has been evaluated
+      (<varname>evaluated</varname><constant>==true</constant>) and found
+      computable during the evaluation
+      (<varname>computable</varname><constant>==true</constant>), that is the
+      subterms contain no variables. The attributes can be initialized at the
+      declaration or inside an additional braces block which may follow
+      the declarations and can contain arbitrary &cpp; code. Example <xref
+      linkend="exa:gramattr2"/> shows an alternative to the initialization from
+      example <xref linkend="exa:gramattr1"/>.</para>
+    <example id="exa:gramattr2">
+      <title>Alternative Attributes Initialization</title>
+      <programlisting>
+<![CDATA[              { int result;
+                bool evaluated;
+                bool computable;
+                { $0->result      = 0;
+                  $0->evaluated   = false;
+                  $0->computable  = true; }
+              };]]>
+      </programlisting>
+    </example>
+    <para>That &cpp; code is executed when a term of that phylum has been
+      created. It can be referred to as <varname>$0</varname> and its
+      attributes can be accessed via the operator
+      <constant><![CDATA[->]]></constant>.</para>
+    <indexterm class="endofrange" startref="intro_attributes"/>
+  </sect1>
+</chapter>
+
+<chapter><title>Aid with Term Handling</title>
+  <para>This chapter describes techniques necessary and useful to traverse a
+    term structure: the application of term patterns and the
+    use of special &kpp; language constructs for term handling.</para>
+  <sect1
+    id="sec:patterns">
+    <title>Patterns<indexterm><primary>patterns</primary></indexterm></title>
+    <para>Patterns are a means to select specific terms which can be associated
+      with a desired action. Example <xref linkend="exa:pattern"/> shows some
+      patterns and explains what terms they match. Patterns are used in special
+      statements and in rewrite and unparse rules (see <xref
+      linkend="sec:specstatements"/>
+      and <xref linkend="cha:modify"/> respectively).</para>
+    <example id="exa:pattern"><title>Patterns</title>
+      <programlisting>
+<![CDATA[  Plus( *, * )
+  // matches a term Plus with two subterms
+
+  c=Plus( a, b )
+  // matches a term Plus with two subterms, which are assigned to
+  // the variables a and b, while the term itself is assigned to c
+
+  Plus( a, a )
+  // similar to the previous case, but matches only if the two subterms
+  // are structurally equal; variable a gets assigned the first subterm
+
+  Plus( Mul( a, b ), * )
+  // matches a term Plus with two subterms, whereof the first one
+  // is a Mul term with the subterms assigned to the variables a and b
+
+  Plus( a, b ), Minus( a, b )
+  // matches if the term in question is either a Plus or a Minus; the
+  // two subterms then are assigned to the variables a and b]]>
+      </programlisting>
+    </example>
+  </sect1>
+  <sect1 id="sec:specstatements"><title>Special Statements</title>
+    <para>&kpp; provides two statements as extensions to &cpp; which make it
+      more comfortable to deal with terms. These are the &with;-statement and
+      the &foreach;-statement. They can be used in functions and in the &cpp;
+      parts of unparse rules (see <xref linkend="sec:traverse"/>).</para>
+    <para>The &with;<indexterm><primary>&with;</primary></indexterm>-statement
+      can be considered as a 
+      <constant>switch</constant>-statement for a phylum. It contains an
+      enumeration of patterns which must describe &kind;s of the specified
+      phylum. From these, the one is chosen which matches a given term best.
+      Then the &cpp; code is executed, which was assigned to that pattern.
+    </para>
+    <para>Example <xref linkend="exa:with"/> takes a term of the phylum
+      &aritherm;
+      and calculates the attribute <varname>result</varname>, if the term is a
+      sum or a difference,
+      by adding or subtracting the results of the subterms. The keyword
+      <constant>default</constant> serves as a special pattern in &with;, which
+      matches when none of the others does.</para>
+    <para>In the first case, the two subterms are assigned to the variables
+      <varname>a</varname> and <varname>b</varname>, which can be used in the
+      &cpp; part. The term itself is assigned to variable <varname>c</varname>
+      which thus refers to the same term as the variable <varname>at</varname>.
+      Variable <varname>at</varname> is visible throughout the entire &with;
+      body and it can be accessed in all &cpp; parts. It may get a new term
+      assigned as it is done in the second case whithin which the variable
+      <varname>at</varname> refers to the first subterm.</para>
+    <example id="exa:with">
+      <title>&with;-statement</title>
+      <programlisting>
+<![CDATA[  aritherm at;
+  ...
+  with ( at ) {
+    c = Plus ( a, b )	:  { c -> result = a -> result + b -> result; }
+    Minus ( at, b )	:  { c -> result = at -> result - b -> result; }
+    default		:  { }
+  }]]>
+      </programlisting>
+    </example>
+    <para>The second special construct is the
+      &foreach;<indexterm><primary>&foreach;</primary></indexterm>-statement, which
+      iterates over a term of a list phylum and performs the specified actions
+      for every list element. Example <xref linkend="exa:foreach"/> determines
+      the greatest <varname>result</varname> from the terms in the list
+      <varname>a</varname>.</para>
+      <example id="exa:foreach">
+	<title>&foreach;-statement</title>
+	<programlisting>
+<![CDATA[  int max = 0;
+  foreach( a; arithermlist A ){
+    if( a -> result > max ) max = a -> result;
+  }]]>
+	</programlisting>
+      </example>
+  </sect1>
+</chapter>
+
+<chapter id="cha:modify"><title>Modifying and Evaluating Term Trees</title>
+  <para>This chapter describes how the tree of terms can be processed
+    once it has been created. On one hand we can change its structure and
+    hopefully simplify it by applying rewrite rules. On the other hand we
+    can step through it and create a formatted output by applying unparse
+    rules.
+    </para>
+  <sect1><title>Transforming</title>
+    <para>Rewriting<indexterm><primary>rewriting</primary></indexterm> denotes
+      the process of stepping through the tree, seeking
+      the terms that match a pattern and substituting them by the appropriate
+      substitution term. Rewrite rules consist of two parts, where the
+      left-hand side is a pattern (as described in <xref
+	linkend="sec:patterns"/>) and the right-hand side is a substitution term
+      enclosed by angle brackets. A term must always be substituted by a simpler
+      one, that is by one that is nearer to the desired form of result.
+      Otherwise the substitution process may never stop.</para>
+    <para>Let us try simplifying according to figure <xref
+      linkend="fig:simplify"/> to demonstrate the usage of rewrite rules. What
+      would the rules look like in &kpp; to achieve a simplification of that
+      kind?
+      Example <xref linkend="exa:rewrite"/> shows a solution using rewriting. It
+      is quite short in comparison with example <xref linkend="exa:cpp"/>, isn't
+      it?</para>
+    <example id="exa:rewrite">
+	<title>Term Substitution using &kpp;</title>
+	<programlisting>
+<![CDATA[  Mul( Plus( a, b ), Plus( c, b ) ) -> <: Plus( Mul( a, c ), b )> ;]]>
+	</programlisting>
+      </example>
+    <para>An equivalent part would cover the case that <varname>b</varname>
+      takes the first position in both subterms. The meaning of the colon will
+      be explained in <xref linkend="sec:views"/>.</para>
+  </sect1>
+  <sect1 id="sec:traverse"><title>Traversing</title>
+    <para>Originally unparsing was meant to be a reverse parse, used to give a
+      formatted output of the tree built. In general it should better be
+      recognized
+      as a way to traverse the tree. Unparse rules have a structure similar to
+      that of rewrite rules. The left-hand side consists of a pattern, the
+      right-hand side of a
+      list of unparse items enclosed by square brackets. Some more common
+      unparse items are strings, pattern variables, attributes, and blocks of
+      arbitrary &cpp; code enclosed in braces.</para>
+    <para>Unparsing starts by calling the
+      <function>unparse</function><indexterm><primary>unparse()</primary></indexterm>-method
+      of a term, usually the root term,
+      and when a rule matches a term the
+      specified items are &lsquo;printed&rsquo;. Only string items are really
+      delivered to the current printer. This printer has to be defined by the
+      user, and it usually writes to the standard output or into a file.
+      Variable items and attribute items are further unparsed, code fragments
+      are executed. If no pattern matches then the default rule is used, which
+      exists for every phylum operator and which simply unparses the
+      subterms.</para>
+    <para>We could do quite a lot of different things with the information saved
+      in the tree. It just depends on the rules we use. For example we choose to
+      print the input term in infix notation, because it is better readable to
+      humans.</para>
+    <informalexample>
+      <programlisting>
+<![CDATA[  Plus( a, b ) -> [infix: "(" a "+" b ")" ];]]>
+      </programlisting>
+    </informalexample>
+    <para>
+      For every <constant>Plus</constant> term this rule prints an opening
+      parenthesis, unparses the first subterm, prints a plus sign, unparses the
+      second subterm, and then prints the closing parenthesis. The other
+      operators are handled by similar rules.</para>
+    <para>We also may want to eventually compute the result of
+      expressions. This can be achieved with rules like this.</para>
+    <informalexample>
+      <programlisting>
+<![CDATA[  c = Plus( a, b ) -> [: a b { c -> result = a -> result + b -> result; } ];]]>
+      </programlisting>
+    </informalexample>
+    <para>Here the subterms are unparsed and then an attribute of the term gets
+      assigned the sum of the subterm results. This will work only if these do
+      not contain <constant>Ident</constant>s. The meaning of the colon will be
+      explained in <xref linkend="sec:views"/>.</para>
+    <para>The &cpp; code is enclosed by braces, but can itself contain
+      braces in matching pairs. If a single brace is needed, as when
+      mixing code and variable items, it has to be escaped with the dollar
+      sign. Example <xref linkend="exa:escapedbrace"/> shows an application.
+      If the function yields <constant>true</constant> the first branch
+      is taken, and
+      <varname>b</varname> is unparsed before <varname>a</varname>.</para>
+    <example id="exa:escapedbrace">
+      <title>Escaped Braces in Unparse Rule</title>
+      <programlisting>
+<![CDATA[  Plus( a, b ) -> [ : { if( smaller_than( a, b ) ) } ${
+			  b "+" a $}
+		      { else } ${
+			  a "+" b $} ];]]>
+      </programlisting>
+    </example>
+  </sect1>
+  <sect1
+    id="sec:views">
+    <title>Views<indexterm class="startofrange"
+	id="idx:view"><primary>view</primary></indexterm></title>
+    <para>The whole process of rewriting and unparsing as well as parts of it
+      can be executed under different views. Each rule contains a view list
+      between the respective opening brace and the colon, and it is used only
+      if the current view appears
+      in the list. This allows to specify different rules for a pattern. If a
+      term is visited twice under different views, different rules are
+      applied. These rules can be merged into one by listing all right-hand sides
+      after one left-hand side, separating them by a comma.</para>
+    <para>Example <xref linkend="exa:rewriteview"/> defines two rewrite views 
+      (<constant>simplify</constant> and <constant>canonify</constant>) and
+      two rules, each of which will only be applied to a matching term if the
+      current view is among
+      the specified ones. The first rule replaces the quotient of the same two
+      identifiers by the number <literal>1</literal>, the second expresses
+      the associativity of addition. Both change the tree.</para>
+    <example id="exa:rewriteview">
+      <title>Views in Rewrite Rules</title>
+      <indexterm><primary>mkinteger</primary></indexterm>
+      <programlisting>
+<![CDATA[  %rview simplify, canonify;
+
+  Div( SimpleTerm( Ident( a ) ), SimpleTerm( Ident( a ) ) )
+      -> < simplify: SimpleTerm( Number( mkinteger( 1 ) ) ) >;
+
+  Plus( Plus( a, b ), c )
+      -> < canonify: Plus( a, Plus( b, c ) ) >;]]>
+      </programlisting>
+    </example>
+    <para>Example <xref linkend="exa:unparseview"/> defines two unparse views
+      (<constant>infix</constant> and <constant>postfix</constant>) and two
+      rules for the same pattern, the one of which is used which matches both
+      the term and the current view. It is possible to force a variable item to
+      be unparsed under a desired view by specifying it after the variable and
+      an intermediate colon. Subterm <varname>b</varname> is further
+      unparsed under the view <constant>check_zero</constant> instead of the
+      view <constant>infix</constant>.</para>
+    <informalexample id="exa:specview">
+      <indexterm><primary>%uview</primary></indexterm>
+      <programlisting>
+<![CDATA[  %uview check_zero;
+
+  Div( a, b ) -> [ infix : a "/" b : check_zero ];
+	]]>
+      </programlisting>
+    </informalexample>
+    <example id="exa:unparseview">
+      <title>Views in Unparse Rules</title>
+      <programlisting>
+<![CDATA[  %uview infix, postfix;
+
+  Plus( a, b ) -> [ infix   : a "+" b ],
+		  [ postfix : a b "+" ];]]>
+      </programlisting>
+    </example>
+    <!-- Always move to end of enclosing chapter -->
+    <para><indexterm class="endofrange" startref="idx:view"/></para>
+  </sect1>
+</chapter>
+<!-- vim:set sw=2 ts=8 tw=80: -->

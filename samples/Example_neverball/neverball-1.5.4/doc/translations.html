@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN">
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Neverball translation guidelines</title>
+</head>
+
+<body>
+    <h1>Neverball translation guidelines</h1>
+
+    <h2>About this document</h2>
+
+    <p>This document contains information for people who are interested in
+    translating <a href="http://neverball.org/">Neverball</a> (and Neverputt)
+    to their language of choice.</p>
+
+    <p>If you have any questions after reading this document, do not hesitate
+    to <a href="http://www.nevercorner.net/forum/" title="Neverforum">ask
+        them</a>, so that this document can be further improved.</p>
+
+    <h2>General information</h2>
+
+    <p>Neverball is internationalised using the <a
+        href="http://www.gnu.org/software/gettext/">GNU Gettext
+        internationalisation library</a>.  In this approach, translators
+    typically work with PO files containing "message identifiers" (source text)
+    and "message strings" (translations of the source text).</p>
+
+    <h2 id="tools">Tools</h2>
+
+    <p>It is advisable to use a dedicated PO editing tool instead of editing
+    the files manually.  By doing so, you will ensure that files remain in a
+    valid format and encoding, and source text is not accidentally modified,
+    and it will also minimise the time required for translation.</p>
+
+    <p>Listed below are few of such editing tools.  There are also custom modes
+    and plugins available for Vim and Emacs and probably your own favourite
+    extensible text editor.</p>
+
+    <dl>
+
+        <dt>Poedit</dt>
+
+        <dd>
+
+        <p><a href="http://www.poedit.net/">Poedit</a> is a multi-platform PO
+        file editor.  If you are using Microsoft Windows, Poedit is likely to
+        be your only option.  The interface is straight-forward and the editor
+        is easy-to-use.  It appears to lack documentation for key bindings,
+        however, and plural forms for your language will have to be entered
+        manually (if needed).<p>
+
+        </dd>
+
+        <dt>KBabel</dt>
+
+        <dd>
+
+        <p><a href="http://kbabel.kde.org/">KBabel</a> is an advanced PO
+        editor for KDE.  It is so advanced, in fact, that this author gave up
+        trying it out during the initial set-up...  Can be overwhelming and may
+        require some time to become familiar with.<p>
+
+        </dd>
+
+        <dt>gtranslator</dt>
+
+        <dd>
+
+        <p><a href="http://gtranslator.sourceforge.net/">gtranslator</a> is a
+        PO file editor for the GNOME desktop environment.  While being one of
+        the easiest-to-use editors from those mentioned here, it unfortunately
+        has a critical bug (up until version 1.1.7 as of this writing) and does
+        not handle certain message identifiers correctly.  Therefore it is
+        <strong>not usable with Neverball</strong> at the moment.<p>
+
+        </dd>
+
+    </dl>
+
+    <h2>Instructions</h2>
+
+    <p>First, if there is already a translation for your language, contact the
+    current translator (or translation team), as indicated in the respective PO
+    file.  A list of current translations is available in the <a
+        href="https://s.snth.net/svn/neverball/trunk/po/">"po"
+        subdirectory of the source code tree</a>.</p>
+
+    <p>If your language does not yet have a translation, download the
+    translation template file "neverball.pot".  Then, translate it.</p>
+
+    <p>Important remarks:</p>
+
+    <ul>
+
+        <li>The text encoding must be UTF-8.</li>
+
+        <li>Never edit the source text.  (Using a <a href="#tools">dedicated PO
+            editor</a> can sometimes help resist the temptation.)  If you find
+        errors or have any suggestions on how to improve the source text,
+        please contact the developers (preferably by posting a message on the
+        forum).</li>
+
+        <li>Some strings are "contextualised", in order to allow different
+        translations for identical message identifiers.  These strings are in
+        the form of "xxx^yyy", where "xxx" is the context and "yyy" is the
+        string to translate.  The translations of such strings must have the
+        context prefix removed and must <em>only</em> contain the translation
+        of "yyy".</li>
+
+    </ul>
+
+    <p>After completing the translation, send us the translated file.  You can
+    open a new thread in the forum and either link the PO file from there or
+    send the file to one of the developers.</p>
+
+    <h2>(In)Frequently Asked Questions</h2>
+
+    <dl>
+
+        <dt>What to do with the sentences in French in the source text?</dt>
+
+        <dd>
+
+        <p>The currently accepted practice is to copy the French text verbatim
+        (untranslated) and only translate the parts in English.<p>
+
+        </dd>
+
+        <dt>Why <em>are</em> there sentences in French in the source text?</dt>
+
+        <dd>
+
+        <p>The French text comes from the intro messages of most of Mehdi's
+        levels.  What can probably be assumed to be the the first attempts to
+        introduce i18n in Neverball is now seen as a sort of a "trade mark" for
+        Mehdi's levels.  In any case, this is an exception, not the norm, and
+        these days mappers are expected to just stick with the "real deal" and
+        use Gettext to do the localisation.</p>
+
+        </dd>
+
+        <dt>How to deal with plural forms?</dt>
+
+        <dd>
+
+        <p>A good description of <a
+            href="http://www.gnu.org/software/gettext/manual/html_node/Plural-forms.html">Gettext
+            plural form handling</a> is available in the Gettext documentation.
+        It is somewhat technical in nature, however, it is advisable to read
+        the entire section to gain a good understanding of the concept.  Below
+        is a short (but not necessarily easier to understand) summary.</p>
+
+        <p>PO entries involving plural forms typically look like this (example
+        taken from the Finnish translation):</p>
+
+        <pre>#: ball/st_goal.c:157
+#, c-format
+msgid "%d new bonus level"
+msgid_plural "%d new bonus levels"
+msgstr[0] "%d uusi bonuskenttä"
+msgstr[1] "%d uutta bonuskenttää"</pre>
+
+        <p>The number of "msgstr[x]" lines depends on how many plural forms
+        there are in your language.  The number of plural forms is in turn
+        specified in the Plural-Forms header at the top of the PO file:</p>
+
+        <pre>"Plural-Forms: nplurals=2; plural=(n != 1);\n"</pre>
+
+        <p>Here "nplurals" is the number of plural forms and "plural" is an
+        expression used to determine the plural form of the number "n".  (See
+        the Gettext documentation for details and limitations.)</p>
+
+        <p>Each "msgstr[x]" should contain the translation using the plural
+        form "x" where "x" corresponds to a value of the plural expression.</p>
+
+        </dd>
+
+    </dl>
+
+</body>
+</html>
+

@@ -1,0 +1,137 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @Modula package for formatting Modula-2 programs (Version 1.0)        #
+#                                                                             #
+#  Version 1.0 by Jeffrey H. Kingston, September 1993.                        #
+#                                                                             #
+#  This package implements the complete Modula-2 language (in a style which   #
+#  claims only to reflect its author's taste) with the following caveats:     #
+#                                                                             #
+#  * The symbol { must be given as lbrace                                     #
+#                                                                             #
+#  * The symbol } must be given as rbrace                                     #
+#                                                                             #
+#  * The symbol # must be given as numbersign                                 #
+#                                                                             #
+#  * Double quotes are used by Lout to delimit literal strings, so they       #
+#    need to be quoted (Modula-2 allows single quoted strings wherever        #
+#    double quoted strings can go; we recommend these be used)                #
+#                                                                             #
+#  * Literal strings should be enclosed in double quotes                      #
+#                                                                             #
+#  * The symbols B, H, C, and E as used in numeric literals will appear       #
+#    in italic font                                                           #
+#                                                                             #
+###############################################################################
+
+export	"0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+
+	"*" "/" "~" "+" "-" "=" "<>" ">" ">=" "<" "<=" "("
+	")" "[" "]" "," ";" "." ":" "..." ".." "|" "^" ":=" "'" "`"
+	"&"
+
+	lbrace rbrace numbersign
+
+	AND ARRAY BEGIN BY CASE CONST DEFINITION DIV DO ELSE ELSIF
+	END EXPORT EXIT FOR FROM IF IMPLEMENTATION IMPORT IN LOOP
+	MOD MODULE NOT OF OR POINTER PROCEDURE QUALIFIED RECORD
+	REPEAT RETURN SET TO THEN TYPE UNTIL VAR WHILE WITH @Com
+
+def @Modula
+   body @Body
+@Begin
+
+    def @R right x { Base @Font x }
+    def @B right x { Bold @Font x }
+    def @S right x { { Symbol Base } @Font x }
+
+    def "0"	{ @R "0"			}
+    def "1"	{ @R "1"			}
+    def "2"	{ @R "2"			}
+    def "3"	{ @R "3"			}
+    def "4"	{ @R "4"			}
+    def "5"	{ @R "5"			}
+    def "6"	{ @R "6"			}
+    def "7"	{ @R "7"			}
+    def "8"	{ @R "8"			}
+    def "9"	{ @R "9"			}
+
+    def "*"	{ @S @Char "asteriskmath"	}
+    def "/"	{ @R @Char "fraction"		}
+    def "~"	{ @R "~"			}
+    def "+"	{ @S "+"			}
+    def "-"	{ @S "-"			}
+    def "="	{ @S @Char "equal"		}
+    def "<>"	{ @S @Char "notequal"		}
+    def ">"	{ @S @Char "greater"		}
+    def ">="	{ @S @Char "greaterequal"	}
+    def "<"	{ @S @Char "less"		}
+    def "<="	{ @S @Char "lessequal"		}
+    def "("	{ @R "("			}
+    def ")"	{ @R ")"			}
+    def "["	{ @R "["			}
+    def "]"	{ @R "]"			}
+    def ","	{ @R ","			}
+    def ";"	{ @R ";"			}
+    def "."	{ @R "."			}
+    def ":"	{ @R ":"			}
+    def ".."	{ @R ".." &0.1f			}
+    def "..."	{ @R "..." 			}
+    def "|"	{ @R "|"			}
+    def "^"	{ @S 0.8f @Font @Char "arrowup"	}
+    def ":="	{ :{//0.03fo =}			}
+    def "'"	{ @R "'"			}
+    def "`"	{ @R "`"			}
+    def "&"	{ @R "&"			}
+
+    def lbrace		{ @R "{"		}
+    def rbrace		{ @R "}"		}
+    def numbersign	{ @R "#"		}
+
+    def AND		{ @B "and"		}
+    def ARRAY		{ @B "array"		}
+    def BEGIN		{ @B "begin"		}
+    def BY		{ @B "by"		}
+    def CASE		{ @B "case"		}
+    def CONST		{ @B "const"		}
+    def DEFINITION	{ @B "definition"	}
+    def DIV		{ @B "div"		}
+    def DO		{ @B "do"		}
+    def ELSE		{ @B "else"		}
+    def ELSIF		{ @B "elsif"		}
+    def END		{ @B "end"		}
+    def EXPORT		{ @B "export"		}
+    def EXIT		{ @B "exit"		}
+    def FOR		{ @B "for"		}
+    def FROM		{ @B "from"		}
+    def IF		{ @B "if"		}
+    def IMPLEMENTATION	{ @B "implementation"	}
+    def IMPORT		{ @B "import"		}
+    def IN		{ @B "in"		}
+    def LOOP		{ @B "loop"		}
+    def MOD		{ @B "mod"		}
+    def MODULE		{ @B "module"		}
+    def NOT		{ @B "not"		}
+    def OF		{ @B "of"		}
+    def OR		{ @B "or"		}
+    def POINTER		{ @B "pointer"		}
+    def PROCEDURE	{ @B "procedure"	}
+    def QUALIFIED	{ @B "qualified"	}
+    def RECORD		{ @B "record"		}
+    def REPEAT		{ @B "repeat"		}
+    def RETURN		{ @B "return"		}
+    def SET		{ @B "set"		}
+    def TO		{ @B "to"		}
+    def THEN		{ @B "then"		}
+    def TYPE		{ @B "type"		}
+    def UNTIL		{ @B "until"		}
+    def VAR		{ @B "var"		}
+    def WHILE		{ @B "while"		}
+    def WITH		{ @B "with"		}
+
+    def @Com right x	{ @R "{" x @R "}"	}
+
+   Slope @Font lines @Break @Body
+
+@End @Modula

@@ -1,0 +1,56 @@
+#
+# A common make file that each GDBUnit .make file should include.
+#
+
+#
+# The absolute path to the gdbunit/media/swfs folder 
+#
+$?SWFS_DIR=X
+
+#
+# The absolute path to the flascc build folder
+#
+$?FLASCC_DIR=X
+
+#
+# The swf version to use.
+#
+# Ex: SWF_VERSION=15
+# Leave blank for default swf version of the build
+#
+ifneq (,$(SWF_VERSION))
+    $?SWF_VERSION_FLAGS=-swf-version=$(SWF_VERSION)
+else
+    $?SWF_VERSION_FLAGS=
+endif
+
+#
+# Sometimes when running on Windows a make file needs paths in both a native
+# C:/ style and in a /cygdrive/c style.
+#
+# For example java needs C:/ on Windows since it isn't a cygwin program, but gcc
+# needs cygwin style paths.
+#
+# This is much simpler on Mac since there is no concept of a cygwin style path.
+#
+# This block sets up the NATIVE_FLASCC_DIR and NATIVE_SWFS_DIR variables by
+# using cygpath -m to get a C:/ style path (with forward slashes) on Windows
+# and on Mac just sets them to the FLASCC_DIR and SWFS_DIR variables.
+#
+$?UNAME=$(shell uname -s)
+ifneq (,$(findstring CYGWIN,$(UNAME)))
+	# Windows
+	$?NATIVE_FLASCC_DIR=$(shell cygpath -m $(FLASCC_DIR))
+	$?NATIVE_SWFS_DIR=$(shell cygpath -m $(SWFS_DIR))
+else
+	# Mac
+	$?NATIVE_FLASCC_DIR=$(FLASCC_DIR)
+	$?NATIVE_SWFS_DIR=$(SWFS_DIR)
+endif
+
+#
+# ASC2 Setup
+#
+	$?ASC=$(NATIVE_FLASCC_DIR)/sdk/usr/lib/asc2.jar
+	$?CFLAGS=
+	$?CXXFLAGS=

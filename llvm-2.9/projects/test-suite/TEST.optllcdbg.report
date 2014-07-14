@@ -1,0 +1,20 @@
+##=== TEST.optllcdbg.report - Compare codegen w/ dbg info ------*- perl -*-===##
+#
+# This file defines a report to be generated for the optllcdbg test.
+#
+##===----------------------------------------------------------------------===##
+
+# Sort by name
+$SortCol = 1;
+$TrimRepeatedPrefix = 1;
+
+# These are the columns for the report.  The first entry is the header for the
+# column, the second is the regex to use to match the value.  Empty list create
+# seperators, and closures may be put in for custom processing.
+(
+# Name
+ ["Name:" , '\'([^\']+)\' Program'],
+ [],
+ ["Result:", 'TEST-(.*)'],
+ []
+ );

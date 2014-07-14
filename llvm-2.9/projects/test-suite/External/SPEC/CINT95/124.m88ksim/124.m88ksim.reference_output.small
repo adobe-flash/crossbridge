@@ -1,0 +1,117 @@
+
+Dhrystone Benchmark, Version 2.1 (Language: C)
+
+Program compiled without 'register' attribute
+
+Execution starts, 1000 runs through Dhrystone
+Execution ends
+
+Final values of the variables used in the benchmark:
+
+Int_Glob:            5
+        should be:   5
+Bool_Glob:           1
+        should be:   1
+Ch_1_Glob:           A
+        should be:   A
+Ch_2_Glob:           B
+        should be:   B
+Arr_1_Glob[8]:       7
+        should be:   7
+Arr_2_Glob[8][7]:    1010
+        should be:   Number_Of_Runs + 10
+Ptr_Glob->
+  Ptr_Comp:          4264752
+        should be:   (implementation-dependent)
+  Discr:             0
+        should be:   0
+  Enum_Comp:         2
+        should be:   2
+  Int_Comp:          17
+        should be:   17
+  Str_Comp:          DHRYSTONE PROGRAM, SOME STRING
+        should be:   DHRYSTONE PROGRAM, SOME STRING
+Next_Ptr_Glob->
+  Ptr_Comp:          4264752
+        should be:   (implementation-dependent), same as above
+  Discr:             0
+        should be:   0
+  Enum_Comp:         1
+        should be:   1
+  Int_Comp:          18
+        should be:   18
+  Str_Comp:          DHRYSTONE PROGRAM, SOME STRING
+        should be:   DHRYSTONE PROGRAM, SOME STRING
+Int_1_Loc:           5
+        should be:   5
+Int_2_Loc:           13
+        should be:   13
+Int_3_Loc:           7
+        should be:   7
+Enum_Loc:            1
+        should be:   1
+Str_1_Loc:           DHRYSTONE PROGRAM, 1'ST STRING
+        should be:   DHRYSTONE PROGRAM, 1'ST STRING
+Str_2_Loc:           DHRYSTONE PROGRAM, 2'ND STRING
+        should be:   DHRYSTONE PROGRAM, 2'ND STRING
+
+Microseconds for one run through Dhrystone:   33.3 
+Dhrystones per Second:                      30000.0 
+
+  DCMMU & ICMMU RESET   
+sim>> Loading section ".text" at address $000100B8, bytes to load $00007780
+Loading section ".data" at address $00407838, bytes to load $000062F0
+Loading section ".bss" at address $0040DB28, bytes to load $000037B8
+Setting stack space at EFFF0000 to EFFFFFFF
+Execution address = $000110C8
+SysV IO vectors: Enabled
+
+sim>> 
+sim>> BREAKPOINTS
+00011C88	
+sim>> Effective address: 000110C8
+At Breakpoint
+   r00:  00000000   r01:  00011100   r02:  00000001   r03:  00410DD0
+   r04:  00000001   r05:  0000000A   r06:  00000AA4   r07:  0000000A
+   r08:  00000001   r09:  00000044   r10:  00000998   r11:  00000001
+   r12:  00000001   r13:  00400000   r14:  00000000   r15:  00000000
+   r16:  00000000   r17:  00000000   r18:  00000000   r19:  00000000
+   r20:  00000000   r21:  00000000   r22:  00000000   r23:  00000000
+   r24:  00000000   r25:  00000000   r26:  00000000   r27:  00000000
+   r28:  00000000   r29:  00000000   r30:  00000000   r31:  00409800
+   ip:   0x00011C88   vbr:  0x00000000   psr:  0x800003FF
+   sbd:  0x00000000
+   fpsr: 0x00000001   fpcr: 0x00000000 
+
+sim>> Effective address: 00011C88
+Program "EXIT", exit value 1
+   r00:  00000000   r01:  00016CA0   r02:  00000001   r03:  00410DD0
+   r04:  00000001   r05:  0000000A   r06:  00000AA4   r07:  0000000A
+   r08:  00000001   r09:  00000009   r10:  00000998   r11:  00410DD0
+   r12:  0040BB08   r13:  00400000   r14:  00000000   r15:  00000000
+   r16:  00000000   r17:  00000000   r18:  00000000   r19:  00000000
+   r20:  00000000   r21:  00000000   r22:  00000000   r23:  00000000
+   r24:  00000001   r25:  00000000   r26:  00000000   r27:  00000000
+   r28:  00000000   r29:  00000000   r30:  00000000   r31:  004097C0
+   ip:   0x00016CBC   vbr:  0x00000000   psr:  0x800003FF
+   sbd:  0x00000000
+   fpsr: 0x00000001   fpcr: 0x00000000 
+
+sim>> Instructions: 452459
+Clocks:       582105
+arithmetic            78440   17.34 percent
+logical              117438   25.96 percent
+load address           3116    0.69 percent
+load                  84743   18.73 percent
+store                 64422   14.24 percent
+xmem                      0    0.00 percent
+control register          0    0.00 percent
+bit field             11196    2.47 percent
+jumps not taken       26593    5.88 percent
+jumps taken           66368   14.67 percent
+traps                    66    0.01 percent
+floating point           77    0.02 percent
+error count               0    0.00 percent
+
+sim>> 
+exit 0

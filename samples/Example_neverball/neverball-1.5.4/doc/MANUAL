@@ -1,0 +1,461 @@
+
+                            * Neverball *
+
+
+Tilt the  floor to roll a  ball through an obstacle  course within the
+given  time.  If  the  ball falls  or time  expires, a ball is lost.
+
+Collect coins to unlock the exit  and earn extra balls.  Red coins are
+worth 5.  Blue coins are worth 10.  A ball is awarded for 100 coins.
+
+
+* INSTRUCTIONS
+
+Click Play  to begin.   Mouse motion tilts  the floor.   Mouse buttons
+rotate the viewpoint.  The following  keyboard controls are defined by
+default; most  of them can  be changed  in a configuration  file.  See
+below for details.
+
+    ESC    Pause and resume / Exit
+    SHIFT  Fast camera rotation
+
+    F1     Chase Camera (default)
+    F2     Lazy Camera
+    F3     Manual Camera
+
+    F6     Hide HUD
+    F8     Toggle nice mode
+    F9     Toggle frame counter
+    F10    Snap a screenshot
+
+    UP     Tilt the floor forward
+    DOWN   Tilt the floor backward
+    LEFT   Tilt the floor left
+    RIGHT  Tilt the floor right
+
+    D      Rotate the view right
+    S      Rotate the view left
+
+    R      Restart the current level
+
+    TAB    Cycle through scores in high-score table
+
+
+* LEVEL PROGRESSION
+
+Neverball levels are grouped in  level sets.  All sets are immediately
+accessible to the player, and track of progress is kept separately for
+each set.  The player starts out  at the first level and must complete
+each level in turn to unlock subsequent levels until all levels in the
+set are completed.   A level is "unlocked" by  completing the previous
+level in the  progression or if it  is the first level of  the set.  A
+level  is "completed"  by collecing  the required  amount of  coins to
+activate the goal in the level and reaching said goal.
+
+There are  two game  modes or  ways of  progressing through  levels in
+Neverball.  Each  mode is essentially  a subset  of the single  way of
+playing present in Neverball 1.4.0.
+
+In 1.4.0, the game keeps track of "lives" or balls, preventing a level
+from being retried once the balls run out, however, unlocked/completed
+levels remain accessible in the menu at all times.  As a special case,
+1.4.0  also records  a set  high-score (see  below for  information on
+high-scores)  when all  levels  of a  set are  played  through in  one
+attempt, with  the condition  that no successfully-completed  level be
+restarted during the run.
+
+To  address  some of  the  problems  with  this  mode of  playing,  in
+Neverball 1.5.0  it was  split into two  separate modes:  the "normal"
+mode and the challenge mode.
+
+In   the   normal  mode,   no   track   of   balls  is   kept.    Each
+unlocked/completed level is immediately  accessible and can be retried
+and restarted mid-game as often as desired.
+
+In the challenge  mode, the player is given a  limited number of balls
+and starts  out at the  first level of the  set with all  other levels
+locked.  The game ends once the balls run out or all levels in the set
+are completed.  A set score is  recorded for a successful run.  Levels
+cannot be restarted, but can be retried.
+
+In addition to regular  1.4.0-style levels, Neverball 1.5.0 introduces
+bonus levels: extra levels awarded  for playing challenge mode.  Bonus
+levels can only  be unlocked by completing all the  levels before them
+in  challenge mode,  however,  bonus levels themselves  are skipped in
+challenge mode; after  they have been unlocked, they can  be played in
+the normal mode as any regular level.
+
+
+* USER DATA FILES
+
+Neverball  creates a  directory in  which it  stores user  data files.
+These files include high scores, replays, and configurations.
+
+Under Unix, Linux,  and OSX this directory is  called ".neverball" and
+is created in  the user's home directory,  specifically, the directory
+set in the HOME environment variable.
+
+Under Windows  it is called "Neverball"  and is created  in the user's
+application  data directory,  the  location of  which  is obtained  by
+inspecting the  APPDATA environment variable.   An easy way  to access
+this directory is by typing  %APPDATA% in the Windows Explorer address
+bar.  If the location could not  be determined, it is assumed that the
+user has permission to write to  the game directory, and the user data
+directory is created within.
+
+
+* HIGH SCORES
+
+The top  three fastest  times through each  level, the top  three coin
+scores  and the top  three fastest  unlock scores  for each  level are
+stored in the Scores directory within user data directory.
+
+The top  three fastest  times and  most coins scores  for each  set of
+levels are also stored.  To achieve  a set score, the player must play
+through all levels of a set in challenge mode.
+
+The total set time will  include time spent during both successful and
+unsuccesful level  plays, thus  time-outs and fall-outs  count against
+the total time.
+
+The  total  set  coin  count  will include  only  coins  collected  on
+successful  level plays.   This  prevents unbounded  coin scores  from
+being collected on levels with more than 100 coins.
+
+
+* REPLAYS
+
+Neverball  includes a  mechanism for  recording and  replaying levels.
+The player may enter  a name for each replay at the  end of the level.
+By default, the most recent unsaved  level will be saved to the replay
+file named "Last.nbr".
+
+Replay files are stored in  the Replays directory within the user data
+directory.   They may be  copied freely.   To view  a replay  you have
+downloaded, simply move it to the Replays directory and it will appear
+in the Replay menu in-game.
+
+
+* CONFIGURATION
+
+Game  settings are stored  in the  file neverballrc  in the  user data
+directory.  This file is created  when the game exits.  It consists of
+key /  value pairs.  Some of  these values are  configurable using the
+in-game  options  screen.  Other  meaningful  keys  and their  default
+values follow.
+
+    width  800
+    height 600
+
+        These keys determine the effective display resolution.  If for
+        any reason  the resolution you're looking  for isn't available
+        in the in-game settings, you can modify these values instead.
+
+    mouse_sense 300
+
+        This  key controls  mouse  sensitivity.  The  value gives  the
+        number of screen pixels the  mouse pointer must move to rotate
+        the floor  through its entire  range.  A smaller  number means
+        more sensitive.
+
+    mouse_invert 0
+
+        This key inverts the vertical mouse axis if set to 1.
+
+    key_camera_1      f1
+    key_camera_2      f2
+    key_camera_3      f3
+    key_camera_l      d
+    key_camera_r      s
+    key_camera_toggle e
+
+        These keys  define keyboard mappings for  camera selection and
+        rotation.   Key  names  are specified  using  SDL's  canonical
+        key  naming   convention  (for   a  mostly-complete   list  of
+        non-single-letter  key  names,  see  share/keynames.c  in  the
+        source archive).  The three camera behaviors are as follows:
+
+        1 - Chase  camera stays behind  the ball by cueing  off of the
+        velocity of the  ball.  It is very  responsive,  but sometimes
+        confusing.
+
+        2 - Lazy  camera chases a point a set  distance from the ball.
+        It is seldom  surprising, but at times it  is not sufficiently
+        responsive.
+
+        3 - Manual camera  does not rotate  except by  player command.
+
+	key_camera_toggle toggles camera behaviour between 1 and 3.
+
+    mouse_camera_1      none
+    mouse_camera_2      none
+    mouse_camera_3      none
+    mouse_camera_l      left
+    mouse_camera_r      right
+    mouse_camera_toggle none
+
+        These   keys  match   the  respective   key_camera_*  options.
+        Accepted values are: "none" (for no mapping), "left", "right",
+        "wheelup",  "middle", "wheeldown"  or a  numeric  mouse button
+        index.
+
+    key_forward  up
+    key_backward down
+    key_left     left
+    key_right    right
+
+        These keys define keyboard mappings for tilt control.
+
+    key_pause escape
+
+        This  key defines  a  keyboard mapping  for pause  activation.
+        Before version 1.5.0, this mapping was hard-coded to the space
+        bar and Escape key was used  to immediately exit the game.  To
+        restore  this behaviour,  set  key_pause  to "space"  (without
+        quotes).
+
+    key_restart r
+
+        This key defines a keyboard  mapping for a mid-game restart of
+        the  current  level.   Handy  when  trying  to  record  a  new
+        high-score, this function isn't available in challenge mode.
+
+    key_score_next tab
+
+        This key  defines a keyboard mapping for  cycling through Most
+        Coins / Best Times /  Fast Unlock score tabs in the high-score
+        board.
+
+    view_fov 50
+    view_dp  75
+    view_dc  25
+    view_dz  200
+
+        These keys  define the view of the ball.  They give  the field
+        of view in degrees,  the height of the view point,  the height
+        of the view center,  and the horizontal distance from the ball
+        in centimeters, respectively.  (The ball is  50 centimeters in
+        diameter in most levels.)
+
+        The default values  for these keys changed with version 1.2.6.
+        Some players may be interested in using the  old values.  They
+        were as follows:
+
+            view_fov 40
+            view_dp  400
+            view_dc  0
+            view_dz  600
+
+    rotate_fast 300
+    rotate_slow 150
+
+        These keys control the rate of camera rotation.  Roughly, they
+        give  the rate  of lateral  camera motion  in  centimeters per
+        seconds,  so the  actual rotation  rate depends  upon view_dz,
+        above.  The fast rate is used when the Shift key is held down.
+
+    fps 0
+
+        This key enables an on-screen frames-per-second counter. Press
+        F9 to toggle this flag in-game.
+
+    nice 0
+
+        This  key  enables  a  delay  function  after  each  frame  is
+        rendered, forcing a context  switch and ensuring that the game
+        does not utilize 100% of the CPU.  0 is off, 1 is on.
+
+        If the  frame rate is not  fast enough for you,  or you simply
+        want to  test the  performance of the  game on  your hardware,
+        disable it.
+
+        Press F8 to toggle this flag in-game.
+
+    ball_file ball/basic-ball/basic-ball
+
+        This key determines the model used for the ball.
+
+    replay_name %s-%l
+
+        This  key specifies  the  format of  the  default replay  name
+        generated when saving replays.
+
+        The value  of replay_name  can include regular  characters and
+        special  character sequences  which act  as place-holders  for
+        certain "dynamic" text.  These sequences are recognised:
+
+            %s  current set identifier (such as "easy" or "mym")
+            %l  current level identifier (such as "03" or "IV")
+            %%  single percentage sign
+
+        Any  other sequence  starting with  % will  be reported  as an
+        error and skipped.
+
+        The resulting  replay name is  also suffixed by  an underscore
+        and  a unique  2-digit number  to avoid  name collisions  with
+        existing replays.
+
+    stats 0
+
+        This  key enables  print-out (to  standard output)  of running
+        statistics of  the current  frame time  and frames-per-second,
+        averaged over 250 milliseconds.  Most people won't need this.
+
+    uniform 0
+
+        This  key controls  the  frequency of  graphical updates  with
+        respect to physics updates.
+
+        When  uniform is  N, then  there  will be  exactly N  physical
+        updates per graphics update, regardless of the passage of real
+        time.  So for example, if uniform is 1 then you will see every
+        physics update  rendered exactly once.   The default is  0 and
+        the option is disabled.
+
+        A further functionality  is built atop the  uniform option: if
+        the  uniform value  is  negative  then the  game  will take  a
+        screenshot  at  each  frame.   This  may  be  used  to  record
+        high-quality movies of replays.  Set uniform to -3 and start a
+        replay using  the --replay command  line option, and  you will
+        find a 30FPS movie written as a series of PNGs.
+
+        On an unfortunate note: audio is handled in a separate thread,
+        and there is no support for outputting audio synchronized with
+        a movie created in this fashion.
+
+    screenshot 0
+
+        This key holds  the current screen-shot index.   The number is
+        incremented every time a new screen-shot is taken (by pressing
+        F10 or in  uniform mode) and it is appended  to the image file
+        name.
+
+    stereo 0
+
+        This key  enables quad-buffered stereo viewing  for those with
+        the hardware to support it.  1 is on, 0 is off.
+
+    vsync 1
+
+        This key controls vertical  blanking synchronization.  1 is on
+        (and is the default), 0 is off.
+
+    multisample 0
+
+        This key enables multisample full-screen antialiasing.  Values
+        can be 2,  4, 8, etc., and can be  overspecified; in such case
+        the game  will search for  the highest level  of multisampling
+        supported by  your hardware.  (The best  value eventually gets
+        written to the config file.)
+
+    mipmap 0
+    aniso  0
+
+        These  keys  control  mipmapping  and  anisotropic  filtering,
+        respectively.
+
+        With mipmapping, smaller versions of  each texture are kept in
+        video  memory, and  are referenced  when a  texture is  viewed
+        from  a distance.   This  improves video  cache coherence  and
+        eliminates texture  "swimming" on detailed textures  when seen
+        from afar.  To enable mipmapping, set mipmap to 1.
+
+        Related to mipmapping is anisotropic filtering.  "Anisotropic"
+        basically means "not the same from all directions".  It refers
+        to  cases where  a texture  might need  to be  compressed more
+        vertically than  horizontally.  For  example, if a  texture is
+        applied  to a  flat surface  and seen  from far  away then  it
+        appears  much wider  than high.   Anisotropic filtering  takes
+        care of  this.  To enable  it, set aniso  to a small  power of
+        two.   If  you  have  weak hardware,  this  feature  won't  do
+        anything.
+
+    joystick 1
+
+        This key  enables joystick control.  0  is off, 1  is on.  The
+        game may still be controlled with the mouse even while gamepad
+        control  is enabled.   However,  random noise  from an  analog
+        controller at rest can disrupt normal mouse input.
+
+    joystick_device 0
+
+        This  number selects  which joystick  to use if  more than one
+        joystick is  found. 0 is the first  joystick, 1 is the  second
+        and so on.
+
+    joystick_axis_x 0
+
+        Joystick horizontal axis number
+
+    joystick_axis_y 1
+
+        Joystick vertical axis number
+
+    joystick_axis_u 2
+
+        Joystick axis number for view rotation control
+
+    joystick_button_a 0
+
+        Joystick menu select button
+
+    joystick_button_b 1
+
+        Joystick menu cancel button
+
+    joystick_button_r 2
+
+        Joystick counter-clockwise camera rotation button
+
+    joystick_button_l 3
+
+        Joystick clockwise camera rotation button
+
+    joystick_button_exit 4
+
+        Joystick exit button
+
+    wiimote_addr
+
+        This key  specifies the address  of your Nintendo  Wii Remote.
+        For more  information, see the  section on using  Wiimote with
+        Neverball.
+
+
+* WIIMOTE SUPPORT
+
+For information  on how to build  the game with Wiimote  support under
+Linux, see instructions in the file INSTALL in the source archive.
+
+To use it, first make sure you've set up all the Bluetooth mumbo-jumbo
+in your kernel  and what-not.  Once this is done,  you'll need to find
+out your Wiimote's address like this:
+
+    $ hcitool scan
+    Scanning ...
+            00:1B:7A:3E:45:7F       Nintendo RVL-CNT-01
+
+This  hexadecimal   string  must  go   in  the  neverballrc   file  as
+"wiimote_addr 00:1B:7A:3E:45:7F" so that the game knows that there's a
+Wiimote to be used.
+
+Now, when  you start the game  everything will proceed normally  but a
+background thread  will place your Bluetooth  device into discoverable
+mode.  You've got about  15 seconds to press 1 and  2 on your wiimote.
+The Wiimote's LEDs will flash, and once the game makes friends with it
+the Player 1 LED will be lit.  If you don't activate your Wiimote then
+the  game  will  behave  normally and  the  Bluetooth  discovery  will
+eventually time out.
+
+From  there,  the  Wiimote  digital  pad works  like  a  joystick  for
+navigating menus.  A and  B buttons are the A and  B buttons.  Home is
+Pause.  Plus and  Minus are camera rotation controls.   Also, the tilt
+sensor controls the floor.
+
+The  Wiimote tilt  sensor is  a  surprisingly noisy  device, so  heavy
+filtering is applied to the input.   For this reason, the controls may
+feel sluggish.  This might improve with  an IR sensor bar, but has not
+been tested.
+
+
+Web: <http://neverball.org/>

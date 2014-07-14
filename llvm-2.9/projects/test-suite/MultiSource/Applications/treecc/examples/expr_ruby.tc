@@ -1,0 +1,329 @@
+/*
+ * expr_ruby.tc - Expression example treecc input file for Ruby.
+ *
+ * Copyright (C) 2001, 2002  Southern Storm Software, Pty Ltd.
+ *
+ * Hacked by Peter Minten <silvernerd@users.sf.net>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+%option lang = "Ruby"
+
+%output "expr_ruby.rb"
+
+/*
+ * Include the following declarations in the ".rb" file.
+ */
+%{
+
+class Eval_value
+  Int_value = 0
+  Float_value = 0
+end
+
+%}
+
+/*
+ * Define the type code that is associated with a node
+ * in the syntax tree.  We use "error_type" to indicate
+ * a failure during type inferencing.
+ */
+%enum Type_code =
+{
+	Error_type,
+    Int_type,
+    Float_type
+}
+
+/*
+ * Define the node types that make up the syntax.
+ */
+%node Expression %abstract %typedef =
+{
+    %nocreate Type_code type = {Type_code::Error_type};
+}
+
+%node Binary Expression %abstract =
+{
+    Expression expr1;
+    Expression expr2;
+}
+
+%node Unary Expression %abstract =
+{
+    Expression expr;
+}
+
+%node Intnum Expression =
+{
+	int num;
+}
+
+%node Floatnum Expression =
+{
+    float num;
+}
+
+%node Plus Binary
+%node Minus Binary
+%node Multiply Binary
+%node Divide Binary
+%node Power Binary
+%node Negate Unary
+
+%node Cast Expression =
+{
+	Type_code new_type;
+	Expression expr;
+}
+
+/*
+ * Define the "infer_type" operation as a non-virtual.
+ */
+%operation void InferType::infer_type(Expression e)
+
+infer_type(Binary)
+{
+  infer_type(e.expr1)
+  infer_type(e.expr2)
+
+  if (e.expr1.type == Type_code::Error_type || e.expr2.type == Type_code::Error_type) then
+    e.type = Type_code::Error_type
+  elsif (e.expr1.type == Type_code::Float_type || e.expr2.type == Type_code::Float_type) then
+    e.type = Type_code::Float_type
+  else
+    e.type = Type_code::Int_type
+  end
+}
+
+infer_type(Unary)
+{
+  infer_type(e.expr)
+  e.type = e.expr.type
+}
+
+infer_type(Intnum)
+{
+  e.type = Type_code::Int_type
+}
+
+infer_type(Floatnum)
+{
+  e.type = Type_code::Float_type
+}
+
+infer_type(Power)
+{
+  infer_type(e.expr1)
+  infer_type(e.expr2)
+
+  if (e.expr1.type == Type_code::Error_type || e.expr2.type == Type_code::Error_type) then
+    e.type = Type_code::Error_type
+  elsif (e.expr2.type != Type_code::Int_type) then
+    p (e.getFilename() + ":" + e.getLinenum() + ": second argument to `^' is not an integer")
+    e.type = Type_code::Error_type
+  else
+    e.type = e.expr1.type
+  end
+}
+
+infer_type(Cast)
+{
+  infer_type(e.expr)
+
+  if(e.expr.type != Type_code::Error_type)
+    e.type = e.new_type
+  else
+    e.type = Type_code::Error_type
+  end
+}
+
+/*
+ * Define the "eval_expr" operation as a virtual.
+ */
+%operation %virtual eval_value eval_expr(Expression this)
+
+eval_expr(Plus)
+{
+  # Evaluate the sub-Expressions
+  eval_value value1 = expr1.eval_expr
+  eval_value value2 = expr2.eval_expr
+
+  # Coerce to the common type
+  Coerce.coerce(value1, expr1.type, type)
+  Coerce.coerce(value2, expr2.type, type)
+
+  # Evaluate the operator 
+  if (type == Type_code::Int_type) then
+    value1.Int_value += value2.Int_value
+  else
+    value1.Float_value += value2.Float_value
+  end
+
+  # Return the result to the caller
+  return value1
+}
+
+eval_expr(Minus)
+{
+  # Evaluate the sub-Expressions 
+  eval_value value1 = expr1.eval_expr()
+  eval_value value2 = expr2.eval_expr()
+
+  # Coerce to the common type
+  Coerce.coerce(value1, expr1.type, type)
+  Coerce.coerce(value2, expr2.type, type)
+
+  # Evaluate the operator
+  if(type == Type_code::Int_type) then
+    value1.Int_value -= value2.Int_value
+  else
+    value1.Float_value -= value2.Float_value;
+  end
+
+  # Return the result to the caller
+  return value1
+}
+
+eval_expr(Multiply)
+{
+  # Evaluate the sub-Expressions 
+  eval_value value1 = expr1.eval_expr()
+  eval_value value2 = expr2.eval_expr()
+
+  # Coerce to the common type
+  Coerce.coerce(value1, expr1.type, type)
+  Coerce.coerce(value2, expr2.type, type)
+
+  # Evaluate the operator
+  if(type == Type_code::Int_type) then
+    value1.Int_value *= value2.Int_value
+  else
+    value1.Float_value *= value2.Float_value;
+  end
+
+  # Return the result to the caller
+  return value1
+}
+
+eval_expr(Divide)
+{
+  # Evaluate the sub-Expressions 
+  eval_value value1 = expr1.eval_expr()
+  eval_value value2 = expr2.eval_expr()
+
+  # Coerce to the common type
+  Coerce.coerce(value1, expr1.type, type)
+  Coerce.coerce(value2, expr2.type, type)
+
+  # Evaluate the operator
+  if(type == Type_code::Int_type) then
+    value1.Int_value -= value2.Int_value
+  else
+    value1.Float_value -= value2.Float_value;
+  end
+
+  # Return the result to the caller
+  return value1
+}
+
+eval_expr(Power)
+{
+  # Evaluate the sub-Expressions 
+  eval_value value1 = expr1.eval_expr()
+  eval_value value2 = expr2.eval_expr()
+
+  # Coerce to the common type
+  Coerce.coerce(value1, expr1.type, type)
+  Coerce.coerce(value2, expr2.type, type)
+
+  # Evaluate the operator
+  if(type == Type_code::Int_type) then
+    value1.Int_value = value1.Int_value ^ value2.Int_value
+  else
+    value1.Float_value = value1.Float_value ^ value2.Float_value;
+  end
+
+  # Return the result to the caller
+  return value1
+}
+
+eval_expr(Negate)
+{
+  # Evaluate the sub-Expression 
+  eval_value value = expr.eval_expr()
+
+  # Coerce to the common type
+  Coerce.coerce(value1, expr1.type, type)
+  Coerce.coerce(value, expr.type, type)
+
+  # Evaluate the operator
+  if(type == Type_code::Int_type) then
+    value.Int_value = -1 * value.Int_value
+  else
+    value.Float_value = -1 * value.Float_value;
+  end
+
+  # Return the result to the caller
+  return value
+}
+
+eval_expr(Cast)
+{
+  # Evaluate the sub-Expression
+  eval_value value = expr.eval_expr()
+
+  # Coerce to the common type
+  Coerce.coerce(value, expr.type, type)
+
+  # Return the result to the caller
+  return value
+}
+
+eval_expr(Intnum)
+{
+  value = eval_value.new
+  value.Int_value = num
+  return value
+}
+
+eval_expr(Floatnum)
+{
+  value = eval_value.new
+  value.Float_value = num
+  return value
+}
+
+/*
+ * Define the "coerce" operation as an inline non-virtual.
+ */
+%operation %inline void Coerce::coerce
+				(value, [Type_code from], [Type_code to])
+
+coerce(Int_type, Float_type)
+{
+  value.Float_value = value.Int_value.to_f;
+}
+
+coerce(Float_type, Int_type)
+{
+  value.Int_value = value.Float_value.to_i;
+}
+
+coerce(Type_code, Type_code)
+{
+  # Nothing to do here
+}

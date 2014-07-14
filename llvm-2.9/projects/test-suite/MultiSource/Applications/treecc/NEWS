@@ -1,0 +1,105 @@
+
+0.2.8 (3 January 2004)
+
+	* Add the "base_type" option (Gopal V).
+	* Don't put trailing commas on enums because strict ANSI C
+	  does not allow trailing commas (Miroslaw Dobrzanski-Neumann).
+
+0.2.6 (17 July 2003)
+
+	* Add the "gc_allocator" option, so that node allocation can be
+	  done using "libgc" if the programmer chooses to do so.
+	* Fix some non-ANSI variable declarations.
+
+0.2.4 (29 March 2003)
+
+	* Fixes to treecc.spec.in for RPM generation (Stephen Compall).
+	* Add support for namespaces in C++ (Jeyasankar Kottalam).
+	* Change "new.h" to "new" to comply with C++ standards
+	  (Jeyasankar Kottalam).
+	* Fix the return type of YYNODESTATE::dealloc (Jeyasankar Kottalam).
+
+0.2.2 (8 February 2003)
+
+	* PHP back-end patches (Alan Knowles).
+	* Add directory entries to texinfo documentation (Stephen Compall).
+	* "print_lines" and "no_print_lines" options (James Michael DuPont).
+	* "allocator" and "no_allocator" options.
+	* Permit treecc "%name" options to be set from the command-line.
+	* Replace "sed" with "normalize" in "run_tests", to work around
+	  problems on systems with CRLF end of line markers (e.g. cygwin.
+
+0.2.0 (11 January 2003)
+
+	* Bind the skeleton files directly into the "treecc" binary,
+	  to solve problems with locating the skeletons at runtime.
+	* Always disable cygwin for Win32 builds.
+	* Better support for out of tree builds.
+	* Fix up end of line handling in the test suite so that the
+	  tests don't fail because of CRLF vs LF issues.
+	* Add the "interal_access" and "public_access" options to
+	  support creating private libraries of nodes in C#.
+	* Fix the "-f" (force) command-line flag.
+	* PHP back-end (Alan Knowles).
+
+0.1.8 (23 November 2002)
+
+	* Bug fixes and documentation for Ruby back-end (Peter Minten).
+	* Support languages that don't use tabs for indenting (Peter Minten).
+
+0.1.6 (5 November 2002)
+
+	* Fix C++ code generation in the declaration of virtual operations.
+	* Add Ruby code generation (Peter Minten).
+	* "Quick and Dirty" guide to extending treecc to new languages.
+
+0.1.4 (2 September 2002)
+
+	* Fixes to "auto_gen.sh" and autoconf/automake support scripts
+	  to better support automake 1.6 systems.
+
+0.1.2 (27 June 2002)
+
+	* Add some patches to support out of tree builds (Stephen Compall).
+	* Make the build system more automake 1.5 friendly.
+	* Work around versions of "sed" that don't support "-" for stdin.
+
+0.1.0 (20 April 2002)
+
+	* Add maintainer mode to the autoconf system to work around
+	  autotools version problems.
+
+0.0.8 (27 March 2002)
+
+	* ANSI C compatiblity fixes.
+	* Only build "expr_cpp" if bison is being used because "byacc"
+	  does not understand the options used in the C++ grammar.
+	* Polish the Texinfo documentation a little.
+	* Fix the C++ skeleton to use "size_t" in the declaration of "alloc".
+	* Implement the "strip_filenames" option to improve the predictability
+	  of code generation in Portable.NET's C# compiler.
+	* Add the "auto_gen.sh" and "conf_fix.sh" scripts.
+	* Add the "essay.html" file to the documentation directory.
+
+0.0.6 (28 December 2001)
+
+	* Swap the order of some fields in "YYNODESTATE" to align nodes
+	  better on 64-bit platforms.
+	* Fix a bug which prevented treecc from creating default output
+	  files if "%output" and "%header" were missing from the source.
+	* Bug fix in the singleton code: missing '*' in return case.
+	* Add an option for kind values in either the node or the vtable.
+	  Vtable kinds can help reduce memory requirements.
+	* Bug fix to the skeleton expansion code: "yy" was not being
+	  properly expanded to the specified prefix.
+	* Implement the "%split" flag for non-virtual operations to split
+	  large "switch" statements across multiple functions.  This should
+	  help alleviate optimisation problems when compiling Portable.NET's
+	  C# compiler with GCC 3.0.
+
+0.0.4 (8 November 2001)
+
+	* Modify the skeleton files so that tree nodes are aligned correctly
+	  on 64-bit Solaris systems.
+	* Slight documentation and GNU-compliance updates.
+	* New version numbering scheme.

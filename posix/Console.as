@@ -38,17 +38,19 @@ package com.adobe.flascc
   */
   public class Console extends Sprite implements ISpecialFile
   {
-    private var enableConsole:Boolean = true
-    private var _tf:TextField
-    private var inputContainer:DisplayObjectContainer
+    private var enableConsole:Boolean = true;
+    private var _tf:TextField;
+    private var inputContainer:DisplayObjectContainer;
 
     /**
     * To Support the preloader case you might want to have the Console
     * act as a child of some other DisplayObjectContainer.
     */
     public function Console(container:DisplayObjectContainer = null)
-    {
-      CModule.rootSprite = container ? container.root : this
+    {      
+      CONFIG::debug { trace("Console::created"); }
+      
+      CModule.rootSprite = container ? container.root : this;
 
       if(CModule.runningAsWorker()) {
         return;
@@ -69,6 +71,8 @@ package com.adobe.flascc
     */
     protected function init(e:Event):void
     {
+      CONFIG::debug { trace("Console::init"); }
+      
       inputContainer = new Sprite()
       addChild(inputContainer)
 
@@ -124,8 +128,10 @@ package com.adobe.flascc
     */
     public function exit(code:int):Boolean
     {
+      CONFIG::debug { trace("Console::exit: " + code); }
+      
       // default to unhandled
-      if (exitHook)
+      if (exitHook != null)
         return exitHook(code)
       else
         throw new Error("exit() called.")

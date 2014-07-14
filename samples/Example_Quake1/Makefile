@@ -1,11 +1,38 @@
-$?PAK0FILE=/xxx
+#
+# =BEGIN MIT LICENSE
+# 
+# The MIT License (MIT)
+#
+# Copyright (c) 2014 The CrossBridge Team
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+# 
+# =END MIT LICENSE
+#
+
+.PHONY: clean all 
+
+$?PAK0FILE=baseq1/pak0.pak
 $?BUILDDIR=build
 $?QUAKECFLAGS=$(BASE_CFLAGS) -D_THREAD_SAFE -DSDL -Wno-pointer-sign `"$(call unixpath,$(FLASCC)/usr/bin/sdl-config)" --cflags` $(EXTRACFLAGS)
-$?DEBUG=FALSE
-$?EXTRACFLAGS= 
-JVMARGS:=-Xmx1G
 
-ifeq ("$(DEBUG)","FALSE")
+ifeq ("$(MXMLC_DEBUG)","FALSE")
 	$?CFLAGS=-O4 -flto-api=../exports.txt -fno-stack-protector $(EXTRACFLAGS)
 else
 	$?CFLAGS=-O0 -g $(EXTRACFLAGS)
@@ -24,14 +51,14 @@ q1build: $(OBJS)
 	
 	cp -f sdlquake-1.0.9/Console.as $(BUILDDIR)/
 
-	cd $(BUILDDIR) && $(AS3COMPILERARGS) \
+	cd $(BUILDDIR) && $(ASC2) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/ISpecialFile.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \
 		Console.as 
 
-	cd $(BUILDDIR) && $(AS3COMPILERARGS) \
+	cd $(BUILDDIR) && $(ASC2) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
 		-import $(call nativepath,$(FLASCC)/usr/lib/BinaryData.abc) \
@@ -49,7 +76,6 @@ link:
 linkmt:
 	cd $(BUILDDIR) && "$(FLASCC)/usr/bin/gcc" $(CFLAGS) $(OBJS) -lSDL -lvgl -o ../Quake1MT.swf q1vfs*.abc $(FLASCC)/usr/lib/AlcVFSZip.abc -emit-swf -symbol-abc=Console.abc -swf-size=1024x768 -pthread
 
-include ../Makefile.common
 
 setup:	check
 	@if [ -e $(PAK0FILE) ] ; then true ; \
@@ -58,9 +84,12 @@ setup:	check
 
 	mkdir -p $(BUILDDIR)/q1vfs/id1
 	mkdir -p $(BUILDDIR)/sdlquake-1.0.9	
-	
-clean:
-	rm -rf $(BUILDDIR) *.swf
 
 .c.o:
 	"$(FLASCC)/usr/bin/gcc" $(CFLAGS) $(QUAKECFLAGS) -c $< -o $(BUILDDIR)/sdlquake-1.0.9/$(@F)
+
+include ../Makefile.common
+
+clean:
+	rm -rf $(BUILDDIR) *.swf
+

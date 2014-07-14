@@ -1,0 +1,69 @@
+// -*- mode: c++ -*-
+// $Id: regexmatch.cpp-x 10416 2003-12-12 03:58:35Z lattner $
+// http://www.bagley.org/~doug/shootout/
+// From Bill Lear
+
+
+#include <iostream>
+#include <zopyra/regx>
+
+using namespace std;
+
+typedef pair<const char*, const char*> span;
+
+int main(int ac, char* av[]) {
+    zopyra::regx re(
+	"(?x)	          # set extended flag for embedded comment fun\n"
+        "(?:^|[^\\d(])    # must be preceded by non-digit\n"
+        "([(])?           # match 1: possible initial left paren\n"
+        "(\\d{3})         # match 2: area code is 3 digits\n"
+        "(?(1)[)])        # if match1 then match right paren\n"
+        "[ ]              # area code followed by one space\n"
+        "(\\d{3})         # match 3: prefix of 3 digits\n"
+        "[- ]             # separator is either space or dash\n"
+        "(\\d{4})         # match 4: last 4 digits\n"
+        "(?:\\D|\\b)      # followed by non-digit or break\n"
+	);
+    
+    string line;
+    vector<span> lines;
+    while (getline(cin, line)) {
+        char* phone = new char[line.size()];
+        copy(line.begin(), line.end(), phone);
+        lines.push_back(span(phone, phone + line.size()));
+    }
+
+    size_t ITER = (ac == 2 ? (atoi(av[1]) < 1 ? 1 : atoi(av[1])): 1);
+
+    char num[13];
+    num[0] = '(';
+    num[4] = ')';
+    num[5] = ' ';
+    num[9] = '-';
+    size_t count = 0;
+    while (ITER--) {
+        vector<span>::iterator end = lines.end();
+        for (vector<span>::iterator i = lines.begin(); i != end; ++i) {
+            zopyra::regx::iterator p = re.find(i->first, i->second);
+            if (p++ != re.end()) {
+                char* num_p = &num[1];
+                ++p;
+                copy(p->first, p->second, num_p);
+
+                num_p = &num[6];
+                ++p;
+                copy(p->first, p->second, num_p);
+
+                num_p = &num[10];
+                ++p;
+                copy(p->first, p->second, num_p);
+
+                if (!ITER) {
+                    cout << ++count << ": ";
+                    copy(num, num + 14, ostream_iterator<char>(cout));
+                    cout << '\n';
+                }
+            }
+        }
+    }
+}

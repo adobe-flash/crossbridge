@@ -1,9 +1,34 @@
-FLASCC:=X
-FLEX:=X
-AS3COMPILER:=asc2.jar
-BASE_CFLAGS:=-Werror -Wno-write-strings -Wno-trigraphs
+#
+# =BEGIN MIT LICENSE
+# 
+# The MIT License (MIT)
+#
+# Copyright (c) 2014 The CrossBridge Team
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+# 
+# =END MIT LICENSE
+#
 
+# Detect host 
 $?UNAME=$(shell uname -s)
+#$(info $(UNAME))
 ifneq (,$(findstring CYGWIN,$(UNAME)))
 	$?nativepath=$(shell cygpath -at mixed $(1))
 	$?unixpath=$(shell cygpath -at unix $(1))
@@ -12,18 +37,41 @@ else
 	$?unixpath=$(abspath $(1))
 endif
 
-ifneq (,$(findstring "asc2.jar","$(AS3COMPILER)"))
-	$?AS3COMPILERARGS=java $(JVMARGS) -jar $(call nativepath,$(FLASCC)/usr/lib/$(AS3COMPILER)) -merge -md 
+# CrossBridge SDK Home
+ifneq "$(wildcard $(call unixpath,$(FLASCC_ROOT)/sdk))" ""
+ $?FLASCC:=$(call unixpath,$(FLASCC_ROOT)/sdk)
 else
-	echo "ASC is no longer supported" ; exit 1 ;
+ $?FLASCC:=/path/to/crossbridge-sdk/
+endif
+$?ASC2=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md -parallel
+ 
+# Auto Detect AIR/Flex SDKs
+ifneq "$(wildcard $(AIR_HOME)/lib/compiler.jar)" ""
+ $?FLEX=$(AIR_HOME)
+else
+ $?FLEX:=/path/to/adobe-air-sdk/
 endif
 
+# Stage3D+
+$?GLS3D=$(FLASCC)/../samples/Example_GLS3D
+
+# C/CPP Compiler
+$?BASE_CFLAGS=-Werror -Wno-write-strings -Wno-trigraphs
+$?EXTRACFLAGS=
+$?OPT_CFLAGS=-O4
+
+# ASC2 Compiler
+$?MXMLC_DEBUG=true
+$?SWF_VERSION=25
+$?SWF_SIZE=800x600
+
+# Self check
 check:
 	@if [ -d $(FLASCC)/usr/bin ] ; then true ; \
-	else echo "Couldn't locate FLASCC sdk directory, please invoke make with \"make FLASCC=/path/to/FLASCC/sdk ...\"" ; exit 1 ; \
+	else echo "Couldn't locate CrossBridge SDK directory, please invoke make with \"make FLASCC=/path/to/CrossBridge/ ...\"" ; exit 1 ; \
 	fi
-
 	@if [ -d "$(FLEX)/bin" ] ; then true ; \
-	else echo "Couldn't locate Flex sdk directory, please invoke make with \"make FLEX=/path/to/flex  ...\"" ; exit 1 ; \
+	else echo "Couldn't locate Adobe AIR or Apache Flex SDK directory, please invoke make with \"make FLEX=/path/to/AirOrFlex  ...\"" ; exit 1 ; \
 	fi
+	@echo "ASC2: $(ASC2)"
 

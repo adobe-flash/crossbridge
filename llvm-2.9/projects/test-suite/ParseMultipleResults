@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+import re
+import sys
+
+def main():
+    _,testname,path = sys.argv
+    data = open(path).read()
+    for result in re.finditer('Result-([^:]*): (.*)', data):
+        name, value = result.groups()
+        value = float(value)
+        print
+        print '-' * 62
+        print ">>> ========= '%s.Subtest.%s' Program " % (testname, name)
+        print '-' * 62
+        print
+        print 'TEST-PASS: exec %s.Subtest.%s' % (testname, name)
+        print 'TEST-RESULT-exec-success: pass'
+        print 'TEST-RESULT-exec-time: program %f' % value
+
+if __name__ == '__main__':
+    main()

@@ -27,14 +27,43 @@ import com.adobe.flascc.kernel.*;
 import com.adobe.flascc.vfs.*;
 import C_Run.*;
 
-class ThunkMaker
+//CONFIG::debug { trace("CModule::loaded"); }
+  
+//--------------------------------------------------------------------------
+//
+//  ThunkMaker
+//
+//--------------------------------------------------------------------------
+
+/**
+* @private
+*/
+internal class ThunkMaker
 {
+  /**
+  * @private
+  */
   private var modPkgName:String;
+  /**
+  * @private
+  */
   private var thunkSet:Dictionary;
+  /**
+  * @private
+  */
   private var start:int;
+  /**
+  * @private
+  */
   private var end:int;
+  /**
+  * @private
+  */
   private var index:int;
 
+  /**
+  * Constructor
+  */
   public function ThunkMaker(modPkgName:String, thunkSet:Dictionary, start:int, end:int, index:int):void
   {
 	this.modPkgName = modPkgName;
@@ -43,6 +72,10 @@ class ThunkMaker
 	this.end = end;
 	this.index = index;
   }
+  
+  /**
+  * TBD
+  */
   public function thunk():void
   {
     delete CModule.modThunks[modPkgName];
@@ -67,6 +100,12 @@ class ThunkMaker
   };
 }
 
+//--------------------------------------------------------------------------
+//
+//  CModule
+//
+//--------------------------------------------------------------------------
+
 /**
 * Contains convenience functions for reading and writting to domainMemory; also manages any flascc-specific global state (for example, the VFS and Posix interface implementations.)
 */
@@ -85,14 +124,14 @@ public class CModule
   */
   public static function get throwWhenOutOfMemory():Boolean
   {
-    return C_Run.throwWhenOutOfMemory
+    return C_Run.throwWhenOutOfMemory;
   }
   /**
   * Sets a boolean indicating whether Flash out of memory conditions when growing the domainMemory ByteArray will throw an ActionScript exception or cause malloc to fail. The default is false, malloc will return an appropriate failure and new/new[] will throw a std::badalloc C++ exception.
   */
   public static function set throwWhenOutOfMemory(x:Boolean):void
   {
-    C_Run.throwWhenOutOfMemory = x
+    C_Run.throwWhenOutOfMemory = x;
   }
 
   /**
@@ -101,7 +140,7 @@ public class CModule
   */
   public static function get canUseWorkers():Boolean
   {
-    return C_Run.workerClass;
+    return C_Run.workerClass != null;
   }
 
   /**
@@ -193,7 +232,7 @@ public class CModule
   /***
   * @private
   */
-  static var preppedForThreadedExec:Boolean = false;
+  internal static var preppedForThreadedExec:Boolean = false;
 
   /***
   * @private
@@ -215,7 +254,7 @@ public class CModule
   /***
   * @private
   */
-  static var explicitlyInittedAllModules:Boolean = false;
+  internal static var explicitlyInittedAllModules:Boolean = false;
 
   /***
   * @private
@@ -253,12 +292,12 @@ public class CModule
   /***
   * @private
   */
-  static const modThunks:Dictionary = new Dictionary;
+  internal static const modThunks:Dictionary = new Dictionary;
 
   /***
   * @private
   */
-  static function makeThunk(modPkgName:String, thunkSet:Dictionary, start:int, end:int, index:int):Function
+  internal static function makeThunk(modPkgName:String, thunkSet:Dictionary, start:int, end:int, index:int):Function
   {
     return new ThunkMaker(modPkgName, thunkSet, start, end, index).thunk;
   }
@@ -1125,7 +1164,7 @@ public class CModule
 
     var thunk:Function = modThunks[modPackage];
 
-    if(thunk)
+    if(thunk != null)
       thunk(); // remove remaining thunks
     this.script = script;
     this.init = null;
@@ -1393,6 +1432,8 @@ public class CModule
   */
   public static function start(console:Object, args:Vector.<String>, env:Vector.<String>, preserveStack:Boolean = true):int
   {
+    CONFIG::debug { trace("CModule::start: " + arguments); }
+    
     if(console)
     {
       if(activeConsole)
@@ -1435,9 +1476,12 @@ public class CModule
   * @param args A vector of Strings that are used to fill the argv array given to main. The first String is typically used to specify the name of the application.
   * @param env A vector of Strings that are used to populate the environment variables accesible by <code>getenv()</code>. There should be an even number of Strings in this Vector as they are treated as name/value pairs.
   * @param preserveStack Inidcates whether the C stack should be preserved after the call to <code>__start1</code>. If this is set to false the stack depth will return to the value when start() was called upon return.
+  * @param isAutoSetRealThreadId Inidcates whether the module should auto-set its real thread id. Use false when using multi-threaded SWCs.
   */
-  public static function startAsync(console:Object = null, args:Vector.<String> = null, env:Vector.<String> = null, preserveStack:Boolean = true):void
+  public static function startAsync(console:Object = null, args:Vector.<String> = null, env:Vector.<String> = null, preserveStack:Boolean = true, isAutoSetRealThreadId:Boolean = true):void
   {
+    CONFIG::debug { trace("CModule::startAsync: " + arguments); }
+    
     if(activeConsole)
       throw new Error("calling startAsync with an active console");
 
@@ -1448,9 +1492,11 @@ public class CModule
       env = new Vector.<String>
 
     // try to set us as the ui thread
-    try {
-      C_Run.workerClass["current"].setSharedProperty("flascc.uiThread.threadId", realThreadId);
-    } catch(e:*) {}
+    if(isAutoSetRealThreadId) {
+        try {
+          C_Run.workerClass["current"].setSharedProperty("flascc.uiThread.threadId", realThreadId);
+        } catch(e:*) {}    
+    }
     try {
       CModule.start(console, args, env, preserveStack);
     } catch(e:GoingAsync) {
@@ -1469,6 +1515,8 @@ public class CModule
   */
   public static function startBackground(console:Object = null, args:Vector.<String> = null, env:Vector.<String> = null, afterStackSize:int = 65536):void
   {
+    CONFIG::debug { trace("CModule::startBackground: " + arguments); }
+    
     if(console)
     {
       if(activeConsole)
@@ -1537,7 +1585,7 @@ public class CModule
   // set up worker init stuff
   workerInits.push(function(worker:*):void
   {
-    //trace("workerInit: " + threadId);
+    CONFIG::debug { trace("CModule::workerInit: " + threadId + " / " + realThreadId); }
     prepForThreadedExec();
 
     var v:Vector.<CModule> = getModuleVector();
@@ -1553,20 +1601,33 @@ public class CModule
       worker.setSharedProperty("flascc." + pkgName + ".oncep", m.oncep);
     }
   });
-  //trace("workerInit added: " + threadId);
+  //CONFIG::debug { trace("CModule::workerInit added: " + threadId); }
 }
+
+//--------------------------------------------------------------------------
+//
+//  GoingAsync
+//
+//--------------------------------------------------------------------------
 
 /**
 * @private
 */
 public class GoingAsync {}
 
+//--------------------------------------------------------------------------
+//
+//  PtrLink
+//
+//--------------------------------------------------------------------------
+
 /**
 * @private
 */
-class PtrLink
+internal class PtrLink
 {
   public const ptr:int = 0;
+  
   public var next:PtrLink;
 
   public function PtrLink(ptr:int)

@@ -140,7 +140,8 @@ void test_encode_an(int num)
 
 		snprintf(buf, 256, "monkey-orig-bits-%d.dat", num);
 		fp = fopen(buf, "w");
-		bstream = QRinput_mergeBitStream(input);
+		bstream = BitStream_new();
+		QRinput_mergeBitStream(input, bstream);
 		c = 0;
 		for(x=0; x<bstream->length; x++) {
 			fputc((bstream->data[x]&1)?'1':'0', fp);
@@ -467,12 +468,12 @@ void test_split_structure(int num)
 	QRinput_InputList *il;
 	int version;
 	QRecLevel level;
-	int len, c, i, ret;
+	int c, i, ret;
 
 	version = (int)drand(40) + 1;
 	level = (QRecLevel)drand(4);
 
-	len = fill8bitString();
+	fill8bitString();
 
 	input = QRinput_new2(version, level);
 	if(input == NULL) {

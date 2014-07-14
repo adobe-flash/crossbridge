@@ -1,0 +1,295 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @GraphMath package for @Graph (Version 1.1)                           #
+#                                                                             #
+#  Version 1.0 by Jeffrey H. Kingston, December 1993.                         #
+#  Version 1.1 by Jeffrey H. Kingston, October 1996.                          #
+#                                                                             #
+#  This package provides mathematics for the @Graph graph drawing package.    #
+#                                                                             #
+###############################################################################
+
+export
+
+    "-0" "-1" "-2" "-3" "-4" "-5" "-6" "-7" "-8" "-9" "-."
+    pi e sqrt abs ceiling floor truncate round cos sin atan
+    exp log rand "*" "/" idiv mod "+" "-"
+    "=" "!=" "<" "<=" ">" ">=" not and xor or
+    if xloop yloop zloop
+
+def @GraphMath
+{
+    def "-0" { "-0" }
+    def "-1" { "-1" }
+    def "-2" { "-2" }
+    def "-3" { "-3" }
+    def "-4" { "-4" }
+    def "-5" { "-5" }
+    def "-6" { "-6" }
+    def "-7" { "-7" }
+    def "-8" { "-8" }
+    def "-9" { "-9" }
+    def "-." { "-." }
+
+    def pi { "3.14159" }
+
+    def e  { "2.71828" }
+
+    def sqrt
+	precedence 40
+	right y
+    {
+	y "sqrt"
+    }
+
+    def abs
+	precedence 40
+	right y
+    {
+	y "abs"
+    }
+
+    def ceiling
+	precedence 40
+	right y
+    {
+	y "ceiling"
+    }
+
+    def floor
+	precedence 40
+	right y
+    {
+	y "floor"
+    }
+
+    def truncate
+	precedence 40
+	right y
+    {
+	y "truncate"
+    }
+
+    def round
+	precedence 40
+	right y
+    {
+	y "round"
+    }
+
+    def cos
+	precedence 40
+	right y
+    {
+	y "cos"
+    }
+
+    def sin
+	precedence 40
+	right y
+    {
+	y "sin"
+    }
+
+    def atan
+	precedence 39
+	left x
+	right y
+    {
+	x y "atan"
+    }
+
+    def exp
+	precedence 38
+	left x
+	right y
+    {
+	x y "exp"
+    }
+
+    def log
+	precedence 37
+	left x
+	right y
+    {
+	x y "dolog"
+    }
+
+    def rand
+	precedence 36
+	left x
+	right y
+    {
+	x y "dorand"
+    }
+
+    def "*"
+	precedence 35
+	left x
+	right y
+    {
+	x y "mul"
+    }
+
+    def "/"
+	precedence 35
+	left x
+	right y
+    {
+	x y "div"
+    }
+
+    def "idiv"
+	precedence 34
+	left x
+	right y
+    {
+	x y "idiv"
+    }
+
+    def "mod"
+	precedence 34
+	left x
+	right y
+    {
+	x y "mod"
+    }
+
+    def "-"
+	precedence 33
+	left x
+	right y
+    {
+	x @Case {
+	    ""   @Yield { y "neg" }
+	    else @Yield { x y "sub" }
+	}
+    }
+
+    def "+"
+	precedence 32
+	left x
+	right y
+    {
+	x @Case {
+	    ""   @Yield { y }
+	    else @Yield { x y "add" }
+	}
+    }
+
+    def "="
+	precedence 30
+	left x
+	right y
+    {
+	x y "eq"
+    }
+
+    def "!="
+	precedence 30
+	left x
+	right y
+    {
+	x y "ne"
+    }
+
+    def "<"
+	precedence 30
+	left x
+	right y
+    {
+	x y "lt"
+    }
+
+    def "<="
+	precedence 30
+	left x
+	right y
+    {
+	x y "le"
+    }
+
+    def ">"
+	precedence 30
+	left x
+	right y
+    {
+	x y "gt"
+    }
+
+    def ">="
+	precedence 30
+	left x
+	right y
+    {
+	x y "ge"
+    }
+
+    def "not"
+	precedence 25
+	right y
+    {
+	y "not"
+    }
+
+    def "and"
+	precedence 24
+	left x
+	right y
+    {
+	x y "and"
+    }
+
+    def "xor"
+	precedence 23
+	left x
+	right y
+    {
+	x y "xor"
+    }
+
+    def "or"
+	precedence 22
+	left x
+	right y
+    {
+	x y "or"
+    }
+
+    def if
+	named cond { true }
+	named then {}
+	named else {}
+    {
+	cond "{" then "} {" else "} ifelse"
+    }
+
+    def xloop
+	named from { 0 }
+	named to { 0 }
+	named by { 1 }
+	named do named x { "xval" } {}
+    {
+	from by to "{ /xval exch def" do "} for"
+    }
+
+    def yloop
+	named from { 0 }
+	named to { 0 }
+	named by { 1 }
+	named do named y { "yval" } {}
+    {
+	from by to "{ /yval exch def" do "} for"
+    }
+
+    def zloop
+	named from { 0 }
+	named to { 0 }
+	named by { 1 }
+	named do named z { "zval" } {}
+    {
+	from by to "{ /zval exch def" do "} for"
+    }
+
+}

@@ -1,3 +1,359 @@
+2014.06.22 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrencode.c:
+	  - A memory leak bug has been fixed. (Thanks to @win32asm)
+	* bitstream.c:
+	  - Check return value of BitStream_expand. (PR #46, Thanks to @tklauser)
+
+2014.02.14 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrinput.c:
+	  - Minor documentation fix.
+	* qrenc.c:
+	  - Error message improved.
+
+2014.02.09 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* .travis.yaml:
+	  - Configuration file for Travis CI. (Thanks to Danil Dörrhöfer)
+	* configure.ac:
+	  - Fixed some warnings.
+
+2014.01.15 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - Merged pull request 78d44fd - commandline argument --help and -V is
+	    printed to stdout, instead of stderr.
+
+2014.01.04 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* rsecc.[ch]:
+	  - Code cleanups.
+
+2013.10.27 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrinput.c:
+	  - Bug in QRinput_insertFNC1Header() has been fixed. (Thanks to David
+	    Binderman)
+	* qrinput.c, test/decoder.[ch]:
+	  - Code cleanup.
+
+2013.09.08 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* tests/test_qrencode.c:
+	  - Small bug fix.
+
+2013.09.06 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - bzero() has been replaced with memset(). (Thanks to Gavin Andresen)
+	* qrspec.c, qrinput.c:
+	  - QRspec_getMinimumVersion() now returns maximum version number for
+	    excessive input, instead of -1. Closes #31. (Thanks to Danil
+		Dörrhöfer)
+	* tests/test_qrencode.c:
+	  - New tests for excessive or maximum input have been added.
+	* tests/test_qrinput.c:
+	  - A deprecatd test has been removed.
+	[reduce_malloc]
+	* bitstream.c:
+	  - Minimum length of bit buffer has been extended to 128. In many cases
+	    the library needs 128 bits at least to generate a symbol.
+	[master]
+	* merged reduce_malloc branch.
+
+2013.08.22 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* configure.ac:
+	  - Avoid to use sdl-config. (Thanks to Heiko Becker)
+
+2013.08.15 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* rsecc.[ch], qrencode.c, tests/test_rc.c:
+	  - Code cleanups and refactoring.
+	  - Bug fix.
+	* configure.ac:
+	  - Bumped version to 3.9.0, preparing for major update.
+	* qrenc.c:
+	  - Copyright year in usage has been updated.
+	  - Help message improved.
+
+2013.08.15 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* rsecc.[ch], rscode.[ch], Makefile.am, qrencode.c:
+	  - Reed-Solomon error correction code has been completely rewritten.
+	  - Phil Karn's code has been removed (moved to tests).
+	* tests/test_rs.c, tests/test_qrencode.c, tests/rscode.[ch], tests/Makefile.am:
+	  - Test codes related to ECC have been updated.
+	  - Phil Karn's code has been moved to tests, just for test purpose.
+	* tests/test_mqrspec.c:
+	  - Code cleanup.
+
+2013.07.29 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.4]
+	* configure.ac, README, NEWS: 
+	  - Bumped version to 3.4.3.
+
+2013.07.16 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - missing break in switch. (Thanks to ßlúèÇhîp)
+	* qrinput.c:
+	  - missing/redundant breaks in some switch statements.
+
+2013.06.17 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - Merged pull request #29. (Thanks to Daniel Dörrhöfer)
+	    - Run length encoding has been made non-default.
+	    - New option "--rle" has been instroduced to enable run length encoding
+	      for SVG format.
+
+2013.03.30 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrinput.c:
+	  - Renamed a variable ("index") to avoid compile-time warning. (Thanks to
+	    Emmanuel Blot)
+	  - Range check improved.
+	* autogen.sh:
+	  - bug fix.(Thanks to Emmanuel Blot)
+
+2013.03.26 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - Memory leak bug has been fixed. (Thanks to Hassan Hajji)
+	  - Buffer overrun bug has been fixed.
+	  - Code cleanups.
+
+2013.03.01 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* README, NEWS:
+	  - Documentation update.
+	* Version 3.4.2 has been released.
+
+2013.02.26 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* split.c, tests/test_split.c:
+	  - Applied Viona's bug fix patch. (Thanks to Viona)
+	  - Additional switching cost between AN and Num mode has been included
+	    correctly.
+	  - Additional switching cost between 8 and AN/Num mode has been included
+	    correctly.
+	  - New test case has been added.
+
+2013.02.16 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.4, master]
+	* configure.ac, README, NEWS: 
+	  - Bumped version to 3.4.2.
+
+2013.02.16 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - Now it includes "string.h" by itself for libpng16. (Thanks to Petr)
+
+2012.11.30 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrencode.h
+	  - Doxygen documents improved.
+
+2012.11.09 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrinput.c:
+	  - Code cleanup.
+
+2012.11.08 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrinput.c:
+	  - Memory leak bug has been fixed. (issue #24) (Thanks to chisj)
+	* qrencode.c:
+	  - Incorrect bit extraction bug in QRcode_encodeMaskMQR() has been fixed.
+	    (issue #25) (Thanks to vlad417)
+	* tests/test_qrencode.c:
+	  - Added NUL checks for malloc-related bugs using failmalloc.
+	  - Added a new test for issue #25. (Thanks to vlad417)
+
+2012.10.21 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrinput.c:
+	  - Unnecessary "goto ABORT" eliminated.
+
+2012.10.17 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.4]
+	* NEWS:
+	  - Release note has been written.
+	* Version 3.4.1 has been released.
+
+2012.10.15 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.4]
+	* configure.ac:
+	  - HAVE_LIBPTHREAD was not correctly defined in config.h.in.
+	* tests/test_configure.sh:
+	  - New test script checking autoconf-related scripts has been added.
+	* configure.ac, README, NEWS: 
+	  - Bumped version to 3.4.1.
+
+2012.10.15 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.4]
+	* Version 3.4.0 has been released.
+	[master]
+	* Merged 3.4.0.
+
+2012.10.13 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.4]
+	* qrencode.h:
+	  - Documentation improved.
+	  - Copyright year has been updated.
+	* Doxyfile:
+	  - Rebased on a template from Doxygen 1.7.6.1.
+
+2012.10.09 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.4]
+	* configure.ac, README, NEWS: 
+	  - Bumped version to 3.4.0.
+	* qrencode.1.in:
+	  - Added SVG option to --type.
+	* qrenc.c:
+	  - Usage improved.
+	  - Inkscape-friendly SVG output.
+
+2012.09.29 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[reduce_malloc]
+	* bstream.h:
+	  - Added a new function "BitStream_reset()".
+	* qrinput.c:
+	  - Reduced the use of dynamic memory allocation.
+	  - Performance improved.
+	  - Interfaces of QRinput_getBitStream() and QRinput_mergeBitStream() have
+	    been changed.
+
+2012.09.25 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[reduce_malloc]
+	* qrinput.c, tests/qrinput.c:
+	  - Reduced the use of dynamic memory allocation.
+
+2012.09.25 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - Input validation improved. (Thanks to Yann Droneaud)
+	* README:
+	  - Contributors list has been updated.
+	  - Added a note about autogen.sh.
+
+2012.09.24 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* tests/test_bitstream.c:
+	  - Added new test.
+	* tests/test_{monkey,qrspec}.c:
+	  - Warnings suppressed.
+	[reduce_malloc]
+	* bitstream.[ch]:
+	  - Reduced the use of dynamic memory allocation.
+
+2012.09.22 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - Color palette support has been added. Currently PNG and SVG are
+	    supported
+	* qrencode.1.in:
+	  - "--foreground" and "--background" options have been added.
+
+2012.09.19 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* README:
+	  - Contributors list has been updated.
+	* qrencode.1.in:
+	  - Followed Unicode block elements patch.
+
+2012.09.18 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - Merge pull request #19 from mezcalero/master (Unicode block elements
+	    support).
+
+2012.09.13 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - Set XML(SVG) declaration's 'standalone' to 'yes'.
+
+2012.09.03 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - A bug introduced in 'b3d5f7' has been reverted. (Thanks to Terry)
+
+2012.09.03 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - Integrated David's SVG patch.
+
+2012.04.21 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* qrenc.c:
+	  - Incorrect arguments order has been fixed. (Thank to Fred Steinhaeuser)
+
+2012.04.18 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.3]
+	* qrenc.c:
+	  - EPS dot size bug has been fixed (closes: #12).
+	* Version 3.3.1 has been released.
+
+2012.04.11 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[master]
+	* qrenc.c:
+	  - Paper size and margin are now set properly in SVG output.
+
+2012.04.10 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[master]
+	* Following fixes have been contributed by Yutaka Niibe.
+	* qrencode.1.in:
+	  - "Hyphen-used-as-minus-sign" error has been fixed.
+	* configure.ac, libqrencode.pc.in, tests/Makefile.am:
+	  - Explicit link to libpthread has been eliminated.
+	* qrenc.c:
+	  - Pulled Repox's SVG patch (Pull request #10).
+	  - Slightly simplified.
+	[3.3]
+	* README, configure.ac:
+	  - Bumped version to 3.3.1.
+
+2012.04.01 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.3]
+	* qrenc.c:
+	  - ASCII mode has been added. (Thanks to Ralf Ertzinger)
+	  - Small code cleanups.
+	  - ASCII mode now handles ".txt" suffix correctly.
+	* NEWS, README:
+	  - Documentation updates.
+	* Version 3.3.0 has been released.
+	[master]
+	* Merged to 3.3.0.
+
+2012.03.31 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.2]
+	* README, NEWS, configure.ac:
+	  - Bumped version to 3.2.1.
+	* Version 3.2.1 has been released.
+	[3.3]
+	* qrenc.c:
+	  - Copyright year has been updated.
+
+2012.03.30 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	* libqrencode.pc.in :
+	  - Replaced obsolete macro LIBPTHREAD with LIBS. (thx to gniibe)
+	* configure.ac:
+	  - Checks $ac_cv_lib_pthread_pthread_mutex_init instead of
+	    HAVE_LIBPTHREAD. (thx to gniibe)
+
+2012.02.28 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[master, 3.2.1]
+	* .gitignore:
+	  - Added "tests/pthread_qrencode".
+	[3.3]
+	* 3.3 branch has been started.
+	  - 3.2.1 has been canceled.
+	* configure.ac, README, NEWS:
+	  - Version number changes.
+
+2012.01.31 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[master]
+	* Recent 3.2 branch has been merged into the master.
+	* qrenc.c:
+	  - Quick bug fix introduced in 09b72eb3070a36461eb83c1ec5237e4855ee515b.
+
+2012.01.19 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.2.1]
+	* cofigure.ac, qrencode.[hc], qrenc.c, tests/test_qrencode.c:
+	  - QRcode_APIVersion() and QRcode_APIVersionString() have been added.
+	  - New macro values {MAJOR,MINOR,MICRO}_VERSION have been introduced.
+	  - New tests have been added.
+	* qrenc.c:
+	  - Removed a useless storage class specifier from enum imageType.
+	[master, 3.2.1]
+	* Pulled moshen:write_ansi.
+	[3.2.1]
+	* tests/decoder.c:
+	  - Bug fix.
+	* qrenc.c:
+	  - Code refactoring.
+	  - Now you can omit "-o -" for EPS and ANSI output.
+	  - Default margin size has been rollbacked to 4 for ANSI(256).
+	* README:
+	  - Added Colin (moshen@github) to ACKNOWLEDGMENTS.
+	  - Added zapster's real name to ACKNOWLEDGMENTS.
+
+2011.12.12 Kentaro FUKUCHI <kentaro@fukuchi.org>
+	[3.2.1]
+	* configure.ac, README:
+	  - Bumped version to 3.2.1.
+
 2011.12.12 Kentaro FUKUCHI <kentaro@fukuchi.org>
 	* qrenc.c, qrencode.1.in:
 	  - Usage updates.
@@ -467,7 +823,7 @@
 	* Bumped version to 3.1.0.
 
 2009.04.30 Kentaro FUKUCHI <fukuchi@megaui.net>
-	* bistream.[ch]:
+	* bitstream.[ch]:
 	  - Internal representation of BitStream has been changed from
 	    NUL-terminated string to unsigned char array.
 	* tests/common.h, tests/test_{bitstream,qrinput}.c:

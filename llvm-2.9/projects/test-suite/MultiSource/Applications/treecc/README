@@ -1,0 +1,77 @@
+Tree Compiler-Compiler
+======================
+
+The treecc program is designed to assist in the development of compilers
+and other language-based tools.  It manages the generation of code to handle
+abstract syntax trees and operations upon the trees.
+
+A fuller account of why treecc exists and what it can be used for can
+be found in the Texinfo documentation within the "doc" subdirectory,
+and in the introductory article "doc/essay.html".
+
+Downloading and Building
+------------------------
+
+The latest version of treecc can be obtained from the following Web site:
+
+    http://www.southern-storm.com.au/treecc/
+
+To build and install, unpack the ".tar.gz" file into a temporary directory
+and execute the following commands:
+
+    $ ./configure
+	$ make all
+	$ make check
+	$ make install
+
+The "make check" runs the treecc test suite to check for any problems
+on your system.  Report any such problems to the authors, together with
+a script of the failed test output.
+
+If you obtained the treecc sources via CVS, you will need to run the
+following before "./configure":
+
+	$ ./auto_gen.sh
+
+If you wish to install treecc somewhere other than the default prefix
+("/usr/local"), use the following configuration command instead:
+
+    $ ./configure --prefix=PREFIX
+
+where "PREFIX" is the full pathname of the directory where you want to
+install the program.
+
+If you want to add a new output language, see "doc/extending.txt".
+
+Copyright Considerations
+------------------------
+
+Treecc is distributed under the terms of the GNU General Public License.
+A copy of this can be found in the "COPYING" file.
+
+However, it is not our intention to restrict the use of treecc to only
+free software providers.  Use by commercial software vendors is welcome.
+
+When you use treecc on your own input files to generate source code as
+output, the resulting source code files are also owned by you.  You may
+re-distribute unmodified copies of these output source files, and any
+binaries derived from them, in any way you see fit.
+
+If you modify treecc itself, and generate new output files as a result,
+then you must release all modifications to treecc with your program so
+that other users can benefit from your changes under the terms of the GPL.
+
+Contact the authors if you have any questions regarding the above.
+It is our intention to allow the same amount of access to treecc output
+files as is currently available using the GNU Bison and Flex programs.
+
+Contacting the Authors
+----------------------
+
+The authors can be contacted via e-mail at the following address:
+
+    treecc@southern-storm.com.au
+
+Also check our Web site for updates to treecc:
+
+    http://www.southern-storm.com.au/treecc/

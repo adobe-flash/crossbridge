@@ -24,12 +24,22 @@ package C_Run
   * throw on "exit"
   * @private
   */
-  [ExcludeClass] public class Exit
+  [ExcludeClass] 
+  public class Exit
   {
-    public var code:int
+    /**
+    * The exit code
+    */
+    public var code:int;
 
+    /**
+    * Constructor
+    *
+    * @param code The exit code
+    */
     public function Exit(code:int)
     {
+      CONFIG::debug { trace("Exit::exit: " + code); }
       this.code = code;
     }
   }

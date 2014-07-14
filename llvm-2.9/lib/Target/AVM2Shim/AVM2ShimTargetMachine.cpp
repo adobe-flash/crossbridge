@@ -27,7 +27,7 @@
 #include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
 #include "AVM2ShimTargetMachine.h"
 #include "AVM2ShimTargetAsmInfo.h"
-#include "AVM2shim.h"
+#include "AVM2Shim.h"
 #include <set>
 
 using namespace llvm;

@@ -1,0 +1,378 @@
+
+2004-01-03  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* configure.in, NEWS: update version for the 0.2.8 release.
+
+2003-12-03  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* gen_c.c, tests/output15.out, tests/output7.out, tests/output8.out:
+	don't put a trailing comma on "enum" definitions, because strict ANSI
+	C compilers don't like them (thanks to Miroslaw Dobrzanski-Neumann).
+
+2003-11-20  Gopal.V  <gopalv82@symonds.net>
+
+	* context.c, gen_cpp.c, gen_cs.c, gen_java.c, info.h, options.c,
+	doc/treecc.texi: add the "base_type" option.
+
+2003-07-17  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* configure.in, NEWS: update version for the 0.2.6 release.
+
+	* configure.in: update working version to "0.2.7".
+
+2003-07-05  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* gen_c.c, gen_cpp.c: fix some incorrect variable declarations
+	that gcc allowed through when it shouldn't have.
+
+2003-07-04  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* README: minor change to the treecc README file.
+
+	* Makefile.am, context.c, gen_c.c, gen_cpp.c, info.h, options.c,
+	doc/treecc.texi, etc/Makefile.am, etc/c_gc_skel.c, etc/c_gc_skel.h,
+	etc/cpp_gc_skel.cc, etc/cpp_gc_skel.h, tests/output17.out,
+	tests/output17.tst, tests/output18.out, tests/output18.tst,
+	tests/test_list: add the "gc_allocator" option to treecc,
+	to make the node allocator use libgc.
+
+2003-02-29  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* tests/output5.out, tests/output6.out, tests/output9.out:
+	update test output files for one of jeyk's fixes.
+
+	* configure.in, NEWS: update version for the 0.2.4 release.
+
+	* configure.in: update working version to "0.2.5".
+
+2003-02-29  Jeyasankar Kottalam  <jeyk@cox.net>
+
+	* gen_cpp.cpp, etc/cpp_skel.cc: add namespace support for C++;
+	fix a bug in the C++ skeleton.
+
+2003-02-08  Stephen Compall  <s11@member.fsf.org>
+
+	* treecc.spec.in: Removed $PREFIX/share/treecc from the install
+	search-path.
+
+2003-02-08  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* NEWS, configure.in: update version for the "0.2.2" release.
+
+	* configure.in: update working version to "0.2.3".
+
+2003-01-29  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* context.c, gen_c.c, gen_cpp.c, info.h, options.c, doc/treecc.texi,
+	etc/cpp_skel.cc, tests/output5.out, tests/output6.out,
+	tests/output9.out: add the "allocator" and "no_allocator" options,
+	which allow treecc's C/C++ node allocators to be replaced with
+	third party node allocators.
+
+	* main.c, doc/treecc.1, doc/treecc.texi: add the "-O" option to
+	the treecc command-line, which allows "%option" commands to
+	be issued directly from the command-line.
+
+	* tests/.cvsignore, tests/Makefile.am, tests/normalize.c,
+	tests/run_tests: replace the reference to "sed" in "run_tests"
+	with "normalize", to work around problems with CRLF's under cygwin.
+
+2003-01-27  James Michael DuPont  <mdupont777@yahoo.com>
+
+	* context.c, info.h, options.c, stream.c: add the "print_lines"
+	and "no_print_lines" options to suppress #line directives.
+
+2003-01-27  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* doc/treecc.texi: minor adjustment to direntry tag; only include
+	treecc once in the info directory.
+
+	* doc/treecc.texi: document the "print_lines" and "no_print_lines"
+	options.
+
+2003-01-26  Stephen Compall  <s11@member.fsf.org>
+
+	* doc/treecc.texi: Added info dir entries.
+
+2003-01-15  Gopal.V  <gopalv82@symonds.net>
+
+	* gen_php.c: Merge patch #942 for Php output and make a few cosmetic
+	changes to the file.
+
+2003-01-11  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* NEWS, configure.in: update version for the "0.2.0" release.
+
+	* configure.in: update working version to "0.2.1".
+
+2003-01-11  Alan Knowles  <alan@akbkhome.com>
+
+	* Makefile.am, gen.c, gen.h, gen_php.c, info.h, options.c:
+	add support for PHP output.
+
+2003-01-09  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* stream.c (TreeCCStreamCreate): copy the "force" flag from
+	the configuration settings into newly created streams.
+
+2002-12-31  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* gen_cs.c, gen_java.c, info.h, options.c, doc/treecc.texi,
+	tests/output16.out, tests/output16.tst, tests/test_list:
+	add the "internal_access" and "public_access" options, so that
+	treecc can output assembly-private node definitions.
+
+2002-12-21  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* configure.in: remove AC_PROG_CXX from configure.in, because it
+	isn't necessary any more since expr_cpp was disabled.
+
+2002-12-16  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* tests/run_tests: perform end of line conversion on the expected
+	test output files to prevent problems when diff'ing on MS-DOS systems.
+
+	* configure.in: don't use "-mno-cygwin" with "mingw32" compilers.
+
+2002-12-15  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* mkskel-sh, .cvsignore, Makefile.am, info.h, main.c, skeleton.c,
+	doc/treecc.1, doc/treecc.texi, etc/Makefile.am, tests/output1.out,
+	tests/output12.out, tests/output13.out, tests/output14.out,
+	tests/output15.out, tests/output2.out, tests/output3.out,
+	tests/output4.out, tests/output5.out, tests/output6.out,
+	tests/output7.out, tests/output8.out, tests/output9.out,
+	tests/test_output.c: bind the skeleton files into the "treecc"
+	binary so that we don't have any more skeleton path search problems.
+
+	* README, configure.in: always turn off cygwin builds under Win32.
+
+	* configure.in, config.guess, config.sub: set up for a canonical
+	build system, so that cygwin/mingw32 detection works correctly.
+
+	* Makefile.am, configure.in, examples/Makefile.am, tests/Makefile.am:
+	remove TREECC_DATA_DIR and clean up the -Wall handling for gcc.
+
+	* examples/Makefile.am: remove the unnecessary skeleton directory
+	specification.
+
+	* make-zip.sh, doc/binary_readme.txt: add the "make-zip.sh"
+	script, to assist with building a Win32 binary .zip file package.
+
+	* errors.c, main.c, examples/Makefile.am, examples/expr_c.tc,
+	tests/Makefile.am, tests/run_tests, tests/test_input.c,
+	tests/test_output.c, tests/test_parse.c: changes to support
+	out of tree builds properly.
+
+2002-11-24  Gopal V  <gopalv82@symonds.net>
+	
+	* treecc.spec, configure.in, treecc.spec.in: Fix RPM builds
+
+2002-11-23  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* NEWS, configure.in: update version for the "0.1.8" release.
+
+	* configure.in: update working version to "0.1.9".
+
+2002-11-16  Peter Minten  <silvernerd@users.sf.net>
+
+	* doc/treecc.texi: Added Ruby output documentation.
+
+2002-11-09  Peter Minten  <silvernerd@users.sf.net>
+
+	* gen_ruby.c: Modified to create code compliant with Ruby markup
+	conventions, also some little bug fixes.
+	
+	* examples/expr_ruby.tc: Improved example.
+	
+	* stream.h, stream.c: Overloaded TreeCCStreamCodeIndent
+	to support languages that don't use tabs for indenting.
+	
+2002-11-05  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* NEWS, configure.in: update version for the "0.1.6" release.
+
+	* configure.in: update working version to "0.1.7".
+
+2002-11-03  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* doc/extending.txt, README: add a "quick and dirty" guide for
+	people who want to extend treecc with new output languages.
+
+2002-10-26  Peter Minten  <silvernerd@users.sf.net>
+
+	* Makefile.am, gen.c, gen.h, gen_ruby.c, info.h, options.c,
+	examples/README, examples/expr_ruby.tc: add Ruby code generation
+	support to treecc.
+
+2002-09-12  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* gen_cpp.c: extra comma where there shouldn't be in the
+	declaration of C++ virtual operations.
+
+2002-09-02  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* NEWS, configure.in: update version for the "0.1.4" release.
+
+	* configure.in: update working version to "0.1.5".
+
+2002-08-13  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* auto_gen.sh: slightly smarter script that also runs "aclocal".
+
+	* aclocal.m4, config.h.in, missing, examples/Makefile.am,
+	examples/ylwrap: update build system to automake 1.6, and remove
+	"expr_cpp" from the build because cygwin's automake is busted.
+
+	* auto_gen.sh, config.h.in: remove config.h.in from the CVS
+	tree and generate it from "auto_gen.sh" instead.
+
+2002-06-27  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* NEWS, configure.in: update version for the "0.1.2" release.
+
+	* configure.in: update working version to "0.1.3".
+
+2002-06-14  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* auto_gen.sh, configure.in: make the system more friendly to
+	automake 1.5 systems.
+
+	* tests/run_tests: work-around versions of "sed" that do not
+	recognise "-" to mean standard input.
+
+2002-05-27  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* tests/Makefile.am, examples/Makefile.am: patches from
+	Stephen Compall to support out of tree builds.
+
+2002-04-20  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* configure.in, NEWS: update version for the "0.1.0" release.
+
+	* configure.in: update the working version to "0.1.1".
+
+2002-04-01  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* configure.in, aclocal.m4: use "AM_MAINTAINER_MODE" in the
+	configure.in file to work around automake issues under Cygwin.
+
+	* conf_fix.sh, README: remove "conf_fix.sh", as we don't
+	need it any more with maintainer mode.
+
+	* auto_gen.sh: pass the "-a" option to "automake".
+
+2002-03-27  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* conf_fix.sh, README: add a configuration script that can be
+	used to get around problems with automake 1.5 under Cygwin.
+
+	* configure.in, NEWS: update version for the "0.0.8" release.
+
+	* configure.in: update the working version to "0.0.9".
+
+2002-03-23  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* doc/essay.html, README: add the treecc essay to the "doc"
+	subdirectory.
+
+2002-03-17  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* context.c, gen_c.c, gen_cpp.c, gen_cs.c, gen_java.c, info.h,
+	options.c, skeleton.c, stream.c, stream.h, doc/treecc.texi:
+	implement the "strip_filenames" option to make it more likely
+	that treecc will generate constant output files regardless of
+	which directory it is executed in.
+
+	* auto_gen.sh, README: add the "auto_gen.sh" script and some
+	instructions on its use.
+
+2002-03-05  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* doc/treecc.texi: polish the text a little.
+
+	* etc/cpp_skel.cc: declare the argument to "alloc" as "size_t",
+	to match the declaration in the common header file.
+
+	* tests/output5.out, tests/output6.out, tests/output9.out:
+	modify test output files to match the change to "etc/cpp_skel.cc".
+
+2002-01-10  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* configure.in, examples/Makefile.am: only build "expr_cpp" if
+	bison is being used, because it uses features that are not
+	compatible with byacc.
+
+2002-01-07  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* input.c: add ';' after a goto label for correct ANSI C syntax.
+
+2001-12-28  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* gen_c.c (ImplementCreateFuncs): insert a '*' into the return
+	cast when creating a singleton.
+
+	* context.c, gen_c.c, info.h, options.c, doc/treecc.texi:
+	add the options "kind_in_vtable" and "kind_in_node".
+
+	* skeleton.c (TreeCCIncludeSkeleton): replace all instances of
+	"yy" in a skeleton with "context->yy_replacement".
+
+	* tests/output12.out, tests/output12.tst, tests/output13.out,
+	tests/output13.tst, tests/output14.out, tests/output14.tst,
+	tests/test_list: add new tests for singletons, vtable kinds, and
+	"yy" replacement.
+
+	* ChangeLog: adjust the ChangeLog format to make it Emacs-friendly.
+
+	* gen.c, gen.h, gen_c.c, gen_java.c, info.h, input.c, input.h,
+	parse.c, doc/treecc.texi, tests/output15.out, tests/output15.tst,
+	tests/test_input.c, tests/test_list: implement the "%split" flag
+	for non-virtual operations to split large "switch" statements
+	across multiple functions.
+
+	* configure.in, NEWS: update the release version to 0.0.6.
+
+	* configure.in: change the version to "0.0.7" for the new working
+	version.
+
+2001-12-16  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* main.c: bug fix - create the default output files correctly;
+	defaults weren't working when the input didn't have "%output"
+	specified.
+
+2001-12-11  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* etc/c_skel.c, etc/cpp_skel.cc: swap the order of "data__" and
+	"next__" in "YYNODESTATE_block" so that the start of the
+	"data__" buffer will be properly aligned on 64-bit platforms.
+
+	* tests/output1.out, tests/output2.out, tests/output3.out,
+	tests/output4.out, tests/output5.out, tests/output6.out,
+	tests/output7.out, tests/output8.out, tests/output9.out:
+	new test output files that were affected by the skeleton change.
+
+2001-11-08  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* etc/c_skel.c, etc/cpp_skel.cc: update the C and C++ skeleton
+	files with an alignment algorithm that should work better on
+	platforms such as 64-bit Solaris.
+
+	* tests/output1.out, tests/output2.out, tests/output3.out,
+	tests/output4.out, tests/output5.out, tests/output6.out,
+	tests/output7.out, tests/output8.out, tests/output9.out:
+	new test output files that were affected by the skeleton change.
+
+	* doc/treecc.texi: insert a "@page" command to force the index to
+	be formatted correctly when PDF documentation is generated.
+
+	* configure.in, NEWS: version and news updates for the "0.0.4" release.
+
+	* configure.in: change the version to "0.0.5" for the new working
+	version.
+
+2001-08-14  Rhys Weatherley  <rweather@southern-storm.com.au>
+
+	* treecc.spec: applied patch submitted by mdaniel to create
+	RPM spec file.

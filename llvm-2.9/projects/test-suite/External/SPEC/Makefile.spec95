@@ -1,0 +1,27 @@
+##===- Makefile.spec95 -------------------------------------*- Makefile -*-===##
+#
+# This makefile contains information for building SPEC95 as an external test.
+#
+##===----------------------------------------------------------------------===##
+
+include $(LEVEL)/Makefile.config
+
+SPEC_ROOT := $(SPEC95_ROOT)
+CPPFLAGS += -DSPEC_CPU95
+
+# RUN_TYPE - Either ref, test, or train.  May be specified on the command line.
+# individual tests may override this to provide better input sizes
+ifndef RUN_TYPE
+ifdef SMALL_PROBLEM_SIZE
+RUN_TYPE := test
+else
+ifdef LARGE_PROBLEM_SIZE
+RUN_TYPE  := ref
+else
+RUN_TYPE  := train
+endif
+endif
+endif
+
+include $(PROJ_SRC_ROOT)/External/SPEC/Makefile.spec.config
+include $(LEVEL)/External/SPEC/Makefile.spec

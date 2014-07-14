@@ -1,7 +1,7 @@
 /**
  * qrencode - QR Code encoder
  *
- * Copyright (C) 2006-2011 Kentaro Fukuchi <kentaro@fukuchi.org>
+ * Copyright (C) 2006-2012 Kentaro Fukuchi <kentaro@fukuchi.org>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,10 +24,10 @@
  *
  * \section encoding Encoding
  * 
- * There are two ways to encode data: <b>encoding a string</b> or 
+ * There are two methods to encode data: <b>encoding a string/data</b> or 
  * <b>encoding a structured data</b>.
  *
- * \subsection encoding-string Encoding a string
+ * \subsection encoding-string Encoding a string/data
  * You can encode a string by calling QRcode_encodeString().
  * The given string is parsed automatically and encoded. If you want to encode
  * data that can be represented as a C string style (NUL terminated), you can
@@ -36,11 +36,11 @@
  * If the input data contains Kanji (Shift-JIS) characters and you want to
  * encode them as Kanji in QR Code, you should give QR_MODE_KANJI as a hint.
  * Otherwise, all of non-alphanumeric characters are encoded as 8 bit data.
- * If you want to encode a whole string in 8 bit mode, use
+ * If you want to encode a whole string in 8 bit mode, you can use
  * QRcode_encodeString8bit() instead.
  *
- * Please note that a C string can not contain NUL character. If your data
- * contains NUL, you should chose the second way.
+ * Please note that a C string can not contain NUL characters. If your data
+ * contains NUL, you must use QRcode_encodeData().
  *
  * \subsection encoding-input Encoding a structured data
  * You can construct a structured input data manually. If the structure of the
@@ -101,6 +101,14 @@
 
 #if defined(__cplusplus)
 extern "C" {
+#endif
+
+#ifdef __AVM2__
+#define __STATIC static
+#define MAJOR_VERSION 1
+#define MINOR_VERSION 0
+#define MICRO_VERSION 0
+#define VERSION 1
 #endif
 
 /**
@@ -382,12 +390,10 @@ typedef struct {
  * Singly-linked list of QRcode. Used to represent a structured symbols.
  * A list is terminated with NULL.
  */
-typedef struct _QRcode_List QRcode_List;
-
-struct _QRcode_List {
+typedef struct _QRcode_List {
 	QRcode *code;
-	QRcode_List *next;
-};
+	struct _QRcode_List *next;
+} QRcode_List;
 
 /**
  * Create a symbol from the input data.
@@ -410,11 +416,12 @@ extern QRcode *QRcode_encodeInput(QRinput *input);
  * @param version version of the symbol. If 0, the library chooses the minimum
  *                version for the given input data.
  * @param level error correction level.
- * @param hint tell the library how non-alphanumerical characters should be
- *             encoded. If QR_MODE_KANJI is given, kanji characters will be
- *             encoded as Shif-JIS characters. If QR_MODE_8 is given, all of
- *             non-alphanumerical characters will be encoded as is. If you want
- *             to embed UTF-8 string, choose this.
+ * @param hint tell the library how Japanese Kanji characters should be
+ *             encoded. If QR_MODE_KANJI is given, the library assumes that the
+ *             given string contains Shift-JIS characters and encodes them in
+ *             Kanji-mode. If QR_MODE_8 is given, all of non-alphanumerical
+ *             characters will be encoded as is. If you want to embed UTF-8
+ *             string, choose this. Other mode will cause EINVAL error.
  * @param casesensitive case-sensitive(1) or not(0).
  * @return an instance of QRcode class. The version of the result QRcode may
  *         be larger than the designated version. On error, NULL is returned,
@@ -485,11 +492,12 @@ extern QRcode_List *QRcode_encodeInputStructured(QRinput_Struct *s);
  * @param string input string. It must be NUL terminated.
  * @param version version of the symbol.
  * @param level error correction level.
- * @param hint tell the library how non-alphanumerical characters should be
- *             encoded. If QR_MODE_KANJI is given, kanji characters will be
- *             encoded as Shif-JIS characters. If QR_MODE_8 is given, all of
- *             non-alphanumerical characters will be encoded as is. If you want
- *             to embed UTF-8 string, choose this.
+ * @param hint tell the library how Japanese Kanji characters should be
+ *             encoded. If QR_MODE_KANJI is given, the library assumes that the
+ *             given string contains Shift-JIS characters and encodes them in
+ *             Kanji-mode. If QR_MODE_8 is given, all of non-alphanumerical
+ *             characters will be encoded as is. If you want to embed UTF-8
+ *             string, choose this. Other mode will cause EINVAL error.
  * @param casesensitive case-sensitive(1) or not(0).
  * @return a singly-linked list of QRcode. On error, NULL is returned, and
  *         errno is set to indicate the error. See Exceptions for the details.
@@ -538,8 +546,24 @@ extern void QRcode_List_free(QRcode_List *qrlist);
  *****************************************************************************/
 
 /**
+ * Return a string that identifies the library version.
+ * @param major_version
+ * @param minor_version
+ * @param micro_version
+ */
+extern void QRcode_APIVersion(int *major_version, int *minor_version, int *micro_version);
+
+/**
+ * Return a string that identifies the library version.
+ * @return a string identifies the library version. The string is held by the
+ * library. Do NOT free it.
+ */
+extern char *QRcode_APIVersionString(void);
+
+/**
  * Clear all caches. This is only for debug purpose. If you are attacking a
  * complicated memory leak bug, try this to reduce the reachable blocks record.
+ * @warning This function is THREAD UNSAFE when pthread is disabled.
  */
 extern void QRcode_clearCache(void);
 

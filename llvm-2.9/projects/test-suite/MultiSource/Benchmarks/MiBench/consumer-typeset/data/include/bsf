@@ -1,0 +1,1609 @@
+
+###############################################################################
+#                                                                             #
+#  Lout @BasicSetup package (Version 3.13)                                    #
+#                                                                             #
+#  Jeffrey H. Kingston                                                        #
+#  5 February 1999                                                            #
+#                                                                             #
+#  Based on the first part of the @DocumentLayout package, version 3.11.      #
+#                                                                             #
+#  This package contains basic symbols used widely throughout many            #
+#  documents, for font changes, particular characters, standard words in      #
+#  the current language, date and time, paragraphs, lists, colours,           #
+#  rules, and boxes.                                                          #
+#                                                                             #
+###############################################################################
+
+@SysPrependGraphic { "bsf.lpg" }   # rules, boxes, margin note setup
+
+
+###############################################################################
+#                                                                             #
+#  The following symbols are defined outside @BasicSetup so that              #
+#  they can be invoked when setting its parameters in the @Use clause.        #
+#                                                                             #
+###############################################################################
+
+def @OrIfPlain
+    precedence 80
+    left x
+    right y
+{
+    @BackEnd @Case {
+	PlainText @Yield y
+	else      @Yield x
+    }
+}
+
+    ###########################################################################
+    #                                                                         #
+    #   @Colour, @Color                                                       #
+    #                                                                         #
+    ###########################################################################
+
+    def @ColourCommand right col
+    {
+	def @ColourCoords
+	{
+	    col @Case {
+		darkblue	@Yield	{ 0.0 0.0 0.5 }
+		blue		@Yield	{ 0.0 0.0 1.0 }
+		lightblue	@Yield	{ 0.5 0.5 1.0 }
+		darkgreen	@Yield	{ 0.0 0.5 0.0 }
+		green		@Yield	{ 0.0 1.0 0.0 }
+		lightgreen	@Yield	{ 0.5 1.0 0.5 }
+		darkred		@Yield	{ 0.5 0.0 0.0 }
+		red		@Yield	{ 1.0 0.0 0.0 }
+		lightred	@Yield	{ 1.0 0.5 0.5 }
+		darkcyan	@Yield	{ 0.0 0.5 0.5 }
+		cyan		@Yield	{ 0.0 1.0 1.0 }
+		lightcyan	@Yield	{ 0.5 1.0 1.0 }
+		darkmagenta	@Yield	{ 0.5 0.0 0.5 }
+		magenta		@Yield	{ 1.0 0.0 1.0 }
+		lightmagenta	@Yield	{ 1.0 0.5 1.0 }
+		darkyellow	@Yield	{ 0.5 0.5 0.0 }
+		yellow		@Yield	{ 1.0 1.0 0.0 }
+		lightyellow	@Yield	{ 1.0 1.0 0.5 }
+		darkgray	@Yield	{ 0.2 0.2 0.2 }
+		gray		@Yield	{ 0.5 0.5 0.5 }
+		lightgray	@Yield	{ 0.8 0.8 0.8 }
+		darkgrey	@Yield	{ 0.2 0.2 0.2 }
+		grey		@Yield	{ 0.5 0.5 0.5 }
+		lightgrey	@Yield	{ 0.8 0.8 0.8 }
+		black		@Yield	{ 0.0 0.0 0.0 }
+		white		@Yield	{ 1.0 1.0 1.0 }
+	    }
+	}
+
+	col @Case {
+	    nochange @Yield { nochange }
+	    else @Yield { @BackEnd @Case {
+		PostScript	@Yield { @ColourCoords setrgbcolor }
+		PDF		@Yield { @ColourCoords rg @ColourCoords RG }
+		PlainText	@Yield ""
+	    } }
+	}
+    }
+
+    def @Colour @Color left col right y { {@ColourCommand col} @SetColour y }
+
+    export i c p m s v f
+    def @LengthUnits
+    {
+	def i left x {
+	    @BackEnd @Case {
+		PostScript @Yield { x" in" }
+		PDF        @Yield { "__mul(__in, "x")" }
+		PlainText  @Yield ""
+	    }
+	}
+
+	def c left x {
+	    @BackEnd @Case {
+		PostScript @Yield { x" cm" }
+		PDF        @Yield { "__mul(__cm, "x")" }
+		PlainText  @Yield ""
+	    }
+	}
+
+	def p left x {
+	    @BackEnd @Case {
+		PostScript @Yield { x" pt" }
+		PDF        @Yield { "__mul(__pt, "x")" }
+		PlainText  @Yield ""
+	    }
+	}
+
+	def m left x {
+	    @BackEnd @Case {
+		PostScript @Yield { x" em" }
+		PDF        @Yield { "__mul(__em, "x")" }
+		PlainText  @Yield ""
+	    }
+	}
+
+	def s left x {
+	    @BackEnd @Case {
+		PostScript @Yield { x" sp" }
+		PDF        @Yield { "__mul(__louts, "x")" }
+		PlainText  @Yield ""
+	    }
+	}
+
+	def v left x {
+	    @BackEnd @Case {
+		PostScript @Yield { x" vs" }
+		PDF        @Yield { "__mul(__loutv, "x")" }
+		PlainText  @Yield ""
+	    }
+	}
+
+	def f left x {
+	    @BackEnd @Case {
+		PostScript @Yield { x" ft" }
+		PDF        @Yield { "__mul(__loutf, "x")" }
+		PlainText  @Yield ""
+	    }
+	}
+    }
+
+
+###############################################################################
+#                                                                             #
+#  Symbols exported by @BasicSetup.                                           #
+#                                                                             #
+###############################################################################
+
+export
+
+    @InitialFont @InitialBreak @InitialSpace @InitialLanguage @InitialColour
+    @OptimizePages @HeadingFont
+    @ParaGap @ParaIndent @DisplayGap @DisplayIndent @DefaultIndent
+    @DisplayNumStyle @WideIndent @VeryWideIndent
+    @ListGap @ListIndent @ListRightIndent @ListLabelWidth
+    @NumberSeparator
+
+    @Word @Roman @UCRoman @Alpha @UCAlpha @Months @ShortMonths @WeekDays
+    @ShortWeekDays @TwelveHours @ShortHours @MeriDiems @ShortMeriDiems
+
+    @Sym @R @I @B @BI @S @F @II
+    "~" "~~" "``" "''" ",," "--" "---" "..."
+
+    @Bullet @ParSym @SectSym @Dagger @DaggerDbl @CDot @Sterling @Yen @Florin
+    @Star @Degree @Minute @Second @Multiply @Divide @Lozenge @Register
+    @CopyRight @TradeMark @Euro
+
+    @Date @Time @DateTimeFormat @DropCapTwo @DropCapThree @Centre @Right
+    @NoDotSep @NoDotJoin @Join @Sep @DotSep @DotJoin @DashJoin @NumSep
+    @OverStrike @Sup @Sub @FullWidthRule @LocalWidthRule
+    @Box @CurveBox @ShadowBox @BoundaryMarks @NumberMarker @NumberOf
+    @PageMarker @PageMark @NoLinkPageMark @PageOf @CrossLink
+
+    @BeginDisplayCounter
+
+    @Heading "^" "&-" @If @Not @And @Or @True
+    @PP @LP @LLP @DP @LOP @NP @CNP
+
+    @BeginAlignedDisplays
+    @EndAlignedDisplays
+
+    @Display
+    @LeftDisplay
+    @IndentedDisplay
+    @QuotedDisplay
+    @CentredDisplay
+    @RightDisplay
+    @AlignedDisplay
+    @LeftAlignedDisplay
+    @IndentedAlignedDisplay
+    @QuotedAlignedDisplay
+    @CentredAlignedDisplay
+    @RightAlignedDisplay
+    @NumberedDisplay
+    @LeftNumberedDisplay
+    @IndentedNumberedDisplay
+    @QuotedNumberedDisplay
+    @CentredNumberedDisplay
+    @RightNumberedDisplay
+    @AlignedNumberedDisplay
+    @LeftAlignedNumberedDisplay
+    @IndentedAlignedNumberedDisplay
+    @QuotedAlignedNumberedDisplay
+    @CentredAlignedNumberedDisplay
+    @RightAlignedNumberedDisplay
+
+    @RawDisplay
+    @RawLeftDisplay
+    @RawIndentedDisplay
+    @RawQuotedDisplay
+    @RawCentredDisplay
+    @RawRightDisplay
+    @RawAlignedDisplay
+    @RawLeftAlignedDisplay
+    @RawIndentedAlignedDisplay
+    @RawQuotedAlignedDisplay
+    @RawCentredAlignedDisplay
+    @RawRightAlignedDisplay
+    @RawNumberedDisplay
+    @RawLeftNumberedDisplay
+    @RawIndentedNumberedDisplay
+    @RawQuotedNumberedDisplay
+    @RawCentredNumberedDisplay
+    @RawRightNumberedDisplay
+    @RawAlignedNumberedDisplay
+    @RawLeftAlignedNumberedDisplay
+    @RawIndentedAlignedNumberedDisplay
+    @RawQuotedAlignedNumberedDisplay
+    @RawCentredAlignedNumberedDisplay
+    @RawRightAlignedNumberedDisplay
+
+    @ListItem
+    @ListInterruptItem
+    @ListNewPage
+    @DropListItem
+    @TagItem
+    @DropTagItem
+
+    @EndList
+    @RawEndList
+
+    @RawList
+    @RawLeftList
+    @RawIndentedList
+    @RawQuotedList
+    @RawCentredList @RawCenteredList
+    @RawNumberedList
+    @RawParenNumberedList
+    @RawRomanList
+    @RawParenRomanList
+    @RawUCRomanList
+    @RawParenUCRomanList
+    @RawAlphaList
+    @RawParenAlphaList
+    @RawUCAlphaList
+    @RawParenUCAlphaList
+    @RawBulletList
+    @RawStarList
+    @RawDashList
+    @RawTaggedList
+    @RawWideTaggedList
+    @RawVeryWideTaggedList
+
+    @List
+    @LeftList
+    @IndentedList
+    @QuotedList
+    @CentredList @CenteredList
+    @NumberedList 
+    @ParenNumberedList
+    @RomanList
+    @ParenRomanList
+    @UCRomanList
+    @ParenUCRomanList
+    @AlphaList
+    @ParenAlphaList
+    @UCAlphaList
+    @ParenUCAlphaList
+    @BulletList 
+    @StarList 
+    @DashList
+    @TaggedList
+    @WideTaggedList
+    @VeryWideTaggedList
+
+
+###############################################################################
+#                                                                             #
+#  The @BasicSetup package.                                                   #
+#                                                                             #
+###############################################################################
+
+def @BasicSetup
+    named @InitialFont	  { Times Base 12p	} # initial font
+    named @InitialBreak	  { {adjust 1.20fx hyphen} @OrIfPlain
+			    {ragged 1fx nohyphen} } # initial break
+    named @InitialSpace	  { lout		} # initial space style
+    named @InitialLanguage{ English		} # initial language
+    named @InitialColour  { black		} # initial colour
+    named @OptimizePages  { No			} # optimize page breaks?
+    named @HeadingFont	  { Bold		} # font for @Heading
+    named @ParaGap	  { 1.3vx @OrIfPlain 1f	} # gap between paragraphs
+    named @ParaIndent	  { 2.0f @OrIfPlain 5s	} # first-line indent for @PP
+    named @DisplayGap	  { 1.0v @OrIfPlain 1f	} # gap above, below displays
+    named @DisplayIndent  { 2.0f @OrIfPlain 5s	} # @IndentedDisplay indent
+    named @DefaultIndent  { 0.5rt		} # @Display indent
+    named @DisplayNumStyle
+	right num	  { (num)		} # display number style
+    named @WideIndent	  { 4.0f @OrIfPlain 10s	} # @WideTaggedList indent
+    named @VeryWideIndent { 8.0f @OrIfPlain 20s	} # @VeryWideTaggedList indent
+    named @ListOuterGap	  { 1.0v @OrIfPlain 1f	} # gap before, after list
+    named @ListGap	  { 1.0v @OrIfPlain 1f	} # gap between list items
+    named @ListIndent	  { 0s			} # indent of list items
+    named @ListRightIndent{ 0s			} # right indent of list items
+    named @ListLabelWidth { 2.0f @OrIfPlain 5s	} # width allowed for list tags
+    named @NumberSeparator{ .			} # separates numbers like 2.3.7
+    import @BasicSetup
+    named @CrossLinkFormat
+	right @Body	  { @Body		} # format for cross links
+@Begin
+
+    ###########################################################################
+    #                                                                         #
+    #   @Sym, font symbols, and miscellaneous special characters.             #
+    #                                                                         #
+    ###########################################################################
+
+    def @Sym right x { { Symbol Base } @Font @Char x	}
+
+    def @R   right x { Base @Font x			}
+    def @I   right x { Slope @Font x			}
+    def @B   right x { Bold @Font x			}
+    def @BI  right x { BoldSlope @Font x		}
+    def @S   right x { smallcaps @Font x		}
+    def @F   right x { { Courier Base -1p } @Font x 	}
+
+    def @II
+	right x
+    {
+	{ @CurrFace @Case {
+	    Bold @Yield BoldSlope
+	    else @Yield Slope
+	} } @Font x
+    }
+
+    def "~"  left x right y { x &1su y }
+    def "~~" left x right y { x &2s y }
+
+    def "``"       { @Char "quotedblleft"	@OrIfPlain "``"	}
+    def "''"       { @Char "quotedblright"	@OrIfPlain "''"	}
+    def ",,"       { @Char "quotedblbase"	@OrIfPlain ",,"	}
+    def "--"       { @Char "endash"		@OrIfPlain "--"	}
+    def "---"      { @Char "emdash"		@OrIfPlain "---"}
+    def "..."      { @Char "ellipsis"		@OrIfPlain "..."}
+    def @Bullet    { @Char "bullet"		@OrIfPlain "o"	}
+    def @ParSym    { @Char "paragraph"		@OrIfPlain "P"	}
+    def @SectSym   { @Char "section"		@OrIfPlain "$"	}
+    def @Dagger    { @Char "dagger"		@OrIfPlain "+"	}
+    def @DaggerDbl { @Char "daggerdbl"		@OrIfPlain "++"	}
+    def @CDot      { @Char "periodcentered"	@OrIfPlain "."	}
+    def @Sterling  { @Char "sterling"		@OrIfPlain "&"	}
+    def @Yen       { @Char "yen"		@OrIfPlain "Y"	}
+    def @Florin    { @Char "florin"		@OrIfPlain "f"	}
+
+    def @Star      { @Sym  "asteriskmath"	@OrIfPlain "*"	}
+    def @Degree    { @Sym  "degree"		@OrIfPlain "o"	}
+    def @Minute    { @Sym  "minute"		@OrIfPlain "'"	}
+    def @Second    { @Sym  "second"		@OrIfPlain "''"	}
+    def @Multiply  { @Sym  "multiply"		@OrIfPlain "x"	}
+    def @Divide    { @Sym  "divide"		@OrIfPlain "/"	}
+    def @Lozenge   { @Sym  "lozenge"		@OrIfPlain "O"	}
+    def @Register  { @Sym  "registersans"	@OrIfPlain "R"	}
+    def @CopyRight { @Sym  "copyrightsans"	@OrIfPlain "C"	}
+    def @TradeMark { @Sym  "trademarksans"	@OrIfPlain "TM"	}
+
+    def @Euro
+    {
+	@BackEnd @Case {
+
+	    PostScript @Yield {
+		0.65w @VShift @VContract @HContract
+		"xsize ysize ysize 0.07 mul louteuro" @Graphic {
+		    0.7f @High 0.735f @Wide
+		}
+	    }
+
+	    PDF @Yield { EUR }
+
+	    PlainText @Yield { EUR }
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Symbols stored in the "standard" database                              #
+    #                                                                         #
+    #    @Word            language-spacific words such as Chapter, etc.       #
+    #    @Roman           lower case Roman numerals i, ii, ... , cc           #
+    #    @UCRoman         upper case Roman numerals I, II, ... , CC           #
+    #    @Alpha           lower case Roman alphabet a, b,  ... , z            #
+    #    @UCAlpha         upper case Roman alphabet A, B,  ... , Z            #
+    #    @Months          months of the year:  January, ... , December        #
+    #    @ShortMonths     months of the year, abbreviated:  Jan, ..., Dec     #
+    #    @WeekDays        days of the week:  Sunday, ... , Saturday           #
+    #    @ShortWeekDays   days of the week, abbreviated:  Sun, ... , Sat      #
+    #    @TwelveHours     hours, from 1 to 12                                 #
+    #    @ShortHours      hours, from 0 to 23                                 #
+    #    @DateTimeFormat  format of results of @Date and @Time                #
+    #                                                                         #
+    ###########################################################################
+
+    def @Word		left @Tag right @Val { @Val }
+    def @Roman		left @Tag right @Val { @Val }
+    def @UCRoman	left @Tag right @Val { @Val }
+    def @Alpha		left @Tag right @Val { @Val }
+    def @UCAlpha	left @Tag right @Val { @Val }
+    def @Months		left @Tag right @Val { @Val }
+    def @ShortMonths	left @Tag right @Val { @Val }
+    def @WeekDays	left @Tag right @Val { @Val }
+    def @ShortWeekDays	left @Tag right @Val { @Val }
+    def @TwelveHours  	left @Tag right @Val { @Val }
+    def @ShortHours  	left @Tag right @Val { @Val }
+    def @MeriDiems  	left @Tag right @Val { @Val }
+    def @ShortMeriDiems	left @Tag right @Val { @Val }
+
+    export @Value
+    def @DateTimeFormat	left @Tag
+	named @Value
+	    named @Year          {}
+	    named @ShortYear     {}
+	    named @Month         {}
+	    named @ShortMonth    {}
+	    named @MonthNum      {}
+	    named @Day           {}
+	    named @ShortDay      {}
+	    named @DayNum        {}
+	    named @MeriDiem      {}
+	    named @ShortMeriDiem {}
+	    named @Hour          {}
+	    named @TwelveHour    {}
+	    named @ShortHour     {}
+	    named @Minute        {}
+	    named @Second        {}
+	{}
+    {}
+
+    @SysDatabase @Word @Roman @UCRoman @Alpha @UCAlpha @Months
+		 @ShortMonths @WeekDays @ShortWeekDays @TwelveHours
+		 @ShortHours @MeriDiems @ShortMeriDiems @DateTimeFormat
+    { standard  }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @Date and @Time: the date and time now.                                #
+    #                                                                         #
+    ###########################################################################
+
+    def @Date
+	named @Format
+	    named @Year         { @Moment&&now @Open { {@Century}@Year         }}
+	    named @ShortYear    { @Moment&&now @Open { @Year                   }}
+	    named @Month        { @Moment&&now @Open { @Months&&@Month         }}
+	    named @ShortMonth   { @Moment&&now @Open { @ShortMonths&&@Month    }}
+	    named @MonthNum     { @Moment&&now @Open { @Month                  }}
+	    named @Day          { @Moment&&now @Open { @WeekDays&&@WeekDay     }}
+	    named @ShortDay     { @Moment&&now @Open { @ShortWeekDays&&@WeekDay}}
+	    named @DayNum       { @Moment&&now @Open { @Day                    }}
+	    named @MeriDiem     { @Moment&&now @Open { @MeriDiems&&@Hour       }}
+	    named @ShortMeriDiem{ @Moment&&now @Open { @ShortMeriDiems&&@Hour  }}
+	    named @Hour         { @Moment&&now @Open { @Hour                   }}
+	    named @TwelveHour   { @Moment&&now @Open { @TwelveHours&&@Hour     }}
+	    named @ShortHour    { @Moment&&now @Open { @ShortHours&&@Hour      }}
+	    named @Minute       { @Moment&&now @Open { @Minute                 }}
+	    named @Second       { @Moment&&now @Open { @Second                 }}
+	{
+	    @DateTimeFormat&&date @Open { @Value
+		@Year          { @Year }
+		@ShortYear     { @ShortYear }
+		@Month         { @Month }
+		@ShortMonth    { @ShortMonth }
+		@MonthNum      { @MonthNum }
+		@Day           { @Day }
+		@ShortDay      { @ShortDay }
+		@DayNum        { @DayNum }
+		@MeriDiem      { @MeriDiem }
+		@ShortMeriDiem { @ShortMeriDiem }
+		@Hour          { @Hour }
+		@TwelveHour    { @TwelveHour }
+		@ShortHour     { @ShortHour }
+		@Minute        { @Minute }
+		@Second        { @Second }
+	    }
+	}
+    { @Format }
+
+    def @Time
+	named @Format
+	    named @Year         { @Moment&&now @Open { {@Century}@Year         }}
+	    named @ShortYear    { @Moment&&now @Open { @Year                   }}
+	    named @Month        { @Moment&&now @Open { @Months&&@Month         }}
+	    named @ShortMonth   { @Moment&&now @Open { @ShortMonths&&@Month    }}
+	    named @MonthNum     { @Moment&&now @Open { @Month                  }}
+	    named @Day          { @Moment&&now @Open { @WeekDays&&@WeekDay     }}
+	    named @ShortDay     { @Moment&&now @Open { @ShortWeekDays&&@WeekDay}}
+	    named @DayNum       { @Moment&&now @Open { @Day                    }}
+	    named @MeriDiem     { @Moment&&now @Open { @MeriDiems&&@Hour       }}
+	    named @ShortMeriDiem{ @Moment&&now @Open { @ShortMeriDiems&&@Hour  }}
+	    named @Hour         { @Moment&&now @Open { @Hour                   }}
+	    named @TwelveHour   { @Moment&&now @Open { @TwelveHours&&@Hour     }}
+	    named @ShortHour    { @Moment&&now @Open { @ShortHours&&@Hour      }}
+	    named @Minute       { @Moment&&now @Open { @Minute                 }}
+	    named @Second       { @Moment&&now @Open { @Second                 }}
+	{
+	    @DateTimeFormat&&time @Open { @Value
+		@Year          { @Year }
+		@ShortYear     { @ShortYear }
+		@Month         { @Month }
+		@ShortMonth    { @ShortMonth }
+		@MonthNum      { @MonthNum }
+		@Day           { @Day }
+		@ShortDay      { @ShortDay }
+		@DayNum        { @DayNum }
+		@MeriDiem      { @MeriDiem }
+		@ShortMeriDiem { @ShortMeriDiem }
+		@Hour          { @Hour }
+		@TwelveHour    { @TwelveHour }
+		@ShortHour     { @ShortHour }
+		@Minute        { @Minute }
+		@Second        { @Second }
+	    }
+	}
+    { @Format }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @DropCapTwo and @DropCapThree                                          #
+    #                                                                         #
+    ###########################################################################
+
+    def @DropCapTwo
+	left y
+	named height { 1.5v }
+	right x
+    {
+	def @ParPlace { @Galley }
+	def @EndParPlace { @Galley }
+
+	def @LineList
+	{
+	    @PAdjust @ParPlace
+	    //1vx @LineList
+	}
+
+	def @ParGalley horizontally into { @ParPlace&&preceding }
+	    right x
+	{
+	    x
+	}
+
+	def @EndPar force into { @EndParPlace&&following } { @Null }
+
+	def @Cap
+	{
+	    -0.25f @VShift 1.0w @VShift {
+		-90d @Rotate height @Wide @Scale 90d @Rotate y
+	    }
+	}
+
+						  |1s @PAdjust @ParPlace 
+	/1vo  @Cap @ParGalley {x & @EndPar &1rt } |   @PAdjust @ParPlace
+	//1vx @LineList
+	//    @EndParPlace
+    }
+
+    def @DropCapThree
+	left y
+	named height { 2.5v }
+	right x
+    {
+	def @ParPlace { @Galley }
+	def @EndParPlace { @Galley }
+
+	def @LineList
+	{
+	    @PAdjust @ParPlace
+	    //1vx @LineList
+	}
+
+	def @ParGalley force horizontally into { @ParPlace&&preceding }
+	    right x
+	{
+	    x
+	}
+
+	def @EndPar force into { @EndParPlace&&following } { @Null }
+
+	def @Cap
+	{
+	    -0.25f @VShift 1.0w @VShift {
+		-90d @Rotate height @Wide @Scale 90d @Rotate y
+	    }
+	}
+
+						|1s @PAdjust @ParPlace 
+	/1vo  @ParGalley { x & @EndPar &1rt }	|   @PAdjust @ParPlace
+	/1vo  @Cap				|   @PAdjust @ParPlace
+	//1vx @LineList
+	//    @EndParPlace
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @Centre, @Center, @Right, @NoDotSep, @NoDotJoin, @DotSep,              #
+    #  @DotJoin, @DashJoin, @NumSep                                           #
+    #                                                                         #
+    ###########################################################################
+
+    macro @Centre @Center { |0.5rt @HContract }
+
+    def @Right
+	precedence 50
+	left x
+	right y
+    { x |1.0rt @OneCol { 2f @Wide {} | y } }
+
+    def @NoDotSep left x right y
+    {
+	x @Case {
+	    {}   @Yield y
+	    else @Yield {
+		y @Case {
+		    {}   @Yield x
+		    else @Yield { x |2s y }
+		}
+	    }
+	}
+    }
+
+    def @NoDotJoin left x right y
+    {
+	x @Case {
+	    {}   @Yield y
+	    else @Yield {
+	        y @Case {
+		    {}   @Yield x
+		    else @Yield { x{y} }
+	        }
+	    }
+	}
+    }
+
+    def @DotSep left x right y
+    {
+	x @Case {
+	    {}   @Yield y
+	    else @Yield {
+		y @Case {
+		    {}   @Yield x
+		    else @Yield { x. |2s y }
+		}
+	    }
+        }
+    }
+
+    def @DotJoin left x right y
+    {
+	x @Case {
+	    {}   @Yield y
+	    else @Yield {
+		y @Case {
+		    {}   @Yield x
+		    else @Yield { x.y }
+		}
+	    }
+	}
+    }
+
+    def @DashJoin left x right y
+    {
+	x @Case {
+	    {}   @Yield y
+	    else @Yield {
+		y @Case {
+		    {}   @Yield x
+		    else @Yield { x--y }
+		}
+	    }
+        }
+    }
+
+    def @NumSep left x right y
+    {
+	x @Case {
+	    {}   @Yield y
+	    else @Yield {
+		y @Case {
+		    {}   @Yield x
+		    else @Yield {
+			@CurrLang @Case {
+			    Hungarian @Yield { y. x }
+			    else      @Yield { x y }
+			}
+		    }
+		}
+	    }
+        }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @OverStrike, @Sup and @Sub                                            #
+    #                                                                         #
+    ###########################################################################
+
+    def @OverStrike left x right y
+    {
+	@OneRow { @HContract @VContract x /0io @HContract @VContract y }
+    }
+
+    def @Sup
+	left x
+	named gap { 0.40fk }
+	right y
+    {
+	@HContract @VContract
+	{
+	    | 0.7f @Font y ^/gap x
+	}
+    }
+
+    def @Sub
+	left x
+	named gap { 0.40fk }
+	right y
+    {
+	@HContract @VContract
+	{
+	    x /gap | 0.7f @Font y
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @AddPaint, @LineWidth (obsolete), @StrokeCommand                      #
+    #                                                                         #
+    ###########################################################################
+
+    def @AddPaint right col
+    {
+	col @Case {
+	    none @Yield ""
+	    nochange @Yield {
+		@BackEnd @Case {
+		    PostScript @Yield "gsave fill grestore"
+		    PDF        @Yield "q f Q"
+		    PlainText  @Yield ""
+		}
+	    }
+	    else @Yield {
+		@BackEnd @Case {
+		    PostScript @Yield {"gsave" @ColourCommand col "fill grestore"}
+		    PDF        @Yield { "q" @ColourCommand col "f Q" }
+		    PlainText  @Yield ""
+		}
+	    }
+	}
+    }
+
+    def @LineWidth right lw
+    {
+	lw @Case {
+	    "" @Yield ""
+	    else @Yield {
+		@BackEnd @Case {
+		    PostScript @Yield { lw "setlinewidth" }
+		    PDF        @Yield { lw "w" }
+		    PlainText  @Yield ""
+		}
+	    }
+	}
+    }
+
+    def @StrokeCommand right linewidth
+    {
+	@BackEnd @Case {
+	    PostScript @Yield {
+		linewidth @Case {
+		    ""   @Yield { "stroke" }
+		    none @Yield { }
+		    else @Yield { linewidth "setlinewidth stroke" }
+		}
+	    }
+	    PDF @Yield {
+		linewidth @Case {
+		    ""   @Yield { "S" }
+		    none @Yield { }
+		    else @Yield { linewidth "w S" }
+		}
+	    }
+	    else @Yield ""
+	}
+    }
+
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @FullWidthRule, @Box, @CurveBox, and @ShadowBox                       #
+    #                                                                         #
+    ###########################################################################
+
+    def @FullWidthRule
+	import @LengthUnits named linewidth {}
+    {
+	@BackEnd @Case {
+
+	    PostScript @Yield @HExpand {
+		{ "LoutRule" @StrokeCommand linewidth } @Graphic { 0.5p @High }
+	    }
+
+	    PDF @Yield @HExpand {
+		{ "0 0 m __xsize 0 l" @StrokeCommand linewidth } @Graphic { 0.5p @High }
+	    }
+
+	    PlainText @Yield { "-" @PlainGraphic 1f @High }
+	}
+    }
+
+    def @LocalWidthRule
+	import @LengthUnits named linewidth {}
+    {
+	@BackEnd @Case {
+
+	    PostScript @Yield {
+		{ "LoutRule" @StrokeCommand linewidth } @Graphic { 0.5p @High }
+	    }
+
+	    PDF @Yield {
+		{ "0 0 m __xsize 0 l" @StrokeCommand linewidth } @Graphic { 0.5p @High }
+	    }
+
+	    PlainText  @Yield { "-" @PlainGraphic 1f @High }
+	}
+    }
+
+    def @Box
+	named margin { 0.3f }
+	import @LengthUnits named linewidth {}
+	named paint { none }
+	right x
+    {
+	@BackEnd @Case {
+
+	    PostScript @Yield @VContract @HContract 0c @HShift {
+		{"LoutBox" @AddPaint paint @StrokeCommand linewidth }
+		@Graphic
+		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
+	    }
+
+	    PDF @Yield @VContract @HContract 0c @HShift {
+		{ "0 0 m __xsize 0 l __xsize __ysize l 0 __ysize l h"
+		@AddPaint paint @StrokeCommand linewidth } @Graphic
+		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
+	    }
+
+	    PlainText @Yield @VContract @HContract 0c @HShift {
+		^/margin ^|margin 0c @HShift @OneRow x |margin /margin
+	    }
+	}
+    }
+
+    def @CurveBox
+	named margin { 0.3f }
+	import @LengthUnits named linewidth {}
+	named paint { none }
+	right x
+    {
+	def @PDFStuff
+	{
+	    "__xmark 0 m"
+	    "__sub(__xsize, __xmark) 0 l"
+	    "__sub(__xsize, __div(__mul(11, __xmark), 24)) 0"
+	    "__xsize __div(__mul(11, __xmark), 24)"
+	    "__xsize __xmark c"
+	    "__xsize __sub(__ysize, __xmark) l"
+	    "__xsize __sub(__ysize, __div(__mul(11, __xmark), 24))"
+	    "__sub(__xsize, __div(__mul(11, __xmark), 24)) __ysize"
+	    "__sub(__xsize, __xmark) __ysize c"
+	    "__xmark __ysize l"
+	    "__div(__mul(11, __xmark), 24) __ysize"
+	    "0 __sub(__ysize, __div(__mul(11, __xmark), 24))"
+	    "0 __sub(__ysize, __xmark) c"
+	    "0 __xmark l"
+	    "0 __div(__mul(11, __xmark), 24)"
+	    "__div(__mul(11, __xmark), 24) 0"
+	    "__xmark 0 c"
+	    "h"
+	    @AddPaint paint @StrokeCommand linewidth
+	}
+
+	@VContract @HContract 0c @HShift @BackEnd @Case {
+
+	    PostScript @Yield {
+		{"LoutCurveBox" @AddPaint paint @StrokeCommand linewidth }
+		@Graphic
+		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
+	    }
+
+	    PlainText @Yield {
+		^/margin ^|margin 0c @HShift @OneRow x |margin /margin
+	    }
+
+	    PDF @Yield {
+		@PDFStuff @Graphic
+		{ ^/margin ^|margin 0c @HShift @OneRow x |margin /margin }
+	    }
+	}
+    }
+
+    def @ShadowBox
+	named margin { 0.3f }
+	import @LengthUnits named linewidth {}
+	named paint { none }
+	named shadow { 0.2f }
+	right x
+    {
+	@VContract @HContract 0c @HShift @BackEnd @Case {
+
+	    PostScript @Yield {
+		"LoutShadowBox fill" @Graphic
+		{ ^/shadow ^|shadow 0c @HShift
+		      @Box margin {margin} paint {paint} linewidth {linewidth} x
+		      |shadow /shadow
+		}
+	    }
+
+	    PlainText @Yield {
+		^/shadow ^|shadow 0c @HShift
+		@Box margin {margin} paint {paint} linewidth {linewidth} x
+		|shadow /shadow
+	    } 
+
+	    PDF @Yield {
+		{
+		  "__mul(__xmark, 2) 0 m __xsize 0 l"
+		  "__xsize __sub(__ysize, __mul(__xmark, 2)) l"
+		  "__sub(__xsize, __xmark) __sub(__ysize, __mul(__xmark, 2)) l"
+		  "__sub(__xsize, __xmark) __xmark l"
+		  "__mul(__xmark, 2) __xmark l h f"
+		}
+		@Graphic
+		{ ^/shadow ^|shadow 0c @HShift
+		  @Box margin {margin} paint {paint} linewidth {linewidth} x
+		  |shadow /shadow
+		}
+	    }
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #   @BoundaryMarks                                                        #
+    #                                                                         #
+    ###########################################################################
+
+    def @BoundaryMarks
+	import @LengthUnits named linewidth { 0.2p }
+	import @LengthUnits named length { 0.5c }
+	import @LengthUnits named gap { 0.5c }
+	import @LengthUnits named lout { 0c }
+	import @LengthUnits named rout { 0c }
+	import @LengthUnits named uout { 0c }
+	import @LengthUnits named dout { 0c }
+    {
+	def @UpStroke    { "0" gap       "rmoveto" "0" length     "rlineto" }
+	def @DownStroke  { "0" gap "neg" "rmoveto" "0" length "neg rlineto" }
+	def @LeftStroke  { gap "neg" "0" "rmoveto" length "neg" "0 rlineto" }
+	def @RightStroke { gap "0"       "rmoveto" length       "0 rlineto" }
+
+	def @LLSpot { lout "neg"             dout "neg" moveto }
+	def @LRSpot { xsize rout "add"       dout "neg" moveto }
+	def @ULSpot { lout "neg"       ysize uout "add" moveto }
+	def @URSpot { xsize rout "add" ysize uout "add" moveto }
+
+	def @PDFStuff {
+	    "__sub(-"gap", "lout")            __sub(0, "dout") m "
+	    "__sub(__sub(-"gap", "lout"), "length") __sub(0, "dout") l"
+	    "__sub(0, "lout")       __sub(-"gap", "dout") m "
+	    "__sub(0, "lout") __sub(__sub(-"gap", "dout"), "length") l"
+	    "__add(__xsize,"rout")       __sub(-"gap", "dout") m "
+	    "__add(__xsize,"rout") __sub(__sub(-"gap", "dout"), "length") l"
+	    "__add(__add(__xsize,"rout"),"gap")           __sub(0, "dout") m "
+	    "__add(__add(__add(__xsize,"rout"),"gap"),"length") __sub(0, "dout") l"
+	    "      __sub(__sub(0, "lout"), "gap")            __add(__ysize, "uout") m "
+	    "__sub(__sub(__sub(0, "lout"), "gap"), "length") __add(__ysize, "uout") l"
+	    "__sub(0, "lout")       __add(__add(__ysize, "uout"), "gap") m "
+	    "__sub(0, "lout") __add(__add(__add(__ysize, "uout"), "gap"), "length") l"
+	    "      __add(__add(__xsize, "rout"), "gap")            __add(__ysize, "uout") m "
+	    "__add(__add(__add(__xsize, "rout"), "gap"), "length") __add(__ysize, "uout") l"
+	    "__add(__xsize, "rout")       __add(__add(__ysize, "uout"), "gap") m "
+	    "__add(__xsize, "rout") __add(__add(__add(__ysize, "uout"), "gap"), "length") l"
+
+	    linewidth "w S"
+	}
+
+	@BackEnd @Case {
+
+	    PostScript @Yield {
+		{
+		    @LLSpot @LeftStroke
+		    @LLSpot @DownStroke
+		    @LRSpot @DownStroke
+		    @LRSpot @RightStroke
+		    @ULSpot @LeftStroke
+		    @ULSpot @UpStroke
+		    @URSpot @RightStroke
+		    @URSpot @UpStroke
+	
+		    linewidth "setlinewidth stroke"
+		} @Graphic {}
+	    }
+
+	    PlainText @Yield ""
+
+	    PDF @Yield { @PDFStuff @Graphic {} }
+	}
+    }
+
+    ##########################################################################
+    #                                                                        #
+    #  @NumberMarker, @NumberOf, @PageMarker, @PageMark, @PageOf, @CrossLink #
+    #                                                                        #
+    ##########################################################################
+
+    export @Tag @Value
+    def @NumberMarker
+	named @Tag {}
+	named @Value { "??" }
+    {
+	@Null
+    }
+
+    def @NumberOf
+	right tag
+    {
+	@NumberMarker&&tag @Open { @Value }
+    }
+
+
+    export num rawnum @Tag
+    def @PageMarker
+	named @Tag {}
+	named num {}
+	named rawnum {}
+    {
+	@PageLabel num
+    }
+
+    def @PageMark
+	right tag
+    {
+	@Null & tag @LinkDest & @PageMarker&&preceding @Tagged tag
+    }
+
+    def @NoLinkPageMark
+	right tag
+    {
+	@PageMarker&&preceding @Tagged tag
+    }
+
+    def @PageOf
+	right tag
+    {
+	@PageMarker&&tag @Open { num }
+    }
+
+    def @CrossLink
+	left tag
+	named @Format right @Body { @CrossLinkFormat @Body }
+	right obj
+    {
+	@HContract @VContract {
+	    tag @LinkSource @Format obj
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @Join and @Sep                                                         #
+    #                                                                         #
+    #  Join two objects together with @NumberSeparator, unless one is         #
+    #  empty in which case just return the other.                             #
+    #                                                                         #
+    ###########################################################################
+
+    def @Join left x right y
+    {
+        x @Case {
+	    {}   @Yield y
+	    else @Yield {
+	        y @Case {
+		    {}   @Yield x
+		    else @Yield { x{@NumberSeparator}y }
+	        }
+	    }
+        }
+    }
+
+    def @Sep left x right y
+    {
+	x @Case {
+	    {}   @Yield y
+	    else @Yield {
+		y @Case {
+		    {}   @Yield x
+		    else @Yield { x{@NumberSeparator} |2s y }
+		}
+	    }
+        }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Miscellaneous.                                                         #
+    #                                                                         #
+    ###########################################################################
+
+    def @Heading       right x { ragged @Break @HeadingFont      @Font x }
+    def "^"		       { {} ^& {}				 }
+    def "&-"  left x   right y { x &0ch y				 }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  @If @Not @And @Or @True                                                #
+    #                                                                         #
+    #  Used in databases to make optional fields format nicely.               #
+    #                                                                         #
+    ###########################################################################
+
+    def @If
+	precedence 97
+	left x
+	right y
+    {
+	y @Case {
+	    {} @Yield @Null
+	    else @Yield { @Null{x} }
+	}
+    }
+
+    def @Not
+	precedence 100
+	right y
+    {
+	y @Case {
+	    {} @Yield "*"
+	    else @Yield ""
+	}
+    }
+
+    def @And
+	precedence 99
+	left x
+	right y
+    {
+	x @Case {
+	   {} @Yield {}
+	   else @Yield y
+	}
+    }
+
+    def @Or
+	precedence 98
+	left x
+	right y
+    {
+	x @Case {
+	   {} @Yield y
+	   else @Yield x
+	}
+    }
+
+    def @True { "*" }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Paragraphs.                                                            #
+    #                                                                         #
+    ###########################################################################
+
+    macro @PP	{ //@ParaGap @ParaIndent @Wide &{0i}	}
+    macro @LP	{ //{@ParaGap}			  	}
+    macro @LLP	{ //{1vx}				}
+    macro @DP	{ //{@DisplayGap}			}
+    macro @LOP	{ //{@ListOuterGap}			}
+    macro @NP	{ //{1.1b}				}
+    macro @CNP	{ // 3.2v @High //0io //{}		}
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Beginning and ending of aligned displays.                              #
+    #                                                                         #
+    ###########################################################################
+
+    def @APlace            { @Galley }
+    def @EndAlignedPlace   { @Galley }
+    def @AlignedPlace      { @Galley }
+
+    def @BAligned into { @APlace&&preceding }
+    {
+	def @AlignedList { @AlignedPlace /1.1b @AlignedList }
+
+	//1.1b @AlignedList
+	//     @EndAlignedPlace
+    }
+
+    macro @BAD @BeginAlignedDisplays { // @APlace | @BAligned }
+    def   @EAD @EndAlignedDisplays force into { @EndAlignedPlace&&preceding } {}
+
+
+    ###########################################################################
+    #                                                                         #
+    #  New code for numbered displays that will cross section boundaries      #
+    #                                                                         #
+    ###########################################################################
+
+    export @Tag val
+    def @NumDispCounterMarker
+	named @Tag {}
+	named val {}
+    {
+	@Null
+    }
+
+    def @NumDispNum right tag
+    {
+	@NumDispCounterMarker&&tag @Open { @Next val }
+    }
+
+    def @NumDispCounterIncrement
+	right tag
+    {
+	@NumDispCounterMarker&&preceding @Tagged tag
+	@NumDispCounterMarker val { @NumDispNum tag }
+	@NumberMarker @Tag { tag } @Value { @NumDispNum tag }
+    }
+
+    def @NN
+    {
+	@NumDispCounterMarker&&preceding @Open { @DisplayNumStyle val }
+    }
+
+    def @Do
+        left x
+        right y
+    {
+        x @Case {
+            { No None } @Yield @Null
+            else        @Yield y
+        }
+    }
+
+    def @BeginDisplayCounter
+	left condition
+	right prefix
+    {
+	condition @Do @NumDispCounterMarker val { prefix @Join 0 }
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Galleys that carry displays to their places.                           #
+    #                                                                         #
+    ###########################################################################
+
+    def @DispPlace { @Galley }
+
+    def @Disp into { @DispPlace&&preceding }
+	right x
+    {
+	x
+    }
+
+    def @NDisp into { @DispPlace&&preceding }
+	named @Tag {}
+	right x
+    {
+	@OneRow {
+	   @NumDispCounterIncrement @Tag
+	   @PageMark @Tag
+	   ^//
+	   @OneRow x
+	}
+    }
+
+    def @ADisp into { @AlignedPlace&&preceding }
+	right x
+    {
+	x
+    }
+
+    def @ANDisp into { @AlignedPlace&&preceding }
+	named @Tag {}
+	right x
+    {
+	@OneRow {
+	   @NumDispCounterIncrement @Tag
+	   @PageMark @Tag
+	   ^/
+	   @OneRow x
+	}
+    }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Displays and raw displays.                                             #
+    #                                                                         #
+    ###########################################################################
+
+    macro @G  { |@DefaultIndent      }
+    macro @LG { |                    }
+    macro @IG { |@DisplayIndent      }
+    macro @CG { |0.5rt               }
+    macro @RG { |1.0rt               }
+    macro @QR { @DisplayIndent @Wide { |1rt @NN } }
+    macro @DX { @DispPlace           }
+    macro @DY { @Disp                }
+    macro @AX { @APlace              }
+    macro @AY { @ADisp               }
+    macro @NY { @NDisp               }
+    macro @MY { @ANDisp              }
+
+    macro @D	 @Display			{ @DP @G   @DX  |         @DP // @DY }
+    macro @LD	 @LeftDisplay			{ @DP @LG  @DX  |         @DP // @DY }
+    macro @ID	 @IndentedDisplay		{ @DP @IG  @DX  |         @DP // @DY }
+    macro @QD	 @QuotedDisplay			{ @DP @IG  @DX  @IG       @DP // @DY }
+    macro @CD	 @CentredDisplay
+		 @CenteredDisplay		{ @DP @CG  @DX  |         @DP // @DY }
+    macro	 @RightDisplay			{ @DP @RG  @DX  |         @DP // @DY }
+
+
+    macro @AD	 @AlignedDisplay		{ @DP @G   @AX  |         @DP // @AY }
+    macro @LAD	 @LeftAlignedDisplay		{ @DP @LG  @AX  |         @DP // @AY }
+    macro @IAD	 @IndentedAlignedDisplay	{ @DP @IG  @AX  |         @DP // @AY }
+    macro @QAD	 @QuotedAlignedDisplay		{ @DP @IG  @AX  @IG       @DP // @AY }
+    macro @CAD	 @CentredAlignedDisplay
+		 @CenteredAlignedDisplay	{ @DP @CG  @AX  |         @DP // @AY }
+    macro        @RightAlignedDisplay		{ @DP @RG  @AX  |         @DP // @AY }
+
+    macro @ND	 @NumberedDisplay		{ @DP @G   @DX  |1rt @NN  @DP // @NY }
+    macro @LND	 @LeftNumberedDisplay		{ @DP @LG  @DX  |1rt @NN  @DP // @NY }
+    macro @IND	 @IndentedNumberedDisplay	{ @DP @IG  @DX  |1rt @NN  @DP // @NY }
+    macro @QND	 @QuotedNumberedDisplay		{ @DP @IG  @DX  |1rt @QR  @DP // @NY }
+    macro @CND	 @CentredNumberedDisplay
+		 @CenteredNumberedDisplay	{ @DP @CG  @DX  |1rt @NN  @DP // @NY }
+    macro	 @RightNumberedDisplay		{ @DP @RG  @DX  |1rt @NN  @DP // @NY }
+
+    macro @AND	 @AlignedNumberedDisplay	{ @DP @G   @AX  |1rt @NN  @DP // @MY }
+    macro @LAND	 @LeftAlignedNumberedDisplay	{ @DP @LG  @AX  |1rt @NN  @DP // @MY }
+    macro @IAND	 @IndentedAlignedNumberedDisplay{ @DP @IG  @AX  |1rt @NN  @DP // @MY }
+    macro @QAND  @QuotedAlignedNumberedDisplay	{ @DP @IG  @AX  |1rt @QR  @DP // @MY }
+    macro @CAND	 @CentredAlignedNumberedDisplay
+		 @CenteredAlignedNumberedDisplay{ @DP @CG  @AX  |1rt @NN  @DP // @MY }
+    macro	 @RightAlignedNumberedDisplay	{ @DP @RG  @AX  |1rt @NN  @DP // @MY }
+
+
+    macro @RD	 @RawDisplay			{     @G   @DX  |         // @DY }
+    macro @RLD	 @RawLeftDisplay		{     @LG  @DX  |         // @DY }
+    macro @RID	 @RawIndentedDisplay		{     @IG  @DX  |         // @DY }
+    macro @RQD	 @RawQuotedDisplay		{     @IG  @DX  @IG |     // @DY }
+    macro @RCD	 @RawCentredDisplay
+		 @RawCenteredDisplay		{     @CG  @DX  | |       // @DY }
+    macro @RRD	 @RawRightDisplay		{     @RG  @DX  |         // @DY }
+
+
+    macro @RAD	 @RawAlignedDisplay		{     @G   @AX  |         // @AY }
+    macro @RLAD	 @RawLeftAlignedDisplay		{     @LG  @AX  |         // @AY }
+    macro @RIAD	 @RawIndentedAlignedDisplay	{     @IG  @AX  |         // @AY }
+    macro @RQAD	 @RawQuotedAlignedDisplay	{     @IG  @AX  @IG |     // @AY }
+    macro @RCAD	 @RawCentredAlignedDisplay
+		 @RawCenteredAlignedDisplay	{     @CG  @AX  |         // @AY }
+    macro @RRAD  @RawRightAlignedDisplay	{     @RG  @AX  |         // @AY }
+
+    macro @RND	 @RawNumberedDisplay		{     @G   @DX  |1rt @NN  // @NY }
+    macro @RLND	 @RawLeftNumberedDisplay	{     @LG  @DX  |1rt @NN  // @NY }
+    macro @RIND	 @RawIndentedNumberedDisplay	{     @IG  @DX  |1rt @NN  // @NY }
+    macro @RQND	 @RawQuotedNumberedDisplay	{     @IG  @DX  |1rt @QR  // @NY }
+    macro @RCND	 @RawCentredNumberedDisplay
+		 @RawCenteredNumberedDisplay	{     @CG  @DX  |1rt @NN  // @NY }
+    macro @RRND	 @RawRightNumberedDisplay	{     @RG  @DX  |1rt @NN  // @NY }
+
+    macro @RAND	 @RawAlignedNumberedDisplay	{     @G   @AX  |1rt @NN  // @MY }
+    macro @RLAND @RawLeftAlignedNumberedDisplay {     @LG  @AX  |1rt @NN  // @MY }
+    macro @RIAND @RawIndentedAlignedNumberedDisplay { @IG  @AX  |1rt @NN  // @MY }
+    macro @RQAND @RawQuotedAlignedNumberedDisplay {   @IG  @AX  |1rt @QR  // @MY }
+    macro @RCAND @RawCentredAlignedNumberedDisplay
+		 @RawCenteredAlignedNumberedDisplay { @CG  @AX  |1rt @NN  // @MY }
+    macro @RRAND @RawRightAlignedNumberedDisplay{     @RG  @AX  |1rt @NN  // @MY }
+
+
+    ###########################################################################
+    #                                                                         #
+    #  Lists and raw lists.                                                   #
+    #                                                                         #
+    ###########################################################################
+
+
+    def @ItemPlace          { @Galley }
+    def @InterruptItemPlace { @Galley }
+    def @NewPageItemPlace   { @Galley }
+    def @TagPlace           { @Galley }
+    def @EndListPlace       { @Galley }
+
+    def @RawList
+	named style right num { num              }
+	named type  right num { num              }
+	named gap             { @ListGap         }
+	named indent          { @ListIndent      }
+	named itemindent      { 0c		 }
+	named rightindent     { @ListRightIndent }
+	named labelwidth      { @ListLabelWidth  }
+	named start           { 1                }
+    {
+        def @MakeList right num
+	{
+	    def @NormalItem
+	    {
+	        |indent
+	        labelwidth @Wide {
+		    # @NumberMarker @Value {style num} {style num} &0io
+		    @NumberMarker @Value {num} {style type num} &0io
+		}
+	        |itemindent  @ItemPlace  |rightindent
+	        //gap  @MakeList @NotRevealed @Next num
+	    }
+
+	    def @InterruptItem
+	    {
+		@InterruptItemPlace
+		//gap  @MakeList @NotRevealed num
+	    }
+
+	    def @NewPageItem
+	    {
+		@NewPageItemPlace
+		//1.1b  @MakeList @NotRevealed num
+	    }
+
+	    @OneOf
+	    {
+		@NormalItem
+		@InterruptItem
+		@NewPageItem
+	    }
+	}
+
+	def @ListGalleyPlace { @Galley }
+
+	def @ListGalley into { @ListGalleyPlace&&preceding }
+	{
+	    @MakeList start // @EndListPlace
+	}
+
+	@ListGalleyPlace
+	//
+	@ListGalley
+    }
+
+    def listitem into { @ItemPlace&&preceding }
+	named @Tag {}
+	right x
+    {
+	   @NumberMarker&&preceding @Tagged @Tag
+	// x
+	// @PageMark @Tag   # weird placement, but @PageMark is definite now
+    }
+
+    def droplistitem into { @ItemPlace&&preceding }
+	named @Tag {}
+	right x
+    {
+	   @NumberMarker&&preceding @Tagged @Tag
+	// @PageMark @Tag
+	//1vx x
+    }
+
+    def tagitem into { @ItemPlace&&preceding }
+	named tag {}
+	right x
+    {
+	def sendtag into { @TagPlace&&preceding } { tag }
+
+	sendtag // x
+    }
+
+    def droptagitem into { @ItemPlace&&preceding }
+	named tag {}
+	right x
+    {
+	def sendtag into { @TagPlace&&preceding } { tag }
+
+	sendtag // //1vx x
+    }
+
+    def endlist force into { @EndListPlace&&preceding } {}
+
+    def listnewpage into { @NewPageItemPlace&&preceding } {}
+
+    def listinterruptitem into { @InterruptItemPlace&&preceding }
+	right x
+    {
+	x
+    }
+
+
+    macro @LI   @ListItem		{ // listitem			}
+    macro @LII  @ListInterruptItem	{ // listinterruptitem		}
+    macro @LNP  @ListNewPage		{ // listnewpage		}
+    macro @DLI  @DropListItem		{ // droplistitem		}
+    macro @TI   @TagItem		{ // tagitem tag		}
+    macro @DTI  @DropTagItem		{ // droptagitem tag		}
+    macro @REL  @RawEndList		{ // & endlist // 		}
+    macro @EL   @EndList		{ // & endlist @LOP		}
+
+
+    macro @RLL    @RawLeftList		{ @RawList style {}
+						   labelwidth { 0c }           }
+    macro @RIL    @RawIndentedList	{ @RawList style {}                    }
+    macro @RQL    @RawQuotedList	{ @RawList style {}
+						   rightindent {@DisplayIndent}}
+    macro @RCL    @RawCentredList	{ @RawList style {}
+						   labelwidth {0c}
+						   itemindent {0.5rt}          }
+    macro         @RawCenteredList	{ @RawCentredList                      }
+    macro @RNL    @RawNumberedList      { @RawList style { num.	             } }
+    macro @RPNL   @RawParenNumberedList { @RawList style { (num)	     } }
+    macro @RRL    @RawRomanList	        { @RawList type  { @Roman&&num }
+						   style { num.    } }
+    macro @RPRL   @RawParenRomanList    { @RawList type  { @Roman&&num }
+						   style { (num)   } }
+    macro @RUCRL  @RawUCRomanList       { @RawList type  { @UCRoman&&num }
+						   style { num.  } }
+    macro @RPUCRL @RawParenUCRomanList  { @RawList type  { @UCRoman&&num }
+						   style { (num) } }
+    macro @RAL    @RawAlphaList	        { @RawList type  { @Alpha&&num }
+						   style { num.    } }
+    macro @RPAL   @RawParenAlphaList    { @RawList type  { @Alpha&&num }
+						   style { (num)   } }
+    macro @RUCAL  @RawUCAlphaList       { @RawList type  { @UCAlpha&&num }
+						   style { num.  } }
+    macro @RPUCAL @RawParenUCAlphaList  { @RawList type  { @UCAlpha&&num }
+						   style { (num) } }
+    macro @RBL    @RawBulletList        { @RawList style { @Bullet	     } }
+    macro @RSL    @RawStarList	        { @RawList style { @Star	     } }
+    macro @RDL    @RawDashList	        { @RawList style { --	 	     } }
+    macro @RTL    @RawTaggedList        { @RawList type { @TagPlace         } }
+    macro @RWTL   @RawWideTaggedList    { @RawList type { @TagPlace         }
+					           labelwidth { @WideIndent  } }
+    macro @RVWTL  @RawVeryWideTaggedList{ @RawList type { @TagPlace         }
+					        labelwidth { @VeryWideIndent } }
+
+
+    macro @L     @List			{ @LOP @RawList			}
+    macro @LL    @LeftList		{ @LOP @RawLeftList		}
+    macro @IL    @IndentedList		{ @LOP @RawIndentedList		}
+    macro @QL    @QuotedList		{ @LOP @RawQuotedList		}
+    macro @CL    @CentredList		{ @LOP @RawCentredList		}
+    macro        @CenteredList		{ @LOP @RawCenteredList		}
+    macro @NL    @NumberedList		{ @LOP @RawNumberedList		}
+    macro @PNL   @ParenNumberedList	{ @LOP @RawParenNumberedList	}
+    macro @RL    @RomanList		{ @LOP @RawRomanList		}
+    macro @PRL   @ParenRomanList	{ @LOP @RawParenRomanList	}
+    macro @UCRL  @UCRomanList		{ @LOP @RawUCRomanList		}
+    macro @PUCRL @ParenUCRomanList	{ @LOP @RawParenUCRomanList	}
+    macro @AL    @AlphaList		{ @LOP @RawAlphaList		}
+    macro @PAL   @ParenAlphaList	{ @LOP @RawParenAlphaList	}
+    macro @UCAL  @UCAlphaList		{ @LOP @RawUCAlphaList		}
+    macro @PUCAL @ParenUCAlphaList	{ @LOP @RawParenUCAlphaList	}
+    macro @BL    @BulletList		{ @LOP @RawBulletList		}
+    macro @SL    @StarList		{ @LOP @RawStarList		}
+    macro @DL    @DashList		{ @LOP @RawDashList		}
+    macro @TL    @TaggedList		{ @LOP @RawTaggedList		}
+    macro @WTL   @WideTaggedList	{ @LOP @RawWideTaggedList	}
+    macro @VWTL  @VeryWideTaggedList	{ @LOP @RawVeryWideTaggedList	}
+
+@End @BasicSetup

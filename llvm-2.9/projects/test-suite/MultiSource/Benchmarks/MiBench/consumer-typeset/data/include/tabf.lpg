@@ -1,0 +1,115 @@
+%%BeginResource: procset LoutTabPrependGraphic
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                  %
+%  PostScript @SysPrependGraphic file for @Tab     %
+%                                                  %
+%  To assist in avoiding name clashes, the names   %
+%  of all these symbols begin with "ltab".         %
+%                                                  %
+%  Jeffrey H. Kingston                             %
+%  24 September 1991                               %
+%  22 December 1992                                %
+%                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% linewidth ltabhs -
+% horizontal single line
+/ltabhs
+{  0 0 moveto xsize 0 lineto
+   setlinewidth 0 setlinecap stroke
+} def
+
+% linewidth ltabhsp -
+% horizontal single line with projecting ends
+/ltabhsp
+{  0 0 moveto xsize 0 lineto
+   setlinewidth 2 setlinecap stroke
+} def
+
+% linewidth ltabhd -
+% horizontal double line
+/ltabhd
+{  dup dup
+   0 0 moveto xsize 0 lineto
+   0 exch 3 mul moveto xsize exch 3 mul lineto
+   setlinewidth 0 setlinecap stroke
+} def
+
+% linewidth ltabhdb -
+% horizontal double line below mark
+/ltabhdb
+{  dup dup
+   0 0 moveto xsize 0 lineto
+   0 exch -3 mul moveto xsize exch -3 mul lineto
+   setlinewidth 0 setlinecap stroke
+} def
+
+% linewidth ltabhdnw -
+% horizontal double line with northwest corner
+/ltabhdnw
+{  dup dup dup dup
+   0 0 moveto xsize 0 lineto
+   xsize exch 3 mul moveto
+   -3 mul exch 3 mul lineto
+   -3 mul 0 lineto
+   setlinewidth 0 setlinejoin 2 setlinecap stroke
+} def
+
+% linewidth ltabhdne -
+% horizontal double line with northeast corner
+/ltabhdne
+{  dup dup dup dup
+   0 0 moveto xsize 0 lineto
+   0 exch 3 mul moveto
+   3 mul xsize add exch 3 mul lineto
+   3 mul xsize add 0 lineto
+   setlinewidth 0 setlinejoin 2 setlinecap stroke
+} def
+
+% linewidth ltabhdsw -
+% horizontal double line with southwest corner
+/ltabhdsw
+{  dup dup dup dup
+   0 0 moveto xsize 0 lineto
+   xsize exch -3 mul moveto
+   -3 mul exch -3 mul lineto
+   -3 mul 0 lineto
+   setlinewidth 0 setlinejoin 2 setlinecap stroke
+} def
+
+% linewidth ltabhdse -
+% horizontal double line with southeast corner
+/ltabhdse
+{  dup dup dup dup
+   0 0 moveto xsize 0 lineto
+   0 exch -3 mul moveto
+   3 mul xsize add exch -3 mul lineto
+   3 mul xsize add 0 lineto
+   setlinewidth 0 setlinejoin 2 setlinecap stroke
+} def
+
+% linewidth ltabvs -
+% vertical single line
+/ltabvs
+{  0 0 moveto 0 ysize lineto
+   setlinewidth 0 setlinecap stroke
+} def
+
+% linewidth ltabvd -
+% vertical double line
+/ltabvd
+{  dup dup
+   0 0 moveto 0 ysize lineto
+   -3 mul 0 moveto -3 mul ysize lineto
+   setlinewidth 0 setlinecap stroke
+} def
+
+% linewidth ltabvdr -
+% vertical double line to right of mark
+/ltabvdr
+{  dup dup
+   0 0 moveto 0 ysize lineto
+   3 mul 0 moveto 3 mul ysize lineto
+   setlinewidth 0 setlinecap stroke
+} def
+%%EndResource
