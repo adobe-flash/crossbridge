@@ -160,6 +160,7 @@ $?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX -l
 $?NATIVE_AR=ar
 # java tool
 $?JAVA=$(call nativepath,$(shell which java))
+$?JAVACOPTS=-target 1.7
 # python tool
 $?PYTHON=$(call nativepath,$(shell which python))
 # Target Tools

@@ -37,4 +37,6 @@ CHANGES
 ### 1.0.4
 
 * Updated AVMPlus from https://github.com/adobe-flash/avmplus
-* Updated libraries
+* Added LibOpenSSL
+* Added LibXML2
+* Updated CMake to v3.0.0
