@@ -8,6 +8,7 @@ import sample.qrencode.CModule;
 
 import flash.display.Sprite;
 
+[SWF(width="800", height="600", backgroundColor="#333333", frameRate="60")]
 class Main extends Sprite {
 
     internal var uic:Sprite;

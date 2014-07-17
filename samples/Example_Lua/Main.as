@@ -1,19 +1,23 @@
 package {
+import flash.display.SimpleButton;
+import flash.display.Sprite;
 import flash.events.Event;
 import flash.text.TextField;
+import flash.text.TextFormat;
 import flash.utils.ByteArray;
 import flash.utils.getTimer;
 
 import sample.lua.CModule;
 import sample.lua.vfs.ISpecialFile;
 
-class Main {
+[SWF(width="800", height="600", backgroundColor="#333333", frameRate="60")] class Main extends Sprite {
 
     internal var luastate:int;
 
     private var inbox:TextField;
     private var outbox:TextField;
     private var runtimelabel:TextField;
+    private var button:SimpleButton;
 
     public function Main() {
         addEventListener(Event.ADDED_TO_STAGE, appInit);
@@ -21,11 +25,33 @@ class Main {
 
     internal function appInit(event:Event):void {
         removeEventListener(Event.ADDED_TO_STAGE, appInit);
+
+        runtimelabel = getTextField(0, 0, 800, 20);
+        inbox = getTextField(0, 20, 800, 280);
+        outbox = getTextField(0, 300, 800, 300);
+
+        // TODO: button = new SimpleButton();
+
         CModule.rootSprite = this
         CModule.vfs.console = this
         CModule.startAsync(this)
 
         runScript(null)
+    }
+
+    private function getTextField(x:int, y:int, w:int, h:int):TextField {
+        var result:TextField = new TextField();
+        result.width = w;
+        result.height = h;
+        result.x = x;
+        result.y = y;
+        result.multiline = true;
+        result.selectable = true;
+        result.wordWrap = true;
+        addChild(result);
+        const tf:TextFormat = new TextFormat("Arial", 12, 0x000000);
+        result.defaultTextFormat = tf;
+        return result;
     }
 
     internal function runScript(event:Event):void {
