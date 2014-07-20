@@ -9,7 +9,7 @@ Reporting Bugs
 Contributing
 ------------
 
-1. Fork the [repository](https://github.com/vpmedia/crossbridge)
+1. Fork the [master-dev](https://github.com/vpmedia/crossbridge/tree/master-dev) or  [futures](https://github.com/vpmedia/crossbridge/tree/futures) branch
 
 2. Commit updates and bug fixes
 
@@ -17,5 +17,7 @@ Contributing
 
 Notes
 -----
+
+Do NOT send pull request to master branch, please use the others.
 
 **BE CONSISTENT.**
