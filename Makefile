@@ -267,7 +267,11 @@ TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_s
 TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols test_gdb 
 #TESTORDER+= gcctests swigtests llvmtests checkasm 
 
-BUILDORDER= cmake abclibs basictools llvm binutils plugins gcc bmake stdlibs gcclibs as3wig abcstdlibs
+BUILDORDER= cmake abclibs  
+BUILDORDER+= uname noenv avm2-as alctool alcdb
+BUILDORDER+= llvm binutils plugins gcc bmake 
+BUILDORDER+= csu libc libthr libm libBlocksRuntime
+BUILDORDER+= gcclibs as3wig abcflashpp abcstdlibs_more
 BUILDORDER+= sdkcleanup tr trd swig genfs gdb pkgconfig libtool   
 ifeq (,$(findstring 1,$(LIGHTSDK)))
 BUILDORDER+= $(EXTRALIBORDER)
@@ -642,9 +646,6 @@ asdocs_deploy:
 # ====================================================================================
 # BASICTOOLS
 # ====================================================================================
-# Assemble basic tools (C/CPP)
-basictools:
-	$(MAKE) uname noenv avm2-as alctool alcdb
 
 # Assemble UName Helper
 uname:
@@ -815,9 +816,6 @@ bmake:
 # ====================================================================================
 # STDLIBS
 # ====================================================================================
-# TBD
-stdlibs:
-	$(MAKE) csu libc libthr libm libBlocksRuntime
 
 # TBD
 csu:
@@ -949,9 +947,6 @@ as3wig:
 # ====================================================================================
 # ABCSDTLIBS
 # ====================================================================================
-# TBD
-abcstdlibs:
-	$(MAKE) abcflashpp abcstdlibs_more
 
 # TBD
 abcflashpp:
