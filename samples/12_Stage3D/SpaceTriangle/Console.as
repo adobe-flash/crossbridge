@@ -41,8 +41,6 @@ package com.adobe.flascc
   */
   public class Console extends Sprite implements ISpecialFile
   {
-    include "../../TestingCode.as";
-
     /**
     * To Support the preloader case you might want to have the Console
     * act as a child of some other DisplayObjectContainer.
