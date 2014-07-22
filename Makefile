@@ -275,9 +275,6 @@ endif
 BUILDORDER+= finalcleanup
 BUILDORDER+= $(TESTORDER)
 BUILDORDER+= samples
-ifeq (,$(findstring 1,$(LIGHTSDK)))
-BUILDORDER+= examples
-endif
 
 # All Tests
 all_tests: $(TESTORDER)
@@ -1728,11 +1725,7 @@ test_vfs:
 samples:
 	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME)
 
-# Examples used to test the SDK
-examples:
-	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) examples
-
-# Examples used to clean the samples
+# Used to clean the samples
 clean_samples:
 	cd samples && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) UNAME=$(UNAME) FLASCC=$(SDK) FLEX=$(FLEX_SDK_HOME) clean
 
