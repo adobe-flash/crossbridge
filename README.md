@@ -17,3 +17,7 @@ Demo:
 Download:
 
 * [SourceForge Project] (https://sourceforge.net/projects/crossbridge-community/files/)
+
+Examples:
+
+* [GitHub Team] (https://github.com/crossbridge-community/)
