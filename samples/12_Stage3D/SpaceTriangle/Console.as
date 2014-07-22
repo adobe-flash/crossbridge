@@ -75,7 +75,7 @@ package com.adobe.flascc
       addChild(inputContainer)
       CModule.vfs.console = this
       CModule.startAsync(this)
-      initTesting()
+      //initTesting()
     }
 
     /**

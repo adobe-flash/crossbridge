@@ -80,7 +80,7 @@ package com.adobe.flascc
       bm = new Bitmap(bmd)
       inputContainer.addChild(bm)
       CModule.startAsync(this)
-      initTesting()
+      //initTesting()
     }
 
     /**

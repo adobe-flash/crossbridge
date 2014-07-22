@@ -73,7 +73,7 @@ package com.adobe.flascc
 
       CModule.vfs.console = this
       CModule.startAsync(this)
-      initTesting()
+      //initTesting()
     }
 
     /**
