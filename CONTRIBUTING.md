@@ -4,12 +4,12 @@ Contributing to CrossBridge
 Reporting Bugs
 --------------
 
-[GitHub Issue Tracker](https://github.com/vpmedia/crossbridge/issues)
+[GitHub Issue Tracker](https://github.com/crossbridge-community/crossbridge/issues)
 
 Contributing
 ------------
 
-1. Fork the [master-dev](https://github.com/vpmedia/crossbridge/tree/master-dev) or  [futures](https://github.com/vpmedia/crossbridge/tree/futures) branch
+1. Fork the [master-dev](https://github.com/crossbridge-community/crossbridge/tree/master-dev) or  [futures](https://github.com/crossbridge-community/crossbridge/tree/futures) branch
 
 2. Commit updates and bug fixes
 
