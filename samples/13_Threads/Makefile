@@ -28,7 +28,7 @@
 
 .PHONY: clean all
 
-SWFS=atomic.swf flash++flavors.swf flash++ui.swf openmp.swf pthreads.swf sema.swf workers.swf libco.swc
+SWFS=atomic.swf flash++flavors.swf flash++ui.swf openmp.swf pthreads.swf sema.swf workers.swf
 
 all: check $(SWFS)
 
@@ -52,9 +52,6 @@ flash++flavors.swf: flash++flavors.cpp
 
 flash++ui.swf: flash++ui.cpp
 	$(FLASCC)/usr/bin/g++ -emit-swf -swf-version=$(SWF_VERSION) -swf-size=$(SWF_SIZE) -O4 -flto-api=../exports.txt -pthread flash++ui.cpp -lFlash++ -lAS3++ -o flash++ui.swf
-
-libco.swc:
-	"$(FLASCC)/usr/bin/gcc" $(BASE_CFLAGS) -O4 libco_v16/libco.c -pthread -emit-swc=sample.libco -o libco.swc 
 
 include ../Makefile.common
 
