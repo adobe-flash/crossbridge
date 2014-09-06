@@ -288,7 +288,8 @@ all_libs: $(EXTRALIBORDER)
 
 # All Targets
 all:
-	@echo "Building $(SDKNAME) - Please be patient, may take a few hours ..."
+	@echo "Building $(SDKNAME)"
+	@echo "Please be patient, may take a few hours ..."
 	@mkdir -p $(BUILD)/logs
 	@$(MAKE) diagnostics &> $(BUILD)/logs/diagnostics.txt 2>&1
 	@echo "-  install_libs"
@@ -1506,8 +1507,6 @@ test_hello_c:
 	cd $(BUILD)/test_hello_c && $(SDK_CC) -emit-swf -swf-size=320x240 -O0 -g hello.abc -o hello.swf
 	# Assembling SWF Output (Optimized)
 	cd $(BUILD)/test_hello_c && $(SDK_CC) -emit-swf -swf-size=320x240 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
-	# Assembling SWF Output (Use AS3 Assembly instead of intrinsics - Does not work)
-	# cd $(BUILD)/test_hello_c && $(SDK_CC) -emit-swf -swf-size=320x240 -O4 -muse-legacy-asc $(SRCROOT)/test/hello.c -o hello-muse.swf
 
 # Test HelloWorld.CPP
 test_hello_cpp:

@@ -146,9 +146,10 @@ static long start_time;
 
 static int flag_macro_alternate;
 
+// CROSSBRIDGE PATCH START
 flag_target_player = 0;
-
-flag_use_legacy_asc = 0;
+flag_save_temps = 0;
+// CROSSBRIDGE PATCH END
 
 #ifdef USE_EMULATIONS
 #define EMULATION_ENVIRON "AS_EMULATION"
@@ -476,8 +477,8 @@ parse_args (int * pargc, char *** pargv)
       OPTION_WARN_FATAL,
       OPTION_COMPRESS_DEBUG,
       OPTION_NOCOMPRESS_DEBUG,
-      OPTION_AVM2_TARGET_PLAYER,
-      OPTION_AVM2_USE_LEGACY_ASC
+      OPTION_AVM2_SAVE_TEMPS,
+      OPTION_AVM2_TARGET_PLAYER
     /* When you add options here, check that they do
        not collide with OPTION_MD_BASE.  See as.h.  */
     };
@@ -546,8 +547,8 @@ parse_args (int * pargc, char *** pargv)
     ,{"target-help", no_argument, NULL, OPTION_TARGET_HELP}
     ,{"traditional-format", no_argument, NULL, OPTION_TRADITIONAL_FORMAT}
     ,{"warn", no_argument, NULL, OPTION_WARN}
+    ,{"save-temps", no_argument, NULL, OPTION_AVM2_SAVE_TEMPS}
     ,{"target-player", no_argument, NULL, OPTION_AVM2_TARGET_PLAYER}
-    ,{"use-legacy-asc", no_argument, NULL, OPTION_AVM2_USE_LEGACY_ASC}
   };
 
   /* Construct the option lists from the standard list and the target
@@ -828,10 +829,10 @@ This program has absolutely no warranty.\n"));
 	  flag_target_player = 1;
 	  break;
 
-	case OPTION_AVM2_USE_LEGACY_ASC:
-	  flag_use_legacy_asc = 1;
+	case OPTION_AVM2_SAVE_TEMPS:
+	  flag_save_temps = 1;
 	  break;
-
+      
 	case OPTION_WARN:
 	  flag_no_warnings = 0;
 	  flag_fatal_warnings = 0;
@@ -1241,8 +1242,8 @@ main (int argc, char ** argv)
   args[argNo++] = out_file_name;
   if(flag_target_player)
     args[argNo++] = strdup("--target-player");
-  if(flag_use_legacy_asc)
-    args[argNo++] = strdup("--use-legacy-asc");
+  if(flag_save_temps)
+    args[argNo++] = strdup("--save-temps");
   args[argNo++] = NULL;
 
   /* Skip argv[0].  */

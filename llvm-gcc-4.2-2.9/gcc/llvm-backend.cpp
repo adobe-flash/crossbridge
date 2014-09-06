@@ -1109,9 +1109,10 @@ void llvm_asm_file_end(void) {
         args.push_back(winfriendlypath(asm_file_name));
         args.push_back("-o");
         args.push_back(winfriendlypath(asm_file_name));
-        if(use_asc) {
-          args.push_back("-use-legacy-as3-asm");
-        }
+        // Deprecated ASC1
+        //if(use_asc) {
+        //  args.push_back("-use-legacy-as3-asm");
+        //}
         
         struct optlist *jvmopts = getjvmoptlist();
         while(jvmopts) {

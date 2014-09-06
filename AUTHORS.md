@@ -41,4 +41,8 @@ N: Romain Tisserand
 W: https://github.com/rtissera
 D: Testing, OSX releases
 
+N: Joé Dupuis
+W: https://github.com/twistedjoe
+D: Testing, URLLoaderVFS
+
 .. Add Your Details Here! ..

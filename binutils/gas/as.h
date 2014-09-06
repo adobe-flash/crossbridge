@@ -387,9 +387,15 @@ COMMON int need_pass_2;
    leave lots of padding.  */
 COMMON int linkrelax;
 
+// CROSSBRIDGE PATCH START
+
 /* True if We should link against player globals.  */
 COMMON int flag_target_player; /* -W */
 
+/* True if We want to keep temporary as files.  */
+COMMON int flag_save_temps;
+
+// CROSSBRIDGE PATCH END
 
 /* TRUE if we should produce a listing.  */
 extern int listing;

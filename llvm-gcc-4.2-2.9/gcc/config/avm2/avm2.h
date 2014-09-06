@@ -159,7 +159,7 @@ extern int avm2_regparm;
 
 /*
 ** TODO: re-enable once falcon is thread-safe!
-** %{!muse-legacy-asc: %{!disable-falcon-parallel: -plugin-opt llc-opt --plugin-opt  -falcon-parallel} }
+** %{!disable-falcon-parallel: -plugin-opt llc-opt --plugin-opt  -falcon-parallel}
 */
 
 #ifndef LINK_COMMAND_SPEC
@@ -171,8 +171,7 @@ extern int avm2_regparm;
      --plugin %smultiplug" xstr(SHARED_LIBRARY_EXTENSION) " \
         %{O4|emit-llvm|flto: ;: %:useabcstdlibs() } \
         %{pthread: --plugin-opt pthread} \
-        %{muse-legacy-asc:--plugin-opt llc-opt --plugin-opt -use-legacy-as3-asm } \
-        %{!muse-legacy-asc: %{!disable-falcon-parallel: -plugin-opt llc-opt --plugin-opt -falcon-parallel} } \
+        %{!disable-falcon-parallel: -plugin-opt llc-opt --plugin-opt -falcon-parallel} \
         %{!emit-swc=*: %{!emit-swf: %{!nostdlib: ISpecialFile.abc%s IBackingStore.abc%s IVFS.abc%s --plugin-opt appendabc --plugin-opt startHack.abc%s --plugin-opt appendabc --plugin-opt ShellCreateWorker.abc%s } } } \
         %{emit-swf: %<emit-swf " SWFOPTS " --plugin-opt symbolclass=%{!symbol-class=*:0:com.adobe.flascc::Console}%{symbol-class=*:%*} --plugin-opt appendabc --plugin-opt %{!symbol-abc=*:Console.abc%s}%{symbol-abc=*:%*} %{!no-swf-preloader: --plugin-opt swfpreloader --plugin-opt %{swf-preloader=*:%*;:DefaultPreloader.swf%s} \ } } \
         %{emit-swc=*: %<emit-swc=* " SWFOPTS " --plugin-opt emit-swc=%* } \
