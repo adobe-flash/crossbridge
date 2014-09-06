@@ -18,29 +18,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package C_Run
-{
-  /**
-  * throw on longjmp
-  * @private
-  */
-  [ExcludeClass] 
-  public class LongJmp
-  {
-    // esp at setjmp time
+package C_Run {
+/**
+ * throw on longjmp
+ * @private
+ */
+[ExcludeClass]
+public class LongJmp {
+    /**
+     * esp at setjmp time
+     */
     public var esp:int;
-    
-    // setjmp id
-    public var sjid:int;
-    
-    // value for setjmp to return
-    public var retval:int; 
 
-    public function LongJmp(esp:int, sjid:int, retval:int)
-    {
-      this.esp = esp;
-      this.sjid = sjid;
-      this.retval = retval;
+    /**
+     * setjmp id
+     */
+    public var sjid:int;
+
+    /**
+     * value for setjmp to return
+     */
+    public var retval:int;
+
+    /**
+     * Constructor
+     * @param esp esp at setjmp time
+     * @param sjid setjmp id
+     * @param retval value for setjmp to return
+     */
+    public function LongJmp(esp:int, sjid:int, retval:int) {
+        this.esp = esp;
+        this.sjid = sjid;
+        this.retval = retval;
     }
-  }
+}
 }

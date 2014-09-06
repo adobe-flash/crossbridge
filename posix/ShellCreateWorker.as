@@ -18,23 +18,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package C_Run
-{
+package C_Run {
 import flash.utils.ByteArray;
 
 /**
-* @private
-*/
-public function createRawWorker(ba:ByteArray):*
-{
-  return workerDomainClass.current.createWorkerFromByteArray(ba);
+ * @private
+ */
+public function createRawWorker(ba:ByteArray):* {
+    return workerDomainClass.current.createWorkerFromByteArray(ba);
 }
 
 /**
-* @private
-*/
-public function createflasccWorker():*
-{
-  return workerDomainClass.current.createWorkerFromPrimordial();
+ * @private
+ */
+public function createflasccWorker():* {
+    return workerDomainClass.current.createWorkerFromPrimordial();
 }
 }

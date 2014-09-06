@@ -28,7 +28,7 @@ import flash.events.Event;
 import flash.text.TextField;
 
 /**
- * A basic implementation of a console for FlasCC apps.
+ * A basic implementation of a console for CrossBridge apps.
  * The PlayerKernel class delegates to this for things like read/write,
  * so that console output can be displayed in a TextField on the Stage.
  */
@@ -78,20 +78,17 @@ public class Console extends Sprite implements ISpecialFile {
      * which is either run on startup or once the SWF has
      * been added to the stage.
      */
-    protected function init(e:Event):void {
+    protected function init(event:Event):void {
         CONFIG::debug {
             trace("Console::init");
         }
-        removeEventListener(Event.ADDED_TO_STAGE, init);
-
-        inputContainer = new Sprite();
-        addChild(inputContainer);
-
-        addEventListener(Event.ENTER_FRAME, enterFrame, false, 0, true);
-
+        // setup stage properties
         stage.frameRate = 60;
         stage.scaleMode = StageScaleMode.NO_SCALE;
-
+        // create input container
+        inputContainer = new Sprite();
+        addChild(inputContainer);
+        // create console
         if (enableConsole) {
             _tf = new TextField();
             _tf.multiline = true;
@@ -123,10 +120,26 @@ public class Console extends Sprite implements ISpecialFile {
             consoleWrite(error.toString() + "\n" + error.getStackTrace().toString());
             throw error;
         }
+        // remove event listener
+        removeEventListener(Event.ADDED_TO_STAGE, init);
+        // attach event listeners
+        addEventListener(Event.ENTER_FRAME, enterFrame, false, 0, true);
+        addEventListener(Event.REMOVED_FROM_STAGE, dispose, false, 0, true);
     }
 
     /**
-     * The callback to call when FlasCC code calls the <code>posix exit()</code> function. Leave null to exit silently.
+     * Disposes Console freeing memory
+     */
+    public function dispose(event:Event = null):void {
+        removeEventListener(Event.ADDED_TO_STAGE, init);
+        removeEventListener(Event.REMOVED_FROM_STAGE, dispose);
+        removeEventListener(Event.ENTER_FRAME, enterFrame);
+        inputContainer = null;
+        _tf = null;
+    }
+
+    /**
+     * The callback to call when CrossBridge code calls the <code>posix exit()</code> function. Leave null to exit silently.
      * @private
      */
     public var exitHook:Function;

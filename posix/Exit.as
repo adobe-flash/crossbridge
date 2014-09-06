@@ -36,9 +36,9 @@ public class Exit {
      * @param code The exit code
      */
     public function Exit(code:int) {
-        CONFIG::debug {
+        /*CONFIG::debug {
             trace("Exit::exit: " + code);
-        }
+        }*/
         this.code = code;
     }
 }
