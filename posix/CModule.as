@@ -151,6 +151,25 @@ public class CModule
   /**
   * @private
   */
+  public static function dispose():void
+  {
+    weakResolvers = null;
+    workerSprite = null;
+    cachedCSyms = null;
+    toBeMapped = null;
+    rootSprite = null;
+    _kernel = null;
+    activeConsole = null;
+    _vfs = null;
+    recordFixups = false;
+    regsInitted = false;
+    preppedForThreadedExec = false;
+    explicitlyInittedAllModules = false;
+  }
+  
+  /**
+  * @private
+  */
   public static function resolveWeaks(f:Function):void
   {
     weakResolvers.unshift(f);
@@ -849,6 +868,10 @@ public class CModule
   {
     return modules.concat();
   }
+  
+  //----------------------------------
+  //  CModule instance properties
+  //----------------------------------  
 
   private var sections:Object; // section map
   private var init:Function; // initialization function to force the module to init
@@ -876,6 +899,25 @@ public class CModule
       sbrk(1, 1);
     if(recordFixups)
       fixups = new Vector.<int>;
+  }
+  
+ /**
+  * Resets the object properties and frees memory.
+  */
+  public function dispose():void
+  {
+    this.sections = null;
+    this.init = null;
+    this.script = null;
+    this.modSyms = null;
+    if(this.modSyms) {
+        this.modSyms.length = 0;
+    }
+    this.modPackage = null;
+    if(this.fixups) {
+        this.fixups.length = 0;
+    }
+    this.fixups = null;
   }
 
   /**

@@ -20,54 +20,54 @@
 
 package com.adobe.flascc.vfs {
 
-	/**
-	* This interface is used by the VFS for special files that must be implemented via code
-	* rather than a fixed ByteArray. The default Console implementation uses the ISpecialFile
-	* interface to handle read/write requests to /dev/tty which corresponds with C/C++ code
-	* reading/writting to stdin/stdout.
-	*
-	* You might also use this interface to implement other special files like "/dev/null" or "/dev/random".
-	*/
-	public interface ISpecialFile {
-		/**
-		* This matches the signature of read from the IKernel interface.
-		* @param fileDescriptor The file descriptor being read from
-		* @param bufPtr A Pointer to the buffer you are expected to fill with data for this read.
-		* @param nbyte The size of the buffer pointed to by bufPtr
-		* @param errnoPtr A pointer to the location of the errno global variable
-		* @return an integer indicating the success or failure of the syscall, see the BSD documentation for expected values
-		*/
-		function read(fileDescriptor:int, bufPtr:int, nbyte:int, errnoPtr:int):int
+/**
+ * This interface is used by the VFS for special files that must be implemented via code
+ * rather than a fixed ByteArray. The default Console implementation uses the ISpecialFile
+ * interface to handle read/write requests to /dev/tty which corresponds with C/C++ code
+ * reading/writting to stdin/stdout.
+ *
+ * You might also use this interface to implement other special files like "/dev/null" or "/dev/random".
+ */
+public interface ISpecialFile {
+    /**
+     * This matches the signature of read from the IKernel interface.
+     * @param fileDescriptor The file descriptor being read from
+     * @param bufPtr A Pointer to the buffer you are expected to fill with data for this read.
+     * @param nbyte The size of the buffer pointed to by bufPtr
+     * @param errnoPtr A pointer to the location of the errno global variable
+     * @return an integer indicating the success or failure of the syscall, see the BSD documentation for expected values
+     */
+    function read(fileDescriptor:int, bufPtr:int, nbyte:int, errnoPtr:int):int;
 
-		/**
-		* This matches the signature of write from the IKernel interface.
-		* @param fileDescriptor The file descriptor being written to
-		* @param bufPtr A Pointer to the buffer containing data to be written to this file descriptor.
-		* @param nbyte The size of the buffer pointed to by bufPtr
-		* @param errnoPtr A pointer to the location of the errno global variable
-		* @return an integer indicating the success or failure of the syscall, see the BSD documentation for expected values
-		*/
-		function write(fileDescriptor:int, bufPtr:int, nbyte:int, errnoPtr:int):int
+    /**
+     * This matches the signature of write from the IKernel interface.
+     * @param fileDescriptor The file descriptor being written to
+     * @param bufPtr A Pointer to the buffer containing data to be written to this file descriptor.
+     * @param nbyte The size of the buffer pointed to by bufPtr
+     * @param errnoPtr A pointer to the location of the errno global variable
+     * @return an integer indicating the success or failure of the syscall, see the BSD documentation for expected values
+     */
+    function write(fileDescriptor:int, bufPtr:int, nbyte:int, errnoPtr:int):int;
 
-		/**
-		* This matches the signature of fcntl from the IKernel interface.
-		* @param fileDescriptor The file descriptor being manipulated
-		* @param cmd An fcntl command
-		* @param data An argument for the given command
-		* @param errnoPtr A pointer to the location of the errno global variable
-		* @return an integer indicating the success or failure of the syscall, see the BSD documentation for expected values
-		*/
-		function fcntl(fileDescriptor:int, cmd:int, data:int, errnoPtr:int):int
+    /**
+     * This matches the signature of fcntl from the IKernel interface.
+     * @param fileDescriptor The file descriptor being manipulated
+     * @param cmd An fcntl command
+     * @param data An argument for the given command
+     * @param errnoPtr A pointer to the location of the errno global variable
+     * @return an integer indicating the success or failure of the syscall, see the BSD documentation for expected values
+     */
+    function fcntl(fileDescriptor:int, cmd:int, data:int, errnoPtr:int):int;
 
-		/**
-		* This matches the signature of ioctl from the IKernel interface.
-		* @param fileDescriptor The file descriptor being manipulated
-		* @param request An ioctl request
-		* @param data An argument for the given command
-		* @param errnoPtr A pointer to the location of the errno global variable
-		* @return an integer indicating the success or failure of the syscall, see the BSD documentation for expected values
-		*/
-		function ioctl(fileDescriptor:int, request:int, data:int, errnoPtr:int):int
-	}
+    /**
+     * This matches the signature of ioctl from the IKernel interface.
+     * @param fileDescriptor The file descriptor being manipulated
+     * @param request An ioctl request
+     * @param data An argument for the given command
+     * @param errnoPtr A pointer to the location of the errno global variable
+     * @return an integer indicating the success or failure of the syscall, see the BSD documentation for expected values
+     */
+    function ioctl(fileDescriptor:int, request:int, data:int, errnoPtr:int):int;
+}
 }
 

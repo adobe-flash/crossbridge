@@ -18,63 +18,70 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package com.adobe.flascc
-{
+package com.adobe.flascc {
+import flash.system.System;
 import flash.utils.ByteArray;
 
 [ExcludeClass]
 /**
-* ByteArray subclass that self-populates
-* based on class metadata
-* swfresolve will recognize this metadata and build
-* the correct definebinary tag
-*
-* [HexData("aabbccdd")]
-* public class D_2e_text extends BinaryData
-* {
+ * ByteArray subclass that self-populates
+ * based on class metadata
+ * swfresolve will recognize this metadata and build
+ * the correct definebinary tag
+ *
+ * [HexData("aabbccdd")]
+ * public class D_2e_text extends BinaryData
+ * {
 * }
-*
-* @private
-*/
-public class BinaryData extends ByteArray
-{
-	public function BinaryData()
-	{
-		if(length) // pre-populated via definebinary
+ *
+ * @private
+ */
+public class BinaryData extends ByteArray {
+    public function BinaryData() {
+        // check for pre-populated via definebinary
+        if (length) {
             return;
+        }
+        // parse hex data
+        var md:XML = CModule.describeType(this);
+        var bdList:XMLList = md..metadata.(@name == "HexData");
 
-		var md:XML = CModule.describeType(this);
-		var bdList:XMLList = md..metadata.(@name == "HexData");
+        for each(var bd:XML in bdList) {
+            var argList:XMLList = bd..arg.(@key == "");
 
-		for each(var bd:XML in bdList)
-		{
-			var argList:XMLList = bd..arg.(@key == "");
+            for each(var arg:XML in argList) {
+                var hex:String = arg.@value;
+                var len:uint = hex.length;
 
-			for each(var arg:XML in argList)
-			{
-				var hex:String = arg.@value;
-				var len:uint = hex.length
+                for (var i:uint = 0; i < len; i += 2) {
+                    var c1:int = hex.charCodeAt(i);
+                    var c2:int = hex.charCodeAt(i + 1);
+                    var result:int = 0;
 
-				for (var i:uint = 0; i < len; i += 2) {
-					var c1:int = hex.charCodeAt(i)
-					var c2:int = hex.charCodeAt(i+1)
-					var result:int = 0
+                    if (c1 < 58)
+                        result = c1 - 48;
+                    else if (c1 < 71)
+                        result = 10 + (c1 - 65);
+                    else if (c1 < 103)
+                        result = 10 + (c1 - 97);
 
-					if(c1 < 58) result = c1 - 48
-					else if(c1 < 71) result = 10 + (c1 - 65)
-					else if(c1 < 103) result = 10 + (c1 - 97)
+                    result *= 16;
 
-					result *= 16
+                    if (c2 < 58)
+                        result += c2 - 48;
+                    else if (c2 < 71)
+                        result += 10 + (c2 - 65);
+                    else if (c2 < 103)
+                        result += 10 + (c2 - 97);
 
-					if(c2 < 58) result += c2 - 48
-					else if(c2 < 71) result += 10 + (c2 - 65)
-					else if(c2 < 103) result += 10 + (c2 - 97)
-					
-					writeByte(result);
-				}
-			}
-		}
-		position = 0;
-	}
+                    writeByte(result);
+                }
+            }
+        }
+        position = 0;
+        // free memory
+        System.disposeXML(md);
+        md = null;
+    }
 }
 }

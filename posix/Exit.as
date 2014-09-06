@@ -18,30 +18,29 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-package C_Run
-{
-  /**
-  * throw on "exit"
-  * @private
-  */
-  [ExcludeClass] 
-  public class Exit
-  {
+package C_Run {
+/**
+ * throw on "exit"
+ * @private
+ */
+[ExcludeClass]
+public class Exit {
     /**
-    * The exit code
-    */
+     * The exit code
+     */
     public var code:int;
 
     /**
-    * Constructor
-    *
-    * @param code The exit code
-    */
-    public function Exit(code:int)
-    {
-      CONFIG::debug { trace("Exit::exit: " + code); }
-      this.code = code;
+     * Constructor
+     *
+     * @param code The exit code
+     */
+    public function Exit(code:int) {
+        CONFIG::debug {
+            trace("Exit::exit: " + code);
+        }
+        this.code = code;
     }
-  }
+}
 }
 

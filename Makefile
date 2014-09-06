@@ -55,6 +55,7 @@ $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-4.0
 $?DEPENDENCY_OPENSSL=openssl-1.0.1i
 $?DEPENDENCY_POLARSSL=polarssl-1.3.8-gpl
+$?DEPENDENCY_MCRYPT=libmcrypt-2.5.8
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_SWIG=swig-3.0.0
@@ -393,6 +394,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_POLARSSL).tgz
+	tar xf packages/$(DEPENDENCY_MCRYPT).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	tar xf packages/$(DEPENDENCY_SWIG).tar.gz
 	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
@@ -453,6 +455,8 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBXML)
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_OPENSSL)
+	rm -rf $(DEPENDENCY_POLARSSL)
+	rm -rf $(DEPENDENCY_MCRYPT)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SCIMARK)
 	rm -rf $(DEPENDENCY_SWIG)
