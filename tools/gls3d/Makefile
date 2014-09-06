@@ -26,15 +26,13 @@
 # =END MIT LICENSE
 #
 
-.PHONY: debug clean all 
+.PHONY: all
 
-all: check compile
+all: compile
 
 compile:
 	@mkdir -p install/usr/lib
-	@mkdir -p install/usr/include
-	
-	@echo "Compiling libGL.as"
+# Compile libGL.as
 	$(ASC2) -md -strict -optimize -abcfuture -AS3 \
 	-import $(call nativepath,$(FLASCC)/usr/lib/builtin.abc) \
 	-import $(call nativepath,$(FLASCC)/usr/lib/playerglobal.abc) \
@@ -55,20 +53,16 @@ compile:
 	-in src/com/adobe/utils/macro/VariableExpression.as \
 	-in src/com/adobe/utils/macro/VM.as \
 	libGL.as
+# Post-Process
 	@mv libGL.abc install/usr/lib/
-	
-	@echo "Compiling libGL.cpp"
+# Compile libGL.cpp
 	@$(FLASCC)/usr/bin/g++ -fno-exceptions -O4 -c -Iinstall/usr/include/ libGL.cpp
 	@$(FLASCC)/usr/bin/ar crus install/usr/lib/libGL.a install/usr/lib/libGL.abc libGL.o 
-
+# Post-Cleanup
 	@rm -f libGL.o 
-
-install: check
+# Install
 	@cp -r install/usr/include/ $(FLASCC)/usr/include
 	@cp -r install/usr/lib/ $(FLASCC)/usr/lib
 	@cp $(FLASCC)/usr/SDL_opengl.h $(FLASCC)/usr/include/SDL/
 
 include ../../samples/Makefile.common
-
-clean:
-	#rm -rf build
