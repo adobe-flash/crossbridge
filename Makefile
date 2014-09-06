@@ -53,7 +53,7 @@ $?DEPENDENCY_LIBXML=libxml2-2.9.1
 $?DEPENDENCY_LLVM=llvm-2.9
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-4.0
-$?DEPENDENCY_OPENSSL=openssl-1.0.1h
+$?DEPENDENCY_OPENSSL=openssl-1.0.1i
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_SWIG=swig-3.0.0
@@ -1504,9 +1504,9 @@ test_hello_c:
 	# Assembling AS3 Output (ASM)
 	cd $(BUILD)/test_hello_c && $(SDK)/usr/bin/llc -jvm="$(JAVA)" hello.bc -o hello.as -filetype=asm
 	# Assembling SWF Output
-	cd $(BUILD)/test_hello_c && $(SDK_CC) -emit-swf -swf-size=320x240 -O0 -g hello.abc -o hello.swf
+	cd $(BUILD)/test_hello_c && $(SDK_CC) -save-temps -emit-swf -swf-size=320x240 -O0 -g hello.abc -o hello.swf
 	# Assembling SWF Output (Optimized)
-	cd $(BUILD)/test_hello_c && $(SDK_CC) -emit-swf -swf-size=320x240 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
+	cd $(BUILD)/test_hello_c && $(SDK_CC) -save-temps -emit-swf -swf-size=320x240 -O4 $(SRCROOT)/test/hello.c -o hello-opt.swf
 
 # Test HelloWorld.CPP
 test_hello_cpp:
@@ -1516,9 +1516,9 @@ test_hello_cpp:
 	# Assembling Native Output
 	cd $(BUILD)/test_hello_cpp && $(SDK_CXX) -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
 	# Assembling SWF Output
-	cd $(BUILD)/test_hello_cpp && $(SDK_CXX) -emit-swf -swf-size=320x240 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
+	cd $(BUILD)/test_hello_cpp && $(SDK_CXX) -save-temps -emit-swf -swf-size=320x240 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
 	# Assembling SWF Output (Optimized)
-	cd $(BUILD)/test_hello_cpp && $(SDK_CXX) -emit-swf -swf-size=320x240 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
+	cd $(BUILD)/test_hello_cpp && $(SDK_CXX) -save-temps -emit-swf -swf-size=320x240 -O4 $(SRCROOT)/test/hello.cpp -o hello-cpp-opt.swf
 
 # Test POSIX Threads - C
 test_pthreads_c_shell:

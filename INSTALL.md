@@ -79,7 +79,7 @@ In order to compile the Master branch you will need Apple GCC 4.2:
   
 > Example (Linux): export \_JAVA\_OPTIONS="-Xms512m -Xmx4096m"
 
-* Disable anti-virus software for faster builds
+* Disable anti-virus software for faster builds or add CrossBridge to exclusions (false alarms)
 
 * To build a Light SDK without extra libraries use: *make all LIGHTSDK=1*
 
