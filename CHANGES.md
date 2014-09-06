@@ -41,3 +41,8 @@ CHANGES
 * Added LibXML2
 * Updated CMake to v3.0.0
 * Moved Examples to https://github.com/crossbridge-community
+
+### 1.0.5
+
+* Updated LibOpenSSL
+* Added LibPolarSSL
