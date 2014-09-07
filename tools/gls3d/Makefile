@@ -26,6 +26,32 @@
 # =END MIT LICENSE
 #
 
+# Detect host 
+$?UNAME=$(shell uname -s)
+#$(info $(UNAME))
+ifneq (,$(findstring CYGWIN,$(UNAME)))
+	$?nativepath=$(shell cygpath -at mixed $(1))
+	$?unixpath=$(shell cygpath -at unix $(1))
+else
+	$?nativepath=$(abspath $(1))
+	$?unixpath=$(abspath $(1))
+endif
+
+# CrossBridge SDK Home
+ifneq "$(wildcard $(call unixpath,$(FLASCC_ROOT)/sdk))" ""
+ $?FLASCC:=$(call unixpath,$(FLASCC_ROOT)/sdk)
+else
+ $?FLASCC:=/path/to/crossbridge-sdk/
+endif
+$?ASC2=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md -parallel
+ 
+# Auto Detect AIR/Flex SDKs
+ifneq "$(wildcard $(AIR_HOME)/lib/compiler.jar)" ""
+ $?FLEX=$(AIR_HOME)
+else
+ $?FLEX:=/path/to/adobe-air-sdk/
+endif
+
 .PHONY: all
 
 all: compile
@@ -61,8 +87,7 @@ compile:
 # Post-Cleanup
 	@rm -f libGL.o 
 # Install
-	@cp -r install/usr/include/ $(FLASCC)/usr/include
-	@cp -r install/usr/lib/ $(FLASCC)/usr/lib
-	@cp $(FLASCC)/usr/SDL_opengl.h $(FLASCC)/usr/include/SDL/
+	@cp -r install/usr/include $(FLASCC)/usr/
+	@cp -r install/usr/lib $(FLASCC)/usr/
+	#@cp $(FLASCC)/usr/SDL_opengl.h $(FLASCC)/usr/include/SDL/
 
-include ../../samples/Makefile.common

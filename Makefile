@@ -340,6 +340,10 @@ diagnostics:
 	@echo "FLEX_SDK_HOME: $(FLEX_SDK_HOME)"
 
 # Development target
+all_dev:
+	@$(SDK_MAKE) gls3d
+
+# Development target
 all_dev48:
 	@$(SDK_MAKE) abclibs_compile
 	#@cd samples/05_SWC && $(MAKE)
@@ -610,6 +614,7 @@ abclibs_compile:
 	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import IBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/InMemoryBackingStore.as) -outdir . -out InMemoryBackingStore
 	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import IBackingStore.abc -import ISpecialFile.abc $(call nativepath,$(SRCROOT)/posix/vfs/IVFS.as) -outdir . -out IVFS
 	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import ISpecialFile.abc -import IBackingStore.abc -import IVFS.abc -import InMemoryBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/DefaultVFS.as) -outdir . -out DefaultVFS
+	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -import ISpecialFile.abc -import IBackingStore.abc -import IVFS.abc -import InMemoryBackingStore.abc $(call nativepath,$(SRCROOT)/posix/vfs/URLLoaderVFS.as) -outdir . -out URLLoaderVFS
 	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) $(call nativepath, `find $(SRCROOT)/posix/vfs/nochump -name "*.as"`) -outdir . -out AlcVFSZip
 	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) -import Exit.abc -import C_Run.abc -import IBackingStore.abc -import ISpecialFile.abc -import IVFS.abc -import LongJmp.abc $(call nativepath,$(SRCROOT)/posix/CModule.as) -outdir . -out CModule
 	cd $(BUILD)/abclibs && $(ASC2) $(ASC2OPTS) $(ASC2EXTRAOPTS) -import IBackingStore.abc -import IVFS.abc -import ISpecialFile.abc -import CModule.abc -import C_Run.abc -import Exit.abc -import ELF.abc $(call nativepath,$(SRCROOT)/posix/AlcDbgHelper.as) -d -outdir . -out AlcDbgHelper
@@ -1027,6 +1032,7 @@ sdkcleanup:
 	$(RSYNC) $(SRCROOT)/posix/vfs/IVFS.as $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/vfs/InMemoryBackingStore.as $(SDK)/usr/share/
 	$(RSYNC) $(SRCROOT)/posix/vfs/LSOBackingStore.as $(SDK)/usr/share/
+	$(RSYNC) $(SRCROOT)/posix/vfs/URLLoaderVFS.as $(SDK)/usr/share/
 	$(RSYNC) --exclude "*.xslt" --exclude "*.html" --exclude ASDoc_Config.xml --exclude overviews.xml $(BUILDROOT)/tempdita/ $(SDK)/usr/share/asdocs
 
 # TBD
@@ -1139,6 +1145,13 @@ libtool:
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(TRIPLE) \
 		--prefix=$(SDK)/usr --enable-static --disable-shared --disable-ltdl-install
 	cd $(BUILD)/libtool && $(MAKE) && $(MAKE) install-exec
+
+# Converts OpenGL Shaders to Stage3D AGAL format
+gls3d:
+	rm -rf $(BUILD)/gls3d
+	mkdir -p $(BUILD)/gls3d
+	$(RSYNC) $(SRCROOT)/tools/gls3d/ $(BUILD)/gls3d
+	cd $(BUILD)/gls3d && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE)
 
 # Converts GLSL Shaders to Stage3D AGAL format
 # About 'peflags' see: http://www.cygwin.com/cygwin-ug-net/setup-maxmem.html
