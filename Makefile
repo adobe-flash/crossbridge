@@ -341,10 +341,14 @@ diagnostics:
 	@echo "FLEX_SDK_HOME: $(FLEX_SDK_HOME)"
 
 # Development target
-all_dev:
+all_dev48:
 	@$(SDK_MAKE) abclibs_compile
 	@$(SDK_MAKE) test_hello_cpp
 	#@$(SDK_MAKE) test_hello_c
+
+# Development target
+all_dev49:
+	@$(SDK_MAKE) libpolarssl
 
 # Clean build outputs
 clean:
@@ -1470,15 +1474,14 @@ libopenssl:
 libpolarssl:
 	rm -rf $(BUILD)/libpolarssl
 	mkdir -p $(BUILD)/libpolarssl
-	cd $(SRCROOT)/$(DEPENDENCY_POLARSSL) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./make --prefix=$(SDK)/usr 
+	cd $(BUILD)/libpolarssl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SDK_CMAKE) -G "Unix Makefiles" \
+		$(SRCROOT)/polarssl-1.3.8 -DCMAKE_INSTALL_PREFIX="$(SDK)/usr"
 
 # Cryptography library.
 libmcrypt:
-	rm -rf $(BUILD)/libmcrypt
-	mkdir -p $(BUILD)/libmcrypt
-	cd $(BUILD)/libmcrypt && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_MCRYPT)/configure \
+	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./configure \
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
-	cd $(BUILD)/libmcrypt && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -i install
 
 # The GNU Readline library provides a set of functions for use by applications that allow users to edit command lines as they are typed in (GPL). 
 # TODO: add to build chain
