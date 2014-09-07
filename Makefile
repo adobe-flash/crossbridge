@@ -340,10 +340,11 @@ diagnostics:
 	@echo "FLEX_SDK_TYPE: $(FLEX_SDK_TYPE)"
 	@echo "FLEX_SDK_HOME: $(FLEX_SDK_HOME)"
 
-# Development target (#26)
+# Development target
 all_dev:
 	@$(SDK_MAKE) abclibs_compile
-	cd samples/09_Pthreads && $(SDK_MAKE) T09_3 T09_4 T09_5
+	@$(SDK_MAKE) test_hello_cpp
+	#@$(SDK_MAKE) test_hello_c
 
 # Clean build outputs
 clean:
@@ -1465,6 +1466,20 @@ libopenssl:
 	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) openssl.pc libssl.pc libcrypto.pc 
 	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install_sw
 
+# Cryptography library.
+libpolarssl:
+	rm -rf $(BUILD)/libpolarssl
+	mkdir -p $(BUILD)/libpolarssl
+	cd $(SRCROOT)/$(DEPENDENCY_POLARSSL) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./make --prefix=$(SDK)/usr 
+
+# Cryptography library.
+libmcrypt:
+	rm -rf $(BUILD)/libmcrypt
+	mkdir -p $(BUILD)/libmcrypt
+	cd $(BUILD)/libmcrypt && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_MCRYPT)/configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
+	cd $(BUILD)/libmcrypt && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
 # The GNU Readline library provides a set of functions for use by applications that allow users to edit command lines as they are typed in (GPL). 
 # TODO: add to build chain
 libreadline:
@@ -1520,7 +1535,7 @@ test_hello_cpp:
 	@rm -rf $(BUILD)/test_hello_cpp
 	@mkdir -p $(BUILD)/test_hello_cpp
 	# Assembling Native Output
-	cd $(BUILD)/test_hello_cpp && $(SDK_CXX) -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp
+	cd $(BUILD)/test_hello_cpp && $(SDK_CXX) -g -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp && ./hello-cpp /key1=value1 /key2=value2
 	# Assembling SWF Output
 	cd $(BUILD)/test_hello_cpp && $(SDK_CXX) -save-temps -emit-swf -swf-size=320x240 -O0 $(SRCROOT)/test/hello.cpp -o hello-cpp.swf
 	# Assembling SWF Output (Optimized)

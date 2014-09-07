@@ -1474,7 +1474,13 @@ public class CModule
   */
   public static function start(console:Object, args:Vector.<String>, env:Vector.<String>, preserveStack:Boolean = true):int
   {
-    CONFIG::debug { trace("CModule::start: " + arguments); }
+    CONFIG::debug { 
+    trace("CModule::start"); 
+    trace("\t", "console:", console);
+    trace("\t", "args:", args);
+    trace("\t", "env:", env);
+    trace("\t", "preserveStack:", preserveStack);
+    }
     
     if(console)
     {
@@ -1522,7 +1528,14 @@ public class CModule
   */
   public static function startAsync(console:Object = null, args:Vector.<String> = null, env:Vector.<String> = null, preserveStack:Boolean = true, isAutoSetRealThreadId:Boolean = true):void
   {
-    CONFIG::debug { trace("CModule::startAsync: " + arguments); }
+    CONFIG::debug { 
+        trace("CModule::startAsync");         
+        trace("\t", "console:", console);
+        trace("\t", "args:", args);
+        trace("\t", "env:", env);
+        trace("\t", "preserveStack:", preserveStack);
+        trace("\t", "isAutoSetRealThreadId:", isAutoSetRealThreadId);
+    }
     
     if(activeConsole)
       throw new Error("calling startAsync with an active console");
@@ -1557,7 +1570,13 @@ public class CModule
   */
   public static function startBackground(console:Object = null, args:Vector.<String> = null, env:Vector.<String> = null, afterStackSize:int = 65536):void
   {
-    CONFIG::debug { trace("CModule::startBackground: " + arguments); }
+    CONFIG::debug { 
+        trace("CModule::startBackground");        
+        trace("\t", "console:", console);
+        trace("\t", "args:", args);
+        trace("\t", "env:", env);
+        trace("\t", "afterStackSize:", afterStackSize);
+    }
     
     if(console)
     {

@@ -19,7 +19,6 @@
 // THE SOFTWARE.
 
 package com.adobe.flascc {
-import flash.system.System;
 import flash.utils.ByteArray;
 
 [ExcludeClass]
@@ -80,7 +79,7 @@ public class BinaryData extends ByteArray {
         }
         position = 0;
         // free memory
-        System.disposeXML(md);
+        // flash.system.System.disposeXML(md);
         md = null;
     }
 }
