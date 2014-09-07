@@ -1737,11 +1737,6 @@ test_gdb:
 	#cd $(GDBUNIT_ROOT) && make -f ./Quake1.make SWFS_DIR=$(GDBUNIT_ROOT) FLASCC_DIR=$(SRCROOT)
 	cd $(GDBUNIT_ROOT) && make -f ./setjmp.make SWFS_DIR=$(GDBUNIT_ROOT) FLASCC_DIR=$(SRCROOT)
 
-
-# Run Virtual File System (VFS) tests
-test_vfs:
-	@cd test/vfs/framework && $(MAKE) FLASCC=$(SDK)
-
 # ====================================================================================
 # Samples and Examples
 # ====================================================================================
