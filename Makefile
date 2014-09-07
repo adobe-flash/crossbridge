@@ -262,10 +262,11 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 # ====================================================================================
 
 EXTRALIBORDER= zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv libxml2 libvgl libjpeg libpng libgif libtiff libwebp
-EXTRALIBORDER+= libogg libvorbis libflac libsndfile libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image libphysfs libncurses libopenssl
+EXTRALIBORDER+= libogg libvorbis libflac libsndfile libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image gls3d libphysfs libncurses 
+EXTRALIBORDER+= libopenssl libmcrypt 
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
-TESTORDER+= test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols test_gdb 
+TESTORDER+= test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols  
 #TESTORDER+= gcctests swigtests llvmtests checkasm 
 
 BUILDORDER= cmake abclibs  
@@ -349,10 +350,6 @@ all_dev48:
 	#@cd samples/05_SWC && $(MAKE)
 	@$(SDK_MAKE) test_hello_cpp
 	@$(SDK_MAKE) test_hello_c
-
-# Development target
-all_dev49:
-	@$(SDK_MAKE) libpolarssl
 
 # Clean build outputs
 clean:
