@@ -35,12 +35,14 @@ package
  
     public function initCode(e:Event):void
     {
-      CModule.startAsync(this)
+      removeEventListener(Event.ADDED_TO_STAGE, initCode);
       
-      var tf:TextField = new TextField
-      tf.multiline = true
-      tf.width = stage.stageWidth
-      tf.height = stage.stageHeight
+      CModule.startAsync(this);
+      
+      var tf:TextField = new TextField();
+      tf.multiline = true;
+      tf.width = stage.stageWidth;
+      tf.height = stage.stageHeight;
       addChild(tf)
 
       var words:Array = [
@@ -53,8 +55,11 @@ package
         var hash:uint = MurmurHash3(word)
         var s:String = "hash of '" + word + "' is: " + hash + "\n"
         tf.appendText( s )
-	trace( s )
+        trace( s )
       }
+      
+      // test to free memory
+      CModule.dispose();
     }
   }
 }

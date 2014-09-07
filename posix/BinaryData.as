@@ -37,7 +37,7 @@ import flash.utils.ByteArray;
  */
 public class BinaryData extends ByteArray {
     public function BinaryData() {
-        // check for pre-populated via definebinary
+        // check for pre-populated via DefineBinary
         if (length) {
             return;
         }
@@ -79,7 +79,13 @@ public class BinaryData extends ByteArray {
         }
         position = 0;
         // free memory
-        // flash.system.System.disposeXML(md);
+        try
+        {
+            import flash.system.System;
+            System.disposeXML(md);
+        } catch(error:*) {
+            // swallow #1065 flash.system::System is not defined, when using projector
+        }
         md = null;
     }
 }

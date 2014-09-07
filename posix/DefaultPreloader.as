@@ -24,6 +24,7 @@ import com.adobe.flascc.Console;
 import com.adobe.flascc.vfs.HTTPBackingStore;
 
 import flash.display.MovieClip;
+import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
@@ -43,42 +44,51 @@ public class DefaultPreloader extends MovieClip {
     /**
      * @private
      */
-    private var webfs:Object;
+    protected var webFS:Object;
 
     /**
      * @private
      */
-    private var webfsPct:Number = 0
+    protected var webFSPercent:Number = 0;
 
     /**
      * @private
      */
-    private var swfPct:Number = 0;
+    protected var swfPercent:Number = 0;
 
     /**
      * @private
      */
-    private var webfsFinished:Boolean;
+    protected var barHeight:uint = 40;
 
     /**
      * @private
      */
-    private var failed:Boolean;
+    protected var isWebFSFinished:Boolean;
+
+    /**
+     * @private
+     */
+    protected var isWebFSFailed:Boolean;
 
     /**
      * Construct the flascc preloader that is injected into every SWF by default.
      */
     public function DefaultPreloader() {
-        CONFIG::debug {
-            trace("DefaultPreloader::created");
-        }
+        initialize();
+    }
 
+    /**
+     * @private
+     */
+    protected function initialize() {
+        CONFIG::debug { trace("DefaultPreloader::initialize"); }
         try {
-            if (!webfs) {
-                webfs = new HTTPBackingStore();
-                webfs.addEventListener(ProgressEvent.PROGRESS, onWebFSProgress, false, 0, true);
-                webfs.addEventListener(Event.COMPLETE, onWebFSComplete, false, 0, true);
-                webfs.addEventListener(IOErrorEvent.IO_ERROR, onWebFSError, false, 0, true);
+            if (!webFS) {
+                webFS = new HTTPBackingStore();
+                webFS.addEventListener(ProgressEvent.PROGRESS, onWebFSProgress, false, 0, true);
+                webFS.addEventListener(Event.COMPLETE, onWebFSComplete, false, 0, true);
+                webFS.addEventListener(IOErrorEvent.IO_ERROR, onWebFSError, false, 0, true);
             }
         } catch (error:*) {
             // If an HTTPBackingStore wasn't linked into this exe then ignore it.
@@ -96,39 +106,74 @@ public class DefaultPreloader extends MovieClip {
     /**
      * @private
      */
-    private function initStage():void {
-        stage.frameRate = 60;
-        stage.scaleMode = StageScaleMode.NO_SCALE;
+    protected function dispose(event:Event = null) {
+        CONFIG::debug { trace("DefaultPreloader::dispose"); }
+        removeListeners();
+        removeWebFSListeners();
     }
 
     /**
      * @private
      */
-    private function onWebFSProgress(event:ProgressEvent):void {
-        webfsPct = (event.bytesLoaded / event.bytesTotal);
+    protected function removeListeners() {
+        loaderInfo.removeEventListener(ProgressEvent.PROGRESS, onProgress);
+        loaderInfo.removeEventListener(Event.COMPLETE, onPreloaderComplete);
+        removeEventListener(Event.ADDED_TO_STAGE, onPreloaderComplete);
+        removeEventListener(Event.REMOVED_FROM_STAGE, dispose);
+    }
+
+    /**
+     * @private
+     */
+    protected function removeWebFSListeners() {
+        if (webFS) {
+            webFS.removeEventListener(ProgressEvent.PROGRESS, onWebFSProgress);
+            webFS.removeEventListener(Event.COMPLETE, onWebFSComplete);
+            webFS.removeEventListener(IOErrorEvent.IO_ERROR, onWebFSError);
+        }
+    }
+    
+    /**
+     * @private
+     */
+    protected function initStage():void {
+        //CONFIG::debug { trace("DefaultPreloader::initStage"); }
+        stage.frameRate = 60;
+        stage.scaleMode = StageScaleMode.NO_SCALE;
+        stage.align = StageAlign.TOP_LEFT;
+    }
+
+    /**
+     * @private
+     */
+    protected function onWebFSProgress(event:ProgressEvent):void {
+        webFSPercent = (event.bytesLoaded / event.bytesTotal);
         render();
     }
 
     /**
      * @private
      */
-    private function onWebFSComplete(event:Event):void {
-        webfsFinished = true;
+    protected function onWebFSComplete(event:Event):void {
+        isWebFSFinished = true;
         onPreloaderComplete(null);
     }
 
     /**
      * @private
      */
-    private function onWebFSError(event:Event):void {
-        trace(event);
-        failed = true;
+    protected function onWebFSError(event:Event):void {
+        CONFIG::debug {
+            trace("DefaultPreloader::onWebFSError: " + event);
+        }
+        removeWebFSListeners();
+        isWebFSFailed = true;
     }
 
     /**
      * @private
      */
-    private function render():void {
+    protected function render():void {
         const sw:int = stage.stageWidth;
         const sh:int = stage.stageHeight;
 
@@ -137,27 +182,26 @@ public class DefaultPreloader extends MovieClip {
         graphics.drawRect(0, 0, sw, sh);
         graphics.endFill();
 
-        var barColor:uint = failed ? 0xFF0000 : 0xFFFFFF;
+        var barColor:uint = isWebFSFailed ? 0xFF0000 : 0xFFFFFF;
 
         // Swf progress bar
-        var barHeight:int = 40;
         var barWidth:int = sw * 0.75;
 
         graphics.lineStyle(1, barColor);
         graphics.drawRect((sw - barWidth) * 0.5, (sh * 0.5) - (barHeight * 0.5), barWidth, barHeight);
 
         graphics.beginFill(barColor);
-        graphics.drawRect((sw - barWidth) * 0.5 + 5, (sh * 0.5) - (barHeight * 0.5) + 5, (barWidth - 10) * swfPct, barHeight - 10);
+        graphics.drawRect((sw - barWidth) * 0.5 + 5, (sh * 0.5) - (barHeight * 0.5) + 5, (barWidth - 10) * swfPercent, barHeight - 10);
         graphics.endFill();
 
         // WebsFS progress bar
-        if (webfs) {
-            barColor = failed ? 0xFF0000 : 0xAAAAAA;
+        if (webFS) {
+            barColor = isWebFSFailed ? 0xFF0000 : 0xAAAAAA;
             graphics.lineStyle(1, barColor);
             graphics.drawRect((sw - barWidth) * 0.5, (sh * 0.5) - (barHeight * 0.5) + 5 + barHeight, barWidth, barHeight);
 
             graphics.beginFill(barColor);
-            graphics.drawRect((sw - barWidth) * 0.5 + 5, (sh * 0.5) - (barHeight * 0.5) + 10 + barHeight, (barWidth - 10) * webfsPct, barHeight - 10);
+            graphics.drawRect((sw - barWidth) * 0.5 + 5, (sh * 0.5) - (barHeight * 0.5) + 10 + barHeight, (barWidth - 10) * webFSPercent, barHeight - 10);
             graphics.endFill();
         }
     }
@@ -165,26 +209,32 @@ public class DefaultPreloader extends MovieClip {
     /**
      * @private
      */
-    private function onProgress(event:ProgressEvent):void {
-        swfPct = event.bytesLoaded / event.bytesTotal;
+    protected function onProgress(event:ProgressEvent):void {
+        swfPercent = event.bytesLoaded / event.bytesTotal;
         render();
     }
 
     /**
      * @private
      */
-    private function onPreloaderComplete(event:Event):void {
-        // wait until the webfs is complete
-        if (webfs && webfsFinished == false) {
+    protected function onPreloaderComplete(event:Event):void {
+        // wait until the webFS is complete
+        if (webFS && isWebFSFinished == false) {
             return;
         }
+        CONFIG::debug { trace("DefaultPreloader::onPreloaderComplete"); }
+        // remove event listeners
+        removeListeners();
+        // add dispose listeners
+        addEventListener(Event.REMOVED_FROM_STAGE, dispose, false, 0, true);
         // step to main frame
-        gotoAndStop(2);
         graphics.clear();
+        gotoAndStop(2);
         // cache web file system
-        if (webfs) {
-            CModule.vfs.addBackingStore(webfs, null);
-            webfs = null;
+        if (webFS) {
+            CModule.vfs.addBackingStore(webFS, null);
+            removeWebFSListeners();
+            webFS = null;
         }
         // create console
         new Console(this);

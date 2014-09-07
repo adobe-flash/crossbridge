@@ -342,8 +342,9 @@ diagnostics:
 # Development target
 all_dev48:
 	@$(SDK_MAKE) abclibs_compile
+	#@cd samples/05_SWC && $(MAKE)
 	@$(SDK_MAKE) test_hello_cpp
-	#@$(SDK_MAKE) test_hello_c
+	@$(SDK_MAKE) test_hello_c
 
 # Development target
 all_dev49:
@@ -385,10 +386,10 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBSDLIMAGE).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSDLMIXER).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBSDLTTF).tar.gz
-	tar xf packages/$(DEPENDENCY_LIBSDL2).tar.gz
-	tar xf packages/$(DEPENDENCY_LIBSDL2IMAGE).tar.gz
-	tar xf packages/$(DEPENDENCY_LIBSDL2MIXER).tar.gz
-	tar xf packages/$(DEPENDENCY_LIBSDL2TTF).tar.gz
+	#tar xf packages/$(DEPENDENCY_LIBSDL2).tar.gz
+	#tar xf packages/$(DEPENDENCY_LIBSDL2IMAGE).tar.gz
+	#tar xf packages/$(DEPENDENCY_LIBSDL2MIXER).tar.gz
+	#tar xf packages/$(DEPENDENCY_LIBSDL2TTF).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBTIFF).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBTOOL).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBVORBIS).tar.gz
@@ -410,7 +411,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_LIBPHYSFS) .
 	cp -r ./patches/$(DEPENDENCY_LIBPNG) .
 	cp -r ./patches/$(DEPENDENCY_LIBSDL) .
-	cp -r ./patches/$(DEPENDENCY_LIBSDL2) .
+	#cp -r ./patches/$(DEPENDENCY_LIBSDL2) .
 	cp -r ./patches/$(DEPENDENCY_OPENSSL) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SWIG) .
@@ -445,10 +446,10 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBSDLIMAGE)
 	rm -rf $(DEPENDENCY_LIBSDLMIXER)
 	rm -rf $(DEPENDENCY_LIBSDLTTF)
-	rm -rf $(DEPENDENCY_LIBSDL2)
-	rm -rf $(DEPENDENCY_LIBSDL2IMAGE)
-	rm -rf $(DEPENDENCY_LIBSDL2MIXER)
-	rm -rf $(DEPENDENCY_LIBSDL2TTF)
+	#rm -rf $(DEPENDENCY_LIBSDL2)
+	#rm -rf $(DEPENDENCY_LIBSDL2IMAGE)
+	#rm -rf $(DEPENDENCY_LIBSDL2MIXER)
+	#rm -rf $(DEPENDENCY_LIBSDL2TTF)
 	rm -rf $(DEPENDENCY_LIBTIFF)
 	rm -rf $(DEPENDENCY_LIBTOOL)
 	rm -rf $(DEPENDENCY_LIBVORBIS)

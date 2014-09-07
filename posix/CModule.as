@@ -153,6 +153,7 @@ public class CModule
   */
   public static function dispose():void
   {
+    CONFIG::debug { trace("CModule::dispose"); }
     weakResolvers = null;
     workerSprite = null;
     cachedCSyms = null;
@@ -181,6 +182,9 @@ public class CModule
     }
   }
 
+  /**
+   * @private
+   */
   private static var workerSprite:* = null
 
   /**
@@ -220,7 +224,7 @@ public class CModule
   /**
   * Lookup the specified publicly defined C/C++ symbol
   *
-  * @param s The name of the symbol to lookup, for example, "malloc"
+  * @param name The name of the symbol to lookup, for example, "malloc"
   *
   * @return The address of the symbol. If the symbol was a POD type you can read it's
   *         value using one of the read functions. If the symbol was a function then you can call it using callI.
@@ -1040,12 +1044,12 @@ public class CModule
       for(var i:int=0; i<modSyms.length; i++) {
         var arr:Array = modSyms[i];
         if (arr.length < 4)
-          continue
+          continue;
 
-        var _type:String = arr[0]
-        var _name:String = arr[1]
-        var _sect:String = arr[2]
-        var _off:uint = arr[3]
+        var _type:String = arr[0];
+        var _name:String = arr[1];
+        var _sect:String = arr[2];
+        var _off:uint = arr[3];
         if(_type == "t")
         {
           ns = new Namespace(modPackage);
@@ -1124,22 +1128,22 @@ public class CModule
   {
     var script:Object = getScript();
     var result:Array = [];
-    var ns:Namespace
-    var value:uint
-    var sv:String
+    var ns:Namespace;
+    var value:uint;
+    var sv:String;
 
 
     if(modSyms) {
       for(var i:int=0; i<modSyms.length; i++) {
         var arr:Array = modSyms[i];
 
-        var _type:String = arr[0]
-        var _name:String = arr[1]
+        var _type:String = arr[0];
+        var _name:String = arr[1];
 
         if(arr.length == 2) {
           result.push([_type, _name]);
         } else {
-          var _sect:String = arr[2]
+          var _sect:String = arr[2];
           if(_type == "t")
           {
             ns = new Namespace(modPackage);
@@ -1323,7 +1327,6 @@ public class CModule
   {
     public static var rootSprite:Object;
 
-
     private static var _kernel:Object = null;
 
     public static function get kernel():Object
@@ -1349,7 +1352,9 @@ public class CModule
   */
   public static var activeConsole:Object;
 
-
+  /**
+   * @private
+   */
   private static var _vfs:Object = null;
 
   /**
@@ -1364,6 +1369,9 @@ public class CModule
     return _vfs;
   }
 
+  /**
+   * @private
+   */
   public static function set vfs(fs:IVFS):void
   {
     _vfs = fs;
@@ -1541,10 +1549,10 @@ public class CModule
       throw new Error("calling startAsync with an active console");
 
     if(!args)
-      args = new Vector.<String>
+      args = new Vector.<String>;
 
     if(!env)
-      env = new Vector.<String>
+      env = new Vector.<String>;
 
     // try to set us as the ui thread
     if(isAutoSetRealThreadId) {
@@ -1589,10 +1597,10 @@ public class CModule
       throw new Error("invalid stack size");
 
     if(!args)
-      args = new Vector.<String>
+      args = new Vector.<String>;
 
     if(!env)
-      env = new Vector.<String>
+      env = new Vector.<String>;
 
     var esp:int = ESP;
 
