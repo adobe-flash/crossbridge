@@ -57,7 +57,6 @@ $?DEPENDENCY_OPENSSL=openssl-1.0.1i
 $?DEPENDENCY_POLARSSL=polarssl-1.3.8-gpl
 $?DEPENDENCY_MCRYPT=libmcrypt-2.5.8
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
-$?DEPENDENCY_SCIMARK=scimark2_1c
 $?DEPENDENCY_SWIG=swig-3.0.0
 $?DEPENDENCY_ZLIB=zlib-1.2.5
 $?DEPENDENCY_DEJAGNU=dejagnu-1.5
@@ -266,7 +265,7 @@ EXTRALIBORDER= zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv libxml
 EXTRALIBORDER+= libogg libvorbis libflac libsndfile libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image libphysfs libncurses libopenssl
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
-TESTORDER+= test_scimark_shell test_scimark_swf test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols test_gdb 
+TESTORDER+= test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols test_gdb 
 #TESTORDER+= gcctests swigtests llvmtests checkasm 
 
 BUILDORDER= cmake abclibs  
@@ -402,7 +401,6 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_MCRYPT).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	tar xf packages/$(DEPENDENCY_SWIG).tar.gz
-	mkdir -p $(DEPENDENCY_SCIMARK) && cd $(DEPENDENCY_SCIMARK) && unzip -q ../packages/$(DEPENDENCY_SCIMARK).zip
 	unzip -q packages/$(DEPENDENCY_AVMPLUS).zip
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# apply patches
@@ -415,7 +413,6 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_LIBSDL2) .
 	cp -r ./patches/$(DEPENDENCY_OPENSSL) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
-	cp -r ./patches/$(DEPENDENCY_SCIMARK) .
 	cp -r ./patches/$(DEPENDENCY_SWIG) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
 	cp -r ./patches/$(DEPENDENCY_AVMPLUS) .
@@ -463,7 +460,6 @@ clean_libs:
 	rm -rf $(DEPENDENCY_POLARSSL)
 	rm -rf $(DEPENDENCY_MCRYPT)
 	rm -rf $(DEPENDENCY_PKG_CFG)
-	rm -rf $(DEPENDENCY_SCIMARK)
 	rm -rf $(DEPENDENCY_SWIG)
 	rm -rf $(DEPENDENCY_ZLIB)
 	rm -rf $(DEPENDENCY_AVMPLUS)
