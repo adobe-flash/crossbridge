@@ -38,9 +38,9 @@ all:
 				-import $(call nativepath,$(FLASCC)/usr/lib/InMemoryBackingStore.abc) \
 				-import $(call nativepath,$(FLASCC)/usr/lib/PlayerKernel.abc) \
 				-import $(call nativepath,$(FLASCC)/usr/lib/C_Run.abc) \
-				-import $(call nativepath,$(GLS3D)/install/usr/lib/libGL.abc) \
+				-import $(call nativepath,$(FLASCC)/usr/lib/libGL.abc) \
 				Console.as -outdir . -out Console
-	"$(FLASCC)/usr/bin/gcc" -O0 -D_GNU_SOURCE=1 -Wall -g test.c -symbol-abc=Console.abc -I$(GLS3D)/install/usr/include/ -L$(GLS3D)/install/usr/lib/ -emit-swf -o test.swf -lGL -lSDL -lvgl -lm -swf-size=800x600
+	"$(FLASCC)/usr/bin/gcc" -O0 -D_GNU_SOURCE=1 -Wall -g test.c -symbol-abc=Console.abc -emit-swf -o test.swf -lGL -lSDL -lvgl -lm -swf-size=800x600
 
 include ../Makefile.common
 

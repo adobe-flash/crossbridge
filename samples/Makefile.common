@@ -52,9 +52,6 @@ else
  $?FLEX:=/path/to/adobe-air-sdk/
 endif
 
-# Stage3D+
-$?GLS3D=$(FLASCC)/../samples/Example_GLS3D
-
 # C/CPP Compiler
 $?BASE_CFLAGS=-Werror -Wno-write-strings -Wno-trigraphs
 $?EXTRACFLAGS=
