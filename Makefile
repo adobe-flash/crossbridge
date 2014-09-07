@@ -54,7 +54,7 @@ $?DEPENDENCY_LLVM=llvm-2.9
 $?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
 $?DEPENDENCY_MAKE=make-4.0
 $?DEPENDENCY_OPENSSL=openssl-1.0.1i
-$?DEPENDENCY_POLARSSL=polarssl-1.3.8-gpl
+$?DEPENDENCY_POLARSSL=polarssl-1.3.8
 $?DEPENDENCY_MCRYPT=libmcrypt-2.5.8
 $?DEPENDENCY_PKG_CFG=pkg-config-0.26
 $?DEPENDENCY_SWIG=swig-3.0.0
@@ -1482,7 +1482,7 @@ libpolarssl:
 	rm -rf $(BUILD)/libpolarssl
 	mkdir -p $(BUILD)/libpolarssl
 	cd $(BUILD)/libpolarssl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SDK_CMAKE) -G "Unix Makefiles" \
-		$(SRCROOT)/polarssl-1.3.8 -DCMAKE_INSTALL_PREFIX="$(SDK)/usr"
+		$(SRCROOT)/$(DEPENDENCY_POLARSSL) -DCMAKE_INSTALL_PREFIX="$(SDK)/usr"
 
 # Cryptography library.
 libmcrypt:
