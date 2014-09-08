@@ -1497,7 +1497,7 @@ libbeecrypt:
 	rm -rf $(BUILD)/libbeecrypt
 	mkdir -p $(BUILD)/libbeecrypt
 	cd $(BUILD)/libbeecrypt && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_BEECRYPT)/configure \
-		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared --with-curses 
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libbeecrypt && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Cryptography library.
@@ -1505,7 +1505,7 @@ libnettle:
 	rm -rf $(BUILD)/libnettle
 	mkdir -p $(BUILD)/libnettle
 	cd $(BUILD)/libnettle && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_NETTLE)/configure \
-		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared --with-curses 
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
 	cd $(BUILD)/libnettle && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # The GNU Readline library provides a set of functions for use by applications that allow users to edit command lines as they are typed in (GPL). 
