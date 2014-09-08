@@ -44,5 +44,5 @@ CHANGES
 
 ### 1.0.5
 
-* Updated LibOpenSSL
-* Added LibPolarSSL
+* Updated OpenSSL to v1.0.1i
+* Added Cryptography libraries: MCrypt, BeeCrypt, Nettle

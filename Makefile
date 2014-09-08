@@ -13,6 +13,7 @@ $?LINUX_BUILD=$(BUILDROOT)/linux
 # ====================================================================================
 # DEPENDENCIES
 # ====================================================================================
+# Dependency Core
 $?DEPENDENCY_AVMPLUS=avmplus-master
 $?DEPENDENCY_BINUTILS=binutils
 $?DEPENDENCY_BMAKE=bmake
@@ -20,22 +21,32 @@ $?DEPENDENCY_CMAKE=cmake-3.0.0
 $?DEPENDENCY_DMALLOC=dmalloc-5.5.2
 $?DEPENDENCY_FFI=libffi-3.0.11
 $?DEPENDENCY_GDB=gdb-7.3
-$?DEPENDENCY_JPEG=jpeg-8c
-$?DEPENDENCY_LIBAA=aalib-1.2
-$?DEPENDENCY_LIBBZIP=bzip2-1.0.6
-$?DEPENDENCY_LIBEIGEN=eigen-3.1.2
-$?DEPENDENCY_LIBFLAC=flac-1.2.1
-$?DEPENDENCY_LIBFREETYPE=freetype-2.5.3
-$?DEPENDENCY_LIBGIF=giflib-5.0.5
-$?DEPENDENCY_LIBGMP=gmp-6.0.0
+$?DEPENDENCY_LIBTOOL=libtool-2.4.2
+$?DEPENDENCY_LLVM=llvm-2.9
+$?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
+$?DEPENDENCY_MAKE=make-4.0
+$?DEPENDENCY_PKG_CFG=pkg-config-0.26
+$?DEPENDENCY_SWIG=swig-3.0.0
+# Dependency Testing
+$?DEPENDENCY_DEJAGNU=dejagnu-1.5
+# Dependency Extras
 $?DEPENDENCY_LIBICONV=libiconv-1.14
+$?DEPENDENCY_LIBREADLINE=readline-6.3
+$?DEPENDENCY_LIBPROTOBUF=protobuf-2.5.0
+$?DEPENDENCY_LIBNCURSES=ncurses-5.9
+$?DEPENDENCY_LIBXML=libxml2-2.9.1
+$?DEPENDENCY_LIBAA=aalib-1.2
+$?DEPENDENCY_LIBEIGEN=eigen-3.1.2
+$?DEPENDENCY_LIBGMP=gmp-6.0.0
+$?DEPENDENCY_LIBPHYSFS=physfs-2.0.3
+# Dependency Multimedia
+$?DEPENDENCY_LIBSNDFILE=libsndfile-1.0.25
+$?DEPENDENCY_LIBFLAC=flac-1.2.1
+$?DEPENDENCY_LIBGIF=giflib-5.0.5
+$?DEPENDENCY_LIBFREETYPE=freetype-2.5.3
 $?DEPENDENCY_LIBOGG=libogg-1.3.1
 $?DEPENDENCY_LIBPNG=libpng-1.5.7
-$?DEPENDENCY_LIBPROTOBUF=protobuf-2.5.0
-$?DEPENDENCY_LIBPHYSFS=physfs-2.0.3
-$?DEPENDENCY_LIBNCURSES=ncurses-5.9
-$?DEPENDENCY_LIBREADLINE=readline-6.3
-$?DEPENDENCY_LIBSNDFILE=libsndfile-1.0.25
+$?DEPENDENCY_JPEG=jpeg-8c
 $?DEPENDENCY_LIBSDL=SDL-1.2.14
 $?DEPENDENCY_LIBSDLIMAGE=SDL_image-1.2.12
 $?DEPENDENCY_LIBSDLMIXER=SDL_mixer-1.2.12
@@ -45,21 +56,17 @@ $?DEPENDENCY_LIBSDL2IMAGE=SDL2_image-2.0.0
 $?DEPENDENCY_LIBSDL2MIXER=SDL2_mixer-2.0.0
 $?DEPENDENCY_LIBSDL2TTF=SDL2_ttf-2.0.12
 $?DEPENDENCY_LIBTIFF=tiff-4.0.3
-$?DEPENDENCY_LIBTOOL=libtool-2.4.2
 $?DEPENDENCY_LIBVORBIS=libvorbis-1.3.4
 $?DEPENDENCY_LIBWEBP=libwebp-0.4.0
-$?DEPENDENCY_LIBXZ=xz-5.0.5
-$?DEPENDENCY_LIBXML=libxml2-2.9.1
-$?DEPENDENCY_LLVM=llvm-2.9
-$?DEPENDENCY_LLVM_GCC=llvm-gcc-4.2-2.9
-$?DEPENDENCY_MAKE=make-4.0
-$?DEPENDENCY_OPENSSL=openssl-1.0.1i
-$?DEPENDENCY_POLARSSL=polarssl-1.3.8
-$?DEPENDENCY_MCRYPT=libmcrypt-2.5.8
-$?DEPENDENCY_PKG_CFG=pkg-config-0.26
-$?DEPENDENCY_SWIG=swig-3.0.0
+# Dependency Compression
+$?DEPENDENCY_BZIP=bzip2-1.0.6
 $?DEPENDENCY_ZLIB=zlib-1.2.5
-$?DEPENDENCY_DEJAGNU=dejagnu-1.5
+$?DEPENDENCY_XZ=xz-5.0.5
+# Dependency Cryptography 
+$?DEPENDENCY_OPENSSL=openssl-1.0.1i
+$?DEPENDENCY_MCRYPT=libmcrypt-2.5.8
+$?DEPENDENCY_BEECRYPT=beecrypt-4.2.1
+$?DEPENDENCY_NETTLE=nettle-3.0
 
 # ====================================================================================
 # HOST PLATFORM OPTIONS
@@ -369,7 +376,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_GDB).tar.gz
 	tar xf packages/$(DEPENDENCY_JPEG).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBAA).tar.gz
-	tar xf packages/$(DEPENDENCY_LIBBZIP).tar.gz
+	tar xf packages/$(DEPENDENCY_BZIP).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBEIGEN).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBFLAC).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBFREETYPE).tar.gz
@@ -395,12 +402,13 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_LIBTOOL).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBVORBIS).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBWEBP).tar.gz
-	tar xf packages/$(DEPENDENCY_LIBXZ).tar.gz
+	tar xf packages/$(DEPENDENCY_XZ).tar.gz
 	tar xf packages/$(DEPENDENCY_LIBXML).tar.gz
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
-	tar xf packages/$(DEPENDENCY_POLARSSL).tgz
 	tar xf packages/$(DEPENDENCY_MCRYPT).tar.gz
+	tar xf packages/$(DEPENDENCY_BEECRYPT).tar.gz
+	tar xf packages/$(DEPENDENCY_NETTLE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	tar xf packages/$(DEPENDENCY_SWIG).tar.gz
 	unzip -q packages/$(DEPENDENCY_AVMPLUS).zip
@@ -428,7 +436,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_GDB)
 	rm -rf $(DEPENDENCY_JPEG)
 	rm -rf $(DEPENDENCY_LIBAA)
-	rm -rf $(DEPENDENCY_LIBBZIP)
+	rm -rf $(DEPENDENCY_BZIP)
 	rm -rf $(DEPENDENCY_LIBEIGEN)
 	rm -rf eigen-eigen-5097c01bcdc4
 	rm -rf $(DEPENDENCY_LIBFLAC)
@@ -455,12 +463,13 @@ clean_libs:
 	rm -rf $(DEPENDENCY_LIBTOOL)
 	rm -rf $(DEPENDENCY_LIBVORBIS)
 	rm -rf $(DEPENDENCY_LIBWEBP)
-	rm -rf $(DEPENDENCY_LIBXZ)
+	rm -rf $(DEPENDENCY_XZ)
 	rm -rf $(DEPENDENCY_LIBXML)
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_OPENSSL)
-	rm -rf $(DEPENDENCY_POLARSSL)
 	rm -rf $(DEPENDENCY_MCRYPT)
+	rm -rf $(DEPENDENCY_BEECRYPT)
+	rm -rf $(DEPENDENCY_NETTLE)
 	rm -rf $(DEPENDENCY_PKG_CFG)
 	rm -rf $(DEPENDENCY_SWIG)
 	rm -rf $(DEPENDENCY_ZLIB)
@@ -1190,15 +1199,15 @@ zlib:
 
 # BZip data compression (GPL).
 libbzip:
-	cd $(SRCROOT)/$(DEPENDENCY_LIBBZIP) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(MAKE) PREFIX=$(SDK)/usr install
-	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_LIBBZIP)/bzlib.h $(SDK)/usr/include/
-	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_LIBBZIP)/libbz2.a $(SDK)/usr/lib/
+	cd $(SRCROOT)/$(DEPENDENCY_BZIP) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(MAKE) PREFIX=$(SDK)/usr install
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_BZIP)/bzlib.h $(SDK)/usr/include/
+	$(RSYNC) $(SRCROOT)/$(DEPENDENCY_BZIP)/libbz2.a $(SDK)/usr/lib/
 
 # XZ data compression (GPL).
 libxz:
 	rm -rf $(BUILD)/libxz
 	mkdir -p $(BUILD)/libxz
-	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBXZ)/configure \
+	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_XZ)/configure \
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared \
 		--enable-encoders=lzma1,lzma2,delta --enable-decoders=lzma1,lzma2,delta 
 	cd $(BUILD)/libxz && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
@@ -1478,17 +1487,26 @@ libopenssl:
 	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install_sw
 
 # Cryptography library.
-libpolarssl:
-	rm -rf $(BUILD)/libpolarssl
-	mkdir -p $(BUILD)/libpolarssl
-	cd $(BUILD)/libpolarssl && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SDK_CMAKE) -G "Unix Makefiles" \
-		$(SRCROOT)/$(DEPENDENCY_POLARSSL) -DCMAKE_INSTALL_PREFIX="$(SDK)/usr"
-
-# Cryptography library.
 libmcrypt:
 	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./configure \
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
 	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -i install
+
+# Cryptography library.
+libbeecrypt:
+	rm -rf $(BUILD)/libbeecrypt
+	mkdir -p $(BUILD)/libbeecrypt
+	cd $(BUILD)/libbeecrypt && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_BEECRYPT)/configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared --with-curses 
+	cd $(BUILD)/libbeecrypt && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# Cryptography library.
+libnettle:
+	rm -rf $(BUILD)/libnettle
+	mkdir -p $(BUILD)/libnettle
+	cd $(BUILD)/libnettle && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_NETTLE)/configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared --with-curses 
+	cd $(BUILD)/libnettle && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # The GNU Readline library provides a set of functions for use by applications that allow users to edit command lines as they are typed in (GPL). 
 # TODO: add to build chain
