@@ -1476,11 +1476,13 @@ libncurses:
 	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Cryptography library.
+# see: http://wiki.openssl.org/index.php/Compilation_and_Installation#Configure_Options
+# see: https://gist.github.com/steakknife/8247726
 libopenssl:
 	rm -rf $(BUILD)/libopenssl
 	mkdir -p $(BUILD)/libopenssl
 	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./config \
-		no-hw no-asm no-threads no-shared no-dso --prefix=$(SDK)/usr 
+		no-asm no-ssl2 no-ssl3 no-dtls no-shared no-hw no-engines no-threads no-dso no-err no-npn no-psk no-srp no-gost no-ocsp no-sock --prefix=$(SDK)/usr 
 	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) depend 
 	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) build_crypto
 	cd $(SRCROOT)/$(DEPENDENCY_OPENSSL) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) openssl.pc libssl.pc libcrypto.pc 
