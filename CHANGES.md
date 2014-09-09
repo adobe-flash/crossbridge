@@ -45,4 +45,8 @@ CHANGES
 ### 1.0.5
 
 * Updated OpenSSL to v1.0.1i
-* Added Cryptography libraries: MCrypt, BeeCrypt, Nettle
+* Added MCrypt Crypto Lib.
+* Added BeeCrypt Crypto Lib.
+* Added Nettle Crypto Lib.
+* Integrated GLS3D
+* Improved AS3 POSIX Classes (Enhancements related to Garbage Collection)
