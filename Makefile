@@ -270,7 +270,7 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 
 EXTRALIBORDER= zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv libxml2 libvgl libjpeg libpng libgif libtiff libwebp
 EXTRALIBORDER+= libogg libvorbis libflac libsndfile libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image gls3d libphysfs libncurses 
-EXTRALIBORDER+= libopenssl libmcrypt 
+EXTRALIBORDER+= libopenssl libmcrypt libnettle libbeecrypt  
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
 TESTORDER+= test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_symbols  
@@ -349,10 +349,6 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(SDK_MAKE) gls3d
-
-# Development target
-all_dev48:
 	@$(SDK_MAKE) abclibs_compile
 	#@cd samples/05_SWC && $(MAKE)
 	@$(SDK_MAKE) test_hello_cpp
@@ -1471,8 +1467,7 @@ libncurses:
 	mkdir -p $(BUILD)/libncurses
 	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_LIBNCURSES)/configure \
 		--prefix=$(SDK)/usr --host=$(TRIPLE) --enable-static --disable-shared \
-		--disable-pthread --without-shared --without-debug --without-tests \
-		--without-progs --without-dlsym
+		--disable-pthread --without-shared --without-debug --without-tests --without-progs --without-dlsym
 	cd $(BUILD)/libncurses && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Cryptography library.
@@ -1497,7 +1492,8 @@ libbeecrypt:
 	rm -rf $(BUILD)/libbeecrypt
 	mkdir -p $(BUILD)/libbeecrypt
 	cd $(BUILD)/libbeecrypt && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_BEECRYPT)/configure \
-		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared \
+		--without-cplusplus --without-java --without-python
 	cd $(BUILD)/libbeecrypt && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Cryptography library.
