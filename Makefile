@@ -349,6 +349,10 @@ diagnostics:
 
 # Development target
 all_dev:
+	@$(SDK_MAKE) libmcrypt
+
+# Development target
+all_dev48:
 	@$(SDK_MAKE) abclibs_compile
 	#@cd samples/05_SWC && $(MAKE)
 	@$(SDK_MAKE) test_hello_cpp
@@ -418,6 +422,7 @@ install_libs:
 	cp -r ./patches/$(DEPENDENCY_LIBSDL) .
 	#cp -r ./patches/$(DEPENDENCY_LIBSDL2) .
 	cp -r ./patches/$(DEPENDENCY_OPENSSL) .
+	cp -r ./patches/$(DEPENDENCY_MCRYPT) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SWIG) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
@@ -1483,7 +1488,7 @@ libopenssl:
 
 # Cryptography library.
 libmcrypt:
-	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./configure \
+	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ac_cv_func_malloc_0_nonnull=yes ./configure \
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
 	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -i install
 
