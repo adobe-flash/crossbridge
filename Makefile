@@ -514,6 +514,8 @@ base:
 	$(RSYNC) $(SRCROOT)/tools/utils-py/swf-info.py $(SDK)/usr/bin/
 
 	$(MAKE) builtinabcs
+	$(RSYNC) tools/playerglobal/14.0/airglobal.abc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/14.0/airglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) tools/playerglobal/14.0/playerglobal.abc $(SDK)/usr/lib/
 	$(RSYNC) tools/playerglobal/14.0/playerglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
@@ -959,6 +961,7 @@ as3wig:
 	cp -f $(SRCROOT)/tools/aet/AS3Wig.h $(SDK)/usr/include/AS3++/AS3Wig.h
 	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/builtin.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/builtin)
 	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/playerglobal)
+	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/airglobal.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/airglobal)
 	cp -f $(SRCROOT)/tools/aet/AS3Wig.cpp $(BUILD)/as3wig/
 	echo "#include <AS3++/builtin.h>\n" > $(BUILD)/as3wig/AS3WigIncludes.h
 	echo "#include <AS3++/playerglobal.h>\n" >> $(BUILD)/as3wig/AS3WigIncludes.h
@@ -1490,9 +1493,9 @@ libopenssl:
 
 # Cryptography library.
 libmcrypt:
-	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ac_cv_func_malloc_0_nonnull=yes ./configure \
+	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./configure \
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
-	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -i install
+	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Cryptography library.
 libbeecrypt:
