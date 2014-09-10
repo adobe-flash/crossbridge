@@ -65,6 +65,7 @@ $?DEPENDENCY_XZ=xz-5.0.5
 # Dependency Cryptography 
 $?DEPENDENCY_OPENSSL=openssl-1.0.1i
 $?DEPENDENCY_MCRYPT=libmcrypt-2.5.8
+$?DEPENDENCY_MHASH=mhash-0.9.9.9
 $?DEPENDENCY_BEECRYPT=beecrypt-4.2.1
 $?DEPENDENCY_NETTLE=nettle-3.0
 
@@ -349,7 +350,7 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(SDK_MAKE) libmcrypt
+	@$(SDK_MAKE) libmhash
 
 # Development target
 all_dev48:
@@ -407,6 +408,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_MAKE).tar.gz
 	tar xf packages/$(DEPENDENCY_OPENSSL).tar.gz
 	tar xf packages/$(DEPENDENCY_MCRYPT).tar.gz
+	tar xf packages/$(DEPENDENCY_MHASH).tar.gz
 	tar xf packages/$(DEPENDENCY_BEECRYPT).tar.gz
 	tar xf packages/$(DEPENDENCY_NETTLE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
@@ -469,6 +471,7 @@ clean_libs:
 	rm -rf $(DEPENDENCY_MAKE)
 	rm -rf $(DEPENDENCY_OPENSSL)
 	rm -rf $(DEPENDENCY_MCRYPT)
+	rm -rf $(DEPENDENCY_MHASH)
 	rm -rf $(DEPENDENCY_BEECRYPT)
 	rm -rf $(DEPENDENCY_NETTLE)
 	rm -rf $(DEPENDENCY_PKG_CFG)
@@ -1493,6 +1496,12 @@ libmcrypt:
 	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./configure \
 		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
 	cd $(SRCROOT)/$(DEPENDENCY_MCRYPT) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
+
+# Cryptography library.
+libmhash:
+	cd $(SRCROOT)/$(DEPENDENCY_MHASH) && PATH=$(SDK)/usr/bin:$(PATH) CC=$(CC) CXX=$(CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) ./configure \
+		--prefix=$(SDK)/usr --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --enable-static --disable-shared
+	cd $(SRCROOT)/$(DEPENDENCY_MHASH) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
 # Cryptography library.
 libbeecrypt:
