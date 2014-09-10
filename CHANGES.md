@@ -45,9 +45,10 @@ CHANGES
 ### 1.0.5
 
 * Updated OpenSSL to v1.0.1i
-* Added MCrypt Crypto Lib.
-* Added BeeCrypt Crypto Lib.
-* Added Nettle Crypto Lib.
+* Added MCrypt Cryptography Library
+* Added BeeCrypt Cryptography Library
+* Added Nettle Cryptography Library
 * Integrated GLS3D
 * Improved AS3 POSIX Classes (Enhancements related to Garbage Collection)
 * Updated PlayerGlobal to v15.0.0
+* Enabled AIR classes for Flash++ (PlayerPlobal switched to AirGlobal)

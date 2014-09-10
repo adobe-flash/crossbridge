@@ -253,7 +253,7 @@ $?AVMSHELL=$(SDK)/usr/bin/avmshell$(EXEEXT)
 $?FLASCC_VERSION_MAJOR:=1
 $?FLASCC_VERSION_MINOR:=0
 $?FLASCC_VERSION_PATCH:=5
-$?FLASCC_VERSION_BUILD:=0
+$?FLASCC_VERSION_BUILD:=1
 $?SDKNAME=CrossBridge_$(FLASCC_VERSION_MAJOR).$(FLASCC_VERSION_MINOR).$(FLASCC_VERSION_PATCH).$(FLASCC_VERSION_BUILD)
 BUILD_VER_DEFS"-DFLASCC_VERSION_MAJOR=$(FLASCC_VERSION_MAJOR) -DFLASCC_VERSION_MINOR=$(FLASCC_VERSION_MINOR) -DFLASCC_VERSION_PATCH=$(FLASCC_VERSION_PATCH) -DFLASCC_VERSION_BUILD=$(FLASCC_VERSION_BUILD)"
 
@@ -514,8 +514,6 @@ base:
 	$(RSYNC) $(SRCROOT)/tools/utils-py/swf-info.py $(SDK)/usr/bin/
 
 	$(MAKE) builtinabcs
-	$(RSYNC) tools/playerglobal/15.0/airglobal.abc $(SDK)/usr/lib/
-	$(RSYNC) tools/playerglobal/15.0/airglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) tools/playerglobal/15.0/playerglobal.abc $(SDK)/usr/lib/
 	$(RSYNC) tools/playerglobal/15.0/playerglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
@@ -961,7 +959,6 @@ as3wig:
 	cp -f $(SRCROOT)/tools/aet/AS3Wig.h $(SDK)/usr/include/AS3++/AS3Wig.h
 	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/builtin.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/builtin)
 	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/playerglobal.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/playerglobal)
-	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/airglobal.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/airglobal)
 	cp -f $(SRCROOT)/tools/aet/AS3Wig.cpp $(BUILD)/as3wig/
 	echo "#include <AS3++/builtin.h>\n" > $(BUILD)/as3wig/AS3WigIncludes.h
 	echo "#include <AS3++/playerglobal.h>\n" >> $(BUILD)/as3wig/AS3WigIncludes.h
