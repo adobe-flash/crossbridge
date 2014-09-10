@@ -288,6 +288,7 @@ int main(int argc, char **argv)
   static const char *defOutput = "a.out";
   // TODO: option for verbose mode, logging (VPMedia)
   bool targetPlayer = false;
+  bool targetAIR = false;
   bool saveTemps = false;
   FILE *input = NULL;
   FILE *output = NULL;
@@ -314,6 +315,10 @@ int main(int argc, char **argv)
     else if(arg == "--target-player") 
     {
       targetPlayer = true;
+    }
+    else if(arg == "--target-air") 
+    {
+      targetAIR = true;
     }
     else if(arg == "--save-temps") 
     {
@@ -425,6 +430,8 @@ int main(int argc, char **argv)
   jargs.push_back("-import");
   if(targetPlayer)
     jargs.push_back(libPath + "/playerglobal.abc");
+  else if(targetAIR)
+    jargs.push_back(libPath + "/airglobal.abc");
   else
     jargs.push_back(libPath + "/shell_toplevel.abc");
   jargs.push_back("-import");
