@@ -51,4 +51,4 @@ CHANGES
 * Integrated GLS3D
 * Improved AS3 POSIX Classes (Enhancements related to Garbage Collection)
 * Updated PlayerGlobal to v15.0.0
-* Enabled AIR classes for Flash++ (PlayerPlobal switched to AirGlobal)
+* Enabled AIR classes for Flash++ (PlayerGlobal switched to AirGlobal)
