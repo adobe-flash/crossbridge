@@ -50,3 +50,4 @@ CHANGES
 * Added Nettle Crypto Lib.
 * Integrated GLS3D
 * Improved AS3 POSIX Classes (Enhancements related to Garbage Collection)
+* Updated PlayerGlobal to v15.0.0
