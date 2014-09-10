@@ -514,13 +514,13 @@ base:
 	$(RSYNC) $(SRCROOT)/tools/utils-py/swf-info.py $(SDK)/usr/bin/
 
 	$(MAKE) builtinabcs
-	$(RSYNC) tools/playerglobal/14.0/airglobal.abc $(SDK)/usr/lib/
-	$(RSYNC) tools/playerglobal/14.0/airglobal.swc $(SDK)/usr/lib/
-	$(RSYNC) tools/playerglobal/14.0/playerglobal.abc $(SDK)/usr/lib/
-	$(RSYNC) tools/playerglobal/14.0/playerglobal.swc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/15.0/airglobal.abc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/15.0/airglobal.swc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/15.0/playerglobal.abc $(SDK)/usr/lib/
+	$(RSYNC) tools/playerglobal/15.0/playerglobal.swc $(SDK)/usr/lib/
 	$(RSYNC) avm2_env/public-api.txt $(SDK)/
 	rm -rf $(DEPENDENCY_AVMPLUS)/generated/builtin.abc
-	$(RSYNC) tools/playerglobal/14.0/builtin.abc $(DEPENDENCY_AVMPLUS)/generated/
+	$(RSYNC) tools/playerglobal/15.0/builtin.abc $(DEPENDENCY_AVMPLUS)/generated/
 	cp -f $(DEPENDENCY_AVMPLUS)/generated/*.abc $(SDK)/usr/lib/
 
 	$(RSYNC) --exclude '*iconv.h' avm2_env/usr/include/ $(SDK)/usr/include
@@ -646,7 +646,7 @@ abclibs_asdocs:
 	mkdir -p $(BUILD)/logs
 	cd $(BUILDROOT) && $(FLEX_ASDOC) \
 				-load-config= \
-				-external-library-path=$(call nativepath,$(FLEX_SDK_HOME)/frameworks/libs/player/14.0/playerglobal.swc) \
+				-external-library-path=$(call nativepath,$(FLEX_SDK_HOME)/frameworks/libs/player/15.0/playerglobal.swc) \
 				-strict=false -define+=CONFIG::asdocs,true -define+=CONFIG::actual,false -define+=CONFIG::debug,false \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix/vfs) \
 				-doc-sources+=$(call nativepath,$(SRCROOT)/posix) \
