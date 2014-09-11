@@ -46,6 +46,7 @@ CHANGES
 
 * Updated OpenSSL to v1.0.1i
 * Added MCrypt Cryptography Library
+* Added MHash Hashing Library
 * Added BeeCrypt Cryptography Library
 * Added Nettle Cryptography Library
 * Integrated GLS3D
