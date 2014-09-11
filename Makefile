@@ -425,6 +425,7 @@ install_libs:
 	#cp -r ./patches/$(DEPENDENCY_LIBSDL2) .
 	cp -r ./patches/$(DEPENDENCY_OPENSSL) .
 	cp -r ./patches/$(DEPENDENCY_MCRYPT) .
+	cp -r ./patches/$(DEPENDENCY_MHASH) .
 	cp -r ./patches/$(DEPENDENCY_PKG_CFG) .
 	cp -r ./patches/$(DEPENDENCY_SWIG) .
 	cp -r ./patches/$(DEPENDENCY_ZLIB) .
