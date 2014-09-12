@@ -353,7 +353,7 @@ all_dev:
 	@$(SDK_MAKE) libmhash
 
 # Development target
-all_dev48:
+all_dev51:
 	@$(SDK_MAKE) abclibs_compile
 	#@cd samples/05_SWC && $(MAKE)
 	@$(SDK_MAKE) test_hello_cpp

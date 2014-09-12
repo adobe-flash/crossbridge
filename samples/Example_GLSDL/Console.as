@@ -70,7 +70,7 @@ package com.adobe.flascc
     private var rendered:Boolean = false;
     private var datazip:URLLoader;
     private var inited:Boolean = false
-    private const emptyVec:Vector.<int> = new Vector.<int>()
+    //private const emptyVec:Vector.<int> = new Vector.<int>()
 
     /**
     * To Support the preloader case you might want to have the Console
@@ -342,7 +342,7 @@ package com.adobe.flascc
       CModule.write32(vgl_my, my);
       CModule.write32(vgl_buttons, button);
 
-      CModule.callI(mainloopTickPtr, emptyVec);
+      CModule.callI(mainloopTickPtr);
 
       GLAPI.instance.context.present();
       GLAPI.instance.context.clear(1.0,0.0,0.0);

@@ -146,7 +146,7 @@ public class CModule
   /**
   * @private
   */
-  static protected var weakResolvers:Vector.<Function> = new Vector.<Function>;
+  protected static var weakResolvers:Vector.<Function> = new Vector.<Function>;
 
   /**
   * @private
@@ -366,7 +366,7 @@ public class CModule
   /**
   * @private
   */
-  static protected var text:int = int(0xf0000000); // 3.75G (don't clash w/ real data)
+  protected static var text:int = int(0xf0000000); // 3.75G (don't clash w/ real data)
 
   /**
   * allocate a region in "text" space (i.e., code space)
@@ -582,9 +582,12 @@ public class CModule
   */
   public static function malloc(size:int):int
   {
-    var args:Vector.<int> = new Vector.<int>;
+    /*var args:Vector.<int> = new Vector.<int>;
     args.push(size);
-    return callI(_malloc, args);
+    return callI(_malloc, args);*/
+    callIArgs.length = 0;
+    callIArgs.push(size);
+    return callI(_malloc, callIArgs);
   }
 
   /**
@@ -594,9 +597,12 @@ public class CModule
   */
   public static function free(ptr:int):void
   {
-    var args:Vector.<int> = new Vector.<int>;
+    /*var args:Vector.<int> = new Vector.<int>;
     args.push(ptr);
-    callI(_free, args);
+    callI(_free, args);*/
+    callIArgs.length = 0;
+    callIArgs.push(ptr);
+    callI(_free, callIArgs);
   }
 
   /**
@@ -711,8 +717,9 @@ public class CModule
       scratchBA.length = 0x1000;
     return ptr;
   }
+
   /**
-  * @private
+  * TBD
   */
   public static function allocaString(s:String):int
   {
@@ -727,8 +734,9 @@ public class CModule
       scratchBA.length = 0x1000;
     return ptr;
   }
+
   /**
-  * @private
+  * Mallocs a Latin1 String
   */
   public static function mallocLatin1String(s:String):int
   {
@@ -739,8 +747,9 @@ public class CModule
     ram_init[ptr+length] = 0;
     return ptr;
   }
+
   /**
-  * @private
+  * Allocas a Latin1 String
   */
   public static function allocaLatin1String(s:String):int
   {
@@ -753,7 +762,7 @@ public class CModule
   }
 
   /**
-  * @private
+  * Registers a function by pointer
   */
   public static function regFun(ptr:int, f:Function):void
   {
@@ -764,11 +773,16 @@ public class CModule
     ptr2fun_init[ptr] = f;
   }
 
+    /**
+     * @private
+     */
+  private static const callIArgs:Vector.<int> = new Vector.<int>();
+
   /**
   * Low level API for calling a C/C++ function from Actionscript, returning a 32-bit value
   * @param functionPtr The address of the function. You can find the address of a C/C++
   *            function by passing the name of the function to <code>getPublicSym</code>.
-  * @param args A Vector containing 32-bit values to pass on the stack to
+  * @param args An optional vector containing 32-bit values to pass on the stack to
   *             the function. These could either be primitive integer data, or pointers.
   *             To pass more complex data types (including AS3 types) you should use the
   *             function annotation syntax explained in the interop tutorial to give the
@@ -781,9 +795,12 @@ public class CModule
   *         types you should annotate the function as explained in the interop tutorial
   *         to give the function a more natural signature and return type.
   */
-  public static function callI(functionPtr:int, args:Vector.<int>, stack:int = 0, preserveStack:Boolean = false):int
+  public static function callI(functionPtr:int, args:Vector.<int> = null, stack:int = 0, preserveStack:Boolean = false):int
   {
     var esp:int = ESP;
+
+    // get argument length
+    var argsLength:int = args ? args.length : 0;
 
     try
     {
@@ -794,11 +811,11 @@ public class CModule
       // align stack
       ESP = int(ESP / stackAlign) * stackAlign;
       // align for args
-      var argAlign:int = (stackAlign - ((args.length * 4) % stackAlign)) % stackAlign;
+      var argAlign:int = (stackAlign - ((argsLength * 4) % stackAlign)) % stackAlign;
 
       ESP -= argAlign;
 
-      for(var i:int = args.length-1; i >= 0; i--)
+      for(var i:int = argsLength-1; i >= 0; i--)
         push32(args[i]);
 
       (ptr2fun_init[functionPtr])();
@@ -828,7 +845,7 @@ public class CModule
   *         types you should annotate the function as explained in the interop tutorial
   *         to give the function a more natural signature and return type.
   */
-  public static function callN(functionPtr:int, args:Vector.<int>, stack:int = 0, preserveStack:Boolean = false):Number
+  public static function callN(functionPtr:int, args:Vector.<int> = null, stack:int = 0, preserveStack:Boolean = false):Number
   {
     callI(functionPtr, args, stack);
     return st0;
@@ -837,8 +854,11 @@ public class CModule
   /**
   * @private
   */
-  static protected const modules:Vector.<CModule> = new Vector.<CModule>;
+  protected static const modules:Vector.<CModule> = new Vector.<CModule>;
 
+    /**
+     * @private
+     */
   private static var seenModuleInit:Boolean;
 
   /**
@@ -876,12 +896,36 @@ public class CModule
   //----------------------------------
   //  CModule instance properties
   //----------------------------------  
-
-  private var sections:Object; // section map
-  private var init:Function; // initialization function to force the module to init
-  private var script:Object; // global/script object for this module
+    /**
+     * @private
+     *
+     * section map
+     */
+  private var sections:Object;
+    /**
+     * @private
+     *
+     * initialization function to force the module to init
+     */
+  private var init:Function;
+    /**
+     * @private
+     *
+     * global/script object for this module
+     */
+  private var script:Object;
+    /**
+     * @private
+     */
   private var modSyms:Array;
+    /**
+     * @private
+     */
   private var modPackage:String;
+
+    /**
+     * @private
+     */
   private var fixups:Vector.<int>;
 
   /**
@@ -1255,7 +1299,7 @@ public class CModule
     if(ctorsSect)
     {
       var size:int = ctorsSect[1];
-      var args:Vector.<int> = new Vector.<int>;
+      //var args:Vector.<int> = new Vector.<int>;
 
       if(size)
         getScript(); // ensure module is initialized
@@ -1264,7 +1308,7 @@ public class CModule
         var fun:int = read32(p);
 
         if(fun)
-          callI(fun, args);
+          callI(fun);
       }
     }
   }
@@ -1279,7 +1323,7 @@ public class CModule
     {
       var size:int = dtorsSect[1];
       var p:int = dtorsSect[0];
-      var args:Vector.<int> = new Vector.<int>;
+      //var args:Vector.<int> = new Vector.<int>;
 
       if(size)
         getScript(); // ensure module is initialized
@@ -1288,7 +1332,7 @@ public class CModule
         var fun:int = read32(p);
 
         if(fun)
-          callI(fun, args);
+          callI(fun);
       }
     }
   }
@@ -1464,14 +1508,11 @@ public class CModule
   * This method services any pending uiThunk requests that background threads
   * have queued up. A good place to call this would be in the <code>enterFrame</code> handler.
   */
-  private static var uiArgs:Vector.<int> = new Vector.<int>;
   public static function serviceUIRequests():void
   {
     var fun:int = read32(_flascc_uiTickProc);
-    // TODO: Do we need to create a new vector on each call (per frame) or can be pooled. [VPMedia]
     if(fun) {
-      uiArgs.length = 0;
-      callI(fun, uiArgs); // after
+      callI(fun); // after
       //callI(fun, new <int>[]); // before
     }
   }
