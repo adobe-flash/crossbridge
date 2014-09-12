@@ -1507,8 +1507,9 @@ public class CModule
   /**
   * This method services any pending uiThunk requests that background threads
   * have queued up. A good place to call this would be in the <code>enterFrame</code> handler.
+  * Update: you can attach your dispatchers directly into this handler since the optional event arg.
   */
-  public static function serviceUIRequests():void
+  public static function serviceUIRequests(event:Object = null):void
   {
     var fun:int = read32(_flascc_uiTickProc);
     if(fun) {

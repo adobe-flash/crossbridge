@@ -123,7 +123,7 @@ public class Console extends Sprite implements ISpecialFile {
         // remove event listener
         removeEventListener(Event.ADDED_TO_STAGE, init);
         // attach event listeners
-        addEventListener(Event.ENTER_FRAME, enterFrame, false, 0, true);
+        addEventListener(Event.ENTER_FRAME, CModule.serviceUIRequests, false, 0, true);
         addEventListener(Event.REMOVED_FROM_STAGE, dispose, false, 0, true);
     }
 
@@ -133,9 +133,16 @@ public class Console extends Sprite implements ISpecialFile {
     public function dispose(event:Event = null):void {
         removeEventListener(Event.ADDED_TO_STAGE, init);
         removeEventListener(Event.REMOVED_FROM_STAGE, dispose);
-        removeEventListener(Event.ENTER_FRAME, enterFrame);
+        removeEventListener(Event.ENTER_FRAME, CModule.serviceUIRequests);
         inputContainer = null;
         _tf = null;
+    }
+
+    /**
+     * Switches default console logging behaviour (text field output)
+     */
+    public function switchConsole(isEnabled:Boolean):void {
+        enableConsole = isEnabled;
     }
 
     /**
@@ -152,7 +159,6 @@ public class Console extends Sprite implements ISpecialFile {
         CONFIG::debug {
             trace("Console::exit: " + code);
         }
-
         // default to unhandled
         if (exitHook != null)
             return exitHook(code);
@@ -219,7 +225,8 @@ public class Console extends Sprite implements ISpecialFile {
      * here by calling <code>CModule.serviceUIRequests()</code> (see CModule ASdocs for more information on the UI thunking functionality).
      */
     protected function enterFrame(e:Event):void {
-        CModule.serviceUIRequests();
+        throw new Error("Deprecated, you should attach your listener directly into CModule.serviceUIRequests() or make your own handler.");
+        //CModule.serviceUIRequests();
     }
 
     /**
