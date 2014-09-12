@@ -772,7 +772,7 @@ public class CModule
   *             the function. These could either be primitive integer data, or pointers.
   *             To pass more complex data types (including AS3 types) you should use the
   *             function annotation syntax explained in the interop tutorial to give the
-  *             function a mopre natural AS3 function signature.
+  *             function a more natural AS3 function signature.
   * @param stack An optional pointer to the base of the stack. A value of 0 means use the
   *              current ESP.
   * @param preserveStack Indicates whether the stack pointer should unwind back to the value it was
@@ -1464,12 +1464,16 @@ public class CModule
   * This method services any pending uiThunk requests that background threads
   * have queued up. A good place to call this would be in the <code>enterFrame</code> handler.
   */
+  private static var uiArgs:Vector.<int> = new Vector.<int>;
   public static function serviceUIRequests():void
   {
     var fun:int = read32(_flascc_uiTickProc);
-
-    if(fun)
-      callI(fun, new <int>[]);
+    // TODO: Do we need to create a new vector on each call (per frame) or can be pooled. [VPMedia]
+    if(fun) {
+      uiArgs.length = 0;
+      callI(fun, uiArgs); // after
+      //callI(fun, new <int>[]); // before
+    }
   }
 
   /**
@@ -1480,16 +1484,22 @@ public class CModule
   * @param preserveStack Indicates whether the C stack should be preserved after the call to <code>__start1</code>. If this is set to false the stack depth will return to the value when start() was called upon return.
   * @return The exit code of the C application
   */
-  public static function start(console:Object, args:Vector.<String>, env:Vector.<String>, preserveStack:Boolean = true):int
+  public static function start(console:Object, args:Vector.<String> = null, env:Vector.<String> = null, preserveStack:Boolean = true):int
   {
     CONFIG::debug { 
-    trace("CModule::start"); 
-    trace("\t", "console:", console);
-    trace("\t", "args:", args);
-    trace("\t", "env:", env);
-    trace("\t", "preserveStack:", preserveStack);
+        trace("CModule::start"); 
+        trace("\t", "console:", console);
+        trace("\t", "args:", args);
+        trace("\t", "env:", env);
+        trace("\t", "preserveStack:", preserveStack);
     }
-    
+    // set to defaults
+    if(!args)
+      args = new Vector.<String>();
+    // set to defaults      
+    if(!env)
+      env = new Vector.<String>();
+    // check for existing console    
     if(console)
     {
       if(activeConsole)
