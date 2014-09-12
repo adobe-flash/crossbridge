@@ -19,4 +19,5 @@ Examples:
 * [NeverBall](http://www.vpmedia.hu/crossbridge/neverball)
 * [GLSDL](http://www.vpmedia.hu/crossbridge/glsdl)
 * [StarlingFilters](http://www.vpmedia.hu/crossbridge/starlingfilters)
+* [QREncode](http://www.vpmedia.hu/crossbridge/qrencode)
 * [OpenGL](http://www.cmodule.org/nehe)
