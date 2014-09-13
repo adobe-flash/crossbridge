@@ -270,7 +270,7 @@ $?BMAKE=AR='/usr/bin/true ||' GENCAT=/usr/bin/true RANLIB=/usr/bin/true CC="$(SD
 # ====================================================================================
 
 EXTRALIBORDER= zlib libbzip libxz libeigen dmalloc libffi libgmp libiconv libxml2 libvgl libjpeg libpng libgif libtiff libwebp
-EXTRALIBORDER+= libogg libvorbis libflac libsndfile libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image gls3d libphysfs libncurses 
+EXTRALIBORDER+= libogg libvorbis libflac libsndfile libsdl libfreetype libsdl_ttf libsdl_mixer libsdl_image gls3d freeglut libphysfs libncurses 
 EXTRALIBORDER+= libopenssl libmcrypt libmhash libnettle libbeecrypt  
 
 TESTORDER= test_hello_c test_hello_cpp test_pthreads_c_shell test_pthreads_cpp_swf test_posix 
@@ -1165,6 +1165,13 @@ gls3d:
 	mkdir -p $(BUILD)/gls3d
 	$(RSYNC) $(SRCROOT)/tools/gls3d/ $(BUILD)/gls3d
 	cd $(BUILD)/gls3d && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE)
+
+# Freeglut, the Free openGL Utility Toolkit.
+freeglut:
+	rm -rf $(BUILD)/freeglut
+	mkdir -p $(BUILD)/freeglut
+	$(RSYNC) $(SRCROOT)/tools/freeglut/ $(BUILD)/freeglut
+	cd $(BUILD)/freeglut && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE)
 
 # Converts GLSL Shaders to Stage3D AGAL format
 # About 'peflags' see: http://www.cygwin.com/cygwin-ug-net/setup-maxmem.html

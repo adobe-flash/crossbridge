@@ -26,6 +26,32 @@
 # =END MIT LICENSE
 #
 
+# Detect host 
+$?UNAME=$(shell uname -s)
+#$(info $(UNAME))
+ifneq (,$(findstring CYGWIN,$(UNAME)))
+	$?nativepath=$(shell cygpath -at mixed $(1))
+	$?unixpath=$(shell cygpath -at unix $(1))
+else
+	$?nativepath=$(abspath $(1))
+	$?unixpath=$(abspath $(1))
+endif
+
+# CrossBridge SDK Home
+ifneq "$(wildcard $(call unixpath,$(FLASCC_ROOT)/sdk))" ""
+ $?FLASCC:=$(call unixpath,$(FLASCC_ROOT)/sdk)
+else
+ $?FLASCC:=/path/to/crossbridge-sdk/
+endif
+$?ASC2=java -jar $(call nativepath,$(FLASCC)/usr/lib/asc2.jar) -merge -md -parallel
+ 
+# Auto Detect AIR/Flex SDKs
+ifneq "$(wildcard $(AIR_HOME)/lib/compiler.jar)" ""
+ $?FLEX=$(AIR_HOME)
+else
+ $?FLEX:=/path/to/adobe-air-sdk/
+endif
+
 .PHONY: clean all
 
 SRC=$(wildcard src/*.c)
@@ -56,8 +82,6 @@ compile: $(OBJS)
 	@echo "Compiling $<"
 	@$(FLASCC)/usr/bin/gcc -DHAVE_GETTIMEOFDAY -DHAVE_ERRNO_H -DHAVE_LIMITS_H -DHAVE_VFPRINTF -DHAVE_UNISTD_H -O4 -c \
 		-I$(FLASCC)/usr/include/ -Iinstall/usr/include/ $< -o $@
-
-include ../Makefile.common
 
 clean:
 	rm -f src/*.o
