@@ -350,7 +350,7 @@ diagnostics:
 
 # Development target
 all_dev:
-	@$(SDK_MAKE) libmhash
+	@$(SDK_MAKE) freeglut
 
 # Development target
 all_dev51:
