@@ -70,11 +70,15 @@ AS3COMP=$(ASC2) -AS3 -optimize \
 	-import $(call nativepath,$(FLASCC)/usr/lib/libGL.abc)
 
 all:
+# Init
 	@mkdir -p install/usr/lib
-	
-	@echo "Compiling libglut.o"
+# Compile
 	make compile
+# Assemble
 	@$(FLASCC)/usr/bin/ar crus install/usr/lib/libglut.a src/*.o
+# Install
+	@cp -r install/usr/include $(FLASCC)/usr/
+	@cp -r install/usr/lib $(FLASCC)/usr/
 
 compile: $(OBJS)
 
