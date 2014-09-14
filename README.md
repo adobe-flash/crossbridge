@@ -20,5 +20,7 @@ Examples:
 * [GLSDL](http://www.vpmedia.hu/crossbridge/glsdl)
 * [StarlingFilters](http://www.vpmedia.hu/crossbridge/starlingfilters)
 * [QREncode](http://www.vpmedia.hu/crossbridge/qrencode)
+* [LUA](http://www.vpmedia.hu/crossbridge/lua)
 * [LUA with Starling](http://www.vpmedia.hu/crossbridge/luastarling)
+* [LiquidFun](http://www.vpmedia.hu/crossbridge/liquidfun)
 * [OpenGL](http://www.cmodule.org/nehe)

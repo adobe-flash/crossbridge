@@ -413,7 +413,7 @@ install_libs:
 	tar xf packages/$(DEPENDENCY_NETTLE).tar.gz
 	tar xf packages/$(DEPENDENCY_PKG_CFG).tar.gz
 	tar xf packages/$(DEPENDENCY_SWIG).tar.gz
-	unzip -q packages/$(DEPENDENCY_AVMPLUS).zip
+	unzip -q -u packages/$(DEPENDENCY_AVMPLUS).zip
 	tar xf packages/$(DEPENDENCY_ZLIB).tar.gz
 	# apply patches
 	cp -r ./patches/$(DEPENDENCY_DEJAGNU) .
@@ -1164,14 +1164,14 @@ gls3d:
 	rm -rf $(BUILD)/gls3d
 	mkdir -p $(BUILD)/gls3d
 	$(RSYNC) $(SRCROOT)/tools/gls3d/ $(BUILD)/gls3d
-	cd $(BUILD)/gls3d && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE)
+	cd $(BUILD)/gls3d && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) FLASCC=$(SDK)
 
 # Freeglut, the Free openGL Utility Toolkit.
 freeglut:
 	rm -rf $(BUILD)/freeglut
 	mkdir -p $(BUILD)/freeglut
 	$(RSYNC) $(SRCROOT)/tools/freeglut/ $(BUILD)/freeglut
-	cd $(BUILD)/freeglut && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE)
+	cd $(BUILD)/freeglut && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) FLASCC=$(SDK)
 
 # Converts GLSL Shaders to Stage3D AGAL format
 # About 'peflags' see: http://www.cygwin.com/cygwin-ug-net/setup-maxmem.html
