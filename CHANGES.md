@@ -12,43 +12,36 @@ CHANGES
 
 ## Community Releases
 
-### 1.0.2 
+### 15.0.0 
 
-* Updated BMake from VCS
-* Updated CMake to v2.8.12.2
-* Updated Make to v4.0
-* Updated SWIG to v3.0.0
-* Updated PlayerGlobal to v13.0.0
-* Updated libraries
-* Merged libraries from https://github.com/alexmac/alcextra
-* Merged examples from https://github.com/alexmac/alcexamples
-* Improved cross-platform compatibility of sources
-* Created SourceForge project: http://sourceforge.net/projects/crossbridge-community/
-
-### 1.0.3
-
-* Updated PlayerGlobal to v14.0.0
-* Updated ASC2 Compiler to v14.0.0
+* Aligned version scheme to Adobe AIR SDK
+* Added LibOpenSSL v1.0.1i
+* Added LibXML2
+* Added MCrypt Cryptography library
+* Added MHash Hashing library
+* Added BeeCrypt Cryptography library
+* Added Nettle Cryptography library
+* Added GLS3D library
 * Deprecated ObjectiveC support
 * Deprecated Legacy ASC support
-* Enabled ASC2 parallel compilation
-* Improved AS3 logging for threads
-
-### 1.0.4
-
-* Updated AVMPlus from https://github.com/adobe-flash/avmplus
-* Added LibOpenSSL
-* Added LibXML2
+* Updated BMake from VCS
 * Updated CMake to v3.0.0
-* Moved Examples to https://github.com/crossbridge-community
-
-### 1.0.5
-
-* Updated OpenSSL to v1.0.1i
-* Added MCrypt Cryptography Library
-* Added MHash Hashing Library
-* Added BeeCrypt Cryptography Library
-* Added Nettle Cryptography Library
-* Integrated GLS3D
-* Improved performance
+* Updated Make to v4.0
+* Updated SWIG to v3.0.0
+* Updated 3rd party libraries
 * Updated PlayerGlobal to v15.0.0
+* Updated ASC2 Compiler to v14.0.0
+* Updated AVMPlus from https://github.com/adobe-flash/avmplus
+* Merged libraries from https://github.com/alexmac/alcextra
+* Merged examples from https://github.com/alexmac/alcexamples
+* Moved Examples to https://github.com/crossbridge-community
+* Migrated SourceForge project: http://sourceforge.net/projects/crossbridge-community/
+* Minor bug fixes
+* Improved ASC2 compilation
+* Improved cross-platform compatibility of sources
+* Improved AS3 CModule logging
+* Improved AS3 CModule performance
+
+### 16.0.0
+
+TBA
