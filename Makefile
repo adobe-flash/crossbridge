@@ -169,7 +169,8 @@ $?RSYNC=rsync -az --no-p --no-g --chmod=ugo=rwX -l
 $?NATIVE_AR=ar
 # java tool
 $?JAVA=$(call nativepath,$(shell which java))
-$?JAVACOPTS=-target 1.7
+$?JAVAC=$(call nativepath,$(shell which javac))
+$?JAVACOPTS=-source 1.6 -target 1.6 -Xlint:-options 
 # python tool
 $?PYTHON=$(call nativepath,$(shell which python))
 # Target Tools
@@ -278,7 +279,7 @@ TESTORDER+= test_sjlj test_sjlj_opt test_eh test_eh_opt test_as3interop test_sym
 #TESTORDER+= gcctests swigtests llvmtests checkasm 
 
 BUILDORDER= cmake abclibs  
-BUILDORDER+= uname noenv avm2-as alctool alcdb
+BUILDORDER+= uname noenv avm2-as alctool alcdb alcwig
 BUILDORDER+= llvm binutils plugins gcc bmake 
 BUILDORDER+= csu libc libthr libm libBlocksRuntime
 BUILDORDER+= gcclibs as3wig abcflashpp abcstdlibs_more
@@ -694,7 +695,7 @@ alctool:
 	cp -f $(SRCROOT)/tools/lib-air/legacy/*.jar $(SDK)/usr/lib/
 	cp -f $(SRCROOT)/tools/aet/*.java $(BUILD)/alctool/flascc/.
 	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/alctool/flascc/.
-	cd $(BUILD)/alctool && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib-air/compiler.jar)
+	cd $(BUILD)/alctool && $(JAVAC) $(JAVACOPTS) flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib-air/compiler.jar)
 	cd $(BUILD)/alctool && echo "Main-Class: flascc.AlcTool" > MANIFEST.MF
 	cd $(BUILD)/alctool && echo "Class-Path: compiler.jar" >> MANIFEST.MF
 	cd $(BUILD)/alctool && jar cmf MANIFEST.MF alctool.jar flascc/*.class
@@ -706,11 +707,23 @@ alcdb:
 	mkdir -p $(BUILD)/alcdb/flascc
 	cp -f $(SRCROOT)/tools/alcdb/*.java $(BUILD)/alcdb/flascc/.
 	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/alcdb/flascc/.
-	cd $(BUILD)/alcdb && javac flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib-air/legacy/fdb.jar)
+	cd $(BUILD)/alcdb && $(JAVAC) $(JAVACOPTS) flascc/*.java -cp $(call nativepath,$(SRCROOT)/tools/lib-air/legacy/fdb.jar)
 	cd $(BUILD)/alcdb && echo "Main-Class: flascc.AlcDB" > MANIFEST.MF
 	cd $(BUILD)/alcdb && echo "Class-Path: fdb.jar" >> MANIFEST.MF
 	cd $(BUILD)/alcdb && jar cmf MANIFEST.MF alcdb.jar flascc/*.class 
 	cp $(BUILD)/alcdb/alcdb.jar $(SDK)/usr/lib/.
+
+# Assemble Debugger Tool
+alcwig:
+	rm -rf $(BUILD)/alcwig
+	mkdir -p $(BUILD)/alcwig/flascc/
+	cp -f $(SRCROOT)/tools/aet/AS3Wig.java $(BUILD)/alcwig/flascc/.
+	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/alcwig/flascc/.
+	cd $(BUILD)/alcwig && $(JAVAC) $(JAVACOPTS) flascc/*.java -cp $(call nativepath,$(SDK)/usr/lib/compiler.jar)
+	cd $(BUILD)/alcwig && echo "Main-Class: flascc.AS3Wig" > MANIFEST.MF
+	cd $(BUILD)/alcwig && echo "Class-Path: compiler.jar" >> MANIFEST.MF
+	cd $(BUILD)/alcwig && jar cmf MANIFEST.MF as3wig.jar flascc/*.class
+	cp $(BUILD)/alcwig/as3wig.jar $(SDK)/usr/lib/.
 
 # ====================================================================================
 # LLVM
@@ -953,14 +966,15 @@ gcclibs:
 # TBD
 as3wig:
 	rm -rf $(BUILD)/as3wig
-	mkdir -p $(BUILD)/as3wig/flascc
-	cp -f $(SRCROOT)/tools/aet/AS3Wig.java $(BUILD)/as3wig/flascc/.
-	cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/as3wig/flascc/.
-	cd $(BUILD)/as3wig && javac flascc/*.java -cp $(call nativepath,$(SDK)/usr/lib/compiler.jar)
-	cd $(BUILD)/as3wig && echo "Main-Class: flascc.AS3Wig" > MANIFEST.MF
-	cd $(BUILD)/as3wig && echo "Class-Path: compiler.jar" >> MANIFEST.MF
-	cd $(BUILD)/as3wig && jar cmf MANIFEST.MF as3wig.jar flascc/*.class
-	cp $(BUILD)/as3wig/as3wig.jar $(SDK)/usr/lib/.
+	mkdir -p $(BUILD)/as3wig
+	#mkdir -p $(BUILD)/as3wig/flascc
+	#cp -f $(SRCROOT)/tools/aet/AS3Wig.java $(BUILD)/as3wig/flascc/.
+	#cp -f $(SRCROOT)/tools/common/java/flascc/*.java $(BUILD)/as3wig/flascc/.
+	#cd $(BUILD)/as3wig && $(JAVAC) $(JAVACOPTS) flascc/*.java -cp $(call nativepath,$(SDK)/usr/lib/compiler.jar)
+	#cd $(BUILD)/as3wig && echo "Main-Class: flascc.AS3Wig" > MANIFEST.MF
+	#cd $(BUILD)/as3wig && echo "Class-Path: compiler.jar" >> MANIFEST.MF
+	#cd $(BUILD)/as3wig && jar cmf MANIFEST.MF as3wig.jar flascc/*.class
+	#cp $(BUILD)/as3wig/as3wig.jar $(SDK)/usr/lib/.
 	mkdir -p $(SDK)/usr/include/AS3++/
 	cp -f $(SRCROOT)/tools/aet/AS3Wig.h $(SDK)/usr/include/AS3++/AS3Wig.h
 	java -jar $(call nativepath,$(SDK)/usr/lib/as3wig.jar) -builtins -i $(call nativepath,$(SDK)/usr/lib/builtin.abc) -o $(call nativepath,$(SDK)/usr/include/AS3++/builtin)
