@@ -97,7 +97,10 @@ export CC:=$(CC)
 export CXX:=$(CXX)
 $?DBGOPTS=
 $?ABCLIBOPTS=-config CONFIG::asdocs=false -config CONFIG::actual=true
+# Common Flags
 $?LIBHELPEROPTFLAGS=-O3
+$?CFLAGS=-O4
+$?CXXFLAGS=-O4
 
 # ====================================================================================
 # TARGET PLATFORM OPTIONS
@@ -285,7 +288,7 @@ diagnostics:
 
 # Development
 all_dev:
-	@$(SDK)/usr/bin/make dmalloc
+	@$(SDK)/usr/bin/make swig
 
 # ====================================================================================
 # CORE
@@ -715,7 +718,7 @@ libm:
 	cd $(BUILD)/libmbc && $(SDK)/usr/bin/ar x $(BUILD)/msun/msun/libm.a
 	cd $(BUILD)/libmbc && $(SDK)/usr/bin/llvm-link -o $(BUILD)/libmbc/libm.o $(BUILD)/libcompiler_rt.o *.o
 	cp -f $(BUILD)/libmbc/libm.o $(SDK)/usr/lib/libm.o
-	$(SDK)/usr/bin/opt -O3 -o $(SDK)/usr/lib/libm.o $(BUILD)/libmbc/libm.o
+	$(SDK)/usr/bin/opt $(LIBHELPEROPTFLAGS) -o $(SDK)/usr/lib/libm.o $(BUILD)/libmbc/libm.o
 	$(SDK)/usr/bin/nm $(SDK)/usr/lib/libm.o | grep "T _" | sed 's/_//' | awk '{print $$3}' | sort | uniq > $(BUILD)/libm.bc.txt
 
 # Math
@@ -914,7 +917,7 @@ trd:
 zlib:
 	rm -rf $(BUILD)/zlib
 	cp -r $(SRCROOT)/$(DEPENDENCY_ZLIB) $(BUILD)/zlib
-	cd $(BUILD)/zlib && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libz.a CFLAGS=-O4 CXXFLAGS=-O4 SFLAGS=-O4
+	cd $(BUILD)/zlib && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libz.a CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) SFLAGS=-O4
 	$(RSYNC) $(BUILD)/zlib/zlib.h $(SDK)/usr/include/
 	$(RSYNC) $(BUILD)/zlib/libz.a $(SDK)/usr/lib/
 
@@ -929,7 +932,7 @@ libvgl:
 libjpeg:
 	rm -rf $(BUILD)/libjpeg
 	mkdir -p $(BUILD)/libjpeg
-	cd $(BUILD)/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/$(DEPENDENCY_JPEG)/configure \
+	cd $(BUILD)/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_JPEG)/configure \
 		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
 	cd $(BUILD)/libjpeg && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) -j$(THREADS) libjpeg.la && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) install-libLTLIBRARIES install-includeHEADERS
 	cp -f $(BUILD)/libjpeg/jconfig.h $(SDK)/usr/include/
@@ -944,7 +947,7 @@ libjpeg:
 libpng:
 	rm -rf $(BUILD)/libpng
 	mkdir -p $(BUILD)/libpng
-	cd $(BUILD)/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/libpng-1.5.7/configure \
+	cd $(BUILD)/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/libpng-1.5.7/configure \
 		--prefix=$(SDK)/usr --disable-shared --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE) --disable-dependency-tracking
 	cd $(BUILD)/libpng && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j$(THREADS) && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 	rm -f $(SDK)/usr/bin/libpng-config
@@ -956,7 +959,7 @@ libpng:
 libsdl:
 	rm -rf $(BUILD)/libsdl
 	mkdir -p $(BUILD)/libsdl
-	cd $(BUILD)/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-O4 CXXFLAGS=-O4 $(SRCROOT)/$(DEPENDENCY_SDL)/configure \
+	cd $(BUILD)/libsdl && PATH='$(SDK)/usr/bin:$(PATH)' CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_SDL)/configure \
 		--host=$(TRIPLE) --prefix=$(SDK)/usr --disable-pthreads --disable-alsa --disable-video-x11 \
 		--disable-cdrom --disable-loadso --disable-assembly --disable-esd --disable-arts --disable-nas \
 		--disable-nasm --disable-altivec --disable-dga --disable-screensaver --disable-sdl-dlopen \
@@ -976,7 +979,7 @@ libsdl-install:
 dmalloc:
 	rm -rf $(BUILD)/dmalloc
 	mkdir -p $(BUILD)/dmalloc
-	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CFLAGS=" -O3 " CXXFLAGS=" -O3 " CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_DMALLOC)/configure \
+	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_DMALLOC)/configure \
 		--prefix=$(SDK)/usr --disable-shared --enable-static --build=$(BUILD_TRIPLE) --host=$(TRIPLE) --target=$(TRIPLE)
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j1 threads cxx
 	cd $(BUILD)/dmalloc && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) -j1 installcxx installth
@@ -997,7 +1000,7 @@ libfficheck:
 # TBD
 libiconv:
 	mkdir -p $(BUILD)/libiconv
-	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) CFLAGS=" -O3 " CXXFLAGS=" -O3 " CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_ICONV)/configure \
+	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_ICONV)/configure \
 		--prefix=$(SDK)/usr
 	cd $(BUILD)/libiconv && PATH=$(SDK)/usr/bin:$(PATH) $(MAKE) install
 
@@ -1072,7 +1075,7 @@ SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/include -I$(BUILD)/llvm-debug/in
 SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/include -I$(BUILD)/llvm-debug/tools/clang/include
 SWIG_CXXFLAGS+= -I$(SRCROOT)/$(DEPENDENCY_LLVM)/tools/clang/lib
 SWIG_CXXFLAGS+= -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -fno-rtti -Wno-long-long 
-#SWIG_CXXFLAGS+= -g
+SWIG_CXXFLAGS+= -O0 -g
 
 # SWIG Phase 1
 swig-clean:
@@ -1082,26 +1085,26 @@ swig-clean:
 # SWIG Phase 2
 swig-pcre:
 	cp -f packages/$(DEPENDENCY_SWIG_PCRE).tar.gz $(BUILD)/swig
-	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh \
+	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(SRCROOT)/$(DEPENDENCY_SWIG)/Tools/pcre-build.sh \
 		--build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
 
 # SWIG Phase 3
 swig-configure:
-	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=-g LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" CXXFLAGS="$(SWIG_CXXFLAGS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure \
+	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS="$(SWIG_CXXFLAGS)" CXXFLAGS="$(SWIG_CXXFLAGS)" LDFLAGS="$(SWIG_LDFLAGS)" LIBS="$(SWIG_LIBS)" $(SRCROOT)/$(DEPENDENCY_SWIG)/configure \
 		--prefix=$(SDK)/usr --disable-ccache --without-maximum-compile-warnings --build=$(BUILD_TRIPLE) --host=$(HOST_TRIPLE) --target=$(HOST_TRIPLE)
 
 # SWIG Phase 4
 swig-build:
 	rm -rf $(SDK)/usr/lib/clang
 	cp -R $(BUILD)/llvm-debug/lib/clang $(SDK)/usr/lib/clang
-	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) $(MAKE) && $(MAKE) install
+	cd $(BUILD)/swig && PATH=$(SDK)/usr/bin:$(PATH) CC=$(FLASCC_CC) CXX=$(FLASCC_CXX) CFLAGS=$(CFLAGS) CXXFLAGS=$(CXXFLAGS) $(MAKE) && $(MAKE) install
 
 # SWIG All
 swig:
 	$(MAKE) swig-clean
 	$(MAKE) swig-pcre
 	$(MAKE) swig-configure
-	$(MAKE) swig-build -i
+	$(MAKE) swig-build
 
 # SWIG Tests
 swigtests:
