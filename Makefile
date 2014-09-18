@@ -1385,17 +1385,6 @@ samples:
 
 # TBD
 # TODO: Not in build
-gdbunit:
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=17
-	ant $(MAKE) -f qa/gdbunit/build.xml -Dalchemy.dir=$(SDK)/../ -Ddebugplayer="$(PLAYER)" -Dflex.dir=$(SRCROOT)/tools/flex -Dgbdunit.halt.on.first.failure=false -Dgdbunit.excludes=**/quake.input -Dswfversion=18
-
-# TBD
-# TODO: Not in build
-vfstests:
-	@cd qa/vfs/framework && $(MAKE) FLASCC=$(FLASCC)
-
-# TBD
-# TODO: Not in build
 checkasm:
 	rm -rf $(BUILD)/libtoabc
 	@mkdir -p $(BUILD)/logs/libtoabc
