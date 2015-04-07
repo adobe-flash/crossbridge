@@ -81,7 +81,7 @@ public class DefaultPreloader extends MovieClip {
     /**
      * @private
      */
-    protected function initialize() {
+    protected function initialize():void {
         CONFIG::debug { trace("DefaultPreloader::initialize"); }
         try {
             if (!webFS) {
@@ -106,7 +106,7 @@ public class DefaultPreloader extends MovieClip {
     /**
      * @private
      */
-    protected function dispose(event:Event = null) {
+    protected function dispose(event:Event = null):void {
         CONFIG::debug { trace("DefaultPreloader::dispose"); }
         removeListeners();
         removeWebFSListeners();
@@ -115,7 +115,7 @@ public class DefaultPreloader extends MovieClip {
     /**
      * @private
      */
-    protected function removeListeners() {
+    protected function removeListeners():void {
         loaderInfo.removeEventListener(ProgressEvent.PROGRESS, onProgress);
         loaderInfo.removeEventListener(Event.COMPLETE, onPreloaderComplete);
         removeEventListener(Event.ADDED_TO_STAGE, onPreloaderComplete);
@@ -125,7 +125,7 @@ public class DefaultPreloader extends MovieClip {
     /**
      * @private
      */
-    protected function removeWebFSListeners() {
+    protected function removeWebFSListeners():void {
         if (webFS) {
             webFS.removeEventListener(ProgressEvent.PROGRESS, onWebFSProgress);
             webFS.removeEventListener(Event.COMPLETE, onWebFSComplete);
