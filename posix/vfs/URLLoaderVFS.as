@@ -146,7 +146,7 @@ public class URLLoaderVFS extends InMemoryBackingStore {
             }
 
             var paths:Array = newfile.split(" ");
-            var filterFunc:Function = function (path:String, index:int, array:Array):void {
+            var filterFunc:Function = function (path:String, index:int, array:Array):Boolean {
                 return (path != "");
             };
             paths = paths.filter(filterFunc);
