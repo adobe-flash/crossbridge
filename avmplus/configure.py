@@ -70,7 +70,9 @@ def _setSDKParams(sdk_version, os_ver, xcode_version):
         os_ver,sdk_number = '10.7','10.7'
         if xcode_version is None:
             xcode_version = '4'
-    elif sdk_version == '109':
+    # Current XBridge Versions require XCode 5
+    # OSX version support for Yosemite and El Captain
+    elif sdk_version == '109' or sdk_version == '1010' or sdk_version == '1011':
         os_ver,sdk_number = '10.9','10.9'
         if xcode_version is None:
             xcode_version = '5'
