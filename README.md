@@ -45,9 +45,12 @@ The build system only supports Mac OS officially.
 So assume you have a machine like what I have 
 
 * Mac OS 10.7+
-* Xcode 4.6+ 
+* \*Xcode 4.6+  
 * Memory 4G (8G+ would be great)
 * Macport/Homebrew
+
+_NOTE: XCode 6.0+ will fail to compile llvm-3.2. XCode 5.0.1 is suggested. Even with a higher OSX version (Yosemite or El Captain), you can still install XCode, and although the application itself will not run, the apple-llvm and clang compilers can still be used from within the .app packaging_
+
 
 ###### Tools and libs required for building  
 Use macport/homebrew to install autoconf, automake, ccache, cmake, gettext,  
