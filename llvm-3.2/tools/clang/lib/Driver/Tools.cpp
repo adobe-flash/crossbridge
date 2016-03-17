@@ -5707,6 +5707,8 @@ void avm2::Link::ConstructJob(Compilation &C, const JobAction &JA,
   CmdArgs.push_back("--plugin");
 #ifdef __CYGWIN__
   CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath("multiplug.dll")));
+#elif __linux__
+  CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath("multiplug.so")));
 #else
   CmdArgs.push_back(Args.MakeArgString(ToolChain.GetFilePath("multiplug.dylib")));
 #endif

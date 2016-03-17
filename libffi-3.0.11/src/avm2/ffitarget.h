@@ -53,4 +53,9 @@ typedef enum ffi_abi {
 
 #define FFI_CLOSURES 1
 
+// TODO: set proper value (1024, 24, ?) (VPMedia)
+#ifndef FFI_TRAMPOLINE_SIZE
+    #define FFI_TRAMPOLINE_SIZE 1024
+#endif // FFI_TRAMPOLINE_SIZE
+
 #endif

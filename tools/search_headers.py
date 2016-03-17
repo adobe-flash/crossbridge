@@ -58,8 +58,8 @@ def hasbadasm(files):
 
 
 def handle(dir, relpath, basename):
-    sdkcc = os.path.join(sdk, 'usr/bin/gcc')
-    sdkcxx = os.path.join(sdk, 'usr/bin/g++')
+    sdkcc = os.path.join(sdk, 'usr/bin/clang')
+    sdkcxx = os.path.join(sdk, 'usr/bin/clang++')
     preprocessed = '{0}/{1}.i'.format(relpath, basename)
     macros = preprocessed + '.macros'
     cmds = [(' -E {2} -o {0} {1}', preprocessed), 

@@ -39,6 +39,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <sys/wait.h>
 #include <arpa/inet.h> // htonl
 #include <pthread.h>
+#include <unistd.h>
 
 #include "SetAlchemySDKLocation.c"
 
