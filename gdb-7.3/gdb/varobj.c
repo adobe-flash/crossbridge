@@ -462,7 +462,7 @@ static int format_code[] = { 0, 't', 'd', 'x', 'o' };
 static struct varobj_root *rootlist;
 
 /* Prime number indicating the number of buckets in the hash table.  */
-/* A prime large enough to avoid too many colisions.  */
+/* A prime large enough to avoid too many collisions.  */
 #define VAROBJ_TABLE_SIZE 227
 
 /* Pointer to the varobj hash table (built at run time).  */
