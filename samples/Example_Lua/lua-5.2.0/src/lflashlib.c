@@ -218,7 +218,7 @@ static int flash_getstring (lua_State *L) {
   AS3_CopyCStringToVar(propname, s1, l);
   char *str = NULL;
   lua_pop(L, 2);
-  inline_as3("%0 = CModule.mallocString(\"\"+__lua_objrefs[%1][%2]);\n" : "=r"(str) : "r"(obj), "r"(s1));
+  inline_as3("%0 = CModule.mallocString(\"\"+__lua_objrefs[%1][propname]);\n" : "=r"(str) : "r"(obj));
   lua_pushfstring(L, "%s", str);
   free(str);
   return 1;
